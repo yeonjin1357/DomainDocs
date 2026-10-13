@@ -10,3 +10,18 @@ export function baseLatencies(): number[] {
 export function latencySample(slowCount: number): number[] {
   return baseLatencies().map((v, i) => (i < slowCount ? SLOW_MS : v));
 }
+
+export const CPU_STEP_SECONDS = 10;
+export const RAW_PEAK = 95;
+
+/** 10초 간격 1시간 CPU 사용률. 평소 35~45%, 32분 무렵 30초(3개)만 95%. */
+export function cpuSeries(): number[] {
+  return Array.from({ length: 360 }, (_, i) => (i >= 192 && i <= 194 ? RAW_PEAK : 40 + ((i * 7) % 11) - 5));
+}
+
+export const RESOLUTIONS = [
+  { label: '10초', bucket: 1 },
+  { label: '1분', bucket: 6 },
+  { label: '5분', bucket: 30 },
+  { label: '15분', bucket: 90 },
+] as const;

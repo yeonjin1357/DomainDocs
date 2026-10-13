@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { mean, percentile } from '../../src/lib/stats';
-import { baseLatencies, latencySample, REQUEST_COUNT, SLOW_MS } from '../../src/lib/demo-data';
+import { downsample, mean, percentile } from '../../src/lib/stats';
+import { baseLatencies, cpuSeries, latencySample, RAW_PEAK, REQUEST_COUNT, RESOLUTIONS, SLOW_MS } from '../../src/lib/demo-data';
 
 describe('mean', () => {
   it('산술 평균이다', () => {
@@ -63,5 +63,44 @@ describe('데모 데이터', () => {
   });
   it('느린 요청 10개: p95도 3000이다', () => {
     expect(percentile(latencySample(10), 95)).toBe(SLOW_MS);
+  });
+});
+
+describe('downsample', () => {
+  it('size개씩 평균으로 묶고, 마지막 묶음은 남은 값만 쓴다', () => {
+    expect(downsample([1, 2, 3, 4, 5], 2, 'avg')).toEqual([1.5, 3.5, 5]);
+  });
+  it('최댓값으로 묶을 수 있다', () => {
+    expect(downsample([1, 9, 3, 4, 5], 2, 'max')).toEqual([9, 4, 5]);
+  });
+  it('size가 1이면 원본과 같다', () => {
+    expect(downsample([3, 1, 2], 1, 'avg')).toEqual([3, 1, 2]);
+  });
+  it('size가 1 미만이거나 정수가 아니면 RangeError다', () => {
+    expect(() => downsample([1], 0, 'avg')).toThrow(RangeError);
+    expect(() => downsample([1], 1.5, 'avg')).toThrow(RangeError);
+  });
+});
+
+describe('CPU 데모 데이터', () => {
+  const raw = cpuSeries();
+  it('10초 간격 1시간(360개), 기본 35~45%, 피크 95%', () => {
+    expect(raw).toHaveLength(360);
+    expect(Math.max(...raw)).toBe(RAW_PEAK);
+    expect(Math.min(...raw)).toBe(35);
+    expect(raw.filter((v) => v === RAW_PEAK)).toHaveLength(3);
+  });
+  it.each([
+    [1, 360, 95],
+    [6, 60, 67.17],
+    [30, 12, 45.3],
+    [90, 4, 41.8],
+  ])('평균으로 %d개씩 묶으면 점 %d개, 최고값 %d', (size, points, peak) => {
+    const out = downsample(raw, size, 'avg');
+    expect(out).toHaveLength(points);
+    expect(Math.max(...out)).toBeCloseTo(peak, 2);
+  });
+  it('최댓값으로 묶으면 어떤 크기든 피크 95%가 남는다', () => {
+    for (const { bucket } of RESOLUTIONS) expect(Math.max(...downsample(raw, bucket, 'max'))).toBe(RAW_PEAK);
   });
 });

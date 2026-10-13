@@ -10,3 +10,16 @@ export function percentile(values: readonly number[], p: number): number {
   const sorted = [...values].sort((a, b) => a - b);
   return sorted[Math.ceil((p * sorted.length) / 100) - 1];
 }
+
+export type Aggregation = 'avg' | 'max';
+
+/** 앞에서부터 size개씩 묶어 평균 또는 최댓값으로 요약한다. 마지막 묶음은 남은 값만 쓴다. */
+export function downsample(values: readonly number[], size: number, how: Aggregation): number[] {
+  if (!Number.isInteger(size) || size < 1) throw new RangeError(`size는 1 이상의 정수여야 해요: ${size}`);
+  const out: number[] = [];
+  for (let i = 0; i < values.length; i += size) {
+    const bucket = values.slice(i, i + size);
+    out.push(how === 'max' ? Math.max(...bucket) : mean(bucket));
+  }
+  return out;
+}
