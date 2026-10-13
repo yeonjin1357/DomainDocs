@@ -16,7 +16,7 @@
 
   --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo',
     'Malgun Gothic', sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'Pretendard Variable', Pretendard, monospace;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'Apple SD Gothic Neo', 'Malgun Gothic', monospace;
 
   --radius-card: 20px;
   --radius-row: 14px;
