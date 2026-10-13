@@ -64,7 +64,7 @@
 
 .demo-stat-diff {
   font-size: 13px;
-  color: var(--color-text-weak);
+  color: var(--color-text-sub);
 }
 
 /* 좁은 화면: 타일 셋이 나란히 들어가지 않아 "3,000ms"가 줄바꿈되므로 이름 왼쪽·숫자 오른쪽 행으로 쌓는다 */

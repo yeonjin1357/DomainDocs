@@ -3,7 +3,7 @@ import { ChevronDown } from '@lucide/astro';
 ---
 <details class="block deeper" data-block="deeper">
   <summary class="deeper-summary pressable">
-    <span>더 깊이 알아보기</span>
+    <h2 class="deeper-title">더 깊이 알아보기</h2>
     <ChevronDown class="deeper-chevron" size={20} aria-hidden="true" />
   </summary>
   <div class="deeper-body"><slot /></div>
@@ -23,6 +23,15 @@ import { ChevronDown } from '@lucide/astro';
 
   .deeper-summary::-webkit-details-marker {
     display: none;
+  }
+
+  /* 안의 ### 소제목이 이 제목 아래에 놓이도록 h2로 두되, 모양은 요약 줄 글자 그대로 둔다. */
+  .deeper-title {
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
   }
 
   .deeper-chevron {

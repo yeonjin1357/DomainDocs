@@ -31,7 +31,13 @@ const max = yMax ?? niceMax(series.flatMap((s) => s.values));
         <li>
           <span class={`swatch tone-${s.tone ?? 'accent'}`} aria-hidden="true"></span>
           <span>{s.label}</span>
-          {s.value && <strong class="legend-value">{s.value}</strong>}
+          {/* 화면 읽기 프로그램이 "평균187ms"로 붙여 읽지 않게 공백을 둔다. 배치 간격은 gap이 맡는다. */}
+          {s.value && (
+            <>
+              {' '}
+              <strong class="legend-value">{s.value}</strong>
+            </>
+          )}
         </li>
       ))
     }

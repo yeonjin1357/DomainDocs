@@ -29,6 +29,15 @@ test.describe('개념 페이지', () => {
     await expect(deeper).toHaveAttribute('open', '');
   });
 
+  test('더 깊이 제목은 h2라서 안의 ### 소제목이 그 아래에 놓인다', async ({ page }) => {
+    const title = page.locator('details[data-block="deeper"] > summary > h2.deeper-title');
+    await expect(title).toHaveText('더 깊이 알아보기');
+    // 보이는 모양은 예전 요약 줄 글자와 같다.
+    await expect(title).toHaveCSS('font-size', '17px');
+    await expect(title).toHaveCSS('font-weight', '600');
+    await expect(title).toHaveCSS('margin-top', '0px');
+  });
+
   test('물결표 범위가 취소선이 되지 않는다', async ({ page }) => {
     await expect(page.locator('article del')).toHaveCount(0);
     await expect(page.locator('article')).toContainText('1~2초 또는 3~4초');

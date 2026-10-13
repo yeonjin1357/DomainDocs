@@ -16,6 +16,11 @@ export function initTermSheet(): void {
   setupDialog(dialog);
   const part = <T extends HTMLElement>(selector: string) => dialog.querySelector<T>(selector)!;
 
+  // 스크립트가 시트를 띄울 수 있는 링크에만 알린다. 스크립트가 없으면 보통 링크로 남는다.
+  document.querySelectorAll<HTMLAnchorElement>('a[data-term]').forEach((link) => {
+    if (previews[link.dataset.term ?? '']) link.setAttribute('aria-haspopup', 'dialog');
+  });
+
   document.addEventListener('click', (event) => {
     const link = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[data-term]');
     if (!link) return;

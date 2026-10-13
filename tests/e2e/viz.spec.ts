@@ -8,7 +8,7 @@ test('대시보드 그림에 설명이 붙은 차트와 숫자 타일이 있다'
   const block = page.locator('[data-block="on-dashboard"]');
   await expect(block.getByRole('img', { name: '평균은 잔잔하고 p99만 튀는 응답시간 그래프' })).toBeVisible();
   await expect(block.locator('[data-mini-chart] path.line')).toHaveCount(2);
-  await expect(block.locator('[data-mini-chart] .legend li')).toHaveText(['평균187ms', 'p993,000ms']);
+  await expect(block.locator('[data-mini-chart] .legend li')).toHaveText(['평균 187ms', 'p99 3,000ms']);
   await expect(block.locator('[data-stat]')).toHaveCount(2);
   await expect(block.locator('[data-stat]').nth(1)).toContainText('3,000ms');
   await expect(block.locator('[data-stat]').nth(1)).toContainText('평소의 19배');

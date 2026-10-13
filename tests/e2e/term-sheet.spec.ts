@@ -16,6 +16,10 @@ test.describe('개념 미리보기 시트', () => {
     await expect(page).toHaveURL(/foundations\/alpha\/$/);
   });
 
+  test('미리보기가 있는 개념 링크는 대화상자를 연다고 알린다', async ({ page }) => {
+    await expect(page.locator('a.term[data-term="foundations/beta"]')).toHaveAttribute('aria-haspopup', 'dialog');
+  });
+
   test('Esc로 닫히고 포커스가 링크로 돌아온다', async ({ page }) => {
     const link = page.locator('a.term[data-term="foundations/beta"]');
     await link.focus();
