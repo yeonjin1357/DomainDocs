@@ -84,29 +84,36 @@ CPU 사용률 같은 원인 지표(USE, 사용률·포화·에러)는 대시보�
 
 Google SRE Workbook은 임계값을 SLO와 같게 잡아도 시끄럽다고 해요. 30일 99.9% SLO에서 10분 에러 비율 0.1% 이상에 울리면, 하루 최대 144번 울려요. 에러 비율이 0.1%에 머물면, 하나도 조치하지 않아도 SLO는 지켜져요.
 
-그래서 이 책은 <Term slug="foundations/slo-and-error-budget">에러 버짓</Term>을 쓰는 속도(burn rate)로 임계값을 정해요. 30일 99.9%라면 burn rate가 1시간 14.4나 6시간 6일 때 사람을 부르고, 3일 1이면 티켓으로 남겨요. `for` 대신 긴 구간이 튐을 거르고, 짧은 구간(1시간이면 5분)도 함께 넘을 때만 울려 장애가 끝나면 곧 풀려요.
+그래서 이 책은 <Term slug="foundations/slo-and-error-budget">에러 버짓</Term>을 쓰는 속도(burn rate)로 임계값을 정해요. 30일 99.9%라면 1시간 구간이 14.4, 6시간 구간이 6을 넘으면 사람을 부르고, 3일 구간이 1을 넘으면 티켓으로 남겨요. `for` 대신 긴 구간이 튐을 거르고, 짧은 구간(1시간이면 5분)도 함께 넘을 때만 울려 장애가 끝나면 곧 풀려요.
 
-**확인 방법**: 규칙마다 2주 동안 울리기 시작한 횟수와, 그중 5분 안에 풀린 횟수를 세요. 2주를 그래프로 그리면 점 간격이 수십 분이라 짧은 알림이 빠지니, Prometheus 화면의 Table 탭에서 아래 식을 하나씩 실행해요.
+**확인 방법**: 규칙마다 2주 동안 울리기 시작한 횟수와, 그중 5분 안에 풀린 횟수를 세요. 2주를 그래프로 그리면 점 간격이 수십 분이라 짧은 알림이 빠져요.
 
-Prometheus는 알림 규칙을 평가 간격(`evaluation_interval`, 기본 1분)마다 다시 계산해요. 규칙 그룹에 `interval`을 적었다면 그 값이에요. 울리는 알림은 평가마다 `ALERTS{alertstate="firing"}` <Term slug="foundations/time-series-and-labels">시계열</Term>에 1을 남겨요.
+Prometheus는 알림 규칙을 평가 간격(`evaluation_interval`, 기본 1분)마다 다시 계산해요. 규칙 그룹(함께 평가하는 규칙 묶음)에 `interval`을 적었다면 그 값이에요. 울리는 알림은 평가마다 `ALERTS{alertstate="firing"}` <Term slug="foundations/time-series-and-labels">시계열</Term>에 1을 남겨요.
+
+Prometheus 화면의 Table 탭에서 아래 식을 하나씩 실행해요.
 
 ```text
 # 울리기 시작한 횟수
 sum by (alertname) (count_over_time(
-  (ALERTS{alertstate="firing"} unless ALERTS{alertstate="firing"} offset 15s)[2w:15s]
+  # 15초 전엔 없던 알림 = 막 울리기 시작한 알림
+  (ALERTS{alertstate="firing"} unless ALERTS{alertstate="firing"} offset 15s)
+  # 2주를 15초 간격으로 훑어요(offset의 15s와 같은 값)
+  [2w:15s]
 ))
 
-# 그중 5분 뒤엔 풀려 있던 횟수
+# 그중 5분 안에 풀린 횟수
 sum by (alertname) (count_over_time(
   (ALERTS{alertstate="firing"} unless ALERTS{alertstate="firing"} offset 15s
-    unless ALERTS{alertstate="firing"} offset -5m)[2w:15s]
+    # offset -5m은 5분 뒤 시각: 그때도 울리고 있으면 빼요
+    unless ALERTS{alertstate="firing"} offset -5m)
+  [2w:15s]
 ))
 ```
 
-`15s`는 평가 간격보다 길지만 않으면 돼서, 기본 1분과 15초 설정에 모두 맞아요. 평가 간격이 15초보다 짧다면 `15s`를 그 값으로 바꿔요. 둘째 값을 첫째 값으로 나누면 5분 안에 풀린 비율이에요.
+`15s`는 평가 간격보다 길지만 않으면 돼서, 기본 1분과 15초 설정에 모두 맞아요. 평가 간격이 15초보다 짧다면 `15s`를 모두 그 값으로 바꿔요. 둘째 값을 첫째 값으로 나누면 5분 안에 풀린 비율이에요.
 
-- **첫째 값이 크고 그 비율이 높은 규칙은**: `for`를 더해요. SLO 알림이라면 짧은 구간 하나 대신 위의 세 burn rate 알림으로 바꿔요.
-- **5분 넘게 울렸는데 아무도 손대지 않았다면**: 1단계로 돌아가 그 알림이 필요한지 봐요. burn rate 알림이라면 짧은 구간도 함께 걸었는지 봐요.
+- **첫째 값이 크고 그 비율이 높은 규칙은**: `for`를 더해요. SLO 알림이라면 구간 하나로 걸지 말고, 위의 세 burn rate 알림으로 바꿔요.
+- **5분 넘게 울렸는데 아무도 손대지 않았다면**: 임계값을 SLO에서 다시 구해, 너무 낮지 않은지 봐요. burn rate 알림이라면 짧은 구간도 함께 걸었는지 봐요.
 
 ## 4. 같은 장애의 알림을 묶으세요
 
