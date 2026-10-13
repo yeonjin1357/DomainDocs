@@ -67,3 +67,20 @@ PromQL은 promtool 3.15.0(revision 5241a27, 공식 배포본 sha256 일치)의 `
 - (오해 소지, 출처 제목) scrape.go L1611-L1635의 제목을 제안대로 "추가에 실패하면 받은 값을 버리고 수집 실패로 침"으로 바꿨어요.
 - 4단계 확인 방법도 같은 꼴(행동 한 문장 + 결과 갈래 2개)로 맞췄어요. 내용은 그대로예요.
 - 반영 뒤 `npm run lint:content` → 글 8편 검사, 위반 0건. 본문 3,379자(최대 4,000), 가장 긴 문장 79자. 출처 33개.
+- (글 검토 1차) 2단계 "지웠더니 결과가 생기면" 갈래가 아직 4단계와 어긋났어요. 500 응답이 한 번도 없던 서비스엔 `"500"`이 어디에도 없는데, 질의는 맞아요. 갈래를 "`count by (status) (http_requests_total)`처럼 그 레이블로 묶어 세 봐요. 값이 다른 시계열에 있는데 이 조합만 없다면 4단계로 가요. 어디에도 없다면 오타·바뀐 값이거나 아직 한 번도 안 생긴 값이라, 지표를 내보내는 코드에서 그 값을 확인해요."로 바꿨어요.
+- (글 검토 1차) 처음 나오는 도구 용어에 풀이를 달았어요.
+  - 1단계: "그 패널의 Query options에서 Relative time·Time shift를 봐요. 둘 다 패널만 다른 기간을 보게 하는 설정으로, …에도 나와요. 제목 옆의 시계 아이콘과 기간도 단서예요." 설명 없던 "따로 숨기지 않았다면"은 지웠어요.
+  - 2단계: "Explore(질의를 따로 열어 고쳐 가며 실행하는 Grafana 화면)".
+  - 3단계: "수집 설정의 `sample_limit`(한 번 수집할 때 남길 값 개수의 상한)"과 "`metric_relabel_configs`(저장 전에 시계열을 거르는 설정)". relabel 동작은 해결책으로 바꿨어요: "로 버린 값은 세지 않아서, 늘어난 조합을 거기서 버리면 풀려요."
+  - 3단계: "OTLP(OpenTelemetry 전송 규약)", "`target_info{job="api"}`(받은 앱의 정보를 담는 지표)".
+- (글 검토 1차, 판단 B9) 2단계의 Explore 권한 단락을 지웠어요. 그 단락만 받치던 출처 3개(urlBuilders.ts, PanelInspectDrawer.tsx, Panel inspect view)도 지웠어요.
+- (글 검토 1차, 판단 B9) 3단계를 3단락으로 줄였어요.
+  - 서비스 디스커버리 단락은 "결과가 비면" 갈래로 옮겼어요. 갈래는 "job 이름이 맞는지 보고, Target health 목록에 그 대상이 있는지 찾아요."로 시작해요.
+  - `sample_limit` 단락의 "선은 기본 설정에서 최대 5분 더 이어지다 끊길 수 있어요"는 Target health 문구로 바꿨어요: "Prometheus의 Target health 화면엔 `sample limit exceeded`가 뜨고 `up`은 0이 돼요." 문구는 사실 검토 실험의 `lastError` 그대로이고, 소스 정의(scrape/target.go L363-L366 `errors.New("sample limit exceeded")`)를 출처에 더했어요. 5분 문장만 받치던 scrape.go L1826-L1836 출처는 지웠어요.
+  - OTLP 갈래는 맨 앞으로 옮겼어요. `up`이 있는지부터 갈리는 전제 조건이라서예요. 갈래는 "그 앱이 보내는 지표나 `target_info{job="api"}`(…)가 계속 들어오는지 봐요."로 썼어요. 앱 지표를 먼저 둔 이유가 있어요. Prometheus는 리소스에 service.name·service.namespace·service.instance.id 말고 다른 속성이 없으면 `target_info`를 만들지 않아요(storage/remote/otlptranslator/prometheusremotewrite/helper.go v3.15.0 L533-L554, "If we only have job + instance, then target_info isn't useful, so don't add it.").
+  - rate 단락의 "샘플이 2개 이상" 문장은 남기고 "샘플(수집한 값 하나)" 풀이를 옮겨 달았어요. 이 글에서 "샘플"이 처음 나오는 곳이 여기로 바뀌었기 때문이에요.
+- (글 검토 1차, 판단 B9) 확인 2·3이 `up`에 기대요. 그래서 OTLP 앱에 늘 울리는 알림을 만들지 않도록 범위를 밝혔어요.
+  - 확인 2 셋째 문장은 "가져가는 대상이라면 `absent_over_time(up{job="api"}[10m])` 알림을 더해, 10분 동안 모두 사라진 경우도 잡아요."예요.
+  - 확인 3 끝에 "OTLP로 보내는 앱엔 `up`이 없으니, 이 패널과 앞의 알림은 앱이 보내는 지표나 `target_info`로 만들어요."를 더했어요. 둘째 문장은 한 문장으로 합쳐 세 문장을 지켰어요.
+- (글 검토 1차, 판단 B9) time-series-and-labels.mdx 더 깊이의 `sample_limit` 문장을 "relabel 뒤에 센다"는 동작에 맞췄어요. 그 글 검토 기록의 `## 반영`에도 적었어요.
+- 반영 뒤 `npm run lint:content` → 글 8편 검사, 위반 0건. 본문 3,505자(최대 4,000), 가장 긴 문장 79자. 출처 30개.

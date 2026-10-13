@@ -73,3 +73,4 @@
 - (글 검토 1차, 판단 B6) 핵심 2 제목과 summary의 "곱"이 무엇의 곱인지 드러나지 않았어요. 제목은 "시계열 수는 최대 레이블 값 수의 곱이에요"로 바꿨어요. summary는 "레이블 값 조합 하나가 시계열 하나예요. 시계열 수는 최대 레이블 값 수의 곱이에요."(47자)로 바꿨어요.
 - (글 검토 1차, 판단 B6) overflow가 처음 나오는 곳에 풀이를 달았어요. "overflow 시계열(상한을 넘친 측정값을 모으는 시계열)"이라고 쓰고, 속성 이름은 다음 문장으로 나눴어요.
 - (글 검토 1차, 판단 B6) aggregation-and-downsampling.mdx L101의 "시리즈 하나에"를 "시계열 하나에"로 바꿨어요. 그 글의 다른 부분은 건드리지 않았어요.
+- (가이드 「그래프가 비어 있을 때 무엇부터 볼까」 글 검토 1차, 판단 B9) 더 깊이 「수집할 때 걸러 내기」의 `sample_limit` 문장을 확인된 동작에 맞췄어요. 새 문장은 "`sample_limit` 설정은 대상 하나를 한 번 수집할 때, `metric_relabel_configs`로 거르고 남은 샘플 수의 상한이에요."예요(80자 안에 맞추려고 "수집 설정의"를 "설정은"으로 줄였어요). 근거는 configuration 문서의 "If more than this number of samples are present after metric relabeling the entire scrape will be treated as failed."와, 가이드 사실 검토의 Prometheus 3.15.0 실험이에요. 상한 5에 10개를 받고 5개를 버린 job은 `up` 1이었어요. 다음 문장 "넘으면 그 수집 전체가 실패로 처리돼요."는 그대로 맞아서 두었고, 이 글의 다른 곳은 건드리지 않았어요.
