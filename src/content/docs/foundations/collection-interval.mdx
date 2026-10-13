@@ -1,0 +1,132 @@
+---
+title: 수집 방식과 수집 주기
+summary: 수집 주기보다 짧은 일은 게이지에선 빠질 수 있고, 카운터에선 평균으로 남아요.
+domain: foundations
+type: concept
+order: 40
+icon: timer
+keywords: [scrape, scrape interval, 수집 주기, pull, push, 푸시, Pushgateway, OTLP, export interval, staleness]
+related: [foundations/counters-and-rate, foundations/aggregation-and-downsampling]
+sources:
+  - title: Prometheus — Configuration (scrape_interval)
+    url: https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+  - title: Prometheus 소스 — 예시 설정 파일 (documentation/examples/prometheus.yml)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/documentation/examples/prometheus.yml#L1-L5
+  - title: Prometheus — Jobs and instances (up)
+    url: https://prometheus.io/docs/concepts/jobs_instances/
+  - title: Prometheus 소스 — scrape/scrape.go (endOfRunStaleness, 대상이 빠질 때 stale 표시)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/scrape/scrape.go#L1663-L1729
+  - title: Prometheus — When to use the Pushgateway
+    url: https://prometheus.io/docs/practices/pushing/
+  - title: Pushgateway README (About timestamps, push_time_seconds)
+    url: https://github.com/prometheus/pushgateway/blob/v1.11.4/README.md
+  - title: Prometheus — Querying basics (staleness)
+    url: https://prometheus.io/docs/prometheus/latest/querying/basics/
+  - title: Prometheus — Migration to 3.0 (left-open range selectors)
+    url: https://prometheus.io/docs/prometheus/latest/migration/
+  - title: Prometheus 소스 — promql/functions.go (extrapolatedRate)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/promql/functions.go
+  - title: node_exporter 소스 — collector/cpu_common.go (node_cpu_seconds_total)
+    url: https://github.com/prometheus/node_exporter/blob/v1.12.1/collector/cpu_common.go#L27-L31
+  - title: Grafana — Configure the Prometheus data source (Scrape interval)
+    url: https://grafana.com/docs/grafana/latest/datasources/prometheus/configure/
+  - title: Grafana — Prometheus template variables ($__rate_interval)
+    url: https://grafana.com/docs/grafana/latest/datasources/prometheus/template-variables/
+  - title: Grafana Blog — $__rate_interval for Prometheus rate queries that just work
+    url: https://grafana.com/blog/2020/09/28/new-in-grafana-7.2-__rate_interval-for-prometheus-rate-queries-that-just-work/
+  - title: Prometheus — Using Prometheus as your OpenTelemetry backend (OTLP receiver)
+    url: https://prometheus.io/docs/guides/opentelemetry/
+  - title: OpenTelemetry — Metrics SDK (Periodic exporting MetricReader, Last Value)
+    url: https://opentelemetry.io/docs/specs/otel/metrics/sdk/
+  - title: OpenTelemetry — SDK environment variables (OTEL_METRIC_EXPORT_INTERVAL)
+    url: https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/
+  - title: OpenTelemetry — Prometheus Metric Exporter (pull)
+    url: https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/prometheus/
+  - title: OpenTelemetry Collector 소스 — hostmetrics cpuscraper metadata (system.cpu.utilization)
+    url: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/hostmetricsreceiver/internal/scraper/cpuscraper/metadata.yaml#L71-L78
+updated: 2026-10-13
+---
+
+<OnDashboard title="CPU 사용률 · 15초마다 수집" caption="3초 동안 100%였던 스파이크가 수집 사이에 끝나 게이지에는 남지 않았어요. 카운터로 구한 1분 평균에는 43%로 조금 남아요.">
+  <MiniLineChart
+    ariaLabel="10분 동안 1분마다 찍은 게이지 값. 모두 40%라 스파이크가 보이지 않는 평평한 그래프"
+    yMax={100}
+    series={[{ label: '게이지(수집 순간 값)', values: [40, 40, 40, 40, 40, 40, 40, 40, 40, 40], tone: 'sub', value: '최고 40%' }]}
+  />
+  <MiniLineChart
+    ariaLabel="카운터로 구한 1분 평균. 다섯 번째 1분만 43%로 살짝 오르는 그래프"
+    yMax={100}
+    series={[{ label: '카운터로 구한 1분 평균', values: [40, 40, 40, 40, 43, 40, 40, 40, 40, 40], tone: 'accent', value: '최고 43%' }]}
+  />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="게이지는 수집하는 순간의 값만 남아요">
+    게이지(gauge, 오르내리는 현재 값)는 값 하나를 들고 있다가 수집할 때 넘겨요. 1초마다 값이 바뀌는 CPU 사용률 게이지를 15초마다 수집한다고 해 봐요. 3초 동안 100%였다가 수집 전에 40%로 돌아오면, 기록엔 40%만 남아요.
+
+    그래서 이 데이터에 "CPU 90% 초과" 알림을 걸어도 이 스파이크엔 울리지 않아요. 수집하는 순간에 걸린 스파이크만 보여요.
+  </Point>
+  <Point title="카운터엔 수집 사이의 일도 남지만 평균으로 보여요">
+    CPU가 일한 시간(초)을 계속 더하는 카운터라면, 스파이크 3초 동안 일한 시간도 다음 수집 값에 들어가요. 재시작하지 않는 한 빠지지 않아요.
+
+    다만 <Term slug="foundations/counters-and-rate">rate</Term>처럼 늘어난 양을 구간 길이로 나누면 그 구간의 평균이 돼요. 1분 중 57초는 40%, 3초는 100%였다면 1분 평균은 (57×40 + 3×100) ÷ 60 = 43%예요. 스파이크가 있었다는 건 보이지만, 100%까지 올랐다는 건 알 수 없어요.
+  </Point>
+  <Point title="수집 주기보다 촘촘하게 볼 수는 없어요">
+    Prometheus가 가져가든(pull) 앱이 보내든(push), 값은 수집 주기마다 하나예요. 스파이크가 든 15초를 카운터로 구하면 (12×40 + 3×100) ÷ 15 = 52%예요. 3초 동안 100%였는지, 15초 내내 52%였는지는 구별할 수 없어요.
+
+    그래서 "3초 넘게 90%" 같은 알림 조건은 15초 수집으로는 판단할 수 없어요. rate 구간도 Prometheus에선 샘플(sample, 수집한 값 하나)이 2개 이상 들 만큼 길어야 해요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>15초마다 수집하는 게이지로 몇 초짜리 스파이크를 잡으려 했다면 다시 보세요. 수집 사이에 끝난 스파이크엔 알림이 울리지 않아요. 수집 주기를 줄이거나, 1초마다 잴 때 90%를 넘은 횟수를 카운터로 세요.</Check>
+  <Check>Prometheus에서 rate 구간이 수집 주기의 2배보다 짧으면, 구간에 샘플이 하나만 드는 시각이 생길 수 있어요. 그 시각의 점은 비어요. 2배여도 수집이 한 번 빠지면 그 근처 점이 비니, Grafana가 권하는 4배(15초 수집이면 1분) 이상으로 잡으세요.</Check>
+  <Check>수집 주기를 15초에서 1분으로 늘렸다면 rate 구간과 알림 규칙도 다시 보세요. 15초일 때 4배로 맞춘 `rate(...[1m])`는 이제 샘플이 대개 하나뿐이라, 값이 비고 알림도 울리지 않아요. Grafana 데이터 소스의 Scrape interval도 1분으로 바꿔야 `$__rate_interval`이 맞게 잡혀요.</Check>
+  <Check>Pushgateway(push로 받은 값을 Prometheus에 내주는 중간 서버)의 값이 한동안 그대로라면 작업이 멈췄을 수 있어요. Pushgateway는 지우기 전까지 마지막 값을 계속 내보내서 선이 이어져요. `push_time_seconds`(마지막으로 성공한 푸시 시각)가 너무 오래되지 않았는지 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### CPU 게이지와 카운터
+
+  그림의 게이지는 앱이 1초마다 직전 1초 사용률로 바꾼다고 가정했어요. CPU 사용률 게이지가 어느 구간을 재는지는 수집기마다 달라요.
+
+  OpenTelemetry Collector hostmetrics의 `system.cpu.utilization`은 직전 측정부터의 평균이에요. 기본으로 꺼져 있는 지표예요. 이런 게이지에는 카운터의 rate처럼 사이의 일이 평균으로 남아요.
+
+  카운터 쪽 예는 node_exporter의 `node_cpu_seconds_total`이에요. 코어(`cpu`)와 상태(`mode`)마다 CPU가 쓴 시간을 초로 쌓아요.
+
+  Prometheus 3에서 15초마다 수집하면 `[1m]` 구간에는 샘플이 4개 들어와요. 첫 샘플과 끝 샘플은 45초 떨어져 있어요. `rate(...[1m])`는 <Term slug="foundations/counters-and-rate">구간 끝을 추정</Term>해 이 45초의 증가량을 60초 치로 늘려 잡고, 60으로 나눠요.
+
+  결국 45초 평균이라, 스파이크가 그 45초 안에 들면 (42×40 + 3×100) ÷ 45 = 44%예요. 구간 시작과 첫 샘플 사이 15초에 들면 40%, 그 경계에 걸치면 그 사이 값이에요. 점을 1분마다 찍으면, 40%가 나오는 경우 스파이크는 어느 점에도 남지 않아요.
+
+  점 간격 1분, 수집 15초면 Grafana `$__rate_interval`은 75초예요. 구간을 75초로 잡으면 점마다 60초 떨어진 샘플을 써서 빠지는 시간이 없어요. 스파이크가 한 점의 60초 안에 들면 그림처럼 43%예요.
+
+  ### pull과 push
+
+  Prometheus는 대상에 찾아가 값을 가져오는 pull 방식이에요. 한 번 가져오는 일을 scrape(수집)라 하고, 간격은 `scrape_interval`이에요. 설정 문서의 전역 기본값은 1분이에요.
+
+  Prometheus 저장소의 예시 설정 파일은 이 값을 15초로 바꿔 둬요. Grafana의 Prometheus 데이터 소스도 Scrape interval 기본값이 15초예요. 15초라고 짐작하지 말고 실제 설정을 확인해서 Grafana 값도 맞춰요.
+
+  Prometheus는 수집할 때마다 대상별로 `up`을 남겨요. 닿으면 1, 수집에 실패하면 0이에요. 수집 목록에 남은 대상이 죽으면 다음 수집에서 `up`이 0이 돼요.
+
+  서비스 디스커버리(수집 대상을 자동으로 찾는 기능)에서 대상이 빠지면 달라요. 예를 들어 Kubernetes에서 지운 파드의 `up`은 0이 되지 않고, stale 표시(더 이상 값이 없다는 표시)와 함께 사라져요. 그래서 `up == 0` 알림만으로는 이런 대상을 놓쳐요.
+
+  push는 앱이 값을 보내는 방식이에요. OpenTelemetry 사양의 주기적 내보내기(periodic exporting MetricReader)는 기본 60초마다 보내요. 이 간격이 수집 주기가 되고, `OTEL_METRIC_EXPORT_INTERVAL`로 바꿔요.
+
+  push여도 게이지는 같아요. OpenTelemetry 사양은 게이지의 기본 집계를 마지막 값(Last Value)으로 정해 둬요. 내보내기 사이에 바뀐 값은 남지 않아요.
+
+  OpenTelemetry도 늘 push만 하지는 않아요. 사양은 Prometheus exporter를 Prometheus가 앱에서 가져가는 pull 방식으로 정해 둬요. Prometheus도 OTLP(OpenTelemetry 전송 규약) 수신을 켜면 push를 받아요.
+
+  Prometheus 문서는 Pushgateway를 보통 서비스 단위 배치 작업의 결과를 남길 때만 쓰라고 해요. 서비스 단위란 특정 서버나 인스턴스에 묶이지 않는다는 뜻이에요. 서버에 묶인 cron 작업은 node_exporter textfile collector로 내보내라고 해요.
+
+  Pushgateway를 거치면 대상마다 `up`으로 상태를 보는 길도 잃어요.
+
+  ### 수집이 끊기면
+
+  Prometheus는 수집하던 <Term slug="foundations/time-series-and-labels">시계열</Term>이 다음 수집에서 빠지면 stale 표시를 남겨요. 대상이 사라지거나 그 값을 더 내보내지 않을 때예요. 그래프의 선은 마지막 샘플에서 끊겨요.
+
+  `[1m]` 같은 구간 없이 쓴 질의는 시각마다 5분 안의 가장 최근 샘플을 골라요. 이 5분이 lookback(되돌아보는 구간)이고 `--query.lookback-delta`로 바꿔요. stale 표시가 붙은 뒤로는 5분이 지나지 않아도 값이 나오지 않아요.
+
+  샘플에 직접 시각을 붙이는 exporter는 달라요. 값을 더 내보내지 않아도 기본 5분 동안 마지막 값이 이어지다 사라져요.
+
+  Pushgateway는 받은 값을 지우기 전까지 계속 내보내요. Prometheus는 가져간 시각을 샘플에 붙여서, 오래된 값도 늘 새로 보여요. Pushgateway 문서도 `push_time_seconds`가 예상보다 오래되면 알림을 걸라고 해요.
+</Deeper>
