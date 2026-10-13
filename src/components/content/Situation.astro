@@ -1,0 +1,16 @@
+<section class="block" data-block="situation">
+  <h2 class="block-title">상황</h2>
+  <div class="situation-card"><slot /></div>
+</section>
+
+<style>
+  .situation-card {
+    padding: 20px;
+    border-radius: var(--radius-card);
+    background: var(--color-bg);
+  }
+
+  .situation-card > :global(p:last-child) {
+    margin-bottom: 0;
+  }
+</style>

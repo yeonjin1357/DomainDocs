@@ -1,0 +1,45 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<li class="item" data-item>
+  <strong class="item-title">{title}</strong>
+  <div class="item-body"><slot /></div>
+</li>
+
+<style>
+  .item {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    column-gap: 12px;
+    counter-increment: item;
+  }
+
+  .item::before {
+    content: counter(item);
+    display: grid;
+    grid-row: span 2;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .item-title {
+    font-weight: 700;
+  }
+
+  .item-body {
+    color: var(--color-text-sub);
+  }
+
+  .item-body > :global(p) {
+    margin: 0;
+  }
+</style>

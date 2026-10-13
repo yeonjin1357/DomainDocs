@@ -1,0 +1,19 @@
+---
+import { docPath } from '../../lib/paths';
+
+interface Props {
+  slug: string;
+}
+const { slug } = Astro.props;
+---
+<a class="term" href={docPath(slug)} data-term={slug}><slot /></a>
+
+<style>
+  .term {
+    color: var(--color-accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+    text-underline-offset: 3px;
+  }
+</style>

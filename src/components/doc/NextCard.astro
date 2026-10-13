@@ -1,0 +1,42 @@
+---
+import type { DocCard } from '../../lib/catalog';
+
+interface Props {
+  doc: DocCard;
+}
+const { doc } = Astro.props;
+---
+<a class="next-card pressable" href={doc.url} data-next>
+  <span class="next-label">다음에 읽을 글</span>
+  <span class="next-title">{doc.title}</span>
+  <span class="next-summary">{doc.summary}</span>
+</a>
+
+<style>
+  .next-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 48px;
+    padding: 20px;
+    border-radius: var(--radius-card);
+    background: var(--color-bg);
+  }
+
+  .next-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .next-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .next-summary {
+    font-size: 15px;
+    color: var(--color-text-sub);
+  }
+</style>

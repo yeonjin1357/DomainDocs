@@ -1,0 +1,31 @@
+---
+import { TriangleAlert } from '@lucide/astro';
+---
+<li class="check" data-check>
+  <TriangleAlert class="check-icon" size={20} aria-hidden="true" />
+  <div class="check-body"><slot /></div>
+</li>
+
+<style>
+  .check {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--color-warn-weak);
+  }
+
+  .check-icon {
+    flex: none;
+    margin-top: 4px;
+    color: var(--color-warn);
+  }
+
+  .check-body {
+    min-width: 0;
+  }
+
+  .check-body > :global(p) {
+    margin: 0;
+  }
+</style>

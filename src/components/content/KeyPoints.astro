@@ -1,0 +1,15 @@
+<section class="block" data-block="key-points">
+  <h2 class="block-title">핵심</h2>
+  <ol class="points"><slot /></ol>
+</section>
+
+<style>
+  .points {
+    display: grid;
+    gap: 28px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: point;
+  }
+</style>

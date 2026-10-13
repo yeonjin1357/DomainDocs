@@ -1,0 +1,72 @@
+---
+import { TYPE_LABEL, type DocType } from '../../lib/catalog';
+
+interface Props {
+  domainName: string;
+  title: string;
+  summary: string;
+  type: DocType;
+  readingMinutes: number;
+  updated: Date;
+}
+
+const { domainName, title, summary, type, readingMinutes, updated } = Astro.props;
+const updatedText = new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(updated);
+---
+<header class="doc-header">
+  <p class="doc-domain" data-pagefind-ignore>{domainName}</p>
+  <h1 class="doc-title" data-page-title>{title}</h1>
+  <p class="doc-summary" data-doc-summary>{summary}</p>
+  <p class="doc-meta" data-pagefind-ignore>
+    <span class="pill" data-doc-type>{TYPE_LABEL[type]}</span>
+    <span data-reading-time>{readingMinutes}분</span>
+    <span aria-hidden="true">·</span>
+    <time datetime={updated.toISOString().slice(0, 10)}>{updatedText} 수정</time>
+  </p>
+</header>
+
+<style>
+  .doc-header {
+    padding: 16px 0 8px;
+  }
+
+  .doc-domain {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .doc-title {
+    margin: 8px 0 12px;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+  }
+
+  .doc-summary {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--color-text-sub);
+  }
+
+  .doc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0 0;
+    font-size: 14px;
+    color: var(--color-text-weak);
+  }
+
+  .pill {
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: var(--color-accent-weak);
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+</style>

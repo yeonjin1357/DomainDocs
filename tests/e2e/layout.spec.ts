@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectNoHorizontalOverflow } from './helpers';
+import { expectNoHorizontalOverflow, openAllDetails, PAGES } from './helpers';
 
 test('본문 글꼴은 Pretendard, 17px, 행간 1.7이다', async ({ page }) => {
   await page.goto('./');
@@ -36,7 +36,10 @@ test('상단 바에 사이트 이름과 검색 버튼이 있다', async ({ page 
   await expect(page.getByRole('button', { name: '검색' })).toBeVisible();
 });
 
-test('홈에 가로 스크롤이 없다', async ({ page }) => {
-  await page.goto('./');
-  await expectNoHorizontalOverflow(page);
-});
+for (const path of PAGES) {
+  test(`가로 스크롤이 없다: ${path}`, async ({ page }) => {
+    await page.goto(path);
+    await openAllDetails(page);
+    await expectNoHorizontalOverflow(page);
+  });
+}

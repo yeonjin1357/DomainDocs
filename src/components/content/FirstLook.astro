@@ -1,0 +1,15 @@
+<section class="block" data-block="first-look">
+  <h2 class="block-title">먼저 볼 것</h2>
+  <ol class="items"><slot /></ol>
+</section>
+
+<style>
+  .items {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: item;
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<li class="point" data-point>
+  <h3 class="point-title">{title}</h3>
+  <div class="point-body"><slot /></div>
+</li>
+
+<style>
+  .point {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    column-gap: 12px;
+    counter-increment: point;
+  }
+
+  .point::before {
+    content: counter(point);
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin-top: 1px;
+    border-radius: 50%;
+    background: var(--color-accent-weak);
+    color: var(--color-accent);
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .point-title {
+    grid-column: 2;
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.45;
+    letter-spacing: -0.02em;
+  }
+
+  .point-body {
+    grid-column: 2;
+    min-width: 0;
+  }
+
+  .point-body > :global(p:last-child) {
+    margin-bottom: 0;
+  }
+</style>

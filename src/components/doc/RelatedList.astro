@@ -1,0 +1,17 @@
+---
+import ListRow from '../ui/ListRow.astro';
+import type { DocCard } from '../../lib/catalog';
+
+interface Props {
+  title: string;
+  items: DocCard[];
+  marker: 'related' | 'used-concepts';
+}
+const { title, items, marker } = Astro.props;
+---
+<section class="doc-section" data-related={marker === 'related' ? '' : undefined} data-used-concepts={marker === 'used-concepts' ? '' : undefined}>
+  <h2 class="section-title">{title}</h2>
+  <div>
+    {items.map((d) => <ListRow href={d.url} icon={d.icon} title={d.title} description={d.summary} />)}
+  </div>
+</section>

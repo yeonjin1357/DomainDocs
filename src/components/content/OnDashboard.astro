@@ -1,0 +1,50 @@
+---
+interface Props {
+  title: string;
+  caption?: string;
+}
+const { title, caption } = Astro.props;
+---
+<section class="block" data-block="on-dashboard">
+  <h2 class="block-title">대시보드에서는 이렇게 보여요</h2>
+  <figure class="widget">
+    <figcaption class="widget-title">{title}</figcaption>
+    <div class="widget-body"><slot /></div>
+  </figure>
+  {caption && <p class="block-caption">{caption}</p>}
+</section>
+
+<style>
+  .widget {
+    margin: 0;
+    padding: 20px;
+    border-radius: var(--radius-card);
+    background: var(--color-bg);
+  }
+
+  .widget-title {
+    margin-bottom: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-sub);
+  }
+
+  /* 차트는 한 줄 전체, 숫자 타일은 나란히 */
+  .widget-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .widget-body > :global(*) {
+    flex: 1 1 100%;
+  }
+
+  .widget-body > :global([data-stat]) {
+    flex: 1 1 96px;
+  }
+
+  .widget-body > :global(p) {
+    margin: 0;
+  }
+</style>

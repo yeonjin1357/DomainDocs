@@ -1,5 +1,8 @@
 import { expect, type Page } from '@playwright/test';
 
+/** 넘침 검사를 도는 테스트 페이지 목록. 페이지를 늘리는 Task가 여기에 추가한다. */
+export const PAGES = ['./', 'foundations/alpha/', 'foundations/beta/', 'foundations/gamma-guide/'];
+
 /** 가로 넘침 검사. 모바일 에뮬레이션에서는 innerWidth가 늘어나므로 clientWidth와 비교한다. */
 export async function expectNoHorizontalOverflow(page: Page): Promise<void> {
   const { scrollWidth, clientWidth } = await page.evaluate(() => ({

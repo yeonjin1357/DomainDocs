@@ -1,0 +1,40 @@
+---
+import { ChevronDown } from '@lucide/astro';
+---
+<details class="block deeper" data-block="deeper">
+  <summary class="deeper-summary pressable">
+    <span>더 깊이 알아보기</span>
+    <ChevronDown class="deeper-chevron" size={20} aria-hidden="true" />
+  </summary>
+  <div class="deeper-body"><slot /></div>
+</details>
+
+<style>
+  .deeper-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: var(--color-bg);
+    font-weight: 600;
+    list-style: none;
+  }
+
+  .deeper-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .deeper-chevron {
+    color: var(--color-text-weak);
+    transition: transform 0.2s ease;
+  }
+
+  .deeper[open] .deeper-chevron {
+    transform: rotate(180deg);
+  }
+
+  .deeper-body {
+    padding: 20px 4px 0;
+  }
+</style>

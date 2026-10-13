@@ -1,0 +1,99 @@
+---
+import { ChevronRight } from '@lucide/astro';
+import Icon from './Icon.astro';
+import type { IconName } from '../../data/icons';
+
+interface Props {
+  href?: string;
+  icon?: IconName;
+  title: string;
+  description?: string;
+  meta?: string;
+  badge?: string;
+}
+
+const { href, icon, title, description, meta, badge } = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+<Tag class:list={['row', href ? 'pressable' : 'is-disabled']} href={href} aria-disabled={href ? undefined : 'true'} data-row>
+  {icon && <span class="row-icon"><Icon name={icon} size={22} /></span>}
+  <span class="row-text">
+    <span class="row-title">{title}</span>
+    {description && <span class="row-desc">{description}</span>}
+  </span>
+  {meta && <span class="row-meta">{meta}</span>}
+  {badge && <span class="row-badge">{badge}</span>}
+  {href && <ChevronRight class="row-chevron" size={20} aria-hidden="true" />}
+</Tag>
+
+<style>
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 -12px;
+    padding: 14px 12px;
+    border-radius: var(--radius-row);
+  }
+
+  .row-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--color-accent-weak);
+    color: var(--color-accent);
+  }
+
+  .row-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .row-title {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.45;
+    letter-spacing: -0.02em;
+  }
+
+  .row-desc {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-text-sub);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .row-meta {
+    flex: none;
+    font-size: 13px;
+    color: var(--color-text-weak);
+  }
+
+  .row-badge {
+    flex: none;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: var(--color-bg);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-weak);
+  }
+
+  .row-chevron {
+    flex: none;
+    color: var(--color-text-weak);
+  }
+
+  .is-disabled {
+    opacity: 0.6;
+  }
+</style>

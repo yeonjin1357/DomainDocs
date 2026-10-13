@@ -1,0 +1,43 @@
+---
+title: 알파 개념
+summary: 테스트용 개념 글이에요. 백분위수라는 단어를 담고 있어요.
+domain: foundations
+type: concept
+order: 1
+icon: chart-column
+keywords: [꼬리 지연, tail latency]
+related: [foundations/beta]
+sources:
+  - title: 알파 테스트 출처
+    url: https://example.com/alpha
+updated: 2026-10-01
+---
+
+<OnDashboard title="응답시간" caption="테스트용 위젯 설명이에요.">
+  위젯 자리예요.
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="첫 번째 핵심">
+    응답은 보통 1~2초 또는 3~4초예요. 백분위수는 느린 요청을 드러내요. <Term slug="foundations/beta">베타 개념</Term>과 함께 봐요.
+  </Point>
+  <Point title="긴 이름도 화면을 넘지 않아요">
+    `container_cpu_cfs_throttled_periods_total_namespace` 같은 이름도 있어요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>평균만 보고 있다면 다시 확인하세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  표와 코드도 화면을 넘지 않아야 해요.
+
+  | 구분 | 아주 긴 열 이름이 들어간 표 | 또 다른 긴 열 이름 | 세 번째 열 이름 |
+  | --- | --- | --- | --- |
+  | p50 | 0.1초 | 0.2초 | 0.3초 |
+
+  ```text
+  histogram_quantile(0.99, sum by (le) (rate(http_server_request_duration_seconds_bucket[5m])))
+  ```
+</Deeper>
