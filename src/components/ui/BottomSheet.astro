@@ -48,14 +48,27 @@ const { id, label, variant = 'sheet' } = Astro.props;
     animation: sheet-up 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
+  /* 손잡이 모양은 40×5px이지만 끌기 영역은 96×28px로 넓힌다. 모양의 위치는 그대로다. */
   .sheet-handle {
-    width: 40px;
-    height: 5px;
-    margin: 0 auto 16px;
-    border-radius: 3px;
-    background: var(--color-line);
+    position: relative;
+    width: 96px;
+    height: 28px;
+    margin: -12px auto 5px;
     cursor: grab;
     touch-action: none;
+  }
+
+  .sheet-handle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--color-text-weak);
+    opacity: 0.4;
+    transform: translate(-50%, -50%);
   }
 
   /* 검색: 모바일은 화면 전체, 데스크톱은 위쪽 카드 */

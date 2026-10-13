@@ -96,4 +96,35 @@ const Tag = href ? 'a' : 'div';
   .is-disabled {
     opacity: 0.6;
   }
+
+  /* 좁은 화면: 메타·배지를 설명 아래로 내려 제목과 설명이 쓸 폭을 넓힌다 */
+  @media (max-width: 560px) {
+    .row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas:
+        'icon text chevron'
+        'icon meta chevron';
+      gap: 0 14px;
+    }
+
+    .row-icon {
+      grid-area: icon;
+    }
+
+    .row-text {
+      grid-area: text;
+    }
+
+    .row-meta,
+    .row-badge {
+      grid-area: meta;
+      justify-self: start;
+      margin-top: 4px;
+    }
+
+    .row-chevron {
+      grid-area: chevron;
+    }
+  }
 </style>

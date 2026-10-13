@@ -43,15 +43,16 @@ const { backHref, title } = Astro.props;
     max-width: var(--content-width);
     height: var(--topbar-height);
     margin: 0 auto;
-    padding: 0 calc(var(--gutter) - 8px);
+    /* 버튼(44px) 안쪽 여백만큼 덜어 내 아이콘과 사이트 이름이 본문 끝선 근처에 오게 한다 */
+    padding: 0 calc(var(--gutter) - 10px);
   }
 
   .icon-button {
     display: grid;
     flex: none;
     place-items: center;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border: 0;
     border-radius: var(--radius-button);
     background: transparent;
@@ -59,7 +60,7 @@ const { backHref, title } = Astro.props;
   }
 
   .brand {
-    padding: 0 8px;
+    padding: 0 10px;
     font-size: 18px;
     font-weight: 700;
     letter-spacing: -0.02em;

@@ -29,7 +29,9 @@ const { label, value, unit, tone = 'default', note } = Astro.props;
     color: var(--color-text-sub);
   }
 
+  /* 이름이 두 줄로 넘어가도 옆 타일과 숫자 높이를 맞춘다 */
   .stat-value {
+    margin-top: auto;
     font-size: 24px;
     font-weight: 700;
     letter-spacing: -0.02em;

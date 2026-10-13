@@ -53,14 +53,20 @@ import { withBase } from '../../lib/paths';
     background: transparent;
     font: inherit;
     color: var(--color-text);
+    appearance: none;
+  }
+
+  /* 브라우저 기본 지우기(×)가 닫기 버튼(×) 옆에 하나 더 생기지 않게 한다 */
+  .search-input::-webkit-search-cancel-button {
+    display: none;
   }
 
   .search-close {
     display: grid;
     flex: none;
     place-items: center;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border: 0;
     border-radius: 12px;
     background: transparent;
@@ -69,7 +75,7 @@ import { withBase } from '../../lib/paths';
   .search-status {
     margin: 16px 4px 4px;
     font-size: 14px;
-    color: var(--color-text-weak);
+    color: var(--color-text-sub);
   }
 
   .search-results {

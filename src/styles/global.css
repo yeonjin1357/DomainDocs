@@ -106,7 +106,7 @@ svg {
 
 .block-title {
   margin: 0 0 16px;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1.4;
   letter-spacing: -0.02em;
@@ -181,8 +181,14 @@ svg {
   font-family: var(--font-mono);
   font-size: 15px;
   line-height: 1.6;
+  letter-spacing: normal;
   word-break: normal;
   overflow-wrap: normal;
+}
+
+/* 브라우저 기본 code 글꼴(monospace)이 pre의 글꼴을 덮지 않게 한다 */
+:where(.prose) pre code {
+  font: inherit;
 }
 
 :where(.prose) table {
@@ -206,11 +212,15 @@ svg {
   color: var(--color-text-sub);
 }
 
+/* 코드 블록 바탕은 테마 색(라이트 #fff) 대신 상황·위젯 상자와 같은 안쪽 면 색을 쓴다 */
+.astro-code {
+  background-color: var(--color-bg) !important;
+}
+
 @media (prefers-color-scheme: dark) {
   .astro-code,
   .astro-code span {
     color: var(--shiki-dark) !important;
-    background-color: var(--shiki-dark-bg) !important;
   }
 }
 
