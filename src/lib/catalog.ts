@@ -34,11 +34,13 @@ export function nextInDomain<T extends Pick<DocCard, 'id' | 'domain' | 'order'>>
   return list[list.findIndex((d) => d.id === currentId) + 1];
 }
 
-export function recentlyUpdated<T extends Pick<DocCard, 'updated' | 'id'>>(docs: readonly T[], limit: number): T[] {
-  return [...docs].sort((a, b) => b.updated.getTime() - a.updated.getTime() || a.id.localeCompare(b.id)).slice(0, limit);
+export function recentlyUpdated<T extends Pick<DocCard, 'updated' | 'id' | 'order'>>(docs: readonly T[], limit: number): T[] {
+  return [...docs]
+    .sort((a, b) => b.updated.getTime() - a.updated.getTime() || b.order - a.order || a.id.localeCompare(b.id))
+    .slice(0, limit);
 }
 
-/** 홈의 두 목록. 처음 목록은 공통 기초를 순서대로, 최근 목록은 처음 목록에 없는 글만 최근 수정 순으로 고른다. */
+/** 홈의 두 목록. 처음 목록은 공통 기초를 순서대로, 최근 목록은 처음 목록에 없는 글만 최근 수정 순, 같은 날이면 나중 순서(order)부터 고른다. */
 export function homeLists<T extends Pick<DocCard, 'id' | 'domain' | 'order' | 'updated'>>(
   docs: readonly T[],
   limit = 5,

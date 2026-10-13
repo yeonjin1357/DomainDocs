@@ -39,6 +39,10 @@ describe('catalog', () => {
   it('최근 수정 순으로 limit개를 고른다', () => {
     expect(recentlyUpdated(DOCS, 3).map((d) => d.id)).toEqual(['apm/x', 'foundations/a', 'foundations/b']);
   });
+  it('수정일이 같으면 order가 큰 글을 먼저 고른다', () => {
+    const sameDay = [card('foundations/p', 10, '2026-10-13'), card('foundations/q', 30, '2026-10-13'), card('foundations/r', 20, '2026-10-13')];
+    expect(recentlyUpdated(sameDay, 2).map((d) => d.id)).toEqual(['foundations/q', 'foundations/r']);
+  });
 });
 
 describe('homeLists', () => {
