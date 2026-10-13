@@ -1,0 +1,105 @@
+---
+title: 카운터와 rate
+summary: 카운터는 쌓이기만 하는 값이고, rate는 초당 증가량이에요.
+domain: foundations
+type: concept
+order: 2
+icon: trending-up
+keywords: [counter, 누적값, 증가율, 초당, increase, irate, 재시작, reset, 게이지, gauge]
+related: [foundations/percentiles]
+sources:
+  - title: Prometheus — Metric types
+    url: https://prometheus.io/docs/concepts/metric_types/
+  - title: Prometheus — Query functions
+    url: https://prometheus.io/docs/prometheus/latest/querying/functions/
+  - title: OpenTelemetry — Metrics data model
+    url: https://opentelemetry.io/docs/specs/otel/metrics/data-model/
+  - title: Prometheus 소스 — promql/functions.go (extrapolatedRate)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/promql/functions.go
+  - title: Grafana — Prometheus template variables ($__rate_interval)
+    url: https://grafana.com/docs/grafana/latest/datasources/prometheus/template-variables/
+  - title: Grafana Blog — $__rate_interval for Prometheus rate queries that just work
+    url: https://grafana.com/blog/2020/09/28/new-in-grafana-7.2-__rate_interval-for-prometheus-rate-queries-that-just-work/
+updated: 2026-10-13
+---
+
+<OnDashboard title="처리한 요청 수 · 10초마다 수집" caption="위는 카운터를 그대로 그린 선이에요. 아래는 이웃한 두 값 사이 증가량을 10초로 나눈 rate예요. 재시작한 순간에도 rate는 이어져요.">
+  <MiniLineChart
+    ariaLabel="카운터 원래 값은 계속 오르다가 재시작 때 0 근처로 떨어진 뒤 다시 오르는 그래프"
+    series={[{ label: '카운터 원래 값', values: [1000, 1030, 1060, 1090, 1120, 20, 50, 80, 110, 140], tone: 'sub' }]}
+  />
+  <MiniLineChart
+    ariaLabel="rate로 바꾼 값은 초당 3건으로 고르게 이어지고, 재시작 구간에서만 2건으로 조금 내려가는 그래프"
+    yMax={5}
+    series={[{ label: 'rate', values: [3, 3, 3, 3, 2, 3, 3, 3, 3], tone: 'accent', value: '초당 3건' }]}
+  />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="카운터는 쌓이기만 해요">
+    `http_requests_total` 같은 카운터(counter)는 프로세스가 시작된 뒤 처리한 요청 수를 계속 더한 값이에요. 그래서 1,000,000이라는 값만으로는 지금 바쁜지 알 수 없어요. 값이 줄어드는 건 재시작해서 0부터 다시 셀 때뿐이에요.
+  </Point>
+  <Point title="rate는 1초에 얼마나 늘었는지예요">
+    rate(초당 증가량)는 구간 동안 늘어난 양을 구간 길이(초)로 나눈 값이에요. 5분(300초) 동안 1,000,000에서 1,030,000이 됐다면 30,000 ÷ 300 = 초당 100건이에요. 대시보드에는 카운터가 아니라 이 값을 그려요.
+  </Point>
+  <Point title="재시작하면 카운터는 0부터 다시 세요">
+    Prometheus의 `rate`와 `increase`(구간 증가량)는 재시작을 알아서 처리해요. 값이 1,000 → 1,050 → (재시작) → 20일 때, 재시작 앞뒤 값을 그냥 빼면 20 − 1,050 = −1,030이에요. 두 함수는 값이 줄어든 순간을 재시작으로 보고, 재시작 전에 늘어난 50과 뒤의 20을 더해 70으로 세요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>카운터 값을 그대로 그린 그래프는 지금 상태를 말해 주지 않아요. 선이 오르기만 하다가 재시작 때만 떨어진다면 이 경우예요. rate로 바꿨는지 확인하세요.</Check>
+  <Check>코드에서 직접 계산한 rate가 음수로 나온다면 재시작 처리가 빠진 거예요. 값이 줄었다면 그 구간 증가량은 줄어든 뒤의 값으로 봐요. 앞의 예에서는 20이에요.</Check>
+  <Check>여러 서버의 카운터를 먼저 더한 뒤 rate를 구했다면 틀려요. 한 서버만 재시작해도 합계가 줄어, 합계 전체를 재시작으로 보고 rate가 크게 튀어요. `sum(rate(...))`처럼 서버마다 rate를 먼저 구하고 더하세요.</Check>
+  <Check>메모리 사용량 같은 게이지(gauge, 오르내리는 현재 값)에 rate를 썼다면 의미 없는 값이에요. rate는 값이 줄 때마다 재시작으로 보고 엉뚱하게 더해요. 게이지의 변화는 `delta()`나 `deriv()`로 봐요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### rate, increase, irate
+
+  `rate`는 구간 전체의 평균 초당 증가율이에요. `rate(http_requests_total[5m])`는 최근 5분 동안의 평균이에요.
+
+  `increase`는 구간 전체의 증가량이에요. rate × 구간 초와 같아서, 앞의 예라면 100 × 300 = 30,000이에요. "5분 동안 30,000건"처럼 사람이 읽을 숫자가 필요할 때 써요.
+
+  `irate`는 구간의 마지막 두 샘플만 써요. `irate(http_requests_total[5m])`도 5분 중 마지막 두 샘플 사이만 봐요. 그래서 짧은 변화에 민감하고 선이 많이 흔들려요.
+
+  Prometheus 문서는 빠르게 변하는 카운터를 그래프로 볼 때만 irate를 쓰라고 해요. 알림과 천천히 변하는 카운터에는 rate를 써요.
+
+  ### 재시작한 구간
+
+  그림에서 재시작한 구간의 rate는 초당 2건이에요. 1,120 다음 값이 20이라서, 그 10초 동안 20만 늘었다고 세기 때문이에요. 마지막 수집 뒤 재시작 전까지 센 요청은 수집되지 못하고 사라져요.
+
+  ### 구간 끝은 추정해요
+
+  샘플이 구간 경계에 딱 맞춰 찍히는 일은 드물어요. 그래서 Prometheus는 구간 끝까지 값을 추정(외삽)해요. 정수 카운터라도 increase가 소수로 나올 수 있는 이유예요.
+
+  10초마다 수집하면 1분 구간에는 샘플이 6개 들어와요. 첫 샘플과 끝 샘플은 50초 떨어져 있어요. 그사이 7이 늘었다면, increase는 60초로 늘려 7 × 60 ÷ 50 = 8.4예요.
+
+  끝까지 늘리지 않을 때도 있어요. 경계까지 거리가 샘플 간격 평균의 1.1배 이상이면, 그 평균의 절반만큼만 늘려요. 카운터가 0 아래로 내려가게 늘리지도 않아요.
+
+  ### 구간 길이
+
+  구간 안에 샘플이 2개 이상 있어야 rate가 계산돼요. 15초마다 수집하는데 `[15s]`로 잡으면 샘플이 대개 하나뿐이라 값이 비어요. 그래서 구간은 수집 주기보다 충분히 길게 잡아요.
+
+  Grafana는 구간을 수집 주기의 4배 이상으로 잡으라고 해요. `$__rate_interval`은 이 기준을 자동으로 맞춰 주는 변수예요. 값은 `$__interval + 수집 주기`와 `4 × 수집 주기` 중 큰 쪽이에요.
+
+  `$__interval`은 그래프의 시간 범위와 패널 폭으로 정해지는 간격이에요.
+
+  여기서 Grafana는 데이터 소스의 Scrape interval 설정값을 수집 주기로 써요. 쿼리에 Min step을 정했다면 그 값을 써요.
+
+  Scrape interval을 그림처럼 10초로 정했다면, `$__rate_interval`은 40초보다 짧아지지 않아요. 기본값 15초로 둔 채 실제로는 60초마다 수집하면 구간이 너무 짧게 잡혀요.
+
+  ### 히스토그램 버킷도 카운터예요
+
+  Prometheus 클래식 히스토그램의 버킷(`_bucket`)은 카운터예요. 그래서 여러 서버를 묶은 <Term slug="foundations/percentiles">p99</Term>를 구할 때도, 버킷마다 rate를 먼저 구하고 더해요.
+
+  ### OpenTelemetry에서는
+
+  OpenTelemetry에서 카운터는 단조 증가(monotonic) Sum이에요. Sum에는 시간 기준(temporality)이 붙어요.
+
+  cumulative는 시작부터 누적한 값을 보내요. delta는 지난 보고 뒤 늘어난 양만 보내요. Prometheus 카운터는 cumulative예요.
+
+  delta는 값마다 증가량이라 재시작해도 값이 줄지 않아요. 대신 보고 누락을 조심해야 해요.
+
+  cumulative로 100, (누락), 160을 받으면 그사이 모두 60이 늘었다는 건 알 수 있어요. delta로 30, (누락), 30을 받으면 빠진 보고에 담긴 증가량은 되찾을 수 없어요. cumulative는 다음 값이 빈자리를 메워 주지만, delta는 그대로 사라져요.
+</Deeper>

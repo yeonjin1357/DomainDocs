@@ -6,6 +6,7 @@ type: concept
 order: 1
 icon: chart-column
 keywords: [p50, p95, p99, 퍼센타일, percentile, 중앙값, 꼬리 지연, tail latency]
+related: [foundations/counters-and-rate]
 sources:
   - title: Prometheus — Histograms and summaries
     url: https://prometheus.io/docs/practices/histograms/
@@ -81,7 +82,7 @@ import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';
 
   `histogram_quantile()`은 버킷 안에 값이 고르게 퍼져 있다고 보고 선형 보간해요. 그래서 결과는 근사값이고, 버킷 경계가 정확도를 좌우해요. 예를 들어 p99가 0.5~1초 버킷에 들면, 실제 p99는 그 사이 어디든 될 수 있어요.
 
-  히스토그램은 여러 서버를 합칠 수 있어요. 서버별 버킷 카운터마다 rate(초당 증가량)를 먼저 구하고, 같은 `le`끼리 더한 뒤 p99를 계산해요. 이때 서버마다 버킷 경계가 같아야 해요.
+  히스토그램은 여러 서버를 합칠 수 있어요. 서버별 버킷 카운터마다 <Term slug="foundations/counters-and-rate">rate</Term>(초당 증가량)를 먼저 구하고, 같은 `le`끼리 더한 뒤 p99를 계산해요. 이때 서버마다 버킷 경계가 같아야 해요.
 
   summary는 각 서버가 직접 계산한 p99 같은 값을 내보내요. 이 값끼리는 합칠 수 없어서, 여러 서버를 묶은 p99를 구할 수 없어요. `avg(http_request_duration_seconds{quantile="0.99"})`처럼 평균 내는 식도 틀려요.
 
