@@ -4,7 +4,7 @@ import { mean, percentile } from '../../lib/stats';
 import './demo.css';
 
 const MAX_SLOW = 10;
-const P99_INDEX = Math.ceil(0.99 * REQUEST_COUNT) - 1;
+const P99_INDEX = Math.ceil((99 * REQUEST_COUNT) / 100) - 1;
 const ms = (v: number) => `${Math.round(v).toLocaleString('ko-KR')}ms`;
 
 function statsOf(sample: number[]) {

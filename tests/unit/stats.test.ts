@@ -18,6 +18,10 @@ describe('percentile (nearest-rank)', () => {
     expect(percentile(oneToHundred, 99)).toBe(99);
     expect(percentile(oneToHundred, 100)).toBe(100);
   });
+  it('부동소수점 오차가 나는 p(7, 29)도 정확한 순위를 고른다', () => {
+    expect(percentile(oneToHundred, 7)).toBe(7);
+    expect(percentile(oneToHundred, 29)).toBe(29);
+  });
   it('정렬되지 않은 입력도 정렬해서 계산하고, 원본은 바꾸지 않는다', () => {
     const input = [5, 1, 4, 2, 3];
     expect(percentile(input, 50)).toBe(3);

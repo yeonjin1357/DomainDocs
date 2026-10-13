@@ -8,5 +8,5 @@ export function percentile(values: readonly number[], p: number): number {
   if (!(p > 0 && p <= 100)) throw new RangeError(`p는 0 초과 100 이하여야 해요: ${p}`);
   if (values.length === 0) return Number.NaN;
   const sorted = [...values].sort((a, b) => a - b);
-  return sorted[Math.ceil((p / 100) * sorted.length) - 1];
+  return sorted[Math.ceil((p * sorted.length) / 100) - 1];
 }
