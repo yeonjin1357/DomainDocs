@@ -32,9 +32,11 @@ const { label, value, unit, tone = 'default', note } = Astro.props;
 
   /* 이름이 두 줄로 넘어가도 옆 타일과 숫자 높이를 맞춘다.
      숫자 크기는 타일 폭을 따른다: 360px 화면에 타일 둘이 나란히 서면 숫자 칸이 100px이라,
-     24px로는 "210,000개"의 단위나 "데이터 없음"이 다음 줄로 갈라진다. */
+     24px로는 "210,000개"의 단위나 "데이터 없음"이 다음 줄로 갈라진다.
+     cqi를 모르는 브라우저는 clamp 줄을 버리고 앞 줄의 24px을 쓴다(물려받은 17px이 아니라). */
   .stat-value {
     margin-top: auto;
+    font-size: 24px;
     font-size: clamp(20px, 20cqi, 24px);
     font-weight: 700;
     letter-spacing: -0.02em;
