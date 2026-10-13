@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "lint:content": "tsx scripts/lint-content/index.ts",
+    "build": "npm run lint:content && astro build",
     "check": "astro check",
     "test": "vitest run",
     "test:e2e": "playwright test"

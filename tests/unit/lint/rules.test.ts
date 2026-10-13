@@ -1,0 +1,165 @@
+import { describe, expect, it } from 'vitest';
+import { lintSource, type DocMeta, type LintContext, type RuleId } from '../../../scripts/lint-content/rules';
+
+const FRONT = (extra = '', type = 'concept', domain = 'foundations') => `---
+title: 테스트 글
+summary: 검사 규칙을 확인하려고 만든 글이에요.
+domain: ${domain}
+type: ${type}
+order: 1
+sources:
+  - title: 예시 출처
+    url: https://example.com/
+updated: 2026-10-13
+${extra}---
+`;
+
+const CONCEPT_BODY = `
+<OnDashboard title="응답시간">
+  <StatTile label="p99" value="1.2" unit="초" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="첫 번째 핵심">
+    응답은 1~2초 사이예요. <Term slug="foundations/other">다른 개념</Term>과 함께 봐요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>평균만 보고 있다면 다시 확인하세요.</Check>
+</Checkpoints>
+`;
+
+const GUIDE_BODY = `
+<Situation>
+  두 화면의 숫자가 달라요.
+</Situation>
+
+<FirstLook>
+  <Item title="집계 구간">한 점이 몇 초인지 봐요.</Item>
+</FirstLook>
+
+## 1. 구간을 맞춰 보세요
+
+<Term slug="foundations/other">다른 개념</Term>을 떠올려요.
+
+<Checkpoints>
+  <Check>계산식이 다르다면 문서로 남기세요.</Check>
+</Checkpoints>
+`;
+
+const DOCS: DocMeta[] = [
+  { id: 'foundations/test', type: 'concept', draft: false },
+  { id: 'foundations/other', type: 'concept', draft: false },
+  { id: 'foundations/secret', type: 'concept', draft: true },
+];
+const ctx: LintContext = { docs: new Map(DOCS.map((d) => [d.id, d])) };
+const lint = (source: string, id = 'foundations/test') => lintSource({ file: `${id}.mdx`, id, source }, ctx);
+const rules = (source: string, id?: string): RuleId[] => lint(source, id).map((i) => i.rule);
+
+describe('통과 사례', () => {
+  it('올바른 개념 글은 위반이 없다', () => {
+    expect(lint(FRONT() + CONCEPT_BODY)).toEqual([]);
+  });
+  it('올바른 가이드 글은 위반이 없다', () => {
+    expect(lint(FRONT('', 'guide') + GUIDE_BODY)).toEqual([]);
+  });
+  it('CRLF 줄바꿈도 위반이 없다', () => {
+    expect(lint((FRONT() + CONCEPT_BODY).replace(/\n/g, '\r\n'))).toEqual([]);
+  });
+  it('import한 데모는 최상위 어디에 둬도 된다', () => {
+    const body = CONCEPT_BODY.replace('<Checkpoints>', "<PercentileDemo client:visible />\n\n<Checkpoints>");
+    expect(lint(`${FRONT()}import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';\n${body}`)).toEqual([]);
+  });
+  it('Deeper 안에서는 금지 표현을 허용한다', () => {
+    expect(lint(`${FRONT() + CONCEPT_BODY}\n<Deeper>\n  모든 버전을 보장하지 않아요.\n</Deeper>\n`)).toEqual([]);
+  });
+  it('초안 글은 초안을 가리켜도 된다', () => {
+    const body = CONCEPT_BODY.replace('foundations/other', 'foundations/secret');
+    expect(lint(FRONT('draft: true\n') + body)).toEqual([]);
+  });
+});
+
+describe('문장 규칙', () => {
+  it('합쇼체 끝맺음을 잡는다', () => {
+    expect(rules(FRONT() + CONCEPT_BODY.replace('사이예요.', '사이입니다.'))).toEqual(['formal-ending']);
+  });
+  it('80자를 넘는 문장을 잡는다', () => {
+    const long = `${'가'.repeat(80)}예요.`;
+    expect(rules(FRONT() + CONCEPT_BODY.replace('응답은 1~2초 사이예요.', long))).toEqual(['sentence-length']);
+  });
+  it('한 단락에 문장이 4개면 잡는다', () => {
+    const para = '하나예요. 둘이에요. 셋이에요. 넷이에요.';
+    expect(rules(FRONT() + CONCEPT_BODY.replace('응답은 1~2초 사이예요.', para))).toEqual(['paragraph-length']);
+  });
+  it('본문의 금지 표현을 잡는다', () => {
+    expect(rules(FRONT() + CONCEPT_BODY.replace('사이예요.', '사이라고 단정하지 않아요.'))).toEqual(['banned-phrase']);
+  });
+  it('개념 본문이 1,500자를 넘으면 잡는다', () => {
+    // 문장 36자 × 3문장 × 15단락 = 1,620자
+    const sentence = '가나다라마바사아자차카타파하 가나다라마바사아자차카타파하 문장이에요. ';
+    const paras = Array.from({ length: 15 }, () => sentence.repeat(3).trim()).join('\n\n    ');
+    expect(rules(FRONT() + CONCEPT_BODY.replace('응답은 1~2초 사이예요.', paras))).toContain('body-length');
+  });
+});
+
+describe('틀 규칙', () => {
+  it('Checkpoints가 없으면 잡는다', () => {
+    const body = CONCEPT_BODY.replace(/<Checkpoints>[\s\S]*<\/Checkpoints>/, '');
+    expect(rules(FRONT() + body)).toEqual(['structure']);
+  });
+  it('블록 순서가 틀리면 잡는다', () => {
+    const onDashboard = CONCEPT_BODY.match(/<OnDashboard[\s\S]*?<\/OnDashboard>/)![0];
+    const body = CONCEPT_BODY.replace(onDashboard, '').replace('<Checkpoints>', `${onDashboard}\n\n<Checkpoints>`);
+    expect(rules(FRONT() + body)).toEqual(['structure']);
+  });
+  it('개념 글 최상위의 일반 단락과 소제목을 잡는다', () => {
+    expect(rules(`${FRONT()}\n## 소제목\n\n그냥 단락이에요.\n${CONCEPT_BODY}`)).toEqual(['structure', 'structure']);
+  });
+  it('최상위에 둘 수 없는 컴포넌트를 잡는다', () => {
+    expect(rules(`${FRONT()}${CONCEPT_BODY}\n<Point title="밖">밖이에요.</Point>\n`)).toEqual(['structure']);
+  });
+  it('Point가 4개면 잡는다', () => {
+    const point = '  <Point title="추가">추가예요.</Point>\n';
+    const body = CONCEPT_BODY.replace('</KeyPoints>', `${point}${point}${point}</KeyPoints>`);
+    expect(rules(FRONT() + body)).toEqual(['block-children']);
+  });
+  it('KeyPoints 안의 맨 글자를 잡는다', () => {
+    expect(rules(FRONT() + CONCEPT_BODY.replace('</KeyPoints>', '  맨 글자예요.\n</KeyPoints>'))).toEqual(['block-children']);
+  });
+  it('Point 제목이 없거나 30자를 넘으면 잡는다', () => {
+    expect(rules(FRONT() + CONCEPT_BODY.replace(' title="첫 번째 핵심"', ''))).toEqual(['block-title']);
+    expect(rules(FRONT() + CONCEPT_BODY.replace('첫 번째 핵심', '가'.repeat(31)))).toEqual(['block-title']);
+  });
+  it('가이드에 ## 소제목이 없으면 잡는다', () => {
+    expect(rules(FRONT('', 'guide') + GUIDE_BODY.replace('## 1. 구간을 맞춰 보세요\n', ''))).toEqual(['structure']);
+  });
+  it('가이드에 KeyPoints를 쓰면 잡는다', () => {
+    const body = GUIDE_BODY.replace('## 1.', '<KeyPoints>\n  <Point title="x">x예요.</Point>\n</KeyPoints>\n\n## 1.');
+    expect(rules(FRONT('', 'guide') + body)).toEqual(['structure']);
+  });
+});
+
+describe('머리말과 참조 규칙', () => {
+  it('domain이 폴더와 다르면 잡는다', () => {
+    expect(rules(FRONT('', 'concept', 'apm') + CONCEPT_BODY)).toEqual(['domain-folder']);
+  });
+  it('type이 잘못되면 잡는다', () => {
+    expect(rules(FRONT('', 'essay') + CONCEPT_BODY)).toEqual(['frontmatter']);
+  });
+  it('없는 글을 가리키는 Term과 related를 잡는다', () => {
+    expect(rules(FRONT() + CONCEPT_BODY.replace('foundations/other', 'foundations/nope'))).toEqual(['reference']);
+    expect(rules(FRONT('related: [foundations/nope]\n') + CONCEPT_BODY)).toEqual(['reference']);
+  });
+  it('공개 글이 초안을 가리키면 잡는다', () => {
+    expect(rules(FRONT() + CONCEPT_BODY.replace('foundations/other', 'foundations/secret'))).toEqual(['reference']);
+  });
+  it('마크다운 링크를 잡는다', () => {
+    expect(rules(FRONT() + CONCEPT_BODY.replace('사이예요.', '사이예요. [문서](https://example.com)를 봐요.'))).toEqual(['markdown-link']);
+  });
+  it('MDX 문법 오류는 parse 위반 하나로 끝낸다', () => {
+    const issues = lint(`${FRONT()}\n<KeyPoints>\n  <Point title="x">열린 채로 끝나요.\n`);
+    expect(issues.map((i) => i.rule)).toEqual(['parse']);
+    expect(issues[0].line).toBeGreaterThanOrEqual(1);
+  });
+});
