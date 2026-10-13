@@ -3,6 +3,7 @@ import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import '../styles/tokens.css';
 import '../styles/global.css';
 import TopBar from '../components/ui/TopBar.astro';
+import SearchOverlay from '../components/ui/SearchOverlay.astro';
 import { SITE } from '../data/site';
 import { withBase } from '../lib/paths';
 
@@ -36,6 +37,7 @@ const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
     <main id="main" class="page">
       <slot />
     </main>
+    <SearchOverlay />
     <slot name="end" />
   </body>
 </html>

@@ -1,0 +1,109 @@
+---
+import { Search, X } from '@lucide/astro';
+import BottomSheet from './BottomSheet.astro';
+import { withBase } from '../../lib/paths';
+---
+<BottomSheet id="search-dialog" label="검색" variant="full">
+  <div class="search-bar">
+    <Search class="search-icon" size={20} aria-hidden="true" />
+    <input
+      class="search-input"
+      type="search"
+      placeholder="개념이나 지표 이름으로 검색해요"
+      aria-label="검색어"
+      autocomplete="off"
+      enterkeyhint="search"
+      data-search-input
+      data-pagefind-url={withBase('pagefind/pagefind.js')}
+    />
+    <button class="search-close pressable" type="button" data-sheet-close aria-label="검색 닫기">
+      <X size={22} aria-hidden="true" />
+    </button>
+  </div>
+  <p class="search-status" role="status" aria-live="polite" data-search-status></p>
+  <ol class="search-results" data-search-results></ol>
+</BottomSheet>
+
+<script>
+  import { initSearch } from '../../scripts/search';
+  initSearch();
+</script>
+
+<style>
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 4px 4px 14px;
+    border-radius: 14px;
+    background: var(--color-bg);
+  }
+
+  .search-icon {
+    flex: none;
+    color: var(--color-text-weak);
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: var(--color-text);
+  }
+
+  .search-close {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+  }
+
+  .search-status {
+    margin: 16px 4px 4px;
+    font-size: 14px;
+    color: var(--color-text-weak);
+  }
+
+  .search-results {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* 결과는 스크립트가 만들어 범위 스타일이 닿지 않는다 */
+  .search-results :global(.search-result) {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0 -8px;
+    padding: 12px 8px;
+    border-radius: var(--radius-row);
+  }
+
+  .search-results :global(.search-result-title) {
+    font-weight: 600;
+  }
+
+  .search-results :global(.search-result-excerpt) {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 15px;
+    color: var(--color-text-sub);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .search-results :global(mark) {
+    background: transparent;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+</style>

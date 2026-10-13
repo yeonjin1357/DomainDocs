@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "astro dev",
     "lint:content": "tsx scripts/lint-content/index.ts",
-    "build": "npm run lint:content && astro build",
+    "build": "npm run lint:content && astro build && pagefind --site dist",
     "check": "astro check",
     "test": "vitest run",
     "test:e2e": "playwright test"
@@ -40,6 +40,7 @@
     "@types/node": "^22.20.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "pagefind": "^1.5.2",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vitest": "^5.0.4"
