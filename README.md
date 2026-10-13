@@ -13,6 +13,8 @@ npm ci
 npm run dev        # http://localhost:4321/DomainDocs/
 ```
 
+화면 테스트(`npm run test:e2e`)를 처음 돌리기 전에 `npx playwright install chromium`을 한 번 실행해 주세요.
+
 ## 글 쓰기
 
 글은 `src/content/docs/{영역}/{글이름}.mdx`예요. 쓰기 전에 [글쓰기 가이드](docs/writing-guide.md)를 읽어 주세요.
