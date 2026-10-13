@@ -1,0 +1,45 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/ui/Card.astro';
+import ListRow from '../../components/ui/ListRow.astro';
+import { DOMAINS, type Domain } from '../../data/domains';
+import { inDomain, sortByOrder, TYPE_LABEL, type DocCard } from '../../lib/catalog';
+import { getCards } from '../../lib/content';
+import { withBase } from '../../lib/paths';
+
+export const getStaticPaths = (async () => {
+  const cards = await getCards();
+  return DOMAINS.filter((d) => inDomain(cards, d.id).length > 0).map((domain) => ({ params: { domain: domain.id }, props: { domain } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  domain: Domain;
+}
+
+const { domain } = Astro.props;
+const docs = sortByOrder(inDomain(await getCards(), domain.id));
+const guides = docs.filter((d) => d.type === 'guide');
+const concepts = docs.filter((d) => d.type === 'concept');
+const metaOf = (d: DocCard) => `${TYPE_LABEL[d.type]} · ${d.readingMinutes}분`;
+---
+<BaseLayout title={domain.name} description={domain.description} surface="grey" backHref={withBase()} barTitle={domain.name}>
+  <section class="hero">
+    <h1 class="hero-title" data-page-title>{domain.name}</h1>
+    <p class="hero-desc">{domain.description}</p>
+  </section>
+  {
+    guides.length > 0 && (
+      <Card title="가이드">
+        {guides.map((d) => <ListRow href={d.url} icon={d.icon} title={d.title} description={d.summary} meta={metaOf(d)} />)}
+      </Card>
+    )
+  }
+  {
+    concepts.length > 0 && (
+      <Card title="개념">
+        {concepts.map((d) => <ListRow href={d.url} icon={d.icon} title={d.title} description={d.summary} meta={metaOf(d)} />)}
+      </Card>
+    )
+  }
+</BaseLayout>

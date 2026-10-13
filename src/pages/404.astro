@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/paths';
+---
+<BaseLayout title="페이지를 찾을 수 없어요" surface="grey">
+  <section class="hero">
+    <h1 class="hero-title" data-page-title>페이지를 찾을 수 없어요</h1>
+    <p class="hero-desc">주소가 바뀌었거나 아직 없는 글이에요.</p>
+  </section>
+  <a class="home-button pressable" href={withBase()}>홈으로 가기</a>
+</BaseLayout>
+
+<style>
+  .home-button {
+    display: block;
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--color-accent);
+    font-weight: 600;
+    text-align: center;
+    color: #fff;
+  }
+</style>

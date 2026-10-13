@@ -1,10 +1,50 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Card from '../components/ui/Card.astro';
+import ListRow from '../components/ui/ListRow.astro';
+import { DOMAINS } from '../data/domains';
 import { SITE } from '../data/site';
+import { inDomain, recentlyUpdated, sortByOrder, TYPE_LABEL, type DocCard } from '../lib/catalog';
+import { getCards } from '../lib/content';
+import { domainPath } from '../lib/paths';
+
+const cards = await getCards();
+const starter = sortByOrder(inDomain(cards, 'foundations')).slice(0, 5);
+const recent = recentlyUpdated(cards, 5);
+const metaOf = (d: DocCard) => `${TYPE_LABEL[d.type]} · ${d.readingMinutes}분`;
 ---
-<BaseLayout>
+<BaseLayout surface="grey">
   <section class="hero">
     <h1 class="hero-title" data-page-title>{SITE.headline.split('\n').map((line) => <span>{line}</span>)}</h1>
     <p class="hero-desc">{SITE.description}</p>
   </section>
+
+  <Card title="영역">
+    {
+      DOMAINS.map((domain) => {
+        const count = inDomain(cards, domain.id).length;
+        return count > 0 ? (
+          <ListRow href={domainPath(domain.id)} icon={domain.icon} title={domain.name} description={domain.description} meta={`${count}편`} />
+        ) : (
+          <ListRow icon={domain.icon} title={domain.name} description={domain.description} badge="준비 중" />
+        );
+      })
+    }
+  </Card>
+
+  {
+    starter.length > 0 && (
+      <Card title="처음이라면 여기부터">
+        {starter.map((d) => <ListRow href={d.url} icon={d.icon} title={d.title} description={d.summary} meta={metaOf(d)} />)}
+      </Card>
+    )
+  }
+
+  {
+    recent.length > 0 && (
+      <Card title="최근 추가된 글">
+        {recent.map((d) => <ListRow href={d.url} icon={d.icon} title={d.title} description={d.summary} meta={metaOf(d)} />)}
+      </Card>
+    )
+  }
 </BaseLayout>
