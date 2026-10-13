@@ -1,0 +1,170 @@
+.demo {
+  margin: 48px 0;
+  padding: 20px;
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+}
+
+.demo-title {
+  margin-bottom: 16px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.demo-legend {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.demo-control {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 20px;
+  font-size: 15px;
+}
+
+.demo-range {
+  width: 100%;
+  margin: 8px 0 0;
+  accent-color: var(--color-accent);
+}
+
+.demo-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.demo-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--color-card);
+}
+
+.demo-stat-label {
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.demo-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.demo-stat-diff {
+  font-size: 13px;
+  color: var(--color-text-weak);
+}
+
+.demo-stat.is-warn .demo-stat-value {
+  color: var(--color-warn);
+}
+
+.demo-message {
+  margin: 16px 0 0;
+  font-weight: 600;
+}
+
+/* 백분위수 데모: 빠른 순서로 줄 세운 요청 100개 */
+.demo-dots {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  max-width: 280px;
+}
+
+.dot {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-accent);
+  opacity: 0.35;
+}
+
+.dot.is-slow {
+  background: var(--color-warn);
+  opacity: 1;
+}
+
+.dot.is-p99 {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+/* 다운샘플링 데모(Task 11) */
+.demo-chart {
+  width: 100%;
+  height: 140px;
+}
+
+.demo-chart-base {
+  stroke: var(--color-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.demo-chart-line {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.demo-segment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 16px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.demo-segment legend {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 15px;
+}
+
+.demo-segment label {
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--color-card);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.demo-segment label.is-active {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.demo-segment label {
+  position: relative;
+}
+
+/* 라디오는 숨기되 키보드 포커스와 클릭은 그대로 받는다 */
+.demo-segment input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.demo-segment label:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
