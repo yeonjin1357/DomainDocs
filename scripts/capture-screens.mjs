@@ -15,11 +15,16 @@ const PAGES = [
   ['collection', 'foundations/collection-interval/'],
   ['no-data', 'foundations/no-data-vs-zero/'],
   ['empty-graph', 'foundations/empty-graph/'],
+  ['slo', 'foundations/slo-and-error-budget/'],
+  ['red-use', 'foundations/red-and-use/'],
+  ['alert-conditions', 'foundations/alert-conditions/'],
+  ['alert-fatigue', 'foundations/alert-fatigue/'],
 ];
 // 미리보기 시트를 여는 링크. 가이드의 첫 링크는 다른 가이드라서, 핵심 목록이 나오는 개념 글 링크를 고른다.
 const SHEETS = [
   ['sheet', 'foundations/why-numbers-differ/', 'a.term'],
   ['sheet-empty-graph', 'foundations/empty-graph/', 'a.term[data-term="foundations/no-data-vs-zero"]'],
+  ['sheet-alert-fatigue', 'foundations/alert-fatigue/', 'a.term[data-term="foundations/alert-conditions"]'],
 ];
 const VIEWS = [
   ['desktop', { width: 1440, height: 900 }, false],
