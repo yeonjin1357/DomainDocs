@@ -96,14 +96,16 @@ Prometheus 화면의 Table 탭에서 아래 식을 하나씩 실행해요.
 # 울리기 시작한 횟수
 sum by (alertname) (count_over_time(
   # 15초 전엔 없던 알림 = 막 울리기 시작한 알림
-  (ALERTS{alertstate="firing"} unless ALERTS{alertstate="firing"} offset 15s)
+  (ALERTS{alertstate="firing"}
+    unless ALERTS{alertstate="firing"} offset 15s)
   # 2주를 15초 간격으로 훑어요(offset의 15s와 같은 값)
   [2w:15s]
 ))
 
 # 그중 5분 안에 풀린 횟수
 sum by (alertname) (count_over_time(
-  (ALERTS{alertstate="firing"} unless ALERTS{alertstate="firing"} offset 15s
+  (ALERTS{alertstate="firing"}
+    unless ALERTS{alertstate="firing"} offset 15s
     # offset -5m은 5분 뒤 시각: 그때도 울리고 있으면 빼요
     unless ALERTS{alertstate="firing"} offset -5m)
   [2w:15s]

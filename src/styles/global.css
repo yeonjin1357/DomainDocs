@@ -208,6 +208,12 @@ svg {
   white-space: nowrap;
 }
 
+/* 칸이 문장이면 한 줄로 두는 표는 본문 폭을 넘어 뒤 열이 가려진다(데스크톱에서도).
+   첫 열(항목 이름)만 한 줄로 두고, 나머지 칸은 줄을 바꾼다. */
+:where(.prose) td:not(:first-child) {
+  white-space: normal;
+}
+
 :where(.prose) th {
   font-weight: 600;
   color: var(--color-text-sub);

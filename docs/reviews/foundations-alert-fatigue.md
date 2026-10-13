@@ -87,3 +87,5 @@
 - (글 검토 1차) 확인 3의 수집 끊김 규칙을 `up`에 걸었어요: "`up`(수집 성공 1, 실패 0)에 건 `up == 0`과 `absent_over_time(up{job="api"}[10m])`로 알려요." alert-conditions.mdx(1ca102a) 확인 3과 같은 식이에요.
 - (글 검토 1차) 억제 YAML에 키 풀이 주석(끄는 쪽, 꺼지는 쪽, 같은 값일 때만)을 달았어요. amtool 0.34.1 `check-config` SUCCESS예요. "디스크가 곧 가득 차는" 예는 원문 각주 25 "nearly full"에 맞춘 거예요.
 - 반영 뒤 `npm run lint:content` → 글 12편 검사, 위반 0건. 본문 3,818자(최대 4,000), 가장 긴 문장 79자. 출처 15개.
+- (묶음 화면 점검) 3단계 세기 식 두 개에서 `(ALERTS{alertstate="firing"} unless ALERTS{alertstate="firing"} offset 15s` 줄을 `unless` 앞에서 나눴어요. 1440px 화면에서도 `offset 15s`가 코드 상자 밖으로 밀려 가로로 밀어야 보였어요. 줄바꿈만 바꿨고 식은 같아요.
+  - promtool 3.15.0 `test rules`: 글에 실린 줄바꿈 그대로 넣은 1분 평가·15초 평가 시험이 모두 SUCCESS예요. 기대값은 앞 라운드와 같아요. 두 시험 모두 Mixed는 6과 4, Long은 1과 결과 없음(5분 안에 풀린 적 없음)이에요.

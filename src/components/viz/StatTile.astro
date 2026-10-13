@@ -61,6 +61,14 @@ const { label, value, unit, tone = 'default', note } = Astro.props;
     color: var(--color-text-sub);
   }
 
+  /* 한 그림에 note가 있는 타일과 없는 타일이 섞이면 숫자 높이가 어긋난다.
+     숫자는 margin-top: auto로 타일 바닥에 붙는데, note가 있는 타일은 그 아래에 한 줄이 더 있어서다.
+     그럴 때만 note가 없는 타일에 note 한 줄만큼 빈 줄을 둔다. 모두 있거나 모두 없으면 그대로다. */
+  :global([data-block='on-dashboard']:has(.stat-note)) .stat:not(:has(.stat-note))::after {
+    content: '\00a0';
+    font-size: 13px;
+  }
+
   .tone-accent .stat-value {
     color: var(--color-accent);
   }
