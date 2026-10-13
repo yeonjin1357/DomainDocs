@@ -22,6 +22,7 @@ const { label, value, unit, tone = 'default', note } = Astro.props;
     padding: 14px 16px;
     border-radius: 16px;
     background: var(--color-card);
+    container-type: inline-size;
   }
 
   .stat-label {
@@ -29,10 +30,12 @@ const { label, value, unit, tone = 'default', note } = Astro.props;
     color: var(--color-text-sub);
   }
 
-  /* 이름이 두 줄로 넘어가도 옆 타일과 숫자 높이를 맞춘다 */
+  /* 이름이 두 줄로 넘어가도 옆 타일과 숫자 높이를 맞춘다.
+     숫자 크기는 타일 폭을 따른다: 360px 화면에 타일 둘이 나란히 서면 숫자 칸이 100px이라,
+     24px로는 "210,000개"의 단위나 "데이터 없음"이 다음 줄로 갈라진다. */
   .stat-value {
     margin-top: auto;
-    font-size: 24px;
+    font-size: clamp(20px, 20cqi, 24px);
     font-weight: 700;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;

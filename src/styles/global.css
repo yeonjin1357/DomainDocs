@@ -170,7 +170,8 @@ svg {
   font-family: var(--font-mono);
   font-size: 15px;
   background: var(--color-bg);
-  word-break: break-all;
+  /* 줄바꿈은 body를 따른다: 띄어쓰기에서 먼저 바꾸고, 한 줄에 안 들어가는 이름만 끊는다(overflow-wrap: anywhere).
+     break-all이면 `up`·`status="500"`처럼 짧은 이름도 줄 끝에서 둘로 갈라진다. */
 }
 
 :where(.prose) pre {
