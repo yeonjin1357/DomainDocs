@@ -30,6 +30,12 @@ function loadPagefind(url: string): Promise<Pagefind> {
   return pagefindPromise;
 }
 
+/** 검색 상태 문구. 찾은 글이 보여 주는 개수(MAX_RESULTS)보다 많으면 그 사실을 함께 알린다. */
+export function searchStatus(query: string, total: number, shown: number): string {
+  if (total === 0) return `'${query}'에 맞는 글이 없어요`;
+  return total > shown ? `총 ${total}개 중 ${shown}개를 보여 줘요` : `${shown}개를 찾았어요`;
+}
+
 function renderResult(d: PagefindResultData): HTMLLIElement {
   const li = document.createElement('li');
   const a = document.createElement('a');
@@ -84,9 +90,11 @@ export function initSearch(): void {
       return;
     }
     let data: PagefindResultData[];
+    let total: number;
     try {
       const pf = await loadPagefind(url);
       const found = await pf.search(query);
+      total = found.results.length;
       data = await Promise.all(found.results.slice(0, MAX_RESULTS).map((r) => r.data()));
     } catch {
       if (mySeq !== seq) return;
@@ -95,7 +103,7 @@ export function initSearch(): void {
       return;
     }
     if (mySeq !== seq) return;
-    status.textContent = data.length > 0 ? `${data.length}개를 찾았어요` : `'${query}'에 맞는 글이 없어요`;
+    status.textContent = searchStatus(query, total, data.length);
     list.replaceChildren(...data.map(renderResult));
   });
 }

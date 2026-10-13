@@ -4,13 +4,13 @@ import Card from '../components/ui/Card.astro';
 import ListRow from '../components/ui/ListRow.astro';
 import { DOMAINS } from '../data/domains';
 import { SITE } from '../data/site';
-import { inDomain, recentlyUpdated, sortByOrder, TYPE_LABEL, type DocCard } from '../lib/catalog';
+import { homeLists, inDomain, TYPE_LABEL, type DocCard } from '../lib/catalog';
 import { getCards } from '../lib/content';
 import { domainPath } from '../lib/paths';
 
 const cards = await getCards();
-const starter = sortByOrder(inDomain(cards, 'foundations')).slice(0, 5);
-const recent = recentlyUpdated(cards, 5);
+// 최근 목록은 처음 목록에 이미 있는 글을 빼고 고른다. 비면 카드를 숨긴다.
+const { starter, recent } = homeLists(cards);
 const metaOf = (d: DocCard) => `${TYPE_LABEL[d.type]} · ${d.readingMinutes}분`;
 ---
 <BaseLayout surface="grey">

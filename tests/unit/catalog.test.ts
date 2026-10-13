@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { inDomain, nextInDomain, recentlyUpdated, sortByOrder, type DocCard } from '../../src/lib/catalog';
+import { homeLists, inDomain, nextInDomain, recentlyUpdated, sortByOrder, type DocCard } from '../../src/lib/catalog';
 
 const card = (id: string, order: number, updated: string, domain: DocCard['domain'] = 'foundations', type: DocCard['type'] = 'concept'): DocCard => ({
   id,
@@ -38,5 +38,20 @@ describe('catalog', () => {
   });
   it('최근 수정 순으로 limit개를 고른다', () => {
     expect(recentlyUpdated(DOCS, 3).map((d) => d.id)).toEqual(['apm/x', 'foundations/a', 'foundations/b']);
+  });
+});
+
+describe('homeLists', () => {
+  const ids = (docs: readonly DocCard[]) => docs.map((d) => d.id);
+  it('처음 목록은 공통 기초를 order 순으로 limit개까지 고른다', () => {
+    expect(ids(homeLists(DOCS).starter)).toEqual(['foundations/a', 'foundations/b', 'foundations/c']);
+    expect(ids(homeLists(DOCS, 2).starter)).toEqual(['foundations/a', 'foundations/b']);
+  });
+  it('최근 목록은 처음 목록에 없는 글만 수정일이 늦은 순으로 고른다', () => {
+    expect(ids(homeLists(DOCS).recent)).toEqual(['apm/x']);
+    expect(ids(homeLists(DOCS, 2).recent)).toEqual(['apm/x', 'foundations/c']);
+  });
+  it('모든 글이 처음 목록에 있으면 최근 목록은 비어 있다', () => {
+    expect(homeLists(inDomain(DOCS, 'foundations')).recent).toEqual([]);
   });
 });

@@ -21,9 +21,11 @@ test('처음이라면 여기부터는 공통 기초를 순서대로 보여 준�
   await expect(cardWithTitle(page, '처음이라면 여기부터').locator('.row-title')).toHaveText(['데모 모음', '알파 개념', '베타 개념', '감마 가이드']);
 });
 
-test('최근 추가된 글은 수정일이 늦은 순서다', async ({ page }) => {
+test('처음 목록에 이미 있는 글은 최근 추가된 글에 다시 나오지 않는다', async ({ page }) => {
+  // 테스트 글 4편이 모두 처음 목록에 있으므로 최근 추가된 글 카드는 비어서 숨는다.
   await page.goto('./');
-  await expect(cardWithTitle(page, '최근 추가된 글').locator('.row-title')).toHaveText(['감마 가이드', '베타 개념', '알파 개념', '데모 모음']);
+  await expect(cardWithTitle(page, '처음이라면 여기부터').locator('[data-row]')).toHaveCount(4);
+  await expect(cardWithTitle(page, '최근 추가된 글')).toHaveCount(0);
 });
 
 test('영역 페이지는 가이드와 개념을 나눠 보여 준다', async ({ page }) => {
