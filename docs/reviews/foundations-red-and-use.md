@@ -74,3 +74,19 @@
 - load average(맞음, 선택 제안): 반영. "Wilkie의 발표 자료는 load average를 CPU 수로 나눠 CPU 포화로 쓰니, 이 차이를 알고 읽어요."를 더했어요. "이 글은" 같은 메타 표현은 쓰지 않았어요.
 - 발표 자료 코드의 `route`에 `r.URL.Path`가 들어가는 점(맞음, 참고): 반영 안 함. 글은 발표 자료의 코드를 옮기지 않고 식만 다뤄요. 더 깊이도 약 2,100자로 상한 근처라 더하지 않았어요.
 - 더 깊이 분량을 맞추려고, 다른 사실은 그대로 두고 문장만 줄였어요. 골든 시그널의 지연 두 문장을 한 문장으로 합쳤어요. 배치 작업 문장은 한 문장으로 줄였어요. 표 앞 문장과 Linux 체크리스트 도입 문장도 짧게 썼어요.
+
+### 글 검토 반영 (수정 1회차)
+
+글 검토(Important 5, Minor 10)를 반영하면서 사실이 바뀌거나 새로 들어간 곳이에요.
+
+- **네이티브 히스토그램:** "`_count`·`_bucket` 시계열이 없어요"로 넓혔어요. p99 식 `histogram_quantile(0.99, sum(rate(request_duration_seconds{status_code!~"5.."}[5m])))`을 더했어요. 근거는 Prometheus Query functions "When aggregating native histograms, the expression simplifies to …"이에요.
+  - promtool 3.15.0 `test rules`로 확인했어요. 15초 수집, 서버 2대, schema 0, 15초마다 서버당 200 8,964건과 500 36건이에요.
+  - `sum(histogram_count(rate(...[5m])))`은 1,200, 5xx만 세면 4.8이에요.
+  - 위 p99 식은 0.9565초예요. 5xx를 섞으면 0.9559초로, 빠른 에러가 p99를 끌어내려요.
+  - 네이티브만 있으면 `request_duration_seconds_count`와 `request_duration_seconds_bucket`은 빈 결과예요. 띄운 서버는 없어요.
+- **load average:** 풀이를 "CPU를 쓰거나 기다리는 작업 수의 평균"으로 바꾸고, Linux에서 디스크 I/O 대기도 센다고 썼어요. https://man7.org/linux/man-pages/man5/proc_loadavg.5.html "the number of jobs in the run queue (state R) or waiting for disk I/O (state D) averaged over 1, 5, and 15 minutes"를 sources에 더했어요.
+  - "발표 자료가 CPU 포화로 쓰는 load average ÷ CPU 수는 디스크 I/O 대기로도 올라요"는 이 정의에서 바로 나와요.
+- **`await`:** "기다린 시간까지 합친 요청당 평균 처리 시간"으로 풀었어요. iostat(1) "This includes the time spent by the requests in queue and the time spent servicing them". 체크리스트 기준 'or high "await"'도 다시 넣었어요.
+- **`r`:** "CPU 수를 넘은 만큼은 기다리는 스레드예요"를 더했어요. use-linux 각주 [2](`r`은 기다리는 스레드와 CPU에서 도는 스레드를 함께 셈)에서 바로 나와요.
+- **Point 2:** "USE는 문제의 원인을, RED는 사용자가 겪는 증상을 보여 줘요"를 더했어요. 근거는 Grafana Dashboard best practices "USE reports on causes of issues. RED reports on user experience"예요.
+- **지운 문장:** "웹 서비스라면 트래픽은 보통 초당 HTTP 요청 수예요"와 "메모리처럼 용량을 쓰는 자원은 쓴 양의 비율로…"는 분량 때문에 지웠어요. 남은 문장과 어긋나지 않아요.
