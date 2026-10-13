@@ -1,0 +1,95 @@
+---
+title: 평균과 백분위수
+summary: 평균은 느린 요청을 숨기고, 백분위수는 드러내요.
+domain: foundations
+type: concept
+order: 1
+icon: chart-column
+keywords: [p50, p95, p99, 퍼센타일, percentile, 중앙값, 꼬리 지연, tail latency]
+sources:
+  - title: Prometheus — Histograms and summaries
+    url: https://prometheus.io/docs/practices/histograms/
+  - title: Google SRE Book — Service Level Objectives
+    url: https://sre.google/sre-book/service-level-objectives/
+  - title: Prometheus — Query functions (histogram_quantile)
+    url: https://prometheus.io/docs/prometheus/latest/querying/functions/#histogram_quantile
+  - title: NumPy — numpy.percentile
+    url: https://numpy.org/doc/stable/reference/generated/numpy.percentile.html
+  - title: R — quantile (Sample Quantiles)
+    url: https://stat.ethz.ch/R-manual/R-devel/library/stats/html/quantile.html
+updated: 2026-10-13
+---
+import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';
+
+<OnDashboard title="응답시간 · 최근 1시간" caption="같은 순간 평균은 187ms까지만 오르는데, p99는 3,000ms로 튀어요.">
+  <MiniLineChart
+    ariaLabel="평균 응답시간은 130ms 근처에서 두 번 187ms까지 조금 오르고, p99는 같은 때 3,000ms까지 튀는 그래프"
+    series={[
+      { label: '평균', values: [130, 128, 131, 129, 187, 130, 129, 131, 130, 129, 187, 130], tone: 'sub', value: '187ms' },
+      { label: 'p99', values: [160, 158, 160, 159, 3000, 160, 158, 160, 159, 160, 3000, 160], tone: 'warn', value: '3,000ms' },
+    ]}
+  />
+  <StatTile label="평균(가장 높을 때)" value="187" unit="ms" />
+  <StatTile label="p99(가장 높을 때)" value="3,000" unit="ms" tone="warn" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="평균은 아무도 겪지 않은 숫자일 수 있어요">
+    요청 100개 중 98개가 0.1초, 2개가 3초 걸렸다면 평균은 0.158초예요. 그런데 0.158초 걸린 요청은 하나도 없어요. 평균만 보면 3초를 기다린 사용자가 보이지 않아요.
+  </Point>
+  <Point title="p99는 요청의 99%가 끝난 시간이에요">
+    p99는 요청을 빠른 순서로 줄 세웠을 때 99% 위치의 값이에요. 요청이 100개라면 99번째 값이에요. "p99가 1.2초"라면 요청의 99%가 1.2초 안에 끝났다는 뜻이에요.
+
+    p50은 가운데 값(중앙값)이고, p95는 95% 위치의 값이에요.
+  </Point>
+  <Point title="느린 요청이 1%를 넘으면 p99가 튀어요">
+    요청 100개 중 3초짜리 느린 요청이 1개(1%)면 p99는 그대로예요. 2개(2%)가 되는 순간 p99는 느린 요청의 시간인 3초가 돼요. 그래서 p99가 튀었다면 느린 요청이 1%를 넘었다는 신호예요.
+
+    아래 데모에서 느린 요청을 하나씩 늘리며 p99가 언제 튀는지 보세요.
+  </Point>
+</KeyPoints>
+
+<PercentileDemo client:visible />
+
+<Checkpoints>
+  <Check>서버별 p99를 구한 뒤 평균을 냈다면 틀린 값이에요. 서버별 원본 값이나 히스토그램을 먼저 합치고, p99를 다시 계산해야 해요.</Check>
+  <Check>1분짜리 p99 60개를 평균 내서 1시간 p99라고 부르면 틀려요. 1시간 p99는 1시간 동안의 요청을 모두 모아 다시 계산해야 해요.</Check>
+  <Check>응답시간 알림이 평균만 본다면 느린 요청이 작게 보여요. 앞의 예처럼 요청 2%가 3초를 기다려도 평균은 0.158초예요.</Check>
+  <Check>요청이 50개뿐인 구간의 p99는 사실상 최댓값이에요. 순위를 구하면 ⌈0.99 × 50⌉ = 50번째, 곧 맨 끝 값이에요. p99 옆에 요청 수를 함께 보여 주세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 계산 방법
+
+  가장 단순한 계산법은 nearest-rank(가장 가까운 순위) 방식이에요. 값을 오름차순으로 정렬하고, 아래 순위에 있는 값을 골라요.
+
+  ```text
+  순위 = ⌈p × n / 100⌉   (⌈ ⌉는 올림, n은 요청 수)
+  ```
+
+  요청 100개의 p99는 99 × 100 / 100 = 99번째 값이에요. 요청 50개의 p99는 ⌈49.5⌉ = 50번째, 곧 최댓값이에요.
+
+  코드에서는 p × n을 먼저 곱하고 100으로 나눠요. 100으로 먼저 나누면 부동소수점 오차로 순위가 밀릴 수 있어요. JavaScript에서 99.9 / 100 × 1000은 999.0000000000001이라, 올림하면 1000이 돼요.
+
+  NumPy와 R은 기본으로 앞뒤 순위의 값 사이를 보간해요. 요청이 적고 꼬리가 길면 도구마다 p99가 크게 달라져요.
+
+  요청 50개 중 49개가 160ms, 1개가 3초라고 해 봐요. p99는 nearest-rank로 3,000ms, NumPy 기본값으로 1,608ms예요.
+
+  ### 히스토그램과 summary
+
+  Prometheus 클래식 히스토그램은 미리 정한 구간(bucket)마다 요청 수를 세요. 버킷은 누적이라서, `le="0.5"` 버킷에는 0.5초 이하인 요청이 모두 들어가요.
+
+  `histogram_quantile()`은 버킷 안에 값이 고르게 퍼져 있다고 보고 선형 보간해요. 그래서 결과는 근사값이고, 버킷 경계가 정확도를 좌우해요. 예를 들어 p99가 0.5~1초 버킷에 들면, 실제 p99는 그 사이 어디든 될 수 있어요.
+
+  히스토그램은 여러 서버를 합칠 수 있어요. 서버별 버킷 카운터마다 rate(초당 증가량)를 먼저 구하고, 같은 `le`끼리 더한 뒤 p99를 계산해요. 이때 서버마다 버킷 경계가 같아야 해요.
+
+  summary는 각 서버가 직접 계산한 p99 같은 값을 내보내요. 이 값끼리는 합칠 수 없어서, 여러 서버를 묶은 p99를 구할 수 없어요. `avg(http_request_duration_seconds{quantile="0.99"})`처럼 평균 내는 식도 틀려요.
+
+  히스토그램으로 여러 서버를 합친 p99는 이렇게 구해요.
+
+  ```text
+  histogram_quantile(0.99, sum by (le) (rate(http_server_request_duration_seconds_bucket[5m])))
+  ```
+
+  `sum by (le)`는 `le`만 남기고 서버·경로 같은 다른 라벨을 모두 합쳐요. 서비스별로 보려면 `sum by (job, le)`처럼 남길 라벨을 더 적어요.
+</Deeper>
