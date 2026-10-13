@@ -94,10 +94,10 @@ p99, rate, span 같은 말은 영어 그대로 써요. 처음 나올 때 한 번
 ````mdx
 ---
 title: 제목(30자 이하)
-summary: 한 줄 요약(15~60자). 이것만 읽어도 무엇인지 알게 써요.
+summary: 한 문장 요약(15~60자). 앞 25자만 읽어도 무엇인지 알게 써요.
 domain: foundations
 type: concept
-order: 1
+order: 10
 icon: chart-column
 keywords: [검색 별칭, 영어 용어]
 related: [foundations/다른-글]
@@ -108,14 +108,14 @@ updated: 2026-10-13
 ---
 import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';
 
-<OnDashboard title="위젯 이름" caption="그림이 보여 주는 것 한 문장">
+<OnDashboard title="위젯 이름" caption="그림이 보여 주는 것 1~2문장">
   <MiniLineChart ariaLabel="그래프 설명" series={[{ label: '평균', values: [1, 2, 3], tone: 'sub' }]} />
   <StatTile label="p99" value="3,000" unit="ms" tone="warn" />
 </OnDashboard>
 
 <KeyPoints>
-  <Point title="핵심 1 (30자 이하)">
-    두세 문장이에요.
+  <Point title="결론으로 쓴 핵심 1 (30자 이하)">
+    결론부터 5문장 안팎, 두 단락 이하로 써요.
   </Point>
 </KeyPoints>
 
@@ -139,11 +139,27 @@ import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';
 
 가이드의 `Item` 제목도 본문보다 먼저 읽혀요. 무엇을 볼지 한눈에 알게 짧게 써요.
 
+### 블록마다 분량을 지켜요
+
+검사기는 본문 전체 분량만 봐요. 블록마다의 분량은 이 표로 손으로 확인해요.
+
+| 블록 | 분량 |
+| --- | --- |
+| `Point` | 5문장 안팎, 두 단락 이하. 넘치는 내용은 `Deeper`로 보내요 |
+| `caption` | 1~2문장 |
+| `summary` | 한 문장. 목록은 두 줄까지만 보여 줘서 좁은 화면에선 뒤가 잘려요. 앞 25자 안팎만 읽어도 뜻이 통하게 써요 |
+| `Deeper` | 2,000자 안팎 |
+| `sources` | 독자가 볼 출처 15개 안팎. 소스 줄 번호 같은 세부 근거는 `docs/reviews/`의 검토 기록에 남겨요 |
+
+`summary`와 `sources` 기준은 가이드 글에도 똑같아요.
+
 ### 머리말의 `order`와 `draft`
 
 두 항목은 가이드 글에도 똑같이 써요.
 
-- `order`: 영역 안에서 추천하는 읽기 순서예요. 영역 페이지와 홈의 "처음이라면 여기부터"가 이 순서로 줄을 세워요. 글 끝 "다음에 읽을 글"도 이 순서를 따라요. 0부터 쓸 수 있고, 값이 같으면 파일 이름 순이에요.
+- `order`: 영역 안에서 추천하는 읽기 순서예요. 영역 페이지와 홈의 "처음이라면 여기부터"가 이 순서로 줄을 세워요. 글 끝 "다음에 읽을 글"도 이 순서를 따라요.
+  - 10, 20, 30처럼 10씩 띄워 써요. 그래야 사이에 글을 끼워도 다른 글 번호를 고치지 않아요.
+  - 0부터 쓸 수 있고, 값이 같으면 파일 이름 순이에요.
 - `draft: true`: 초안이에요. 운영 빌드(`npm run build`)에서 빠지고 개발 서버에서만 보여요. 공개 글은 `<Term>`이나 `related`로 초안을 가리킬 수 없어요. 공개할 때 이 줄을 지워요.
 
 ## 4. 가이드 글 뼈대
@@ -155,10 +171,10 @@ import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';
 ````mdx
 ---
 title: 제목(30자 이하)
-summary: 한 줄 요약. 이 글로 무엇을 할 수 있는지 써요.
+summary: 한 문장 요약(15~60자). 이 글로 무엇을 할 수 있는지 앞부분에 써요.
 domain: foundations
 type: guide
-order: 1
+order: 10
 sources:
   - title: 출처 제목
     url: https://...
@@ -237,16 +253,47 @@ updated: 2026-10-13
 
 기준값은 `scripts/lint-content/config.ts`에 있어요. 값을 바꾸면 이 표도 같이 고쳐요.
 
-## 7. 작성 절차
+## 7. 검토에서 자주 나온 지적
+
+1·2묶음 검토에서 되풀이된 지적이에요. 검사기는 잡지 못하니, 검토를 맡기기 전에 이 표로 다시 봐요.
+
+| 지적 | 이렇게 고쳐요 |
+| --- | --- |
+| 왜 신경 써야 하는지가 `Deeper`에만 있음 | 무엇이 나빠지는지를 본문에 써요. 예: "새 값마다 시계열이 생기고, 시계열마다 메모리와 디스크를 써요." |
+| `Check`가 `Deeper`와 어긋남 | 같은 글의 `Check`와 `Deeper`를 나란히 놓고 읽어요. `Deeper`가 권장 기준(예: 카디널리티 10 아래)을 들면, 본문 예시가 그 기준과 어떻게 맞는지 밝혀요 |
+| 조건이 느슨함 | 조건을 정확히 써요. "지표 이름만 쓴 질의"가 아니라 "`[5m]` 같은 구간 없이 쓴 질의"예요 |
+| 근거 없는 단정 | "대부분", "늘", "절대"는 근거가 있을 때만 써요 |
+| 도구마다 다른 동작을 일반론으로 씀 | 도구, 버전, 설정을 밝혀요. 예: "Prometheus 3에서", "Grafana Stat 패널의 기본 계산 Last *". 숫자 예시는 전제(수집 주기, 패널 폭 등)도 밝혀요 |
+| 도구 화면 용어나 설정 키를 풀지 않음 | 처음 나올 때 풀어요. 예: Explore(질의를 따로 열어 고쳐 가며 실행하는 Grafana 화면), Query options(패널의 질의 간격·기간 설정), `$__rate_interval`(rate 구간을 자동으로 잡는 Grafana 변수), OTLP(OpenTelemetry 전송 규약) |
+| 사실 검토 수정을 지적받은 곳만 고침 | 같은 주장이 나오는 곳을 모두 찾아 고쳐요. `Point`, `Check`, `caption`, 그림의 글자(`label`, `value`, `ariaLabel`)까지 봐요 |
+
+### 자주 쓰는 용어
+
+같은 것은 모든 글에서 같은 말로 불러요. "라벨", "시리즈"처럼 바꿔 부르지 않아요. 처음 나올 때는 아래 풀이를 써요.
+
+| 용어 | 처음 나올 때 풀이 |
+| --- | --- |
+| 레이블 | label, 키와 값의 쌍 |
+| 시계열 | time series, 값을 시각 순서로 늘어놓은 줄 |
+| 샘플 | sample, 수집한 값 하나 |
+| 게이지 | gauge, 오르내리는 현재 값 |
+| 카운터 | counter, 계속 더하기만 하는 값. 재시작하면 0부터 다시 세요 |
+| 수집 주기 | 값을 하나씩 모으는 간격. Prometheus 설정은 `scrape_interval`이에요 |
+| 점 간격 | 그래프의 점 사이 간격. Prometheus는 step, Grafana는 interval이라고 불러요 |
+| stale 표시 | 더 이상 값이 없다는 표시 |
+| `up` | 수집 성공 1, 실패 0. 대상이 수집 목록에서 빠지면 0이 아니라 사라져요 |
+
+## 8. 작성 절차
 
 1. 출처를 조사해요. 공식 문서, 명세, 원 논문을 먼저 봐요.
 2. 초안을 써요.
-3. `npm run lint:content`를 돌려요.
-4. 작성자와 다른 에이전트가 사실을 검토해요. 결과는 `docs/reviews/{domain}-{slug}.md`에 남겨요.
-5. 검토 내용을 반영하고 다시 검사해요.
-6. 사이트 주인이 화면에서 확인해요.
+3. 숫자 예시는 직접 다시 계산해요. PromQL은 promtool(Prometheus 명령줄 도구)이나 로컬 Prometheus로, JavaScript 식은 node로 돌려 봐요. 띄운 서버는 끝나면 꼭 꺼요.
+4. `npm run lint:content`를 돌려요.
+5. 작성자와 다른 에이전트가 사실을 검토해요. 결과는 `docs/reviews/{domain}-{slug}.md`에 남겨요.
+6. 검토 내용을 반영하고 다시 검사해요. 같은 주장이 나오는 곳은 모두 고쳐요(7장).
+7. 사이트 주인이 화면에서 확인해요.
 
-## 8. 사실 검토 기록 형식
+## 9. 사실 검토 기록 형식
 
 ````md
 # 사실 검토: <제목>
