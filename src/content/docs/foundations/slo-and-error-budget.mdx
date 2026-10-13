@@ -1,0 +1,124 @@
+---
+title: SLI·SLO·에러 버짓
+summary: SLO는 성공 비율의 목표이고, 에러 버짓은 그 목표가 허용하는 실패의 양이에요.
+domain: foundations
+type: concept
+order: 90
+icon: gauge
+keywords: [SLI, SLO, SLA, error budget, 에러 버짓, 오류 예산, burn rate, 소진율, 가용성]
+related: [foundations/percentiles, foundations/counters-and-rate, foundations/red-and-use]
+sources:
+  - title: Google SRE Book — Service Level Objectives
+    url: https://sre.google/sre-book/service-level-objectives/
+  - title: Google SRE Book — Embracing Risk (시간 기준·요청 기준 가용성)
+    url: https://sre.google/sre-book/embracing-risk/
+  - title: Google SRE Book — Availability Table
+    url: https://sre.google/sre-book/availability-table/
+  - title: Google SRE Book — Monitoring Distributed Systems (증상과 원인)
+    url: https://sre.google/sre-book/monitoring-distributed-systems/
+  - title: Google SRE Workbook — Implementing SLOs
+    url: https://sre.google/workbook/implementing-slos/
+  - title: Google SRE Workbook — Alerting on SLOs
+    url: https://sre.google/workbook/alerting-on-slos/
+  - title: 'Google Cloud Blog — SRE fundamentals: SLI vs SLO vs SLA'
+    url: https://cloud.google.com/blog/products/devops-sre/sre-fundamentals-sli-vs-slo-vs-sla
+  - title: Google Cloud — Define reliability based on user-experience goals (CPU 같은 서버 지표)
+    url: https://docs.cloud.google.com/architecture/framework/reliability/define-reliability-based-on-user-experience-goals
+  - title: Prometheus — Histograms and summaries (300ms 안에 끝난 요청의 비율)
+    url: https://prometheus.io/docs/practices/histograms/
+updated: 2026-10-13
+---
+
+<OnDashboard title="결제 API · SLO 99.9% · 30일" caption="30일 동안 요청 100만 건 중 1,000건(0.1%)까지 실패할 수 있는데, 500건이 실패했어요. 그래서 성공률은 99.95%이고, 에러 버짓은 절반이 남았어요.">
+  <MiniLineChart
+    ariaLabel="남은 에러 버짓이 30일 동안 100%에서 50%로 줄어드는 그래프. 중간에 한 번 85%에서 70%로 크게 떨어져요"
+    yMax={100}
+    series={[{ label: '남은 에러 버짓', values: [100, 96, 91, 88, 85, 70, 66, 62, 58, 55, 52, 50], tone: 'accent', value: '50%' }]}
+  />
+  <StatTile label="30일 요청" value="100만" unit="건" />
+  <StatTile label="30일 성공률" value="99.95" unit="%" />
+  <StatTile label="남은 에러 버짓" value="50" unit="%" />
+  <StatTile label="남은 실패 허용" value="500" unit="건" note="1,000건 중" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="SLI는 좋은 요청의 비율로 두면 좋아요">
+    SLI(service level indicator, 서비스 수준 지표)는 사용자가 겪는 서비스 품질을 잰 숫자예요. Google SRE 워크북은 SLI를 '좋은 이벤트 수 ÷ 전체 이벤트 수'로 두라고 권해요. 예를 들면 '300ms 안에 성공한 요청 ÷ 전체 요청'이에요.
+
+    비율이라 값이 0~100% 사이에 들어서, 목표와 견주기 쉬워요. 서버 CPU 사용률 같은 내부 지표는 SLI로 두지 않아요. CPU 과부하는 느린 응답의 원인일 뿐, 사용자가 겪는 일은 아니에요.
+  </Point>
+  <Point title="SLO는 목표와 기간을 함께 정해요">
+    SLO(service level objective, 서비스 수준 목표)는 SLI가 이뤄야 할 목표값이에요. '30일 동안 99.9%'처럼 기간이 함께 있어야 지켰는지 판정할 수 있어요. 요청이 고르게 들어올 때 모든 요청이 30분 동안 실패하면, 하루 기준으론 목표를 깨지만 30일 기준으론 허용 안이에요.
+
+    SLA(service level agreement, 서비스 수준 협약)는 목표를 못 지켰을 때 환불 같은 대가를 정한 계약이에요. 그래서 SLA 목표는 보통 내부 SLO보다 느슨하게 둬요. SLA가 한 달 99.9%, 내부 SLO가 99.95%라면 내부 목표가 먼저 깨져서, 계약을 어기기 전에 손볼 수 있어요.
+  </Point>
+  <Point title="에러 버짓은 허용한 실패의 양이에요">
+    에러 버짓(error budget)은 100%에서 SLO를 뺀 만큼의 실패예요. 30일 99.9%라면 0.1%라서, 30일 요청이 100만 건이면 1,000건까지 실패해도 돼요. 시간으로 재면 30일(43,200분)의 0.1%인 43.2분이에요.
+
+    99.99%로 9를 하나 더하면 버짓은 4.32분으로 10분의 1이 돼요. Google SRE Book은 신뢰성을 한 단계 올리는 비용이 앞 단계의 100배일 수도 있다고 해요. 같은 책의 예에선 버짓이 남으면 배포를 이어 가고, 다 쓰면 잠시 멈춰요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>SLI를 '평균 응답시간 300ms 이하'로 정했다면 다시 보세요. <Term slug="foundations/percentiles">평균</Term>은 느린 요청을 숨기고, 나쁜 요청을 세지 않아 에러 버짓으로 바꾸기 어려워요. '300ms 안에 끝난 요청의 비율'처럼 임계값 안에 든 요청을 세세요.</Check>
+  <Check>목표가 '99.9%'뿐이고 기간이 없다면 기간부터 정하세요. 같은 99.9%라도 시간으로 재면 하루는 1.44분, 30일은 43.2분까지 허용돼요. 대시보드 시간 범위(예: 최근 6시간)로 구한 성공률을 SLO와 견주면, 30일이 아니라 6시간을 판정한 거예요.</Check>
+  <Check>SLO가 100%라면 목표부터 다시 잡으세요. 에러 버짓이 0이라 실패 한 건이 곧 위반이고, 배포할 여유도 없어요. 쓴 버짓을 (1 − SLI) ÷ (1 − SLO)로 구하면 0으로 나눠서, JavaScript에선 Infinity나 NaN이 돼요.</Check>
+  <Check>CPU·메모리 사용률에 SLO를 걸었다면 다시 보세요. CPU가 낮아도 DB가 연결을 거부하면 사용자는 에러를 받는데, 이 SLO는 그걸 놓쳐요. 이런 원인 지표는 원인을 찾는 대시보드에 두고, SLO는 성공률과 응답시간 비율로 거세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 요청 기준과 시간 기준
+
+  요청 기준 SLI는 성공한 요청 ÷ 전체 요청이고, 버짓은 실패해도 되는 요청 수예요. 시간 기준 SLI는 정상이던 시간 ÷ 전체 시간이고, 버짓은 분으로 세요. 43.2분은 시간 기준 숫자예요.
+
+  요청 기준에서는 버짓이 버티는 시간이 실패 비율에 달려요. 요청이 고르게 들어올 때 모든 요청이 실패하면 43분, 10%만 실패하면 7.2시간 만에 30일 버짓을 다 써요. 같은 10분 장애라도 요청이 몰린 때라면 버짓을 더 써요.
+
+  Google은 시간 기준 대신 요청 기준을 써요. 전 세계에 나뉜 서비스는 어느 때든 일부는 돌아가서, 멈춘 시간을 정하기 어렵기 때문이에요.
+
+  요청이 적으면 버짓도 작아요. 한 시간에 10건이면 30일 요청이 7,200건이라, 99.9% 버짓은 7건 남짓이에요. 실패 한 건이 버짓의 약 14%를 써요.
+
+  응답시간 SLI도 요청 수로 세요. Prometheus 클래식 히스토그램이라면 300ms 안에 끝난 요청의 비율을 서비스(`job`)마다 이렇게 구해요.
+
+  ```text
+    sum by (job) (rate(http_server_request_duration_seconds_bucket{le="0.3"}[5m]))
+  /
+    sum by (job) (rate(http_server_request_duration_seconds_count[5m]))
+  ```
+
+  `by (job)`을 빼면 모든 서비스의 요청이 한 숫자로 섞여요. 이 식은 경계가 0.3초인 버킷(그 시간 이하 요청을 세는 칸)이 꼭 있어야 해요. 없으면 결과가 비고, 일부 서버에만 있으면 경고 없이 틀린 값이 나와요.
+
+  이 식은 300ms 안에 끝난 실패 요청도 좋은 요청으로 세요. 실패는 성공률 SLI로 따로 세요. 워크북의 예도 성공률 SLI와 응답시간 SLI를 따로 둬요.
+
+  ### burn rate
+
+  burn rate(소진율)는 SLO에 견줘 에러 버짓을 쓰는 속도예요. 1이면 SLO 기간이 끝나는 순간 버짓이 정확히 0이 돼요. 99.9%·30일에서 에러율 0.1%가 이어지면 burn rate가 1이에요.
+
+  burn rate는 어떤 구간의 에러율을 (1 − SLO)로 나눈 값이에요. 99.9%에서 에러율이 1%면 10이라 3일 만에, 100%면 1,000이라 43분 만에 버짓을 다 써요.
+
+  SRE 워크북은 30일 99.9% SLO의 알림 출발점으로 이런 값을 권해요. 1시간 burn rate 14.4(버짓 2%)나 6시간 6(5%)이면 사람을 호출해요. 3일 1(10%)이면 티켓(나중에 처리할 작업)만 남겨요.
+
+  괄호 안의 비율은 그 구간에 쓴 버짓이에요. 쓴 버짓은 burn rate × 구간 ÷ 30일이라, 14.4 × 1시간 ÷ 720시간 = 2%예요.
+
+  에러율은 실패 요청과 전체 요청 카운터의 <Term slug="foundations/counters-and-rate">rate</Term>로 구해요. 워크북의 식을 풀어 쓰면 1시간 알림은 이래요.
+
+  ```text
+    sum by (job) (rate(slo_errors[1h]))
+  /
+    sum by (job) (rate(slo_requests[1h]))
+  > 14.4 * 0.001
+  ```
+
+  0.001은 1 − SLO(99.9%)예요. `by (job)`이 없으면 한 서비스의 에러가 다른 서비스 요청에 묻혀요. 에러율 2%(burn rate 20)인 서비스도 요청이 9배인 정상 서비스와 합치면 0.2%라 울리지 않아요.
+
+  긴 구간의 1/12인 짧은 구간(1시간이면 `[5m]`)도 함께 넘을 때만 울리면, 장애가 끝나고 1시간이 아니라 5분 뒤에 알림이 풀려요.
+
+  ### 고정 기간과 이동 기간
+
+  고정 기간(calendar window)은 매달 1일부터 말일까지처럼 달력에 맞춘 기간이에요. 새 기간이 시작되면 처음부터 다시 세서, 말일의 큰 장애가 다음 날 셈에서 빠져요.
+
+  이동 기간(rolling window)은 지금부터 거슬러 올라간 일정 기간(예: 30일)이에요. 실패는 그 기간 동안 셈에 남다가 빠지고, 빠지는 날 남은 버짓이 다시 늘어요. SRE 워크북은 이쪽이 사용자 경험에 더 가깝다고 보고, 4주 이동 기간을 무난한 기본값으로 꼽아요.
+
+  주 단위로 잡으면 기간마다 주말 수가 같아요. 30일 기간은 주말이 네 번일 때도, 다섯 번일 때도 있어서, 주말 트래픽이 다르면 SLI가 괜히 흔들려요. 이 글의 숫자는 워크북 알림 장처럼 30일로 계산했고, 4주(28일)면 99.9% 버짓은 40.32분이에요.
+
+  고정 기간은 분기 계획 같은 사업 일정과 맞아요. 대신 기간 중간에는 남은 기간의 요청 수를 몰라서, 요청 기준 버짓의 크기를 짐작해야 해요.
+</Deeper>
