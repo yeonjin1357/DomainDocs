@@ -11,6 +11,15 @@ const PAGES = [
   ['counters', 'foundations/counters-and-rate/'],
   ['downsampling', 'foundations/aggregation-and-downsampling/'],
   ['guide', 'foundations/why-numbers-differ/'],
+  ['time-series', 'foundations/time-series-and-labels/'],
+  ['collection', 'foundations/collection-interval/'],
+  ['no-data', 'foundations/no-data-vs-zero/'],
+  ['empty-graph', 'foundations/empty-graph/'],
+];
+// 미리보기 시트를 여는 링크. 가이드의 첫 링크는 다른 가이드라서, 핵심 목록이 나오는 개념 글 링크를 고른다.
+const SHEETS = [
+  ['sheet', 'foundations/why-numbers-differ/', 'a.term'],
+  ['sheet-empty-graph', 'foundations/empty-graph/', 'a.term[data-term="foundations/no-data-vs-zero"]'],
 ];
 const VIEWS = [
   ['desktop', { width: 1440, height: 900 }, false],
@@ -31,13 +40,16 @@ for (const scheme of ['light', 'dark']) {
     await page.goto(new URL('foundations/percentiles/', base).toString());
     const perLine = await page.locator('.point-body p').first().evaluate((p) => p.getBoundingClientRect().width / parseFloat(getComputedStyle(p).fontSize));
     console.log(`${view}/${scheme}: 핵심 본문 한 줄 ≈ ${perLine.toFixed(1)}자`);
-    // 미리보기 시트와 검색
-    await page.goto(new URL('foundations/why-numbers-differ/', base).toString());
-    await page.locator('a.term').first().click();
-    await page.locator('#term-sheet').waitFor({ state: 'visible' });
-    await page.waitForTimeout(400);
-    await page.screenshot({ path: `screenshots/sheet-${view}-${scheme}.png` });
-    await page.keyboard.press('Escape');
+    // 미리보기 시트
+    for (const [name, path, link] of SHEETS) {
+      await page.goto(new URL(path, base).toString());
+      await page.locator(link).first().click();
+      await page.locator('#term-sheet').waitFor({ state: 'visible' });
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: `screenshots/${name}-${view}-${scheme}.png` });
+      await page.keyboard.press('Escape');
+    }
+    // 검색
     await page.getByRole('button', { name: '검색' }).click();
     await page.getByRole('searchbox', { name: '검색어' }).fill('백분위수');
     await page.locator('[data-search-result]').first().waitFor();
