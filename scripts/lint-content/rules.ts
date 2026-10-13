@@ -9,7 +9,7 @@ import {
   readFrontmatter,
   type JsxElement,
 } from '../../src/lib/mdx/parse';
-import { extractProse, findBanned, FORMAL_ENDING, sentencesOf } from '../../src/lib/mdx/prose';
+import { endsPolitely, extractProse, findBanned, sentencesOf } from '../../src/lib/mdx/prose';
 import { proseChars } from '../../src/lib/mdx/analyze';
 import { LINT_CONFIG } from './config';
 
@@ -26,7 +26,9 @@ export type RuleId =
   | 'banned-phrase'
   | 'body-length'
   | 'reference'
-  | 'markdown-link';
+  | 'markdown-link'
+  | 'unknown-component'
+  | 'demo-hydration';
 
 export interface LintIssue {
   file: string;
@@ -197,6 +199,29 @@ function checkBlocks(tree: Root, report: Report): void {
   });
 }
 
+const MDX_COMPONENTS: readonly string[] = LINT_CONFIG.mdxComponents;
+
+/** 등록된 컴포넌트와 import한 데모만 쓰게 하고, 데모에는 client 지시어가 있어야 한다. */
+function checkComponents(tree: Root, demos: Set<string>, report: Report): void {
+  visit(tree, (node) => {
+    if (!isJsx(node) || node.name == null) return;
+    const name = node.name;
+    if (demos.has(name)) {
+      const hydrated = Object.keys(jsxAttrs(node)).some((k) => k.startsWith('client:'));
+      if (!hydrated) {
+        report('demo-hydration', lineOf(node), columnOf(node), `<${name}>에 client 지시어가 없어서 움직이지 않는 그림으로만 보여요. <${name} client:visible />로 쓰세요.`);
+      }
+    } else if (!MDX_COMPONENTS.includes(name)) {
+      report(
+        'unknown-component',
+        lineOf(node),
+        columnOf(node),
+        `<${name}>은(는) 쓸 수 없는 요소예요. 등록된 컴포넌트나 default import한 데모만 써요. 다른 글은 <Term>으로 이어요.`,
+      );
+    }
+  });
+}
+
 function checkProse(tree: Root, report: Report): void {
   for (const unit of extractProse(tree)) {
     const sentences = sentencesOf(unit);
@@ -208,7 +233,7 @@ function checkProse(tree: Root, report: Report): void {
       if (s.length > LINT_CONFIG.maxSentenceChars) {
         report('sentence-length', s.line, col, `문장이 ${s.length}자예요 (최대 ${LINT_CONFIG.maxSentenceChars}자): "${preview(s.text)}"`);
       }
-      if (FORMAL_ENDING.test(s.masked)) report('formal-ending', s.line, col, `해요체로 써 주세요: "${preview(s.text)}"`);
+      if (!endsPolitely(s.masked)) report('formal-ending', s.line, col, `해요체(~요)로 끝내 주세요: "${preview(s.text)}"`);
       if (unit.ancestors.includes('Deeper')) continue;
       for (const b of findBanned(s, LINT_CONFIG.bannedPhrases)) {
         report('banned-phrase', s.line, col, `본문에 쓰지 않는 표현이에요("${b}"). 꼭 필요하면 <Deeper>로 옮기세요.`);
@@ -278,6 +303,7 @@ export function lintSource(src: SourceFile, ctx: LintContext): LintIssue[] {
   if (type === 'concept') checkConceptStructure(items, demos, report);
   else checkGuideStructure(items, demos, report);
   checkBlocks(tree, report);
+  checkComponents(tree, demos, report);
   checkProse(tree, report);
 
   const chars = proseChars(tree, { excludeDeeper: true });

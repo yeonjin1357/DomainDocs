@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseMdx } from '../../../src/lib/mdx/parse';
-import { extractProse, FORMAL_ENDING, findBanned, sentencesOf, splitSentenceSpans } from '../../../src/lib/mdx/prose';
+import { CODE_MASK, endsPolitely, extractProse, findBanned, sentencesOf, splitSentenceSpans } from '../../../src/lib/mdx/prose';
 
 const split = (text: string) => splitSentenceSpans(text).map(([s, e]) => text.slice(s, e));
 const sentences = (mdx: string) => extractProse(parseMdx(mdx)).flatMap((u) => sentencesOf(u).map((s) => s.text));
@@ -64,19 +64,35 @@ describe('extractProse', () => {
     const [s] = sentencesOf(unit);
     expect(s.text).toBe('`Node.js 습니다.` 명령은 짧아요.'.replace(/`/g, ''));
     expect(s.length).toBe([...'Node.js 습니다. 명령은 짧아요.'].length);
-    expect(FORMAL_ENDING.test(s.masked)).toBe(false);
+    expect(endsPolitely(s.masked)).toBe(true);
+  });
+  it('인라인 코드로 끝나는 문장은 코드 앞의 마지막 글로 끝맺음을 본다', () => {
+    const masked = (mdx: string) => sentencesOf(extractProse(parseMdx(mdx))[0])[0].masked;
+    expect(endsPolitely(masked('PromQL로는 이렇게 써요: `rate(x[5m])`\n'))).toBe(true);
+    expect(endsPolitely(masked('쓰는 함수는 `rate()`.\n'))).toBe(false);
+    expect(endsPolitely(masked('`rate()`\n'))).toBe(true);
   });
   it('링크와 Term의 보이는 글자를 문장에 포함한다', () => {
     expect(sentences('<Term slug="foundations/beta">rate</Term>도 함께 봐요.\n')).toEqual(['rate도 함께 봐요.']);
   });
 });
 
-describe('FORMAL_ENDING', () => {
+describe('endsPolitely', () => {
   it.each(['끝냅니다.', '그렇습니다', '좋습니다!', '합니다?', '그렇습니다."'])('%s는 합쇼체로 잡는다', (s) => {
-    expect(FORMAL_ENDING.test(s)).toBe(true);
+    expect(endsPolitely(s)).toBe(false);
   });
-  it.each(['예요.', '해요.', '그렇습니다만 아니에요.', '"합니다"라고 해요.'])('%s는 잡지 않는다', (s) => {
-    expect(FORMAL_ENDING.test(s)).toBe(false);
+  it.each(['평균은 느린 요청을 숨긴다.', '확인한다', '그렇다!', '느리다."'])('%s는 해라체로 잡는다', (s) => {
+    expect(endsPolitely(s)).toBe(false);
+  });
+  it.each(['예요.', '해요.', '해요!', '그렇죠?', '그렇습니다만 아니에요.', '"합니다"라고 해요.', '"그래요."라고 해요.', '정말요…', '(예요)'])(
+    '%s는 잡지 않는다',
+    (s) => {
+      expect(endsPolitely(s)).toBe(true);
+    },
+  );
+  it('가려진 인라인 코드만 있는 문장은 판단하지 않고, 코드 안 글자는 끝맺음으로 보지 않는다', () => {
+    expect(endsPolitely(CODE_MASK.repeat(4))).toBe(true);
+    expect(endsPolitely(`설정은 ${CODE_MASK.repeat(4)}.`)).toBe(false);
   });
 });
 

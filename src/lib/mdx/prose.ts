@@ -131,8 +131,21 @@ export function sentencesOf(unit: ProseUnit): Sentence[] {
   });
 }
 
-/** 합쇼체 끝맺음("~니다.", "~니다?", "~니다\"")을 찾는다. masked 문장에 쓴다. */
-export const FORMAL_ENDING = /니다[.?!…~]*["'”’」』)\]]*$/u;
+/** 해요체 끝맺음("~요.", "~죠?", "~요.\")"). 뒤에 문장 부호와 닫는 따옴표·괄호가 붙어도 된다. */
+export const POLITE_ENDING = /[요죠][.?!…~]*["'”’」』)\]]*$/u;
+const ENDS_WITH_CODE = new RegExp(`${CODE_MASK}[\\s.?!…~"'”’」』)\\]]*$`, 'u');
+
+/**
+ * masked 문장이 해요체(~요, ~죠)로 끝나는지 본다. 합쇼체(~니다)와 해라체(~다)는 false다.
+ * 인라인 코드로 끝나는 문장은 코드 앞의 마지막 한글 글자로 판단하고, 한글이 없으면(코드만 있는 문장) 통과시킨다.
+ */
+export function endsPolitely(masked: string): boolean {
+  const s = masked.trimEnd();
+  if (POLITE_ENDING.test(s)) return true;
+  if (!ENDS_WITH_CODE.test(s)) return false;
+  const hangul = s.replaceAll(CODE_MASK, '').match(/[가-힣]/gu);
+  return !hangul || /[요죠]/u.test(hangul.at(-1)!);
+}
 
 export function findBanned(s: Sentence, banned: readonly string[]): string[] {
   return banned.filter((b) => s.masked.includes(b));

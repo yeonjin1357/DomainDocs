@@ -1,4 +1,6 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { LINT_CONFIG } from '../../../scripts/lint-content/config';
 import { lintSource, type DocMeta, type LintContext, type RuleId } from '../../../scripts/lint-content/rules';
 
 const FRONT = (extra = '', type = 'concept', domain = 'foundations') => `---
@@ -84,6 +86,16 @@ describe('문장 규칙', () => {
   it('합쇼체 끝맺음을 잡는다', () => {
     expect(rules(FRONT() + CONCEPT_BODY.replace('사이예요.', '사이입니다.'))).toEqual(['formal-ending']);
   });
+  it('해라체 끝맺음도 잡는다', () => {
+    const issues = lint(FRONT() + CONCEPT_BODY.replace('응답은 1~2초 사이예요.', '평균은 느린 요청을 숨긴다.'));
+    expect(issues.map((i) => i.rule)).toEqual(['formal-ending']);
+    expect(issues[0].message).toBe('해요체(~요)로 끝내 주세요: "평균은 느린 요청을 숨긴다."');
+    expect(rules(FRONT() + CONCEPT_BODY.replace('다시 확인하세요.', '다시 확인한다'))).toEqual(['formal-ending']);
+  });
+  it('~요, ~죠로 끝나면 문장 부호와 닫는 따옴표가 붙어도 통과한다', () => {
+    const body = CONCEPT_BODY.replace('응답은 1~2초 사이예요.', '"그래요."라고 해요. 그렇죠?').replace('다시 확인하세요.', '다시 봐요!');
+    expect(lint(FRONT() + body)).toEqual([]);
+  });
   it('80자를 넘는 문장을 잡는다', () => {
     const long = `${'가'.repeat(80)}예요.`;
     expect(rules(FRONT() + CONCEPT_BODY.replace('응답은 1~2초 사이예요.', long))).toEqual(['sentence-length']);
@@ -137,6 +149,38 @@ describe('틀 규칙', () => {
   it('가이드에 KeyPoints를 쓰면 잡는다', () => {
     const body = GUIDE_BODY.replace('## 1.', '<KeyPoints>\n  <Point title="x">x예요.</Point>\n</KeyPoints>\n\n## 1.');
     expect(rules(FRONT('', 'guide') + body)).toEqual(['structure']);
+  });
+});
+
+describe('컴포넌트 규칙', () => {
+  const DEMO_IMPORT = "import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';\n";
+  it('등록되지 않은 JSX 요소(날것의 a, img)를 잡는다', () => {
+    const withA = CONCEPT_BODY.replace('과 함께 봐요.', '과 <a href="/foundations/other/">문서</a>를 함께 봐요.');
+    const issues = lint(FRONT() + withA);
+    expect(issues.map((i) => i.rule)).toEqual(['unknown-component']);
+    expect(issues[0].message).toContain('<a>');
+    const withImg = `${FRONT() + CONCEPT_BODY}\n<Deeper>\n  <img src="chart.png" alt="그래프" />\n\n  설명이에요.\n</Deeper>\n`;
+    expect(rules(withImg)).toEqual(['unknown-component']);
+  });
+  it('import하지 않은 이름이나 named import는 알 수 없는 컴포넌트예요', () => {
+    const body = CONCEPT_BODY.replace('<Checkpoints>', '<FancyDemo client:visible />\n\n<Checkpoints>');
+    expect(rules(`${FRONT()}import { FancyDemo } from './fancy.tsx';\n${body}`)).toContain('unknown-component');
+  });
+  it('등록된 컴포넌트와 client 지시어를 붙인 데모는 통과한다', () => {
+    const body = CONCEPT_BODY.replace('<Checkpoints>', '<PercentileDemo client:visible />\n\n<Checkpoints>');
+    expect(lint(FRONT() + DEMO_IMPORT + body)).toEqual([]);
+  });
+  it('client 지시어가 없는 데모를 잡는다', () => {
+    const body = CONCEPT_BODY.replace('<Checkpoints>', '<PercentileDemo />\n\n<Checkpoints>');
+    const issues = lint(FRONT() + DEMO_IMPORT + body);
+    expect(issues.map((i) => i.rule)).toEqual(['demo-hydration']);
+    expect(issues[0].message).toContain('client:visible');
+  });
+  it('검사기의 컴포넌트 목록은 MDX 컴포넌트 맵과 같다', () => {
+    const src = readFileSync('src/components/content/index.ts', 'utf8');
+    const map = /export const mdxComponents = \{([^}]*)\}/.exec(src);
+    const keys = map![1].split(',').map((s) => s.trim()).filter(Boolean);
+    expect([...LINT_CONFIG.mdxComponents].sort()).toEqual(keys.sort());
   });
 });
 
