@@ -7,7 +7,8 @@ const { title, caption } = Astro.props;
 ---
 <section class="block" data-block="on-dashboard">
   <h2 class="block-title">대시보드에서는 이렇게 보여요</h2>
-  <figure class="widget">
+  {/* 차트 범례·숫자 타일 글자가 검색 발췌에 "p993,000ms"처럼 붙어 나오지 않게 색인에서 뺀다. 설명(caption)은 색인한다. */}
+  <figure class="widget" data-pagefind-ignore>
     <figcaption class="widget-title">{title}</figcaption>
     <div class="widget-body"><slot /></div>
   </figure>
