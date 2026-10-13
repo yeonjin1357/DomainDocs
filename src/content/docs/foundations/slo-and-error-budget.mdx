@@ -6,7 +6,7 @@ type: concept
 order: 90
 icon: gauge
 keywords: [SLI, SLO, SLA, error budget, 에러 버짓, 오류 예산, burn rate, 소진율, 가용성]
-related: [foundations/percentiles, foundations/counters-and-rate, foundations/red-and-use]
+related: [foundations/percentiles, foundations/counters-and-rate, foundations/red-and-use, foundations/alert-conditions, foundations/alert-fatigue]
 sources:
   - title: Google SRE Book — Service Level Objectives
     url: https://sre.google/sre-book/service-level-objectives/
@@ -89,7 +89,7 @@ updated: 2026-10-13
 
   이 식은 경계가 0.3초인 버킷(그 시간 이하 요청을 세는 칸)이 꼭 있어야 해요. 없으면 결과가 비고, 일부 서버에만 있으면 경고 없이 실제보다 낮은 값이 나와요.
 
-  이 식은 300ms 안에 끝난 실패 요청도 좋은 요청으로 세서, 핵심 1의 '300ms 안에 성공한 요청'과 달라요. 이 식을 쓴다면 실패는 성공률 SLI로 따로 세요. Google SRE Workbook의 예시 서비스도 성공률 SLI와 응답시간 SLI를 따로 둬요.
+  또 300ms 안에 끝난 실패 요청도 좋은 요청으로 세서, 핵심 1의 '300ms 안에 성공한 요청'과 달라요. 이 식을 쓴다면 실패는 성공률 SLI로 따로 세요. Google SRE Workbook의 예시 서비스도 성공률 SLI와 응답시간 SLI를 따로 둬요.
 
   ### burn rate
 
@@ -120,9 +120,9 @@ updated: 2026-10-13
 
   이동 기간(rolling window)은 지금부터 거슬러 올라간 일정 기간(예: 30일)이에요. 실패는 그 기간 동안 셈에 남다가 빠지고, 빠지는 날 남은 버짓이 다시 늘어요. Google SRE Workbook은 이쪽이 사용자 경험에 더 가깝다고 보고, 4주 이동 기간을 무난한 기본값으로 꼽아요.
 
-  주 단위로 잡으면 기간마다 주말 수가 같아요. 30일 기간은 주말이 네 번일 때도, 다섯 번일 때도 있어서, 주말 트래픽이 다르면 SLI가 괜히 흔들려요.
-
   이 글의 숫자는 같은 책의 알림 장처럼 30일로 계산했어요. 4주(28일)로 잡으면 99.9% 버짓은 40.32분이에요.
+
+  주 단위로 잡으면 기간마다 주말 수가 같아요. 30일 기간은 주말이 네 번일 때도, 다섯 번일 때도 있어서, 주말 트래픽이 다르면 SLI가 괜히 흔들려요.
 
   고정 기간은 분기 계획 같은 사업 일정과 맞아요. 대신 기간 중간에는 남은 기간의 요청 수를 몰라서, 요청 기준 버짓의 크기를 짐작해야 해요.
 </Deeper>

@@ -41,13 +41,13 @@ sources:
 updated: 2026-10-13
 ---
 
-<OnDashboard title="에러율 · 1분마다 평가 · 임계값 2%" caption="지속 시간이 없으면 2분·4분의 한 번짜리 튐까지 세 번 울려요. 지속 시간을 3분(for: 3m)으로 두면 7분부터 이어진 문제에만, 3분 늦은 10분에 한 번 울려요.">
+<OnDashboard title="에러율 · 1분마다 평가 · 임계값 2%" caption="지속 시간이 없으면 2분·4분의 한 번짜리 스파이크까지 세 번 울려요. 지속 시간을 3분(for: 3m)으로 두면 7분부터 이어진 문제에만, 3분 늦은 10분에 한 번 울려요.">
   <MiniLineChart
     ariaLabel="0분부터 12분까지 1분마다 평가한 에러율과 2% 임계값 선. 2분과 4분에 한 번씩 2%를 살짝 넘고, 7분부터 11분까지 5분 동안 2%를 넘는 그래프"
     yMax={3}
     series={[{ label: '에러율', values: [0.5, 0.6, 2.1, 0.7, 2.3, 0.6, 0.5, 2.2, 2.4, 2.5, 2.6, 2.7, 0.6], tone: 'warn', value: '최고 2.7%' }, { label: '임계값', values: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], tone: 'sub', value: '2%' }]}
   />
-  <StatTile label="지속 시간 없음" value="3" unit="번 울림" tone="warn" note="튐 2번 포함" />
+  <StatTile label="지속 시간 없음" value="3" unit="번 울림" tone="warn" note="스파이크 2번 포함" />
   <StatTile label="for: 3m" value="1" unit="번 울림" note="문제보다 3분 늦게" />
 </OnDashboard>
 
@@ -67,9 +67,9 @@ updated: 2026-10-13
     Prometheus에선 `expr`에 질의와 임계값(0.02, 곧 2%)을, `for`에 지속 시간을 적어요. 이 질의는 15초마다 수집한 요청 <Term slug="foundations/counters-and-rate">카운터의 rate</Term>로 서비스(`job`)마다 구한 1분 에러율이에요. `by (job)`이 없으면 한 서비스의 에러가 다른 서비스 요청에 묻혀요.
   </Point>
   <Point title="지속 시간은 흔들림과 늦음을 맞바꿔요">
-    지속 시간이 없으면 그림의 2분·4분처럼 한 번 튄 값에도 울리고, 1분 뒤 해제돼요. 울림과 해제를 되풀이하는 이런 알림을 flapping(흔들림)이라 해요. 너무 자주 울리면 사람들이 알림을 훑어보다가 진짜 문제도 놓쳐요.
+    지속 시간이 없으면 그림의 2분·4분처럼 한 번 튄 값(스파이크)에도 울리고, 1분 뒤 해제돼요. 울림과 해제를 되풀이하는 이런 알림을 flapping(흔들림)이라 해요. 너무 자주 울리면 사람들이 알림을 훑어보다가 진짜 문제도 놓쳐요.
 
-    `for: 3m`이면 튐은 거르고, 7분부터 이어진 문제에만 10분에 울려요. 대신 문제가 시작되고 3분 늦어요. `for: 5m`이면 5분 만에 끝난 이 문제엔 아예 울리지 않아요.
+    `for: 3m`이면 스파이크는 거르고, 7분부터 이어진 문제에만 10분에 울려요. 대신 문제가 시작되고 3분 늦어요. `for: 5m`이면 5분 만에 끝난 이 문제엔 아예 울리지 않아요.
   </Point>
   <Point title="원인보다 증상에 알림을 걸어요">
     증상은 사용자가 겪는 일(에러, 느린 응답)이고, 원인은 그 이유(CPU 과부하, DB 연결 거부)예요. CPU 90% 알림은 사용자가 멀쩡해도 울릴 수 있고, CPU가 낮은 채 DB가 연결을 거부하면 조용해요.
@@ -79,9 +79,9 @@ updated: 2026-10-13
 </KeyPoints>
 
 <Checkpoints>
-  <Check>`[1m]`처럼 짧은 구간의 값에 `for`도 없는 규칙은, 그림처럼 튈 때마다 울리고 해제돼요. 평가가 수집보다 잦거나 rate 구간이 평가 간격보다 길면, 튐 하나가 여러 번 평가될 수 있어요. 15초마다 수집·평가하는 `[1m]` 질의라면 튐 하나가 세 번 걸리니, `for`는 수집 주기와 rate 구간보다 길게 잡으세요.</Check>
+  <Check>`[1m]`처럼 짧은 구간의 값에 `for`도 없는 규칙은, 그림처럼 튈 때마다 울리고 해제돼요. 평가가 수집보다 잦거나 rate 구간이 평가 간격보다 길면, 스파이크 하나가 여러 번 평가될 수 있어요. 15초마다 수집·평가하는 `[1m]` 질의라면 스파이크 하나가 세 번 걸리니, `for`는 수집 주기와 rate 구간보다 길게 잡으세요.</Check>
   <Check>알림 질의의 rate 구간이 <Term slug="foundations/collection-interval">수집 주기</Term>의 4배보다 짧다면 다시 보세요. 2배쯤이면 수집이 한 번만 빠져도 결과가 빌 수 있고, 그러면 울리던 알림이 해제돼요. 값이 다시 나오면 `for`를 처음부터 세서, 알림이 끊겼다가 늦게 다시 울려요.</Check>
-  <Check>Prometheus 알림 규칙은 <Term slug="foundations/no-data-vs-zero">질의 결과가 빌 때</Term> 울리지 않아서, 수집이 멈추면 에러율 알림도 조용해져요. 수집 끊김은 `up == 0`과 `absent_over_time(up{job="api"}[10m])` 같은 규칙으로 따로 알리세요. 5xx 시계열에 `absent_over_time()`을 걸면, 에러가 한 번도 없던 서비스는 그 시계열이 없어 잘못 울려요.</Check>
+  <Check>Prometheus 알림 규칙은 <Term slug="foundations/no-data-vs-zero">질의 결과가 빌 때</Term> 울리지 않아서, 수집이 멈추면 에러율 알림도 조용해져요. 수집 실패는 `up == 0`으로, api 대상이 모두 사라진 건 `absent_over_time(up{job="api"}[10m])`으로 알리세요. 5xx 시계열에 `absent_over_time()`을 걸면, 에러가 한 번도 없던 서비스는 그 시계열이 없어 잘못 울려요.</Check>
   <Check>임계값 2%를 왜 골랐는지 답할 수 없다면 다시 보세요. SLO가 '30일 동안 99%'라면 <Term slug="foundations/slo-and-error-budget">에러 버짓</Term>은 1%라, 에러율 2%가 이어지면 버짓을 2배 빠르게 써서 15일 만에 다 써요. 이렇게 임계값을 버짓을 쓰는 속도로 바꿔 보면, 사람을 부를 만큼 급한지 따질 수 있어요.</Check>
 </Checkpoints>
 
@@ -94,7 +94,7 @@ updated: 2026-10-13
 
   Prometheus는 pending과 firing인 알림을 `ALERTS`라는 <Term slug="foundations/time-series-and-labels">시계열</Term>로도 남겨요. 상태는 `alertstate` 레이블(label, 키와 값의 쌍)에 들어가요.
 
-  점 간격(그래프의 점 사이 간격, step)을 평가 간격 이하로 두고 그리면, 언제 pending이었고 언제 울렸는지 보여요. Prometheus 화면에서 2주를 그리면 기본 점 간격이 80분쯤이라, 몇 분짜리 알림은 빠져요. 이럴 땐 <Term slug="foundations/alert-fatigue">알림이 너무 많이 울릴 때</Term>처럼 식으로 세요.
+  점 간격(그래프의 점 사이 간격, step)을 평가 간격 이하로 두고 그리면, 언제 pending이었고 언제 울렸는지 보여요. Prometheus 화면에서 2주를 그리면 기본 점 간격이 80분쯤이라, 몇 분짜리 알림은 빠져요. 이럴 땐 <Term slug="foundations/alert-fatigue">알림이 너무 많이 울릴 때</Term>처럼 울린 횟수를 식으로 세요.
 
   ### 해제를 늦추는 `keep_firing_for`
 
@@ -102,7 +102,7 @@ updated: 2026-10-13
 
   그림의 `for: 3m`에 `keep_firing_for: 5m`을 더하면, 12분에 조건이 풀려도 17분에 해제돼요. 데이터가 잠깐 비어 생기는 거짓 해제도 막아요. 대신 문제가 정말 끝나도 그만큼 늦게 해제돼요.
 
-  지속 시간 없이 이 설정만 쓰면 흔들림은 줄지만, 튐에 울리는 건 그대로예요. 그림에선 2분의 튐에 울린 알림이 17분에 해제될 때까지 이어져요.
+  지속 시간 없이 이 설정만 쓰면 흔들림은 줄지만, 스파이크에 울리는 건 그대로예요. 그림에선 2분에 울린 알림이 17분에 해제될 때까지 이어져요.
 
   ### Grafana의 pending period
 
@@ -114,7 +114,7 @@ updated: 2026-10-13
 
   ### Alertmanager가 보내는 방식
 
-  Prometheus는 firing 알림을 Alertmanager로 넘기고, 사람에게 보내는 일은 Alertmanager가 맡아요. Alertmanager는 `group_by`에 적은 레이블이 같은 알림을 한 알림으로 묶어요. 네트워크가 끊겨 수백 대가 함께 울려도 한 번에 받을 수 있어요.
+  Prometheus는 firing 알림을 Alertmanager로 넘기고, 사람에게 보내는 일은 Alertmanager가 맡아요. Alertmanager는 `group_by`에 적은 레이블이 같은 알림을 한 알림으로 묶어요.
 
   새 그룹은 `group_wait`(기본 30초)를 기다렸다가 처음 보내요. 그래서 그림의 `for: 3m` 알림이 그룹의 첫 알림이면, 10분에 울려도 10분 30초쯤 도착해요. 그 뒤 그룹에 알림이 더해지거나 풀리면 `group_interval`(기본 5분)마다 보내요.
 
@@ -124,9 +124,9 @@ updated: 2026-10-13
 
   Google SRE Workbook은 SLO 기반 알림에 지속 시간을 쓰지 말라고 해요. 값이 잠깐만 기준 아래로 내려가도 타이머가 처음부터 다시 세서, 오르내리는 장애엔 울리지 않을 수 있어서예요. 장애가 심해도 똑같이 늦게 울린다는 것도 이유로 들어요.
 
-  대신 1시간처럼 긴 구간으로 burn rate(<Term slug="foundations/slo-and-error-budget">에러 버짓</Term>을 쓰는 속도)를 구해요. 작은 튐은 긴 구간의 평균에 묻혀서, `for` 없이도 덜 흔들려요. 그림의 규칙에서 `for: 3m`이 하던 튐 거르기를 긴 구간이 대신하는 셈이에요.
+  대신 1시간처럼 긴 구간으로 burn rate(<Term slug="foundations/slo-and-error-budget">에러 버짓</Term>을 쓰는 속도)를 구해요. 작은 스파이크는 긴 구간의 평균에 묻혀서, `for` 없이도 덜 흔들려요. 그림의 규칙에서 `for: 3m`이 하던 스파이크 거르기를 긴 구간이 대신하는 셈이에요.
 
-  큰 튐이 묻히는지는 SLO에 달려요. 30일 99.9% SLO에서 요청이 고르게 들어올 때 1분 동안 모든 요청이 실패하면, 1시간 burn rate는 16.7이에요. Google SRE Workbook이 사람을 부르라고 권하는 14.4를 넘어서 울려요.
+  큰 스파이크가 묻히는지는 SLO에 달려요. 30일 99.9% SLO에서 요청이 고르게 들어올 때 1분 동안 모든 요청이 실패하면, 1시간 burn rate는 16.7이에요. Google SRE Workbook이 사람을 부르라고 권하는 14.4를 넘어서 울려요.
 
   SLO가 30일 99%라면 같은 장애도 burn rate가 1.67이라, 14.4에 못 미쳐 울리지 않아요.
 </Deeper>

@@ -78,3 +78,9 @@
 - (선택) Grafana 소스 링크: 반영하지 않았어요. 글은 Grafana에서 Pending 중 조건이 깨질 때를 따로 쓰지 않아서 필요 없어요.
 - 묶음 결정 반영: 더 깊이의 "SRE 워크북"을 "Google SRE Workbook"으로 고쳤어요(본문의 "Google SRE Book"은 그대로). `related`에 커밋된 `foundations/red-and-use`를 더했어요(증상 = RED, 원인 = USE 자원 지표).
 - 맞음으로 판정된 42건은 그대로 뒀어요. 같은 주장이 나오는 곳(캡션, StatTile, 핵심 2, 더 깊이의 7·8·9·10·12·17분)도 다시 맞춰 봤는데 바뀐 숫자는 없어요.
+- (글 검토 1차, 확인 3 — 사실 검토 뒤에 새로 들어간 주장) 수집 끊김을 `up`에 건 규칙으로 알리게 했어요. 지금 문장은 "수집 실패는 `up == 0`으로, api 대상이 모두 사라진 건 `absent_over_time(up{job="api"}[10m])`으로 알리세요."예요.
+  - 판정: 맞음. https://prometheus.io/docs/concepts/jobs_instances/ "`up{job="<job-name>", instance="<instance-id>"}`: `1` if the instance is healthy, i.e. reachable, or `0` if the scrape failed." 수집이 실패해도 `up` 샘플(0)이 남아서 `up == 0`이 잡아요.
+  - https://prometheus.io/docs/prometheus/latest/querying/functions/ `absent_over_time()`은 구간에 샘플이 하나도 없을 때만 값 1을 내고, 선택자의 레이블(`job="api"`)을 이어받아요. 그래서 api 대상이 모두 사라져야 울리고, 여럿 중 하나만 빠진 건 못 잡아요. no-data-vs-zero.mdx 확인 4와 더 깊이 끝 단락도 같은 말이에요.
+  - promtool 3.15.0 `test rules`(작성자, 수정 라운드 1): `up == 0`은 값이 0인 평가에만 울렸어요. `absent_over_time(up{job="api"}[10m])`은 마지막 샘플 5분 뒤엔 울리지 않고, 10분 구간이 빈 뒤 `{job="api"}`로 울렸어요. 5xx 시계열에 건 `absent_over_time()`은 5xx가 없는 멀쩡한 서비스에서 울렸어요.
+  - promtool(글 검토자): 같은 입력에서 `absent_over_time(up{job="other"}[10m])`은 울리지 않았어요.
+  - 재검토(수정 라운드 1 뒤)가 위 두 공식 문서로 다시 확인했어요. 묶음 정리(Task 5)에서 재검토 지적대로 두 규칙이 각각 무엇을 잡는지 문장에 밝혔어요.
