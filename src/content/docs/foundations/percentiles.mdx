@@ -92,5 +92,5 @@ import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';
   histogram_quantile(0.99, sum by (le) (rate(http_server_request_duration_seconds_bucket[5m])))
   ```
 
-  `sum by (le)`는 `le`만 남기고 서버·경로 같은 다른 라벨을 모두 합쳐요. 서비스별로 보려면 `sum by (job, le)`처럼 남길 라벨을 더 적어요.
+  `sum by (le)`는 `le`만 남기고 서버·경로 같은 다른 레이블을 모두 합쳐요. 서비스별로 보려면 `sum by (job, le)`처럼 남길 레이블을 더 적어요.
 </Deeper>
