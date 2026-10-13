@@ -16,7 +16,8 @@ const docs = defineCollection({
     icon: z.enum(ICON_NAMES).optional(),
     keywords: z.array(z.string()).max(10).default([]),
     related: z.array(reference('docs')).max(5).default([]),
-    sources: z.array(z.object({ title: z.string(), url: z.url() })).min(1),
+    // 출처 링크는 http/https만 받는다(javascript:, file: 등은 거른다).
+    sources: z.array(z.object({ title: z.string(), url: z.url({ protocol: /^https?$/ }) })).min(1),
     updated: z.coerce.date(),
     draft: z.boolean().default(false),
   }),
