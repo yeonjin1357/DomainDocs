@@ -1,0 +1,100 @@
+---
+import BottomSheet from '../ui/BottomSheet.astro';
+import type { TermPreview } from '../../lib/content';
+
+interface Props {
+  previews: Record<string, TermPreview>;
+}
+const { previews } = Astro.props;
+const hasPreviews = Object.keys(previews).length > 0;
+// </script> 같은 문자열이 JSON 안에서 태그를 닫지 않도록 <를 이스케이프한다.
+const json = JSON.stringify(previews).replace(/</g, '\\u003c');
+---
+{
+  hasPreviews && (
+    <>
+      <script type="application/json" id="term-previews" set:html={json}></script>
+      <BottomSheet id="term-sheet" label="개념 미리보기">
+        <p class="sheet-meta" data-term-meta></p>
+        <h2 class="sheet-title" data-term-title></h2>
+        <p class="sheet-summary" data-term-summary></p>
+        <div class="sheet-points-wrap" data-term-points-wrap>
+          <h3 class="sheet-subtitle">핵심</h3>
+          <ol class="sheet-points" data-term-points></ol>
+        </div>
+        <div class="sheet-actions">
+          <a class="sheet-primary pressable" href="#" data-term-link>전체 보기</a>
+          <button class="sheet-secondary pressable" type="button" data-sheet-close>닫기</button>
+        </div>
+      </BottomSheet>
+    </>
+  )
+}
+
+<script>
+  import { initTermSheet } from '../../scripts/term-sheet';
+  initTermSheet();
+</script>
+
+<style>
+  .sheet-meta {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .sheet-title {
+    margin: 6px 0 8px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .sheet-summary {
+    margin: 0;
+    color: var(--color-text-sub);
+  }
+
+  .sheet-subtitle {
+    margin: 24px 0 8px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .sheet-points {
+    margin: 0;
+    padding-left: 1.25em;
+  }
+
+  /* 목록 항목은 스크립트가 만들어 범위 스타일이 닿지 않는다 */
+  .sheet-points :global(li + li) {
+    margin-top: 4px;
+  }
+
+  .sheet-actions {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    margin-top: 28px;
+  }
+
+  .sheet-primary,
+  .sheet-secondary {
+    padding: 14px 18px;
+    border: 0;
+    border-radius: 14px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .sheet-primary {
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  .sheet-secondary {
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+</style>

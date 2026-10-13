@@ -4,9 +4,10 @@ import DocHeader from '../components/doc/DocHeader.astro';
 import NextCard from '../components/doc/NextCard.astro';
 import RelatedList from '../components/doc/RelatedList.astro';
 import SourceList from '../components/doc/SourceList.astro';
+import TermSheet from '../components/doc/TermSheet.astro';
 import { getDomain } from '../data/domains';
 import { nextInDomain, type DocCard } from '../lib/catalog';
-import { analyzeEntry, getCards, type DocEntry } from '../lib/content';
+import { analyzeEntry, getCards, getTermPreviews, type DocEntry } from '../lib/content';
 import { domainPath } from '../lib/paths';
 
 interface Props {
@@ -23,6 +24,7 @@ const pick = (ids: readonly string[]) => ids.map((id) => byId.get(id)).filter((c
 const related = pick(entry.data.related.map((r) => r.id));
 const usedConcepts = entry.data.type === 'guide' ? pick(analysis.termSlugs) : [];
 const next = nextInDomain(cards, entry.id);
+const termPreviews = await getTermPreviews(analysis.termSlugs);
 ---
 <BaseLayout title={entry.data.title} description={entry.data.summary} surface="white" backHref={domainPath(domain.id)} barTitle={entry.data.title}>
   <article class="doc" data-pagefind-body>
@@ -41,4 +43,5 @@ const next = nextInDomain(cards, entry.id);
   <SourceList sources={entry.data.sources} />
   {related.length > 0 && <RelatedList title="관련 개념" items={related} marker="related" />}
   {next && <NextCard doc={next} />}
+  <TermSheet previews={termPreviews} slot="end" />
 </BaseLayout>

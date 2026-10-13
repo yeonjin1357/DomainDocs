@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import type { DocCard } from './catalog';
+import { TYPE_LABEL, type DocCard } from './catalog';
+import { getDomain } from '../data/domains';
 import { analyzeBody, type BodyAnalysis } from './mdx/analyze';
 import { docPath } from './paths';
 
@@ -52,4 +53,32 @@ export function toCard(entry: DocEntry): DocCard {
 
 export async function getCards(): Promise<DocCard[]> {
   return (await getPublishedDocs()).map(toCard);
+}
+
+export interface TermPreview {
+  title: string;
+  summary: string;
+  points: string[];
+  url: string;
+  /** '공통 기초 · 개념' 형태 */
+  meta: string;
+}
+
+/** 페이지에 쓰인 Term의 미리보기 데이터. 빌드할 때 페이지 안에 넣어 두므로 시트를 열 때 네트워크 요청이 없다. */
+export async function getTermPreviews(slugs: readonly string[]): Promise<Record<string, TermPreview>> {
+  if (slugs.length === 0) return {};
+  const byId = new Map((await getPublishedDocs()).map((e) => [e.id, e]));
+  const previews: Record<string, TermPreview> = {};
+  for (const slug of slugs) {
+    const target = byId.get(slug);
+    if (!target) continue;
+    previews[slug] = {
+      title: target.data.title,
+      summary: target.data.summary,
+      points: analyzeEntry(target).pointTitles,
+      url: docPath(target.id),
+      meta: `${getDomain(target.data.domain)?.name ?? target.data.domain} · ${TYPE_LABEL[target.data.type]}`,
+    };
+  }
+  return previews;
 }
