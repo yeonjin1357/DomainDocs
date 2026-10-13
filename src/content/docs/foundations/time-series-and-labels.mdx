@@ -1,6 +1,6 @@
 ---
 title: 시계열과 레이블
-summary: 레이블 값 조합 하나가 시계열 하나예요. 레이블을 더하면 시계열이 최대 곱만큼 늘어요.
+summary: 레이블 값 조합 하나가 시계열 하나예요. 시계열 수는 최대 레이블 값 수의 곱이에요.
 domain: foundations
 type: concept
 order: 30
@@ -34,10 +34,6 @@ sources:
     url: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#cardinality-limits
   - title: OpenTelemetry — Prometheus and OpenMetrics compatibility (Metric Attributes)
     url: https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/#metric-attributes
-  - title: OpenTelemetry JS 소스 — sdk-metrics 2.12.0 MetricReader (selectCardinalityLimit)
-    url: https://github.com/open-telemetry/opentelemetry-js/blob/92b844e8aa7d9655e4b3560154e912c4c1ced64d/packages/sdk-metrics/src/export/MetricReader.ts#L201-L205
-  - title: OpenTelemetry JS 소스 — sdk-metrics 2.12.0 DeltaMetricProcessor (수집 주기별 상한, overflow)
-    url: https://github.com/open-telemetry/opentelemetry-js/blob/92b844e8aa7d9655e4b3560154e912c4c1ced64d/packages/sdk-metrics/src/state/DeltaMetricProcessor.ts#L30-L48
 updated: 2026-10-13
 ---
 
@@ -56,13 +52,13 @@ updated: 2026-10-13
 
     요청 수를 세는 <Term slug="foundations/counters-and-rate">카운터</Term> `http_requests_total`로 보면 이래요. `{method="GET", status="200"}`과 `{method="POST", status="200"}`은 서로 다른 시계열이에요. 대시보드에 그리면 선도 두 개예요.
   </Point>
-  <Point title="레이블을 더하면 시계열이 최대 곱만큼 늘어요">
+  <Point title="시계열 수는 최대 레이블 값 수의 곱이에요">
     레이블 값 조합의 수, 곧 시계열 개수를 카디널리티(cardinality)라고 해요. method 5개 × status 10개 × route(`/users/:id` 같은 경로 틀) 200개면 서버 한 대에 최대 10,000개예요. 값을 기록했거나 미리 만들어 둔 조합만 시계열이 돼서, 곱은 최대치예요.
 
     Prometheus는 수집할 때 수집 대상마다 `instance` 레이블을 붙여요. 서버마다 값이 달라서, 서버 50대면 최대 500,000개예요. 여기에 값이 10개인 레이블을 하나 더하면 5,000,000개까지 늘어요.
   </Point>
   <Point title="끝없이 늘어나는 값은 레이블에 넣지 마세요">
-    사용자 ID, 요청 ID, 이메일, 원본 URL은 값이 계속 새로 나와요. 레이블에 넣으면 새 값이 나올 때마다 시계열이 새로 생겨요. Prometheus 문서도 사용자 ID나 이메일처럼 끝없는 값은 레이블로 쓰지 말라고 해요.
+    사용자 ID, 요청 ID, 이메일, 원본 URL은 값이 계속 새로 나와요. 레이블에 넣으면 새 값마다 시계열이 생기고, 시계열마다 메모리와 디스크를 써요. Prometheus 문서도 사용자 ID나 이메일처럼 끝없는 값은 레이블로 쓰지 말라고 해요.
 
     사용자별·요청별로 봐야 한다면 로그 본문이나 트레이스(요청 전체의 기록)에 남겨요. 지표 레이블에는 응답 상태 코드처럼 값이 몇 개로 정해진 것만 둬요.
   </Point>
@@ -88,17 +84,15 @@ updated: 2026-10-13
 
   카디널리티가 100을 넘거나 넘을 수 있다면 다른 방법을 찾으라고 해요. 차원을 줄이거나, 그 분석을 모니터링 밖의 범용 처리 시스템으로 옮기는 거예요. 잘 모르겠다면 레이블 없이 시작해서, 쓸 곳이 생길 때 더하라고 해요.
 
+  핵심 2의 HTTP 요청 지표는 서버 한 대에 최대 10,000개라 이 기준을 크게 넘어요. 그래서 경로처럼 값이 많은 레이블은 꼭 필요한 지표 몇 개에만 붙여요.
+
   ### OpenTelemetry에서는
 
   OpenTelemetry에서는 속성(attribute)이 레이블 역할을 해요. Prometheus로 내보내면 속성이 레이블로 바뀌어요. 사양도 속성 조합의 수를 카디널리티라고 불러요.
 
-  사양은 SDK가 지표마다 카디널리티 상한을 두라고 하고, 따로 정하지 않으면 2,000을 쓰라고 해요. 상한을 넘긴 조합의 값은 버리지 않고, `otel.metric.overflow=true` 속성만 붙은 시계열 하나로 모아요.
+  사양은 SDK가 지표마다 카디널리티 상한을 두라고 하고, 따로 정하지 않으면 2,000을 쓰라고 해요. 상한을 넘긴 조합의 값은 버리지 않고, overflow 시계열(상한을 넘친 측정값을 모으는 시계열) 하나로 모아요. 이 시계열에는 `otel.metric.overflow=true` 속성만 붙어요.
 
   이 시계열이 보이면 그 지표가 상한에 걸린 적이 있다는 뜻이에요. 누적(cumulative)으로 내보내면 프로세스를 재시작할 때까지 계속 보여요. Prometheus에서는 보통 `otel_metric_overflow="true"` 레이블로 찾아요.
-
-  JavaScript SDK(`@opentelemetry/sdk-metrics` 2.12.0)도 기본값은 2,000이에요. overflow 시계열이 그중 한 자리를 써요.
-
-  다만 Counter처럼 코드에서 직접 기록하는 지표는, 한 번 수집하는 사이에 기록된 조합 수로 상한을 재요. 그래서 누적으로 내보내면 시계열이 2,000개를 넘어도 overflow가 생기지 않을 수 있어요.
 
   ### 수집할 때 걸러 내기
 
