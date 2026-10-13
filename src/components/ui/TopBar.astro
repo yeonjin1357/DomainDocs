@@ -1,0 +1,95 @@
+---
+import { ChevronLeft, Search } from '@lucide/astro';
+import { SITE } from '../../data/site';
+import { withBase } from '../../lib/paths';
+
+interface Props {
+  backHref?: string;
+  title?: string;
+}
+
+const { backHref, title } = Astro.props;
+---
+<header class="topbar" data-topbar>
+  <div class="topbar-inner">
+    {
+      backHref ? (
+        <a class="icon-button pressable" href={backHref} aria-label="뒤로 가기">
+          <ChevronLeft size={26} aria-hidden="true" />
+        </a>
+      ) : (
+        <a class="brand" href={withBase()}>{SITE.name}</a>
+      )
+    }
+    <span class="topbar-title" aria-hidden="true">{title}</span>
+    <button class="icon-button pressable" type="button" data-search-open aria-label="검색" aria-keyshortcuts="/">
+      <Search size={22} aria-hidden="true" />
+    </button>
+  </div>
+</header>
+
+<style>
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--surface);
+  }
+
+  .topbar-inner {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    max-width: var(--content-width);
+    height: var(--topbar-height);
+    margin: 0 auto;
+    padding: 0 calc(var(--gutter) - 8px);
+  }
+
+  .icon-button {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: var(--radius-button);
+    background: transparent;
+    color: var(--color-text);
+  }
+
+  .brand {
+    padding: 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .topbar-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 17px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .topbar.is-scrolled .topbar-title {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-topbar]');
+  const heading = document.querySelector('[data-page-title]');
+  if (bar && heading) {
+    new IntersectionObserver(([entry]) => bar.classList.toggle('is-scrolled', !entry.isIntersecting), {
+      rootMargin: '-56px 0px 0px 0px',
+    }).observe(heading);
+  }
+</script>

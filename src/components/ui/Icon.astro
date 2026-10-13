@@ -1,0 +1,28 @@
+---
+import { Activity, ChartColumn, ChartLine, Clock, Database, Gauge, Hash, Layers, Server, Sigma, Timer, TrendingUp } from '@lucide/astro';
+import type { IconName } from '../../data/icons';
+
+interface Props {
+  name: IconName;
+  size?: number;
+}
+
+const ICONS = {
+  sigma: Sigma,
+  activity: Activity,
+  database: Database,
+  server: Server,
+  'chart-line': ChartLine,
+  'chart-column': ChartColumn,
+  gauge: Gauge,
+  timer: Timer,
+  layers: Layers,
+  hash: Hash,
+  clock: Clock,
+  'trending-up': TrendingUp,
+} satisfies Record<IconName, unknown>;
+
+const { name, size = 22 } = Astro.props;
+const Component = ICONS[name];
+---
+<Component size={size} aria-hidden="true" />

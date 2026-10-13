@@ -1,0 +1,41 @@
+---
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import TopBar from '../components/ui/TopBar.astro';
+import { SITE } from '../data/site';
+import { withBase } from '../lib/paths';
+
+interface Props {
+  title?: string;
+  description?: string;
+  surface?: 'grey' | 'white';
+  backHref?: string;
+  barTitle?: string;
+}
+
+const { title, description = SITE.description, surface = 'grey', backHref, barTitle } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
+    <slot name="head" />
+  </head>
+  <body class={`surface-${surface}`}>
+    <TopBar backHref={backHref} title={barTitle} />
+    <main id="main" class="page">
+      <slot />
+    </main>
+    <slot name="end" />
+  </body>
+</html>
