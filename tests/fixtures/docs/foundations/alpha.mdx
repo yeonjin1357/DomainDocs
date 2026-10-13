@@ -14,7 +14,15 @@ updated: 2026-10-01
 ---
 
 <OnDashboard title="응답시간" caption="테스트용 위젯 설명이에요.">
-  위젯 자리예요.
+  <MiniLineChart
+    ariaLabel="평균은 잔잔하고 p99만 튀는 응답시간 그래프"
+    series={[
+      { label: '평균', values: [130, 128, 131, 187, 130, 129], tone: 'sub', value: '187ms' },
+      { label: 'p99', values: [160, 158, 160, 3000, 160, 159], tone: 'warn', value: '3,000ms' },
+    ]}
+  />
+  <StatTile label="평균" value="187" unit="ms" />
+  <StatTile label="p99" value="3,000" unit="ms" tone="warn" note="평소의 19배" />
 </OnDashboard>
 
 <KeyPoints>

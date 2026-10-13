@@ -1,0 +1,102 @@
+---
+import { linePath, niceMax, type ChartBox } from '../../lib/viz/line';
+
+interface Series {
+  label: string;
+  values: number[];
+  tone?: 'accent' | 'sub' | 'warn';
+  /** 범례에 표시할 값(예: '3,000ms'). 없으면 범례에 이름만 나온다. */
+  value?: string;
+}
+
+interface Props {
+  series: Series[];
+  ariaLabel: string;
+  yMax?: number;
+  height?: number;
+}
+
+const { series, ariaLabel, yMax, height = 120 } = Astro.props;
+const box: ChartBox = { width: 320, height, padding: 6 };
+const max = yMax ?? niceMax(series.flatMap((s) => s.values));
+---
+<div class="mini-chart" data-mini-chart>
+  <svg viewBox={`0 0 ${box.width} ${box.height}`} preserveAspectRatio="none" role="img" aria-label={ariaLabel} style={`height:${height}px`}>
+    <line class="baseline" x1="0" x2={box.width} y1={box.height - box.padding} y2={box.height - box.padding} />
+    {series.map((s) => <path class={`line tone-${s.tone ?? 'accent'}`} d={linePath(s.values, max, box)} vector-effect="non-scaling-stroke" />)}
+  </svg>
+  <ul class="legend">
+    {
+      series.map((s) => (
+        <li>
+          <span class={`swatch tone-${s.tone ?? 'accent'}`} aria-hidden="true"></span>
+          <span>{s.label}</span>
+          {s.value && <strong class="legend-value">{s.value}</strong>}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .mini-chart svg {
+    width: 100%;
+  }
+
+  .baseline {
+    stroke: var(--color-line);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .line {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .tone-accent {
+    stroke: var(--color-accent);
+    background: var(--color-accent);
+  }
+
+  .tone-sub {
+    stroke: var(--color-text-sub);
+    background: var(--color-text-sub);
+  }
+
+  .tone-warn {
+    stroke: var(--color-warn);
+    background: var(--color-warn);
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+    color: var(--color-text-sub);
+  }
+
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .swatch {
+    display: inline-block;
+    width: 12px;
+    height: 3px;
+    border-radius: 2px;
+  }
+
+  .legend-value {
+    font-weight: 700;
+    color: var(--color-text);
+  }
+</style>

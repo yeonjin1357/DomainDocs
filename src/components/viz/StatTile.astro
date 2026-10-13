@@ -1,0 +1,57 @@
+---
+interface Props {
+  label: string;
+  value: string;
+  unit?: string;
+  tone?: 'default' | 'accent' | 'warn';
+  note?: string;
+}
+const { label, value, unit, tone = 'default', note } = Astro.props;
+---
+<div class:list={['stat', `tone-${tone}`]} data-stat>
+  <span class="stat-label">{label}</span>
+  <span class="stat-value">{value}{unit && <span class="stat-unit">{unit}</span>}</span>
+  {note && <span class="stat-note">{note}</span>}
+</div>
+
+<style>
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: var(--color-card);
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: var(--color-text-sub);
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-unit {
+    margin-left: 2px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .stat-note {
+    font-size: 13px;
+    color: var(--color-text-weak);
+  }
+
+  .tone-accent .stat-value {
+    color: var(--color-accent);
+  }
+
+  .tone-warn .stat-value {
+    color: var(--color-warn);
+  }
+</style>
