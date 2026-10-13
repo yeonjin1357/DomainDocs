@@ -1,0 +1,155 @@
+---
+title: 그래프가 비어 있을 때 무엇부터 볼까
+summary: 패널의 오류 표시부터 보고, 시간 범위·질의·수집·실제로 일이 없었는지 순서로 봐요.
+domain: foundations
+type: guide
+order: 80
+icon: activity
+keywords: [No data, 데이터 없음, 빈 그래프, 끊긴 그래프, empty panel, 수집 장애, 그래프 안 나옴]
+sources:
+  - title: Prometheus — Querying basics (레이블 매처, staleness)
+    url: https://prometheus.io/docs/prometheus/latest/querying/basics/
+  - title: Grafana 소스 — 질의가 실패해도 패널 본문엔 No data (PanelDataErrorView.tsx)
+    url: https://github.com/grafana/grafana/blob/86037971957ea7c9c879e582643fbb0731f78b5b/public/app/features/panel/components/PanelDataErrorView.tsx#L158-L159
+  - title: Grafana Scenes 소스 — 질의 오류 메시지를 패널 머리에 띄움 (VizPanelRenderer.tsx)
+    url: https://github.com/grafana/scenes/blob/v8.21.1/packages/scenes/src/components/VizPanel/VizPanelRenderer.tsx#L483-L492
+  - title: Prometheus — Storage (보관 기간 기본값 15d)
+    url: https://prometheus.io/docs/prometheus/latest/storage/
+  - title: Grafana — Use dashboards (시간 범위 선택기, Change time settings)
+    url: https://grafana.com/docs/grafana/latest/dashboards/use-dashboards/
+  - title: Grafana — Modify dashboard settings (Time zone)
+    url: https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/modify-dashboard-settings/
+  - title: Grafana 소스 — 입력한 시간 범위를 대시보드 시간대로 읽음 (TimeRangeContent.tsx)
+    url: https://github.com/grafana/grafana/blob/86037971957ea7c9c879e582643fbb0731f78b5b/packages/grafana-ui/src/components/DateTimePickers/TimeRangePicker/TimeRangeContent.tsx#L98-L105
+  - title: Grafana 소스 — convertRawToRange (rangeutil.ts)
+    url: https://github.com/grafana/grafana/blob/86037971957ea7c9c879e582643fbb0731f78b5b/packages/grafana-data/src/datetime/rangeutil.ts#L507-L524
+  - title: Grafana 소스 — 시각을 시간대에 맞춰 읽기 (parser.ts)
+    url: https://github.com/grafana/grafana/blob/86037971957ea7c9c879e582643fbb0731f78b5b/packages/grafana-data/src/datetime/parser.ts#L55-L98
+  - title: Grafana — Query options (Relative time, Time shift)
+    url: https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/#query-options
+  - title: Grafana 소스 — 기간을 재정의한 패널은 머리에 시계 아이콘과 기간을 띄움 (PanelTimeRange.tsx)
+    url: https://github.com/grafana/grafana/blob/86037971957ea7c9c879e582643fbb0731f78b5b/public/app/features/dashboard-scene/scene/panel-timerange/PanelTimeRange.tsx#L166-L258
+  - title: Grafana — Get started with Explore (패널 메뉴에서 Explore 열기, 권한)
+    url: https://grafana.com/docs/grafana/latest/explore/get-started-with-explore/
+  - title: Grafana 소스 — Explore로 열 때 변수를 실제 값으로 바꿈 (explore.ts getExploreUrl)
+    url: https://github.com/grafana/grafana/blob/86037971957ea7c9c879e582643fbb0731f78b5b/public/app/core/utils/explore.ts#L64-L99
+  - title: Grafana 소스 — Explore 권한이 없으면 메뉴를 숨기고, 패널 기간을 넘김 (urlBuilders.ts)
+    url: https://github.com/grafana/grafana/blob/86037971957ea7c9c879e582643fbb0731f78b5b/public/app/features/dashboard-scene/utils/urlBuilders.ts#L14-L33
+  - title: Grafana 소스 — Inspect의 Query 탭 (PanelInspectDrawer.tsx)
+    url: https://github.com/grafana/grafana/blob/86037971957ea7c9c879e582643fbb0731f78b5b/public/app/features/dashboard-scene/inspect/PanelInspectDrawer.tsx#L68-L73
+  - title: Grafana — Panel inspect view (Query 탭)
+    url: https://grafana.com/docs/grafana/latest/panels-visualizations/panel-inspector/
+  - title: Grafana — Transform data
+    url: https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/transform-data/
+  - title: Grafana — Prometheus template variables (여러 값 변수는 =~, $__rate_interval)
+    url: https://grafana.com/docs/grafana/latest/datasources/prometheus/template-variables/
+  - title: Grafana Scenes 소스 — URL에서 온 변수 값은 남김 (MultiValueVariable.ts)
+    url: https://github.com/grafana/scenes/blob/v8.21.1/packages/scenes/src/variables/variants/MultiValueVariable.ts#L176-L211
+  - title: OpenTelemetry — Metrics SDK (Cardinality limits)
+    url: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#cardinality-limits
+  - title: Prometheus — Jobs and instances (up)
+    url: https://prometheus.io/docs/concepts/jobs_instances/
+  - title: Prometheus — Configuration (sample_limit)
+    url: https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+  - title: Prometheus 소스 — scrape/scrape.go (추가에 실패하면 받은 값을 버리고 수집 실패로 침)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/scrape/scrape.go#L1611-L1635
+  - title: Prometheus 소스 — scrape/scrape.go (상한을 넘긴 수집은 stale 표시를 남기지 않음)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/scrape/scrape.go#L1826-L1836
+  - title: Prometheus 소스 — scrape/scrape.go (수집에 실패하면 up을 0으로 남김)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/scrape/scrape.go#L2297-L2310
+  - title: Prometheus — Getting started (Status > Target health)
+    url: https://prometheus.io/docs/prometheus/latest/getting_started/
+  - title: Prometheus 소스 — Target health 화면이 대상별 오류를 보여 줌 (ScrapePoolsList.tsx)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/web/ui/mantine-ui/src/pages/targets/ScrapePoolsList.tsx#L320-L376
+  - title: Prometheus — Using Prometheus as your OpenTelemetry backend (target_info)
+    url: https://prometheus.io/docs/guides/opentelemetry/
+  - title: Grafana Blog — $__rate_interval for Prometheus rate queries that just work (4배)
+    url: https://grafana.com/blog/2020/09/28/new-in-grafana-7.2-__rate_interval-for-prometheus-rate-queries-that-just-work/
+  - title: Prometheus — Instrumentation (Avoid missing metrics)
+    url: https://prometheus.io/docs/practices/instrumentation/
+  - title: Prometheus — Alerting rules
+    url: https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+  - title: Grafana — No Data and Error states
+    url: https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rule-evaluation/nodata-and-error-states/
+  - title: Prometheus — Query functions (absent_over_time)
+    url: https://prometheus.io/docs/prometheus/latest/querying/functions/
+updated: 2026-10-13
+---
+
+<Situation>
+  대시보드 패널에 No data가 떠요. 어제까지 이어지던 선이 중간에 끊기기도 해요. 서비스 장애일까요, 수집이 멈췄을까요, 질의가 틀렸을까요?
+
+  질의가 실패해도 본문엔 No data가 떠요. 이때는 패널 머리에 오류 표시가 뜨니, 그 메시지부터 봐요. 오류 표시 없이 비었다면 원인은 크게 네 갈래라, 아래 순서대로 좁혀요.
+</Situation>
+
+<FirstLook>
+  <Item title="시간 범위와 시간대">기간을 넓혀도 비는지, 대시보드 시간대가 맞는지 봐요.</Item>
+  <Item title="질의가 가리키는 시계열이 있는지">레이블 조건을 하나씩 빼며 결과가 생기는지 봐요.</Item>
+  <Item title="수집이 살아 있는지">`up`(수집 상태 지표)이 1인지, 0인지, 아예 없는지 봐요.</Item>
+</FirstLook>
+
+## 1. 시간 범위와 시간대를 확인하세요
+
+화면이 보는 기간에 데이터가 남아 있는지부터 봐요. Prometheus는 보관 설정을 따로 하지 않으면 15일 치만 남겨서, 30일 전을 그리는 화면은 비어요.
+
+절대 시각으로 범위를 정했다면 시간대를 봐요. Grafana는 입력한 시각을 대시보드 시간대로 읽어요. UTC 대시보드에 KST로 생각한 14:00을 넣으면 KST 23:00을 봐서, 지금이 KST 16:00라면 아직 오지 않은 시간이라 비어요.
+
+한 패널만 비었다면 그 패널만 다른 기간을 보는지 봐요. Relative time이나 Time shift를 건 패널은, 따로 숨기지 않았다면 제목 옆에 시계 아이콘과 기간이 떠요. 이 설정은 <Term slug="foundations/why-numbers-differ">같은 지표가 화면마다 다르게 보이는 이유</Term>에서도 다뤄요.
+
+**확인 방법**: 시간 범위 선택기의 Change time settings에서 시간대를 보고, 범위를 Last 7 days로 넓혀요.
+
+- **선이 어느 시각에서 끊겼다면**: 그 시각에 배포나 장애가 있었는지 보며 다음 단계로 가요.
+- **패널 기간 설정 없이도 7일 내내 비면**: 범위 문제는 아니에요. 2단계로 가요.
+
+## 2. 질의가 실제로 있는 시계열을 가리키는지 보세요
+
+Prometheus는 조건에 맞는 <Term slug="foundations/time-series-and-labels">시계열</Term>이 없으면 오류 없이 빈 결과를 돌려줘요. 그래서 레이블 조건 하나만 어긋나도 화면은 조용히 비어요. 이런 곳에서 어긋나요.
+
+- **오타와 대소문자**: `=`는 값이 글자 그대로 같아야 골라요. `status="Error"`로는 `status="error"`가 나오지 않아요.
+- **정규식**: `=~`도 값 전체가 맞아야 해요. `route=~"/api"`는 `/api/users`를 고르지 않으니, `"/api.*"`처럼 써요.
+- **배포로 바뀐 값**: 배포하며 `job="api"`가 `job="api-server"`로 바뀌면, 그 시각부터 옛 조건의 결과가 비어요. 선이 배포 시각에서 끊겼다면 이 경우를 의심해요.
+- **대시보드 변수**: `$service` 같은 변수에 지금은 없는 값이 골라져 있으면 질의도 비어요. 공유 링크에 담긴 값이 이렇게 남아요. 여러 값이나 All을 고르는 변수는 `=` 대신 `=~`로 써요.
+- **상한에 걸린 조합**: OpenTelemetry 사양은 SDK가 지표마다 레이블 조합 수에 상한(기본 2,000)을 두라고 해요. 넘친 조합의 값은 overflow 시계열 하나로 모여서, 그 조합을 고른 질의는 비어요. Prometheus에서는 보통 `otel_metric_overflow="true"` 레이블이 붙은 시계열이 보여요.
+
+**확인 방법**: 패널 메뉴의 Explore로 질의를 열고, 레이블 조건을 하나씩 지우며 실행해요. Explore에선 변수가 실제 값으로 바뀐 질의가 보여요.
+
+- **지웠더니 결과가 생기면**: 값이 틀렸거나, 그 조합이 아직 한 번도 생기지 않았어요. `count by (status) (http_requests_total)`처럼 묶어 셌을 때 그 값이 아예 없으면 오타나 바뀐 값이에요. 값은 다른 시계열에 있는데 이 조합만 없다면 4단계로 가요.
+- **다 지워도 비면**: 지표 이름과 패널의 데이터 소스를 다시 보고, 맞으면 3단계로 가요.
+- **Explore에선 나오는데 패널만 비면**: 질의 결과를 패널에서 가공하는 Transformations를 봐요.
+
+Explore는 Editor 이상이거나 Explore 권한이 있어야 패널 메뉴에 보여요. 권한이 없으면 패널 메뉴 Inspect → Query에서 실제로 보낸 요청을 볼 수 있어요.
+
+## 3. 수집이 살아 있는지 보세요
+
+<Term slug="foundations/collection-interval">수집</Term>이 멈추면 그 대상의 시계열이 한꺼번에 끊겨요. Prometheus는 가져가는 대상마다 수집 결과를 `up`에 남겨요. 성공하면 1, 실패하면 0이에요.
+
+서비스 디스커버리(수집 대상을 자동으로 찾는 기능)에서 빠진 대상은 달라요. `up`이 0이 되지 않고 함께 사라져서, `up == 0`만 찾으면 놓쳐요.
+
+`sample_limit`을 정해 뒀다면, 레이블 조합이 갑자기 늘 때 수집 전체가 실패할 수 있어요. `metric_relabel_configs`로 걸러 내고 남은 샘플(수집한 값 하나) 수가 이 값을 넘을 때예요. `up`은 0이 되지만, 선은 기본 설정에서 최대 5분 더 이어지다 끊길 수 있어요.
+
+원본 지표엔 값이 있는데 <Term slug="foundations/counters-and-rate">rate</Term>만 비면 구간 길이를 봐요. rate는 구간에 샘플이 2개 이상 있어야 값을 내요. 구간이 수집 주기의 2배보다 짧으면 점이 비는 시각이 생길 수 있으니, Grafana가 권하는 4배 이상으로 잡아요.
+
+**확인 방법**: Explore에서 `up{job="api"}`를 실행해요.
+
+- **0이면**: Prometheus의 Status → Target health 화면에서 그 대상의 오류 메시지를 봐요.
+- **결과가 비면**: job 이름이 맞는지, 대상이 수집 목록에 남아 있는지 봐요.
+- **앱이 OTLP로 직접 보낸다면**: 가져가는 대상이 아니라서 `up`이 없어요. `target_info{job="api"}`가 계속 들어오는지 봐요.
+
+## 4. 정말 일이 없었는지 보세요
+
+앞의 셋이 모두 정상이라면 그 일이 정말 없었을 수 있어요. Prometheus Go·Python 클라이언트(앱에서 지표를 만드는 라이브러리)에선 레이블 조합을 처음 기록할 때 시계열이 생겨요. 그래서 500 응답이 한 번도 없던 경로엔 `status="500"` 시계열이 없고, 그 질의는 0이 아니라 빈 결과예요.
+
+빈 결과만으로는 500 응답이 없었는지, 수집이 멈췄는지 구별할 수 없어요. 그래서 <Term slug="foundations/no-data-vs-zero">데이터 없음</Term>을 0으로 읽으면 장애를 놓쳐요.
+
+**확인 방법**: 값을 정한 조건 하나만 빼고 다시 봐요. `status="500"`을 빼서 같은 경로의 다른 시계열을 봐요.
+
+- **다른 시계열이 늘고 있다면**: 수집은 살아 있고 500 응답만 없었던 거예요.
+- **다른 시계열도 비어 있다면**: 3단계로 돌아가요.
+
+에러가 없을 때 진짜 0이 보이게 하려면, 앱의 지표 코드에서 생길 줄 아는 조합을 미리 0으로 내보내요.
+
+<Checkpoints>
+  <Check>빈 결과를 0으로 바꿔 그리는 화면 코드가 있다면 고치세요. `?? 0`이나 `|| 0`은 수집이 멈춘 장애도 0으로 그려서, 빈 그래프라는 신호를 지워요. 빈 값은 그래프에선 선을 끊고, 숫자 칸에선 '데이터 없음'으로 보여 주세요.</Check>
+  <Check>알림이 '데이터 없음'을 정상으로 처리한다면 다시 보세요. Prometheus 알림 규칙은 식의 결과가 비면 울리지 않고, Grafana 알림도 No Data 처리를 Normal로 두면 같아요. `absent_over_time(up{job="api"}[10m])` 알림을 더하면 api 대상이 10분 동안 모두 사라진 경우도 잡아요.</Check>
+  <Check>수집 상태를 보여 주는 패널이 없는 대시보드라면 더하세요. `sum by (job) (up)`은 job마다 수집에 성공한 대상 수예요. 평소 3이던 값이 2로 줄면 대상 하나의 수집이 실패했거나 수집 목록에서 빠진 거예요.</Check>
+</Checkpoints>
