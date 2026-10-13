@@ -97,22 +97,31 @@ updated: 2026-10-13
 
   burn rate는 어떤 구간의 에러율을 (1 − SLO)로 나눈 값이에요. 99.9%에서 에러율이 1%면 10이라 3일 만에, 100%면 1,000이라 43.2분 만에 버짓을 다 써요. 그림의 결제 API는 30일 에러율이 0.05%라 burn rate가 0.5예요.
 
-  Google SRE Workbook은 30일 99.9% SLO의 알림 출발점으로 이런 값을 권해요. 1시간 burn rate 14.4(버짓 2%)나 6시간 burn rate 6(버짓 5%)이면 사람을 호출해요. 3일 burn rate 1(버짓 10%)이면 티켓(나중에 처리할 작업)만 남겨요.
+  Google SRE Workbook은 30일 99.9% SLO의 알림 출발점으로 이런 값을 권해요. 1시간 burn rate 14.4(버짓 2%)나 6시간 burn rate 6(버짓 5%)이면 사람을 불러요. 3일 burn rate 1(버짓 10%)이면 티켓(나중에 처리할 작업)만 남겨요.
 
-  쓴 버짓은 burn rate × 구간 ÷ 30일이라, 14.4 × 1시간 ÷ 720시간 = 2%예요.
+  쓴 버짓은 burn rate × 구간 ÷ 30일이라, 14.4 × 1시간 ÷ 720시간 = 2%예요. 버짓 비율로 정한 기준이라, 30일 기간이면 SLO가 99%여도 14.4는 같아요.
 
-  에러율은 실패 요청과 전체 요청 카운터의 <Term slug="foundations/counters-and-rate">rate</Term>로 구해요. 같은 책의 예시 이름(`slo_errors`, `slo_requests`)으로 1시간 알림을 풀어 쓰면 이래요.
+  에러율은 실패 요청과 전체 요청 카운터의 <Term slug="foundations/counters-and-rate">rate</Term>로 구해요. 같은 책의 예시 이름(`slo_errors`, `slo_requests`)으로 1시간 알림을 5분 구간과 함께 풀어 쓰면 이래요.
 
   ```text
-    sum by (job) (rate(slo_errors[1h]))
-  /
-    sum by (job) (rate(slo_requests[1h]))
-  > 14.4 * 0.001
+  (
+      sum by (job) (rate(slo_errors[1h]))
+    /
+      sum by (job) (rate(slo_requests[1h]))
+    > 14.4 * 0.001
+  )
+  and
+  (
+      sum by (job) (rate(slo_errors[5m]))
+    /
+      sum by (job) (rate(slo_requests[5m]))
+    > 14.4 * 0.001
+  )
   ```
 
-  0.001은 1 − SLO(99.9%)라, 1시간 에러율이 1.44%를 넘으면 울려요. `by (job)`이 없으면 한 서비스의 에러가 다른 서비스 요청에 묻혀요. 에러율 2%(burn rate 20)인 서비스도 요청이 9배인 정상 서비스와 합치면 0.2%라 울리지 않아요.
+  0.001은 1 − SLO(99.9%)라, 1시간과 5분 에러율이 모두 1.44%를 넘어야 울려요. `by (job)`이 없으면 한 서비스의 에러가 다른 서비스 요청에 묻혀요. 에러율 2%(burn rate 20)인 서비스도 요청이 9배인 정상 서비스와 합치면 0.2%라 울리지 않아요.
 
-  긴 구간의 1/12인 짧은 구간(1시간이면 `[5m]`)도 함께 넘을 때만 울리게 해요. 그러면 장애가 끝난 뒤 길게는 1시간 남던 알림이 5분 안에 풀려요.
+  1시간 조건만 두면 장애가 끝난 뒤에도 길게는 1시간 울려요. 긴 구간의 1/12인 5분 조건을 함께 걸면 5분 안에 풀려요.
 
   ### 고정 기간과 이동 기간
 

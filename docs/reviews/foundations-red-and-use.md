@@ -90,3 +90,18 @@
 - **`r`:** "CPU 수를 넘은 만큼은 기다리는 스레드예요"를 더했어요. use-linux 각주 [2](`r`은 기다리는 스레드와 CPU에서 도는 스레드를 함께 셈)에서 바로 나와요.
 - **Point 2:** "USE는 문제의 원인을, RED는 사용자가 겪는 증상을 보여 줘요"를 더했어요. 근거는 Grafana Dashboard best practices "USE reports on causes of issues. RED reports on user experience"예요.
 - **지운 문장:** "웹 서비스라면 트래픽은 보통 초당 HTTP 요청 수예요"와 "메모리처럼 용량을 쓰는 자원은 쓴 양의 비율로…"는 분량 때문에 지웠어요. 남은 문장과 어긋나지 않아요.
+
+### 묶음 최종 검토 반영 (2026-10-13)
+
+묶음 최종 검토(`.superpowers/sdd/2026-10-13-foundations-batch-3/final-review.md`)의 I1·I2·M3·M9를 반영했어요.
+
+- **I1 `job` 조건:** RED 세 식과 네이티브 p99 식에 `job="order-api"`를 넣었어요. 첫 코드 블록 뒤에 "세 식은 `job="order-api"`로 주문 API만 골라요. `job` 조건을 빼면 모든 서비스의 요청이 한 숫자로 섞여요."를 더했어요. slo·alert-conditions의 `by (job)`, percentiles의 `sum by (job, le)`와 같은 기준이에요.
+  - 더 깊이 분량을 맞추려고 "Prometheus 문서도 비율을 쉽게 구하도록 실패 수와 함께 전체 시도 수를 두라고 해요."를 지웠어요(검토가 꼽은 후보). 비율은 확인 2가 다뤄요. 그 문장의 근거였던 "Failures"는 sources의 Instrumentation 제목에서 뺐어요.
+  - promtool 3.15.0으로 다시 확인했어요. GitHub 릴리스의 prometheus-3.15.0.windows-amd64.zip을 새 빈 폴더에 받았고, sha256 5d333b385557…58f87e가 sha256sums.txt와 일치했어요. 식은 글의 코드 블록에서 바로 읽어 넣었어요. `check rules` SUCCESS(4 rules), `test rules` SUCCESS예요.
+  - 입력: 15초 수집, 서비스 2개 × 서버 2대예요. order-api는 서버당 15초마다 200 8,964건(0.1/0.25/0.5/1초 버킷 누적 4,000/7,000/8,500/8,964)과 500 36건이에요. search-api는 200 2,985건(1초 이하 1,000건, 나머지는 1초 넘음)과 500 15건이에요.
+  - 클래식(10분 시점): Rate 1,200, Errors 4.8, Duration 0.9034초예요. Duration은 손 계산 0.5 + 0.5 × (0.99 × 8,964 − 8,500) ÷ 464와 15자리까지 같아요. `job` 조건을 빼면 1,600, 6.8, 1초(+Inf 버킷에 걸림)예요.
+  - 네이티브(schema 0, 같은 분포): p99 0.8747초(지수 보간 0.5 × 2^0.8068과 같음), `job`을 빼면 1.918초예요. `sum(histogram_count(rate(…[5m])))`은 1,200, `job`을 빼면 1,600이에요. 띄운 서버는 없어요.
+- **I2 rate 구간:** "샘플(sample, 수집한 값 하나)이 2개 이상 들게 해요"를 "`<Term>`수집 주기`</Term>`의 4배 이상(15초 수집이면 1분)으로 둬요"로 바꿨어요. collection-interval·empty-graph의 "Grafana가 권하는 4배 이상", alert-conditions 확인 2와 같은 기준이에요. 괄호를 문장 끝에 두면 문체 검사(`formal-ending`)에 걸려서 가운데로 옮겼어요.
+- **M3 용어:** "에러 비율"을 "에러율"로 맞췄어요. 확인 2, 더 깊이의 "에러율은 Errors ÷ Rate예요", sources의 SRE Book 제목이에요. 확인 2의 "비율도 함께 보여 주세요"와 타일 note "비율 0.4%"는 그대로 뒀어요.
+- **M9 아이콘:** `activity` → `server`예요. 홈 「최근 추가된 글」에서 empty-graph(`activity`)와 겹치지 않아요. `server`는 `src/data/icons.ts`에 있고, 다른 글은 쓰지 않아요.
+- 분량: 본문 1,124자, 더 깊이 2,176자(전 2,166자)예요. `npm run lint:content` 위반 0건이에요.
