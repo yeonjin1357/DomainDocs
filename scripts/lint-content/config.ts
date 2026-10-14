@@ -25,5 +25,6 @@ export const LINT_CONFIG = {
     'StatTile',
     'Waterfall',
     'Scatter',
+    'ServiceMap',
   ],
 } as const;

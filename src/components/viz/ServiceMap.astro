@@ -1,0 +1,149 @@
+---
+import { edgeLines, type MapEdge, type MapNode } from '../../lib/viz/service-map';
+
+interface Props {
+  nodes: MapNode[];
+  edges: MapEdge[];
+  ariaLabel: string;
+  /** 그림 높이(px). 기본 200 */
+  height?: number;
+}
+
+const { nodes, edges, ariaLabel, height = 200 } = Astro.props;
+const lines = edgeLines(nodes, edges);
+const hasVirtual = nodes.some((n) => n.virtual);
+---
+<div class="service-map" data-service-map>
+  <div class="map" role="img" aria-label={ariaLabel} style={`height:${height}px`}>
+    {/* 선은 노드 가운데끼리 잇는다. 폭과 높이가 따로 늘어나도 선 굵기는 그대로다. */}
+    <svg class="edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      {lines.map((l) => <line class={`edge tone-${l.tone}`} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} vector-effect="non-scaling-stroke" />)}
+    </svg>
+    {lines.filter((l) => l.label).map((l) => <span class={`edge-label tone-${l.tone}`} style={`left:${l.mx}%;top:${l.my}%`}>{l.label}</span>)}
+    {
+      nodes.map((n) => (
+        <span class:list={['node', `tone-${n.tone ?? 'sub'}`, { virtual: n.virtual }]} style={`left:${n.x}%;top:${n.y}%`}>
+          <span class="node-label">{n.label}</span>
+          {n.note && <span class="node-note">{n.note}</span>}
+        </span>
+      ))
+    }
+  </div>
+  {
+    hasVirtual && (
+      <ul class="legend">
+        <li>
+          <span class="swatch" aria-hidden="true" />
+          <span>점선은 계측되지 않은 곳</span>
+        </li>
+      </ul>
+    )
+  }
+</div>
+
+<style>
+  .map {
+    position: relative;
+  }
+
+  .edges {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .edge {
+    stroke-width: 1.5;
+  }
+
+  .edge.tone-sub,
+  .edge.tone-accent {
+    stroke: var(--color-text-weak);
+  }
+
+  .edge.tone-warn {
+    stroke: var(--color-warn);
+    stroke-width: 2;
+  }
+
+  /* 선 위 글자는 위젯 바탕색으로 선을 가려 읽히게 한다 */
+  .edge-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    padding: 0 4px;
+    background: var(--color-bg);
+    font-size: 12px;
+    color: var(--color-text-sub);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .edge-label.tone-warn {
+    color: var(--color-warn);
+    font-weight: 600;
+  }
+
+  .node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 10px;
+    border: 1.5px solid transparent;
+    border-radius: 12px;
+    background: var(--color-card);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .node.tone-accent {
+    border-color: var(--color-accent);
+  }
+
+  .node.tone-warn {
+    border-color: var(--color-warn);
+  }
+
+  .node.virtual {
+    border-style: dashed;
+    border-color: var(--color-text-weak);
+    background: var(--color-bg);
+  }
+
+  .node-label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .node-note {
+    font-size: 12px;
+    color: var(--color-text-sub);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .legend {
+    display: flex;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+    color: var(--color-text-sub);
+  }
+
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .swatch {
+    display: inline-block;
+    width: 14px;
+    height: 10px;
+    border: 1.5px dashed var(--color-text-weak);
+    border-radius: 3px;
+  }
+</style>

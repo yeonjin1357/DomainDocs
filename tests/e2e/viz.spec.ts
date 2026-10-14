@@ -41,6 +41,21 @@ test('분포도는 무리마다 점을 찍고, 가로줄 무리는 눈금선 높
   expect(dot!.x).toBeLessThan(box!.x + box!.width * 0.8);
 });
 
+test('서비스 맵은 노드를 위치에 놓고, 선 글자를 두 노드 사이에 둔다', async ({ page }) => {
+  await page.goto('foundations/beta/');
+  const map = page.getByRole('img', { name: '주문 API가 결제 API와 DB를 부르는 서비스 맵' });
+  await expect(map.locator('.node')).toHaveCount(3);
+  await expect(map.locator('.edge')).toHaveCount(2);
+  await expect(map.locator('.node.virtual')).toHaveText('orders DB');
+  await expect(page.locator('[data-service-map] .legend')).toHaveText('점선은 계측되지 않은 곳');
+  const box = await map.boundingBox();
+  const order = await map.locator('.node').first().boundingBox();
+  expect(Math.abs(order!.x + order!.width / 2 - (box!.x + box!.width * 0.2))).toBeLessThan(2);
+  const label = await map.locator('.edge-label').boundingBox();
+  expect(Math.abs(label!.x + label!.width / 2 - (box!.x + box!.width * 0.5))).toBeLessThan(2);
+  expect(Math.abs(label!.y + label!.height / 2 - (box!.y + box!.height * 0.35))).toBeLessThan(2);
+});
+
 test('숫자 타일 두 개가 한 줄에 놓인다', async ({ page }) => {
   const tiles = page.locator('[data-block="on-dashboard"] [data-stat]');
   const [a, b] = [await tiles.nth(0).boundingBox(), await tiles.nth(1).boundingBox()];

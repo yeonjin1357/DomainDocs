@@ -221,6 +221,7 @@ updated: 2026-10-13
 | `StatTile` | `label`, `value`, `unit?`, `tone?`, `note?` | 숫자 하나를 크게 보여 줘요 |
 | `Waterfall` | `spans`, `ariaLabel`, `unit?` | 트레이스 워터폴. `spans`는 `{ label, start, duration, depth?, tone? }` 배열이고, 가장 늦게 끝나는 구간이 막대 끝이에요 |
 | `Scatter` | `groups`, `ariaLabel`, `xMax`, `yMax`, `yTicks?`, `unit?`, `xLabels?` | 응답시간 분포도. `groups`는 `{ count, x: [시작, 끝], y: [아래, 위], skew?, tone?, label? }` 배열이고, 범위 안에 점을 `count`개 흩뿌려요. 범위의 두 값이 같으면 가로줄·세로줄이 돼요 |
+| `ServiceMap` | `nodes`, `edges`, `ariaLabel`, `height?` | 서비스 맵. `nodes`는 `{ id, label, x, y, note?, tone?, virtual? }`(x·y는 %), `edges`는 `{ from, to, label?, tone? }` 배열이에요. 화살표가 없어서 부르는 쪽을 왼쪽에 두고 `caption`에 밝혀요. `virtual`은 점선으로 그려요 |
 | `PercentileDemo`, `DownsamplingDemo` | 없음 | 직접 만져 보는 데모. default import 후 `client:visible`로 써요 |
 
 `MiniLineChart`와 `StatTile` 같은 viz 컴포넌트는 한 줄에 하나씩 써요. 한 줄에 여러 개를 쓰면 단락으로 묶여 배치가 깨져요.
