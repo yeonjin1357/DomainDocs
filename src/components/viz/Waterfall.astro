@@ -1,0 +1,83 @@
+---
+import { spanBars, type WaterfallSpan } from '../../lib/viz/waterfall';
+
+interface Props {
+  spans: WaterfallSpan[];
+  ariaLabel: string;
+  /** 구간 시간 뒤에 붙는 단위. 기본 ms */
+  unit?: string;
+}
+
+const { spans, ariaLabel, unit = 'ms' } = Astro.props;
+const bars = spanBars(spans);
+---
+<div class="waterfall" role="img" aria-label={ariaLabel} data-waterfall>
+  {
+    spans.map((s, i) => (
+      <div class="span-row">
+        {/* 들여쓰기는 이름에만 준다. 트랙까지 들여 쓰면 줄마다 시간축이 어긋난다. */}
+        <span class="span-name" style={`padding-left:${(s.depth ?? 0) * 12}px`}>
+          {s.label}
+        </span>
+        <span class="span-time">{`${s.duration.toLocaleString('ko-KR')}${unit}`}</span>
+        <span class="span-track" aria-hidden="true">
+          <span class={`span-bar tone-${s.tone ?? 'sub'}`} style={`left:${bars[i].left}%;width:${bars[i].width}%`} />
+        </span>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .waterfall {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* 이름과 시간을 한 줄에, 막대는 그 아래 전체 폭으로 둔다. 360px 화면에서도 이름이 막대 폭을 줄이지 않는다. */
+  .span-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 8px;
+    row-gap: 4px;
+  }
+
+  .span-name {
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+
+  .span-time {
+    font-size: 13px;
+    color: var(--color-text-sub);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .span-track {
+    grid-column: 1 / -1;
+    position: relative;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--color-card);
+  }
+
+  .span-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: 4px;
+  }
+
+  .tone-accent {
+    background: var(--color-accent);
+  }
+
+  .tone-sub {
+    background: var(--color-text-weak);
+  }
+
+  .tone-warn {
+    background: var(--color-warn);
+  }
+</style>

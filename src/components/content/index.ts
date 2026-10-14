@@ -10,6 +10,7 @@ import Situation from './Situation.astro';
 import Term from './Term.astro';
 import MiniLineChart from '../viz/MiniLineChart.astro';
 import StatTile from '../viz/StatTile.astro';
+import Waterfall from '../viz/Waterfall.astro';
 
 /** MDX에서 import 없이 쓰는 컴포넌트. React 데모는 여기 넣지 않는다(client 지시어를 쓸 수 없다). */
-export const mdxComponents = { OnDashboard, KeyPoints, Point, Checkpoints, Check, Deeper, Situation, FirstLook, Item, Term, MiniLineChart, StatTile };
+export const mdxComponents = { OnDashboard, KeyPoints, Point, Checkpoints, Check, Deeper, Situation, FirstLook, Item, Term, MiniLineChart, StatTile, Waterfall };

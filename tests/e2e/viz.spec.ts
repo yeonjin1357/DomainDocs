@@ -14,6 +14,17 @@ test('대시보드 그림에 설명이 붙은 차트와 숫자 타일이 있다'
   await expect(block.locator('[data-stat]').nth(1)).toContainText('평소의 19배');
 });
 
+test('워터폴은 구간마다 이름·시간·막대를 그리고, 막대 위치가 시간에 비례한다', async ({ page }) => {
+  await page.goto('foundations/beta/');
+  const fall = page.getByRole('img', { name: '요청 1초 중 DB 조회가 0.3초인 워터폴' });
+  await expect(fall.locator('.span-row')).toHaveCount(2);
+  await expect(fall.locator('.span-time')).toHaveText(['1,000ms', '300ms']);
+  const track = await fall.locator('.span-track').nth(1).boundingBox();
+  const bar = await fall.locator('.span-bar').nth(1).boundingBox();
+  expect(Math.abs(bar!.x - (track!.x + track!.width * 0.1))).toBeLessThan(2);
+  expect(Math.abs(bar!.width - track!.width * 0.3)).toBeLessThan(2);
+});
+
 test('숫자 타일 두 개가 한 줄에 놓인다', async ({ page }) => {
   const tiles = page.locator('[data-block="on-dashboard"] [data-stat]');
   const [a, b] = [await tiles.nth(0).boundingBox(), await tiles.nth(1).boundingBox()];

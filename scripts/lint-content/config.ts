@@ -23,5 +23,6 @@ export const LINT_CONFIG = {
     'Term',
     'MiniLineChart',
     'StatTile',
+    'Waterfall',
   ],
 } as const;

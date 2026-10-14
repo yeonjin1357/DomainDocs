@@ -219,6 +219,7 @@ updated: 2026-10-13
 | `Term` | `slug` | 다른 글로 잇는 링크. 예: `foundations/percentiles` |
 | `MiniLineChart` | `series`, `ariaLabel`, `yMax?`, `height?` | 작은 선 그래프. 단위는 범례 `value`에 직접 써요 |
 | `StatTile` | `label`, `value`, `unit?`, `tone?`, `note?` | 숫자 하나를 크게 보여 줘요 |
+| `Waterfall` | `spans`, `ariaLabel`, `unit?` | 트레이스 워터폴. `spans`는 `{ label, start, duration, depth?, tone? }` 배열이고, 가장 늦게 끝나는 구간이 막대 끝이에요 |
 | `PercentileDemo`, `DownsamplingDemo` | 없음 | 직접 만져 보는 데모. default import 후 `client:visible`로 써요 |
 
 `MiniLineChart`와 `StatTile` 같은 viz 컴포넌트는 한 줄에 하나씩 써요. 한 줄에 여러 개를 쓰면 단락으로 묶여 배치가 깨져요.
@@ -289,7 +290,7 @@ updated: 2026-10-13
 2. 초안을 써요.
 3. 숫자 예시는 직접 다시 계산해요. PromQL은 promtool(Prometheus 명령줄 도구)이나 로컬 Prometheus로, JavaScript 식은 node로 돌려 봐요. 띄운 서버는 끝나면 꼭 꺼요.
 4. `npm run lint:content`를 돌려요.
-5. 작성자와 다른 에이전트가 사실을 검토해요. 결과는 `docs/reviews/{domain}-{slug}.md`에 남겨요.
+5. 초안을 다 쓴 뒤 따로 사실 검토 단계를 둬요. 글의 주장을 하나씩 뽑아 1차 자료 원문과 대조하고, 숫자와 질의는 다시 돌려 봐요. 쓸 때와 다른 방법으로 확인하면 맹점이 줄어요. 결과는 `docs/reviews/{domain}-{slug}.md`에 남겨요.
 6. 검토 내용을 반영하고 다시 검사해요. 같은 주장이 나오는 곳은 모두 고쳐요(7장).
 7. 사이트 주인이 화면에서 확인해요.
 
