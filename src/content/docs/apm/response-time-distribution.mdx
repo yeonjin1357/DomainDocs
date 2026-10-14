@@ -1,0 +1,77 @@
+---
+title: 응답시간 분포도 읽기
+summary: 분포도는 요청마다 점을 찍어, 평균선이 숨기는 느린 무리와 줄무늬를 보여 줘요.
+domain: apm
+type: concept
+order: 60
+icon: chart-column
+keywords: [scatter, 산점도, 분포도, X-View, 히트맵, heatmap, 세로줄, 가로줄, 타임아웃, 잠금]
+related: [apm/transactions-and-response-time, apm/throughput-and-concurrency, foundations/histograms, foundations/percentiles]
+sources:
+  - title: WhaTap — Transaction view (Understanding the hitmap patterns)
+    url: https://docs.whatap.io/en/java/trs-view
+  - title: JENNIFER — X-View transaction analysis
+    url: https://jennifersoft.com/en/?p=2311
+  - title: Pinpoint — Heatmap
+    url: https://pinpoint-apm.gitbook.io/pinpoint/documents/heatmap
+  - title: Elastic APM — Transactions UI (Latency distribution)
+    url: https://www.elastic.co/docs/solutions/observability/apm/transactions-ui
+  - title: Grafana — Heatmap
+    url: https://grafana.com/docs/grafana/latest/visualizations/panels-visualizations/visualizations/heatmap/
+  - title: Brendan Gregg — Latency Heat Maps
+    url: https://www.brendangregg.com/HeatMaps/latency.html
+updated: 2026-10-14
+---
+
+<OnDashboard title="주문 API · 응답시간 분포도 · 14:00~14:10" caption="14:04의 세로줄은 잠금이 풀리며 함께 끝난 요청이에요. 14:06부터 5초 높이에 생긴 가로줄은 타임아웃 에러예요.">
+  <Scatter ariaLabel="14:00부터 10분 동안의 응답시간 분포도. 요청 대부분은 1초 아래에 깔려 있어요. 14:04에는 0.3~3.8초 점이 세로로 늘어서고, 14:06부터는 5초 높이에 타임아웃 에러 점이 가로로 늘어서요." xMax={10} yMax={6000} yTicks={[1000, 3000, 5000]} xLabels={['14:00', '14:05', '14:10']} groups={[{ count: 150, x: [0, 10], y: [40, 900], skew: 2.5, label: '성공' }, { count: 22, x: [4, 4.04], y: [300, 3800] }, { count: 18, x: [6.2, 9.8], y: [5000, 5000], tone: 'warn', label: '에러(타임아웃)' }]} />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="점 하나가 끝난 요청 하나예요">
+    응답시간 분포도는 요청이 끝날 때마다 점을 하나 찍어요. 가로축은 끝난 시각, 세로축은 그 요청의 응답시간이에요. 평균선과 달리 느린 요청이 하나하나 보이고, 영역을 끌어 고르면 그 요청들의 트레이스를 열 수 있어요.
+
+    점은 요청이 끝나야 찍혀요. 그래서 끝나지 않고 멈춰 있는 요청은 보이지 않아요.
+  </Point>
+  <Point title="줄이 보이면 병목이 있어요">
+    세로줄은 여러 요청이 같은 순간에 함께 끝난 자리예요. 잠금(lock)처럼 잠깐 막혔던 것이 풀리면, 기다리던 요청이 한꺼번에 끝나서 생겨요.
+
+    가로줄은 끝난 시각은 달라도 응답시간이 같은 요청들이에요. 자원이 모자라 타임아웃 값만큼 기다리다 에러로 끝나면 생겨서, 그 높이가 곧 타임아웃 값이에요.
+  </Point>
+  <Point title="요청이 많으면 히트맵으로 봐요">
+    요청이 많으면 점이 겹쳐서, 어디에 얼마나 몰렸는지 보이지 않아요. 히트맵(heatmap)은 시각과 응답시간으로 나눈 칸마다 요청 수를 세어 색 진하기로 보여 줘요. 대신 요청 하나하나는 칸을 눌러 들어가야 보여요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>분포도에 점이 끊긴 시간이 있다면, 요청이 없었는지 끝나지 않았는지 가려 보세요. 멈춘 요청은 끝나야 찍혀요. 그 시간에 <Term slug="apm/throughput-and-concurrency">활성 트랜잭션</Term>이 늘었는지 함께 봐요.</Check>
+  <Check>가로줄이 보이면 그 높이를 설정의 타임아웃 값과 맞춰 보세요. DB 커넥션 풀 대기나 외부 호출의 타임아웃이 후보예요. 타임아웃 뒤 재시도하는 코드라면 가로줄이 타임아웃 간격마다 되풀이돼요.</Check>
+  <Check>점이 빠른 무리와 느린 무리로 갈라졌다면 평균만 보지 마세요. 요청 90%가 50ms, 10%가 2,000ms면 평균은 245ms라, 아무도 겪지 않은 값이에요. 무리마다 어떤 요청인지 골라 열어 보세요.</Check>
+  <Check>Prometheus <Term slug="foundations/histograms">히스토그램</Term>으로 히트맵을 그린다면, 칸의 세로 폭은 버킷 경계예요. 경계가 1초, 2.5초, 5초처럼 성기면 그 사이의 무리와 줄무늬가 한 칸에 섞여요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 제품마다 다른 이름과 화면
+
+  WhaTap은 이 그림을 히트맵(hitmap)이라고 불러요. 가로축은 트랜잭션이 끝난 시각, 세로축은 응답시간이고, 지연 문제가 있는 요청은 주황이나 빨강으로 칠해요. 영역을 끌어 고르면 그 안의 트랜잭션 목록이 떠요.
+
+  JENNIFER의 X-View도 모든 트랜잭션의 응답시간을 점 하나씩으로 그리고, 영역을 끌어 고르면 트랜잭션 분석 창이 떠요. Pinpoint는 트랜잭션마다 점을 찍는 Scatter Chart와, 10초 단위 칸으로 묶은 Heatmap을 둘 다 둬요. 히트맵은 요청이 많은 앱에서 화면을 빨리 그리려고 더했다고 해요.
+
+  Elastic APM의 Latency distribution은 시간축 없이 응답시간 구간별 요청 수를 그린 막대예요. 끌어 고른 구간의 트레이스 표본을 최대 500개까지 보여 줘요.
+
+  ### 줄이 생기는 이유
+
+  잠금이 4초 이어졌다고 해 봐요. 그 사이 들어온 요청은 들어온 시각과 상관없이 풀리는 순간 함께 끝나요. 응답시간은 0~4초로 제각각이지만 끝난 시각이 같아서, 점이 세로로 서요.
+
+  가로축을 요청이 시작한 시각으로 그리는 도구라면 모양이 달라요. 일찍 시작한 요청일수록 오래 기다려서, 같은 현상이 오른쪽 아래로 기운 사선으로 보여요. 그래서 줄무늬를 읽기 전에 가로축이 무슨 시각인지 먼저 봐요.
+
+  WhaTap은 뒷단 서비스의 DB에서 생긴 잠금도 앞단 서비스의 분포도에 세로줄로 보인다고 해요. 앞단 요청도 뒷단 응답을 기다리다 함께 끝나서예요.
+
+  타임아웃은 기다린 시간이 정해진 값에 닿으면 요청을 끝내요. 그래서 끝난 시각은 달라도 응답시간은 같아서, 점이 가로로 누워요. WhaTap 문서의 예에서는 부하로 커넥션 풀이 바닥나고, 이어서 타임아웃 에러가 가로줄로 나타났어요.
+
+  ### 히트맵의 칸과 색
+
+  Grafana 히트맵은 시간에 따른 히스토그램이에요. 색은 칸 안의 개수에 대응하고, 가장 왼쪽 색이 가장 적은 개수예요. 세로축을 로그 눈금으로 바꾸면, 빠른 요청이 바닥에 깔려 뭉개지는 것을 줄일 수 있어요.
+
+  Brendan Gregg는 히트맵이 점을 칸에 담아서, 점마다 좌표를 저장하는 산점도와 달리 저장 비용이 고정이라고 해요. 그래서 수백만 개의 값도 그릴 수 있어요.
+</Deeper>
