@@ -36,6 +36,10 @@ const PAGES = [
   ['apm-sampling', 'apm/sampling/'],
   ['apm-connection-pool', 'apm/connection-pool/'],
   ['apm-broken-traces', 'apm/broken-traces/'],
+  ['apm-gc-pause', 'apm/gc-pause/'],
+  ['apm-timeouts', 'apm/timeouts-and-retries/'],
+  ['apm-consumer-lag', 'apm/consumer-lag/'],
+  ['apm-cascading', 'apm/cascading-failure/'],
 ];
 // 미리보기 시트를 여는 링크. 가이드의 첫 링크는 다른 가이드라서, 핵심 목록이 나오는 개념 글 링크를 고른다.
 const SHEETS = [
@@ -45,6 +49,7 @@ const SHEETS = [
   ['sheet-p99-wrong', 'foundations/p99-looks-wrong/', 'a.term[data-term="foundations/histograms"]'],
   ['sheet-error-spike', 'apm/error-spike/', 'a.term[data-term="apm/errors-and-exceptions"]'],
   ['sheet-broken-traces', 'apm/broken-traces/', 'a.term[data-term="apm/service-map"]'],
+  ['sheet-cascading', 'apm/cascading-failure/', 'a.term[data-term="apm/timeouts-and-retries"]'],
 ];
 const VIEWS = [
   ['desktop', { width: 1440, height: 900 }, false],
