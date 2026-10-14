@@ -1,0 +1,81 @@
+---
+title: DB 커넥션 풀
+summary: 커넥션 풀이 바닥나면 쿼리가 빨라도, 요청은 커넥션을 기다리느라 느려져요.
+domain: apm
+type: concept
+order: 110
+icon: layers
+keywords: [connection pool, 커넥션 풀, HikariCP, maximumPoolSize, connectionTimeout, pending, 커넥션 대기, pool exhausted, DB 연결, max_connections]
+related: [apm/throughput-and-concurrency, apm/response-time-distribution, apm/trace-waterfall]
+sources:
+  - title: HikariCP — Configuration (README)
+    url: https://github.com/brettwooldridge/HikariCP#gear-configuration-knobs-baby
+  - title: HikariCP — About Pool Sizing
+    url: https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing
+  - title: HikariCP — MicrometerMetricsTracker (지표 이름)
+    url: https://github.com/brettwooldridge/HikariCP/blob/dev/src/main/java/com/zaxxer/hikari/metrics/micrometer/MicrometerMetricsTracker.java
+  - title: OpenTelemetry — Semantic conventions for database client metrics
+    url: https://opentelemetry.io/docs/specs/semconv/db/database-metrics/
+  - title: PostgreSQL — Connections and Authentication (max_connections)
+    url: https://www.postgresql.org/docs/current/runtime-config-connection.html
+updated: 2026-10-14
+---
+
+<OnDashboard title="주문 API · 커넥션 풀(최대 10개) · 최근 10분" caption="쿼리가 느려지자 사용 중 커넥션이 최대 10개에 붙고, 커넥션을 기다리는 스레드가 26개로 늘었어요. 쿼리는 50ms인데 커넥션을 얻기까지 1.8초를 기다려요.">
+  <MiniLineChart ariaLabel="사용 중 커넥션은 4개에서 10개로 올라 붙어 있고, 커넥션 대기 스레드는 0에서 26으로 늘어나는 그래프" yMax={30} series={[{ label: '사용 중 커넥션', values: [4, 5, 6, 8, 10, 10, 10, 10, 10, 10], tone: 'accent', value: '10/10' }, { label: '대기 스레드', values: [0, 0, 0, 1, 6, 14, 22, 25, 24, 26], tone: 'warn', value: '26' }]} />
+  <StatTile label="쿼리 시간 p95" value="50" unit="ms" />
+  <StatTile label="커넥션 대기 p95" value="1,800" unit="ms" tone="warn" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="풀이 바닥나면 쿼리 밖에서 기다려요">
+    커넥션 풀은 DB 연결을 미리 열어 두고 빌려 쓰는 곳이에요. HikariCP에서는 최대 개수(`maximumPoolSize`, 기본 10)를 다 빌려 가면 다음 요청은 기다려요. `connectionTimeout`(기본 30초)이 지나도 못 얻으면 예외를 던져요.
+
+    그래서 쿼리 시간은 그대로인데 응답시간만 늘어요. 커넥션을 얻는 단계가 계측되지 않았다면, <Term slug="apm/trace-waterfall">워터폴</Term>에서는 DB span 앞의 빈칸으로 보여요.
+  </Point>
+  <Point title="필요한 개수는 빌리는 횟수 × 쥐는 시간이에요">
+    <Term slug="apm/throughput-and-concurrency">동시 처리 수</Term>와 같은 셈이에요. 초당 400번 빌리고 한 번에 20ms 쥐면, 평균 8개를 동시에 써요. 쥐는 시간이 50ms로 늘면 20개가 필요해서, 최대 10개를 넘는 몫은 기다려요.
+
+    쥐는 시간은 쿼리 시간이 아니라 빌려서 돌려줄 때까지예요. 트랜잭션 안에서 다른 일을 하면 그 시간도 들어가요.
+  </Point>
+  <Point title="풀을 키우기 전에 쥐는 시간을 줄여요">
+    HikariCP 문서는 작은 풀을 권해요. 풀 크기는 DB가 동시에 처리할 수 있는 쿼리 수에 맞추고, 나머지 스레드는 풀에서 기다리게 해요. DB의 CPU 코어보다 동시 쿼리가 훨씬 많으면, 번갈아 처리하느라 오히려 느려져요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>응답시간은 늘었는데 쿼리 시간은 그대로라면, 커넥션 대기 시간과 대기 스레드 수를 보세요. Micrometer로 내보낸 HikariCP 지표라면 대기 시간은 `hikaricp_connections_acquire_seconds`예요. 대기 스레드 수는 `hikaricp_connections_pending`이에요.</Check>
+  <Check>풀 최대치에 서버 수를 곱해 DB 연결 한도와 견줘 보세요. 풀 20개짜리 서버를 10대로 늘리면 연결이 200개까지 늘어요. PostgreSQL의 `max_connections` 기본값은 보통 100이에요.</Check>
+  <Check>트랜잭션 안에서 외부 API를 부르는 코드는 다시 보세요. 응답을 기다리는 동안 커넥션을 쥐고 있어서 풀이 빨리 바닥나요.</Check>
+  <Check>커넥션을 기다리는 동안 요청을 처리하는 스레드도 붙잡혀요. 30초씩 기다리는 스레드가 쌓여 스레드 풀이 바닥나면, DB를 쓰지 않는 요청까지 멈춰요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### HikariCP 설정
+
+  `maximumPoolSize`는 쉬는 커넥션과 쓰는 커넥션을 합친 최대 개수예요. `minimumIdle`은 따로 정하지 않으면 `maximumPoolSize`와 같아서, 풀 크기가 고정돼요. `connectionTimeout`은 250ms보다 짧게 둘 수 없어요.
+
+  ### 지표 이름
+
+  HikariCP가 Micrometer로 내는 지표는 `hikaricp.connections.` 아래에 있어요.
+
+  - `active`: 사용 중인 커넥션 수예요.
+  - `idle`: 쉬는 커넥션 수예요.
+  - `pending`: 커넥션을 기다리는 스레드 수예요.
+  - `acquire`: 커넥션을 얻기까지 걸린 시간이에요.
+  - `usage`: 커넥션을 쥐고 있던 시간이에요.
+  - `timeout`: 얻지 못하고 타임아웃 난 횟수예요.
+
+  OpenTelemetry DB 지표 규약도 비슷한 지표를 정해요. 아직 개발 단계(Development)라 이름이 바뀔 수 있어요.
+
+  - `db.client.connection.count`: 상태(사용 중·쉬는 중)별 커넥션 수예요.
+  - `db.client.connection.pending_requests`: 커넥션을 기다리는 요청 수예요.
+  - `db.client.connection.wait_time`: 커넥션을 얻기까지 걸린 시간이에요.
+  - `db.client.connection.timeouts`: 얻지 못하고 타임아웃 난 횟수예요.
+
+  ### 크기를 정하는 출발점
+
+  HikariCP 문서는 출발점으로 `(코어 수 × 2) + 유효 스핀들 수`를 들어요. 코어 수는 DB 서버의 물리 코어이고, 하이퍼스레딩은 빼요. 데이터가 모두 메모리에 올라가 있으면 유효 스핀들 수는 0이에요.
+
+  스레드 하나가 커넥션을 여러 개 동시에 쥐면, 풀이 작을 때 서로 기다리다 멈출 수 있어요. 이를 막는 최소 크기는 `스레드 수 × (스레드당 커넥션 수 − 1) + 1`이에요. 스레드 3개가 4개씩 쥐면 3 × 3 + 1 = 10이에요.
+</Deeper>
