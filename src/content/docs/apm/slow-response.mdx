@@ -1,0 +1,91 @@
+---
+title: 응답이 느려졌을 때 어디부터 볼까
+summary: 느린 범위를 좁히고, 처리량과 견주고, 느린 트레이스를 열어 원인 구간을 찾아요.
+domain: apm
+type: guide
+order: 40
+icon: activity
+keywords: [slow response, 응답 지연, 느려짐, latency, troubleshooting, 원인 찾기, p95, endpoint, 엔드포인트, 최근 변경]
+related: [apm/transactions-and-response-time, apm/throughput-and-concurrency, apm/trace-waterfall, foundations/red-and-use]
+sources:
+  - title: Google SRE Book — Effective Troubleshooting
+    url: https://sre.google/sre-book/effective-troubleshooting/
+  - title: OpenTelemetry — Semantic conventions for HTTP metrics
+    url: https://opentelemetry.io/docs/specs/semconv/http/http-metrics/
+  - title: Prometheus — Query functions (histogram_quantile)
+    url: https://prometheus.io/docs/prometheus/latest/querying/functions/
+updated: 2026-10-14
+---
+
+<Situation>
+  오후 2시부터 주문 API의 응답시간 p95가 300ms에서 1.5초로 올랐어요. 대시보드엔 지표가 수십 개라 어디부터 봐야 할지 막막해요.
+
+  순서를 정하면 빨라져요. 느린 범위를 좁히고, 처리량과 견주고, 느린 요청 하나를 열어 본 뒤, 그 구간의 원인 지표로 확인해요.
+</Situation>
+
+<FirstLook>
+  <Item title="어느 엔드포인트가 느린지">서비스 전체가 아니라 엔드포인트(트랜잭션 이름)마다 p95를 봐요.</Item>
+  <Item title="요청이 늘었는지">처리량과 활성 트랜잭션이 함께 바뀌었는지 봐요.</Item>
+  <Item title="언제부터인지">느려진 시각에 배포나 설정 변경이 있었는지 봐요.</Item>
+</FirstLook>
+
+## 1. 느린 범위부터 좁히세요
+
+엔드포인트(<Term slug="apm/transactions-and-response-time">트랜잭션</Term> 이름)마다 <Term slug="foundations/percentiles">p95</Term>를 나눠 보면 찾을 범위가 좁혀져요. 모든 엔드포인트가 함께 느려졌다면 함께 쓰는 DB, 네트워크, 서버 자원을 의심해요. 한 엔드포인트만 느리다면 그 기능의 코드와 그 기능이 부르는 서비스를 봐요.
+
+Google SRE Book도 문제를 나눠 좁혀 가는 방법을 쓸모 있는 기본기로 꼽아요.
+
+**확인 방법**: 아래 질의로 엔드포인트별 p95를 그려요. `http_route`는 경로 틀(`/orders/{id}`)이 든 레이블이에요.
+
+```text
+# order-api 서비스의 엔드포인트별 p95
+histogram_quantile(0.95,
+  sum by (le, http_route) (
+    rate(http_server_request_duration_seconds_bucket{job="order-api"}[5m])
+  )
+)
+```
+
+지표 이름은 OpenTelemetry HTTP 지표를 Prometheus 이름으로 바꾼 꼴이에요. 쓰는 계측 라이브러리의 지표 이름으로 바꿔 써요.
+
+## 2. 처리량과 함께 보세요
+
+응답시간을 <Term slug="apm/throughput-and-concurrency">처리량</Term>과 같은 시간축에 놓으면 원인의 갈래가 나뉘어요. 요청이 늘면서 함께 느려졌다면 처리할 힘이 모자란 포화 쪽이에요. 요청은 그대로인데 느려졌다면 그 시각의 변경이나 의존 서비스를 먼저 봐요.
+
+Google SRE Book은 최근 변경을 원인 찾기를 시작하기 좋은 곳으로 꼽아요. 문제 해결의 첫째 일로는 피해 멈추기를 들어요. 그래서 느려진 시각에 배포가 있었고 되돌릴 수 있다면, 원인을 찾기 전에 되돌려요.
+
+**확인 방법**: 아래 두 질의를 응답시간 그래프 옆에 둬요. 응답시간이 오르는데 활성 트랜잭션이 일정한 값에 붙어 평평하다면, 스레드 같은 상한에 걸렸는지 의심해요.
+
+```text
+# 초당 처리량
+sum(rate(http_server_request_duration_seconds_count{job="order-api"}[5m]))
+
+# 지금 처리 중인 요청 수(활성 트랜잭션)
+sum(http_server_active_requests{job="order-api"})
+```
+
+## 3. 느린 트레이스를 열어 보세요
+
+느려진 엔드포인트에서 느린 트레이스를 여러 개 열어, <Term slug="apm/trace-waterfall">워터폴</Term>에서 시간을 가장 많이 쓴 구간을 찾아요. 긴 막대 하나, 줄지어 반복된 막대, 막대 없는 빈칸이 후보예요.
+
+평소 속도의 트레이스도 하나 열어 견줘요. 두 트레이스에서 길이가 달라진 구간이 원인 구간 후보예요.
+
+**확인 방법**: APM의 트레이스 목록을 응답시간 순으로 정렬해, p95보다 느린 것을 골라요. 그래프의 <Term slug="foundations/logs-metrics-traces">exemplar</Term>를 눌러 그 시각의 트레이스로 바로 건너갈 수도 있어요. 고른 트레이스 여러 개에서 같은 구간이 느리면 그 구간으로 좁혀요.
+
+## 4. 그 구간의 원인 지표로 확인하세요
+
+워터폴에서 찾은 구간은 증상이 나타난 자리예요. 왜 느려졌는지는 그 구간 쪽의 지표로 확인해요.
+
+- **DB 구간이 길어졌다면**: DB 쪽의 느린 질의, 잠금, 연결 수를 봐요.
+- **외부 API 구간이라면**: 상대 서비스의 응답시간과 에러율을 봐요.
+- **빈칸(앱 코드)이 길어졌다면**: 서버의 CPU·메모리 같은 자원을 <Term slug="foundations/red-and-use">USE</Term>로 봐요.
+
+Google SRE Book은 함께 움직였다고 원인은 아니라고 경고해요. 그래서 원인으로 본 것을 고친 뒤 응답시간이 돌아오는지까지 확인해요.
+
+**확인 방법**: 원인으로 본 것을 고치거나 되돌린 뒤, 1단계의 엔드포인트별 p95가 평소로 돌아오는지 봐요.
+
+<Checkpoints>
+  <Check>응답시간을 평균 하나로만 보는 화면은 다시 보세요. 평균은 일부 요청의 느려짐을 가려요. 엔드포인트별 p95나 p99를 함께 두세요.</Check>
+  <Check>응답시간 알림이 서비스 전체 p95 하나라면 다시 보세요. 요청 수가 비슷한 빠른 엔드포인트와 섞이면, 1.5초로 느려진 엔드포인트도 전체 p95는 0.5초로 보여요.</Check>
+  <Check>느린 트레이스 하나만 보고 원인을 정했다면 다시 보세요. 여러 트레이스에서 같은 구간이 느린지, 평소 트레이스와 무엇이 다른지 확인하세요.</Check>
+</Checkpoints>
