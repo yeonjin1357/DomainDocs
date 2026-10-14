@@ -1,0 +1,117 @@
+---
+title: 히스토그램과 버킷
+summary: 히스토그램은 값을 버킷별로 세고, p99는 그 버킷 안에서 추정한 값이에요.
+domain: foundations
+type: concept
+order: 130
+icon: chart-column
+keywords: [histogram, 히스토그램, bucket, 버킷, le, histogram_quantile, native histogram, 네이티브 히스토그램, 선형 보간]
+related: [foundations/percentiles, foundations/counters-and-rate, foundations/slo-and-error-budget, foundations/red-and-use]
+sources:
+  - title: Prometheus — Histograms and summaries
+    url: https://prometheus.io/docs/practices/histograms/
+  - title: Prometheus — Query functions (histogram_quantile)
+    url: https://prometheus.io/docs/prometheus/latest/querying/functions/
+  - title: Prometheus — Metric types (클래식·네이티브 히스토그램)
+    url: https://prometheus.io/docs/concepts/metric_types/
+  - title: Prometheus — Native histograms 명세 (버전과 설정)
+    url: https://prometheus.io/docs/specs/native_histograms/
+  - title: Prometheus — Configuration (scrape_native_histograms)
+    url: https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+  - title: Prometheus 소스 — promql/quantile.go (BucketQuantile)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/promql/quantile.go
+  - title: Prometheus Go 클라이언트 소스 — histogram.go (DefBuckets)
+    url: https://github.com/prometheus/client_golang/blob/v1.25.0/prometheus/histogram.go
+  - title: OpenTelemetry — Metrics data model (Histogram, ExponentialHistogram)
+    url: https://opentelemetry.io/docs/specs/otel/metrics/data-model/
+  - title: OpenTelemetry — Metrics SDK (기본 버킷 경계)
+    url: https://opentelemetry.io/docs/specs/otel/metrics/sdk/
+  - title: OpenTelemetry — HTTP 지표 규약 (http.server.request.duration)
+    url: https://opentelemetry.io/docs/specs/semconv/http/http-metrics/
+  - title: OpenTelemetry — Prometheus 호환 (히스토그램 변환)
+    url: https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/
+updated: 2026-10-14
+---
+
+<OnDashboard title="결제 API · 응답시간 히스토그램 · 5분" caption="5분 동안 들어온 요청 1,000건 중 0.5초 이하가 985건, 1초 이하가 995건이에요. 99% 위치인 990번째 요청이 그 사이라서, 실제 p99는 0.5~1초 어딘가예요.">
+  <StatTile label="0.5초 이하" value="985" unit="건" />
+  <StatTile label="1초 이하" value="995" unit="건" />
+  <StatTile label="p99 추정값" value="0.75" unit="초" tone="accent" note="0.5~1초 버킷 안을 고르게 나눠 추정" />
+  <StatTile label="실제 p99가 있을 수 있는 범위" value="0.5~1" unit="초" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="버킷은 그 경계 이하를 모두 세요">
+    히스토그램(histogram)은 값을 미리 정한 범위, 곧 버킷(bucket)마다 세요. Prometheus 클래식 히스토그램은 `_bucket`(경계 이하 개수), `_sum`(값의 합), `_count`(전체 개수)를 내요. 버킷에는 `le="0.5"`처럼 위 경계가 붙고, `le`는 less or equal(그 값 이하)이에요.
+
+    그래서 `le="0.5"`는 0.1초 이하까지 센 누적 개수이고, 맨 끝 `le="+Inf"`는 모든 요청을 세요. 그림과 같은 5분 동안 `le="0.1"`은 600건, `le="0.5"`는 985건, `le="+Inf"`는 `_count`와 같은 1,000건이에요. 버킷은 시간이 지나며 쌓이기만 하는 <Term slug="foundations/counters-and-rate">카운터</Term>라서, rate(초당 증가량)로 최근 몇 분 사이 늘어난 만큼만 봐요.
+  </Point>
+  <Point title="p99는 버킷 안에서 추정한 값이에요">
+    `histogram_quantile`(버킷으로 백분위수를 구하는 PromQL 함수)은 요청마다 걸린 시간은 모르고 버킷별 개수만 알아요. 1,000건 중 99% 위치인 990번째 요청은 0.5초 이하 985건과 1초 이하 995건 사이, 곧 0.5~1초 버킷에 있어요. 함수는 이 버킷의 10건이 0.5~1초에 고르게 퍼져 있다고 보고(선형 보간), 그중 5번째를 한가운데인 0.75초로 계산해요.
+
+    그래서 실제 <Term slug="foundations/percentiles">p99</Term>는 0.5~1초 어디든 될 수 있어요. 오차는 많아야 이 버킷의 폭(0.5초)이라, 정확도는 버킷 경계가 정해요.
+  </Point>
+  <Point title="버킷 경계는 판단할 값에 맞춰요">
+    <Term slug="foundations/slo-and-error-budget">SLO</Term> 임계값이 300ms라면 0.3초를 경계로 둬요. 그러면 300ms 안에 끝난 요청을 추정 없이 셀 수 있어요. 요청의 1% 넘게 `+Inf` 바로 앞 경계를 넘으면 p99는 그 경계값만 나와서, 이 경계는 지켜볼 p99보다 커야 해요.
+
+    계측 라이브러리의 기본 경계가 서비스와 맞는지도 봐요. OpenTelemetry SDK는 경계를 따로 주지 않으면 0, 5, 10, …, 10,000을 써요. 여기에 초 단위 값을 넣으면, 요청이 모두 0.2초여도 0~5 버킷에 몰려 Prometheus에서 p99가 4.95초로 나와요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>`histogram_quantile`에 `_bucket`을 rate 없이 넣었다면 고치세요. 버킷은 프로세스가 시작한 뒤 쌓인 값이라, 그동안 전체의 p99가 나와요. 1시간 내내 0.1초 이하였다가 최근 5분 요청의 5%가 1~2.5초 걸리면, rate를 쓴 p99는 2.2초지만 이 식은 0.1초 아래예요.</Check>
+  <Check>서버별 p99 평균은 틀린 값이니, 버킷마다 rate를 구해 `sum by (le)`로 더한 뒤 p99를 구하세요. 서버 a는 1,000건 모두 0.1초 이하, 서버 b는 100건 중 90건 0.1초 이하·10건 1~2.5초예요. p99 평균은 1.22초지만, 먼저 합친 p99는 0.1초예요.</Check>
+  <Check>p99가 늘 `+Inf` 바로 앞 경계(예: 2.5초)와 같다면, 요청의 1% 넘게 그 경계를 넘은 거예요. 실제 p99는 그보다 크지만 얼마인지는 알 수 없어요. 더 큰 경계를 더하세요.</Check>
+  <Check>서버마다 버킷 경계가 다르면 같은 `le`끼리 더해 구한 값이 틀려요. 0.3초 경계가 한 서버에만 있으면, 분포가 같은 두 서버를 합친 p90(요청 90%가 끝난 시간)이 0.3초가 아니라 0.48초로 나와요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 계산식과 예외
+
+  `histogram_quantile`은 순위(0.99 × 전체 개수)가 든 버킷을 찾아, 그 안을 고르게 나눠요. 그림의 p99는 이 질의로 구했어요.
+
+  ```text
+  histogram_quantile(0.99, sum by (le) (rate(http_server_request_duration_seconds_bucket{job="payment"}[5m])))
+  ```
+
+  버킷 안은 이렇게 나눠요.
+
+  ```text
+  p99 = 아래 경계 + (순위 − 아래 경계까지 개수) ÷ 이 버킷 개수 × 버킷 폭
+      = 0.5 + (990 − 985) ÷ 10 × 0.5 = 0.75
+  ```
+
+  위 경계가 양수인 첫 버킷은 아래 경계를 0으로 봐요. 순위가 `le="+Inf"` 버킷에 들면 나누지 않고 바로 앞 경계값을 돌려줘요. Prometheus Go 클라이언트 기본 경계는 0.005~10초라서, 그대로 쓰면 p99가 10초를 넘지 못해요.
+
+  rate 구간(예: 5분) 동안 요청이 하나도 없으면 0이 아니라 NaN이에요. `le="+Inf"` 버킷이 없거나 버킷이 하나뿐이어도 NaN이에요.
+
+  이 글의 숫자는 Prometheus 3.15.0의 promtool(규칙·질의 검사 도구)로 다시 계산했어요.
+
+  ### 네이티브 히스토그램
+
+  네이티브 히스토그램(native histogram)은 Prometheus의 새 히스토그램 형식이에요. 경계를 미리 정하지 않고, 지수로 커지는 경계에 맞춰 버킷을 그때그때 만들어요. 해상도 schema가 3이면 경계가 약 9%(2의 1/8제곱배)씩 커져요.
+
+  히스토그램 하나가 <Term slug="foundations/time-series-and-labels">시계열</Term> 하나라서 `_bucket`과 `le`가 없어요. 질의도 `le` 없이 쓰고, 버킷 안은 직선 대신 지수 곡선을 따라 나눠요.
+
+  ```text
+  histogram_quantile(0.99, sum by (job) (rate(http_server_request_duration_seconds{job="payment"}[5m])))
+  ```
+
+  서버마다 해상도가 달라도 가장 낮은 해상도로 맞춰 합쳐요. 클래식처럼 경계를 맞출 필요가 없어요.
+
+  Prometheus 2.40에 실험 기능으로 들어왔고, 3.8부터 안정 기능이에요. 3.9부터는 기능 플래그 `--enable-feature=native-histograms`가 아무 일도 안 해요. 수집 설정에서 `scrape_native_histograms: true`를 켜야 받고, 수집 형식도 protobuf여야 해요.
+
+  이 설정을 켜면 두 형식을 함께 내보내는 히스토그램은 네이티브만 받아요. 그래서 `_bucket`을 쓰던 질의가 비어요. 클래식도 받으려면 `always_scrape_classic_histograms: true`를 더해요.
+
+  ### summary와 다른 점
+
+  summary는 앱이 p99 같은 값을 직접 계산해 내보내요. 그래서 여러 서버의 값을 합칠 수 없고, 정해 둔 백분위수와 집계 시간 말고는 나중에 구할 수 없어요. summary 값을 평균 내는 식이 왜 틀리는지는 <Term slug="foundations/percentiles">평균과 백분위수</Term>에 있어요.
+
+  ### OpenTelemetry에서는
+
+  OpenTelemetry의 explicit bucket histogram은 경계를 정해 두는 방식이라 클래식과 같아요. 다만 버킷마다 그 버킷의 개수만 담고, Prometheus로 바꿀 때 앞 버킷을 더해 누적으로 만들어요. SDK는 따로 고르지 않으면 이 방식으로 모아요.
+
+  exponential histogram은 지수 버킷이고, 해상도 scale이 Prometheus의 schema와 같아요.
+
+  HTTP 지표 규약은 `http.server.request.duration`을 초로 재고, 경계로 0.005, 0.01, …, 10을 권해요. SDK 기본 경계와 다르니, 어떤 경계를 썼는지 확인해요.
+</Deeper>
