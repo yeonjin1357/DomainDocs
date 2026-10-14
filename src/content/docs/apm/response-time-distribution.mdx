@@ -6,7 +6,7 @@ type: concept
 order: 60
 icon: chart-column
 keywords: [scatter, 산점도, 분포도, X-View, 히트맵, heatmap, 세로줄, 가로줄, 타임아웃, 잠금]
-related: [apm/transactions-and-response-time, apm/throughput-and-concurrency, foundations/histograms, foundations/percentiles]
+related: [apm/transactions-and-response-time, apm/throughput-and-concurrency, apm/connection-pool, foundations/histograms, foundations/percentiles]
 sources:
   - title: WhaTap — Transaction view (Understanding the hitmap patterns)
     url: https://docs.whatap.io/en/java/trs-view
@@ -45,7 +45,7 @@ updated: 2026-10-14
 
 <Checkpoints>
   <Check>분포도에 점이 끊긴 시간이 있다면, 요청이 없었는지 끝나지 않았는지 가려 보세요. 멈춘 요청은 끝나야 찍혀요. 그 시간에 <Term slug="apm/throughput-and-concurrency">활성 트랜잭션</Term>이 늘었는지 함께 봐요.</Check>
-  <Check>가로줄이 보이면 그 높이를 설정의 타임아웃 값과 맞춰 보세요. DB 커넥션 풀 대기나 외부 호출의 타임아웃이 후보예요. 타임아웃 뒤 재시도하는 코드라면 가로줄이 타임아웃 간격마다 되풀이돼요.</Check>
+  <Check>가로줄이 보이면 그 높이를 설정의 타임아웃 값과 맞춰 보세요. <Term slug="apm/connection-pool">DB 커넥션 풀</Term> 대기나 외부 호출의 타임아웃이 후보예요. 타임아웃 뒤 재시도하는 코드라면 가로줄이 타임아웃 간격마다 되풀이돼요.</Check>
   <Check>점이 빠른 무리와 느린 무리로 갈라졌다면 평균만 보지 마세요. 요청 90%가 50ms, 10%가 2,000ms면 평균은 245ms라, 아무도 겪지 않은 값이에요. 무리마다 어떤 요청인지 골라 열어 보세요.</Check>
   <Check>Prometheus <Term slug="foundations/histograms">히스토그램</Term>으로 히트맵을 그린다면, 칸의 세로 폭은 버킷 경계예요. 경계가 1초, 2.5초, 5초처럼 성기면 그 사이의 무리와 줄무늬가 한 칸에 섞여요.</Check>
 </Checkpoints>

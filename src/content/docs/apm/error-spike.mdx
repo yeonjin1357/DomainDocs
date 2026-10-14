@@ -6,7 +6,7 @@ type: guide
 order: 80
 icon: trending-up
 keywords: [error spike, 에러 급증, 에러 증가, 5xx, error rate, 에러율, error.type, troubleshooting, 원인 찾기, 에러 트레이스]
-related: [apm/errors-and-exceptions, apm/slow-response, apm/trace-waterfall, foundations/logs-metrics-traces]
+related: [apm/errors-and-exceptions, apm/slow-response, apm/trace-waterfall, apm/sampling, foundations/logs-metrics-traces]
 sources:
   - title: Google SRE Book — Effective Troubleshooting
     url: https://sre.google/sre-book/effective-troubleshooting/
@@ -92,6 +92,6 @@ sum by (http_route, instance) (
 
 <Checkpoints>
   <Check>에러 알림을 에러 수에 걸었다면 다시 보세요. 임계값이 분당 300건이면, 요청이 분당 200건인 새벽엔 모두 실패해도 울리지 않아요. 에러율에 거세요.</Check>
-  <Check>에러 트레이스가 거의 없다면 샘플링을 확인하세요. 트레이스를 10%만 남기는 head 샘플링이면 에러 요청의 트레이스도 90%가 빠져요.</Check>
+  <Check>에러 트레이스가 거의 없다면 샘플링을 확인하세요. 트레이스를 10%만 남기는 <Term slug="apm/sampling">head 샘플링</Term>이면 에러 요청의 트레이스도 90%가 빠져요.</Check>
   <Check>서버 에러율만 보는 화면이라면 4xx도 따로 두세요. 배포 뒤 앱과 API의 요청 형식이 어긋나 4xx가 늘어도, 서버 에러율은 그대로예요.</Check>
 </Checkpoints>
