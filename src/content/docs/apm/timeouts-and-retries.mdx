@@ -1,0 +1,72 @@
+---
+title: 타임아웃과 재시도
+summary: 타임아웃은 느린 상대를 끊어 우리 자원을 지키고, 재시도는 실패를 덮지만 부하를 곱해요.
+domain: apm
+type: concept
+order: 140
+icon: timer
+keywords: [timeout, 타임아웃, retry, 재시도, backoff, 백오프, jitter, deadline, 재시도 폭주, retry storm]
+related: [apm/connection-pool, apm/throughput-and-concurrency, apm/service-map]
+sources:
+  - title: Amazon Builders' Library — Timeouts, retries, and backoff with jitter
+    url: https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
+  - title: Google SRE Book — Addressing Cascading Failures
+    url: https://sre.google/sre-book/addressing-cascading-failures/
+  - title: Google SRE Book — Handling Overload
+    url: https://sre.google/sre-book/handling-overload/
+  - title: gRPC — Deadlines
+    url: https://grpc.io/docs/guides/deadlines/
+updated: 2026-10-14
+---
+
+<OnDashboard title="사용자 동작 한 번 · DB가 과부하로 실패할 때" caption="브라우저, 프런트 서버, 백엔드가 저마다 실패하면 3번씩 다시 시도해요. 사용자 동작 한 번이 DB에서는 64번이 돼요.">
+  <StatTile label="사용자 동작" value="1" unit="번" />
+  <StatTile label="프런트 서버가 받음" value="4" unit="번" />
+  <StatTile label="백엔드가 받음" value="16" unit="번" />
+  <StatTile label="DB가 받음" value="64" unit="번" tone="warn" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="타임아웃은 우리 자원을 지키는 상한이에요">
+    타임아웃은 부르는 쪽이 응답을 기다리는 시간의 상한이에요. 상한이 없거나 길면, 느린 상대를 기다리는 동안 스레드와 커넥션을 붙잡아요. 그러면 상대의 문제가 우리 쪽 자원 고갈로 번져요.
+
+    Amazon은 받아들일 헛 타임아웃 비율(예: 0.1%)을 먼저 정해요. 그다음 상대 응답시간의 그 백분위수(p99.9)를 타임아웃의 출발점으로 삼아요.
+  </Point>
+  <Point title="재시도는 계층마다 곱해져요">
+    재시도는 잠깐의 실패를 덮어 주지만, 실패한 만큼 요청을 더 보내요. 계층마다 따로 재시도하면 그 수가 곱해져요. 그림처럼 세 계층이 3번씩 다시 시도하면(4번 시도) 4 × 4 × 4 = 64번이에요.
+
+    상대가 과부하로 실패하는 중이라면, 재시도가 부하를 더 키워 회복을 늦춰요. 그래서 Amazon은 재시도를 한 계층에서만 하라고 권해요.
+  </Point>
+  <Point title="다시 보낼 땐 간격을 벌리고 흩뜨려요">
+    실패한 요청이 모두 같은 간격 뒤에 다시 오면, 또 한꺼번에 몰려 실패해요. 그래서 재시도 간격을 두 배씩처럼 점점 늘리고(지수 백오프), 무작위 값(jitter)을 더해 흩뜨려요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>타임아웃 없이 외부를 부르는 코드는 다시 보세요. 상대가 멈추면 스레드가 끝없이 기다려, 우리 서비스의 스레드 풀까지 바닥나요. gRPC도 기본으로는 마감 시각을 두지 않아서, 직접 정해야 해요.</Check>
+  <Check>뒷단의 타임아웃이 앞단보다 길면, 앞단이 포기한 뒤에도 뒷단은 계속 일해요. Google SRE Book은 마감 시각(deadline)을 아래로 넘겨, 남은 시간만큼만 기다리게 하라고 해요.</Check>
+  <Check>에러가 오를 때 뒷단이 받는 요청 수도 함께 뛰었다면, 늘어난 몫이 재시도인지 보세요. SRE Book은 재시도 비율 그래프가 원인인데도 증상으로 오해받기 쉽다고 해요.</Check>
+  <Check>잘못된 요청(4xx)이나 영구 실패까지 재시도하는 코드는 고치세요. 다시 보내도 성공하지 않고 부하만 늘어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 타임아웃을 정하는 출발점
+
+  Amazon은 상대의 p99.9 같은 높은 백분위수에서 시작해요. 다만 p99.9가 p50에 가까울 만큼 응답시간이 고른 서비스라면, 여유를 조금 더해요. 그래야 작은 지연에도 타임아웃이 쏟아지지 않아요.
+
+  Google SRE Book은 마감 시각이 없거나 너무 길면, 이미 지나간 문제가 서버를 재시작할 때까지 자원을 잡아먹을 수 있다고 해요. 반대로 너무 짧으면 무거운 요청이 늘 실패해요.
+
+  ### 마감 시각 넘기기
+
+  마감 시각 전파(deadline propagation)는 맨 앞에서 정한 마감 시각을 모든 하위 호출이 같이 쓰는 방법이에요. A가 30초 마감 중 7초를 쓰고 B를 부르면, B에게는 23초가 남아요. 일부 gRPC 구현은 들어온 호출의 마감 시각을 나가는 호출로 자동으로 넘겨요.
+
+  ### 재시도를 묶어 두는 방법
+
+  Google은 요청 하나에 시도를 3번까지만 허용해요. 클라이언트마다 재시도 요청의 비율도 세서, 10%를 넘으면 더 재시도하지 않아요. SRE Book은 프로세스 전체에 분당 60번 같은 재시도 예산을 두는 방법도 들어요.
+
+  Amazon은 계층마다 재시도하면 곱해진다고 경고해요. 다섯 계층이 저마다 3번씩 시도하면 DB가 받는 부하는 243배예요. Amazon SDK는 토큰 버킷으로 재시도를 묶어서, 토큰이 떨어지면 정해진 속도로만 재시도해요.
+
+  ### 주기 작업에도 jitter를
+
+  Amazon은 매분, 매일 자정처럼 같은 때에 도는 작업에도 jitter를 더하라고 해요. 여러 서버가 같은 순간에 요청을 보내면, 평균 지표에는 안 보이는 짧은 몰림이 생겨요.
+</Deeper>
