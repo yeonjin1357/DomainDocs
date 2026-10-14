@@ -1,0 +1,79 @@
+---
+title: 에러와 예외
+summary: 에러율은 실패한 요청의 비율이라, 예외나 에러 로그를 센 숫자와 달라요.
+domain: apm
+type: concept
+order: 70
+icon: hash
+keywords: [error rate, 에러율, exception, 예외, 5xx, 4xx, span status, error.type, expected error, grouping]
+related: [foundations/red-and-use, apm/transactions-and-response-time, apm/apdex, apm/error-spike, foundations/logs-metrics-traces]
+sources:
+  - title: OpenTelemetry — Recording errors
+    url: https://opentelemetry.io/docs/specs/semconv/general/recording-errors/
+  - title: OpenTelemetry — Semantic conventions for HTTP spans (Status)
+    url: https://opentelemetry.io/docs/specs/semconv/http/http-spans/
+  - title: OpenTelemetry — Semantic conventions for HTTP metrics (error.type)
+    url: https://opentelemetry.io/docs/specs/semconv/http/http-metrics/
+  - title: OpenTelemetry — Semantic conventions for exceptions on spans
+    url: https://opentelemetry.io/docs/specs/semconv/exceptions/exceptions-spans/
+  - title: RFC 9110 — HTTP Semantics (4xx Client Error)
+    url: https://www.rfc-editor.org/rfc/rfc9110#name-client-error-4xx
+  - title: "New Relic — Manage errors in APM: Collect, ignore, or mark as expected"
+    url: https://docs.newrelic.com/docs/apm/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/
+  - title: Sentry — Event grouping
+    url: https://docs.sentry.io/concepts/data-management/event-grouping/
+updated: 2026-10-14
+---
+
+<OnDashboard title="주문 API · 최근 5분 · 요청 10,000건" caption="같은 5분의 숫자예요. 에러율은 5xx로 실패한 요청만 세서 0.5%이고, 4xx 응답과 에러 로그는 따로 세요.">
+  <StatTile label="에러율" value="0.5" unit="%" tone="warn" note="5xx 50건" />
+  <StatTile label="4xx 응답" value="400" unit="건" note="에러율 제외" />
+  <StatTile label="에러 로그" value="320" unit="줄" note="처리한 예외 포함" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="에러율은 실패한 요청의 비율이에요">
+    에러율은 실패한 요청 수를 전체 요청 수로 나눈 값이에요. OpenTelemetry(오픈소스 계측 도구)는 작업이 예외를 밖으로 던지거나 에러 코드로 끝나면 실패로 봐요. 그림이라면 50 ÷ 10,000 = 0.5%예요.
+
+    그래서 에러율은 요청 단위예요. 요청 하나가 실패하면, 그 안에서 예외가 몇 번 났든 한 건이에요.
+  </Point>
+  <Point title="서버는 5xx만 에러로 세요">
+    OpenTelemetry HTTP 규약은 서버 쪽 <Term slug="foundations/logs-metrics-traces">span</Term>에서 5xx 응답을 에러로 봐요. 4xx는 서버 span 상태를 비워 둬요. HTTP 명세(RFC 9110)도 4xx를 클라이언트가 잘못한 것으로 보이는 응답으로 정해요.
+
+    반대로 요청을 보낸 클라이언트 span에서는 4xx도 에러예요. 그래서 같은 404가 부른 쪽에선 에러이고, 받은 쪽에선 에러가 아니에요.
+  </Point>
+  <Point title="예외 수는 실패한 요청 수가 아니에요">
+    코드가 잡아서 처리한 예외는 요청을 실패시키지 않아요. 재시도해서 성공한 호출이 그 예예요. OpenTelemetry는 처리한 에러를 그 작업의 span과 지표에 남기지 말라고 해요.
+
+    하지만 앱 로그에는 처리한 예외도 남을 수 있어요. 요청 하나가 예외 로그를 여러 줄 남기기도 해서, 로그 줄 수로 낸 에러율은 부풀어요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>4xx를 서버 에러율에 넣은 계산은 다시 보세요. 잘못된 요청이 몰리면 서버가 멀쩡해도 에러율이 올라요. 4xx가 갑자기 늘었다면(예: 배포 뒤 401) 따로 지켜보세요.</Check>
+  <Check>에러 로그 줄 수나 예외 수로 에러율을 그린 화면은 다시 보세요. 처리한 예외와 한 요청의 여러 줄이 섞여 실제보다 높게 나와요. 에러율은 요청 수를 세는 지표로 계산해요.</Check>
+  <Check>에러 목록에서 같은 에러가 수천 묶음으로 갈라졌다면 메시지를 보세요. Sentry는 스택 트레이스가 없으면 메시지로 묶어요. 주문 번호를 이어 붙인 메시지는 주문마다 다른 묶음이 돼요.</Check>
+  <Check>에러가 났는데 에러율에 안 잡힌다면, 도구에서 무시하거나 예상된 에러로 지정했는지 보세요. New Relic은 예상된 에러(expected error)를 에러율과 Apdex에서 빼고, 무시한 에러는 아예 버려요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### OpenTelemetry가 실패를 남기는 곳
+
+  상태 코드가 에러인지는 맥락에 따라 달라요. OpenTelemetry는 404를 예로 들어요. 있어야 할 자원을 못 찾았다면 에러지만, 자원이 있는지 확인만 하는 요청이면 에러가 아니에요.
+
+  span은 실패하면 상태를 Error로 두고, 에러 없이 끝나면 상태를 비워 둬요. 작업 시간을 재는 히스토그램 지표에는 실패한 작업에만 `error.type` 속성을 붙여요. 그래서 이 속성이 있는 요청 수로 에러율을 낼 수 있어요.
+
+  HTTP 지표의 `error.type`은 응답이 에러면 상태 코드(예: "500")이고, 응답 전에 실패하면 예외 종류예요. Prometheus로 옮기면 `error_type` 레이블이 돼요.
+
+  ### 예외를 남기는 방법
+
+  OpenTelemetry는 예외를 `exception`이라는 span 이벤트로 남겨 왔어요. 예외 종류(`exception.type`), 메시지, 스택 트레이스를 속성으로 담아요. 규약 1.44.0은 이 방식을 더 이상 권하지 않고(Deprecated), 예외를 로그로 남기라고 해요.
+
+  같은 예외를 여러 번 남기는 것, 라이브러리가 처리한 예외를 남기는 것도 권하지 않아요.
+
+  ### 같은 에러끼리 묶기
+
+  Sentry는 에러를 묶을 때 직접 정한 묶음 기준(fingerprint)을 먼저 보고, 다음으로 스택 트레이스, 예외, 메시지 순으로 봐요. 스택 트레이스가 있으면 사실상 스택 트레이스만으로 묶어요.
+
+  스택 트레이스 없이 예외 종류와 메시지로 묶으면 덜 믿을 만하다고 해요. 메시지가 바뀌기 때문이에요.
+</Deeper>
