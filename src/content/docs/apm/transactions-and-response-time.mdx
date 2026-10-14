@@ -1,0 +1,84 @@
+---
+title: 트랜잭션과 응답시간
+summary: 트랜잭션은 요청 하나의 처리이고, 응답시간은 그 안의 구간들이 쌓인 값이에요.
+domain: apm
+type: concept
+order: 10
+icon: timer
+keywords: [transaction, 트랜잭션, response time, 응답시간, server span, 엔드포인트, request queuing, 요청 대기, 구간별 시간, APM]
+related: [foundations/percentiles, foundations/logs-metrics-traces, foundations/red-and-use]
+sources:
+  - title: OpenTelemetry — Trace API (SpanKind, root span)
+    url: https://opentelemetry.io/docs/specs/otel/trace/api/
+  - title: OpenTelemetry — Semantic conventions for HTTP spans (span 이름, http.route)
+    url: https://opentelemetry.io/docs/specs/semconv/http/http-spans/
+  - title: Elastic APM — Transactions
+    url: https://www.elastic.co/docs/solutions/observability/apm/transactions
+  - title: Elastic APM — Metrics (breakdown metrics)
+    url: https://www.elastic.co/docs/solutions/observability/apm/metrics
+  - title: Elastic APM — Transactions UI (Time spent by span type)
+    url: https://www.elastic.co/docs/solutions/observability/apm/transactions-ui
+  - title: New Relic — Request queuing
+    url: https://docs.newrelic.com/docs/apm/applications-menu/features/request-queuing-tracking-front-end-time/
+  - title: New Relic — Page load timing process
+    url: https://docs.newrelic.com/docs/browser/new-relic-browser/page-load-timing-resources/page-load-timing-process/
+updated: 2026-10-14
+---
+
+<OnDashboard title="주문 API · GET /orders/{id} · 최근 1시간 평균" caption="트랜잭션 하나의 평균 응답시간 600ms를 구간별로 나눈 모습이에요. 평균이라서 세 구간을 더하면 전체와 같아요.">
+  <StatTile label="응답시간 평균" value="600" unit="ms" tone="accent" />
+  <StatTile label="DB" value="300" unit="ms" note="50%" />
+  <StatTile label="외부 API" value="180" unit="ms" note="30%" />
+  <StatTile label="앱 코드" value="120" unit="ms" note="20%" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="트랜잭션은 요청 하나를 처리한 단위예요">
+    APM(애플리케이션 성능 모니터링)은 요청이 서비스에 들어와 응답이 나갈 때까지를 트랜잭션 하나로 재요. OpenTelemetry(오픈소스 계측 도구)는 서버가 요청을 처리한 구간을 SERVER <Term slug="foundations/logs-metrics-traces">span</Term>으로 기록해요. 배치 작업처럼 요청이 아닌 일도 트랜잭션으로 재는 제품이 있어요.
+
+    트랜잭션 이름은 `GET /orders/{id}`처럼 경로 틀로 묶어요. 주문 번호마다 이름이 생기면 같은 기능의 요청을 모아 볼 수 없어요.
+  </Point>
+  <Point title="서버가 잰 시간은 사용자가 기다린 시간의 일부예요">
+    트랜잭션 시간은 앱이 요청을 받아 처리한 시간이에요. 로드밸런서 같은 앞단 서버를 거쳐 앱에 닿기까지 기다린 시간, 네트워크 시간, 브라우저가 화면을 그리는 시간은 빠져요. New Relic도 페이지 로드 시간을 이렇게 나누고, 앱 서버 시간은 그중 한 구간으로 둬요.
+
+    그래서 서버 응답시간이 그대로여도 사용자는 느리다고 할 수 있어요. 이럴 땐 앞단 대기와 네트워크, 브라우저 쪽 시간을 함께 봐요.
+  </Point>
+  <Point title="응답시간은 구간 시간이 쌓인 값이에요">
+    트랜잭션 시간은 DB 조회, 외부 API 호출 같은 하위 구간과, 그 밖에 앱 코드가 쓴 시간으로 나뉘어요. 그림처럼 평균 600ms 중 DB가 300ms라면, 줄일 곳은 DB 쪽부터예요.
+
+    이렇게 나눠 더하는 건 평균이나 합계일 때만 맞아요. 구간별 p95를 더한 값은 전체 <Term slug="foundations/percentiles">p95</Term>가 아니에요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>트랜잭션 이름에 `/orders/1234`처럼 실제 경로가 들어갔다면 고치세요. 같은 기능이 주문 수만큼 갈라져 비교할 수 없고, 지표의 <Term slug="foundations/cardinality-explosion">시계열도 끝없이 늘어요</Term>.</Check>
+  <Check>헬스체크나 정적 파일 요청이 섞인 응답시간 평균은 다시 보세요. 몇 ms짜리 요청이 많으면 평균이 내려가서, 실제 기능의 느린 요청이 가려져요.</Check>
+  <Check>서버 응답시간은 그대로인데 사용자가 느리다고 하면, 앞단 대기·네트워크·브라우저 시간을 재고 있는지 보세요. 서버 트랜잭션만으로는 이 시간이 보이지 않아요.</Check>
+  <Check>구간별 p95를 쌓아 "전체 p95의 구성"처럼 보여 주는 화면은 고치세요. 구간 비중은 평균이나 합계로 나눠야 맞아요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 제품마다 다른 이름
+
+  Elastic APM은 트랜잭션을 서비스 안에서 재는 가장 높은 단위의 일이라고 해요. 서버로 온 요청, 배치 작업, 백그라운드 작업이 그 예예요.
+
+  OpenTelemetry의 SERVER span은 클라이언트가 응답을 기다리는 동안 원격 요청을 서버 쪽에서 처리하는 구간이에요. 트레이스마다 부모가 없는 root span이 하나 있어요. 다른 서비스가 부른 요청이면 SERVER span에도 부모가 있어서, 트랜잭션이 늘 root span은 아니에요.
+
+  HTTP 서버 span 이름은 `{method} {http.route}`로 써요. `http.route`는 프레임워크가 맞춘 경로 틀이고, 없으면 `{method}`만 써요. 명세는 URI 경로를 이름의 기본값으로 쓰지 말라고 해요.
+
+  ### 앱에 닿기 전 시간
+
+  New Relic은 요청이 운영 시스템에 들어와 앱에 닿기까지의 시간을 request queuing이라고 불러요. 앞단 웹 서버(Nginx 등)가 남긴 시각으로 재요. 실제 대기열이 아니라 부하 분산이나 내부 네트워크 시간일 수도 있어요.
+
+  ### 구간 나누기와 비동기
+
+  Elastic APM은 구간 종류(DB, 외부 호출 등)별 시간을 따로 모아, 평균 시간과 비중을 계산해요. 어느 구간에도 속하지 않은 시간은 "app"으로 묶어요. 계측되지 않은 작업이 있으면 이 몫이 커져요.
+
+  비동기로 동시에 도는 구간이 있으면, 구간 시간을 모두 더한 값이 트랜잭션 시간보다 클 수 있어요.
+
+  ### p95는 왜 나눠 더할 수 없나
+
+  요청 100건 중 90건은 DB 100ms·외부 API 100ms라고 해 봐요. 5건은 DB만 1,000ms, 다른 5건은 외부 API만 1,000ms예요. 줄 세운 95번째 값을 p95로 보면 DB p95는 100ms, 외부 API p95도 100ms예요.
+
+  둘을 더하면 200ms지만, 전체 응답시간의 p95는 1,100ms예요. 느린 요청이 구간마다 다른 요청이라서예요. 평균은 DB 145ms + 외부 API 145ms = 전체 290ms로 맞아요.
+</Deeper>
