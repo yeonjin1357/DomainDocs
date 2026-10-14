@@ -1,0 +1,65 @@
+---
+title: 처리량과 동시성
+summary: 동시에 처리 중인 요청 수는 처리량과 응답시간을 곱한 값이라, 응답이 느려지면 함께 늘어요.
+domain: apm
+type: concept
+order: 20
+icon: gauge
+keywords: [throughput, 처리량, TPS, concurrency, 동시성, active transactions, 활성 트랜잭션, Little's Law, 리틀의 법칙, thread pool]
+related: [apm/transactions-and-response-time, foundations/counters-and-rate, foundations/red-and-use]
+sources:
+  - title: Little, J. D. C. (2011). Little's Law as Viewed on Its 50th Anniversary. Operations Research 59(3)
+    url: https://doi.org/10.1287/opre.1110.0940
+  - title: OpenTelemetry — Semantic conventions for HTTP metrics (http.server.active_requests)
+    url: https://opentelemetry.io/docs/specs/semconv/http/http-metrics/
+  - title: Apache Tomcat 10.1 — The HTTP Connector (maxThreads, maxConnections, acceptCount)
+    url: https://tomcat.apache.org/tomcat-10.1-doc/config/http.html
+updated: 2026-10-14
+---
+
+<OnDashboard title="주문 API · DB가 느려진 뒤 10분" caption="DB가 느려져 응답시간이 세 배가 되자, 활성 트랜잭션이 스레드 상한 200에 붙었어요. 처리량은 초당 200건에서 133건으로 떨어졌어요.">
+  <MiniLineChart ariaLabel="활성 트랜잭션이 100에서 오르기 시작해 200에 닿은 뒤 평평하게 이어지는 그래프" yMax={250} series={[{ label: '활성 트랜잭션', values: [100, 100, 100, 100, 150, 200, 200, 200, 200, 200, 200, 200], tone: 'warn', value: '200개' }]} />
+  <StatTile label="처리량" value="133" unit="건/초" tone="warn" note="평소 200" />
+  <StatTile label="응답시간 평균" value="1.5" unit="초" note="평소 0.5초" />
+  <StatTile label="활성 트랜잭션" value="200" unit="개" note="스레드 상한" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="처리량은 초당 끝낸 요청 수예요">
+    처리량(throughput)은 초당 처리한 트랜잭션 수로, TPS(transactions per second)라고도 불러요. 보통 요청이 끝날 때 늘어나는 요청 수 카운터의 <Term slug="foundations/counters-and-rate">rate</Term>로 구해요. 그래서 요청이 밀리면 들어온 수보다 끝낸 수가 먼저 줄어요.
+  </Point>
+  <Point title="활성 트랜잭션은 지금 처리 중인 요청 수예요">
+    활성 트랜잭션은 시작했지만 아직 끝나지 않은 요청 수예요. OpenTelemetry(오픈소스 계측 도구)의 `http.server.active_requests`가 이 값이에요. 요청이 시작하면 1 늘고, 끝나면 1 줄어요.
+
+    처리량이 그대로인데 이 값이 늘면, 요청 하나를 붙잡는 시간이 길어졌다는 뜻이에요.
+  </Point>
+  <Point title="동시 처리 수는 처리량 × 응답시간이에요">
+    리틀의 법칙(Little's Law)에 따라 평균 활성 트랜잭션은 평균 처리량에 평균 응답시간을 곱한 값이에요. 초당 200건을 0.5초씩 처리하면 늘 100건이 처리 중이에요. 응답이 1.5초로 늘면 300건이 필요하지만, 요청을 처리할 스레드가 200개뿐이면 처리량은 200 ÷ 1.5 ≈ 133건으로 떨어져요.
+
+    나머지 요청은 스레드를 기다리며 쌓여서, 사용자는 1.5초보다 오래 기다려요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>처리량이 줄었다고 손님이 줄었다고 보지 마세요. 응답시간과 활성 트랜잭션이 함께 늘었다면 처리할 힘이 모자란 <Term slug="foundations/red-and-use">포화</Term>예요. 손님이 줄었다면 활성 트랜잭션도 함께 줄어요.</Check>
+  <Check>활성 트랜잭션이 일정한 값에 붙어 평평하다면 스레드 풀 상한을 의심하세요. Tomcat은 따로 정하지 않으면 요청 처리 스레드가 200개예요.</Check>
+  <Check>스레드 풀 크기를 정했다면 평균 처리량 × 평균 응답시간보다 넉넉한지 보세요. 초당 300건을 0.4초씩 처리하면 평균 120개가 늘 쓰이고, 응답이 느려지면 더 필요해요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 리틀의 법칙이 맞는 조건
+
+  Little(2011)은 이 법칙을 이렇게 써요. 시스템 안의 평균 개수(L)는 평균 도착률(λ)에 한 개가 머무는 평균 시간(W)을 곱한 값, 곧 L = λW예요.
+
+  관찰 기간의 시작과 끝에 시스템이 비어 있으면 정확히 맞아요. 도착이 시간대마다 달라져도 맞고, 처리 순서와도 상관없어요. 그래서 기간을 요청 시간보다 충분히 길게 잡으면, 경계에 걸친 요청 몫은 작아져요.
+
+  무엇을 시스템으로 보느냐에 따라 W가 달라져요. 처리 중인 요청만 세면 W는 앱 안의 응답시간이에요. 스레드를 기다리는 요청까지 세면 W에 기다린 시간도 들어가요.
+
+  ### Tomcat에서 스레드가 다 차면
+
+  `maxThreads`는 동시에 처리할 수 있는 요청 수를 정하고, 기본값은 200이에요. `maxConnections`는 받아서 처리하는 연결 수의 상한으로, 기본값은 8,192예요. 스레드가 모두 바빠도 연결은 이 수까지 받아 두고, 스레드가 비면 처리해요.
+
+  연결이 `maxConnections`에 닿으면, 운영체제 대기열(`acceptCount`, 기본 100)에 연결이 쌓여요. 이 대기열도 차면 새 연결은 거절되거나 시간 초과로 끊길 수 있어요.
+
+  스레드를 기다린 시간은 <Term slug="apm/transactions-and-response-time">앱에 닿기 전 시간</Term>처럼 트랜잭션 시간 밖에 있을 수 있어요. 그래서 APM의 응답시간은 그대로 1.5초인데, 사용자가 기다린 시간은 더 길어질 수 있어요.
+</Deeper>
