@@ -1,0 +1,79 @@
+---
+title: 메시지 큐 지연(consumer lag)
+summary: lag은 큐에 쌓였지만 아직 처리하지 못한 메시지 수예요. 크기보다 줄어드는지를 봐요.
+domain: apm
+type: concept
+order: 150
+icon: chart-line
+keywords: [consumer lag, 컨슈머 랙, lag, Kafka, 카프카, offset, 오프셋, records-lag-max, Burrow, 비동기 처리]
+related: [apm/throughput-and-concurrency, apm/broken-traces, foundations/no-data-vs-zero]
+sources:
+  - title: Apache Kafka — Basic operations (Checking consumer position)
+    url: https://github.com/apache/kafka/blob/trunk/docs/operations/basic-kafka-operations.md
+  - title: Apache Kafka — Monitoring (records-lag-max)
+    url: https://github.com/apache/kafka/blob/trunk/docs/operations/monitoring.md
+  - title: Apache Kafka — Design (Consumer position)
+    url: https://github.com/apache/kafka/blob/trunk/docs/design/design.md
+  - title: LinkedIn Burrow — Consumer Lag Evaluation Rules
+    url: https://github.com/linkedin/Burrow/wiki/Consumer-Lag-Evaluation-Rules
+  - title: OpenTelemetry — Semantic conventions for messaging spans
+    url: https://opentelemetry.io/docs/specs/semconv/messaging/messaging-spans/
+updated: 2026-10-14
+---
+
+<OnDashboard title="주문 알림 컨슈머 · 최근 10분" caption="들어오는 메시지(초당 500건)보다 처리(초당 400건)가 느려서, lag이 1분에 6,000건씩 늘어 60,000건이 됐어요.">
+  <MiniLineChart ariaLabel="lag이 0건에서 10분 동안 일정하게 늘어 60,000건이 된 그래프" series={[{ label: 'lag', values: [0, 6000, 12000, 18000, 24000, 30000, 36000, 42000, 48000, 54000, 60000], tone: 'warn', value: '60,000건' }]} />
+  <StatTile label="들어오는 속도" value="500" unit="건/초" />
+  <StatTile label="처리 속도" value="400" unit="건/초" tone="warn" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="lag은 아직 못 읽은 메시지 수예요">
+    Kafka는 파티션마다 메시지에 번호(offset)를 붙여 쌓아요. lag은 파티션의 마지막 offset에서 컨슈머가 처리했다고 기록한 offset을 뺀 값이에요. 곧 큐에 들어왔지만 아직 처리하지 못한 메시지 수예요.
+
+    그래서 컨슈머의 처리 시간이 멀쩡해도, 사용자는 결과를 늦게 받을 수 있어요. 그림이라면 주문 알림이 점점 늦게 가요.
+  </Point>
+  <Point title="lag의 크기보다 줄어드는지를 봐요">
+    바쁜 토픽은 잘 돌 때도 lag이 0이 아닐 때가 많아요. 그래서 LinkedIn의 Burrow는 lag에 고정 임계값을 두지 않아요. 최근 구간에서 lag이 0이 된 적이 있는지, offset이 앞으로 가는지, lag이 줄곧 늘기만 하는지로 판단해요.
+  </Point>
+  <Point title="시간으로 바꾸면 얼마나 늦는지 보여요">
+    lag을 처리 속도로 나누면, 지금 쌓인 몫을 처리하는 데 걸릴 시간이에요. 그림이라면 60,000건 ÷ 초당 400건 = 150초라, 방금 들어온 메시지는 2분 넘게 기다려요.
+
+    들어오는 속도가 처리 속도보다 빠르면 lag은 줄지 않고 계속 늘어요. 이때는 컨슈머를 늘리거나 한 건의 처리 시간을 줄여야 해요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>lag 하나에 고정 임계값으로 알림을 걸었다면 다시 보세요. 바쁜 시간엔 정상이어도 울리고, 한가한 토픽은 컨슈머가 멈춰도 lag이 작아 늦게 울려요.</Check>
+  <Check>컨슈머가 offset을 기록하는데 값이 그대로이고 lag이 남아 있다면 멈춘 거예요. Burrow는 이 상태를 STALLED라고 불러요. 같은 메시지를 계속 실패하며 다시 처리하는지 보세요.</Check>
+  <Check>lag을 모든 파티션의 합으로만 보지 마세요. 한 파티션은 그룹 안의 컨슈머 하나만 읽어서, 그 컨슈머가 느리면 그 파티션만 밀려요.</Check>
+  <Check>`records-lag-max`는 브로커가 아니라 컨슈머가 내는 지표예요. 컨슈머가 죽으면 lag이 0이 아니라 <Term slug="foundations/no-data-vs-zero">아예 사라져요</Term>. 브로커 쪽 offset으로 잰 lag도 함께 두세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### Kafka에서 lag 보기
+
+  `kafka-consumer-groups.sh --describe`는 파티션마다 offset 두 개와 그 차이를 보여 줘요. `CURRENT-OFFSET`은 컨슈머가 기록한 offset, `LOG-END-OFFSET`은 로그 끝 offset, `LAG`은 그 차이예요. 아래는 Kafka 문서의 예에서 열 일부만 옮겼어요.
+
+  ```text
+  $ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 \
+      --describe --group my-group
+  TOPIC     PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG
+  my-topic  0          2               4               2
+  ```
+
+  컨슈머 지표 `records-lag-max`는 컨슈머가 생산자보다 몇 건 뒤처졌는지예요. 컨슈머가 직접 내는 값이라, 컨슈머가 없으면 이 지표도 없어요.
+
+  ### Burrow의 판단 규칙
+
+  Burrow는 파티션마다 최근 offset 기록 몇 개를 창으로 두고 봐요. 기본은 10개라, 컨슈머가 60초마다 기록하면 10분을 봐요.
+
+  - 창 안에서 lag이 한 번이라도 0이면 정상(OK)이에요.
+  - offset이 움직이지 않는데 lag이 그대로거나 늘면 오류(STALLED)예요.
+  - offset은 움직이지만 lag이 기록마다 그대로거나 늘면 경고(WARNING)예요. 느려서 뒤처지는 중이에요.
+  - 마지막 기록 뒤로 창 길이보다 오래 기록이 없으면 오류(STOPPED)예요.
+
+  ### 트레이스 잇기
+
+  메시지를 거치면 HTTP 헤더가 없어서, 생산자가 메시지에 컨텍스트를 실어야 해요. OpenTelemetry 메시징 규약은 생산자가 메시지마다 생성 컨텍스트를 붙이라고 해요. 붙이지 않으면 컨슈머 쪽 트레이스를 생산자 트레이스와 이을 수 없어요.
+</Deeper>
