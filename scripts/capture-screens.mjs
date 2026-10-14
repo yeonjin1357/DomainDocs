@@ -23,6 +23,11 @@ const PAGES = [
   ['p99-wrong', 'foundations/p99-looks-wrong/'],
   ['lmt', 'foundations/logs-metrics-traces/'],
   ['cardinality', 'foundations/cardinality-explosion/'],
+  ['apm', 'apm/'],
+  ['apm-transactions', 'apm/transactions-and-response-time/'],
+  ['apm-throughput', 'apm/throughput-and-concurrency/'],
+  ['apm-waterfall', 'apm/trace-waterfall/'],
+  ['apm-slow', 'apm/slow-response/'],
 ];
 // 미리보기 시트를 여는 링크. 가이드의 첫 링크는 다른 가이드라서, 핵심 목록이 나오는 개념 글 링크를 고른다.
 const SHEETS = [

@@ -51,7 +51,7 @@ updated: 2026-10-14
 
   span은 부모가 없거나 하나이고, 자식은 여럿일 수 있어요. 부모가 없는 span이 트레이스의 root span이에요.
 
-  OpenTelemetry는 span 종류를 나눠요. SERVER는 원격 요청을 서버 쪽에서 처리한 구간이고, CLIENT는 원격 서비스에 요청하고 응답을 기다린 구간이에요. INTERNAL은 앱 안의 작업이에요.
+  OpenTelemetry(오픈소스 계측 도구)는 span 종류를 나눠요. SERVER는 원격 요청을 서버 쪽에서 처리한 구간이고, CLIENT는 원격 서비스에 요청하고 응답을 기다린 구간이에요. INTERNAL은 앱 안의 작업이에요.
 
   상대 서비스도 계측돼 있고 trace id를 넘겨받으면, 우리 CLIENT span 아래에 상대의 SERVER span이 자식으로 붙어요. CLIENT 막대가 SERVER 막대보다 긴 만큼이 오가는 데와 상대 앞단에서 기다리는 데 쓴 시간이에요.
 
