@@ -6,7 +6,7 @@ type: concept
 order: 10
 icon: chart-column
 keywords: [p50, p95, p99, 퍼센타일, percentile, 중앙값, 꼬리 지연, tail latency]
-related: [foundations/counters-and-rate, foundations/aggregation-and-downsampling, foundations/red-and-use, foundations/slo-and-error-budget]
+related: [foundations/histograms, foundations/counters-and-rate, foundations/aggregation-and-downsampling, foundations/red-and-use, foundations/slo-and-error-budget]
 sources:
   - title: Prometheus — Histograms and summaries
     url: https://prometheus.io/docs/practices/histograms/
@@ -78,7 +78,7 @@ import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';
 
   ### 히스토그램과 summary
 
-  Prometheus 클래식 히스토그램은 미리 정한 구간(bucket)마다 요청 수를 세요. 버킷은 누적이라서, `le="0.5"` 버킷에는 0.5초 이하인 요청이 모두 들어가요.
+  Prometheus 클래식 <Term slug="foundations/histograms">히스토그램</Term>은 미리 정한 구간(bucket)마다 요청 수를 세요. 버킷은 누적이라서, `le="0.5"` 버킷에는 0.5초 이하인 요청이 모두 들어가요.
 
   `histogram_quantile()`은 버킷 안에 값이 고르게 퍼져 있다고 보고 선형 보간해요. 그래서 결과는 근사값이고, 버킷 경계가 정확도를 좌우해요. 예를 들어 p99가 0.5~1초 버킷에 들면, 실제 p99는 그 사이 어디든 될 수 있어요.
 

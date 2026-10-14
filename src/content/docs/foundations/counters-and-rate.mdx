@@ -6,7 +6,7 @@ type: concept
 order: 20
 icon: trending-up
 keywords: [counter, 누적값, 증가율, 초당, increase, irate, 재시작, reset, 게이지, gauge]
-related: [foundations/percentiles, foundations/aggregation-and-downsampling, foundations/red-and-use, foundations/alert-conditions]
+related: [foundations/percentiles, foundations/histograms, foundations/aggregation-and-downsampling, foundations/red-and-use, foundations/alert-conditions]
 sources:
   - title: Prometheus — Metric types
     url: https://prometheus.io/docs/concepts/metric_types/
@@ -91,7 +91,7 @@ updated: 2026-10-13
 
   ### 히스토그램 버킷도 카운터예요
 
-  Prometheus 클래식 히스토그램의 버킷(`_bucket`)은 카운터예요. 그래서 여러 서버를 묶은 <Term slug="foundations/percentiles">p99</Term>를 구할 때도, 버킷마다 rate를 먼저 구하고 더해요.
+  Prometheus 클래식 <Term slug="foundations/histograms">히스토그램</Term>의 버킷(`_bucket`)은 카운터예요. 그래서 여러 서버를 묶은 <Term slug="foundations/percentiles">p99</Term>를 구할 때도, 버킷마다 rate를 먼저 구하고 더해요.
 
   ### OpenTelemetry에서는
 

@@ -6,6 +6,7 @@ type: guide
 order: 70
 icon: hash
 keywords: [숫자 불일치, 대시보드 차이, 값이 달라요, mismatch, 정합성]
+related: [foundations/aggregation-and-downsampling, foundations/histograms, foundations/p99-looks-wrong]
 sources:
   - title: Prometheus — Querying basics
     url: https://prometheus.io/docs/prometheus/latest/querying/basics/
@@ -64,7 +65,7 @@ Grafana의 `$__rate_interval`을 쓰면 질의가 같아도 기간이 길수록 
 
 2.75초는 숫자 두 개의 평균일 뿐, 요청을 모아 구한 p99가 아니에요. 요청 수로 가중해 평균 내도 p99가 아니에요. 서비스 전체 p99는 1,010개를 모두 모아 다시 계산해야 해요.
 
-Prometheus 클래식 히스토그램이라면 서버마다 버킷 카운터의 rate를 먼저 구해요. 그다음 같은 `le`(버킷 경계)끼리 더하고 p99를 계산해요. 이때 서버마다 버킷 경계가 같아야 해요.
+Prometheus 클래식 <Term slug="foundations/histograms">히스토그램</Term>이라면 서버마다 버킷 카운터의 rate를 먼저 구해요. 그다음 같은 `le`(버킷 경계)끼리 더하고 p99를 계산해요. 이때 서버마다 버킷 경계가 같아야 해요.
 
 ```text
 histogram_quantile(0.99, sum by (le) (rate(http_server_request_duration_seconds_bucket[5m])))
