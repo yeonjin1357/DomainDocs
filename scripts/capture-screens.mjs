@@ -28,6 +28,10 @@ const PAGES = [
   ['apm-throughput', 'apm/throughput-and-concurrency/'],
   ['apm-waterfall', 'apm/trace-waterfall/'],
   ['apm-slow', 'apm/slow-response/'],
+  ['apm-apdex', 'apm/apdex/'],
+  ['apm-distribution', 'apm/response-time-distribution/'],
+  ['apm-errors', 'apm/errors-and-exceptions/'],
+  ['apm-error-spike', 'apm/error-spike/'],
 ];
 // 미리보기 시트를 여는 링크. 가이드의 첫 링크는 다른 가이드라서, 핵심 목록이 나오는 개념 글 링크를 고른다.
 const SHEETS = [
@@ -35,6 +39,7 @@ const SHEETS = [
   ['sheet-empty-graph', 'foundations/empty-graph/', 'a.term[data-term="foundations/no-data-vs-zero"]'],
   ['sheet-alert-fatigue', 'foundations/alert-fatigue/', 'a.term[data-term="foundations/alert-conditions"]'],
   ['sheet-p99-wrong', 'foundations/p99-looks-wrong/', 'a.term[data-term="foundations/histograms"]'],
+  ['sheet-error-spike', 'apm/error-spike/', 'a.term[data-term="apm/errors-and-exceptions"]'],
 ];
 const VIEWS = [
   ['desktop', { width: 1440, height: 900 }, false],

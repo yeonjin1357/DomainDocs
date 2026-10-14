@@ -34,7 +34,7 @@ sources:
     url: https://www.kernel.org/doc/html/latest/admin-guide/iostats.html
   - title: proc_loadavg(5) 매뉴얼 (load average)
     url: https://man7.org/linux/man-pages/man5/proc_loadavg.5.html
-updated: 2026-10-13
+updated: 2026-10-14
 ---
 
 <OnDashboard title="주문 API · 서비스 첫 화면" caption="주문 API의 요청·에러·지연(RED) 세 숫자예요. 초당 1,200건이 들어와 4.8건(0.4%)이 실패하고, 에러를 뺀 요청의 99%가 820ms 안에 끝나요.">
@@ -47,7 +47,7 @@ updated: 2026-10-13
   <Point title="서비스는 요청·에러·지연(RED)으로 봐요">
     요청을 받아 답하는 서비스는 RED로 봐요. Tom Wilkie가 만든 방법이에요. Rate는 초당 요청 수, Errors는 그중 실패하는 요청 수, Duration은 요청이 걸린 시간이에요.
 
-    Duration은 평균 하나가 아니라 p99(요청의 99%가 끝나는 시간) 같은 <Term slug="foundations/percentiles">백분위수</Term>로 봐요. 세 숫자 모두 사용자가 직접 겪는 일이라, RED는 사용자 경험을 대신 보여 줘요.
+    Duration은 평균 하나가 아니라 p99(요청의 99%가 이 시간 안에 끝나고, 느린 1%는 더 걸리는 값) 같은 <Term slug="foundations/percentiles">백분위수</Term>로 봐요. 세 숫자 모두 사용자가 직접 겪는 일이라, RED는 사용자 경험을 대신 보여 줘요.
   </Point>
   <Point title="원인은 자원의 사용률·포화·에러(USE)로 찾아요">
     CPU·메모리·디스크·네트워크 같은 자원은 Brendan Gregg가 만든 USE로 봐요. Utilization(사용률)은 자원이 일하느라 바빴던 시간의 비율이에요. Saturation(포화)은 처리하지 못하고 쌓아 둔 일의 양으로, CPU라면 실행 대기열(run queue) 길이예요.

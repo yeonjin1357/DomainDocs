@@ -6,7 +6,7 @@ type: guide
 order: 40
 icon: activity
 keywords: [slow response, 응답 지연, 느려짐, latency, troubleshooting, 원인 찾기, p95, endpoint, 엔드포인트, 최근 변경]
-related: [apm/transactions-and-response-time, apm/throughput-and-concurrency, apm/trace-waterfall, foundations/red-and-use]
+related: [apm/transactions-and-response-time, apm/throughput-and-concurrency, apm/trace-waterfall, apm/response-time-distribution, foundations/red-and-use]
 sources:
   - title: Google SRE Book — Effective Troubleshooting
     url: https://sre.google/sre-book/effective-troubleshooting/
@@ -70,7 +70,7 @@ sum(http_server_active_requests{job="order-api"})
 
 평소 속도의 트레이스도 하나 열어 견줘요. 두 트레이스에서 길이가 달라진 구간이 원인 구간 후보예요.
 
-**확인 방법**: APM의 트레이스 목록을 응답시간 순으로 정렬해, p95보다 느린 것을 골라요. 그래프의 <Term slug="foundations/logs-metrics-traces">exemplar</Term>를 눌러 그 시각의 트레이스로 바로 건너갈 수도 있어요. 고른 트레이스 여러 개에서 같은 구간이 느리면 그 구간으로 좁혀요.
+**확인 방법**: 트레이스 목록을 응답시간 순으로 정렬하거나 <Term slug="apm/response-time-distribution">분포도</Term>의 위쪽 점을 끌어서, p95보다 느린 것을 골라요. 그래프의 <Term slug="foundations/logs-metrics-traces">exemplar</Term>를 눌러 그 시각의 트레이스로 바로 건너갈 수도 있어요. 고른 트레이스 여러 개에서 같은 구간이 느리면 그 구간으로 좁혀요.
 
 ## 4. 그 구간의 원인 지표로 확인하세요
 
