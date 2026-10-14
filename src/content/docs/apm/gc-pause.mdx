@@ -1,0 +1,82 @@
+---
+title: GC 멈춤과 응답시간
+summary: GC가 앱을 멈추는 동안 처리 중이던 요청도 멈춰서, 응답시간이 한꺼번에 튀어요.
+domain: apm
+type: concept
+order: 130
+icon: clock
+keywords: [GC, garbage collection, 가비지 컬렉션, stop-the-world, GC pause, GC 멈춤, G1, ZGC, Full GC, jvm.gc.pause]
+related: [apm/response-time-distribution, apm/trace-waterfall, apm/throughput-and-concurrency]
+sources:
+  - title: Oracle — Garbage-First (G1) Garbage Collector (JDK 21)
+    url: https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-g1-garbage-collector1.html
+  - title: Oracle — Garbage-First (G1) Garbage Collector (JDK 17, 기본값 표)
+    url: https://docs.oracle.com/en/java/javase/17/gctuning/garbage-first-g1-garbage-collector1.html
+  - title: Oracle — Garbage-First Garbage Collector Tuning (JDK 21, Full GC)
+    url: https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-garbage-collector-tuning.html
+  - title: Oracle — Available Collectors (JDK 21, 기본 수집기)
+    url: https://docs.oracle.com/en/java/javase/21/gctuning/available-collectors.html
+  - title: OpenJDK — JEP 439 Generational ZGC
+    url: https://openjdk.org/jeps/439
+  - title: Micrometer — JvmGcMetrics
+    url: https://github.com/micrometer-metrics/micrometer/blob/main/micrometer-core/src/main/java/io/micrometer/core/instrument/binder/jvm/JvmGcMetrics.java
+  - title: OpenTelemetry — Semantic conventions for JVM metrics
+    url: https://opentelemetry.io/docs/specs/semconv/runtime/jvm-metrics/
+updated: 2026-10-14
+---
+
+<OnDashboard title="주문 API · 응답시간 분포도 · 14:00~14:10" caption="14:03과 14:07에 GC가 앱을 1.2초씩 멈췄어요. 그동안 처리 중이던 요청이 멈춤이 풀린 뒤 함께 끝나서 세로줄이 생겼어요.">
+  <Scatter ariaLabel="14:00부터 10분 동안의 응답시간 분포도. 요청 대부분은 0.3초 아래에 깔려 있고, 14:03과 14:07에 0.1~1.4초 점이 세로로 늘어서요." xMax={10} yMax={2000} yTicks={[500, 1000, 1500]} xLabels={['14:00', '14:05', '14:10']} groups={[{ count: 150, x: [0, 10], y: [20, 300], skew: 2.5, label: '요청' }, { count: 20, x: [3, 3.05], y: [100, 1400], tone: 'warn', label: 'GC 멈춤과 겹친 요청' }, { count: 20, x: [7, 7.05], y: [100, 1400], tone: 'warn' }]} />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="GC가 멈추면 요청도 함께 멈춰요">
+    Java는 더 쓰지 않는 객체를 GC(가비지 컬렉션)로 치워요. GC의 몇몇 단계는 앱 스레드를 모두 세운 채(stop-the-world) 진행해서, 그동안 처리 중이던 요청도 함께 멈춰요.
+
+    멈춤이 풀리면 기다리던 요청이 비슷한 때에 끝나요. 그래서 <Term slug="apm/response-time-distribution">분포도</Term>에 세로줄이 생기고, 줄의 꼭대기는 멈춘 시간에 평소 처리 시간을 더한 만큼이에요.
+  </Point>
+  <Point title="멈춤 길이는 GC 종류마다 달라요">
+    대부분의 서버에서 기본으로 쓰는 G1은 멈춤 목표를 200ms로 둬요. 목표일 뿐이라, 한 번 한 번의 멈춤을 보장하지는 않아요. OpenJDK 문서는 G1의 멈춤이 밀리초에서 초 단위까지 간다고 해요.
+
+    ZGC는 대부분의 일을 앱과 함께 돌려서, 멈춤이 마이크로초 단위예요. 어느 GC를 쓰는지에 따라 같은 힙에서도 멈춤 길이가 크게 달라요.
+  </Point>
+  <Point title="멈춘 시간과 함께 돈 시간을 나눠 봐요">
+    GC에는 앱을 세우는 시간과, 앱과 함께 도는 시간이 있어요. 응답시간을 늘리는 건 앞의 것이에요. Micrometer는 둘을 `jvm.gc.pause`(멈춤)와 `jvm.gc.concurrent.phase.time`(함께 돈 시간)으로 나눠요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>응답시간이 몇 분마다 한꺼번에 튄다면, 같은 시각의 GC 멈춤을 보세요. 여러 서버 중 한 대만 튄다면 그 서버의 GC부터 봐요.</Check>
+  <Check>GC 시간을 비율이나 평균으로만 그린 그래프는 다시 보세요. 1분에 1초 멈춤 한 번은 1.7%라 작아 보이지만, 그 1초 동안 처리 중이던 요청은 최대 1초씩 늦어요. 가장 긴 멈춤(최댓값)을 함께 두세요.</Check>
+  <Check>GC 시간 그래프가 멈춘 시간만 담았는지 보세요. ZGC와 Shenandoah는 앱과 함께 도는 주기(Cycles)와 짧은 멈춤(Pauses)을 따로 알려서, 둘을 더하면 멈춤이 부풀어 보여요.</Check>
+  <Check><Term slug="apm/trace-waterfall">워터폴</Term>에서 하위 구간 없는 빈칸이 여러 요청에 같은 시각으로 겹친다면 GC 멈춤일 수 있어요. 같은 시각의 GC 기록과 맞춰 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### G1의 멈춤
+
+  G1은 대부분의 일을 앱과 함께 하지만, 공간을 되찾는 일은 앱을 멈춘 채 해요. 젊은 객체를 치우는 수집(young collection)이 그 예예요. 앱과 함께 하는 표시(marking) 작업도 Remark와 Cleanup이라는 두 멈춤으로 끝나요.
+
+  표시하는 동안 메모리가 바닥나면, G1은 대비책으로 힙 전체를 멈춘 채 정리하는 Full GC를 해요. 그래서 G1에서 Full GC가 보인다면, 정상 정리가 할당 속도를 따라가지 못한 신호예요.
+
+  멈춤 목표는 `-XX:MaxGCPauseMillis`이고 기본값이 200이에요. Oracle 문서는 G1이 실시간 수집기가 아니라서, 목표를 높은 확률로 맞추려 할 뿐 모든 멈춤을 보장하지는 않는다고 해요.
+
+  ### ZGC
+
+  JEP 439(Generational ZGC)는 멈춤이 1ms를 넘지 않는 것을 목표로 해요. ZGC의 멈춤은 힙 크기와 상관없이 짧아서, 수백 MB에서 수 TB 힙까지 같아요.
+
+  ### 지표 이름
+
+  Micrometer는 GC 알림마다 멈춤인지 함께 돈 단계인지 가려서 기록해요. ZGC·Shenandoah의 Cycles와 원인이 `No GC`인 알림은 함께 돈 단계로 봐요. 이건 `jvm.gc.concurrent.phase.time`으로, 나머지는 `jvm.gc.pause`로 보내요.
+
+  Prometheus로 내보내면 `jvm_gc_pause_seconds_count`, `_sum`, `_max`가 돼요. `_sum`의 rate는 1초에 멈춘 초라서, 그대로 멈춘 시간의 비율이에요.
+
+  ```text
+  # 서버마다 1초 중 GC로 멈춘 시간의 비율
+  sum by (instance) (rate(jvm_gc_pause_seconds_sum[5m]))
+  ```
+
+  OpenTelemetry는 GC 시간을 `jvm.gc.duration` 히스토그램 하나로 남겨요. GC 이름은 `jvm.gc.name`(예: `G1 Young Generation`)에 담아요. 동작은 `jvm.gc.action`(예: `end of minor GC`)에 담아요.
+
+  그래서 이름별로 나눠 봐야 어떤 GC의 시간인지 알 수 있어요.
+</Deeper>
