@@ -1,0 +1,97 @@
+---
+title: 에러가 늘었을 때 어디부터 볼까
+summary: 에러율로 확인하고, 종류와 위치를 좁힌 뒤, 에러 트레이스에서 처음 실패한 곳을 찾아요.
+domain: apm
+type: guide
+order: 80
+icon: trending-up
+keywords: [error spike, 에러 급증, 에러 증가, 5xx, error rate, 에러율, error.type, troubleshooting, 원인 찾기, 에러 트레이스]
+related: [apm/errors-and-exceptions, apm/slow-response, apm/trace-waterfall, foundations/logs-metrics-traces]
+sources:
+  - title: Google SRE Book — Effective Troubleshooting
+    url: https://sre.google/sre-book/effective-troubleshooting/
+  - title: OpenTelemetry — Semantic conventions for HTTP metrics (error.type)
+    url: https://opentelemetry.io/docs/specs/semconv/http/http-metrics/
+  - title: OpenTelemetry — Semantic conventions for HTTP spans (Status)
+    url: https://opentelemetry.io/docs/specs/semconv/http/http-spans/
+  - title: OpenTelemetry — Recording errors (span status description)
+    url: https://opentelemetry.io/docs/specs/semconv/general/recording-errors/
+updated: 2026-10-14
+---
+
+<Situation>
+  오후 3시부터 주문 API의 에러 그래프가 분당 30건에서 300건으로 올랐어요. 에러 목록에는 처음 보는 이름과 늘 보던 이름이 섞여 있어요.
+
+  순서를 정하면 빨라져요. 에러율로 확인하고, 에러 종류와 위치를 좁힌 뒤, 에러 트레이스에서 처음 실패한 구간을 찾아요.
+</Situation>
+
+<FirstLook>
+  <Item title="요청도 함께 늘었는지">에러 수가 아니라 에러율이 올랐는지 봐요.</Item>
+  <Item title="새로 생긴 에러인지">에러 종류별로 나눠 3시에 처음 나온 종류가 있는지 봐요.</Item>
+  <Item title="한 곳에서만 나는지">엔드포인트와 서버별로 나눠 봐요.</Item>
+</FirstLook>
+
+## 1. 에러 수보다 에러율을 보세요
+
+에러 수는 요청이 늘면 함께 늘어요. 요청이 분당 6,000건에서 60,000건으로 늘었다면, 에러가 30건에서 300건이 돼도 <Term slug="apm/errors-and-exceptions">에러율</Term>은 0.5% 그대로예요. 이때는 요청이 왜 늘었는지와, 늘어난 요청을 감당하는지를 봐요.
+
+요청은 그대로인데 에러만 늘었다면 에러율도 0.5%에서 5%로 올라요. 이때 아래 단계로 원인을 좁혀요.
+
+**확인 방법**: 아래 질의로 에러율을 그려요.
+
+```text
+# order-api의 에러율 (error_type이 붙은 요청 ÷ 전체 요청)
+sum(rate(http_server_request_duration_seconds_count{job="order-api", error_type!=""}[5m]))
+  / sum(rate(http_server_request_duration_seconds_count{job="order-api"}[5m]))
+```
+
+`error_type`은 OpenTelemetry(오픈소스 계측 도구)가 실패한 요청에만 붙이는 레이블이에요. 서버 쪽 지표라서 4xx 응답에는 붙지 않아요.
+
+## 2. 에러를 종류별로 나눠 보세요
+
+종류별로 나누면 원인의 갈래가 나뉘어요. 3시에 처음 나타난 종류가 있다면, 그 시각의 배포나 설정 변경을 먼저 봐요. 늘 있던 종류가 늘었다면, 그 에러를 내는 의존 서비스나 자원 쪽을 봐요.
+
+Google SRE Book은 최근 변경을 원인 찾기를 시작하기 좋은 곳으로 꼽아요. 배포 뒤에 새 에러가 나왔고 되돌릴 수 있다면, 원인을 찾기 전에 되돌려 피해부터 멈춰요.
+
+**확인 방법**: 아래 질의로 종류별 에러 수를 그려요.
+
+```text
+# 에러 종류별 초당 에러 수
+sum by (error_type) (
+  rate(http_server_request_duration_seconds_count{job="order-api", error_type!=""}[5m])
+)
+```
+
+`error_type`은 응답이 에러면 `500` 같은 상태 코드이고, 응답을 보내기 전에 실패했으면 예외 종류예요.
+
+## 3. 어디서 나는지 좁혀 보세요
+
+엔드포인트(`http_route`)와 서버(`instance`)로 나눠 봐요. 서버 한 대에서만 난다면, 그 서버의 배포 버전과 자원, 연결 상태를 봐요. 모든 서버의 한 엔드포인트에서 난다면, 그 기능의 코드와 그 기능이 부르는 서비스를 봐요.
+
+**확인 방법**: 아래 질의로 엔드포인트·서버별 에러율을 그려, 에러가 몰린 줄을 찾아요.
+
+```text
+# 엔드포인트·서버별 에러율
+sum by (http_route, instance) (
+  rate(http_server_request_duration_seconds_count{job="order-api", error_type!=""}[5m])
+)
+  / sum by (http_route, instance) (
+    rate(http_server_request_duration_seconds_count{job="order-api"}[5m])
+  )
+```
+
+분자와 분모를 같은 레이블로 나눠야 해요. 한쪽만 나누면 짝이 맞는 줄이 없어 빈 결과가 나와요. 에러가 없는 줄은 0이 아니라 아예 나오지 않아요.
+
+## 4. 에러 트레이스에서 처음 실패한 곳을 찾으세요
+
+좁힌 엔드포인트의 에러 트레이스를 열어, <Term slug="apm/trace-waterfall">워터폴</Term>에서 에러 표시가 된 span을 찾아요. 부모 span의 에러가 자식 span의 실패에서 왔다면 출발점은 자식이에요. 결제 API 호출 span이 실패해서 우리 서비스도 500을 냈다면, 결제 API부터 봐요.
+
+예외로 실패한 span에는 예외 메시지가 상태 설명(status description)으로 담겨요. 더 자세한 이유는 그 트레이스의 trace id로 <Term slug="foundations/logs-metrics-traces">로그</Term>를 찾아 봐요.
+
+**확인 방법**: 에러 트레이스를 여러 개 열어 같은 span에서 처음 실패하는지 봐요. 고친 뒤에는 1단계의 에러율이 평소로 돌아오는지 확인해요.
+
+<Checkpoints>
+  <Check>에러 알림을 에러 수에 걸었다면 다시 보세요. 임계값이 분당 300건이면, 요청이 분당 200건인 새벽엔 모두 실패해도 울리지 않아요. 에러율에 거세요.</Check>
+  <Check>에러 트레이스가 거의 없다면 샘플링을 확인하세요. 트레이스를 10%만 남기는 head 샘플링이면 에러 요청의 트레이스도 90%가 빠져요.</Check>
+  <Check>서버 에러율만 보는 화면이라면 4xx도 따로 두세요. 배포 뒤 앱과 API의 요청 형식이 어긋나 4xx가 늘어도, 서버 에러율은 그대로예요.</Check>
+</Checkpoints>
