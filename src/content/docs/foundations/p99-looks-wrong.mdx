@@ -1,0 +1,120 @@
+---
+title: p99가 이상하게 나올 때
+summary: 버킷 경계, 질의 순서, 요청 수, 서버별 버킷을 차례로 확인해요.
+domain: foundations
+type: guide
+order: 140
+icon: timer
+keywords: [p99, histogram_quantile, 백분위수 이상, NaN, +Inf, 버킷 경계, sum by le, percentile wrong]
+related: [foundations/histograms, foundations/percentiles, foundations/why-numbers-differ, foundations/no-data-vs-zero, foundations/empty-graph]
+sources:
+  - title: Prometheus — Histograms and summaries
+    url: https://prometheus.io/docs/practices/histograms/
+  - title: Prometheus — Query functions (histogram_quantile)
+    url: https://prometheus.io/docs/prometheus/latest/querying/functions/
+  - title: Prometheus — HTTP API (warnings, infos)
+    url: https://prometheus.io/docs/prometheus/latest/querying/api/
+  - title: Prometheus — Migration (le 값을 소수 꼴로 정규화)
+    url: https://prometheus.io/docs/prometheus/latest/migration/
+  - title: Prometheus 소스 — promql/quantile.go (+Inf 버킷, NaN, 단조 보정)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/promql/quantile.go
+  - title: Prometheus 소스 — promql/engine.go (le 레이블이 없을 때 경고)
+    url: https://github.com/prometheus/prometheus/blob/v3.15.0/promql/engine.go
+updated: 2026-10-14
+---
+
+<Situation>
+  Prometheus 클래식 <Term slug="foundations/histograms">히스토그램</Term>(`le` 레이블로 버킷을 나누는 형식)으로 그린 <Term slug="foundations/percentiles">p99</Term>가 이상해요. 몇 시간째 정확히 2.5초에 붙어 있거나, 새벽에 크게 튀거나, 그래프가 아예 비어 있어요.
+
+  서비스가 정말 느려졌을 수도 있지만, 버킷·질의·요청 수만으로도 이런 모양이 나와요. 아래 네 가지를 보면 어느 쪽인지 가려져요. 2.5초에 붙었다면 1단계, 새벽에 튄다면 3단계, 비었다면 2단계부터 봐요.
+</Situation>
+
+<FirstLook>
+  <Item title="값이 버킷 경계와 같은지">p99가 2.5초처럼 가장 큰 유한 경계와 똑같은 값에 머물러 있는지 봐요.</Item>
+  <Item title="질의 순서">rate(초당 증가량) → `sum by (le)` → `histogram_quantile` 순서인지 봐요.</Item>
+  <Item title="그때 요청 수">p99가 튄 시각에 요청이 몇 건이었는지 봐요.</Item>
+</FirstLook>
+
+## 1. 값이 버킷 경계에 붙어 있는지 보세요
+
+p99가 `+Inf` 바로 앞 경계(가장 큰 유한 경계)에 붙어 움직이지 않으면, 실제 p99는 그보다 커요. 요청의 1% 넘게 그 경계를 넘으면, p99가 위 끝이 없는 `+Inf` 버킷에 들어요. 이때 `histogram_quantile`(버킷으로 p99를 구하는 함수)은 추정 없이 바로 앞 경계값을 돌려줘요.
+
+경계가 0.1, 0.25, 0.5, 1, 2.5초인 히스토그램이라고 해 봐요. 5분 동안 1,000건 중 20건(2%)이 2.5초를 넘으면, 그 20건이 3초든 30초든 p99는 2.5초예요. 느린 요청은 진짜 있지만, 얼마나 느린지는 이 버킷으로 알 수 없어요.
+
+**확인 방법**: `+Inf`를 뺀 가장 큰 `le`를 찾아요. 4단계의 `count by (le)` 질의로 경계 목록을 볼 수 있어요. 그 경계를 넘은 요청의 비율이 0.01(1%)을 넘으면, p99는 그 경계에 붙어 있어요.
+
+```text
+# 2.5초를 넘은 요청의 비율 (2.5는 +Inf 바로 앞 경계로 바꾸고, 정수 경계는 "10.0"처럼 써요)
+1 - sum(rate(http_server_request_duration_seconds_bucket{job="payment", le="2.5"}[5m]))
+  / sum(rate(http_server_request_duration_seconds_bucket{job="payment", le="+Inf"}[5m]))
+```
+
+`le="2.5"`는 2.5초 이하 요청 수, `le="+Inf"`는 전체 요청 수예요. 1에서 둘의 비를 빼면 2.5초를 넘은 비율이에요. 앞의 예라면 0.02예요.
+
+Prometheus 3은 수집할 때 정수 경계를 `10.0`처럼 저장해요. 그래서 가장 큰 경계가 10초면 `le="10.0"`으로 써야 하고, `le="10"`은 빈 결과예요. 헷갈리면 `count by (le)` 결과에 보이는 그대로 써요.
+
+붙어 있다면 5초, 10초처럼 더 큰 경계를 더해요. 경계는 계측 코드에서 정해서, 고친 코드를 서버마다 배포해야 해요. 배포 중엔 p99가 새 경계에 붙어 이 증상처럼 보일 수 있으니, 4단계부터 봐요.
+
+## 2. 질의 순서를 확인하세요
+
+p99 질의는 안쪽부터 rate → `sum by (le)` → `histogram_quantile` 순서여야 해요. 버킷마다 최근 5분의 rate를 구하고, 모든 서버의 같은 `le`끼리 더한 뒤, 마지막에 p99를 계산해요. `{job="payment"}`처럼 서비스(`job`)도 골라요.
+
+```text
+histogram_quantile(0.99,
+  sum by (le) (
+    rate(http_server_request_duration_seconds_bucket{job="payment"}[5m])
+  )
+)
+```
+
+순서가 어긋나거나 빠진 게 있으면 이렇게 틀려요.
+
+- **rate가 없으면**: 버킷은 프로세스가 뜬 뒤 쌓인 <Term slug="foundations/counters-and-rate">카운터</Term>라서, 그동안 전체의 p99가 나와요. 최근 5분이 느려져도 거의 움직이지 않아요.
+- **`by (le)`가 빠지면**: `sum`이 `le`까지 지워서 결과가 비어요. `sum by (job)`도 같아요.
+- **`sum` 없이 쓰면**: 서버·경로마다 p99가 한 줄씩 나와요. 이 줄들을 `avg`로 평균 낸 값은 <Term slug="foundations/why-numbers-differ">서비스 전체 p99가 아니에요</Term>.
+- **`job` 조건이 없으면**: 같은 지표 이름을 쓰는 다른 서비스의 요청이 섞여요. 결제 p99가 1.4초여도, 요청이 4배 넘게 많고 빠른 서비스와 섞이면 0.43초로 나와요.
+
+**확인 방법**: 질의를 안쪽부터 읽고, `job` 조건이 있는지도 봐요. `_bucket` → rate → `sum by (le)` → `histogram_quantile` 순서가 아니면 고쳐요. 서비스별로 나눠 보려면 `sum by (job, le)`처럼 `le`를 남긴 채 레이블을 더해요.
+
+## 3. 요청 수를 같이 보세요
+
+요청이 적은 시간대의 p99는 몇 건에 크게 흔들려요. p99는 느린 쪽 1%로 정해지는데, 요청이 100건보다 적으면 느린 요청 1건이 벌써 1%를 넘어요.
+
+1단계와 같은 경계에서, 1건만 1~2.5초 걸리고 나머지는 0.1초 안에 끝났다고 해 봐요. 5분에 1,000건이면 p99는 0.1초 아래인데, 50건이면 1.75초예요. 새벽에만 p99가 튄다면 이 경우일 수 있어요.
+
+5분 동안 요청이 0건이면 p99는 0이 아니라 NaN(숫자가 아니라는 값)이에요. 한 번도 호출되지 않은 경로처럼 <Term slug="foundations/time-series-and-labels">시계열</Term> 자체가 없으면 결과가 아예 비어요. 둘 다 '빠르다'가 아니라 '잴 요청이 없다'는 뜻이라, <Term slug="foundations/no-data-vs-zero">0으로 바꿔 그리면 안 돼요</Term>.
+
+**확인 방법**: 같은 패널에 같은 5분 동안의 요청 수를 함께 띄워요. 아래 식의 `increase`는 `_count`(전체 요청 수 카운터)가 5분 동안 늘어난 양이에요. p99가 튄 시각에 요청이 100건 아래였다면, 느린 요청 1건으로도 나올 수 있는 값이에요.
+
+```text
+# p99와 같은 5분 동안 들어온 요청 수
+sum(increase(http_server_request_duration_seconds_count{job="payment"}[5m]))
+```
+
+## 4. 서버마다 버킷이 같은지 보세요
+
+버킷 경계가 다른 서버를 합치면 틀린 값이 나와요. 같은 `le`끼리 더하는데, 한 서버에만 있는 경계는 그 서버의 요청만 세기 때문이에요.
+
+1단계대로 5초·10초 경계를 더하는 배포가 반쯤 끝나, 새 서버 A와 옛 서버 B가 함께 떠 있다고 해 봐요. 둘 다 5분에 1,000건을 받고, 980건이 2.5초 안에, 995건이 5초 안에 끝나요. A만 보면 p99는 2.5~5초 사이(추정 4.2초)인데, 합치면 10초가 나와요.
+
+합친 5초 경계(`le="5.0"`)에는 A의 995건만 들어가, 2.5초 이하 1,960건(A+B)보다 적어요. 누적 개수가 거꾸로 줄자, `histogram_quantile`은 5초·10초 개수를 1,960건으로 올려요. 그래도 99% 위치인 1,980번째 요청이 그 안에 없어서, `+Inf` 바로 앞 경계인 10초가 나와요.
+
+Prometheus 3은 이때 `needed to be fixed for monotonicity`라는 정보 주석을 붙여요. 누적 개수를 바로잡았다는 뜻으로, API 응답의 `infos`에 담겨서 화면 코드가 버리면 사라져요. 개수가 줄지 않으면 주석 없이도 틀릴 수 있으니, 주석이 없다고 안심하지 마세요.
+
+**확인 방법**: 경계마다 시계열 수를 세요. 모든 `le`의 수가 같아야 하고, 적은 줄이 있으면 그 경계는 일부 서버에만 있어요. 경계가 같아질 때까지는 합친 p99를 믿지 마세요.
+
+```text
+# 경계마다 시계열 수: 모든 줄이 같아야 해요
+count by (le) (http_server_request_duration_seconds_bucket{job="payment"})
+
+# 5초 경계가 있는 서버 (정수 경계는 "5.0"처럼 소수점을 붙여 써요)
+group by (instance) (http_server_request_duration_seconds_bucket{job="payment", le="5.0"})
+```
+
+둘째 식의 `group by (instance)`는 5초 경계가 있는 서버(`instance`)를 한 줄씩 보여 줘요. `le="5"`라고 쓰면 Prometheus 3에서는 아무것도 고르지 못해요. 배포가 끝날 때까지는 `sum by (instance, le)`로 서버마다 p99를 따로 봐요.
+
+<Checkpoints>
+  <Check>`histogram_quantile`에 `_bucket`을 rate 없이 넣은 질의는 고치세요. 프로세스가 뜬 뒤 전체의 p99라서, 1시간 내내 0.1초 이하였다가 최근 5분 요청의 5%가 1~2.5초 걸려도 0.1초 아래로 나와요. rate를 쓰면 2.2초예요.</Check>
+  <Check>`histogram_quantile` 안의 합계가 `sum(...)`이나 `sum by (job)`처럼 `le`를 지우면 결과가 비어요. `sum by (le)`나 `sum by (job, le)`로 고치세요. Prometheus 3은 이때 API 응답 `warnings`에 `le`가 없다는 경고를 담으니, 화면이 경고를 버리지 않는지도 보세요.</Check>
+  <Check>p99만 있고 요청 수가 없는 패널엔 요청 수를 더하세요. 요청 수가 없으면 새벽에 튄 p99가 요청 50건 중 느린 1건이 만든 값인지, 정말 느려진 건지 가를 수 없어요. 요청이 0건이라 NaN이면 '요청 없음'으로 보여 주세요.</Check>
+</Checkpoints>
