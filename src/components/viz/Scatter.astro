@@ -1,0 +1,153 @@
+---
+import { scatterDots, type ScatterGroup } from '../../lib/viz/scatter';
+
+interface Props {
+  groups: ScatterGroup[];
+  ariaLabel: string;
+  /** x축 끝 값. 무리의 x 범위는 0~xMax 안에서 정한다. */
+  xMax: number;
+  /** y축 끝 값(그림 맨 위) */
+  yMax: number;
+  /** 가로 눈금선을 그을 y 값 */
+  yTicks?: number[];
+  /** 눈금 값 뒤에 붙는 단위. 기본 ms */
+  unit?: string;
+  /** x축 아래에 고르게 늘어놓을 글자(예: 시각) */
+  xLabels?: string[];
+}
+
+const { groups, ariaLabel, xMax, yMax, yTicks = [], unit = 'ms', xLabels = [] } = Astro.props;
+const dots = scatterDots(groups, xMax, yMax);
+const tickText = (v: number) => `${v.toLocaleString('ko-KR')}${unit}`;
+const ticks = yTicks.map((v) => ({ text: tickText(v), top: Math.min(Math.max(100 - (v / yMax) * 100, 0), 100) }));
+// 눈금 글자 칸의 폭을 가장 긴 글자에 맞추려고, 보이지 않는 사본을 칸에 넣는다.
+const widest = ticks.reduce((w, t) => (t.text.length > w.length ? t.text : w), '');
+const legend = groups.filter((g) => g.label);
+---
+<div class="scatter" data-scatter>
+  <div class="frame">
+    <div class="y-axis" aria-hidden="true">
+      <span class="tick-sizer">{widest}</span>
+      {ticks.map((t) => <span class="tick" style={`top:${t.top}%`}>{t.text}</span>)}
+    </div>
+    <div class="plot" role="img" aria-label={ariaLabel}>
+      {ticks.map((t) => <span class="grid" style={`top:${t.top}%`} />)}
+      {dots.map((d) => <span class={`dot tone-${d.tone}`} style={`left:${d.left}%;top:${d.top}%`} />)}
+    </div>
+    {
+      xLabels.length > 0 && (
+        <div class="x-axis" aria-hidden="true">
+          {xLabels.map((l) => <span>{l}</span>)}
+        </div>
+      )
+    }
+  </div>
+  {
+    legend.length > 0 && (
+      <ul class="legend">
+        {legend.map((g) => (
+          <li>
+            <span class={`swatch tone-${g.tone ?? 'accent'}`} aria-hidden="true" />
+            <span>{g.label}</span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</div>
+
+<style>
+  .frame {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 8px;
+    row-gap: 6px;
+  }
+
+  .y-axis {
+    position: relative;
+    font-size: 12px;
+    color: var(--color-text-sub);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tick-sizer {
+    display: block;
+    height: 0;
+    visibility: hidden;
+  }
+
+  .tick {
+    position: absolute;
+    right: 0;
+    transform: translateY(-50%);
+    white-space: nowrap;
+  }
+
+  .plot {
+    position: relative;
+    height: 160px;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .grid {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px dashed var(--color-line);
+  }
+
+  .dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    opacity: 0.7;
+  }
+
+  .x-axis {
+    grid-column: 2;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--color-text-sub);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+    color: var(--color-text-sub);
+  }
+
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .swatch {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .tone-accent {
+    background: var(--color-accent);
+  }
+
+  .tone-sub {
+    background: var(--color-text-weak);
+  }
+
+  .tone-warn {
+    background: var(--color-warn);
+  }
+</style>

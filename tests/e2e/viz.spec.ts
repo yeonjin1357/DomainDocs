@@ -25,6 +25,22 @@ test('워터폴은 구간마다 이름·시간·막대를 그리고, 막대 위�
   expect(Math.abs(bar!.width - track!.width * 0.3)).toBeLessThan(2);
 });
 
+test('분포도는 무리마다 점을 찍고, 가로줄 무리는 눈금선 높이에 놓인다', async ({ page }) => {
+  await page.goto('foundations/beta/');
+  const plot = page.getByRole('img', { name: '평소 요청 아래로 3초 가로줄이 있는 분포도' });
+  await expect(plot.locator('.dot')).toHaveCount(52);
+  await expect(plot.locator('.dot.tone-warn')).toHaveCount(12);
+  const scatter = page.locator('[data-scatter]');
+  await expect(scatter.locator('.tick')).toHaveText(['1,000ms', '3,000ms']);
+  await expect(scatter.locator('.legend li')).toHaveText(['정상', '타임아웃']);
+  const grid = await plot.locator('.grid').nth(1).boundingBox();
+  const dot = await plot.locator('.dot.tone-warn').first().boundingBox();
+  expect(Math.abs(dot!.y + dot!.height / 2 - grid!.y)).toBeLessThan(2);
+  const box = await plot.boundingBox();
+  expect(dot!.x).toBeGreaterThan(box!.x + box!.width * 0.4 - 4);
+  expect(dot!.x).toBeLessThan(box!.x + box!.width * 0.8);
+});
+
 test('숫자 타일 두 개가 한 줄에 놓인다', async ({ page }) => {
   const tiles = page.locator('[data-block="on-dashboard"] [data-stat]');
   const [a, b] = [await tiles.nth(0).boundingBox(), await tiles.nth(1).boundingBox()];

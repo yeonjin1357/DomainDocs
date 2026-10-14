@@ -14,6 +14,7 @@ updated: 2026-10-02
 
 <OnDashboard title="처리량">
   <Waterfall ariaLabel="요청 1초 중 DB 조회가 0.3초인 워터폴" spans={[{ label: 'GET /orders', start: 0, duration: 1000 }, { label: 'SELECT orders', start: 100, duration: 300, depth: 1, tone: 'warn' }]} />
+  <Scatter ariaLabel="평소 요청 아래로 3초 가로줄이 있는 분포도" xMax={10} yMax={4000} yTicks={[1000, 3000]} xLabels={['14:00', '14:10']} groups={[{ count: 40, x: [0, 10], y: [50, 500], skew: 2, label: '정상' }, { count: 12, x: [4, 8], y: [3000, 3000], tone: 'warn', label: '타임아웃' }]} />
 </OnDashboard>
 
 <KeyPoints>
