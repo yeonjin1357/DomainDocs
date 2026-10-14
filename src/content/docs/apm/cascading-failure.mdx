@@ -1,0 +1,86 @@
+---
+title: 장애가 다른 서비스로 번질 때 어디부터 볼까
+summary: 처음 나빠진 곳을 찾고, 재시도와 자원 고갈을 확인한 뒤, 부하를 크게 줄여 번짐을 멈춰요.
+domain: apm
+type: guide
+order: 160
+icon: activity
+keywords: [cascading failure, 연쇄 장애, 장애 전파, overload, 과부하, retry storm, 재시도 폭주, load shedding, 부하 줄이기, thread starvation]
+related: [apm/timeouts-and-retries, apm/service-map, apm/connection-pool, apm/throughput-and-concurrency]
+sources:
+  - title: Google SRE Book — Addressing Cascading Failures
+    url: https://sre.google/sre-book/addressing-cascading-failures/
+  - title: Amazon Builders' Library — Timeouts, retries, and backoff with jitter
+    url: https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
+  - title: Grafana Tempo — Service graphs (metrics)
+    url: https://grafana.com/docs/tempo/latest/metrics-from-traces/service_graphs/
+updated: 2026-10-14
+---
+
+<Situation>
+  결제 API가 느려지더니, 주문 API와 장바구니 API까지 에러를 내기 시작했어요. 대시보드가 온통 빨개서 어디가 먼저인지 모르겠어요.
+
+  연쇄 장애는 한 곳의 과부하가 재시도와 자원 고갈을 타고 퍼지는 일이에요. 처음 나빠진 곳을 찾고, 퍼지는 길을 확인한 뒤, 부하를 줄여 멈춰요.
+</Situation>
+
+<FirstLook>
+  <Item title="어디가 먼저 나빠졌는지">서비스마다 응답시간과 에러가 오르기 시작한 시각을 봐요.</Item>
+  <Item title="요청이 불어났는지">뒷단이 받는 요청이 앞단이 받는 것보다 더 늘었는지 봐요.</Item>
+  <Item title="기다리는 자원이 바닥났는지">스레드 풀과 커넥션 풀이 상한에 붙었는지 봐요.</Item>
+</FirstLook>
+
+## 1. 처음 나빠진 곳을 찾으세요
+
+부르는 쪽은 느린 상대를 기다리느라 함께 느려져요. 그래서 대시보드에서는 모두 나빠 보여요. 받은 쪽에서 잰 응답시간이 오른 서비스 중, 호출 사슬의 가장 아래쪽이 출발점 후보예요.
+
+<Term slug="apm/service-map">서비스 맵</Term>의 선은 같은 호출을 부른 쪽과 받은 쪽에서 따로 재요. 받은 쪽 시간이 그대로인데 부른 쪽 시간만 늘었다면, 문제는 받은 쪽 안이 아니라 그 사이에 있어요.
+
+**확인 방법**: 아래 질의로 선마다 받은 쪽에서 잰 p95를 그리고, 오르기 시작한 시각을 견줘요.
+
+```text
+# 선(부른 쪽 → 받은 쪽)마다 받은 쪽에서 잰 p95
+histogram_quantile(0.95,
+  sum by (le, client, server) (
+    rate(traces_service_graph_request_server_seconds_bucket[5m])
+  )
+)
+```
+
+## 2. 재시도가 부하를 키우는지 보세요
+
+과부하로 실패하는 서비스에 앞단들이 <Term slug="apm/timeouts-and-retries">재시도</Term>를 보내면, 받는 요청이 더 늘어요. 그러면 회복이 늦어지고, 원래 문제가 풀린 뒤에도 과부하가 이어질 수 있어요.
+
+Google SRE Book은 재시도 비율 그래프가 원인인데도 증상으로 오해받기 쉽다고 해요. 사용자 요청은 그대로인데 뒷단이 받는 요청만 크게 늘었다면, 늘어난 몫은 재시도예요.
+
+**확인 방법**: 선마다 요청 수를 그려, 앞단이 받는 요청과 견줘요.
+
+```text
+# 선(부른 쪽 → 받은 쪽)마다 초당 요청 수
+sum by (client, server) (
+  rate(traces_service_graph_request_total[5m])
+)
+```
+
+## 3. 기다리는 자원이 바닥났는지 보세요
+
+느린 상대를 기다리는 동안 앞단의 스레드와 커넥션이 붙잡혀요. 이것이 바닥나면, 느린 상대를 부르지 않는 요청까지 기다리다 실패해요. 타임아웃이 길수록 오래 붙잡혀서 더 빨리 바닥나요.
+
+SRE Book은 스레드가 모자라면 헬스 체크까지 실패할 수 있다고 해요. 그러면 서버가 빠지고, 그 몫이 남은 서버로 몰려 더 무너져요.
+
+**확인 방법**: <Term slug="apm/throughput-and-concurrency">활성 트랜잭션</Term>이 스레드 상한에 붙어 평평한지, <Term slug="apm/connection-pool">커넥션 풀</Term>의 대기 스레드가 늘었는지 봐요.
+
+## 4. 부하를 크게 줄여 번짐을 멈추세요
+
+과부하에서 벗어나려면 부하를 조금이 아니라 크게 줄여야 해요. SRE Book의 예에서는 초당 10,000건에서 멀쩡하던 서비스가 11,000건에서 무너졌어요. 이때 9,000건으로 줄여도 살아나지 않아요.
+
+무너지는 동안 건강한 서버가 10%만 남았다면, 받아 낼 수 있는 양도 그만큼 줄어서예요. 그 예에서는 초당 1,000건 정도로 줄여야 안정돼요.
+
+부하를 줄이는 방법은 여럿이에요. 재시도를 끄거나 줄이고, 일부 요청을 일찍 거절하고(예: 503 응답), 기능을 덜어 가볍게 응답하고, 급하지 않은 배치 작업을 멈춰요.
+
+**확인 방법**: 줄인 뒤 1단계의 받은 쪽 p95가 내려오는지, 2단계의 요청 수가 앞단 유입과 비슷해지는지 봐요.
+
+<Checkpoints>
+  <Check>재시도 횟수나 비율을 보는 그래프가 없다면 만들어 두세요. 장애 중에 재시도가 원인인지 가리려면 평소 값과 견줄 수 있어야 해요.</Check>
+  <Check>서버나 클러스터 하나가 빠지면 그 몫이 남은 곳으로 가요. SRE Book의 예에서는 다른 클러스터가 죽자, 초당 1,000건을 받던 클러스터에 1,200건이 몰려 무너졌어요.</Check>
+  <Check>헬스 체크가 무거운 일을 한다면 다시 보세요. 과부하 때 헬스 체크가 실패해 서버가 빠지면, 남은 서버의 부하가 더 커져요.</Check>
+</Checkpoints>
