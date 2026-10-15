@@ -1,0 +1,83 @@
+---
+title: DB 연결이 한도에 닿았을 때 어디부터 볼까
+summary: 연결을 누가 쥐었는지 세고, 쉬는 연결과 앱 풀 설정을 본 뒤, 한도를 올릴지 연결 풀러를 둘지 정해요.
+domain: database
+type: guide
+order: 80
+icon: activity
+keywords: [too many connections, 연결 한도, max_connections, 커넥션 수, idle connection, 쉬는 연결, PgBouncer, connection pooler, 연결 풀러, superuser_reserved_connections]
+related: [apm/connection-pool, database/active-sessions, database/slow-database]
+sources:
+  - title: PostgreSQL — Connections and Authentication (max_connections, reserved slots)
+    url: https://www.postgresql.org/docs/current/runtime-config-connection.html
+  - title: PostgreSQL — The Cumulative Statistics System (pg_stat_activity)
+    url: https://www.postgresql.org/docs/current/monitoring-stats.html
+  - title: PostgreSQL — Client Connection Defaults (idle_session_timeout)
+    url: https://www.postgresql.org/docs/current/runtime-config-client.html
+  - title: HikariCP — Configuration (README)
+    url: https://github.com/brettwooldridge/HikariCP#gear-configuration-knobs-baby
+  - title: PgBouncer — Features (pooling modes)
+    url: https://www.pgbouncer.org/features.html
+  - title: PgBouncer — Configuration (pool_mode)
+    url: https://www.pgbouncer.org/config.html
+updated: 2026-10-15
+---
+
+<Situation>
+  배포 직후부터 앱 로그에 DB 연결 실패가 쏟아져요. DB의 연결 수 그래프는 `max_connections` 100에 붙어 평평해요.
+
+  순서를 정하면 빨라져요. 누가 연결을 쥐었는지 세고, 그 연결이 일하는지 쉬는지 본 뒤, 한도를 올릴지 연결을 줄일지 정해요.
+</Situation>
+
+<FirstLook>
+  <Item title="누가 연결을 쥐었는지">앱, 서버, 사용자별로 연결 수를 세요.</Item>
+  <Item title="연결이 일하는지 쉬는지">`active`와 `idle`, `idle in transaction`의 몫을 봐요.</Item>
+  <Item title="앱 풀 설정이 바뀌었는지">배포로 풀 크기나 서버 수가 늘었는지 봐요.</Item>
+</FirstLook>
+
+## 1. 누가 연결을 쥐었는지 세세요
+
+연결 수 합계만으로는 원인을 알 수 없어요. 앱 이름, 접속한 주소, 사용자, 상태별로 나눠 세면, 연결을 가장 많이 쥔 곳이 보여요.
+
+**확인 방법**: 관리자 계정으로 접속해 아래 질의를 돌려요. 한도에 닿아도 관리자는 들어올 수 있어요. 마지막 몇 자리(`superuser_reserved_connections`, 기본 3개)는 관리자 몫으로 남겨 두기 때문이에요.
+
+```text
+-- 연결을 쥔 곳과 상태별 연결 수
+SELECT usename, application_name, client_addr, state, count(*)
+FROM pg_stat_activity
+WHERE backend_type = 'client backend'
+GROUP BY 1, 2, 3, 4
+ORDER BY count(*) DESC;
+```
+
+## 2. 쉬는 연결이 대부분인지 보세요
+
+대부분이 `idle`이라면, DB가 바쁜 게 아니라 앱 풀들이 연결을 넉넉히 쥐고 있는 거예요. 앱 서버 한 대의 풀 최대치에 서버 수를 곱한 값이 `max_connections`를 넘는지 계산해요.
+
+HikariCP는 `minimumIdle`을 따로 정하지 않으면 `maximumPoolSize`와 같아서, 일이 없어도 최대치만큼 연결을 열어 둬요. 그래서 앱 서버를 늘리는 배포만으로도 한도에 닿을 수 있어요.
+
+`idle in transaction`이 많다면 다른 문제예요. 앱이 트랜잭션을 연 채 쉬고 있어서, 연결과 함께 <Term slug="database/locks-and-blocking">잠금</Term>도 쥐고 있을 수 있어요.
+
+**확인 방법**: 1단계 결과에서 `state`별 합을 보고, 앱마다 풀 설정(<Term slug="apm/connection-pool">최대 크기와 최소 유지 수</Term>)과 서버 수를 곱해 봐요.
+
+## 3. 한도를 올리기 전에 따져 보세요
+
+`max_connections`는 서버를 다시 시작해야 바뀌어요. PostgreSQL은 몇몇 자원을 이 값에 맞춰 잡아서, 올리면 공유 메모리 같은 자원도 함께 늘어요.
+
+연결이 많아도 동시에 일하는 <Term slug="database/active-sessions">액티브 세션</Term>이 적다면, 한도보다 연결 수를 줄이는 쪽이 맞아요. 풀 최대치를 낮추거나, 최소 유지 수를 줄여 쉬는 연결을 닫게 해요.
+
+**확인 방법**: 같은 시각의 액티브 세션 수와 연결 수를 견줘요. 연결 100개 중 액티브가 5개 안팎이라면 연결 대부분이 쉬고 있어요.
+
+## 4. 연결 풀러를 검토하세요
+
+앱 서버가 많아 연결을 줄이기 어렵다면, 앱과 DB 사이에 연결 풀러를 둬요. PgBouncer의 transaction 모드는 트랜잭션 동안에만 DB 연결을 내줘서, 많은 앱 연결이 적은 DB 연결을 나눠 써요.
+
+대신 transaction 모드는 세션 단위 기능 몇 가지를 깨요. PgBouncer 문서는 앱이 그런 기능을 쓰지 않을 때만 쓰라고 해요. 기본값인 session 모드는 모든 기능을 지원하지만, 연결을 끊을 때까지 DB 연결을 쥐어요.
+
+**확인 방법**: 앱이 세션 단위 기능(세션 설정 변경 등)을 쓰는지 PgBouncer 문서의 비호환 기능 표와 견줘요.
+
+<Checkpoints>
+  <Check>앱 서버를 늘리는 배포 전에, 풀 최대치 × 서버 수가 `max_connections`보다 충분히 작은지 계산하세요. 관리자 몫과 다른 앱의 연결도 빼 두세요.</Check>
+  <Check>`idle_session_timeout`으로 쉬는 연결을 끊는다면 조심하세요. PostgreSQL 문서는 연결 풀을 거친 연결에 걸면, 풀이 갑자기 끊긴 연결을 잘 다루지 못할 수 있다고 해요.</Check>
+  <Check>DB 연결 수 그래프만 보는 화면이라면 상태별로 나눠 주세요. 같은 100개라도 대부분 쉬는지, 대부분 일하는지에 따라 할 일이 정반대예요.</Check>
+</Checkpoints>
