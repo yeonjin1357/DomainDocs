@@ -76,7 +76,7 @@ sum(http_server_active_requests{job="order-api"})
 
 워터폴에서 찾은 구간은 증상이 나타난 자리예요. 왜 느려졌는지는 그 구간 쪽의 지표로 확인해요.
 
-- **DB 구간이 길어졌다면**: DB 쪽의 느린 질의, 잠금, 연결 수를 봐요.
+- **DB 구간이 길어졌다면**: <Term slug="database/slow-database">DB 쪽</Term>의 느린 질의, 잠금, 연결 수를 봐요.
 - **외부 API 구간이라면**: 상대 서비스의 응답시간과 에러율을 봐요.
 - **빈칸(앱 코드)이 길어졌다면**: 서버의 CPU·메모리 같은 자원을 <Term slug="foundations/red-and-use">USE</Term>로 봐요.
 
