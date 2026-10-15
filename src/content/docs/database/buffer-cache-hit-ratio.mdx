@@ -1,0 +1,80 @@
+---
+title: 버퍼 캐시 적중률의 함정
+summary: 적중률이 높아도 느릴 수 있어요. 같은 블록을 반복해 읽는 쿼리가 비율을 끌어올리기 때문이에요.
+domain: database
+type: concept
+order: 70
+icon: gauge
+keywords: [buffer cache, 버퍼 캐시, cache hit ratio, 캐시 적중률, 히트율, blks_hit, blks_read, shared_buffers, buffer gets, 논리적 읽기]
+related: [database/execution-plans, database/top-sql, foundations/counters-and-rate]
+sources:
+  - title: PostgreSQL — The Cumulative Statistics System (pg_stat_database)
+    url: https://www.postgresql.org/docs/current/monitoring-stats.html
+  - title: PostgreSQL — Resource Consumption (shared_buffers)
+    url: https://www.postgresql.org/docs/current/runtime-config-resource.html
+  - title: PostgreSQL — pg_stat_statements (shared_blks_hit, shared_blks_read)
+    url: https://www.postgresql.org/docs/current/pgstatstatements.html
+  - title: PostgreSQL — Using EXPLAIN (BUFFERS)
+    url: https://www.postgresql.org/docs/current/using-explain.html
+  - title: Oracle — Tuning the Database Buffer Cache (Interpreting the Buffer Cache Hit Ratio)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/tgdba/tuning-database-buffer-cache.html
+updated: 2026-10-15
+---
+
+<OnDashboard title="VIP 고객 주문 조회 · EXPLAIN (ANALYZE, BUFFERS)" caption="통계가 낡은 계획은 캐시에서 블록을 84,253번 읽어 적중률이 99.9%였어요. 통계를 다시 모은 계획은 1,406번만 읽었어요.">
+  <StatTile label="고치기 전 적중률" value="99.9" unit="%" note="84,253블록 읽음" />
+  <StatTile label="고친 뒤 적중률" value="100" unit="%" note="1,406블록 읽음" />
+  <StatTile label="읽은 블록 차이" value="60" unit="배" tone="warn" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="적중률은 캐시에서 찾은 블록의 비율이에요">
+    DB는 데이터를 블록(PostgreSQL은 보통 8kB) 단위로 읽어요. 읽으려는 블록이 메모리의 버퍼 캐시에 있으면 적중이고, 없으면 디스크 쪽에서 가져와요. 적중률은 읽은 블록 중 캐시에서 찾은 블록의 비율이에요.
+  </Point>
+  <Point title="같은 블록을 많이 읽을수록 비율이 올라가요">
+    나쁜 실행 계획은 같은 인덱스와 표 블록을 몇 번이고 다시 읽어요. 다시 읽는 블록은 대부분 캐시에 있어서, 일을 많이 할수록 적중률은 오히려 올라가요. 그림에서는 60배 많은 블록을 읽고도 적중률이 99.9%였어요.
+
+    Oracle 문서도 같은 표나 인덱스를 반복해 훑으면 적중률이 인위적으로 부풀 수 있다고 해요. 그래서 비율보다 SQL마다 읽은 블록 수를 봐요.
+  </Point>
+  <Point title="캐시 밖 읽기도 디스크 읽기가 아닐 수 있어요">
+    PostgreSQL의 적중은 자기 버퍼 캐시(`shared_buffers`)에서 찾은 것만 세요. 캐시에 없어 읽은 블록도 운영체제의 파일 캐시에서 나왔을 수 있어요. PostgreSQL은 운영체제 캐시에도 기대는 구조라서, 문서도 전용 서버의 `shared_buffers`를 메모리의 25%쯤에서 시작하라고 해요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>적중률 하나로 DB 상태를 '좋음'이라고 보여 주는 화면은 다시 보세요. 비율은 일의 양을 지워요. SQL별로 읽은 블록 수와 실행 시간을 함께 두세요.</Check>
+  <Check>적중률이 떨어졌다고 캐시부터 키우지 마세요. Oracle 문서는 낮은 적중률이 캐시를 키우면 나아진다는 뜻은 아니라고 해요. 한 번만 읽고 마는 데이터가 많으면 키워도 소용없어요.</Check>
+  <Check>적중률을 누적값으로 계산했다면, 서버를 켠 뒤 전체 평균이라 지금의 변화가 묻혀요. <Term slug="foundations/counters-and-rate">카운터</Term>처럼 구간 차이로 계산해요.</Check>
+  <Check>SQL마다 `shared_blks_hit + shared_blks_read`로 줄 세워 보세요. 캐시 안에서 일을 많이 하는 SQL이 위로 올라와요. 이런 SQL은 <Term slug="database/execution-plans">실행 계획</Term>부터 봐요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 그림의 숫자
+
+  앞 글 「실행 계획 읽기」의 상황을 PostgreSQL 18.6(PGlite)에서 재현한 값이에요. `EXPLAIN (ANALYZE, BUFFERS)`로 쟀어요.
+
+  낡은 통계의 Nested Loop는 `shared hit=84253 read=71`이었어요. 통계를 다시 모은 Hash Join은 `shared hit=1406`이었어요.
+
+  적중률은 84,253 ÷ (84,253 + 71) = 99.92%와 1,406 ÷ 1,406 = 100%예요. 읽은 블록은 84,324 ÷ 1,406 ≈ 60배 차이예요.
+
+  ### PostgreSQL에서 재기
+
+  `pg_stat_database`의 `blks_hit`은 버퍼 캐시에서 찾은 횟수, `blks_read`는 캐시에 없어 읽은 블록 수예요. 둘 다 누적값이에요.
+
+  ```text
+  -- DB별 버퍼 캐시 적중률(누적값)
+  SELECT datname, blks_hit, blks_read,
+         round(blks_hit * 100.0
+               / nullif(blks_hit + blks_read, 0), 2) AS hit_pct
+  FROM pg_stat_database
+  WHERE datname IS NOT NULL;
+  ```
+
+  SQL 하나의 블록 읽기는 `EXPLAIN (ANALYZE, BUFFERS)`가 노드마다 `shared hit`과 `read`로 보여 줘요. 누적으로는 `pg_stat_statements`의 `shared_blks_hit`, `shared_blks_read`가 같은 값이에요.
+
+  ### shared_buffers
+
+  기본값은 보통 128MB예요. 문서는 1GB 넘는 전용 DB 서버라면 메모리의 25%를 출발점으로 들어요. 운영체제 캐시에도 기대서, 40%를 넘게 주면 더 나아지기 어렵다고 해요.
+
+  Oracle도 물리적 읽기(physical read)가 파일 시스템 캐시에서 채워질 수 있어서, 디스크 읽기와 같지 않다고 해요.
+</Deeper>
