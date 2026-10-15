@@ -45,6 +45,10 @@ const PAGES = [
   ['db-top-sql', 'database/top-sql/'],
   ['db-execution-plans', 'database/execution-plans/'],
   ['db-slow', 'database/slow-database/'],
+  ['db-locks', 'database/locks-and-blocking/'],
+  ['db-replication', 'database/replication-lag/'],
+  ['db-cache-hit', 'database/buffer-cache-hit-ratio/'],
+  ['db-connections', 'database/too-many-connections/'],
 ];
 // 미리보기 시트를 여는 링크. 가이드의 첫 링크는 다른 가이드라서, 핵심 목록이 나오는 개념 글 링크를 고른다.
 const SHEETS = [
@@ -56,6 +60,7 @@ const SHEETS = [
   ['sheet-broken-traces', 'apm/broken-traces/', 'a.term[data-term="apm/service-map"]'],
   ['sheet-cascading', 'apm/cascading-failure/', 'a.term[data-term="apm/timeouts-and-retries"]'],
   ['sheet-db-slow', 'database/slow-database/', 'a.term[data-term="database/active-sessions"]'],
+  ['sheet-db-connections', 'database/too-many-connections/', 'a.term[data-term="database/locks-and-blocking"]'],
 ];
 const VIEWS = [
   ['desktop', { width: 1440, height: 900 }, false],
