@@ -1,0 +1,90 @@
+---
+title: 클라우드가 빌려주는 것
+summary: 클라우드는 서버·저장소·네트워크를 필요할 때 빌리고 쓴 만큼 내는 방식이에요.
+domain: cloud
+type: overview
+order: 0
+icon: cloud
+keywords: [cloud, 클라우드, IaaS, PaaS, SaaS, AWS, Azure, 책임 공유 모델, shared responsibility, 퍼블릭 클라우드]
+related: [cloud/regions-and-zones, cloud/virtual-machines, server/overview, kubernetes/overview]
+sources:
+  - title: NIST SP 800-145 — The NIST Definition of Cloud Computing
+    url: https://csrc.nist.gov/pubs/sp/800/145/final
+  - title: AWS — Shared Responsibility Model
+    url: https://aws.amazon.com/compliance/shared-responsibility-model/
+  - title: Microsoft Learn — Shared responsibility in the cloud
+    url: https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility
+updated: 2026-10-21
+---
+
+<Analogy limit="사무실 임대는 보통 달이나 해 단위 계약이지만, 클라우드는 몇 분 만에 빌리고 다 쓰면 바로 반납해요. 쓴 양도 자동으로 재서 청구해요.">
+  클라우드는 사무실 임대 빌딩과 같아요. 건물을 직접 짓지 않고, 필요한 크기의 사무실을 빌려 들어가요. 전기·냉방·건물 보안은 빌딩이 맡고, 사무실 안의 살림은 우리가 챙겨요.
+</Analogy>
+
+## 클라우드란
+
+미국 표준기술연구소(NIST)는 클라우드를 이렇게 정의해요. 서버·저장소·네트워크 같은 공유 자원을, 네트워크로 언제든 빌려 쓰는 방식이에요. 빌리고 반납하는 데 사람 손이 거의 들지 않아요.
+
+NIST가 꼽은 다섯 가지 특징을 보면 뜻이 또렷해져요.
+
+| 특징 | 뜻 |
+| --- | --- |
+| 셀프 서비스 | 사업자에게 부탁하지 않고 직접 서버와 저장소를 빌려요 |
+| 네트워크로 접근 | 어디서든 네트워크로 쓰고 관리해요 |
+| 자원 공유 | 여러 고객이 같은 물리 자원을 나눠 써요 |
+| 빠른 늘림·줄임 | 필요에 맞춰 금방 늘리고 줄여요. 자동으로 하기도 해요 |
+| 쓴 만큼 측정 | 쓴 양을 재서 보여 주고, 보통 쓴 만큼 요금을 내요 |
+
+대표적인 사업자는 AWS(Amazon Web Services), Microsoft Azure, Google Cloud예요. 이 사이트는 AWS와 Azure를 예로 들어요.
+
+## 어디까지 빌리나
+
+무엇을 빌리느냐에 따라 세 가지로 나눠요. 아래로 갈수록 사업자가 맡는 부분이 커져요.
+
+| 형태 | 빌리는 것 | 내가 맡는 것 | 예 |
+| --- | --- | --- | --- |
+| IaaS | 가상 서버, 저장소, 네트워크 | 운영체제, 미들웨어, 앱, 데이터 | AWS EC2, Azure Virtual Machines |
+| PaaS | 앱을 올릴 플랫폼 | 앱, 데이터 | Azure App Service, AWS Elastic Beanstalk |
+| SaaS | 완성된 소프트웨어 | 데이터와 계정 | 웹 메일, 협업 도구 |
+
+<Figure caption="IaaS에서 누가 무엇을 맡는지예요. 운영체제부터 위는 내가, 가상 머신부터 아래는 클라우드 사업자가 맡아요.">
+  <Layers
+    ariaLabel="위에서부터 데이터, 앱, 운영체제는 내가 맡고, 가상 머신, 물리 서버와 네트워크, 데이터센터 건물은 사업자가 맡는 층 그림"
+    layers={[
+      { label: '데이터', note: '내가', tone: 'accent' },
+      { label: '앱', note: '내가', tone: 'accent' },
+      { label: '운영체제', note: '내가', tone: 'accent' },
+      { label: '가상 머신', note: '사업자' },
+      { label: '물리 서버·네트워크', note: '사업자' },
+      { label: '데이터센터 건물', note: '사업자' },
+    ]}
+  />
+</Figure>
+
+## 책임은 나눠서 져요
+
+이렇게 나눠 맡는 걸 <Term term="cloud/shared-responsibility">책임 공유 모델</Term>이라고 해요. AWS는 "클라우드의 보안"은 사업자가, "클라우드 안의 보안"은 고객이 맡는다고 설명해요.
+
+예를 들어 EC2 같은 IaaS를 쓰면 운영체제 업데이트와 보안 패치는 고객 몫이에요. Microsoft도 어떤 형태로 빌리든 데이터와 계정은 고객이 지킨다고 해요.
+
+## 주요 서비스 짝
+
+같은 일을 하는 서비스가 사업자마다 이름만 달라요.
+
+| 하는 일 | AWS | Azure |
+| --- | --- | --- |
+| 가상 머신 | EC2 | Virtual Machines |
+| 서버에 붙이는 디스크 | EBS | Managed Disks |
+| 파일을 통째로 담는 저장소 | S3 | Blob Storage |
+| 나만의 네트워크 | VPC | Virtual Network |
+| 로드 밸런서 | Elastic Load Balancing | Load Balancer, Application Gateway |
+| 관리형 데이터베이스 | RDS | Azure SQL Database 등 |
+| 서버리스 함수 | Lambda | Functions |
+| 지표·로그 | CloudWatch | Azure Monitor |
+
+## 단계를 하나씩 확대해 봐요
+
+- 서버가 실제로 어디에 있는지는 <Term slug="cloud/regions-and-zones">리전과 가용 영역</Term>에서 다뤄요.
+- 클라우드에서 빌리는 서버는 <Term slug="cloud/virtual-machines">가상 머신</Term>에서 다뤄요.
+
+가상 머신 안은 결국 리눅스나 윈도 서버예요. 그래서 <Term slug="server/overview">서버·OS</Term> 기초가 그대로 쓰여요. 클라우드 위에 쿠버네티스를 올리는 경우도 많아서, <Term slug="kubernetes/overview">컨테이너·쿠버네티스</Term>도 함께 알면 좋아요.

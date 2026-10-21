@@ -1,0 +1,113 @@
+---
+title: 리전과 가용 영역
+summary: 리전은 떨어진 지역이고, 가용 영역은 리전 안에서 서로 떨어진 데이터센터 묶음이에요.
+domain: cloud
+type: concept
+stage: basics
+order: 10
+icon: cloud
+keywords: [region, 리전, availability zone, 가용 영역, AZ, multi-AZ, 다중 AZ, 데이터센터, 장애 격리, 이중화]
+related: [cloud/overview, cloud/virtual-machines, database/replication]
+sources:
+  - title: AWS — Regions and Availability Zones
+    url: https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html
+  - title: Microsoft Learn — What are availability zones?
+    url: https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview
+  - title: Microsoft Learn — What are Azure regions?
+    url: https://learn.microsoft.com/en-us/azure/reliability/regions-overview
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="리전은 서로 떨어진 지역이에요">
+    서울, 도쿄, 버지니아처럼 지리적으로 떨어진 곳이에요. 리전끼리는 서로 격리되어 있어요.
+  </Point>
+  <Point title="가용 영역은 리전 안의 떨어진 건물들이에요">
+    가용 영역마다 전력·냉방·네트워크가 따로라서, 한 곳에 불이 나도 다른 곳은 계속 돌아요.
+  </Point>
+  <Point title="중요한 서비스는 여러 가용 영역에 나눠 둬요">
+    서버를 가용 영역 둘 이상에 나눠 두면, 한 가용 영역이 멈춰도 서비스가 이어져요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="빌딩은 한 회사가 고르는 하나의 건물이지만, 클라우드는 같은 도시 안 여러 건물에 사무실을 나눠 빌려 함께 쓰는 게 기본이에요.">
+  리전은 도시, 가용 영역은 그 도시 안에서 몇 km씩 떨어진 빌딩이에요. 빌딩마다 전기와 통신선이 따로 들어와요. 빌딩끼리는 전용 광케이블로 이어져 있어 서로 빨리 연락해요.
+</Analogy>
+
+## 리전
+
+<Term term="cloud/region">리전</Term>은 클라우드 사업자가 데이터센터를 둔 지리적 지역이에요. AWS는 리전마다 다른 리전과 격리되도록 설계해서, 한 리전의 문제가 다른 리전으로 번지지 않게 해요.
+
+대부분의 자원은 리전에 속해요. 그래서 AWS 콘솔에서 서울 리전을 고르면 서울에 만든 자원만 보여요. "서버가 사라졌다"고 놀랐는데, 사실 리전을 잘못 고른 경우가 흔해요.
+
+## 가용 영역
+
+<Term term="cloud/availability-zone">가용 영역</Term>(AZ)은 리전 안에서 서로 떨어진 데이터센터 묶음이에요. 리전마다 가용 영역이 여럿 있어요.
+
+가용 영역마다 전력, 냉방, 네트워크가 따로 있어요. 물리적으로 떨어져 있어서 화재나 홍수가 나도 한 가용 영역만 영향을 받아요. Azure는 가용 영역끼리 보통 몇 km 떨어져 있고, 대개 100km 안에 있다고 설명해요.
+
+가용 영역끼리는 빠른 전용 네트워크로 이어져 있어요. Azure는 가용 영역 사이의 왕복 지연을 약 2ms 아래로 맞추려 한다고 해요. 이 정도면 데이터를 가용 영역 사이에 동기로 복제할 수 있어요.
+
+<Figure caption="한 리전 안 가용 영역 셋에 웹 서버를 나눠 두고, 데이터베이스 주 서버와 대기 서버도 다른 가용 영역에 둔 예시예요.">
+  <Flow
+    ariaLabel="로드 밸런서가 가용 영역 a, b, c의 웹 서버 세 대로 요청을 나누고, 가용 영역 a의 DB 주 서버가 가용 영역 b의 DB 대기 서버로 복제하는 구조도"
+    nodes={[
+      { id: 'lb', label: '로드 밸런서', col: 1, row: 0, tone: 'accent' },
+      { id: 'w1', label: '웹 서버', col: 0, row: 1 },
+      { id: 'w2', label: '웹 서버', col: 1, row: 1 },
+      { id: 'w3', label: '웹 서버', col: 2, row: 1 },
+      { id: 'db1', label: 'DB 주', col: 0, row: 2 },
+      { id: 'db2', label: 'DB 대기', col: 1, row: 2 },
+    ]}
+    edges={[
+      { from: 'lb', to: 'w1' },
+      { from: 'lb', to: 'w2' },
+      { from: 'lb', to: 'w3' },
+      { from: 'db1', to: 'db2', dashed: true },
+    ]}
+    groups={[
+      { label: 'AZ a', cols: [0, 0], rows: [1, 2] },
+      { label: 'AZ b', cols: [1, 1], rows: [1, 2] },
+      { label: 'AZ c', cols: [2, 2], rows: [1, 2] },
+    ]}
+  />
+</Figure>
+
+## 여러 가용 영역에 나눠 두기
+
+AWS는 앱을 여러 가용 영역에 나눠 두라고 권해요. 그러면 가용 영역 하나가 멈춰도 다른 가용 영역의 서버가 요청을 받아요. 이렇게 나눠 두는 걸 흔히 다중 AZ(Multi-AZ) 구성이라고 불러요.
+
+다만 모든 자원이 리전 전체에 걸쳐 있지는 않아요. 가상 머신과 그 디스크처럼 가용 영역 하나에 묶이는 자원도 있어요. 이런 자원은 그 가용 영역이 멈추면 함께 멈춰요.
+
+데이터베이스도 같아요. 주 서버와 대기 서버를 다른 가용 영역에 두어야, 한 가용 영역이 멈춰도 대기 서버가 이어받아요. 복제는 DB의 <Term slug="database/replication">복제</Term>에서 다뤄요.
+
+## 리전은 어떻게 고르나
+
+리전을 고를 때는 보통 이런 것들을 따져요.
+
+- 사용자와 가까운 리전일수록 네트워크 지연이 짧아요.
+- 데이터를 특정 나라 안에 둬야 하는 규정이 있으면 그 나라의 리전을 써요.
+- 리전마다 쓸 수 있는 서비스와 가격이 달라요.
+
+## 모니터링에서는
+
+클라우드 지표는 리전마다 따로 모여요. 여러 리전을 쓰면 리전마다 따로 보거나 한곳에 모아 봐야 해요.
+
+지표는 가용 영역별로도 나눠 봐요. 가용 영역 하나만 아픈데 전체 평균만 보면, 나머지 정상인 곳에 가려 문제가 작아 보여요.
+
+<Checkpoints>
+  <Check>운영 서버가 모두 한 가용 영역에 있다면 다시 보세요. 그 가용 영역이 멈추면 서비스 전체가 멈춰요.</Check>
+  <Check>DB 대기 서버가 주 서버와 같은 가용 영역에 있다면 다시 보세요. 가용 영역 장애 때 함께 멈춰요.</Check>
+  <Check>콘솔에서 서버가 안 보인다면, 먼저 고른 리전이 맞는지 보세요.</Check>
+  <Check>오류율을 전체 평균으로만 본다면 가용 영역별로도 나눠 보세요. 한 가용 영역의 문제가 평균에 묻혀요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 리전보다 작은 단위
+
+  AWS에는 사용자 가까이에 컴퓨팅과 저장소를 두는 Local Zones도 있어요. 5G 기기를 위해 통신사 망 끝에 서비스를 두는 Wavelength Zones도 있어요.
+
+  ### 가용 영역의 수
+
+  리전마다 가용 영역 수가 달라요. Azure 문서를 보면 대부분 3개이고, 4개인 리전도 있어요. 가용 영역이 아예 없는 리전도 있어서, 쓰려는 리전에 가용 영역이 있는지 먼저 확인해요.
+</Deeper>

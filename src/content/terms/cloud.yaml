@@ -1,0 +1,54 @@
+terms:
+  - id: cloud-computing
+    name: 클라우드
+    en: Cloud computing
+    aliases: [cloud, 클라우드 컴퓨팅, public cloud, 퍼블릭 클라우드]
+    short: 서버·저장소·네트워크를 네트워크로 필요할 때 빌리고, 쓴 만큼 내는 방식이에요.
+    analogy: 건물을 짓지 않고 필요한 크기의 사무실을 빌려 쓰는 것과 같아요.
+    doc: cloud/overview
+  - id: iaas
+    name: IaaS
+    en: Infrastructure as a Service
+    aliases: [IaaS, PaaS, SaaS, 서비스형 인프라]
+    short: 가상 서버·저장소·네트워크를 빌리는 형태예요. 운영체제부터 위는 내가 맡아요.
+    doc: cloud/overview
+  - id: shared-responsibility
+    name: 책임 공유 모델
+    en: Shared responsibility model
+    aliases: [shared responsibility, 공동 책임 모델, 책임 공유]
+    short: 클라우드 자체의 보안은 사업자가, 클라우드 안에 올린 것의 보안은 고객이 맡는다는 약속이에요.
+    analogy: 건물 보안은 빌딩이, 사무실 안 살림은 입주사가 챙기는 것과 같아요.
+    doc: cloud/overview
+  - id: region
+    name: 리전
+    en: Region
+    aliases: [region, regions, 지역]
+    short: 클라우드 사업자가 데이터센터를 둔 지리적 지역이에요. 리전끼리는 서로 격리돼요.
+    analogy: 빌딩들이 모여 있는 도시와 같아요.
+    doc: cloud/regions-and-zones
+  - id: availability-zone
+    name: 가용 영역
+    en: Availability zone
+    aliases: [AZ, availability zone, 가용영역, Multi-AZ, 다중 AZ]
+    short: 리전 안에서 전력·냉방·네트워크를 따로 가진, 서로 떨어진 데이터센터 묶음이에요.
+    analogy: 같은 도시 안에서 몇 km씩 떨어진 빌딩과 같아요.
+    doc: cloud/regions-and-zones
+  - id: instance
+    name: 인스턴스
+    en: Instance
+    aliases: [instance, EC2, VM, 가상 머신, virtual machine, AMI]
+    short: 클라우드에서 빌린 가상 서버예요. 이미지로 운영체제와 기본 소프트웨어를 골라 띄워요.
+    analogy: 빌딩에서 빌린 사무실 한 칸과 같아요.
+    doc: cloud/virtual-machines
+  - id: instance-type
+    name: 인스턴스 유형
+    en: Instance type
+    aliases: [instance type, 인스턴스 타입, VM size, VM 크기, vCPU]
+    short: 가상 서버의 CPU·메모리·네트워크·저장소 조합이에요. 이름에 용도와 크기가 들어 있어요.
+    doc: cloud/virtual-machines
+  - id: burstable-instance
+    name: 버스트형 인스턴스
+    en: Burstable performance instance
+    aliases: [burstable, T 시리즈, CPU credit, CPU 크레딧, 크레딧, CPUCreditBalance]
+    short: 평소엔 기준선만큼 쓰다가 모아 둔 CPU 크레딧으로 잠깐 더 쓰는 인스턴스예요.
+    doc: cloud/virtual-machines
