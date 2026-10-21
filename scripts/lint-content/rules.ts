@@ -1,5 +1,6 @@
 import type { Heading, Root, RootContent } from 'mdast';
 import { visit } from 'unist-util-visit';
+import { visitParents } from 'unist-util-visit-parents';
 import {
   componentChildren,
   jsxAttrs,
@@ -10,7 +11,6 @@ import {
   type JsxElement,
 } from '../../src/lib/mdx/parse';
 import { endsPolitely, extractProse, findBanned, sentencesOf } from '../../src/lib/mdx/prose';
-import { proseChars } from '../../src/lib/mdx/analyze';
 import { LINT_CONFIG } from './config';
 
 export type RuleId =
@@ -24,7 +24,7 @@ export type RuleId =
   | 'paragraph-length'
   | 'formal-ending'
   | 'banned-phrase'
-  | 'body-length'
+  | 'analogy-limit'
   | 'reference'
   | 'markdown-link'
   | 'unknown-component'
@@ -45,7 +45,7 @@ export interface SourceFile {
   source: string;
 }
 
-export type DocType = 'concept' | 'guide';
+export type DocType = 'overview' | 'concept' | 'guide';
 
 export interface DocMeta {
   id: string;
@@ -59,10 +59,15 @@ export interface LintContext {
 
 type Report = (rule: RuleId, line: number, column: number, message: string) => void;
 
-const CONCEPT_BLOCKS = ['OnDashboard', 'KeyPoints', 'Checkpoints', 'Deeper'];
+/** 개념·한눈에 보기 글 최상위에 둘 수 있는 블록 */
+const DOC_BLOCKS = ['OnDashboard', 'KeyPoints', 'Analogy', 'Figure', 'Checkpoints', 'Deeper'];
+/** 글마다 한 번까지만 쓰는 블록 */
+const ONCE_BLOCKS = ['KeyPoints', 'Analogy', 'Checkpoints', 'Deeper'];
+/** 그림 컴포넌트. <Figure>나 <OnDashboard> 안에만 둔다. */
+const FIGURE_COMPONENTS = ['MiniLineChart', 'StatTile', 'Waterfall', 'Scatter', 'ServiceMap'];
 const GUIDE_BLOCKS = ['Situation', 'FirstLook', 'Checkpoints'];
-const GUIDE_FREE_COMPONENTS = ['OnDashboard'];
-const GUIDE_FREE_NODES = ['paragraph', 'heading', 'list', 'table', 'code', 'blockquote'];
+const GUIDE_FREE_COMPONENTS = ['OnDashboard', 'Figure', 'Analogy'];
+const FREE_NODES = ['paragraph', 'heading', 'list', 'table', 'code', 'blockquote'];
 const CHILD_RULES: Record<string, { child: string; min: number; max: number }> = {
   KeyPoints: { child: 'Point', min: 1, max: 3 },
   FirstLook: { child: 'Item', min: 1, max: 3 },
@@ -98,14 +103,17 @@ function topLevelItems(tree: Root): TopItem[] {
   return items;
 }
 
-/** MDX 안 default import 이름(데모 컴포넌트). */
-function importedNames(tree: Root): Set<string> {
-  const names = new Set<string>();
+/** MDX 안 default import 이름. 경로가 .svg면 SVG 그림, 아니면 데모 컴포넌트다. */
+function importedNames(tree: Root): { demos: Set<string>; svgs: Set<string> } {
+  const demos = new Set<string>();
+  const svgs = new Set<string>();
   for (const c of tree.children) {
     if (c.type !== 'mdxjsEsm') continue;
-    for (const m of c.value.matchAll(/import\s+([A-Z]\w*)\s+from/g)) names.add(m[1]);
+    for (const m of c.value.matchAll(/import\s+([A-Z]\w*)\s+from\s+['"]([^'"]+)['"]/g)) {
+      (m[2].endsWith('.svg') ? svgs : demos).add(m[1]);
+    }
   }
-  return names;
+  return { demos, svgs };
 }
 
 const NODE_LABEL: Record<string, string> = {
@@ -118,25 +126,65 @@ const NODE_LABEL: Record<string, string> = {
   thematicBreak: '구분선',
 };
 
-function checkConceptStructure(items: TopItem[], demos: Set<string>, report: Report): void {
+const isH2 = (item: TopItem) => item.kind === 'node' && item.node.type === 'heading' && (item.node as Heading).depth === 2;
+const componentName = (item: TopItem) => (item.kind === 'component' ? item.name : null);
+
+/**
+ * 개념·한눈에 보기 글의 틀. 블록 사이 순서는 자유지만, Checkpoints 뒤에는 Deeper만, Deeper는 맨 끝에 온다.
+ * 기존 글(OnDashboard → KeyPoints → Checkpoints → Deeper)도 그대로 통과한다.
+ * SVG 그림의 자리는 checkComponents가 본다.
+ */
+function checkFlexibleStructure(items: TopItem[], demos: Set<string>, svgs: Set<string>, type: 'overview' | 'concept', stage: unknown, report: Report): void {
+  const valid: TopItem[] = [];
+  const counts = new Map<string, number>();
   for (const item of items) {
     if (item.kind === 'node') {
-      const label = NODE_LABEL[item.node.type] ?? item.node.type;
-      report('structure', item.line, 1, `개념 글 최상위에는 틀 블록과 데모만 둘 수 있어요. ${label}을(를) 블록 안으로 옮기세요.`);
-    } else if (!CONCEPT_BLOCKS.includes(item.name) && !demos.has(item.name)) {
-      report('structure', item.line, 1, `<${item.name}>은(는) 개념 글 최상위에 둘 수 없어요.`);
+      if (!FREE_NODES.includes(item.node.type)) {
+        report('structure', item.line, 1, `글 최상위에 ${NODE_LABEL[item.node.type] ?? item.node.type}을(를) 둘 수 없어요.`);
+        continue;
+      }
+      if (item.node.type === 'heading' && (item.node as Heading).depth === 1) {
+        report('structure', item.line, 1, '소제목은 ##부터 써요. #은 페이지 제목에만 써요.');
+        continue;
+      }
+    } else if (svgs.has(item.name)) {
+      continue;
+    } else if (FIGURE_COMPONENTS.includes(item.name)) {
+      report('structure', item.line, 1, `그림은 <Figure>나 <OnDashboard> 안에 둬요. <${item.name}>을(를) 옮기세요.`);
+      continue;
+    } else if (!DOC_BLOCKS.includes(item.name) && !demos.has(item.name)) {
+      report('structure', item.line, 1, `<${item.name}>은(는) 글 최상위에 둘 수 없어요.`);
+      continue;
+    } else if (ONCE_BLOCKS.includes(item.name)) {
+      const n = (counts.get(item.name) ?? 0) + 1;
+      counts.set(item.name, n);
+      if (n === 2) report('structure', item.line, 1, `<${item.name}>은(는) 한 번만 써요.`);
+    }
+    valid.push(item);
+  }
+
+  const checkpointsAt = valid.findIndex((i) => componentName(i) === 'Checkpoints');
+  const deeperAt = valid.findIndex((i) => componentName(i) === 'Deeper');
+  if (deeperAt !== -1 && deeperAt !== valid.length - 1) {
+    report('structure', valid[deeperAt].line, 1, '<Deeper>는 글 맨 끝에 둬요.');
+  }
+  if (checkpointsAt !== -1) {
+    for (const item of valid.slice(checkpointsAt + 1)) {
+      if (componentName(item) !== 'Deeper') report('structure', item.line, 1, '<Checkpoints> 뒤에는 <Deeper>만 둘 수 있어요.');
     }
   }
-  const seq = items.flatMap((i) => (i.kind === 'component' && CONCEPT_BLOCKS.includes(i.name) ? [i.name] : []));
-  const expected = seq.at(-1) === 'Deeper' ? CONCEPT_BLOCKS : CONCEPT_BLOCKS.slice(0, 3);
-  if (seq.join() !== expected.join()) {
-    const first = items.find((i) => i.kind === 'component');
-    report(
-      'structure',
-      first?.line ?? 1,
-      1,
-      `개념 글 블록은 OnDashboard → KeyPoints → Checkpoints → (Deeper) 순서여야 해요. 현재: ${seq.join(' → ') || '없음'}`,
-    );
+
+  const firstLine = items[0]?.line ?? 1;
+  const keyPoints = counts.get('KeyPoints') ?? 0;
+  const hasH2 = valid.some(isH2);
+  if (type === 'concept') {
+    if (keyPoints === 0) report('structure', firstLine, 1, '개념 글에는 <KeyPoints>가 필요해요.');
+    if (stage === 'basics' && !hasH2) report('structure', firstLine, 1, '기초 글에는 본문 설명(## 소제목)이 1개 이상 필요해요.');
+  } else {
+    const at = valid.find((i) => componentName(i) === 'KeyPoints');
+    if (at) report('structure', at.line, 1, '한눈에 보기 글에는 <KeyPoints>를 쓰지 않아요.');
+    if (!valid.some((i) => componentName(i) === 'Figure')) report('structure', firstLine, 1, '한눈에 보기 글에는 <Figure>가 1개 이상 필요해요.');
+    if (!hasH2) report('structure', firstLine, 1, '한눈에 보기 글에는 ## 소제목이 1개 이상 필요해요.');
   }
 }
 
@@ -156,13 +204,13 @@ function checkGuideStructure(items: TopItem[], demos: Set<string>, report: Repor
       if (!GUIDE_FREE_COMPONENTS.includes(item.name) && !demos.has(item.name)) {
         report('structure', item.line, 1, `<${item.name}>은(는) 가이드 본문에 둘 수 없어요.`);
       }
-    } else if (!GUIDE_FREE_NODES.includes(item.node.type)) {
+    } else if (!FREE_NODES.includes(item.node.type)) {
       report('structure', item.line, 1, `가이드 본문에 ${NODE_LABEL[item.node.type] ?? item.node.type}을(를) 둘 수 없어요.`);
     } else if (item.node.type === 'heading' && (item.node as Heading).depth === 1) {
       report('structure', item.line, 1, '가이드 본문 소제목은 ##부터 써요. #은 페이지 제목에만 써요.');
     }
   }
-  const hasStep = middle.some((i) => i.kind === 'node' && i.node.type === 'heading' && (i.node as Heading).depth === 2);
+  const hasStep = middle.some(isH2);
   if (!hasStep) report('structure', middle[0]?.line ?? items[1].line, 1, '가이드에는 단계별 설명(## 소제목)이 1개 이상 필요해요.');
 }
 
@@ -188,6 +236,12 @@ function checkBlocks(tree: Root, report: Report): void {
         report('block-children', lineOf(node), columnOf(node), `<${name}> 안의 <${rule.child}>는 ${range}여야 해요. 현재 ${n}개예요.`);
       }
     }
+    if (name === 'Analogy') {
+      const limit = jsxAttrs(node).limit;
+      if (typeof limit !== 'string' || limit.trim() === '') {
+        report('analogy-limit', lineOf(node), columnOf(node), '<Analogy>에 limit(비유가 안 맞는 곳)이 필요해요.');
+      }
+    }
     if (TITLED.includes(name)) {
       const title = jsxAttrs(node).title;
       if (typeof title !== 'string' || title.trim() === '') {
@@ -201,12 +255,20 @@ function checkBlocks(tree: Root, report: Report): void {
 
 const MDX_COMPONENTS: readonly string[] = LINT_CONFIG.mdxComponents;
 
-/** 등록된 컴포넌트와 import한 데모만 쓰게 하고, 데모에는 client 지시어가 있어야 한다. */
-function checkComponents(tree: Root, demos: Set<string>, report: Report): void {
-  visit(tree, (node) => {
+/** 등록된 컴포넌트와 import한 데모·SVG 그림만 쓰게 한다. 데모에는 client 지시어, SVG 그림에는 Figure와 aria-label이 있어야 한다. */
+function checkComponents(tree: Root, demos: Set<string>, svgs: Set<string>, report: Report): void {
+  visitParents(tree, (node, ancestors) => {
     if (!isJsx(node) || node.name == null) return;
     const name = node.name;
-    if (demos.has(name)) {
+    if (svgs.has(name)) {
+      if (!ancestors.some((a) => isJsx(a) && a.name === 'Figure')) {
+        report('structure', lineOf(node), columnOf(node), `SVG 그림 <${name}>은(는) <Figure> 안에 둬요.`);
+      }
+      const label = jsxAttrs(node)['aria-label'];
+      if (typeof label !== 'string' || label.trim() === '') {
+        report('structure', lineOf(node), columnOf(node), `SVG 그림 <${name}>에 aria-label(그림 설명)이 필요해요.`);
+      }
+    } else if (demos.has(name)) {
       const hydrated = Object.keys(jsxAttrs(node)).some((k) => k.startsWith('client:'));
       if (!hydrated) {
         report('demo-hydration', lineOf(node), columnOf(node), `<${name}>에 client 지시어가 없어서 움직이지 않는 그림으로만 보여요. <${name} client:visible />로 쓰세요.`);
@@ -260,11 +322,13 @@ function checkReferences(tree: Root, fm: Record<string, unknown>, src: SourceFil
   }
 }
 
+const isDocType = (t: unknown): t is DocType => t === 'overview' || t === 'concept' || t === 'guide';
+
 export function collectMeta(src: SourceFile): DocMeta | null {
   try {
     const fm = readFrontmatter(parseMdx(src.source));
     if (!fm) return null;
-    const type = fm.type === 'concept' || fm.type === 'guide' ? fm.type : null;
+    const type = isDocType(fm.type) ? fm.type : null;
     return { id: src.id, type, draft: fm.draft === true };
   } catch {
     return null;
@@ -290,8 +354,8 @@ export function lintSource(src: SourceFile, ctx: LintContext): LintIssue[] {
     report('frontmatter', 1, 1, '머리말(---)이 없어요.');
     return issues;
   }
-  if (fm.type !== 'concept' && fm.type !== 'guide') {
-    report('frontmatter', 1, 1, `type은 concept 또는 guide여야 해요. 현재: ${String(fm.type)}`);
+  if (!isDocType(fm.type)) {
+    report('frontmatter', 1, 1, `type은 overview, concept, guide 중 하나여야 해요. 현재: ${String(fm.type)}`);
     return issues;
   }
   const type: DocType = fm.type;
@@ -304,18 +368,12 @@ export function lintSource(src: SourceFile, ctx: LintContext): LintIssue[] {
   if (fm.domain !== folder) report('domain-folder', 1, 1, `domain(${String(fm.domain)})이 폴더(${folder})와 달라요.`);
 
   const items = topLevelItems(tree);
-  const demos = importedNames(tree);
-  if (type === 'concept') checkConceptStructure(items, demos, report);
-  else checkGuideStructure(items, demos, report);
+  const { demos, svgs } = importedNames(tree);
+  if (type === 'guide') checkGuideStructure(items, demos, report);
+  else checkFlexibleStructure(items, demos, svgs, type, fm.stage, report);
   checkBlocks(tree, report);
-  checkComponents(tree, demos, report);
+  checkComponents(tree, demos, svgs, report);
   checkProse(tree, report);
-
-  const chars = proseChars(tree, { excludeDeeper: true });
-  const max = LINT_CONFIG.maxBodyChars[type];
-  if (chars > max) {
-    report('body-length', 1, 1, `본문이 ${chars}자예요 (${type === 'concept' ? '개념' : '가이드'} 최대 ${max}자, '더 깊이' 제외).`);
-  }
 
   checkReferences(tree, fm, src, ctx, report);
   visit(tree, 'link', (node) => {

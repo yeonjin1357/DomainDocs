@@ -1,0 +1,55 @@
+---
+interface Props {
+  /** 비유가 안 맞는 곳. 비유가 틀린 이해를 심지 않게 꼭 적는다. */
+  limit: string;
+}
+const { limit } = Astro.props;
+---
+<aside class="block analogy" data-block="analogy">
+  <h2 class="block-title">비유하면</h2>
+  <div class="analogy-body"><slot /></div>
+  <div class="analogy-limit">
+    <h3 class="limit-title">비유가 안 맞는 곳</h3>
+    <p class="limit-text">{limit}</p>
+  </div>
+</aside>
+
+<style>
+  .analogy {
+    padding: 20px;
+    border-radius: var(--radius-card);
+    background: var(--color-accent-weak);
+  }
+
+  .analogy .block-title {
+    font-size: 17px;
+    color: var(--color-accent);
+  }
+
+  .analogy-body > :global(p) {
+    margin: 0;
+  }
+
+  .analogy-body > :global(p + p) {
+    margin-top: 12px;
+  }
+
+  .analogy-limit {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+  }
+
+  .limit-title {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text-sub);
+  }
+
+  .limit-text {
+    margin: 0;
+    font-size: 15px;
+    color: var(--color-text-sub);
+  }
+</style>

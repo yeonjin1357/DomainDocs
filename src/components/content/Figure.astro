@@ -1,0 +1,47 @@
+---
+interface Props {
+  /** 그림이 보여 주는 것 1~2문장 */
+  caption?: string;
+}
+const { caption } = Astro.props;
+---
+<figure class="block figure" data-block="figure">
+  {/* 그림 안 글자는 검색 발췌에 섞이지 않게 색인에서 뺀다. 설명(caption)은 색인한다. */}
+  <div class="figure-body" data-pagefind-ignore><slot /></div>
+  {caption && <figcaption class="block-caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .figure {
+    margin-inline: 0;
+  }
+
+  .figure-body {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    padding: 20px;
+    border-radius: var(--radius-card);
+    background: var(--color-bg);
+  }
+
+  .figure-body > :global(*) {
+    flex: 1 1 100%;
+  }
+
+  .figure-body > :global([data-stat]) {
+    flex: 1 1 96px;
+  }
+
+  .figure-body > :global(p) {
+    margin: 0;
+  }
+
+  /* SVG 그림은 원래 비율대로, 화면보다 넓어지지 않게 */
+  .figure-body > :global(svg) {
+    max-width: 100%;
+    height: auto;
+    color: var(--color-text);
+  }
+</style>

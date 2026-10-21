@@ -1,6 +1,8 @@
+import Analogy from './Analogy.astro';
 import Check from './Check.astro';
 import Checkpoints from './Checkpoints.astro';
 import Deeper from './Deeper.astro';
+import Figure from './Figure.astro';
 import FirstLook from './FirstLook.astro';
 import Item from './Item.astro';
 import KeyPoints from './KeyPoints.astro';
@@ -15,4 +17,4 @@ import Scatter from '../viz/Scatter.astro';
 import ServiceMap from '../viz/ServiceMap.astro';
 
 /** MDX에서 import 없이 쓰는 컴포넌트. React 데모는 여기 넣지 않는다(client 지시어를 쓸 수 없다). */
-export const mdxComponents = { OnDashboard, KeyPoints, Point, Checkpoints, Check, Deeper, Situation, FirstLook, Item, Term, MiniLineChart, StatTile, Waterfall, Scatter, ServiceMap };
+export const mdxComponents = { OnDashboard, KeyPoints, Point, Analogy, Figure, Checkpoints, Check, Deeper, Situation, FirstLook, Item, Term, MiniLineChart, StatTile, Waterfall, Scatter, ServiceMap };

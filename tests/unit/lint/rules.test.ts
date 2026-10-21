@@ -50,6 +50,30 @@ const GUIDE_BODY = `
 </Checkpoints>
 `;
 
+const BASICS_BODY = `
+<KeyPoints>
+  <Point title="스위치는 같은 네트워크 안을 이어요">
+    스위치는 같은 네트워크 안에서 데이터를 넘겨요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="실제 스위치는 주소를 스스로 배워요.">
+  스위치는 아파트 우편함 분류실과 비슷해요.
+</Analogy>
+
+## 어떻게 동작하나요
+
+스위치는 받은 데이터의 목적지 주소를 봐요.
+
+<Figure caption="서버 둘이 스위치에 꽂힌 모습이에요.">
+  <StatTile label="포트" value="24" unit="개" />
+</Figure>
+
+<Checkpoints>
+  <Check>포트 수만 보고 있다면 다시 확인하세요.</Check>
+</Checkpoints>
+`;
+
 const DOCS: DocMeta[] = [
   { id: 'foundations/test', type: 'concept', draft: false },
   { id: 'foundations/other', type: 'concept', draft: false },
@@ -107,27 +131,9 @@ describe('문장 규칙', () => {
   it('본문의 금지 표현을 잡는다', () => {
     expect(rules(FRONT() + CONCEPT_BODY.replace('사이예요.', '사이라고 단정하지 않아요.'))).toEqual(['banned-phrase']);
   });
-  it('개념 본문이 1,500자를 넘으면 잡는다', () => {
-    // 문장 36자 × 3문장 × 15단락 = 1,620자
-    const sentence = '가나다라마바사아자차카타파하 가나다라마바사아자차카타파하 문장이에요. ';
-    const paras = Array.from({ length: 15 }, () => sentence.repeat(3).trim()).join('\n\n    ');
-    expect(rules(FRONT() + CONCEPT_BODY.replace('응답은 1~2초 사이예요.', paras))).toContain('body-length');
-  });
 });
 
 describe('틀 규칙', () => {
-  it('Checkpoints가 없으면 잡는다', () => {
-    const body = CONCEPT_BODY.replace(/<Checkpoints>[\s\S]*<\/Checkpoints>/, '');
-    expect(rules(FRONT() + body)).toEqual(['structure']);
-  });
-  it('블록 순서가 틀리면 잡는다', () => {
-    const onDashboard = CONCEPT_BODY.match(/<OnDashboard[\s\S]*?<\/OnDashboard>/)![0];
-    const body = CONCEPT_BODY.replace(onDashboard, '').replace('<Checkpoints>', `${onDashboard}\n\n<Checkpoints>`);
-    expect(rules(FRONT() + body)).toEqual(['structure']);
-  });
-  it('개념 글 최상위의 일반 단락과 소제목을 잡는다', () => {
-    expect(rules(`${FRONT()}\n## 소제목\n\n그냥 단락이에요.\n${CONCEPT_BODY}`)).toEqual(['structure', 'structure']);
-  });
   it('최상위에 둘 수 없는 컴포넌트를 잡는다', () => {
     expect(rules(`${FRONT()}${CONCEPT_BODY}\n<Point title="밖">밖이에요.</Point>\n`)).toEqual(['structure']);
   });
@@ -149,6 +155,64 @@ describe('틀 규칙', () => {
   it('가이드에 KeyPoints를 쓰면 잡는다', () => {
     const body = GUIDE_BODY.replace('## 1.', '<KeyPoints>\n  <Point title="x">x예요.</Point>\n</KeyPoints>\n\n## 1.');
     expect(rules(FRONT('', 'guide') + body)).toEqual(['structure']);
+  });
+});
+
+describe('새 틀 규칙', () => {
+  const BASICS = FRONT('', 'concept', 'foundations', 'basics');
+  const OVERVIEW_BODY = BASICS_BODY.replace(/<KeyPoints>[\s\S]*?<\/KeyPoints>/, '');
+  const SVG_IMPORT = "import SwitchFigure from '../../../assets/figures/foundations/switch.svg';\n";
+  const TILE = '<StatTile label="포트" value="24" unit="개" />';
+
+  it('기초 글 틀은 통과한다', () => {
+    expect(lint(BASICS + BASICS_BODY)).toEqual([]);
+  });
+  it('기존 틀(OnDashboard → KeyPoints → Checkpoints → Deeper)도 통과한다', () => {
+    expect(lint(`${FRONT() + CONCEPT_BODY}\n<Deeper>\n  더 깊은 이야기예요.\n</Deeper>\n`)).toEqual([]);
+  });
+  it('본문이 길어도 분량 위반이 없다', () => {
+    const long = '응답시간은 요청 하나를 끝내는 데 걸린 시간이에요.\n\n'.repeat(80);
+    expect(rules(BASICS + BASICS_BODY.replace('## 어떻게 동작하나요', `## 어떻게 동작하나요\n\n${long}`))).toEqual([]);
+  });
+  it('KeyPoints가 없으면 잡는다', () => {
+    expect(rules(BASICS + OVERVIEW_BODY)).toEqual(['structure']);
+  });
+  it('Checkpoints 뒤에 단락이 오면 잡는다', () => {
+    expect(rules(`${BASICS + BASICS_BODY}\n뒤에 붙은 단락이에요.\n`)).toEqual(['structure']);
+  });
+  it('Deeper가 맨 끝이 아니면 잡는다', () => {
+    expect(rules(BASICS + BASICS_BODY.replace('<Checkpoints>', '<Deeper>\n  더 깊은 이야기예요.\n</Deeper>\n\n<Checkpoints>'))).toEqual(['structure']);
+  });
+  it('Analogy를 두 번 쓰면 잡는다', () => {
+    const analogy = BASICS_BODY.match(/<Analogy[\s\S]*?<\/Analogy>/)![0];
+    expect(rules(BASICS + BASICS_BODY.replace('## 어떻게', `${analogy}\n\n## 어떻게`))).toEqual(['structure']);
+  });
+  it('기초 글에 ## 소제목이 없으면 잡는다', () => {
+    expect(rules(BASICS + BASICS_BODY.replace('## 어떻게 동작하나요\n', ''))).toEqual(['structure']);
+  });
+  it('# 소제목을 잡는다', () => {
+    expect(rules(BASICS + BASICS_BODY.replace('## 어떻게', '# 어떻게'))).toContain('structure');
+  });
+  it('그림 컴포넌트를 Figure 밖 최상위에 두면 잡는다', () => {
+    expect(rules(BASICS + BASICS_BODY.replace('<Checkpoints>', `${TILE}\n\n<Checkpoints>`))).toEqual(['structure']);
+  });
+  it('Analogy에 limit이 없으면 잡는다', () => {
+    expect(rules(BASICS + BASICS_BODY.replace(' limit="실제 스위치는 주소를 스스로 배워요."', ''))).toEqual(['analogy-limit']);
+  });
+  it('한눈에 보기는 Figure와 ##가 있으면 통과하고, KeyPoints가 있거나 Figure가 없으면 잡는다', () => {
+    const overview = FRONT('', 'overview');
+    expect(lint(overview + OVERVIEW_BODY)).toEqual([]);
+    expect(rules(overview + BASICS_BODY)).toEqual(['structure']);
+    expect(rules(overview + OVERVIEW_BODY.replace(/<Figure[\s\S]*?<\/Figure>/, ''))).toEqual(['structure']);
+  });
+  it('가이드 본문에 Figure를 둘 수 있다', () => {
+    const figure = '<Figure caption="구간 그림이에요.">\n  <StatTile label="구간" value="1" unit="분" />\n</Figure>\n';
+    expect(lint(FRONT('', 'guide') + GUIDE_BODY.replace('## 1. 구간을 맞춰 보세요\n', `## 1. 구간을 맞춰 보세요\n\n${figure}`))).toEqual([]);
+  });
+  it('SVG import는 데모가 아니고, Figure 밖에 두거나 aria-label이 없으면 잡는다', () => {
+    expect(lint(BASICS + SVG_IMPORT + BASICS_BODY.replace(TILE, '<SwitchFigure aria-label="스위치 그림" />'))).toEqual([]);
+    expect(rules(BASICS + SVG_IMPORT + BASICS_BODY.replace('<Checkpoints>', '<SwitchFigure aria-label="스위치 그림" />\n\n<Checkpoints>'))).toEqual(['structure']);
+    expect(rules(BASICS + SVG_IMPORT + BASICS_BODY.replace(TILE, '<SwitchFigure />'))).toEqual(['structure']);
   });
 });
 

@@ -2,7 +2,6 @@
 export const LINT_CONFIG = {
   maxSentenceChars: 80,
   maxSentencesPerParagraph: 3,
-  maxBodyChars: { concept: 1500, guide: 4000 },
   maxBlockTitleChars: 30,
   /** 본문(Deeper 밖)에 쓰지 않는 표현. 면책·메타 서술을 막는다. */
   bannedPhrases: ['주장하지 않', '단정하지 않', '보장하지 않', '일반화하지 않', '이 문서에서는', '이 장에서는'],
@@ -14,6 +13,8 @@ export const LINT_CONFIG = {
     'OnDashboard',
     'KeyPoints',
     'Point',
+    'Analogy',
+    'Figure',
     'Checkpoints',
     'Check',
     'Deeper',
