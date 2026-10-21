@@ -25,6 +25,7 @@ export type RuleId =
   | 'formal-ending'
   | 'banned-phrase'
   | 'analogy-limit'
+  | 'glossary'
   | 'reference'
   | 'markdown-link'
   | 'unknown-component'
@@ -53,8 +54,15 @@ export interface DocMeta {
   draft: boolean;
 }
 
+/** 용어 파일의 용어 하나. key는 영역/id 형식이다. */
+export interface TermMeta {
+  key: string;
+  doc?: string;
+}
+
 export interface LintContext {
   docs: Map<string, DocMeta>;
+  terms: Map<string, TermMeta>;
 }
 
 type Report = (rule: RuleId, line: number, column: number, message: string) => void;
@@ -284,6 +292,19 @@ function checkComponents(tree: Root, demos: Set<string>, svgs: Set<string>, repo
   });
 }
 
+/** MDX 밖 글(용어의 뜻·비유 등)에 문장 규칙(길이·해요체·금지 표현)을 쓴다. 줄 번호는 부르는 쪽이 단다. */
+export function lintProseText(text: string): { rule: RuleId; message: string }[] {
+  const found: { rule: RuleId; message: string }[] = [];
+  let tree: Root;
+  try {
+    tree = parseMdx(text);
+  } catch {
+    return [{ rule: 'glossary', message: `MDX로 읽을 수 없는 글자가 있어요: "${preview(text)}"` }];
+  }
+  checkProse(tree, (rule, _line, _column, message) => found.push({ rule, message }));
+  return found;
+}
+
 function checkProse(tree: Root, report: Report): void {
   for (const unit of extractProse(tree)) {
     const sentences = sentencesOf(unit);
@@ -309,9 +330,14 @@ function checkReferences(tree: Root, fm: Record<string, unknown>, src: SourceFil
   if (Array.isArray(fm.related)) for (const r of fm.related) targets.push({ slug: String(r), line: 1, via: 'related' });
   visit(tree, (node) => {
     if (!isJsx(node) || node.name !== 'Term') return;
-    const slug = jsxAttrs(node).slug;
-    if (typeof slug !== 'string') report('reference', lineOf(node), columnOf(node), '<Term>에 slug가 필요해요.');
-    else targets.push({ slug, line: lineOf(node), via: 'Term' });
+    const { slug, term } = jsxAttrs(node);
+    if ((typeof slug === 'string') === (typeof term === 'string')) {
+      report('reference', lineOf(node), columnOf(node), '<Term>에는 slug(글)와 term(용어) 중 하나만 써요.');
+    } else if (typeof slug === 'string') {
+      targets.push({ slug, line: lineOf(node), via: 'Term' });
+    } else if (!ctx.terms.has(String(term))) {
+      report('reference', lineOf(node), columnOf(node), `Term: 대상 용어가 없어요 (${String(term)}).`);
+    }
   });
   const selfDraft = fm.draft === true;
   for (const t of targets) {

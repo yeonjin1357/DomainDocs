@@ -16,7 +16,7 @@ export default defineConfig({
     url: BASE_URL,
     reuseExistingServer: false,
     timeout: 300_000,
-    env: { ...(process.env as Record<string, string>), DOCS_CONTENT_DIR: './tests/fixtures/docs' },
+    env: { ...(process.env as Record<string, string>), DOCS_CONTENT_DIR: './tests/fixtures/docs', TERMS_CONTENT_DIR: './tests/fixtures/terms' },
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },

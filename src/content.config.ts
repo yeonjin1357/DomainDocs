@@ -25,4 +25,21 @@ const docs = defineCollection({
   }),
 });
 
-export const collections = { docs };
+// 용어는 영역마다 YAML 파일 하나(src/content/terms/{domain}.yaml). 자세한 형식 검사와 줄 번호는 글 검사기가 맡는다.
+const termSchema = z.object({
+  id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
+  name: z.string().min(1).max(30),
+  en: z.string().optional(),
+  aliases: z.array(z.string()).default([]),
+  short: z.string().min(1).max(60),
+  analogy: z.string().optional(),
+  doc: z.string().optional(),
+});
+
+const glossary = defineCollection({
+  // 화면 테스트는 TERMS_CONTENT_DIR=./tests/fixtures/terms로 테스트 전용 용어를 쓴다.
+  loader: glob({ pattern: '*.yaml', base: process.env.TERMS_CONTENT_DIR ?? './src/content/terms' }),
+  schema: z.object({ terms: z.array(termSchema).min(1) }),
+});
+
+export const collections = { docs, glossary };

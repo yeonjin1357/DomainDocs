@@ -24,6 +24,12 @@ describe('analyze', () => {
   it('KeyPoints 안 Point 제목을 모은다', () => {
     expect(extractPointTitles(parseMdx(BODY))).toEqual(['평균은 느린 요청을 숨겨요', '두 번째 핵심']);
   });
+  it('Term term은 glossaryKeys로, Term slug는 termSlugs로 모은다', () => {
+    const body = '<Term term="network/snmp">SNMP</Term>와 <Term slug="foundations/beta">베타</Term>, <Term term="network/snmp">SNMP</Term>예요.';
+    const result = analyzeBody(body);
+    expect(result.glossaryKeys).toEqual(['network/snmp']);
+    expect(result.termSlugs).toEqual(['foundations/beta']);
+  });
   it('Deeper를 뺀 글자 수를 센다', () => {
     const tree = parseMdx(BODY);
     const withDeeper = proseChars(tree, { excludeDeeper: false });

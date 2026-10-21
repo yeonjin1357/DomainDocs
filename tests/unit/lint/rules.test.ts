@@ -79,7 +79,10 @@ const DOCS: DocMeta[] = [
   { id: 'foundations/other', type: 'concept', draft: false },
   { id: 'foundations/secret', type: 'concept', draft: true },
 ];
-const ctx: LintContext = { docs: new Map(DOCS.map((d) => [d.id, d])) };
+const ctx: LintContext = {
+  docs: new Map(DOCS.map((d) => [d.id, d])),
+  terms: new Map([['foundations/alpha', { key: 'foundations/alpha' }]]),
+};
 const lint = (source: string, id = 'foundations/test') => lintSource({ file: `${id}.mdx`, id, source }, ctx);
 const rules = (source: string, id?: string): RuleId[] => lint(source, id).map((i) => i.rule);
 
@@ -267,6 +270,14 @@ describe('머리말과 참조 규칙', () => {
   it('없는 글을 가리키는 Term과 related를 잡는다', () => {
     expect(rules(FRONT() + CONCEPT_BODY.replace('foundations/other', 'foundations/nope'))).toEqual(['reference']);
     expect(rules(FRONT('related: [foundations/nope]\n') + CONCEPT_BODY)).toEqual(['reference']);
+  });
+  it('Term term은 있는 용어를 가리켜야 한다', () => {
+    expect(lint(FRONT() + CONCEPT_BODY.replace('<Term slug="foundations/other">', '<Term term="foundations/alpha">'))).toEqual([]);
+    expect(rules(FRONT() + CONCEPT_BODY.replace('<Term slug="foundations/other">', '<Term term="foundations/nope">'))).toEqual(['reference']);
+  });
+  it('Term에 slug와 term을 함께 쓰거나 둘 다 없으면 잡는다', () => {
+    expect(rules(FRONT() + CONCEPT_BODY.replace('<Term slug="foundations/other">', '<Term slug="foundations/other" term="foundations/alpha">'))).toEqual(['reference']);
+    expect(rules(FRONT() + CONCEPT_BODY.replace('<Term slug="foundations/other">', '<Term>'))).toEqual(['reference']);
   });
   it('공개 글이 초안을 가리키면 잡는다', () => {
     expect(rules(FRONT() + CONCEPT_BODY.replace('foundations/other', 'foundations/secret'))).toEqual(['reference']);

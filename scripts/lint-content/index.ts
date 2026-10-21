@@ -1,8 +1,10 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
+import { collectTerms, lintGlossaryFile, type GlossaryFile } from './glossary';
 import { collectMeta, lintSource, type LintContext, type SourceFile } from './rules';
 
 const root = process.env.DOCS_CONTENT_DIR ?? 'src/content/docs';
+const termsRoot = process.env.TERMS_CONTENT_DIR ?? 'src/content/terms';
 
 function listMdx(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -23,13 +25,25 @@ const files: SourceFile[] = listMdx(root).map((full) => ({
   source: readFileSync(full, 'utf8'),
 }));
 
-const ctx: LintContext = { docs: new Map() };
+// 용어 폴더는 없어도 된다(용어가 아직 없는 경우).
+const glossaries: GlossaryFile[] = existsSync(termsRoot)
+  ? readdirSync(termsRoot)
+      .filter((name) => name.endsWith('.yaml'))
+      .map((name) => ({
+        file: relative(process.cwd(), join(termsRoot, name)),
+        domain: name.replace(/\.yaml$/, ''),
+        source: readFileSync(join(termsRoot, name), 'utf8'),
+      }))
+  : [];
+
+const ctx: LintContext = { docs: new Map(), terms: new Map() };
 for (const f of files) {
   const meta = collectMeta(f);
   if (meta) ctx.docs.set(meta.id, meta);
 }
+for (const g of glossaries) for (const t of collectTerms(g)) ctx.terms.set(t.key, t);
 
-const issues = files.flatMap((f) => lintSource(f, ctx));
+const issues = [...files.flatMap((f) => lintSource(f, ctx)), ...glossaries.flatMap((g) => lintGlossaryFile(g, ctx))];
 for (const i of issues) console.log(`${i.file}:${i.line}:${i.column} [${i.rule}] ${i.message}`);
-console.log(`글 ${files.length}편 검사, 위반 ${issues.length}건`);
+console.log(`글 ${files.length}편, 용어 파일 ${glossaries.length}개 검사, 위반 ${issues.length}건`);
 process.exitCode = issues.length > 0 ? 1 : 0;

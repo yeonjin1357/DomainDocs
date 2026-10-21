@@ -26,6 +26,17 @@ export function extractTermSlugs(tree: Root): string[] {
   return slugs;
 }
 
+/** <Term term="영역/id">로 이은 용어 키를 등장 순서대로 중복 없이 모은다. */
+export function extractGlossaryKeys(tree: Root): string[] {
+  const keys: string[] = [];
+  visit(tree, (node) => {
+    if (!isJsx(node) || node.name !== 'Term') return;
+    const key = jsxAttrs(node).term;
+    if (typeof key === 'string' && !keys.includes(key)) keys.push(key);
+  });
+  return keys;
+}
+
 export function extractPointTitles(tree: Root): string[] {
   const keyPoints = componentChildren(tree).find((el) => el.name === 'KeyPoints');
   if (!keyPoints || keyPoints.type !== 'mdxJsxFlowElement') return [];
@@ -38,6 +49,7 @@ export function extractPointTitles(tree: Root): string[] {
 export interface BodyAnalysis {
   readingMinutes: number;
   termSlugs: string[];
+  glossaryKeys: string[];
   pointTitles: string[];
 }
 
@@ -46,6 +58,7 @@ export function analyzeBody(body: string): BodyAnalysis {
   return {
     readingMinutes: Math.max(1, Math.ceil(proseChars(tree, { excludeDeeper: true }) / CHARS_PER_MINUTE)),
     termSlugs: extractTermSlugs(tree),
+    glossaryKeys: extractGlossaryKeys(tree),
     pointTitles: extractPointTitles(tree),
   };
 }
