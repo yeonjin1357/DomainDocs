@@ -5,13 +5,14 @@ import ListRow from '../components/ui/ListRow.astro';
 import { DOMAINS } from '../data/domains';
 import { SITE } from '../data/site';
 import { homeLists, inDomain, TYPE_LABEL, type DocCard } from '../lib/catalog';
-import { getCards } from '../lib/content';
-import { domainPath } from '../lib/paths';
+import { getCards, getQuizCounts } from '../lib/content';
+import { domainPath, quizHomePath } from '../lib/paths';
 
 const cards = await getCards();
 // 최근 목록은 처음 목록에 이미 있는 글을 빼고 고른다. 비면 카드를 숨긴다.
 const { starter, recent } = homeLists(cards);
 const metaOf = (d: DocCard) => `${TYPE_LABEL[d.type]} · ${d.readingMinutes}분`;
+const quizTotal = (await getQuizCounts()).total;
 ---
 <BaseLayout surface="grey">
   <section class="hero">
@@ -41,6 +42,16 @@ const metaOf = (d: DocCard) => `${TYPE_LABEL[d.type]} · ${d.readingMinutes}분`
   }
 
   {
+    quizTotal > 0 && (
+      <Card title="퀴즈">
+        <div data-quiz-due="home">
+          <ListRow href={quizHomePath()} icon="list-checks" title="퀴즈 풀어 보기" description="읽은 내용을 문제로 다시 꺼내 봐요." />
+        </div>
+      </Card>
+    )
+  }
+
+  {
     recent.length > 0 && (
       <Card title="최근 추가된 글">
         {recent.map((d) => <ListRow href={d.url} icon={d.icon} title={d.title} description={d.summary} meta={metaOf(d)} />)}
@@ -48,3 +59,8 @@ const metaOf = (d: DocCard) => `${TYPE_LABEL[d.type]} · ${d.readingMinutes}분`
     )
   }
 </BaseLayout>
+
+<script>
+  import { initQuizDue } from '../scripts/quiz-home';
+  initQuizDue();
+</script>

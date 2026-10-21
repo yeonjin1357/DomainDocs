@@ -5,8 +5,8 @@ import Card from '../../components/ui/Card.astro';
 import ListRow from '../../components/ui/ListRow.astro';
 import { DOMAINS, type Domain } from '../../data/domains';
 import { domainSections, inDomain, TYPE_LABEL, type DocCard } from '../../lib/catalog';
-import { getCards, getGlossary } from '../../lib/content';
-import { glossaryPath, withBase } from '../../lib/paths';
+import { getCards, getGlossary, getQuizCounts } from '../../lib/content';
+import { glossaryPath, quizPlayPath, withBase } from '../../lib/paths';
 
 export const getStaticPaths = (async () => {
   const cards = await getCards();
@@ -27,6 +27,7 @@ const cards = [
   { title: '상황 가이드', docs: sections.guides },
 ].filter((c) => c.docs.length > 0);
 const termCount = (await getGlossary()).filter((t) => t.domain === domain.id).length;
+const quizCount = (await getQuizCounts()).byDomain.get(domain.id) ?? 0;
 const metaOf = (d: DocCard) => `${TYPE_LABEL[d.type]} · ${d.readingMinutes}분`;
 ---
 <BaseLayout title={domain.name} description={domain.description} surface="grey" backHref={withBase()} barTitle={domain.name}>
@@ -42,9 +43,14 @@ const metaOf = (d: DocCard) => `${TYPE_LABEL[d.type]} · ${d.readingMinutes}분`
     ))
   }
   {
-    termCount > 0 && (
+    (termCount > 0 || quizCount > 0) && (
       <Card title="더 알아보기">
-        <ListRow href={glossaryPath(domain.id)} icon="book-open" title="용어 사전" description={`용어 ${termCount}개를 한 줄 뜻과 비유로 모았어요.`} />
+        {termCount > 0 && (
+          <ListRow href={glossaryPath(domain.id)} icon="book-open" title="용어 사전" description={`용어 ${termCount}개를 한 줄 뜻과 비유로 모았어요.`} />
+        )}
+        {quizCount > 0 && (
+          <ListRow href={quizPlayPath(`domain:${domain.id}`)} icon="list-checks" title="퀴즈" description={`문제 ${quizCount}개로 이 영역을 다시 꺼내 봐요.`} />
+        )}
       </Card>
     )
   }

@@ -1,0 +1,16 @@
+---
+import ListRow from '../ui/ListRow.astro';
+
+interface Props {
+  count: number;
+  href: string;
+}
+
+const { count, href } = Astro.props;
+---
+<section class="doc-section" data-quiz-card>
+  <h2 class="section-title">이 글 퀴즈</h2>
+  <div>
+    <ListRow href={href} icon="list-checks" title="이 글 퀴즈 풀기" description={`${count}문제로 읽은 내용을 다시 꺼내 봐요.`} />
+  </div>
+</section>

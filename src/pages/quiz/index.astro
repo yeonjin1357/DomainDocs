@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/ui/Card.astro';
+import ListRow from '../../components/ui/ListRow.astro';
+import { DOMAINS } from '../../data/domains';
+import { getQuizCounts } from '../../lib/content';
+import { quizPlayPath, withBase } from '../../lib/paths';
+
+const counts = await getQuizCounts();
+const domains = DOMAINS.filter((d) => (counts.byDomain.get(d.id) ?? 0) > 0);
+---
+<BaseLayout title="퀴즈" description="읽은 내용을 문제로 다시 꺼내 봐요. 틀린 문제는 나중에 다시 나와요." surface="grey" backHref={withBase()} barTitle="퀴즈">
+  <section class="hero">
+    <h1 class="hero-title" data-page-title>퀴즈</h1>
+    <p class="hero-desc">읽은 내용을 문제로 다시 꺼내 봐요. 틀린 문제는 나중에 다시 나와요.</p>
+  </section>
+
+  <Card title="오늘 다시 볼 문제">
+    <div data-quiz-due="quiz">
+      <ListRow href={quizPlayPath('due')} icon="clock" title="다시 볼 문제 풀기" description="문제를 풀면 다시 볼 문제가 여기에 모여요." />
+    </div>
+  </Card>
+
+  <Card title="처음 보는 문제">
+    <ListRow href={quizPlayPath('new')} icon="list-checks" title="처음 보는 문제 풀기" description="아직 안 푼 문제를 모든 영역에서 골라요." />
+  </Card>
+
+  <Card title="영역별로 풀기">
+    {domains.map((d) => <ListRow href={quizPlayPath(`domain:${d.id}`)} icon={d.icon} title={d.name} meta={`${counts.byDomain.get(d.id)}문제`} />)}
+  </Card>
+
+  <p class="quiz-note">기록은 이 브라우저에만 남아요. 다른 기기나 브라우저와는 이어지지 않아요.</p>
+</BaseLayout>
+
+<script>
+  import { initQuizDue } from '../../scripts/quiz-home';
+  initQuizDue();
+</script>
+
+<style>
+  .quiz-note {
+    margin: 16px 4px 0;
+    font-size: 14px;
+    color: var(--color-text-weak);
+  }
+</style>

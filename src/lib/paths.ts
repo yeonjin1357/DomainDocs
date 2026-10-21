@@ -22,3 +22,19 @@ export function domainPath(domain: string): string {
 export function glossaryPath(domain: string): string {
   return withBase(`terms/${domain}/`);
 }
+
+/** 퀴즈 홈 */
+export function quizHomePath(): string {
+  return withBase('quiz/');
+}
+
+/** 풀이 화면. scope는 due, new, domain:{영역}, doc:{글 id} 중 하나(src/lib/quiz/scope.ts). */
+export function quizPlayPath(scope?: string): string {
+  const path = withBase('quiz/play/');
+  return scope ? `${path}?scope=${encodeURIComponent(scope)}` : path;
+}
+
+/** 빌드할 때 만든 문제 은행 */
+export function quizBankPath(): string {
+  return withBase('quiz/bank.json');
+}
