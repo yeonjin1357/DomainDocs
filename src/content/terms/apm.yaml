@@ -1,0 +1,53 @@
+terms:
+  - id: http
+    name: HTTP
+    en: Hypertext Transfer Protocol
+    aliases: [http, HTTPS, 에이치티티피]
+    short: 요청 하나에 응답 하나가 짝을 이루는 웹의 통신 약속이에요. 요청마다 따로라 상태를 기억하지 않아요.
+    analogy: 업무 종류와 계좌를 적어 내는 은행 신청서와 같아요.
+    doc: apm/http-basics
+  - id: status-code
+    name: 상태 코드
+    en: HTTP status code
+    aliases: [status code, 응답 코드, 2xx, 4xx, 5xx]
+    short: 응답 첫 줄의 세 자리 숫자예요. 첫 숫자가 성공(2), 요청 쪽 잘못(4), 서버 쪽 잘못(5)을 나눠요.
+    doc: apm/http-basics
+  - id: idempotent
+    name: 멱등
+    en: Idempotent
+    aliases: [idempotent, idempotency, 멱등성]
+    short: 같은 요청을 여러 번 보내도 한 번 보낸 것과 결과가 같은 성질이에요. GET·PUT·DELETE가 그래요.
+    doc: apm/http-basics
+  - id: load-balancer
+    name: 로드 밸런서
+    en: Load balancer
+    aliases: [load balancer, LB, L4, L7, 부하 분산기]
+    short: 같은 일을 하는 서버 여러 대에 들어온 요청을 나눠 주는 장비나 프로그램이에요.
+    doc: apm/overview
+  - id: web-server
+    name: 웹 서버
+    en: Web server
+    aliases: [web server, nginx, Apache, httpd, IIS]
+    short: 정적 파일을 바로 돌려주고, 앱 코드가 필요한 요청은 뒤의 WAS로 넘기는 서버예요.
+    analogy: 안내 책자는 바로 건네고 업무는 창구로 보내는 은행 안내 데스크와 같아요.
+    doc: apm/web-server-and-was
+  - id: reverse-proxy
+    name: 리버스 프록시
+    en: Reverse proxy
+    aliases: [reverse proxy, 프록시, proxy, 게이트웨이]
+    short: 앞에서 요청을 받아 뒤의 서버로 넘겨 주는 역할이에요. 뒤의 서버가 여럿이면 나눠 줄 수도 있어요.
+    doc: apm/web-server-and-was
+  - id: was
+    name: WAS
+    en: Web Application Server
+    aliases: [웹 애플리케이션 서버, Tomcat, JEUS, WebLogic, 앱 서버]
+    short: 앱 코드를 실행해 요청에 맞는 응답을 만드는 서버예요.
+    analogy: 손님의 업무를 실제로 처리하는 은행 창구와 같아요.
+    doc: apm/web-server-and-was
+  - id: thread-pool
+    name: 스레드 풀
+    en: Thread pool
+    aliases: [thread pool, worker pool, maxThreads, 작업 스레드 풀]
+    short: 요청을 처리할 스레드를 정해 둔 수만큼 묶어 두고 돌려 쓰는 방식이에요.
+    analogy: 정해진 수의 창구 직원이 손님을 번갈아 맡는 것과 같아요.
+    doc: apm/web-server-and-was

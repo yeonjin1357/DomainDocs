@@ -298,7 +298,7 @@ updated: 2026-10-13
 | `Waterfall` | `spans`, `ariaLabel`, `unit?` | 트레이스 워터폴. `spans`는 `{ label, start, duration, depth?, tone? }` 배열이고, 가장 늦게 끝나는 구간이 막대 끝이에요 |
 | `Scatter` | `groups`, `ariaLabel`, `xMax`, `yMax`, `yTicks?`, `unit?`, `xLabels?` | 응답시간 분포도. `groups`는 `{ count, x: [시작, 끝], y: [아래, 위], skew?, tone?, label? }` 배열이고, 범위 안에 점을 `count`개 흩뿌려요. 범위의 두 값이 같으면 가로줄·세로줄이 돼요 |
 | `ServiceMap` | `nodes`, `edges`, `ariaLabel`, `height?` | 서비스 맵. `nodes`는 `{ id, label, x, y, note?, tone?, virtual? }`(x·y는 %), `edges`는 `{ from, to, label?, tone? }` 배열이에요. 화살표가 없어서 부르는 쪽을 왼쪽에 두고 `caption`에 밝혀요. `virtual`은 점선으로 그려요 |
-| `Flow` | `nodes`, `edges`, `ariaLabel`, `groups?` | 구조도(화살표 있는 상자). `nodes`는 `{ id, label, col, row, note?, tone? }`(칸 위치), `edges`는 `{ from, to, label?, tone?, both?, dashed? }`, `groups`는 `{ label, cols: [시작, 끝], rows: [시작, 끝] }` 배열이에요. 한 줄에 3칸까지가 360px에서 읽혀요. 상자 이름은 8자 안팎으로 써요. 글자를 붙인 가로 화살표는 상자 사이에 빈 칸을 하나 둬요 |
+| `Flow` | `nodes`, `edges`, `ariaLabel`, `groups?` | 구조도(화살표 있는 상자). `nodes`는 `{ id, label, col, row, note?, tone? }`(칸 위치), `edges`는 `{ from, to, label?, tone?, both?, dashed? }`, `groups`는 `{ label, cols: [시작, 끝], rows: [시작, 끝] }` 배열이에요. 한 줄에 3칸까지가 360px에서 읽혀요. 상자 이름은 8자 안팎으로 써요. 글자를 붙인 가로 화살표는 상자 사이에 빈 칸을 하나 둬요. 묶음(groups) 테두리를 지나는 화살표에는 글자를 붙이지 않아요. 테두리 위의 묶음 이름과 겹쳐요 |
 | `Sequence` | `participants`, `messages`, `ariaLabel` | 주고받기 순서. 참여자 2~4명, `messages`는 `{ from, to, label, tone?, dashed? }` 배열이고 위에서 아래로 시간 순이에요. 돌아오는 응답은 `dashed`로 그려요 |
 | `Layers` | `layers`, `ariaLabel` | 계층도. `layers`는 위층부터 `{ label, note?, tone? }` 배열이에요 |
 | `Compare` | `columns`, `rows` | 두 가지 비교. `columns`는 두 열 이름, `rows`는 `{ label, values: [왼쪽, 오른쪽] }` 배열이에요 |

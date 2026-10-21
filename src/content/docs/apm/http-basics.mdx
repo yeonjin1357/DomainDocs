@@ -1,0 +1,105 @@
+---
+title: HTTP 요청과 응답
+summary: HTTP는 메서드와 주소로 요청하고, 상태 코드와 본문으로 응답하는 약속이에요.
+domain: apm
+type: concept
+stage: basics
+order: 10
+icon: activity
+keywords: [HTTP, 요청, 응답, method, 메서드, status code, 상태 코드, 5xx, 4xx, idempotent]
+related: [apm/overview, apm/web-server-and-was, apm/errors-and-exceptions, apm/timeouts-and-retries]
+sources:
+  - title: RFC 9110 — HTTP Semantics
+    url: https://www.rfc-editor.org/rfc/rfc9110.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="요청은 메서드와 주소로 시작해요">
+    무엇을 할지(메서드)와 어디에 할지(주소)를 먼저 적고, 필요한 정보는 헤더와 본문에 담아요.
+  </Point>
+  <Point title="상태 코드 첫 숫자가 결과의 갈래예요">
+    2로 시작하면 성공, 4로 시작하면 요청한 쪽 잘못, 5로 시작하면 서버 쪽 잘못이에요.
+  </Point>
+  <Point title="다시 보내도 되는 요청이 정해져 있어요">
+    GET·PUT·DELETE는 여러 번 보내도 결과가 같아요. POST는 다시 보내면 두 번 처리될 수 있어요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="은행 직원은 지난번에 온 손님을 기억하지만, HTTP는 요청마다 따로예요. 로그인 같은 상태는 쿠키 같은 정보에 담아 요청마다 다시 실어 보내요.">
+  HTTP 요청은 은행 신청서와 같아요. 업무 종류(메서드)와 계좌(주소)를 적고, 필요한 서류(본문)를 붙여 내면, 결과 코드가 적힌 통지서(응답)를 받아요.
+</Analogy>
+
+## 요청과 응답의 생김새
+
+<Term term="apm/http">HTTP</Term>는 요청 하나에 응답 하나가 짝을 이루는 약속이에요. 표준 문서는 HTTP를 상태를 기억하지 않는(stateless) 요청·응답 규약이라고 설명해요.
+
+```text
+GET /orders/42 HTTP/1.1
+Host: shop.example.com
+Accept: application/json
+```
+
+```text
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"id": 42, "status": "paid"}
+```
+
+요청의 첫 줄은 메서드(`GET`)와 주소(`/orders/42`)예요. 응답의 첫 줄에는 <Term term="apm/status-code">상태 코드</Term>(`200`)가 와요. 그 아래 줄들은 헤더이고, 빈 줄 뒤가 본문이에요.
+
+## 메서드
+
+| 메서드 | 하는 일 | 안전 | 여러 번 보내도 같음 |
+| --- | --- | --- | --- |
+| GET | 가져와요 | 예 | 예 |
+| POST | 새로 만들거나 처리해요 | 아니요 | 아니요 |
+| PUT | 통째로 바꿔요 | 아니요 | 예 |
+| DELETE | 지워요 | 아니요 | 예 |
+
+안전한 메서드는 서버의 데이터를 바꾸지 않아요. 여러 번 보내도 결과가 같은 성질을 <Term term="apm/idempotent">멱등</Term>이라고 불러요. 표준은 PUT, DELETE와 안전한 메서드를 멱등으로 정해요.
+
+## 상태 코드
+
+상태 코드는 세 자리 숫자이고, 첫 숫자가 결과의 갈래를 정해요.
+
+| 갈래 | 뜻 | 자주 보는 코드 |
+| --- | --- | --- |
+| 2xx | 요청을 받아 잘 처리했어요 | 200 |
+| 3xx | 다른 곳으로 가야 해요 | 301, 302 |
+| 4xx | 요청한 쪽이 잘못한 것 같아요 | 400, 401, 404 |
+| 5xx | 서버가 잘못한 걸 알아요 | 500, 502, 503, 504 |
+
+502와 504는 서버 앞단의 장비(게이트웨이나 프록시)가 만드는 코드예요. 502는 뒤의 서버에서 잘못된 응답을 받은 경우이고, 504는 뒤의 서버에서 제때 응답을 받지 못한 경우예요.
+
+503은 잠시 과부하나 점검 중이라 요청을 처리할 수 없다는 뜻이에요. 앱이 직접 보내기도 하고, 앞단 장비가 보내기도 해요.
+
+## 다시 보내도 되나요
+
+네트워크가 끊기거나 응답이 늦으면 앱은 요청을 다시 보내고 싶어져요. 이때 멱등인지가 기준이에요. GET이나 PUT은 다시 보내도 결과가 같지만, 주문을 만드는 POST를 다시 보내면 주문이 두 번 생길 수 있어요.
+
+재시도를 언제 어떻게 할지는 <Term slug="apm/timeouts-and-retries">타임아웃과 재시도</Term>에서 다뤄요.
+
+## 모니터링에서는
+
+APM은 요청을 메서드와 주소로 묶어 트랜잭션으로 보여 줘요. 이때 `/orders/42`처럼 ID가 든 주소는 `/orders/{id}`처럼 묶어야 같은 기능끼리 모여요.
+
+오류율은 보통 응답 상태 코드로 계산해요. 4xx와 5xx는 원인이 달라서 나눠 봐요. 예외까지 함께 보는 법은 <Term slug="apm/errors-and-exceptions">에러와 예외</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>4xx까지 서버 오류율에 섞어 알림을 보낸다면 다시 보세요. 404나 401은 대개 요청한 쪽 문제예요. 5xx와 나눠서 보세요.</Check>
+  <Check>POST 요청을 자동으로 재시도하는 코드라면 다시 보세요. 같은 주문이나 결제가 두 번 처리될 수 있어요.</Check>
+  <Check>502나 504가 늘었는데 WAS 로그에는 오류가 없다면, 앞단 장비가 만든 응답일 수 있어요. 웹 서버나 로드 밸런서 쪽 기록을 함께 보세요.</Check>
+  <Check>트랜잭션 이름에 주문 번호 같은 ID가 그대로 들어간다면 다시 보세요. 주소마다 따로 묶여 이름이 끝없이 늘어나요. 이 문제는 <Term slug="foundations/cardinality-explosion">카디널리티 폭발</Term>에서 다뤄요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 상태 코드 갈래의 정의
+
+  표준 문서는 1xx를 요청을 받아 처리를 이어 가는 중, 2xx를 요청을 받아 이해하고 받아들인 것으로 정의해요. 3xx는 사용자 쪽에서 더 할 일이 있다는 뜻이에요. 4xx는 클라이언트가 잘못한 것 같다는 뜻이고, 5xx는 서버가 자기 잘못을 안다는 뜻이에요.
+
+  ### 안전과 멱등
+
+  표준은 GET, HEAD, OPTIONS, TRACE를 안전한 메서드로 정해요. 멱등은 같은 요청을 여러 번 보낸 효과가 한 번 보낸 효과와 같다는 뜻이에요.
+</Deeper>

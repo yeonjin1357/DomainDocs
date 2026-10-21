@@ -1,0 +1,111 @@
+---
+title: 웹 서버와 WAS
+summary: 웹 서버는 정적 파일과 요청 전달을 맡고, WAS는 앱 코드를 실행해 응답을 만들어요.
+domain: apm
+type: concept
+stage: basics
+order: 20
+icon: server
+keywords: [web server, 웹 서버, WAS, nginx, Apache, Tomcat, JEUS, reverse proxy, 리버스 프록시, "504"]
+related: [apm/overview, apm/http-basics, apm/throughput-and-concurrency, apm/timeouts-and-retries]
+sources:
+  - title: nginx — ngx_http_proxy_module
+    url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
+  - title: nginx — ngx_http_upstream_module
+    url: https://nginx.org/en/docs/http/ngx_http_upstream_module.html
+  - title: nginx — ngx_http_log_module ($request_time)
+    url: https://nginx.org/en/docs/http/ngx_http_log_module.html
+  - title: Apache Tomcat — Home
+    url: https://tomcat.apache.org/
+  - title: Apache Tomcat 10.1 — The HTTP Connector
+    url: https://tomcat.apache.org/tomcat-10.1-doc/config/http.html
+  - title: RFC 9110 — HTTP Semantics (502, 504)
+    url: https://www.rfc-editor.org/rfc/rfc9110.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="웹 서버는 문지기예요">
+    이미지 같은 정적 파일은 바로 돌려주고, 나머지 요청은 뒤의 WAS로 넘겨요.
+  </Point>
+  <Point title="WAS는 앱 코드를 실행해요">
+    요청마다 스레드 하나가 맡아 코드를 실행해요. 스레드 수에는 한도가 있어요.
+  </Point>
+  <Point title="둘 사이에도 시간 제한이 있어요">
+    WAS의 응답이 정한 시간 안에 오지 않으면, 웹 서버는 기다리기를 그만두고 보통 504를 돌려줘요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="은행 안내 데스크는 창구가 늦어도 손님을 계속 기다리게 하지만, 웹 서버는 정한 시간이 지나면 WAS의 응답을 포기해요.">
+  웹 서버는 은행 안내 데스크예요. 안내 책자(정적 파일)는 바로 건네고, 업무가 있는 손님은 창구(WAS)로 보내요. 창구 직원(스레드) 수는 정해져 있어서, 다 바쁘면 손님은 줄을 서요.
+</Analogy>
+
+## 웹 서버가 하는 일
+
+<Term term="apm/web-server">웹 서버</Term>는 nginx나 Apache 같은 프로그램이에요. 이미지, CSS, 자바스크립트 같은 정적 파일은 디스크에서 읽어 바로 돌려줘요.
+
+앱 코드가 필요한 요청은 뒤에 있는 WAS로 넘겨요. 이렇게 앞에서 요청을 받아 뒤의 서버로 넘겨 주는 역할을 <Term term="apm/reverse-proxy">리버스 프록시</Term>라고 불러요. 뒤의 서버가 여러 대면 그중 하나를 골라 넘길 수도 있어요.
+
+## WAS가 하는 일
+
+<Term term="apm/was">WAS</Term>(웹 애플리케이션 서버)는 앱 코드를 실행해 응답을 만드는 서버예요. 자바에서는 Tomcat, JEUS, WebLogic 같은 제품이 이 일을 해요. Tomcat은 자바 서블릿 같은 표준을 구현한 서버예요.
+
+<Figure caption="웹 서버는 정적 파일을 바로 주고, 나머지를 WAS로 넘겨요. WAS 안에서는 스레드 하나가 요청 하나를 맡아요.">
+  <Flow
+    ariaLabel="요청이 웹 서버로 들어와 정적 파일은 바로 응답하고, 나머지는 WAS의 스레드 풀로 넘어가 스레드가 앱 코드를 실행하는 구조도"
+    nodes={[
+      { id: 'req', label: '요청', col: 0, row: 0 },
+      { id: 'web', label: '웹 서버', col: 1, row: 0, tone: 'accent' },
+      { id: 'static', label: '정적 파일', col: 2, row: 0, note: '바로 응답' },
+      { id: 'pool', label: '스레드 풀', col: 1, row: 1, note: '최대 200개' },
+      { id: 'code', label: '앱 코드', col: 1, row: 2, note: 'DB·API 호출' },
+    ]}
+    edges={[
+      { from: 'req', to: 'web', tone: 'accent' },
+      { from: 'web', to: 'static' },
+      { from: 'web', to: 'pool', tone: 'accent' },
+      { from: 'pool', to: 'code', tone: 'accent' },
+    ]}
+    groups={[{ label: 'WAS', cols: [1, 1], rows: [1, 2] }]}
+  />
+</Figure>
+
+WAS는 요청이 오면 스레드 묶음(<Term term="apm/thread-pool">스레드 풀</Term>)에서 하나를 꺼내 맡겨요. Tomcat은 기본으로 이 스레드를 최대 200개까지 만들어요. 그래서 동시에 처리하는 요청도 최대 200개예요.
+
+스레드가 모두 바쁘면 새 요청은 WAS 안에서 차례를 기다려요. 연결 수가 한도(Tomcat 기본 8,192개)까지 차면, 그 뒤 연결은 운영체제의 대기열(기본 100개)에서 기다려요.
+
+이 대기열마저 차면 운영체제가 새 연결을 거부하거나, 연결이 시간 초과로 끝나요.
+
+## 둘 사이의 시간 제한
+
+웹 서버는 WAS의 응답을 무한정 기다리지 않아요. nginx는 기본으로 60초 동안 WAS에서 아무것도 오지 않으면 연결을 끊어요. 이때 브라우저는 보통 504(제때 응답을 받지 못함)를 받아요.
+
+WAS가 아예 죽어 있거나 이상한 응답을 주면 502(잘못된 응답을 받음)가 나요. 두 코드 모두 웹 서버가 만든 응답이라, WAS의 기록에는 남지 않을 수 있어요.
+
+## 모니터링에서는
+
+APM 에이전트는 보통 WAS 안에서 요청이 들어오고 나가는 지점을 재요. 그래서 APM의 응답시간에는 웹 서버까지 오는 시간과 대기열에서 기다린 시간이 빠져요.
+
+웹 서버는 따로 시간을 남겨요. nginx의 `$request_time`은 클라이언트에게서 첫 바이트를 받은 때부터 응답을 다 보낼 때까지예요. `$upstream_response_time`은 WAS에서 응답을 받는 데 쓴 시간이에요.
+
+웹 서버 쪽 시간이 APM 응답시간보다 훨씬 길다면, 그 사이에서 기다린 거예요.
+
+<Checkpoints>
+  <Check>APM 응답시간은 빠른데 사용자는 느리다고 한다면 웹 서버의 시간도 함께 보세요. WAS 앞에서 줄을 서거나 네트워크에서 쓴 시간은 APM에 안 보여요.</Check>
+  <Check>504가 늘었다면 WAS가 느려져 웹 서버의 시간 제한(nginx 기본 60초)을 넘긴 거예요. WAS의 느린 트랜잭션을 찾아보세요.</Check>
+  <Check>WAS의 최대 스레드 수를 크게만 늘리자는 제안이라면 다시 보세요. 스레드가 늘면 DB 연결과 메모리도 더 쓰고, 느린 곳이 DB라면 줄만 옮겨 가요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### nginx의 시간 제한 규칙
+
+  nginx의 `proxy_read_timeout`은 응답 전체가 아니라, 뒤의 서버에서 연달아 읽는 두 번 사이의 시간이에요. 그 시간 동안 아무것도 오지 않으면 연결을 닫아요. 기본값은 60초예요.
+
+  ### Tomcat의 연결 한도
+
+  Tomcat은 처리 중인 연결이 `maxConnections`(기본 8192)에 닿으면 하나만 더 받아요. 그 뒤 연결은 운영체제의 대기열(`acceptCount`, 기본 100)에 맡겨요. `maxThreads`(기본 200)는 동시에 요청을 처리하는 스레드 수예요.
+
+  ### 서버 묶음
+
+  nginx는 `upstream`으로 같은 일을 하는 서버들을 묶어 두고, 요청마다 그중 하나로 넘길 수 있어요.
+</Deeper>

@@ -1,0 +1,62 @@
+---
+title: 요청 하나가 앱을 지나가는 길
+summary: 브라우저의 요청은 로드 밸런서와 웹 서버를 거쳐 WAS에서 처리되고, 같은 길로 응답이 돌아와요.
+domain: apm
+type: overview
+order: 0
+icon: activity
+keywords: [애플리케이션, application, 요청 흐름, request flow, WAS, 웹 서버, 로드 밸런서, HTTP, APM, 트랜잭션]
+related: [apm/http-basics, apm/web-server-and-was, apm/transactions-and-response-time, apm/trace-waterfall]
+sources:
+  - title: RFC 9110 — HTTP Semantics
+    url: https://www.rfc-editor.org/rfc/rfc9110.html
+  - title: nginx — ngx_http_proxy_module
+    url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
+  - title: Apache Tomcat — Home
+    url: https://tomcat.apache.org/
+updated: 2026-10-21
+---
+
+<Analogy limit="은행 손님은 한 명씩 오지만, 웹 요청은 짧은 메시지라 1초에 수천 개가 몰려와요. 그래서 창구 수와 대기 줄이 앱 성능을 크게 좌우해요.">
+  앱은 은행 지점과 비슷해요. 손님(요청)이 오면 안내 데스크(웹 서버)가 창구(WAS)로 보내요. 창구 직원(스레드)은 금고(DB)나 다른 은행(외부 API)에 확인한 뒤 결과를 돌려줘요.
+</Analogy>
+
+## 요청 하나가 지나가는 길
+
+<Figure caption="브라우저의 요청은 로드 밸런서와 웹 서버를 거쳐 WAS에 닿아요. WAS는 DB와 외부 API를 부른 뒤 응답을 만들어 같은 길로 돌려보내요.">
+  <Flow
+    ariaLabel="브라우저가 로드 밸런서와 웹 서버를 거쳐 WAS에 요청하고, WAS가 DB와 외부 API를 부르는 구조도"
+    nodes={[
+      { id: 'browser', label: '브라우저', col: 0, row: 0 },
+      { id: 'lb', label: '로드 밸런서', col: 1, row: 0 },
+      { id: 'web', label: '웹 서버', col: 2, row: 0 },
+      { id: 'was', label: 'WAS', col: 2, row: 1, note: '앱 코드 실행', tone: 'accent' },
+      { id: 'db', label: 'DB', col: 1, row: 2 },
+      { id: 'api', label: '외부 API', col: 2, row: 2 },
+    ]}
+    edges={[
+      { from: 'browser', to: 'lb', tone: 'accent' },
+      { from: 'lb', to: 'web', tone: 'accent' },
+      { from: 'web', to: 'was', tone: 'accent' },
+      { from: 'was', to: 'db' },
+      { from: 'was', to: 'api' },
+    ]}
+  />
+</Figure>
+
+1. **요청**: 브라우저나 다른 서버가 <Term term="apm/http">HTTP</Term> 요청을 보내요. "주문 42번을 보여 줘" 같은 요청이에요.
+2. **나눠 주기**: <Term term="apm/load-balancer">로드 밸런서</Term>가 같은 일을 하는 서버 여러 대 중 하나를 골라 넘겨요.
+3. **문지기**: <Term term="apm/web-server">웹 서버</Term>가 이미지 같은 정적 파일은 바로 돌려주고, 나머지 요청은 뒤의 WAS로 넘겨요.
+4. **처리**: <Term term="apm/was">WAS</Term>에서 스레드 하나가 이 요청을 맡아 앱 코드를 실행해요. 필요하면 DB와 외부 API를 불러요.
+5. **응답**: 만든 응답이 온 길을 거꾸로 거쳐 브라우저로 돌아가요.
+
+## APM은 이 길을 재요
+
+APM(애플리케이션 성능 모니터링)은 이 길에서 요청 하나가 어디에 시간을 썼는지 재요. 요청 하나를 <Term slug="apm/transactions-and-response-time">트랜잭션</Term>이라 부르고, 그 안에서 DB나 외부 API를 부른 구간은 <Term slug="apm/trace-waterfall">워터폴</Term>로 보여 줘요.
+
+서비스 여러 개가 서로 부르는 모습은 <Term slug="apm/service-map">서비스 맵</Term>으로 그려요. 이런 모니터링 글은 아래 기초를 읽은 뒤 이어 보면 더 잘 읽혀요.
+
+## 단계를 하나씩 확대해 봐요
+
+- 요청과 응답의 생김새는 <Term slug="apm/http-basics">HTTP 요청과 응답</Term>에서 다뤄요.
+- 웹 서버와 WAS가 나눠 맡는 일은 <Term slug="apm/web-server-and-was">웹 서버와 WAS</Term>에서 다뤄요.
