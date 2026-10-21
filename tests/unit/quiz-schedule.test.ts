@@ -37,17 +37,30 @@ describe('상자 옮기기', () => {
 
   it('상자마다 간격은 1·3·7·14·30일이고, 5에서 맞혀도 5에 머문다', () => {
     let rec = applyResult(undefined, false, '2026-01-01');
-    expect(rec.box).toBe(1);
-    rec = applyResult(rec, true, '2026-01-01');
-    expect([rec.box, rec.due]).toEqual([2, '2026-01-04']);
-    rec = applyResult(rec, true, '2026-01-01');
-    expect([rec.box, rec.due]).toEqual([3, '2026-01-08']);
-    rec = applyResult(rec, true, '2026-01-01');
-    expect([rec.box, rec.due]).toEqual([4, '2026-01-15']);
-    rec = applyResult(rec, true, '2026-01-01');
-    expect([rec.box, rec.due]).toEqual([5, '2026-01-31']);
-    rec = applyResult(rec, true, '2026-01-01');
-    expect([rec.box, rec.due]).toEqual([5, '2026-01-31']);
+    expect([rec.box, rec.due]).toEqual([1, '2026-01-02']);
+    rec = applyResult(rec, true, rec.due);
+    expect([rec.box, rec.due]).toEqual([2, '2026-01-05']);
+    rec = applyResult(rec, true, rec.due);
+    expect([rec.box, rec.due]).toEqual([3, '2026-01-12']);
+    rec = applyResult(rec, true, rec.due);
+    expect([rec.box, rec.due]).toEqual([4, '2026-01-26']);
+    rec = applyResult(rec, true, rec.due);
+    expect([rec.box, rec.due]).toEqual([5, '2026-02-25']);
+    rec = applyResult(rec, true, rec.due);
+    expect([rec.box, rec.due]).toEqual([5, '2026-03-27']);
+  });
+
+  it('때가 되기 전에 다시 풀어 맞히면 상자와 다시 나올 날은 그대로다', () => {
+    // 틀린 문제를 결과 화면에서 바로 다시 풀어 맞혀도, 내일 다시 나와야 한다.
+    const wrongToday = applyResult(undefined, false, '2026-10-21');
+    expect(applyResult(wrongToday, true, '2026-10-21')).toEqual({ box: 1, due: '2026-10-22', right: 1, wrong: 1 });
+    const box3 = { box: 3, due: '2026-10-25', right: 2, wrong: 0 };
+    expect(applyResult(box3, true, '2026-10-21')).toEqual({ box: 3, due: '2026-10-25', right: 3, wrong: 0 });
+  });
+
+  it('때가 되기 전에 다시 풀어 틀리면 상자 1로 돌아간다', () => {
+    const box3 = { box: 3, due: '2026-10-25', right: 2, wrong: 0 };
+    expect(applyResult(box3, false, '2026-10-21')).toEqual({ box: 1, due: '2026-10-22', right: 2, wrong: 1 });
   });
 
   it('due가 오늘이거나 지났으면 다시 볼 문제다', () => {

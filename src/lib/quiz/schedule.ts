@@ -29,8 +29,12 @@ export function addDays(date: string, n: number): string {
   return `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}`;
 }
 
-/** 처음 보는 문제는 상자 1에 있다고 본다. 맞히면 한 칸 위, 틀리면 1로. */
+/**
+ * 처음 보는 문제는 상자 1에 있다고 본다. 맞히면 한 칸 위, 틀리면 1로.
+ * 때가 되기 전에 다시 풀어 맞히면(틀린 문제 바로 다시 풀기 등) 상자와 날짜는 그대로 둔다.
+ */
 export function applyResult(rec: QuizRecord | undefined, correct: boolean, today: string): QuizRecord {
+  if (correct && rec && !isDue(rec, today)) return { ...rec, right: rec.right + 1 };
   const box = correct ? Math.min((rec?.box ?? 1) + 1, BOX_DAYS.length) : 1;
   return {
     box,
