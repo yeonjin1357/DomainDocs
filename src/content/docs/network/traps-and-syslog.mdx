@@ -1,0 +1,106 @@
+---
+title: SNMP Trap과 Syslog
+summary: Trap과 Syslog는 장비가 일이 생기면 먼저 보내는 알림이에요. 대신 사라질 수도 있어요.
+domain: network
+type: concept
+stage: basics
+order: 50
+icon: activity
+keywords: [SNMP trap, 트랩, inform, syslog, 시스로그, severity, 심각도, linkDown, UDP 514, UDP 162]
+related: [network/snmp, network/interfaces-and-traffic, foundations/logs-metrics-traces, foundations/alert-conditions]
+sources:
+  - title: RFC 3416 — Version 2 of the Protocol Operations for SNMP (Trap, Inform)
+    url: https://www.rfc-editor.org/rfc/rfc3416.html
+  - title: RFC 3417 — Transport Mappings for SNMP (port 162)
+    url: https://www.rfc-editor.org/rfc/rfc3417.html
+  - title: RFC 2863 — The Interfaces Group MIB (linkDown, linkUp)
+    url: https://www.rfc-editor.org/rfc/rfc2863.html
+  - title: RFC 5424 — The Syslog Protocol
+    url: https://www.rfc-editor.org/rfc/rfc5424.html
+  - title: RFC 5426 — Transmission of Syslog Messages over UDP
+    url: https://www.rfc-editor.org/rfc/rfc5426.html
+  - title: RFC 5425 — Transport Layer Security (TLS) Transport Mapping for Syslog
+    url: https://www.rfc-editor.org/rfc/rfc5425.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="장비가 먼저 알려요">
+    폴링은 관리 서버가 물어야 알지만, Trap과 Syslog는 장비가 일이 생기면 바로 보내요.
+  </Point>
+  <Point title="Trap은 SNMP 형식의 알림이에요">
+    관리 서버의 UDP 162번 포트로 보내요. 받았다는 답이 없어서, 중간에 사라져도 장비는 몰라요.
+  </Point>
+  <Point title="Syslog는 글로 된 이벤트 기록이에요">
+    0(가장 심각)부터 7(디버그)까지 심각도를 붙여 보내요. 숫자가 작을수록 심각해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="병원 호출 벨은 누르면 반드시 울리지만, UDP로 보낸 Trap과 Syslog는 중간에 사라져도 아무도 몰라요.">
+  폴링은 간호사가 정해진 시간에 병실을 돌며 묻는 거예요. Trap은 환자가 누르는 호출 벨, Syslog는 환자가 쓰는 일지를 그때그때 보내 주는 거예요.
+</Analogy>
+
+## 폴링과 알림
+
+<Figure caption="폴링은 수집 사이의 짧은 변화를 놓치고, 알림은 전송 중에 사라질 수 있어요. 그래서 둘을 함께 써요.">
+  <Compare
+    columns={['폴링(GET)', 'Trap·Syslog']}
+    rows={[
+      { label: '누가 먼저', values: ['관리 서버가 물어요', '장비가 먼저 보내요'] },
+      { label: '알게 되는 때', values: ['다음 수집 때', '일이 생긴 즉시'] },
+      { label: '놓칠 수 있는 것', values: ['수집 사이의 짧은 변화', '전송 중에 사라진 알림'] },
+    ]}
+  />
+</Figure>
+
+## SNMP Trap
+
+<Term term="network/snmp-trap">Trap</Term>은 장비의 SNMP 에이전트가 정해진 일이 생겼을 때 관리 서버로 보내는 알림이에요. 받는 쪽은 보통 UDP 162번 포트에서 기다려요.
+
+예를 들어 인터페이스 표준(IF-MIB)에는 linkDown과 linkUp Trap이 있어요. 인터페이스의 동작 상태가 down으로 바뀌려 할 때 linkDown을, down에서 벗어나면 linkUp을 보내요.
+
+Trap에는 받았다는 확인이 없어요. 받았다고 답을 받는 알림이 필요하면 Inform을 써요. 받는 쪽이 같은 요청 번호로 Response를 돌려줘서, 보낸 쪽이 받았는지 알 수 있어요.
+
+## Syslog
+
+<Term term="network/syslog">Syslog</Term>는 장비가 남기는 이벤트 기록을 다른 서버로 보내는 표준이에요. 메시지마다 심각도와 시설(어느 부분에서 난 기록인지)을 붙여요.
+
+| 심각도 | 이름 | 뜻 |
+| --- | --- | --- |
+| 0 | Emergency | 시스템을 쓸 수 없어요 |
+| 1 | Alert | 바로 조치해야 해요 |
+| 2 | Critical | 치명적인 상태예요 |
+| 3 | Error | 오류 상태예요 |
+| 4 | Warning | 경고 상태예요 |
+| 5 | Notice | 정상이지만 눈여겨볼 일이에요 |
+| 6 | Informational | 알림 메시지예요 |
+| 7 | Debug | 디버그 메시지예요 |
+
+Syslog를 받는 쪽은 UDP 514번 포트를 받아야 해요. UDP는 받았는지 확인하지 않아서, 네트워크가 붐비거나 잠깐 끊기면 메시지가 사라져요. Syslog에는 받았다는 답이 없어서 다시 보낼 방법도 없어요.
+
+## 모니터링에서는
+
+네트워크 장비 화면의 이벤트 목록은 Trap과 Syslog를 모아 보여 줘요. 심각도와 장비, 인터페이스로 거르고, 같은 일이 짧은 시간에 여러 번 오면 묶어서 보여 줘요.
+
+알림이 사라질 수 있으니, 중요한 상태는 폴링으로도 확인해요. 예를 들어 linkDown Trap을 놓쳐도, 다음 폴링에서 ifOperStatus가 down이면 알아요.
+
+<Checkpoints>
+  <Check>인터페이스 장애를 Trap만으로 감지한다면 다시 보세요. Trap은 UDP라 사라져도 몰라요. 폴링한 동작 상태(ifOperStatus)로도 확인하세요.</Check>
+  <Check>Syslog 심각도를 "3 이상"처럼 거르는 화면이라면 숫자 방향을 다시 보세요. 0이 가장 심각하고 7이 가장 가벼워요. 오류 이상을 보려면 3 이하예요.</Check>
+  <Check>장비마다 보낸 시각으로 이벤트를 줄 세운다면 장비 시계가 맞는지 보세요. 시계가 어긋난 장비의 이벤트는 순서가 엉켜 보여요.</Check>
+  <Check>중요한 Syslog를 UDP로만 받는다면, 잃어버려도 괜찮은지 따져 보세요. TLS(TCP) 전송 표준도 있어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### PRI 값 읽기
+
+  Syslog 메시지 맨 앞의 `<187>` 같은 숫자는 PRI예요. 시설 번호에 8을 곱하고 심각도를 더한 값이에요. 187이면 23 × 8 + 3이라, 시설 23(local7)에 심각도 3(Error)이에요.
+
+  ### Trap과 Inform
+
+  SNMP 표준은 Trap에 받았다는 확인이 따로 없다고 해요. Inform은 확인이 있는 알림이라, 받는 쪽이 같은 request-id로 Response를 보내요. 받는 쪽이 꺼져 있었다면 보낸 쪽이 알고 다시 보낼 수 있어요.
+
+  ### 시설 값
+
+  Syslog의 시설 값은 0부터 23까지예요. 장비마다 어떤 기능의 기록에 어떤 시설을 쓰는지는 설정으로 정해요.
+</Deeper>

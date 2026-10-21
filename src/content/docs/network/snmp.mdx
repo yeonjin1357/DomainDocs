@@ -1,0 +1,131 @@
+---
+title: SNMP
+summary: SNMP는 관리 서버가 장비에게 정해진 번호(OID)로 값을 물어 가져오는 표준 규약이에요.
+domain: network
+type: concept
+stage: basics
+order: 40
+icon: network
+keywords: [SNMP, MIB, OID, 커뮤니티, community, SNMPv3, 폴링, polling, sysUpTime, 벤더 MIB]
+related: [network/interfaces-and-traffic, network/traps-and-syslog, foundations/collection-interval]
+sources:
+  - title: RFC 3410 — Introduction and Applicability Statements for Internet-Standard Management Framework
+    url: https://www.rfc-editor.org/rfc/rfc3410.html
+  - title: RFC 3416 — Version 2 of the Protocol Operations for SNMP
+    url: https://www.rfc-editor.org/rfc/rfc3416.html
+  - title: RFC 3417 — Transport Mappings for SNMP
+    url: https://www.rfc-editor.org/rfc/rfc3417.html
+  - title: RFC 3418 — Management Information Base for SNMP (sysUpTime)
+    url: https://www.rfc-editor.org/rfc/rfc3418.html
+  - title: RFC 2863 — The Interfaces Group MIB
+    url: https://www.rfc-editor.org/rfc/rfc2863.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="관리 서버가 묻고 장비가 답해요">
+    장비 안의 SNMP 에이전트가 UDP 161번 포트에서 기다리다, 관리 서버가 물으면 값을 답해요.
+  </Point>
+  <Point title="값마다 번호(OID)가 있어요">
+    장비가 내놓는 값의 목록이 MIB, 값 하나하나의 주소가 OID예요. 같은 OID면 어느 장비든 같은 뜻이에요.
+  </Point>
+  <Point title="v1·v2c는 비밀번호가 그대로 보여요">
+    v1과 v2c는 커뮤니티 문자열이라는 평문 비밀번호만 써요. 표준 문서도 v3를 쓰라고 강하게 권해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="문진하는 간호사는 환자가 먼저 아프다고 말하면 듣지만, SNMP 폴링은 묻기 전까지 장비 소식을 몰라요. 장비가 먼저 알리는 건 Trap이라는 다른 방법이에요.">
+  관리 서버가 장비마다 돌며 문진표를 들고 묻는 것과 같아요. 문항마다 번호(OID)가 있어서 "3번 문항, 가동 시간은요?"처럼 물으면 장비가 답해요.
+</Analogy>
+
+## 묻고 답하기
+
+<Term term="network/snmp">SNMP</Term>에는 두 역할이 있어요. 값을 물어 모으는 <Term term="network/snmp-manager">관리 서버</Term>(매니저)와, 장비 안에서 답하는 <Term term="network/snmp-agent">에이전트</Term>예요.
+
+<Figure caption="관리 서버가 가동 시간과 받은 바이트를 묻고 장비가 답해요. 이 묻기를 정해진 간격으로 되풀이하는 것을 폴링이라고 불러요.">
+  <Sequence
+    ariaLabel="관리 서버가 장비에 가동 시간과 받은 바이트를 묻고 장비가 답한 뒤, 1분 뒤 다시 묻고 답하는 순서"
+    participants={['관리 서버', '장비(에이전트)']}
+    messages={[
+      { from: '관리 서버', to: '장비(에이전트)', label: 'GET 가동 시간, 받은 바이트' },
+      { from: '장비(에이전트)', to: '관리 서버', label: '값 두 개', dashed: true },
+      { from: '관리 서버', to: '장비(에이전트)', label: '1분 뒤 다시 GET', tone: 'accent' },
+      { from: '장비(에이전트)', to: '관리 서버', label: '새 값 두 개', dashed: true },
+    ]}
+  />
+</Figure>
+
+| 요청 | 하는 일 |
+| --- | --- |
+| GetRequest | 정한 OID의 값을 달라고 해요 |
+| GetNextRequest | 정한 OID의 바로 다음 OID 값을 달라고 해요 |
+| GetBulkRequest | 여러 값을 한 번에 달라고 해요 |
+| SetRequest | 값을 바꾸라고 해요 |
+| Response | 위 요청에 대한 답이에요 |
+
+에이전트는 보통 UDP 161번 포트에서 요청을 기다려요. UDP는 받았는지 확인하지 않아서, 답이 오지 않으면 관리 서버는 보통 잠시 기다렸다 다시 물어요.
+
+## MIB와 OID
+
+장비가 내놓는 값의 목록을 <Term term="network/mib">MIB</Term>라고 불러요. 값 하나하나에는 <Term term="network/oid">OID</Term>라는 번호 주소가 붙어요. OID는 점으로 이은 숫자이고, 나무처럼 위에서부터 갈라져요.
+
+<Figure caption="표준 MIB(mib-2) 아래에 system과 interfaces 묶음이 있어요. 장비 가동 시간 sysUpTime의 OID는 1.3.6.1.2.1.1.3이에요.">
+  <Flow
+    ariaLabel="mib-2 아래 system과 interfaces가 있고, system 아래 sysUpTime, interfaces 아래 인터페이스 표가 있는 OID 나무 구조도"
+    nodes={[
+      { id: 'mib2', label: 'mib-2', col: 1, row: 0, note: '1.3.6.1.2.1', tone: 'accent' },
+      { id: 'system', label: 'system', col: 0, row: 1, note: '… .1' },
+      { id: 'ifs', label: 'interfaces', col: 2, row: 1, note: '… .2' },
+      { id: 'uptime', label: 'sysUpTime', col: 0, row: 2, note: '… .1.3', tone: 'accent' },
+      { id: 'iftable', label: '인터페이스 표', col: 2, row: 2, note: '… .2.2' },
+    ]}
+    edges={[
+      { from: 'mib2', to: 'system', tone: 'accent' },
+      { from: 'mib2', to: 'ifs' },
+      { from: 'system', to: 'uptime', tone: 'accent' },
+      { from: 'ifs', to: 'iftable' },
+    ]}
+  />
+</Figure>
+
+표준 MIB의 OID는 어느 제조사 장비든 같은 뜻이에요. 인터페이스 트래픽(IF-MIB)처럼 공통인 값은 표준 OID로 읽어요.
+
+CPU·메모리 사용률처럼 표준에 없는 값은 제조사(벤더)가 자기 MIB에 따로 정해요. 그래서 같은 CPU 사용률도 벤더마다 OID가 달라요.
+
+## 가동 시간으로 재시작 알아내기
+
+sysUpTime은 장비의 관리 기능이 다시 시작된 뒤 흐른 시간이에요. 단위는 0.01초예요. 이 값이 갑자기 작아졌다면 장비가 다시 시작된 거예요.
+
+재시작하면 트래픽 카운터도 0부터 다시 세요. 그래서 sysUpTime이 줄었을 때 계산한 트래픽은 버려야 해요. 카운터 계산은 <Term slug="network/interfaces-and-traffic">인터페이스와 트래픽</Term>에서 다뤄요.
+
+## 버전과 보안
+
+v1과 v2c는 <Term term="network/snmp-community">커뮤니티 문자열</Term>을 비밀번호처럼 써요. 이 값은 평문으로 오가서 네트워크를 엿보면 그대로 보여요. 표준 문서도 v1·v2c가 근본적으로 안전하지 않다며 v3를 쓰라고 강하게 권해요.
+
+v3는 사용자마다 인증과 암호화를 걸 수 있어요. 그만큼 장비마다 사용자, 인증 방식, 암호 설정을 맞춰 줘야 해요.
+
+## 모니터링에서는
+
+네트워크 장비 화면의 숫자는 대부분 SNMP 폴링으로 모아요. 장비가 SNMP에 답했는지도 함께 보여 줘서, 값이 비었을 때 장비 문제인지 수집 문제인지 나눠요.
+
+폴링 간격은 그래프가 얼마나 촘촘한지를 정해요. 간격 사이의 짧은 변화는 보이지 않아요. 이 차이는 <Term slug="foundations/collection-interval">수집 방식과 수집 주기</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>장비가 SNMP에 답하지 않는다고 장비가 죽었다고 단정했다면 다시 보세요. 방화벽이 161번 포트를 막았거나, 커뮤니티 문자열·v3 설정이 틀렸을 수 있어요. ping 같은 다른 방법으로도 확인하세요.</Check>
+  <Check>CPU·메모리 사용률을 한 OID로 모든 장비에서 읽는 코드라면 다시 보세요. 이런 값은 벤더 MIB에 있어서 제조사마다 OID가 달라요.</Check>
+  <Check>v2c 커뮤니티 문자열을 화면이나 로그에 그대로 보여 준다면 다시 보세요. 이 값은 장비에 접근하는 비밀번호예요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 관리 프레임워크의 구성
+
+  표준 문서는 관리 대상 노드가 여럿 있고, 노드마다 원격으로 관리 정보에 접근하게 해 주는 SNMP 개체가 있다고 해요. 그리고 관리 앱이 있는 SNMP 개체(관리 서버)가 하나 이상 있어요.
+
+  ### 표를 통째로 읽기
+
+  인터페이스 표처럼 행이 여러 개인 값은 GetNextRequest나 GetBulkRequest로 다음 OID를 차례로 따라가며 읽어요. 이렇게 나무를 따라 읽는 것을 흔히 walk라고 불러요.
+
+  ### 알림 포트
+
+  장비가 먼저 보내는 알림(Trap)을 받는 쪽은 보통 UDP 162번 포트에서 기다려요. 알림은 <Term slug="network/traps-and-syslog">SNMP Trap과 Syslog</Term>에서 다뤄요.
+</Deeper>

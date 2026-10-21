@@ -95,3 +95,66 @@ terms:
     aliases: [default gateway, gateway, 게이트웨이]
     short: 서버가 다른 네트워크로 보낼 때 넘기는 같은 네트워크 안의 라우터예요.
     doc: network/switches-and-routers
+  - id: link-utilization
+    name: 회선 사용률
+    en: Link utilization
+    aliases: [interface utilization, 인터페이스 사용률, 대역폭 사용률, bandwidth utilization]
+    short: 인터페이스로 오간 bps를 인터페이스 속도로 나눈 비율이에요. 방향마다 따로 계산해요.
+    doc: network/interfaces-and-traffic
+  - id: counter-wrap
+    name: 카운터 한 바퀴
+    en: Counter wrap
+    aliases: [counter wrap, wraparound, 카운터 랩, 카운터 오버플로]
+    short: 누적 카운터가 최댓값에 닿아 0으로 돌아가는 일이에요. 32비트는 1Gbps에서 약 34초 만에 돌아요.
+    doc: network/interfaces-and-traffic
+  - id: snmp
+    name: SNMP
+    en: Simple Network Management Protocol
+    aliases: [에스엔엠피, snmp]
+    short: 관리 서버가 장비에게 정해진 번호(OID)로 값을 물어 가져오는 표준 규약이에요.
+    analogy: 관리 서버가 장비마다 돌며 번호 붙은 문진표로 묻는 것과 같아요.
+    doc: network/snmp
+  - id: snmp-manager
+    name: 관리 서버
+    en: SNMP manager
+    aliases: [manager, 매니저, NMS, network management station]
+    short: 장비들에게 SNMP로 값을 물어 모으는 쪽이에요.
+    doc: network/snmp
+  - id: snmp-agent
+    name: SNMP 에이전트
+    en: SNMP agent
+    aliases: [agent, 에이전트]
+    short: 장비 안에서 SNMP 요청에 답하고 알림을 보내는 프로그램이에요. 보통 UDP 161번에서 기다려요.
+    doc: network/snmp
+  - id: mib
+    name: MIB
+    en: Management Information Base
+    aliases: [관리 정보 베이스, IF-MIB, 벤더 MIB]
+    short: 장비가 SNMP로 내놓는 값의 목록이에요. 표준 MIB와 제조사 MIB가 있어요.
+    doc: network/snmp
+  - id: oid
+    name: OID
+    en: Object Identifier
+    aliases: [객체 식별자, object id]
+    short: MIB 안의 값 하나하나에 붙은 번호 주소예요. 점으로 이은 숫자로 나무처럼 갈라져요.
+    analogy: 문진표의 문항 번호와 같아요.
+    doc: network/snmp
+  - id: snmp-community
+    name: 커뮤니티 문자열
+    en: Community string
+    aliases: [community, 커뮤니티, community string]
+    short: SNMP v1·v2c에서 비밀번호처럼 쓰는 문자열이에요. 평문으로 오가서 안전하지 않아요.
+    doc: network/snmp
+  - id: snmp-trap
+    name: SNMP Trap
+    en: SNMP Trap
+    aliases: [trap, 트랩, inform, 인폼]
+    short: 장비에 정해진 일이 생기면 관리 서버로 먼저 보내는 SNMP 알림이에요. 받았다는 확인이 없어요.
+    analogy: 환자가 누르는 호출 벨과 같아요.
+    doc: network/traps-and-syslog
+  - id: syslog
+    name: Syslog
+    en: Syslog
+    aliases: [syslog, 시스로그, 로그 전송]
+    short: 장비의 이벤트 기록을 심각도와 함께 다른 서버로 보내는 표준이에요. 0이 가장 심각해요.
+    doc: network/traps-and-syslog
