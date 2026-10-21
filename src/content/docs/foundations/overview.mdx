@@ -1,0 +1,78 @@
+---
+title: 숫자가 그래프와 알림이 되기까지
+summary: 앱이 센 숫자는 수집·저장·계산을 거쳐 그래프와 알림이 돼요. 단계마다 숫자가 달라질 수 있어요.
+domain: foundations
+type: overview
+order: 0
+icon: sigma
+keywords: [모니터링, monitoring, 메트릭, metric, 지표, 계측, 수집, 대시보드, 알림, Prometheus]
+related: [foundations/counters-and-rate, foundations/collection-interval, foundations/time-series-and-labels, foundations/percentiles, foundations/red-and-use]
+sources:
+  - title: Prometheus — Overview
+    url: https://prometheus.io/docs/introduction/overview/
+  - title: OpenTelemetry — Observability primer
+    url: https://opentelemetry.io/docs/concepts/observability-primer/
+  - title: Google SRE Book — Monitoring Distributed Systems
+    url: https://sre.google/sre-book/monitoring-distributed-systems/
+updated: 2026-10-21
+---
+
+<Analogy limit="기상 예보관은 관측값을 보고 사람이 판단하지만, 모니터링 화면은 정해 둔 계산을 그대로 보여 줘요. 평균을 고를지 p99를 고를지 하나만 바꿔도 같은 데이터에서 다른 결론이 나와요.">
+  모니터링은 기상 관측과 비슷해요. 관측소가 기온을 재고(계측), 정해진 시각마다 모아(수집) 기록부(저장)에 적어요. 예보관은 평균·최고 기온을 계산하고(질의), 폭염이면 경보(알림)를 내요.
+</Analogy>
+
+## 숫자가 화면에 오기까지
+
+<Figure caption="숫자는 아래에서 위로 올라와요. 앱이 세고, 모아서 쌓고, 계산해서, 그래프와 알림으로 보여 줘요.">
+  <Layers
+    ariaLabel="아래부터 계측, 수집, 저장, 질의, 화면과 알림 순서로 쌓인 계층도"
+    layers={[
+      { label: '화면과 알림', note: '대시보드, 알림 규칙', tone: 'accent' },
+      { label: '질의', note: 'rate, 백분위수, 구간 묶기' },
+      { label: '저장', note: '지표 이름과 레이블로 구별한 시계열' },
+      { label: '수집', note: '정해진 간격으로 가져가거나 받아요' },
+      { label: '계측', note: '앱이 카운터·게이지·히스토그램으로 세요' },
+    ]}
+  />
+</Figure>
+
+1. **계측**: 앱이 요청 수 같은 숫자를 세요. 계속 더하기만 하는 카운터, 오르내리는 게이지, 값을 구간마다 세는 히스토그램이 있어요.
+2. **수집**: 모니터링 시스템이 정해진 간격(수집 주기)마다 값을 가져가거나, 앱이 보내 줘요. 그래서 간격 사이의 짧은 일은 빠질 수 있어요.
+3. **저장**: 값은 지표 이름과 레이블(키와 값의 쌍)로 구별되는 시계열에 쌓여요. 레이블 값이 끝없이 늘면 시계열도 끝없이 늘어요.
+4. **질의**: 쌓인 값을 rate(초당 증가량), 백분위수, 평균 같은 계산으로 바꿔요. 계산 방법과 묶는 구간에 따라 같은 데이터도 숫자가 달라요.
+5. **화면과 알림**: 계산한 값을 그래프로 그리고, 조건을 넘으면 알림을 보내요. 값이 빈 것을 0으로 읽지 않는 게 중요해요.
+
+화면의 숫자가 이상하다면 이 다섯 단계 중 어디서 달라졌는지 거슬러 올라가요. 이 영역의 글은 그 단계마다 생기는 함정을 다뤄요.
+
+## 단계마다 읽을 글
+
+| 단계 | 알아 둘 것 | 글 |
+| --- | --- | --- |
+| 계측 | 카운터는 rate로 읽어요 | <Term slug="foundations/counters-and-rate">카운터와 rate</Term> |
+| 계측 | 버킷이 백분위수의 정확도를 정해요 | <Term slug="foundations/histograms">히스토그램과 버킷</Term> |
+| 수집 | 수집 주기보다 촘촘하게 볼 수 없어요 | <Term slug="foundations/collection-interval">수집 방식과 수집 주기</Term> |
+| 저장 | 레이블 조합 하나가 시계열 하나예요 | <Term slug="foundations/time-series-and-labels">시계열과 레이블</Term> |
+| 질의 | 평균은 느린 요청을 숨겨요 | <Term slug="foundations/percentiles">평균과 백분위수</Term> |
+| 질의 | 긴 기간은 점을 줄여 그려요 | <Term slug="foundations/aggregation-and-downsampling">집계 구간과 다운샘플링</Term> |
+| 화면 | 데이터 없음은 0이 아니에요 | <Term slug="foundations/no-data-vs-zero">데이터 없음과 0은 달라요</Term> |
+| 알림 | 지속 시간은 흔들림과 늦음을 맞바꿔요 | <Term slug="foundations/alert-conditions">알림 조건</Term> |
+
+## 무엇을 볼지 정하는 틀
+
+숫자를 모으는 법만큼, 어떤 숫자를 볼지가 중요해요. 이 영역은 세 가지 틀을 다뤄요.
+
+- 서비스는 요청·에러·지연(RED)으로, 자원은 사용률·포화·에러(USE)로 봐요. <Term slug="foundations/red-and-use">RED와 USE</Term>에서 다뤄요.
+- 목표를 숫자로 정하고 허용할 실패의 양을 재는 법은 <Term slug="foundations/slo-and-error-budget">SLI·SLO·에러 버짓</Term>에서 다뤄요.
+- 메트릭으로 알아채고, 트레이스로 위치를 찾고, 로그로 이유를 보는 법은 <Term slug="foundations/logs-metrics-traces">로그, 메트릭, 트레이스</Term>에서 다뤄요.
+
+## 숫자가 이상할 때
+
+화면에서 자주 만나는 증상은 상황 가이드로 따로 정리했어요.
+
+- 두 화면의 숫자가 다르다면 <Term slug="foundations/why-numbers-differ">같은 지표가 화면마다 다르게 보이는 이유</Term>를 봐요.
+- 그래프가 비었다면 <Term slug="foundations/empty-graph">그래프가 비어 있을 때 무엇부터 볼까</Term>를 봐요.
+- p99가 이상하다면 <Term slug="foundations/p99-looks-wrong">p99가 이상하게 나올 때</Term>를 봐요.
+- 알림이 너무 많다면 <Term slug="foundations/alert-fatigue">알림이 너무 많이 울릴 때</Term>를 봐요.
+- 시계열이 갑자기 늘었다면 <Term slug="foundations/cardinality-explosion">시계열이 갑자기 늘었을 때</Term>를 봐요.
+
+이 영역의 개념은 네트워크, 서버, 데이터베이스 같은 다른 영역에서도 그대로 쓰여요. 다른 영역의 글이 rate나 p99를 말할 때 여기로 돌아와 읽어요.

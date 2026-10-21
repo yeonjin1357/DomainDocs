@@ -1,0 +1,36 @@
+questions:
+  - id: pipeline-order
+    type: choice
+    prompt: 앱이 센 숫자가 화면에 오기까지의 순서로 맞는 것은?
+    choices:
+      - 계측 → 수집 → 저장 → 질의 → 화면·알림
+      - 수집 → 계측 → 질의 → 저장 → 화면·알림
+      - 계측 → 저장 → 수집 → 화면·알림 → 질의
+      - 질의 → 계측 → 수집 → 저장 → 화면·알림
+    answer: 0
+    explain: 앱이 세고, 모아서 쌓고, 계산해서 보여 줘요. 숫자가 이상하면 이 순서를 거슬러 올라가요.
+  - id: spike-lost-stage
+    type: choice
+    prompt: 15초마다 수집하는 게이지에서 몇 초짜리 스파이크가 빠졌어요. 어느 단계에서 생긴 일일까요?
+    choices:
+      - 수집
+      - 계측
+      - 저장
+      - 알림
+    answer: 0
+    explain: 게이지는 수집하는 순간의 값만 남겨요. 수집 사이에 끝난 일은 기록에 없어요.
+  - id: mean-vs-p99-stage
+    type: choice
+    prompt: 같은 데이터인데 평균 응답시간과 p99가 크게 달라요. 어느 단계의 차이일까요?
+    choices:
+      - 질의의 계산 방법
+      - 수집 주기
+      - 저장 방식
+      - 계측 코드
+    answer: 0
+    explain: 같은 값을 어떤 계산으로 바꾸느냐에 따라 숫자가 달라요. 평균은 느린 요청을 숨기고, p99는 드러내요.
+  - id: empty-not-zero
+    type: ox
+    prompt: 그래프가 비어 있으면, 그 시간에 일이 없었다는 뜻이니 0으로 읽어도 되나요?
+    answer: false
+    explain: 비어 있는 건 '모른다'는 뜻이에요. 수집이 멈췄을 수도 있어서 0으로 읽으면 장애를 놓쳐요.
