@@ -1,0 +1,111 @@
+---
+title: CPU 사용률과 부하
+summary: CPU 사용률은 CPU가 일한 시간의 비율이고, 부하는 CPU를 쓰거나 기다리는 일의 수예요.
+domain: server
+type: concept
+stage: basics
+order: 20
+icon: gauge
+keywords: [CPU usage, CPU 사용률, load average, 부하, 로드 애버리지, iowait, steal, user, system, run queue]
+related: [server/processes-and-threads, server/overview, foundations/red-and-use, foundations/counters-and-rate]
+sources:
+  - title: Linux man-pages — proc_stat(5)
+    url: https://man7.org/linux/man-pages/man5/proc_stat.5.html
+  - title: Linux man-pages — proc_loadavg(5)
+    url: https://man7.org/linux/man-pages/man5/proc_loadavg.5.html
+  - title: Linux man-pages — top(1)
+    url: https://man7.org/linux/man-pages/man1/top.1.html
+  - title: Linux man-pages — ps(1) (PROCESS STATE CODES)
+    url: https://man7.org/linux/man-pages/man1/ps.1.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="사용률은 일한 시간의 비율이에요">
+    커널은 CPU가 어떤 일에 시간을 썼는지 계속 쌓아 세요. 일정 구간의 차이로 그동안 일한 비율을 구해요.
+  </Point>
+  <Point title="부하는 줄 선 일의 수예요">
+    실행 중이거나 차례를 기다리는 일, 리눅스에서는 디스크를 기다리는 일까지 세요. 코어 수와 견줘 읽어요.
+  </Point>
+  <Point title="100%가 넘어도 정상일 수 있어요">
+    프로세스 사용률은 보통 코어 하나를 100%로 세요. 코어 4개를 다 쓰는 프로세스는 400%로 보여요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="사무실에서는 서류를 기다리는 사람을 대기 줄에 세지 않아요. 리눅스 부하는 디스크를 기다리느라 CPU를 쓰지 않는 일까지 세서, CPU가 한가해도 부하가 높을 수 있어요.">
+  직원 4명(코어 4개)이 일하는 사무실이에요. 사용률은 직원들이 책상에서 실제로 일한 시간의 비율이에요. 부하는 지금 일하는 사람과 책상이 비기를 기다리며 줄 선 사람을 합친 수예요.
+</Analogy>
+
+## CPU 시간은 이렇게 나눠 세요
+
+커널은 CPU 시간을 하는 일에 따라 나눠 세요. `top` 같은 도구의 CPU 줄에 나오는 이름이에요.
+
+| 이름 | 뜻 |
+| --- | --- |
+| us | 앱(사용자 영역) 코드를 실행한 시간 |
+| sy | 커널 코드를 실행한 시간 |
+| ni | 우선순위를 낮춘(nice) 프로세스를 실행한 시간 |
+| id | 할 일이 없어 쉰 시간 |
+| wa | 쉬는 동안 입출력 완료를 기다린 일이 있던 시간(iowait) |
+| hi·si | 하드웨어·소프트웨어 인터럽트를 처리한 시간 |
+| st | 가상 머신에서 다른 가상 머신에 빼앗긴 시간(steal) |
+
+sy가 높으면 앱이 시스템 콜을 아주 많이 부르거나 커널이 바쁜 거예요. st는 가상 머신에서만 의미가 있어요. 같은 물리 서버의 다른 가상 머신이 CPU를 가져간 시간이에요.
+
+## 사용률은 누적값의 차이로 구해요
+
+`/proc/stat`의 CPU 시간은 부팅 뒤 계속 늘어나는 누적값이에요. 그래서 사용률은 두 시점의 값을 빼서 구해요. 누적값을 다루는 법은 <Term slug="foundations/counters-and-rate">카운터와 rate</Term>와 같아요.
+
+예를 들어 코어 4개짜리 서버를 10초 간격으로 읽었다고 해 봐요. 이 단위(USER_HZ)가 1초에 100이면, 10초 동안 CPU 시간은 모두 4 × 10 × 100 = 4,000이에요. 그중 id가 1,000 늘었다면 사용률은 (4,000 − 1,000) ÷ 4,000 = 75%예요.
+
+## 부하는 줄 선 일의 수예요
+
+리눅스의 <Term term="server/load-average">부하</Term>(load average)는 실행 중이거나 실행 대기 줄에 선 일(R 상태)과, 디스크 입출력을 기다리는 일(D 상태)의 수예요. 1분, 5분, 15분 동안의 평균으로 보여 줘요.
+
+<Figure caption="같은 코어 4개 서버라도 두 숫자는 다른 것을 재요. 디스크를 기다리는 일은 사용률을 올리지 않지만 부하는 올려요.">
+  <Compare
+    columns={['CPU 사용률', '부하(load average)']}
+    rows={[
+      { label: '무엇을 세나요', values: ['CPU가 일한 시간의 비율', '실행 중이거나 기다리는 일의 수'] },
+      { label: '디스크를 기다리는 일', values: ['쉰 시간(iowait)으로 세요', '부하에 들어가요'] },
+      { label: '읽는 법', values: ['100%에 가까우면 꽉 찼어요', '코어 수보다 크면 줄이 생겼어요'] },
+    ]}
+  />
+</Figure>
+
+부하는 코어 수와 견줘 읽어요. 코어 4개 서버의 부하 4는 딱 맞게 바쁜 거고, 부하 8이면 평균 4개가 차례를 기다려요. 같은 부하 8도 코어 16개 서버에서는 여유가 있어요.
+
+## 모니터링에서는
+
+<Figure caption="코어 4개 서버의 예시예요. CPU 사용률은 35%로 한가한데, 1분 부하는 9.2로 코어 수의 두 배를 넘어요. 디스크를 기다리는 일이 줄을 선 모습이에요.">
+  <StatTile label="CPU 사용률" value="35" unit="%" />
+  <StatTile label="1분 부하" value="9.2" note="코어 4개" tone="warn" />
+</Figure>
+
+서버 화면의 CPU 그래프는 보통 서버 전체 코어의 평균 사용률이에요. 프로세스 목록의 CPU 사용률은 프로세스마다 코어 하나를 100%로 세는 경우가 많아요. 두 숫자의 기준이 달라요.
+
+사용률은 CPU가 얼마나 바쁜지, 부하는 일이 얼마나 밀렸는지를 보여 줘요. 둘을 함께 보면 CPU가 모자란 건지, 다른 곳을 기다리는 건지 나눌 수 있어요.
+
+<Checkpoints>
+  <Check>프로세스 CPU 사용률이 100%를 넘는다고 오류로 보지 마세요. 여러 스레드가 여러 코어를 함께 쓰면 400%처럼 보여요.</Check>
+  <Check>부하가 높다고 바로 CPU를 늘리자는 제안이라면 다시 보세요. 리눅스 부하에는 디스크를 기다리는 일(D 상태)도 들어가요. CPU 사용률과 함께 보세요.</Check>
+  <Check>iowait가 높다고 CPU가 바쁘다고 읽었다면 다시 보세요. iowait는 CPU가 쉬는 동안 입출력을 기다린 시간이에요. 매뉴얼도 이 값을 믿기 어렵다고 해요.</Check>
+  <Check>가상 머신에서 st(steal)가 높다면 앱이 아니라 같은 물리 서버의 다른 가상 머신을 의심하세요.</Check>
+  <Check>서버 전체 평균 CPU만 보는 화면이라면 코어별로도 보세요. 스레드 하나만 쓰는 프로그램이 코어 하나를 100% 채워도, 코어 8개 평균은 12.5%로 보여요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### iowait를 믿기 어려운 이유
+
+  리눅스 매뉴얼은 iowait가 믿을 만하지 않다고 하며 이유를 들어요. CPU는 입출력을 기다리지 않아요. 입출력을 기다리는 건 작업이고, 그동안 CPU는 쉬거나 다른 작업을 실행해요.
+
+  여러 코어가 있으면 입출력을 기다리는 작업은 어느 코어에서도 실행 중이 아니라, 코어별 iowait를 계산하기 어려워요. 어떤 조건에서는 이 값이 줄어들기도 해요.
+
+  ### 코어별 줄
+
+  `/proc/stat`에는 전체 합계 줄(`cpu`) 말고도 코어마다 줄(`cpu0`, `cpu1`, …)이 있어요. 코어별 사용률은 이 줄로 계산해요.
+
+  ### 부하의 넷째 칸
+
+  `/proc/loadavg`의 넷째 칸은 지금 실행할 수 있는 스케줄링 단위(프로세스·스레드)의 수와, 전체 수를 빗금으로 이어 보여 줘요. 예를 들어 `3/412`예요.
+</Deeper>

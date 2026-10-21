@@ -1,0 +1,67 @@
+---
+title: 서버 한 대가 일하는 방식
+summary: 서버는 하드웨어 위에 운영체제가 있고, 그 위에서 프로세스들이 CPU·메모리·디스크를 나눠 써요.
+domain: server
+type: overview
+order: 0
+icon: server
+keywords: [서버, OS, 운영체제, 커널, kernel, 리눅스, linux, 호스트, host, /proc]
+related: [server/processes-and-threads, server/cpu-usage, foundations/red-and-use, foundations/counters-and-rate]
+sources:
+  - title: Linux man-pages — syscalls(2)
+    url: https://man7.org/linux/man-pages/man2/syscalls.2.html
+  - title: Linux man-pages — sched(7)
+    url: https://man7.org/linux/man-pages/man7/sched.7.html
+  - title: Linux man-pages — proc(5)
+    url: https://man7.org/linux/man-pages/man5/proc.5.html
+  - title: Linux man-pages — proc_stat(5)
+    url: https://man7.org/linux/man-pages/man5/proc_stat.5.html
+updated: 2026-10-21
+---
+
+<Analogy limit="사무실 관리자는 가끔 자리를 비워도 되지만, 운영체제 커널은 한순간도 빠짐없이 모든 자원 사용을 중간에서 맡아요.">
+  서버는 사무실과 비슷해요. 직원(CPU 코어)이 책상(메모리)에서 서류를 펴 놓고 일하고, 오래 둘 서류는 캐비닛(디스크)에 넣어요. 관리자(운영체제)는 누가 언제 어느 책상을 쓸지 정해요.
+</Analogy>
+
+## 세 층으로 나뉘어요
+
+<Figure caption="앱은 하드웨어를 직접 만지지 않아요. 무엇이 필요하면 운영체제 커널에 부탁하고, 커널이 하드웨어를 나눠 줘요.">
+  <Layers
+    ariaLabel="위에서부터 앱, 운영체제 커널, 하드웨어로 쌓인 계층도"
+    layers={[
+      { label: '앱(프로세스)', note: '웹 서버, DB, 모니터링 에이전트' },
+      { label: '운영체제 커널', note: '일정 짜기 · 메모리 나누기 · 입출력', tone: 'accent' },
+      { label: '하드웨어', note: 'CPU · 메모리 · 디스크 · 네트워크' },
+    ]}
+  />
+</Figure>
+
+서버에서 돌아가는 프로그램은 모두 <Term term="server/process">프로세스</Term>예요. 프로세스가 파일을 읽거나 네트워크로 보내려면 <Term term="server/system-call">시스템 콜</Term>로 <Term term="server/kernel">커널</Term>에 부탁해요.
+
+커널은 운영체제의 핵심이에요. 여러 프로세스가 CPU를 번갈아 쓰게 일정을 짜고, 메모리를 나눠 주고, 디스크와 네트워크 입출력을 대신해 줘요.
+
+## 자원 네 가지
+
+서버 모니터링 화면이 보여 주는 숫자는 대부분 이 네 자원에서 와요.
+
+| 자원 | 하는 일 | 자주 보는 숫자 |
+| --- | --- | --- |
+| CPU | 계산 | 사용률, 부하 |
+| 메모리 | 지금 쓰는 데이터를 둠 | 사용량, 스왑 |
+| 디스크 | 오래 둘 데이터를 둠 | 읽기·쓰기 양, 지연, 용량 |
+| 네트워크 | 다른 서버와 주고받음 | 주고받은 양, 오류 |
+
+자원마다 얼마나 바쁜지(사용률), 일이 밀렸는지(포화), 오류가 났는지를 나눠 보면 원인을 빨리 좁혀요. 이 보는 법은 <Term slug="foundations/red-and-use">RED와 USE</Term>에서 다뤄요.
+
+## 숫자는 커널에서 와요
+
+리눅스 커널은 자기 상태를 `/proc`라는 가상 파일로 내놓아요. 실제 디스크에 있는 파일이 아니라, 읽을 때마다 커널이 지금 값을 만들어 줘요.
+
+CPU가 어떤 일에 시간을 썼는지는 `/proc/stat`에, 부하는 `/proc/loadavg`에 있어요. 이 값 대부분은 부팅 뒤 계속 쌓이는 누적값이라, 사용률은 두 시점의 차이로 계산해요. 누적값을 다루는 법은 <Term slug="foundations/counters-and-rate">카운터와 rate</Term>에 있어요.
+
+## 단계를 하나씩 확대해 봐요
+
+이 영역은 리눅스를 기준으로 설명해요.
+
+- 프로세스와 스레드가 CPU를 나눠 쓰는 법은 <Term slug="server/processes-and-threads">프로세스와 스레드</Term>에서 다뤄요.
+- CPU 숫자를 읽는 법은 <Term slug="server/cpu-usage">CPU 사용률과 부하</Term>에서 다뤄요.

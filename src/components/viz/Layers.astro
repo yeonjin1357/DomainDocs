@@ -60,7 +60,9 @@ const { layers, ariaLabel } = Astro.props;
     font-weight: 600;
   }
 
+  /* 설명은 길이와 상관없이 늘 이름 아래 줄에 둬서 층마다 모양을 맞춘다 */
   .layer-note {
+    flex-basis: 100%;
     font-size: 14px;
     color: var(--color-text-sub);
   }

@@ -1,0 +1,90 @@
+terms:
+  - id: process
+    name: 프로세스
+    en: Process
+    aliases: [process, 프로그램 실행 단위]
+    short: 실행 중인 프로그램이에요. 자기만의 메모리 공간과 번호(PID)를 가져요.
+    analogy: 자기 방과 서류함을 가진 팀과 같아요.
+    doc: server/processes-and-threads
+  - id: thread
+    name: 스레드
+    en: Thread
+    aliases: [thread, 쓰레드]
+    short: 프로세스 안의 실행 흐름이에요. 같은 프로세스의 스레드는 메모리를 함께 써요.
+    analogy: 같은 방의 서류를 함께 보는 팀원과 같아요.
+    doc: server/processes-and-threads
+  - id: pid
+    name: PID
+    en: Process ID
+    aliases: [프로세스 ID, process id]
+    short: 운영체제가 프로세스마다 붙이는 번호예요.
+    doc: server/processes-and-threads
+  - id: kernel
+    name: 커널
+    en: Kernel
+    aliases: [kernel, 운영체제 커널, OS 커널]
+    short: 운영체제의 핵심이에요. CPU·메모리·입출력을 프로세스들에게 나눠 줘요.
+    analogy: 누가 언제 어느 책상을 쓸지 정하는 사무실 관리자와 같아요.
+    doc: server/overview
+  - id: system-call
+    name: 시스템 콜
+    en: System call
+    aliases: [system call, syscall, 시스템 호출]
+    short: 앱이 파일 읽기 같은 일을 커널에 부탁하는 통로예요.
+    doc: server/overview
+  - id: proc-fs
+    name: /proc
+    en: proc filesystem
+    aliases: [proc, procfs, 프록 파일 시스템]
+    short: 리눅스 커널이 자기 상태를 파일처럼 내놓는 가상 파일 시스템이에요.
+    doc: server/overview
+  - id: scheduler
+    name: 스케줄러
+    en: Scheduler
+    aliases: [scheduler, CPU 스케줄러]
+    short: 실행할 준비가 된 스레드 중 다음에 CPU에서 돌릴 스레드를 고르는 커널 기능이에요.
+    doc: server/processes-and-threads
+  - id: cpu-core
+    name: CPU 코어
+    en: CPU core
+    aliases: [core, 코어, vCPU, 논리 CPU]
+    short: 한 번에 스레드 하나를 실행하는 CPU의 일꾼 단위예요.
+    analogy: 사무실의 직원 한 명과 같아요.
+    doc: server/cpu-usage
+  - id: cpu-usage
+    name: CPU 사용률
+    en: CPU utilization
+    aliases: [CPU usage, CPU utilization, CPU 사용량]
+    short: 일정 시간 동안 CPU가 쉬지 않고 일한 시간의 비율이에요.
+    doc: server/cpu-usage
+  - id: load-average
+    name: 부하
+    en: Load average
+    aliases: [load average, 로드 애버리지, load, 시스템 부하]
+    short: 실행 중이거나 차례를 기다리는 일의 평균 수예요. 리눅스는 디스크를 기다리는 일도 세요.
+    analogy: 일하는 직원과 책상을 기다리며 줄 선 사람을 합친 수와 같아요.
+    doc: server/cpu-usage
+  - id: iowait
+    name: iowait
+    en: I/O wait
+    aliases: [wa, IO wait, 입출력 대기]
+    short: CPU가 쉬는 동안 입출력 완료를 기다린 일이 있던 시간이에요. 믿기 어려운 값이에요.
+    doc: server/cpu-usage
+  - id: steal
+    name: steal
+    en: Steal time
+    aliases: [st, steal time, 스틸 타임]
+    short: 가상 머신에서 다른 가상 머신에게 CPU를 빼앗긴 시간이에요.
+    doc: server/cpu-usage
+  - id: zombie
+    name: 좀비 프로세스
+    en: Zombie process
+    aliases: [zombie, defunct, 좀비]
+    short: 끝났지만 부모 프로세스가 아직 거두지 않은 프로세스예요.
+    doc: server/processes-and-threads
+  - id: uninterruptible-sleep
+    name: D 상태
+    en: Uninterruptible sleep
+    aliases: [uninterruptible sleep, 깨울 수 없는 잠, D state]
+    short: 보통 디스크 입출력을 기다리며 깨울 수 없게 잠든 상태예요. 리눅스 부하에 들어가요.
+    doc: server/processes-and-threads
