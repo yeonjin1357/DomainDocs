@@ -1,0 +1,80 @@
+---
+title: CPU가 높을 때 어디부터 볼까
+summary: CPU 시간을 종류별로 나눠 갈래를 정하고, 어느 프로세스가 썼는지와 줄 선 일이 있는지 봐요.
+domain: server
+type: guide
+order: 60
+icon: gauge
+keywords: [high CPU, CPU 높음, CPU 100%, steal, sys, load average, pidstat, mpstat, top, 원인 찾기]
+related: [server/cpu-usage, server/processes-and-threads, server/disk-io, apm/thread-dumps]
+sources:
+  - title: Linux man-pages — top(1)
+    url: https://man7.org/linux/man-pages/man1/top.1.html
+  - title: Linux man-pages — mpstat(1)
+    url: https://man7.org/linux/man-pages/man1/mpstat.1.html
+  - title: Linux man-pages — pidstat(1)
+    url: https://man7.org/linux/man-pages/man1/pidstat.1.html
+  - title: Linux man-pages — vmstat(8)
+    url: https://man7.org/linux/man-pages/man8/vmstat.8.html
+updated: 2026-10-21
+---
+
+<Situation>
+  새벽 3시부터 결제 서버의 CPU 사용률이 평소 40%에서 95%로 올라 알림이 울렸어요. 응답도 조금 느려졌어요.
+
+  CPU가 높다는 사실만으로는 무엇을 할지 정할 수 없어요. 어떤 종류의 CPU 시간이 늘었는지, 누가 썼는지, 일이 밀렸는지 차례로 봐요.
+</Situation>
+
+<FirstLook>
+  <Item title="무슨 종류의 시간이 늘었나">us, sy, st 중 무엇이 늘었는지 봐요.</Item>
+  <Item title="어느 프로세스가 썼나">프로세스별 CPU 순위에서 평소와 달라진 것을 찾아요.</Item>
+  <Item title="일이 밀렸나">부하(run queue)가 코어 수를 넘는지 봐요.</Item>
+</FirstLook>
+
+## 1. CPU 시간을 종류별로 나눠 보세요
+
+사용률 하나보다 그 안의 몫이 다음 단계를 정해요. 종류별 뜻은 <Term slug="server/cpu-usage">CPU 사용률과 부하</Term>에 있어요.
+
+- **us(사용자)가 늘었다면**: 앱 코드가 일을 많이 해요. 2단계로 가서 프로세스를 찾아요.
+- **sy(시스템)가 늘었다면**: 앱이 커널을 아주 자주 불러요. 예를 들어 아주 작은 단위로 자주 읽고 쓰거나, 연결을 자주 맺고 끊는 동작을 의심해요.
+- **st(steal)가 늘었다면**: 가상 머신에서 다른 가상 머신에 CPU를 빼앗기고 있어요. 서버 안이 아니라 호스트나 클라우드 쪽을 봐요.
+- **wa(iowait)만 늘었다면**: CPU가 바쁜 게 아니라 디스크를 기다려요. <Term slug="server/disk-io">디스크 입출력</Term>을 봐요.
+
+**확인 방법**: `mpstat -P ALL 5`로 코어별 몫을 5초마다 봐요. %steal은 하이퍼바이저가 다른 가상 CPU를 돌보는 동안 기다린 비율이에요.
+
+## 2. 어느 프로세스가 썼는지 찾으세요
+
+프로세스별 CPU 사용률에서 순위가 바뀌었거나 새로 올라온 프로세스를 찾아요. 프로세스 사용률은 코어 하나를 100%로 세서, 여러 코어를 쓰면 100%를 넘어요.
+
+<Figure caption="코어 8개 서버의 예시예요. 서버 평균은 95%이고, java 프로세스 하나가 코어 7개 가까이(690%)를 쓰고 있어요.">
+  <StatTile label="서버 CPU 평균" value="95" unit="%" tone="warn" />
+  <StatTile label="java 프로세스" value="690" unit="%" tone="warn" note="코어 8개 중" />
+  <StatTile label="1분 부하" value="14.3" note="코어 8개" />
+</Figure>
+
+범인 프로세스를 찾았다면, 그 안의 어느 스레드가 바쁜지까지 내려가요. 자바라면 <Term slug="apm/thread-dumps">스레드 덤프</Term>를 몇 번 떠서 바쁜 스레드가 무슨 코드를 실행하는지 봐요.
+
+**확인 방법**: `pidstat -u 5`로 프로세스별 %usr, %system을 봐요. `top`에서 `H`를 누르면 스레드 단위로 보여 줘요.
+
+## 3. 일이 밀리고 있는지 보세요
+
+CPU가 95%여도 일이 밀리지 않으면 아직 감당하고 있는 거예요. 부하가 코어 수보다 커지면 차례를 기다리는 일이 생겨 응답이 느려져요.
+
+**확인 방법**: `vmstat 5`의 r은 실행 중이거나 차례를 기다리는 프로세스 수예요. r이 코어 수보다 계속 크면 CPU가 모자라요. `pidstat -u`의 %wait은 프로세스가 차례를 기다린 비율이에요.
+
+## 4. 언제부터, 무엇과 함께 늘었는지 맞춰 보세요
+
+CPU가 오른 시각을 다른 사건과 나란히 놓아요. 배포, 배치 작업, 요청 증가, 가비지 컬렉션이 흔한 원인이에요.
+
+- 요청 수가 함께 늘었다면 부하가 는 거예요. 서버를 늘리거나 요청을 나눠요.
+- 요청 수는 그대로인데 CPU만 늘었다면, 요청 하나가 더 무거워졌어요. 배포된 코드나 데이터 변화를 봐요.
+- 일정한 시각마다 오른다면 정해진 작업(백업, 배치, cron)을 먼저 봐요.
+
+자바 서버에서 CPU와 함께 GC 시간이 늘었다면 <Term slug="apm/gc-pause">GC 멈춤</Term>을 함께 봐요. 힙이 모자라 GC가 쉬지 않고 돌면 CPU가 높아져요.
+
+<Checkpoints>
+  <Check>서버 평균 CPU가 낮다고 안심했다면 코어별로도 보세요. 스레드 하나만 쓰는 프로그램은 코어 하나를 꽉 채워도 평균을 조금만 올려요.</Check>
+  <Check>가상 머신의 CPU가 높은데 프로세스 합이 그만큼 안 된다면 st(steal)를 보세요. 다른 가상 머신이 가져간 시간이에요.</Check>
+  <Check>`vmstat`의 첫 줄을 지금 값으로 읽었다면 다시 보세요. 첫 줄은 부팅 뒤 평균이에요. 둘째 줄부터가 지정한 간격 동안의 값이에요.</Check>
+  <Check>CPU를 늘리기 전에 요청 수가 함께 늘었는지 보세요. 요청은 그대로인데 CPU만 늘었다면, 서버를 늘려도 같은 일이 반복돼요.</Check>
+</Checkpoints>

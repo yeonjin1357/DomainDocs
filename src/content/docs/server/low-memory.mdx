@@ -1,0 +1,86 @@
+---
+title: 메모리가 모자라 보일 때
+summary: 진짜 여유(available)부터 확인하고, 스왑이 오가는지와 누가 메모리를 늘렸는지 차례로 봐요.
+domain: server
+type: guide
+order: 70
+icon: layers
+keywords: [low memory, 메모리 부족, available, swap, 스왑, OOM, Killed process, 메모리 누수, RSS, pidstat]
+related: [server/memory, server/processes-and-threads, apm/jvm-memory, kubernetes/requests-and-limits]
+sources:
+  - title: Linux man-pages — free(1)
+    url: https://man7.org/linux/man-pages/man1/free.1.html
+  - title: Linux man-pages — vmstat(8)
+    url: https://man7.org/linux/man-pages/man8/vmstat.8.html
+  - title: Linux man-pages — pidstat(1)
+    url: https://man7.org/linux/man-pages/man1/pidstat.1.html
+  - title: Linux man-pages — dmesg(1)
+    url: https://man7.org/linux/man-pages/man1/dmesg.1.html
+  - title: Linux kernel source — mm/oom_kill.c
+    url: https://github.com/torvalds/linux/blob/master/mm/oom_kill.c
+updated: 2026-10-21
+---
+
+<Situation>
+  서버의 메모리 사용률이 97%라는 알림이 왔어요. 그런데 앱은 멀쩡해 보여요. 다른 날에는 알림 없이 앱 프로세스가 갑자기 사라진 적도 있어요.
+
+  메모리 숫자는 계산 방식에 따라 크게 달라요. 진짜 여유부터 확인하고, 실제로 느려지고 있는지, 누가 늘렸는지를 차례로 봐요.
+</Situation>
+
+<FirstLook>
+  <Item title="available이 얼마인가">캐시를 빼고 실제로 남은 여유를 봐요.</Item>
+  <Item title="스왑이 오가는가">스왑 사용량이 아니라 오가는 양을 봐요.</Item>
+  <Item title="누가 늘었나">RSS가 계속 오르는 프로세스를 찾아요.</Item>
+</FirstLook>
+
+## 1. 진짜 여유부터 확인하세요
+
+리눅스는 남는 메모리를 파일 캐시로 써서, free는 늘 작게 보여요. 사용률을 전체에서 free를 빼서 계산하면 캐시까지 사용으로 잡혀요. 진짜 여유는 <Term term="server/available-memory">available</Term>로 봐요.
+
+<Figure caption="같은 서버를 두 방식으로 계산했어요. free 기준으로는 97%이지만, available 기준으로는 38%예요. 캐시는 앱이 원하면 비워 줘요.">
+  <StatTile label="(전체 − free) 기준" value="97" unit="%" tone="warn" />
+  <StatTile label="(전체 − available) 기준" value="38" unit="%" tone="accent" />
+</Figure>
+
+available이 넉넉하다면 지금 메모리 부족은 아니에요. 알림 기준이 free로 계산된 건 아닌지 먼저 고쳐요. 숫자 읽는 법은 <Term slug="server/memory">메모리</Term>에 있어요.
+
+**확인 방법**: `free -h`의 available 칸을 봐요.
+
+## 2. 스왑이 오가는지 보세요
+
+available이 바닥에 가까워지면 커널은 덜 쓰는 메모리를 스왑으로 내보내기 시작해요. 이때 서버가 눈에 띄게 느려져요. 디스크는 메모리보다 훨씬 느리기 때문이에요.
+
+봐야 할 건 스왑 사용량이 아니라 지금 오가는 양이에요. 한 번 내보낸 메모리는 다시 쓰이기 전까지 스왑에 남아 있어서, 사용량만 높고 조용할 수 있어요.
+
+**확인 방법**: `vmstat 5`의 si(스왑에서 들여온 양)와 so(스왑으로 내보낸 양)를 봐요. 둘 다 0에 가깝다면 지금 스왑 때문에 느려지고 있지는 않아요. 첫 줄은 부팅 뒤 평균이라 건너뛰어요.
+
+## 3. 누가 메모리를 늘렸는지 찾으세요
+
+프로세스별 <Term term="server/rss">RSS</Term>를 시간에 따라 견줘, 계속 오르기만 하는 프로세스를 찾아요. 잠깐 올랐다 내려오는 건 정상적인 일의 흐름이에요. 몇 시간, 며칠에 걸쳐 바닥이 계속 높아지면 누수를 의심해요.
+
+<Figure caption="같은 앱 프로세스의 RSS를 하루 동안 본 예시예요. 요청이 줄어드는 밤에도 내려오지 않고, 바닥이 계속 올라가요.">
+  <MiniLineChart
+    ariaLabel="프로세스 RSS가 하루 동안 2.1GB에서 5.8GB로 계단처럼 오르며 밤에도 내려오지 않는 그래프"
+    yMax={7}
+    series={[{ label: 'RSS', values: [2.1, 2.4, 2.6, 3.0, 3.3, 3.5, 3.9, 4.2, 4.6, 4.9, 5.3, 5.8], tone: 'warn', value: '2.1 → 5.8GB' }]}
+  />
+</Figure>
+
+자바 앱이라면 RSS와 힙을 따로 봐요. 힙은 여유로운데 RSS만 오른다면 힙 밖 메모리가 늘고 있어요. 힙은 <Term slug="apm/jvm-memory">JVM과 힙 메모리</Term>에서 다뤄요.
+
+**확인 방법**: `pidstat -r 60`으로 프로세스별 RSS를 1분마다 기록해 두고 견줘요.
+
+## 4. 프로세스가 사라졌다면 OOM을 확인하세요
+
+메모리가 끝내 모자라면 커널의 <Term term="server/oom-killer">OOM killer</Term>가 프로세스 하나를 골라 끝내요. 앱은 오류 로그를 남길 틈도 없이 사라져요.
+
+이때 커널 로그에는 `Killed process 1234 (java)`처럼 끝낸 프로세스의 번호와 이름이 남아요. 프로세스가 사라진 시각과 이 기록의 시각을 맞춰 봐요.
+
+**확인 방법**: `dmesg -T` 또는 `journalctl -k`로 커널 로그를 보고, `Killed process`를 찾아요. 컨테이너라면 서버 전체가 아니라 컨테이너 한도를 넘었을 수 있어요. 이건 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>의 OOMKilled예요.
+
+<Checkpoints>
+  <Check>메모리 알림이 늘 90%대에 붙어 있다면, 사용률을 free로 계산하는지 보세요. available로 계산하면 알림이 진짜 부족할 때만 울려요.</Check>
+  <Check>스왑 사용량 알림만 걸어 두었다면, si·so처럼 지금 오가는 양으로 바꾸세요. 사용량만 높고 조용한 스왑은 당장 문제가 아니에요.</Check>
+  <Check>앱이 로그도 없이 사라졌다면, 앱 로그보다 커널 로그를 먼저 보세요. OOM killer는 앱에 알리지 않고 끝내요.</Check>
+  <Check>메모리 누수를 의심할 때는 하루 이상의 RSS 추세를 보세요. 몇 분짜리 그래프에서는 정상적인 오르내림과 구분이 안 돼요.</Check>
+</Checkpoints>
