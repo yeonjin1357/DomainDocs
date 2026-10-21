@@ -1,0 +1,120 @@
+---
+title: DNS
+summary: DNS는 이름을 IP 주소로 바꿔 줘요. 답은 TTL 동안 캐시돼서, 바꿔도 바로 퍼지지 않아요.
+domain: network
+type: concept
+stage: basics
+order: 15
+icon: network
+keywords: [DNS, 도메인, name server, 네임 서버, resolver, 리졸버, TTL, A record, CNAME, resolv.conf]
+related: [network/addresses, network/overview, apm/page-load, kubernetes/services-and-ingress]
+sources:
+  - title: RFC 1034 — Domain Names, Concepts and Facilities
+    url: https://www.rfc-editor.org/rfc/rfc1034
+  - title: RFC 1035 — Domain Names, Implementation and Specification
+    url: https://www.rfc-editor.org/rfc/rfc1035
+  - title: RFC 3596 — DNS Extensions to Support IPv6 (AAAA)
+    url: https://www.rfc-editor.org/rfc/rfc3596
+  - title: RFC 2308 — Negative Caching of DNS Queries
+    url: https://www.rfc-editor.org/rfc/rfc2308
+  - title: Linux man-pages — resolv.conf(5)
+    url: https://man7.org/linux/man-pages/man5/resolv.conf.5.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="이름을 주소로 바꿔요">
+    사람은 shop.example.com 같은 이름을 쓰고, 컴퓨터는 IP 주소로 찾아가요. DNS가 둘을 이어요.
+  </Point>
+  <Point title="여러 서버에 나눠 물어요">
+    이름은 나무 모양으로 나뉘어 있고, 각 부분을 맡은 네임 서버에 차례로 물어 답을 찾아요.
+  </Point>
+  <Point title="답은 TTL 동안 캐시돼요">
+    한 번 받은 답은 정해진 시간 동안 다시 묻지 않고 써요. 그래서 주소를 바꿔도 바로 퍼지지 않아요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="택배 주소록은 주인이 바꾸면 바로 바뀌지만, DNS는 여기저기 사본(캐시)이 퍼져 있어서 사본의 유효 시간이 끝날 때까지 옛 주소가 쓰여요.">
+  DNS는 상호로 주소를 찾아 주는 안내 전화와 같아요. 상호를 대고 주소를 물으면 동 안내소, 구 안내소를 거쳐 주소를 알려 줘요. 자주 묻는 주소는 수첩에 적어 두고 한동안 다시 묻지 않아요.
+</Analogy>
+
+## 이름과 주소
+
+택배가 건물 주소로 가듯, 네트워크의 데이터는 IP 주소로 가요. 하지만 사람에게 `203.0.113.10` 같은 숫자는 외우기 어려워요. 그래서 `shop.example.com` 같은 도메인 이름을 쓰고, <Term term="network/dns">DNS</Term>가 이름을 주소로 바꿔 줘요.
+
+주소의 기본은 <Term slug="network/addresses">주소: IP, MAC, 포트</Term>에서 다뤄요.
+
+DNS에 담기는 정보를 레코드라고 해요. 자주 보는 레코드는 이래요.
+
+| 레코드 | 담는 것 |
+| --- | --- |
+| A | IPv4 주소 |
+| AAAA | IPv6 주소 |
+| CNAME | 이 이름이 다른 이름의 별칭이라는 것 |
+| NS | 이 부분을 맡은 네임 서버 |
+| MX | 메일을 받을 서버 |
+
+## 이름은 나무 모양이에요
+
+도메인 이름은 점으로 나뉜 나무 구조예요. `shop.example.com`은 맨 위(루트) 아래 `com`, 그 아래 `example`, 그 아래 `shop`이에요. 나무의 부분마다 그 부분을 맡은 <Term term="network/name-server">네임 서버</Term>가 있어요.
+
+<Figure caption="처음 묻는 이름이면, 리졸버가 루트부터 차례로 물어 내려가요. 각 서버는 답을 모르면 더 아래를 맡은 서버를 알려 줘요.">
+  <Sequence
+    ariaLabel="리졸버가 루트 서버에 묻자 com 서버를 알려 주고, com 서버에 묻자 example.com 서버를 알려 주고, example.com 서버가 shop의 IP 주소를 답하는 순서"
+    participants={['리졸버', '루트', 'com', 'example.com']}
+    messages={[
+      { from: '리졸버', to: '루트', label: '주소 물어요' },
+      { from: '루트', to: '리졸버', label: 'com에 물어요', dashed: true },
+      { from: '리졸버', to: 'com', label: '주소 물어요' },
+      { from: 'com', to: '리졸버', label: 'example.com에 물어요', dashed: true },
+      { from: '리졸버', to: 'example.com', label: '주소 물어요', tone: 'accent' },
+      { from: 'example.com', to: '리졸버', label: '203.0.113.10', dashed: true, tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+이렇게 묻고 답을 모으는 프로그램을 <Term term="network/resolver">리졸버</Term>라고 해요. 보통 서버나 PC는 회사나 통신사가 운영하는 리졸버 하나에 묻고, 그 리졸버가 대신 차례로 물어 답을 가져와요. DNS는 보통 UDP 53번 포트로 묻고 답해요.
+
+## 답은 TTL 동안 캐시돼요
+
+레코드마다 <Term term="network/dns-ttl">TTL</Term>(time to live)이 있어요. 이 답을 몇 초 동안 캐시해도 되는지예요. 리졸버는 TTL이 끝날 때까지 같은 질문에 캐시의 답을 써요.
+
+그래서 DNS 레코드를 바꿔도 바로 모두에게 퍼지지 않아요. 옛 답을 캐시한 리졸버는 TTL이 끝날 때까지 옛 주소를 알려 줘요. 주소를 옮길 계획이라면, 미리 TTL을 짧게 줄여 둬요.
+
+"그런 이름은 없다"는 답도 캐시돼요. 이걸 부정 캐시(negative caching)라고 해요. 그래서 새 레코드를 만들기 전에 그 이름을 물었던 리졸버는, 한동안 "없다"는 답을 계속 줄 수 있어요.
+
+## 서버는 어디에 묻나
+
+리눅스 서버가 어느 리졸버에 물을지는 `/etc/resolv.conf`에 적혀 있어요.
+
+| 항목 | 뜻 |
+| --- | --- |
+| nameserver | 물어볼 네임 서버 주소. 3개까지 적어요 |
+| search | 짧은 이름 뒤에 붙여 볼 도메인 목록 |
+| options timeout | 한 서버의 답을 기다릴 시간. 기본 5초예요 |
+| options attempts | 포기하기 전까지 묻는 횟수. 기본 2번이에요 |
+
+`search`에 `example.com`이 있으면, `shop`만 물어도 `shop.example.com`으로 바꿔 물어요. 쿠버네티스 파드가 서비스 이름만으로 찾아가는 것도 이 기능 덕분이에요. 자세한 건 <Term slug="kubernetes/services-and-ingress">서비스와 인그레스</Term>에 있어요.
+
+## 모니터링에서는
+
+DNS가 느리거나 실패하면, 앱은 연결을 맺기도 전에 멈춰요. 그런데 앱 로그에는 "연결 실패"나 "타임아웃"으로만 남아서 DNS가 원인인지 잘 안 보여요.
+
+리졸버가 답을 안 주면 기본 설정에서 한 서버당 5초를 기다려요. 그래서 요청이 정확히 5초, 10초 늦어진다면 DNS를 먼저 의심해요. 브라우저에서 이름을 찾는 시간은 <Term slug="apm/page-load">브라우저에서 페이지가 뜨기까지</Term>의 DNS 구간에 보여요.
+
+<Checkpoints>
+  <Check>요청 지연이 5초, 10초처럼 딱 떨어진다면 DNS 대기를 의심하세요. 리졸버의 기본 대기 시간이 5초예요.</Check>
+  <Check>DNS 레코드를 바꿨는데 일부 사용자만 옛 서버로 간다면, 옛 레코드의 TTL이 아직 안 끝난 거예요.</Check>
+  <Check>새로 만든 이름이 어떤 서버에서만 "없다"고 나온다면, 만들기 전에 받은 "없다"는 답이 캐시돼 있을 수 있어요.</Check>
+  <Check>`/etc/resolv.conf`의 첫 네임 서버가 죽어 있다면, 모든 이름 찾기가 그 서버의 대기 시간만큼 늦어져요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### TTL 0의 뜻
+
+  RFC 1035는 TTL이 0이면 그 답을 지금 질문에만 쓰고 캐시하지 말라는 뜻이라고 적어요.
+
+  ### 이름의 한 칸 길이
+
+  RFC 1034는 이름의 점과 점 사이 한 칸(레이블)을 63바이트까지로 정해요.
+</Deeper>

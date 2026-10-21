@@ -216,6 +216,26 @@ terms:
   - id: dns
     name: DNS
     en: Domain Name System
-    aliases: [도메인 이름 시스템, 네임 서버, name server, 이름 풀이]
+    aliases: [도메인 이름 시스템, 이름 풀이, domain name, 도메인 이름]
     short: shop.example.com 같은 도메인 이름을 IP 주소로 바꿔 주는 체계예요.
     analogy: 상호를 대면 지점 주소를 알려 주는 안내 전화와 같아요.
+    doc: network/dns
+  - id: name-server
+    name: 네임 서버
+    en: Name server
+    aliases: [name server, nameserver, 권한 네임 서버, authoritative server, NS]
+    short: 도메인 이름 나무의 한 부분을 맡아, 그 부분의 레코드를 답하는 서버예요.
+    doc: network/dns
+  - id: resolver
+    name: 리졸버
+    en: Resolver
+    aliases: [resolver, DNS resolver, 리졸버 서버, 캐시 DNS, resolv.conf]
+    short: 이름을 대신 물어 답을 모아 오는 프로그램이에요. 받은 답은 TTL 동안 캐시해요.
+    analogy: 여러 안내소에 대신 전화해 주소를 알아 오는 비서와 같아요.
+    doc: network/dns
+  - id: dns-ttl
+    name: TTL(DNS)
+    en: Time to live
+    aliases: [DNS TTL, TTL, 캐시 시간, negative caching, 부정 캐시]
+    short: DNS 답을 몇 초 동안 캐시해도 되는지예요. 끝나기 전에는 바꾼 레코드가 퍼지지 않아요.
+    doc: network/dns

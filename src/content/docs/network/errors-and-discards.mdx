@@ -1,0 +1,77 @@
+---
+title: 오류·버린 패킷이 늘 때
+summary: 오류는 물리 쪽, 버림은 넘침 쪽을 먼저 의심해요. 비율과 양쪽 끝 설정을 함께 봐요.
+domain: network
+type: guide
+order: 110
+icon: network
+keywords: [interface errors, CRC, FCS, ifInErrors, ifInDiscards, ifOutDiscards, duplex mismatch, late collision, 패킷 오류, 버린 패킷]
+related: [network/interfaces-and-traffic, network/interface-saturated, network/link-flapping, network/tcp-connections]
+sources:
+  - title: RFC 2863 — The Interfaces Group MIB (ifInErrors, ifInDiscards, ifOutDiscards)
+    url: https://www.rfc-editor.org/rfc/rfc2863
+  - title: RFC 3635 — Ethernet-like Interface Types MIB (FCS errors, late collisions, duplex)
+    url: https://www.rfc-editor.org/rfc/rfc3635
+updated: 2026-10-21
+---
+
+<Situation>
+  서버와 스위치 사이 포트의 받은 오류(ifInErrors)가 하루 사이 0에서 수만 개로 늘었어요. 그 서버로 가는 파일 전송이 유난히 느려요.
+
+  오류와 버린 패킷은 이름이 비슷하지만 원인이 달라요. 무엇이 늘었는지 가르고, 크기를 비율로 보고, 원인을 좁혀요.
+</Situation>
+
+<FirstLook>
+  <Item title="오류인가 버림인가">errors와 discards 중 무엇이 늘었는지 봐요.</Item>
+  <Item title="비율이 얼마인가">전체 패킷 대비 몇 %인지 봐요.</Item>
+  <Item title="양쪽 설정이 같은가">속도와 이중 통신 설정을 견줘요.</Item>
+</FirstLook>
+
+## 1. 오류인지 버림인지 가르세요
+
+두 카운터는 이렇게 달라요. 뜻은 <Term slug="network/interfaces-and-traffic">인터페이스와 트래픽</Term>에도 있어요.
+
+| 카운터 | 뜻 | 먼저 의심할 곳 |
+| --- | --- | --- |
+| ifInErrors | 오류가 있어 위로 넘기지 못한 받은 패킷 | 케이블, 커넥터, 광 모듈, 설정 불일치 |
+| ifInDiscards | 오류는 없었지만 받고 나서 버린 패킷 | 장비의 받는 버퍼, 처리 능력 |
+| ifOutDiscards | 오류는 없었지만 내보내지 못하고 버린 패킷 | 보내는 쪽 넘침(포화) |
+
+보내는 쪽 버림(ifOutDiscards)이 늘었다면 대부분 넘침이에요. <Term slug="network/interface-saturated">인터페이스가 꽉 찼을 때</Term>로 가요. 받은 오류가 늘었다면 이 글의 2단계로 가요.
+
+## 2. 숫자보다 비율로 보세요
+
+카운터는 부팅 뒤 계속 쌓이는 누적값이라, 숫자만 크다고 문제는 아니에요. 같은 시간 동안 받은 전체 패킷과 견줘 비율로 봐요.
+
+<Figure caption="같은 5분 동안의 예시예요. 오류는 3,000개뿐이지만 받은 패킷 대비 0.5%예요. 평소 0에 가깝던 포트라면 분명한 이상이에요.">
+  <StatTile label="받은 패킷" value="60" unit="만 개" />
+  <StatTile label="그중 오류" value="3,000" unit="개" />
+  <StatTile label="오류 비율" value="0.5" unit="%" tone="warn" note="평소 0%" />
+</Figure>
+
+작은 비율이라도 TCP에는 크게 와닿아요. 패킷이 빠지면 TCP는 다시 보내고 보내는 속도를 낮춰서, 전송이 눈에 띄게 느려져요. 다시 보내는 원리는 <Term slug="network/tcp-connections">TCP 연결</Term>에서 다뤄요.
+
+## 3. 물리 쪽부터 좁혀 가세요
+
+받은 오류는 대부분 신호가 깨져서 생겨요. 이더넷에서는 프레임 끝의 검사값(FCS, 흔히 CRC라고 불러요)이 맞지 않는 프레임을 따로 세요.
+
+- 케이블이나 커넥터가 손상됐거나 헐거워요. 다른 케이블로 바꿔 봐요.
+- 광 모듈(SFP)이 낡았거나 받는 빛의 세기가 약해요.
+- 포트 자체가 고장 났어요. 다른 포트로 옮겨 봐요.
+
+한 번에 하나씩 바꾸고, 바꾼 뒤 오류 비율이 0으로 돌아오는지 봐요.
+
+## 4. 양쪽 끝의 이중 통신 설정을 견주세요
+
+이중 통신(duplex)은 한 번에 한 방향만 보낼지(half), 두 방향을 함께 보낼지(full)예요. 양쪽 끝이 서로 다르게 잡히면 오류가 꾸준히 생겨요. 한쪽은 자동 설정이고 다른 쪽은 고정 설정일 때 흔해요.
+
+이때는 대개 한쪽에서 받은 오류(FCS)가, 다른 쪽에서 늦은 충돌(late collision)이 늘어요. 그래서 한쪽 포트만 보면 원인이 반쪽만 보여요.
+
+**확인 방법**: 양쪽 포트의 속도와 이중 통신 상태를 함께 봐요. 이더넷 장비는 SNMP로 현재 이중 통신 모드(dot3StatsDuplexStatus)를 알려 줘요.
+
+<Checkpoints>
+  <Check>오류 카운터의 누적 숫자가 크다는 이유로 알렸다면, 같은 구간의 받은 패킷 대비 비율로 바꾸세요.</Check>
+  <Check>ifInErrors와 ifOutDiscards를 같은 "오류"로 묶어 보여 준다면 다시 보세요. 하나는 물리 문제, 하나는 넘침이라 대응이 달라요.</Check>
+  <Check>한쪽 포트만 보고 원인을 찾고 있다면, 맞은편 장비 포트의 카운터와 설정도 함께 보세요.</Check>
+  <Check>오류가 늘었다 링크가 끊겼다 붙었다를 함께 한다면 <Term slug="network/link-flapping">링크가 끊겼다 붙었다 할 때</Term>도 보세요.</Check>
+</Checkpoints>

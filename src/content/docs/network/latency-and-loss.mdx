@@ -1,0 +1,83 @@
+---
+title: 지연·손실이 늘 때
+summary: 어디서부터 나빠졌는지 경로를 따라 좁혀요. 중간 장비의 ping 손실은 진짜 손실이 아닐 수 있어요.
+domain: network
+type: guide
+order: 120
+icon: network
+keywords: [latency, 지연, packet loss, 손실, traceroute, mtr, RTT, ICMP rate limit, 경로, hop]
+related: [network/ping-and-latency, network/switches-and-routers, network/interface-saturated, network/errors-and-discards]
+sources:
+  - title: Linux man-pages — traceroute(8)
+    url: https://man7.org/linux/man-pages/man8/traceroute.8.html
+  - title: RFC 792 — Internet Control Message Protocol
+    url: https://www.rfc-editor.org/rfc/rfc792
+  - title: RFC 1812 — Requirements for IP Version 4 Routers (ICMP rate limiting)
+    url: https://www.rfc-editor.org/rfc/rfc1812
+updated: 2026-10-21
+---
+
+<Situation>
+  지점 사용자들이 본사 시스템이 느리다고 해요. 지점에서 본사 서버로 보낸 ping의 왕복 시간이 평소 8ms에서 90ms로 늘었고, 손실도 3%예요.
+
+  지연과 손실은 길 위 어디에서든 생길 수 있어요. 언제부터 어느 구간에서 나빠졌는지 경로를 따라 좁혀 가요.
+</Situation>
+
+<FirstLook>
+  <Item title="누구에게 다 그런가">한 서버만인지, 같은 길의 모두인지 봐요.</Item>
+  <Item title="어느 구간부터인가">경로를 따라 나빠지기 시작한 곳을 찾아요.</Item>
+  <Item title="그 구간이 넘치나">그 구간 인터페이스의 사용률과 버림을 봐요.</Item>
+</FirstLook>
+
+## 1. 범위부터 정하세요
+
+같은 지점에서 다른 서버로 가는 ping도 나빠졌는지, 다른 지점에서 같은 서버로 가는 ping도 나빠졌는지 봐요. 범위가 좁혀지면 의심할 구간도 줄어요.
+
+- **한 서버로 가는 길만 나쁘다면**: 그 서버나 서버 앞단 스위치를 봐요.
+- **한 지점에서 나가는 길이 모두 나쁘다면**: 그 지점의 회선이나 지점 라우터를 봐요.
+- **여러 지점이 모두 나쁘다면**: 본사 쪽 공통 구간(본사 회선, 방화벽)을 봐요.
+
+ping이 무엇을 재는지는 <Term slug="network/ping-and-latency">ping과 지연·손실</Term>에 있어요.
+
+## 2. 경로를 따라 나빠진 구간을 찾으세요
+
+traceroute는 TTL을 1부터 하나씩 늘린 패킷을 보내서, 길 위 라우터마다 "시간 초과" 답을 받아 경로를 보여 줘요. 각 단계(hop)마다 세 번씩 재서 왕복 시간을 보여 주고, 답이 없으면 `*`로 표시해요.
+
+<Figure caption="지점에서 본사까지의 경로 예시예요. 2번째 구간까지는 빠르고, 3번째 통신사 구간에서 지연이 크게 늘어나 끝까지 이어져요.">
+  <Waterfall
+    ariaLabel="1번째 지점 라우터 1ms, 2번째 지점 방화벽 2ms, 3번째 통신사 구간 85ms, 4번째 본사 라우터 87ms, 5번째 본사 서버 90ms로 3번째부터 지연이 크게 늘어나는 워터폴"
+    unit="ms"
+    spans={[
+      { label: '1. 지점 라우터', start: 0, duration: 1 },
+      { label: '2. 지점 방화벽', start: 0, duration: 2 },
+      { label: '3. 통신사 구간', start: 0, duration: 85, tone: 'warn' },
+      { label: '4. 본사 라우터', start: 0, duration: 87, tone: 'warn' },
+      { label: '5. 본사 서버', start: 0, duration: 90, tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+읽는 법은 "어디서부터 늘어나, 그 뒤로 계속 이어지는가"예요. 3번째 구간부터 늘어난 지연이 끝까지 이어진다면, 2번째와 3번째 사이에서 지연이 생긴 거예요.
+
+## 3. 중간 장비 하나의 손실에 속지 마세요
+
+traceroute에서 중간 장비 하나만 손실이 크거나 느리고, 그 뒤 구간은 멀쩡할 때가 있어요. 이건 보통 진짜 손실이 아니에요.
+
+라우터는 지나가는 패킷을 넘기는 일과, 자기에게 온 ping·traceroute에 답하는 일을 다르게 다뤄요. 라우터 요구 사항 문서(RFC 1812)도 라우터가 ICMP 오류 메시지의 양을 제한할 수 있어야 한다고 해요. 그래서 바쁜 라우터는 traceroute에 늦게 답하거나 답을 건너뛰어요.
+
+진짜 손실은 그 구간부터 끝까지 이어져요. 중간 하나만 나쁘고 끝(목적지)은 멀쩡하다면, 그 장비가 답을 아끼고 있을 뿐이에요.
+
+## 4. 그 구간의 인터페이스를 보세요
+
+지연이 늘어난 구간을 찾았다면, 그 구간을 잇는 인터페이스의 사용률과 버린 패킷을 봐요. 회선이 넘치면 장비 버퍼에 패킷이 줄을 서서 지연이 늘고, 버퍼가 넘치면 버려져 손실이 돼요.
+
+- 사용률이 높고 버림이 늘었다면 <Term slug="network/interface-saturated">인터페이스가 꽉 찼을 때</Term>로 가요.
+- 받은 오류가 늘었다면 <Term slug="network/errors-and-discards">오류·버린 패킷이 늘 때</Term>로 가요.
+- 장비 쪽은 멀쩡한데 통신사 구간이라면, 시각과 traceroute 결과를 모아 통신사에 문의해요.
+
+<Checkpoints>
+  <Check>traceroute의 중간 구간 하나만 손실이 크다고 그 장비를 원인으로 지목했다면 다시 보세요. 그 뒤 구간이 멀쩡하면 장비가 ICMP 답을 아끼는 거예요.</Check>
+  <Check>ping 평균 지연만 보고 있다면 손실과 최대 지연도 함께 보세요. 평균이 괜찮아도 가끔 튀는 지연과 손실이 사용자를 괴롭혀요.</Check>
+  <Check>한 방향에서만 traceroute를 돌렸다면 반대 방향도 돌려 보세요. 가는 길과 오는 길이 다를 수 있어요.</Check>
+  <Check>지연이 늘어난 시각과 그 구간 인터페이스의 사용률을 같은 시간축에 놓고 보세요. 둘이 함께 움직이면 넘침이 원인이에요.</Check>
+</Checkpoints>
