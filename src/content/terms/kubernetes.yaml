@@ -1,0 +1,86 @@
+terms:
+  - id: cluster
+    name: 클러스터
+    en: Kubernetes cluster
+    aliases: [cluster, k8s cluster, 쿠버네티스 클러스터]
+    short: 컨트롤 플레인 하나와 일하는 노드 여러 대를 묶은, 쿠버네티스의 전체 단위예요.
+    analogy: 관제탑과 배 여러 척을 함께 부르는 항구 전체와 같아요.
+    doc: kubernetes/overview
+  - id: control-plane
+    name: 컨트롤 플레인
+    en: Control plane
+    aliases: [control plane, 마스터, master node, 마스터 노드]
+    short: 클러스터 전체를 관리하는 구성 요소 묶음이에요. API 서버, etcd, 스케줄러가 여기 있어요.
+    analogy: 어느 배에 무엇을 실을지 정하는 항구 관제탑과 같아요.
+    doc: kubernetes/overview
+  - id: desired-state
+    name: 원하는 상태
+    en: Desired state
+    aliases: [desired state, spec, 스펙, 선언형]
+    short: 사용자가 바라는 모습을 적어 둔 거예요. 쿠버네티스는 지금 상태를 여기에 계속 맞춰요.
+    doc: kubernetes/overview
+  - id: api-server
+    name: API 서버
+    en: kube-apiserver
+    aliases: [kube-apiserver, apiserver, API server]
+    short: 쿠버네티스 API를 내놓는 중심 서버예요. 다른 구성 요소는 이 서버를 거쳐 움직여요.
+    doc: kubernetes/overview
+  - id: etcd
+    name: etcd
+    en: etcd
+    aliases: [etcd, 엣시디]
+    short: API 서버의 모든 데이터를 담는 키-값 저장소예요. 클러스터의 원하는 상태가 여기 있어요.
+    doc: kubernetes/overview
+  - id: scheduler
+    name: 스케줄러
+    en: kube-scheduler
+    aliases: [kube-scheduler, scheduler, 스케줄링]
+    short: 아직 노드가 정해지지 않은 파드를 찾아, 알맞은 노드에 배정하는 구성 요소예요.
+    analogy: 화물 묶음을 어느 배에 실을지 정하는 배정 담당과 같아요.
+    doc: kubernetes/pods-and-nodes
+  - id: kubelet
+    name: kubelet
+    en: kubelet
+    aliases: [kubelet, 큐블릿]
+    short: 노드마다 도는 에이전트예요. 그 노드에 배정된 파드의 컨테이너가 잘 돌고 있는지 지켜요.
+    analogy: 배마다 있으면서 실린 화물을 챙기는 선원과 같아요.
+    doc: kubernetes/pods-and-nodes
+  - id: node
+    name: 노드
+    en: Node
+    aliases: [node, worker node, 워커 노드]
+    short: 파드가 실제로 도는 서버예요. 물리 서버일 수도, 가상 머신일 수도 있어요.
+    analogy: 화물 묶음을 싣고 다니는 배와 같아요.
+    doc: kubernetes/pods-and-nodes
+  - id: pod
+    name: 파드
+    en: Pod
+    aliases: [pod, pods, 포드]
+    short: 쿠버네티스의 가장 작은 실행 단위예요. 컨테이너 하나 이상이 IP와 저장소를 함께 써요.
+    analogy: 늘 같은 배에 함께 실리는 컨테이너 묶음과 같아요.
+    doc: kubernetes/pods-and-nodes
+  - id: container
+    name: 컨테이너
+    en: Container
+    aliases: [container, containers, 도커 컨테이너]
+    short: 이미지를 실행한 것이에요. 서버의 커널을 함께 쓰면서 자기만의 프로세스·파일 시스템을 가져요.
+    analogy: 안에 무엇이 들었든 같은 크레인과 배로 옮기는 표준 화물 컨테이너와 같아요.
+    doc: kubernetes/containers
+  - id: container-image
+    name: 컨테이너 이미지
+    en: Container image
+    aliases: [image, 이미지, docker image, 도커 이미지, tag, 태그, digest, 다이제스트]
+    short: 앱과 그 앱이 쓰는 모든 것을 묶은 파일이에요. 이름과 태그, 또는 다이제스트로 가리켜요.
+    doc: kubernetes/containers
+  - id: linux-namespace
+    name: 네임스페이스(리눅스)
+    en: Linux namespace
+    aliases: [namespace, 네임스페이스, PID namespace, network namespace]
+    short: 서버 전체의 자원을 그 안의 프로세스에게 자기만의 것처럼 보이게 감싸는 커널 기능이에요.
+    doc: kubernetes/containers
+  - id: cgroup
+    name: cgroup
+    en: Control groups
+    aliases: [cgroup, cgroups, control group, 컨트롤 그룹]
+    short: 프로세스를 묶어, 그 묶음이 쓰는 CPU·메모리 같은 자원을 제한하고 재는 커널 기능이에요.
+    doc: kubernetes/containers
