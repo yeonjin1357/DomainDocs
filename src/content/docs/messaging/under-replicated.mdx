@@ -1,0 +1,87 @@
+---
+title: 복제가 모자란 파티션이 생길 때
+summary: 브로커가 멈췄는지, 팔로워가 따라오지 못하는지 가르고, 쓰기가 막힐 만큼 줄었는지 봐요.
+domain: messaging
+type: guide
+order: 90
+icon: messages-square
+keywords: [under-replicated partitions, 복제 부족, ISR shrink, UnderMinIsrPartitionCount, OfflinePartitionsCount, replica.lag.time.max.ms, 리더 불균형, preferred leader, 브로커 장애, 원인 찾기]
+related: [messaging/replication, messaging/producers, server/slow-disk, network/interface-saturated]
+sources:
+  - title: Apache Kafka 4.3 — Design (replication)
+    url: https://kafka.apache.org/43/design/design/
+  - title: Apache Kafka 4.3 — Monitoring (broker metrics)
+    url: https://kafka.apache.org/43/operations/monitoring/
+  - title: Apache Kafka 4.3 — Broker Configs
+    url: https://kafka.apache.org/43/configuration/broker-configs/
+  - title: Apache Kafka 4.3 — Basic Kafka Operations (balancing leadership)
+    url: https://kafka.apache.org/43/operations/basic-kafka-operations/
+updated: 2026-10-21
+---
+
+<Situation>
+  Kafka 클러스터의 복제가 모자란 파티션(UnderReplicatedPartitions)이 0에서 120으로 늘었어요. 아직 프로듀서 오류는 없어요.
+
+  복제가 모자라다는 건 어떤 복제본이 리더를 따라오지 못해 ISR에서 빠졌다는 뜻이에요. 지금은 버티고 있어도, 더 줄면 쓰기가 막히거나 이벤트를 잃을 수 있어요.
+</Situation>
+
+<FirstLook>
+  <Item title="브로커가 멈췄나">모자란 파티션이 한 브로커에 몰렸는지 봐요.</Item>
+  <Item title="팔로워가 느린가">디스크·네트워크가 버거운지 봐요.</Item>
+  <Item title="쓰기가 막힐 만큼인가">최소 ISR보다 줄었는지 봐요.</Item>
+</FirstLook>
+
+## 1. 한 브로커에 몰렸는지 보세요
+
+복제가 모자란 파티션들의 빠진 복제본이 모두 같은 브로커에 있다면, 그 브로커가 멈췄거나 아픈 거예요. 여러 브로커에 고루 퍼져 있다면 클러스터 전체가 버거운 거예요.
+
+브로커를 재시작하는 동안 잠깐 생기는 건 정상이에요. 재시작한 브로커의 팔로워가 다시 따라잡으면 ISR로 돌아오고, 숫자는 0으로 돌아가요. 복제의 원리는 <Term slug="messaging/replication">브로커와 복제</Term>에 있어요.
+
+**확인 방법**: 아래 명령으로 복제가 모자란 파티션만 골라 봐요. Replicas는 전체 복제본, Isr은 따라잡은 복제본이에요.
+
+```text
+kafka-topics.sh \
+  --bootstrap-server 브로커:9092 \
+  --describe \
+  --under-replicated-partitions
+```
+
+## 2. 팔로워가 따라오지 못하는 이유를 보세요
+
+브로커는 살아 있는데 ISR에서 빠졌다면, 팔로워가 리더를 따라잡지 못하는 거예요. 팔로워가 30초(`replica.lag.time.max.ms` 기본값) 동안 리더를 따라잡지 못하면 리더가 ISR에서 빼요.
+
+- 팔로워 브로커의 디스크가 느려요. 쓰기 지연이 늘었는지 봐요. <Term slug="server/slow-disk">디스크가 느릴 때</Term>의 순서와 같아요.
+- 브로커 사이 네트워크가 꽉 찼어요. 큰 재처리나 새 브로커로 옮기는 작업이 대역폭을 차지하고 있는지 봐요.
+- 들어오는 양이 크게 늘어 팔로워의 복제 속도가 못 따라가요.
+
+**확인 방법**: IsrShrinksPerSec와 IsrExpandsPerSec를 봐요. Kafka 문서는 브로커가 내려갔다 올라올 때 말고는 둘 다 0이어야 한다고 해요.
+
+## 3. 쓰기가 막힐 만큼 줄었는지 보세요
+
+ISR이 토픽의 `min.insync.replicas`보다 적어지면, acks=all로 쓰는 프로듀서는 실패해요. 이때 프로듀서는 NotEnoughReplicas 같은 오류를 받아요.
+
+<Figure caption="복제본 3개에 최소 ISR 2인 토픽이에요. ISR이 2일 때까지는 쓰기가 되지만, 1로 줄면 acks=all 쓰기가 막혀요.">
+  <Compare
+    columns={['ISR 2개', 'ISR 1개']}
+    rows={[
+      { label: '복제 모자람', values: ['네(3개 중 2개)', '네(3개 중 1개)'] },
+      { label: 'acks=all 쓰기', values: ['돼요', '막혀요'] },
+      { label: '지표', values: ['UnderReplicated', 'UnderMinIsr도 함께'] },
+    ]}
+  />
+</Figure>
+
+UnderMinIsrPartitionCount가 0이 아니라면 이미 쓰기가 막힌 파티션이 있어요. OfflinePartitionsCount가 0이 아니라면 리더조차 없어 읽기·쓰기가 모두 안 되는 파티션이 있어요. 이 둘은 바로 대응해요.
+
+## 4. 돌아온 뒤 리더가 쏠렸는지 보세요
+
+브로커가 멈추면 그 브로커가 맡던 리더 역할은 다른 브로커로 넘어가요. 재시작한 브로커는 처음에 팔로워로만 돌아와서, 리더가 다른 브로커들에 쏠려요.
+
+Kafka는 기본으로 리더를 원래 브로커(선호 리더)에게 되돌려요(`auto.leader.rebalance.enable`). 되돌리기 전까지는 일부 브로커가 더 바빠요.
+
+<Checkpoints>
+  <Check>복제가 모자란 파티션이 계속 0이 아니라면, 빠진 복제본이 한 브로커에 몰렸는지부터 보세요.</Check>
+  <Check>브로커는 살아 있는데 ISR에서 자꾸 빠졌다 돌아온다면, 그 브로커의 디스크 지연과 네트워크 사용률을 보세요.</Check>
+  <Check>UnderMinIsrPartitionCount나 OfflinePartitionsCount가 0이 아니라면 바로 보세요. 쓰기나 읽기가 이미 막혔어요.</Check>
+  <Check>브로커 재시작 뒤 특정 브로커만 바쁘다면, 리더가 아직 원래 브로커로 돌아가지 않은 거예요.</Check>
+</Checkpoints>

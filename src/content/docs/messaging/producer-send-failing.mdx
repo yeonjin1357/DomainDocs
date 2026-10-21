@@ -1,0 +1,86 @@
+---
+title: 프로듀서 전송이 실패할 때
+summary: 시간 초과인지, 복제가 모자라 거절됐는지, 이벤트가 너무 큰지, 버퍼가 찼는지 오류로 가려요.
+domain: messaging
+type: guide
+order: 100
+icon: messages-square
+keywords: [producer error, 전송 실패, TimeoutException, NotEnoughReplicas, RecordTooLargeException, buffer.memory, max.block.ms, delivery.timeout.ms, record-error-rate, 원인 찾기]
+related: [messaging/producers, messaging/under-replicated, messaging/replication, apm/timeouts-and-retries]
+sources:
+  - title: Apache Kafka 4.3 — Producer Configs
+    url: https://kafka.apache.org/43/configuration/producer-configs/
+  - title: Apache Kafka 4.3 — Topic Configs (min.insync.replicas, max.message.bytes)
+    url: https://kafka.apache.org/43/configuration/topic-configs/
+  - title: Apache Kafka 4.3 — Broker Configs (message.max.bytes)
+    url: https://kafka.apache.org/43/configuration/broker-configs/
+  - title: Apache Kafka 4.3 — Monitoring (producer metrics)
+    url: https://kafka.apache.org/43/operations/monitoring/
+updated: 2026-10-21
+---
+
+<Situation>
+  주문 서비스 로그에 Kafka로 이벤트를 보내지 못했다는 오류가 쌓이기 시작했어요. 일부 주문은 이벤트가 빠져 후속 처리가 안 됐어요.
+
+  프로듀서는 실패하면 알아서 다시 보내요. 그래서 앱에 오류가 보일 때는 이미 다시 보내기도 실패한 뒤예요. 오류의 종류로 원인을 가려요.
+</Situation>
+
+<FirstLook>
+  <Item title="어떤 오류인가">시간 초과, 복제 부족, 크기 초과, 버퍼 부족 중 무엇인지 봐요.</Item>
+  <Item title="재시도가 늘었나">실패 전에 재시도가 쌓였는지 봐요.</Item>
+  <Item title="브로커가 건강한가">복제와 요청 지연을 봐요.</Item>
+</FirstLook>
+
+## 1. 오류의 종류를 보세요
+
+프로듀서 오류는 몇 가지로 나뉘고, 갈래마다 볼 곳이 달라요. 프로듀서의 동작은 <Term slug="messaging/producers">프로듀서</Term>에 있어요.
+
+| 오류 | 뜻 | 다음에 볼 곳 |
+| --- | --- | --- |
+| 시간 초과 | 정해진 시간 안에 보내기를 끝내지 못했어요 | 2단계 |
+| NotEnoughReplicas | 동기화된 복제본이 최소 수보다 적어 거절됐어요 | 3단계 |
+| RecordTooLargeException | 이벤트가 허용 크기보다 커요 | 4단계 |
+| 버퍼 대기 시간 초과 | 보낼 이벤트가 쌓여 메모리 버퍼가 찼어요 | 5단계 |
+
+## 2. 시간 초과라면 재시도와 브로커를 보세요
+
+프로듀서는 `delivery.timeout.ms`(기본 2분) 동안 다시 보내기를 되풀이해요. 그 안에 성공하지 못하면 앱에 실패를 알려요. 그래서 시간 초과가 났다면 2분 내내 브로커가 제대로 답하지 못한 거예요.
+
+**확인 방법**: 프로듀서 지표 record-retry-rate와 request-latency-avg가 오류 전에 늘었는지 봐요. 늘었다면 브로커 쪽을 봐요. 리더가 바뀌는 중이었거나, 브로커가 버거웠을 수 있어요.
+
+## 3. NotEnoughReplicas라면 복제를 보세요
+
+acks=all로 쓸 때 ISR이 토픽의 `min.insync.replicas`보다 적으면, 브로커는 쓰기를 거절해요. 이벤트를 잃지 않으려고 일부러 막는 거예요.
+
+이때는 프로듀서가 아니라 클러스터를 고쳐야 해요. <Term slug="messaging/under-replicated">복제가 모자란 파티션이 생길 때</Term>의 순서로 브로커와 팔로워를 봐요. 급하다고 acks를 1로 낮추면, 복제 전에 리더가 죽을 때 이벤트를 잃을 수 있어요.
+
+## 4. 크기 초과라면 이벤트 크기를 보세요
+
+이벤트 하나, 또는 한 번에 보내는 요청이 허용 크기보다 크면 보낼 수 없어요. 기본 한도는 대략 1MB예요.
+
+| 설정 | 어디 | 기본값 |
+| --- | --- | --- |
+| `max.request.size` | 프로듀서 | 1,048,576바이트 |
+| `message.max.bytes` | 브로커 | 1,048,588바이트 |
+| `max.message.bytes` | 토픽 | 1,048,588바이트 |
+
+큰 데이터는 이벤트에 통째로 넣지 말고, 저장소에 두고 위치만 이벤트로 보내는 방법을 먼저 고려해요. 한도를 늘린다면 프로듀서와 브로커(또는 토픽) 설정을 함께 맞춰야 해요.
+
+## 5. 버퍼가 찼다면 보내는 속도를 보세요
+
+프로듀서는 보낼 이벤트를 메모리 버퍼(`buffer.memory`, 기본 32MB)에 모아 둬요. 브로커로 보내는 속도보다 쌓이는 속도가 빠르면 버퍼가 차요. 그러면 보내기 호출이 `max.block.ms`(기본 60초) 동안 기다리다 실패해요.
+
+<Figure caption="버퍼가 찬 프로듀서의 예시예요. 브로커 응답이 느려지자 버퍼가 차고, 보내기 호출이 기다리다 실패했어요.">
+  <StatTile label="요청 지연" value="850" unit="ms" tone="warn" note="평소 15ms" />
+  <StatTile label="버퍼 남은 양" value="0" unit="MB" tone="warn" note="32MB 중" />
+  <StatTile label="초당 실패" value="140" unit="건" tone="warn" />
+</Figure>
+
+버퍼가 찬 건 대개 결과예요. 브로커가 느려진 원인을 먼저 찾고, 그다음 버퍼 크기나 보내는 양을 조정해요.
+
+<Checkpoints>
+  <Check>프로듀서 오류가 났다면 재시도도 이미 실패한 뒤예요. 오류 수와 함께 그 전에 늘어난 재시도 수를 보세요.</Check>
+  <Check>NotEnoughReplicas가 난다고 acks를 낮추려 했다면 다시 보세요. 막힌 이유는 클러스터의 복제 부족이고, acks를 낮추면 이벤트를 잃을 수 있어요.</Check>
+  <Check>큰 이벤트 때문에 한도를 늘렸는데 여전히 실패한다면, 프로듀서와 브로커(토픽) 설정을 함께 늘렸는지 보세요.</Check>
+  <Check>보내기 실패를 로그로만 남기고 넘어가는 코드라면 다시 보세요. 그 이벤트는 사라져요. 실패한 이벤트를 따로 저장하거나 다시 보낼 길을 두세요.</Check>
+</Checkpoints>

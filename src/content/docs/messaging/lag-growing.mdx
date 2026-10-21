@@ -1,0 +1,91 @@
+---
+title: 컨슈머 지연이 쌓일 때
+summary: 들어오는 양이 늘었는지 처리 속도가 줄었는지 가르고, 파티션별로 어디가 밀리는지 찾아요.
+domain: messaging
+type: guide
+order: 70
+icon: messages-square
+keywords: [consumer lag, 지연 증가, lag 쌓임, kafka-consumer-groups, LOG-END-OFFSET, 처리 속도, 파티션 쏠림, 컨슈머 늘리기, STALLED, 원인 찾기]
+related: [apm/consumer-lag, messaging/consumers-and-groups, messaging/topics-and-partitions, messaging/rebalance-storm]
+sources:
+  - title: Apache Kafka 4.3 — Basic Kafka Operations (checking consumer position)
+    url: https://kafka.apache.org/43/operations/basic-kafka-operations/
+  - title: Apache Kafka 4.3 — KafkaConsumer
+    url: https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html
+  - title: Apache Kafka 4.3 — Topic Configs (retention.ms)
+    url: https://kafka.apache.org/43/configuration/topic-configs/
+updated: 2026-10-21
+---
+
+<Situation>
+  주문 이벤트를 처리하는 컨슈머 그룹의 지연이 오전 내내 늘어 50만 건을 넘었어요. 주문 알림 메일이 한 시간씩 늦게 나가요.
+
+  지연이 쌓인다는 건 들어오는 속도가 처리 속도보다 빠르다는 뜻이에요. 어느 쪽이 바뀌었는지, 어느 파티션이 밀리는지 차례로 봐요.
+</Situation>
+
+<FirstLook>
+  <Item title="들어오는 양인가 처리 속도인가">둘 중 무엇이 바뀌었는지 봐요.</Item>
+  <Item title="어느 파티션이 밀리나">파티션별 지연과 맡은 컨슈머를 봐요.</Item>
+  <Item title="멈춘 컨슈머가 있나">위치가 움직이지 않는 컨슈머를 찾아요.</Item>
+</FirstLook>
+
+## 1. 들어오는 양과 처리 속도를 견주세요
+
+지연은 들어온 이벤트와 처리한 이벤트의 차이예요. 그래서 둘 중 하나만 바뀌어도 쌓여요. 지연을 읽는 기본은 <Term slug="apm/consumer-lag">메시지 큐 지연</Term>에 있어요.
+
+<Figure caption="같은 오전의 예시예요. 들어오는 속도는 그대로인데, 컨슈머가 처리하는 속도가 10시부터 절반으로 줄었어요. 그 차이만큼 지연이 쌓여요.">
+  <MiniLineChart
+    ariaLabel="초당 들어오는 이벤트는 1,000으로 그대로이고, 초당 처리하는 이벤트가 1,000에서 500으로 줄어든 그래프"
+    yMax={1200}
+    series={[
+      { label: '들어오는 속도', values: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000], tone: 'sub', value: '초당 1,000' },
+      { label: '처리하는 속도', values: [1000, 1000, 500, 500, 500, 500, 500, 500], tone: 'warn', value: '초당 500' },
+    ]}
+  />
+</Figure>
+
+- **들어오는 양이 늘었다면**: 이벤트를 보내는 쪽이 바빠졌어요. 행사, 배치 작업, 재처리 같은 일이 있었는지 봐요. 처리 능력을 늘려야 해요.
+- **처리 속도가 줄었다면**: 컨슈머가 이벤트 하나를 처리하는 데 더 오래 걸려요. 컨슈머가 부르는 DB나 바깥 API가 느려졌는지 봐요.
+
+## 2. 파티션별로 어디가 밀리는지 보세요
+
+지연을 그룹 전체 합으로만 보면 어디가 문제인지 안 보여요. 파티션 하나는 그룹 안의 컨슈머 하나만 맡아서, 컨슈머 하나가 느리면 그 컨슈머의 파티션만 밀려요.
+
+**확인 방법**: 아래 명령으로 파티션마다 처리 위치와 지연을 봐요.
+
+```text
+kafka-consumer-groups.sh \
+  --bootstrap-server 브로커:9092 \
+  --describe --group 그룹이름
+```
+
+CURRENT-OFFSET은 처리 위치, LOG-END-OFFSET은 끝, LAG는 그 차이예요. CONSUMER-ID는 그 파티션을 맡은 컨슈머예요.
+
+- 한 컨슈머가 맡은 파티션만 밀린다면 그 컨슈머(서버)를 봐요.
+- 한 파티션만 이벤트가 많고 밀린다면 키가 한쪽으로 쏠린 거예요. <Term slug="messaging/topics-and-partitions">토픽과 파티션</Term>의 키 설명을 봐요.
+
+## 3. 멈춘 컨슈머가 있는지 보세요
+
+처리 위치(CURRENT-OFFSET)가 몇 분째 그대로인 파티션이 있다면, 그 컨슈머는 멈췄어요. 같은 이벤트를 처리하다 계속 실패하거나, 바깥 호출에서 끝없이 기다리는 경우가 흔해요.
+
+컨슈머 그룹이 계속 리밸런스 중이어도 처리가 멈춰요. 리밸런스가 잦다면 <Term slug="messaging/rebalance-storm">리밸런스가 반복될 때</Term>를 봐요.
+
+## 4. 처리 능력을 늘리세요
+
+원인을 고칠 수 없거나, 들어오는 양 자체가 늘었다면 처리 능력을 늘려요.
+
+- 컨슈머를 늘려요. 다만 그룹 안에서 일하는 컨슈머 수는 파티션 수를 넘지 못해요. 파티션이 8개면 컨슈머 9번째부터는 놀아요.
+- 컨슈머가 이미 파티션 수만큼이라면, 파티션을 늘리거나 이벤트 하나의 처리 시간을 줄여요. 파티션을 늘리면 키와 파티션의 짝이 바뀌는 점은 미리 살펴요.
+
+## 5. 보관 기간 안에 따라잡는지 보세요
+
+지연이 토픽의 보관 기간을 넘으면, 아직 처리하지 않은 이벤트가 지워져요. 지금 처리 속도로 쌓인 지연을 다 처리하는 데 걸리는 시간을 계산해, 보관 기간(기본 7일)과 견줘요.
+
+예를 들어 지연이 50만 건이고 처리 속도가 들어오는 속도보다 초당 100건 빠르다면, 따라잡는 데 약 83분이 걸려요. 처리 속도가 들어오는 속도보다 느리다면 지연은 계속 늘기만 해요.
+
+<Checkpoints>
+  <Check>지연을 줄이려고 컨슈머만 계속 늘렸다면, 파티션 수를 넘지 않았는지 보세요. 넘는 컨슈머는 놀아요.</Check>
+  <Check>그룹 전체 지연만 보고 있다면 파티션별로도 보세요. 한 파티션만 밀리는 경우가 많아요.</Check>
+  <Check>처리 위치가 몇 분째 그대로인 파티션이 있다면, 같은 이벤트에서 계속 실패하고 있지 않은지 컨슈머 로그를 보세요.</Check>
+  <Check>지연이 보관 기간에 가까워진다면 가장 먼저 처리 능력을 늘리세요. 넘으면 이벤트가 지워져요.</Check>
+</Checkpoints>
