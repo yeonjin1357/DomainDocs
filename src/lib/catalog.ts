@@ -1,15 +1,19 @@
 import type { DomainId } from '../data/domains';
 import type { IconName } from '../data/icons';
 
-export type DocType = 'concept' | 'guide';
+export type DocType = 'overview' | 'concept' | 'guide';
 
-export const TYPE_LABEL: Record<DocType, string> = { concept: '개념', guide: '가이드' };
+/** 개념 글의 층. basics는 도메인 기초, monitoring은 모니터링 관점이다. */
+export type Stage = 'basics' | 'monitoring';
+
+export const TYPE_LABEL: Record<DocType, string> = { overview: '한눈에 보기', concept: '개념', guide: '가이드' };
 
 /** 목록·카드·다음 글에 쓰는 글 요약. astro:content에 의존하지 않아 단위 테스트할 수 있다. */
 export interface DocCard {
   id: string;
   domain: DomainId;
   type: DocType;
+  stage?: Stage;
   order: number;
   title: string;
   summary: string;

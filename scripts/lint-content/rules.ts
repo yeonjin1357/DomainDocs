@@ -295,6 +295,11 @@ export function lintSource(src: SourceFile, ctx: LintContext): LintIssue[] {
     return issues;
   }
   const type: DocType = fm.type;
+  if (type === 'concept' && fm.stage !== 'basics' && fm.stage !== 'monitoring') {
+    report('frontmatter', 1, 1, `개념 글에는 stage(basics 또는 monitoring)가 필요해요. 현재: ${String(fm.stage)}`);
+  } else if (type !== 'concept' && fm.stage !== undefined) {
+    report('frontmatter', 1, 1, 'stage는 개념 글에만 써요.');
+  }
   const folder = src.id.split('/')[0];
   if (fm.domain !== folder) report('domain-folder', 1, 1, `domain(${String(fm.domain)})이 폴더(${folder})와 달라요.`);
 

@@ -3,12 +3,12 @@ import { describe, expect, it } from 'vitest';
 import { LINT_CONFIG } from '../../../scripts/lint-content/config';
 import { lintSource, type DocMeta, type LintContext, type RuleId } from '../../../scripts/lint-content/rules';
 
-const FRONT = (extra = '', type = 'concept', domain = 'foundations') => `---
+const FRONT = (extra = '', type = 'concept', domain = 'foundations', stage: string | null = type === 'concept' ? 'monitoring' : null) => `---
 title: 테스트 글
 summary: 검사 규칙을 확인하려고 만든 글이에요.
 domain: ${domain}
 type: ${type}
-order: 1
+${stage === null ? '' : `stage: ${stage}\n`}order: 1
 sources:
   - title: 예시 출처
     url: https://example.com/
@@ -190,6 +190,15 @@ describe('머리말과 참조 규칙', () => {
   });
   it('type이 잘못되면 잡는다', () => {
     expect(rules(FRONT('', 'essay') + CONCEPT_BODY)).toEqual(['frontmatter']);
+  });
+  it('개념 글에 stage가 없으면 잡는다', () => {
+    expect(rules(FRONT('', 'concept', 'foundations', null) + CONCEPT_BODY)).toContain('frontmatter');
+  });
+  it('stage 값이 basics·monitoring이 아니면 잡는다', () => {
+    expect(rules(FRONT('', 'concept', 'foundations', 'intro') + CONCEPT_BODY)).toContain('frontmatter');
+  });
+  it('가이드에 stage가 있으면 잡는다', () => {
+    expect(rules(FRONT('', 'guide', 'foundations', 'basics') + GUIDE_BODY)).toContain('frontmatter');
   });
   it('없는 글을 가리키는 Term과 related를 잡는다', () => {
     expect(rules(FRONT() + CONCEPT_BODY.replace('foundations/other', 'foundations/nope'))).toEqual(['reference']);

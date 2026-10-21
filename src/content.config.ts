@@ -11,7 +11,9 @@ const docs = defineCollection({
     title: z.string().max(30),
     summary: z.string().min(15).max(60),
     domain: z.enum(DOMAIN_IDS),
-    type: z.enum(['concept', 'guide']),
+    type: z.enum(['overview', 'concept', 'guide']),
+    // 개념 글의 층. basics는 도메인 기초, monitoring은 모니터링 관점. 개념 글에만 쓴다(글 검사가 확인).
+    stage: z.enum(['basics', 'monitoring']).optional(),
     order: z.number().int(),
     icon: z.enum(ICON_NAMES).optional(),
     keywords: z.array(z.string()).max(10).default([]),

@@ -41,6 +41,7 @@ export function toCard(entry: DocEntry): DocCard {
     id: entry.id,
     domain: entry.data.domain,
     type: entry.data.type,
+    stage: entry.data.stage,
     order: entry.data.order,
     title: entry.data.title,
     summary: entry.data.summary,
