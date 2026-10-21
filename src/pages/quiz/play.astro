@@ -1,0 +1,276 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { DOMAINS } from '../../data/domains';
+import { getCards } from '../../lib/content';
+import { quizBankPath, quizHomePath, quizPlayPath } from '../../lib/paths';
+
+// 범위 이름(영역·글 제목)을 화면에 쓰려고 작은 표만 넣는다. 문제는 bank.json에서 받는다.
+const meta = {
+  domains: Object.fromEntries(DOMAINS.map((d) => [d.id, d.name])),
+  docs: Object.fromEntries((await getCards()).map((c) => [c.id, c.title])),
+};
+---
+<BaseLayout title="퀴즈 풀기" description="읽은 내용을 문제로 다시 꺼내 봐요." surface="white" backHref={quizHomePath()} barTitle="퀴즈">
+  <div class="quiz" id="quiz-app" data-bank={quizBankPath()} data-home={quizHomePath()} data-new={quizPlayPath('new')}>
+    <p class="quiz-scope" data-quiz-scope></p>
+    <p class="quiz-message">문제를 불러오고 있어요.</p>
+    <noscript><p class="quiz-message">퀴즈는 자바스크립트가 켜져 있어야 풀 수 있어요.</p></noscript>
+  </div>
+  <script type="application/json" id="quiz-meta" set:html={JSON.stringify(meta)} />
+</BaseLayout>
+
+<script>
+  import { initQuiz } from '../../scripts/quiz';
+  void initQuiz();
+</script>
+
+<style is:global>
+  .quiz {
+    padding: 8px 0 40px;
+  }
+
+  .quiz-scope {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .quiz-message {
+    margin: 24px 0;
+    color: var(--color-text-sub);
+  }
+
+  .quiz-progress {
+    height: 6px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--color-line);
+  }
+
+  .quiz-progress-bar {
+    height: 100%;
+    background: var(--color-accent);
+    transition: width 0.2s ease;
+  }
+
+  .quiz-count {
+    margin: 8px 0 20px;
+    font-size: 14px;
+    color: var(--color-text-weak);
+  }
+
+  .quiz-prompt {
+    margin: 0 0 16px;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: -0.02em;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .quiz-quote {
+    margin: 0 0 20px;
+    padding: 14px 16px;
+    border-radius: var(--radius-button);
+    background: var(--color-bg);
+    font-size: 17px;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .quiz-choices {
+    display: grid;
+    gap: 10px;
+  }
+
+  .quiz-choices.is-ox {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .quiz-choice {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    min-height: 56px;
+    padding: 12px 16px;
+    border: 2px solid transparent;
+    border-radius: var(--radius-button);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: left;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+  }
+
+  .quiz-choices.is-ox .quiz-choice {
+    justify-content: center;
+    min-height: 88px;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .quiz-choice:disabled {
+    cursor: default;
+  }
+
+  .quiz-choice-key {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-card);
+    color: var(--color-text-sub);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .quiz-choices.is-ox .quiz-choice-key {
+    display: none;
+  }
+
+  .quiz-choice.is-correct,
+  .quiz-input.is-correct {
+    border-color: var(--color-accent);
+    background: var(--color-accent-weak);
+  }
+
+  .quiz-choice.is-wrong,
+  .quiz-input.is-wrong {
+    border-color: var(--color-warn);
+    background: var(--color-warn-weak);
+  }
+
+  .quiz-input-form {
+    display: flex;
+    gap: 8px;
+  }
+
+  .quiz-input {
+    flex: 1;
+    min-width: 0;
+    min-height: 56px;
+    padding: 0 16px;
+    border: 2px solid var(--color-line);
+    border-radius: var(--radius-button);
+    background: var(--color-card);
+    color: var(--color-text);
+    font: inherit;
+    font-size: 17px;
+  }
+
+  .quiz-button {
+    flex: none;
+    min-height: 56px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: var(--radius-button);
+    background: var(--color-accent);
+    color: #fff;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .quiz-button.is-sub {
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .quiz-feedback {
+    margin-top: 20px;
+  }
+
+  .quiz-verdict {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .quiz-verdict.is-correct {
+    color: var(--color-accent);
+  }
+
+  .quiz-verdict.is-wrong {
+    color: var(--color-warn);
+  }
+
+  .quiz-answer,
+  .quiz-explain {
+    margin: 0 0 8px;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .quiz-answer {
+    font-weight: 600;
+  }
+
+  .quiz-link {
+    display: inline-block;
+    margin: 4px 0 20px;
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .quiz-next {
+    width: 100%;
+  }
+
+  .quiz-result h2 {
+    margin: 8px 0 4px;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+  }
+
+  .quiz-result h3 {
+    margin: 28px 0 8px;
+    font-size: 17px;
+  }
+
+  .quiz-wrong {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .quiz-wrong li {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-line);
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .quiz-wrong p {
+    margin: 0 0 4px;
+  }
+
+  .quiz-wrong .quiz-quote {
+    margin: 4px 0 8px;
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .quiz-actions {
+    display: grid;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .quiz-actions a.quiz-button {
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+  }
+</style>
