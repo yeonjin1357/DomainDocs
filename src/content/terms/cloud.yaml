@@ -93,3 +93,35 @@ terms:
     short: 파일을 통째로 키를 붙여 HTTP로 넣고 꺼내는 저장소예요. 용량이 거의 끝없이 늘어나요.
     analogy: 상자째 맡기고 번호표로 찾는 보관 창고와 같아요.
     doc: cloud/storage
+  - id: managed-database
+    name: 관리형 데이터베이스
+    en: Managed database
+    aliases: [RDS, managed database, 관리형 DB, Azure SQL Database, DBaaS, Multi-AZ, read replica, 읽기 복제본]
+    short: 설치·패치·백업·고가용성을 사업자가 맡는 DB 서비스예요. 쿼리 튜닝은 여전히 내 몫이에요.
+    analogy: 설비 점검은 빌딩이 맡는 공용 주방을 빌려 쓰는 것과 같아요.
+    doc: cloud/managed-databases
+  - id: serverless
+    name: 서버리스 함수
+    en: Serverless function
+    aliases: [serverless, Lambda, Azure Functions, FaaS, 서버리스]
+    short: 서버 없이 코드만 올려, 이벤트가 올 때 실행하고 쓴 만큼 내는 방식이에요.
+    analogy: 전화가 올 때만 상담원을 불러 앉히는 콜센터와 같아요.
+    doc: cloud/serverless
+  - id: cold-start
+    name: 콜드 스타트
+    en: Cold start
+    aliases: [cold start, 웜 스타트, warm start, Provisioned Concurrency, 초기화]
+    short: 실행 환경이 없어 새로 띄우고 초기화하느라 첫 요청이 늦어지는 일이에요.
+    doc: cloud/serverless
+  - id: concurrency
+    name: 동시성
+    en: Concurrency
+    aliases: [concurrency, 동시 실행, ConcurrentExecutions, Throttles, 스로틀, throttle]
+    short: 함수가 같은 시각에 처리 중인 요청 수예요. 한도를 넘으면 넘친 요청이 거절돼요.
+    doc: cloud/serverless
+  - id: cloud-metric
+    name: 클라우드 지표
+    en: Cloud metric
+    aliases: [CloudWatch, Azure Monitor, namespace, 네임스페이스, dimension, 차원, custom metric, 사용자 지정 지표]
+    short: 사업자가 서비스마다 자동으로 모으는 지표예요. 네임스페이스·이름·차원으로 구분해요.
+    doc: cloud/cloud-metrics
