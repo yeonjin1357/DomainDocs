@@ -51,7 +51,7 @@ test.describe('개념 페이지', () => {
     await expect(page.locator('[data-sources] a')).toHaveAttribute('href', 'https://example.com/alpha');
     await expect(page.locator('[data-related] [data-row]')).toHaveCount(1);
     await expect(page.locator('[data-related] [data-row]')).toContainText('베타 개념');
-    await expect(page.locator('[data-next]')).toContainText('데모 모음');
+    await expect(page.locator('[data-next]')).toContainText('그림 모음');
   });
 
   test('뒤로 가기는 영역 페이지를 가리킨다', async ({ page }) => {

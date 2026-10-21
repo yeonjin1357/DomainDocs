@@ -29,5 +29,7 @@ export const LINT_CONFIG = {
     'ServiceMap',
     'Flow',
     'Sequence',
+    'Layers',
+    'Compare',
   ],
 } as const;

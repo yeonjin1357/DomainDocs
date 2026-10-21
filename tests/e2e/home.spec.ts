@@ -9,7 +9,7 @@ test('홈에 영역 8개가 있고, 글이 없는 영역은 준비 중이다', a
   await expect(rows).toHaveCount(8);
   await expect(rows.nth(0)).toHaveAttribute('href', '/DomainDocs/foundations/');
   await expect(rows.nth(0)).toContainText('모니터링 기초');
-  await expect(rows.nth(0)).toContainText('5편');
+  await expect(rows.nth(0)).toContainText('6편');
   await expect(rows.nth(1)).toContainText('네트워크');
   for (const i of [1, 2, 3, 4, 5, 6, 7]) {
     await expect(rows.nth(i)).toContainText('준비 중');
@@ -34,7 +34,7 @@ test('영역 페이지는 한눈에 보기·기초·모니터링에서는·상�
   await expect(page.locator('h1')).toHaveText('모니터링 기초');
   await expect(page.locator('[data-card] h2')).toHaveText(['한눈에 보기', '기초', '모니터링에서는', '상황 가이드']);
   await expect(cardWithTitle(page, '한눈에 보기').locator('.row-title')).toHaveText(['지도 글']);
-  await expect(cardWithTitle(page, '기초').locator('.row-title')).toHaveText(['알파 개념']);
+  await expect(cardWithTitle(page, '기초').locator('.row-title')).toHaveText(['알파 개념', '그림 모음']);
   await expect(cardWithTitle(page, '모니터링에서는').locator('.row-title')).toHaveText(['데모 모음', '베타 개념']);
   await expect(cardWithTitle(page, '상황 가이드').locator('.row-title')).toHaveText(['감마 가이드']);
   await expect(page.getByRole('link', { name: '뒤로 가기' })).toHaveAttribute('href', '/DomainDocs/');

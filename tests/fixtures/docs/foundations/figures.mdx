@@ -1,0 +1,63 @@
+---
+title: 그림 모음
+summary: 테스트용 기초 글이에요. 새 그림을 모두 담았어요.
+domain: foundations
+type: concept
+stage: basics
+order: 2
+sources:
+  - title: 그림 테스트 출처
+    url: https://example.com/figures
+updated: 2026-09-15
+---
+import Sample from '../../figures/sample.svg';
+
+<KeyPoints>
+  <Point title="그림은 글보다 먼저 보여 줘요">
+    구조와 순서는 그림으로 먼저 보여 줘요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="테스트용 한계 문장이에요.">
+  테스트용 비유 문장이에요.
+</Analogy>
+
+## 그림들
+
+구조도, 주고받기, 계층도, 비교, SVG 그림을 차례로 보여 줘요.
+
+<Figure caption="서버 둘이 스위치 하나에 꽂혀 있어요.">
+  <Flow
+    ariaLabel="서버 둘이 스위치 하나에 꽂힌 구조도"
+    nodes={[
+      { id: 'sw', label: '스위치', col: 1, row: 0, tone: 'accent' },
+      { id: 's1', label: '서버 1', col: 0, row: 1 },
+      { id: 's2', label: '서버 2', col: 2, row: 1, note: '웹' },
+    ]}
+    edges={[{ from: 's1', to: 'sw' }, { from: 's2', to: 'sw', label: '1Gbps' }]}
+    groups={[{ label: '랙', cols: [0, 2], rows: [0, 1] }]}
+  />
+</Figure>
+
+<Figure caption="관리 서버가 묻고 장비가 답해요.">
+  <Sequence
+    ariaLabel="관리 서버가 묻고 장비가 답하는 순서"
+    participants={['관리 서버', '장비']}
+    messages={[{ from: '관리 서버', to: '장비', label: 'GET' }, { from: '장비', to: '관리 서버', label: '응답', dashed: true }]}
+  />
+</Figure>
+
+<Figure caption="위층은 아래층에 기대요.">
+  <Layers ariaLabel="세 층으로 쌓인 계층도" layers={[{ label: '응용' }, { label: '전송', note: 'TCP', tone: 'accent' }, { label: '네트워크' }]} />
+</Figure>
+
+<Figure caption="폴링과 Trap을 나란히 놓았어요.">
+  <Compare
+    columns={['폴링', 'Trap']}
+    rows={[{ label: '누가 먼저', values: ['관리 서버', '장비'] }, { label: '알게 되는 때', values: ['다음 수집 때', '일이 생긴 즉시'] }]}
+  />
+</Figure>
+
+<Figure caption="직접 그린 SVG 그림이에요.">
+  <Sample aria-label="테스트용 SVG 그림" />
+</Figure>

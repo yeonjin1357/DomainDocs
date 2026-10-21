@@ -17,6 +17,8 @@ import Scatter from '../viz/Scatter.astro';
 import ServiceMap from '../viz/ServiceMap.astro';
 import Flow from '../viz/Flow.astro';
 import Sequence from '../viz/Sequence.astro';
+import Layers from '../viz/Layers.astro';
+import Compare from '../viz/Compare.astro';
 
 /** MDX에서 import 없이 쓰는 컴포넌트. React 데모는 여기 넣지 않는다(client 지시어를 쓸 수 없다). */
-export const mdxComponents = { OnDashboard, KeyPoints, Point, Analogy, Figure, Checkpoints, Check, Deeper, Situation, FirstLook, Item, Term, MiniLineChart, StatTile, Waterfall, Scatter, ServiceMap, Flow, Sequence };
+export const mdxComponents = { OnDashboard, KeyPoints, Point, Analogy, Figure, Checkpoints, Check, Deeper, Situation, FirstLook, Item, Term, MiniLineChart, StatTile, Waterfall, Scatter, ServiceMap, Flow, Sequence, Layers, Compare };

@@ -1,0 +1,67 @@
+---
+import type { FigureTone } from '../../lib/viz/flow';
+
+interface Layer {
+  label: string;
+  /** 이름 옆 작은 글자(예: TCP) */
+  note?: string;
+  tone?: FigureTone;
+}
+
+interface Props {
+  /** 위층부터 아래층 순서 */
+  layers: Layer[];
+  ariaLabel: string;
+}
+
+const { layers, ariaLabel } = Astro.props;
+---
+<ol class="layers" data-layers aria-label={ariaLabel}>
+  {
+    layers.map((l) => (
+      <li class={`layer tone-${l.tone ?? 'sub'}`}>
+        <span class="layer-label">{l.label}</span>
+        {l.note && <span class="layer-note">{l.note}</span>}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .layers {
+    display: grid;
+    gap: 6px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .layer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+    padding: 12px 16px;
+    border-left: 4px solid var(--color-line);
+    border-radius: var(--radius-button);
+    background: var(--color-card);
+  }
+
+  .layer.tone-accent {
+    border-left-color: var(--color-accent);
+  }
+
+  .layer.tone-warn {
+    border-left-color: var(--color-warn);
+  }
+
+  .layer-label {
+    font-weight: 600;
+  }
+
+  .layer-note {
+    font-size: 14px;
+    color: var(--color-text-sub);
+  }
+</style>

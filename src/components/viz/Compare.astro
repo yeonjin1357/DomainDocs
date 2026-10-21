@@ -1,0 +1,69 @@
+---
+interface Row {
+  label: string;
+  /** 두 열의 값. 왼쪽 열, 오른쪽 열 순서 */
+  values: [string, string];
+}
+
+interface Props {
+  columns: [string, string];
+  rows: Row[];
+}
+
+const { columns, rows } = Astro.props;
+// MDX에서는 타입 검사가 닿지 않아 값 개수를 직접 확인한다
+for (const r of rows) {
+  if (r.values.length !== 2) throw new Error(`Compare: 값은 두 개여야 해요 (${r.label})`);
+}
+---
+<div class="compare" data-compare>
+  <div class="compare-head">
+    {columns.map((c) => <span class="head-cell" data-compare-head>{c}</span>)}
+  </div>
+  {
+    rows.map((r) => (
+      <div class="compare-row" data-compare-row>
+        <span class="row-label">{r.label}</span>
+        <div class="row-cells">
+          {r.values.map((v) => <span class="cell">{v}</span>)}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .compare {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .compare-head,
+  .row-cells {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .head-cell {
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .row-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: var(--color-text-sub);
+  }
+
+  .cell {
+    padding: 10px 12px;
+    border-radius: var(--radius-button);
+    background: var(--color-card);
+    font-size: 15px;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+</style>
