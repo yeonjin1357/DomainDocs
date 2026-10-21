@@ -51,3 +51,60 @@ terms:
     aliases: [consumer group, group.id, 소비자 그룹, consumer, 컨슈머]
     short: 같은 일을 나눠 맡는 컨슈머 묶음이에요. 그룹 안에서 파티션 하나는 컨슈머 하나만 맡아요.
     doc: messaging/overview
+  - id: consumer
+    name: 컨슈머
+    en: Consumer
+    aliases: [consumer, 소비자, subscriber, 구독자, poll, fetch]
+    short: Kafka에서 이벤트를 가져가 처리하는 프로그램이에요. 브로커가 밀어주지 않고 컨슈머가 당겨 가요.
+    analogy: 게시판의 맡은 칸을 자기 속도로 읽는 팀원과 같아요.
+    doc: messaging/consumers-and-groups
+  - id: offset-commit
+    name: 커밋
+    en: Offset commit
+    aliases: [commit, offset commit, 오프셋 커밋, enable.auto.commit, auto.offset.reset]
+    short: 컨슈머가 파티션마다 다음에 읽을 오프셋을 Kafka에 저장하는 일이에요. 다시 뜨면 여기서 읽어요.
+    analogy: 어디까지 읽었는지 꽂아 두는 책갈피와 같아요.
+    doc: messaging/consumers-and-groups
+  - id: rebalance
+    name: 리밸런스
+    en: Rebalance
+    aliases: [rebalance, rebalancing, 리밸런싱, 재조정, max.poll.interval.ms, session.timeout.ms]
+    short: 컨슈머 그룹의 구성원이 바뀌어 파티션을 다시 나누는 일이에요.
+    doc: messaging/consumers-and-groups
+  - id: replication-factor
+    name: 복제 계수
+    en: Replication factor
+    aliases: [replication factor, RF, 복제본 수, replica, 레플리카, leader, follower, 리더, 팔로워]
+    short: 파티션의 복제본을 몇 개 둘지예요. 하나가 리더, 나머지가 팔로워예요. 운영에선 3이 흔해요.
+    doc: messaging/replication
+  - id: isr
+    name: ISR
+    en: In-sync replicas
+    aliases: [ISR, in-sync replicas, 동기화된 복제본, UnderReplicatedPartitions, min.insync.replicas]
+    short: 리더를 잘 따라잡고 있는 복제본 묶음이에요. 이 묶음 모두가 받아야 이벤트가 커밋돼요.
+    doc: messaging/replication
+  - id: retention
+    name: 보관 기간
+    en: Retention
+    aliases: [retention, retention.ms, retention.bytes, 보존 기간, 리텐션]
+    short: 토픽의 이벤트를 얼마나 오래, 얼마나 많이 둘지예요. 읽혔는지와 상관없이 지나면 지워요.
+    analogy: 붙인 지 일주일이 지나면 떼어 내는 게시판 규칙과 같아요.
+    doc: messaging/retention
+  - id: segment
+    name: 세그먼트
+    en: Log segment
+    aliases: [segment, log segment, segment.bytes, 활성 세그먼트, active segment]
+    short: 파티션 로그를 나눈 파일 하나예요. 보관 기간이 지나면 세그먼트째 지워요.
+    doc: messaging/retention
+  - id: log-compaction
+    name: 로그 압축
+    en: Log compaction
+    aliases: [log compaction, compaction, compact, cleanup.policy, tombstone, 툼스톤]
+    short: 같은 키의 옛 이벤트를 지우고 키마다 최신 값만 남기는 정리 방식이에요.
+    doc: messaging/retention
+  - id: delivery-semantics
+    name: 전달 보장
+    en: Delivery semantics
+    aliases: [at-least-once, at-most-once, exactly-once, 최소 한 번, 최대 한 번, 정확히 한 번, EOS]
+    short: 이벤트를 잃을 수 있는지, 두 번 처리될 수 있는지의 약속이에요. Kafka 기본은 최소 한 번이에요.
+    doc: messaging/delivery-guarantees

@@ -1,0 +1,108 @@
+---
+title: 전달 보장
+summary: 이벤트를 잃을 수 있는지, 겹칠 수 있는지에 따라 최대·최소·정확히 한 번으로 나눠요.
+domain: messaging
+type: concept
+stage: basics
+order: 60
+icon: messages-square
+keywords: [delivery semantics, 전달 보장, at-least-once, at-most-once, exactly-once, 최소 한 번, 정확히 한 번, idempotent, transaction, 중복]
+related: [messaging/producers, messaging/consumers-and-groups, apm/timeouts-and-retries]
+sources:
+  - title: Apache Kafka 4.3 — Design (message delivery semantics)
+    url: https://kafka.apache.org/43/design/design/
+  - title: Apache Kafka 4.3 — KafkaConsumer
+    url: https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html
+  - title: Apache Kafka 4.3 — Producer Configs
+    url: https://kafka.apache.org/43/configuration/producer-configs/
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="세 가지로 나눠요">
+    최대 한 번은 잃을 수 있고, 최소 한 번은 겹칠 수 있고, 정확히 한 번은 둘 다 막아요.
+  </Point>
+  <Point title="Kafka의 기본은 최소 한 번이에요">
+    실패하면 다시 보내고 다시 읽어서, 이벤트를 잃지 않는 대신 가끔 두 번 처리될 수 있어요.
+  </Point>
+  <Point title="중복은 받는 쪽이 견디게 만들어요">
+    같은 이벤트를 두 번 처리해도 결과가 같게 만들면, 최소 한 번으로도 충분해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="등기 우편은 우체국이 중복을 막아 주지만, 메시지 큐에서 중복을 견디는 일은 대개 받는 서비스가 해야 해요.">
+  중요한 서류를 보낼 때, 답장이 안 오면 한 번 더 보내요. 그러면 서류가 두 번 도착할 수는 있어도 잃어버리지는 않아요. 받는 쪽은 "이미 받은 서류 번호"를 보고 두 번째 것을 버려요.
+</Analogy>
+
+## 세 가지 보장
+
+Kafka 문서는 전달 보장을 세 가지로 나눠요.
+
+| 보장 | 잃을 수 있나 | 겹칠 수 있나 |
+| --- | --- | --- |
+| 최대 한 번(at-most-once) | 네 | 아니요 |
+| 최소 한 번(at-least-once) | 아니요 | 네 |
+| 정확히 한 번(exactly-once) | 아니요 | 아니요 |
+
+이 보장은 두 구간에서 따로 생각해요. 프로듀서가 브로커에 쓰는 구간과, 컨슈머가 읽고 처리하는 구간이에요.
+
+## 쓰는 구간: 프로듀서
+
+프로듀서가 보냈는데 응답이 오지 않으면, 실제로 쓰였는지 알 수 없어요. 다시 보내면 겹칠 수 있고, 안 보내면 잃을 수 있어요.
+
+Kafka 프로듀서는 기본으로 다시 보내고, 멱등성으로 겹침을 막아요. 브로커가 프로듀서 ID와 순번으로 같은 이벤트를 걸러내서, 다시 보내도 로그에는 한 번만 쌓여요. 자세한 건 <Term slug="messaging/producers">프로듀서</Term>에서 다뤄요.
+
+## 읽는 구간: 컨슈머
+
+컨슈머 쪽에서는 커밋하는 시점이 보장을 정해요.
+
+<Figure caption="컨슈머 1이 10번을 처리해 DB에 쓴 뒤, 커밋하기 전에 죽었어요. 컨슈머 2는 커밋된 위치인 10번부터 읽어서 같은 결과를 한 번 더 써요.">
+  <Sequence
+    ariaLabel="컨슈머 1이 Kafka에서 10번을 가져가 DB에 결과를 쓰고, 커밋 전에 죽은 뒤, 컨슈머 2가 커밋된 10번부터 가져가 DB에 같은 결과를 또 쓰는 순서"
+    participants={['컨슈머 1', 'Kafka', 'DB', '컨슈머 2']}
+    messages={[
+      { from: '컨슈머 1', to: 'Kafka', label: '10번 가져가기' },
+      { from: '컨슈머 1', to: 'DB', label: '10번 결과 쓰기', tone: 'accent' },
+      { from: '컨슈머 2', to: 'Kafka', label: '커밋된 10번부터' },
+      { from: '컨슈머 2', to: 'DB', label: '10번 결과 또 쓰기', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+- 처리한 뒤 커밋하면, 그 사이에 죽었을 때 같은 이벤트를 다시 처리해요. 최소 한 번이에요.
+- 커밋한 뒤 처리하면, 그 사이에 죽었을 때 그 이벤트를 놓쳐요. 최대 한 번이에요.
+
+Kafka 문서는 기본으로 최소 한 번을 보장한다고 해요. 최대 한 번을 원하면 프로듀서 재시도를 끄고, 컨슈머가 처리 전에 커밋하게 만들어요.
+
+## 정확히 한 번
+
+Kafka는 "Kafka에서 읽고, 처리하고, Kafka에 쓰는" 흐름을 정확히 한 번 처리할 수 있게 해요. 결과를 쓰는 일과 읽은 위치를 커밋하는 일을 한 트랜잭션으로 묶는 거예요. Kafka 문서는 가장 쉬운 방법으로 Kafka Streams를 꼽아요.
+
+결과를 데이터베이스나 다른 서비스로 보낸다면 이야기가 달라요. 그 시스템과 함께 맞춰야 해서, Kafka 혼자서는 정확히 한 번을 만들 수 없어요.
+
+## 겹쳐도 괜찮게 만들기
+
+그래서 실무에서는 최소 한 번에, 받는 쪽이 중복을 견디게 만드는 방법을 많이 써요.
+
+- 이벤트마다 고유 ID를 붙이고, 처리한 ID를 기록해 두었다가 다시 오면 건너뛰어요.
+- "잔액에 1,000원 더하기" 대신 "잔액을 5,000원으로 바꾸기"처럼, 두 번 해도 결과가 같은 작업으로 만들어요.
+
+두 번 해도 결과가 같은 성질을 멱등성이라고 해요. 재시도와 멱등성은 <Term slug="apm/timeouts-and-retries">타임아웃과 재시도</Term>에서도 다뤄요.
+
+## 모니터링에서는
+
+중복과 유실은 지표 하나로 바로 보이지 않아요. 그래서 들어온 수와 처리한 수를 나란히 놓고 봐요.
+
+프로듀서의 재시도가 늘거나 컨슈머 그룹의 리밸런스가 잦으면, 중복이 생기기 쉬운 상태예요. 이런 때는 받는 쪽에서 건너뛴 중복 수를 따로 세 두면 도움이 돼요.
+
+<Checkpoints>
+  <Check>Kafka를 쓰니 중복이 없을 거라고 여겼다면 다시 보세요. 기본은 최소 한 번이라, 장애나 리밸런스 뒤에는 같은 이벤트가 다시 올 수 있어요.</Check>
+  <Check>결제나 재고처럼 두 번 처리되면 안 되는 일이라면, 받는 쪽에서 이벤트 ID로 중복을 걸러내는지 보세요.</Check>
+  <Check>정확히 한 번을 켰으니 DB 쓰기도 한 번일 거라고 여겼다면 다시 보세요. 바깥 시스템까지는 Kafka 혼자 보장하지 못해요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 프로듀서 쪽의 역사
+
+  Kafka 문서에 따르면 0.11 전에는 응답을 못 받은 프로듀서가 다시 보내는 것 말고는 방법이 없어서, 중복이 생길 수 있었어요. 0.11부터 멱등 전송과 여러 파티션에 걸친 트랜잭션 쓰기가 들어왔어요.
+</Deeper>

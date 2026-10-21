@@ -1,0 +1,144 @@
+---
+title: 컨슈머와 컨슈머 그룹
+summary: 컨슈머는 이벤트를 가져가 처리하고 어디까지 읽었는지 커밋해요. 그룹은 파티션을 나눠 맡아요.
+domain: messaging
+type: concept
+stage: basics
+order: 30
+icon: messages-square
+keywords: [consumer, 컨슈머, consumer group, 컨슈머 그룹, commit, 커밋, rebalance, 리밸런스, poll, auto.offset.reset]
+related: [messaging/topics-and-partitions, messaging/producers, apm/consumer-lag]
+sources:
+  - title: Apache Kafka 4.3 — KafkaConsumer
+    url: https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html
+  - title: Apache Kafka 4.3 — Design (consumer)
+    url: https://kafka.apache.org/43/design/design/
+  - title: Apache Kafka 4.3 — Consumer Configs
+    url: https://kafka.apache.org/43/configuration/consumer-configs/
+  - title: Apache Kafka 4.3 — Consumer Rebalance Protocol
+    url: https://kafka.apache.org/43/operations/consumer-rebalance-protocol/
+  - title: Apache Kafka 4.3 — Monitoring (consumer metrics)
+    url: https://kafka.apache.org/43/operations/monitoring/
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="컨슈머가 가져가요">
+    브로커가 밀어주지 않고, 컨슈머가 자기 속도로 이벤트를 가져가요. 느리면 뒤처졌다가 따라잡아요.
+  </Point>
+  <Point title="어디까지 읽었는지 커밋해요">
+    파티션마다 다음에 읽을 오프셋 하나만 기록해 두면 돼요. 다시 시작하면 거기서부터 읽어요.
+  </Point>
+  <Point title="그룹은 파티션을 나눠 맡아요">
+    한 그룹 안에서 파티션 하나는 컨슈머 하나만 맡아요. 컨슈머가 들고 나면 파티션을 다시 나눠요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="게시판을 읽는 사람은 책갈피를 잃어도 대충 기억하지만, 컨슈머는 커밋한 오프셋만 믿어요. 커밋 전에 죽으면 그 뒤 이벤트를 다시 읽어요.">
+  게시판의 칸을 팀원들이 나눠 맡아 읽는 것과 같아요. 각자 맡은 칸에서 어디까지 읽었는지 책갈피(커밋)를 꽂아 둬요. 팀원이 자리를 비우면 그 칸은 다른 팀원이 책갈피부터 이어 읽어요.
+</Analogy>
+
+## 가져가는 방식
+
+<Term term="messaging/consumer">컨슈머</Term>는 파티션의 리더 브로커에 "이 오프셋부터 주세요"라고 요청해서 이벤트를 가져가요. 브로커가 밀어주지 않고 컨슈머가 당겨 가는 방식(pull)이에요.
+
+그래서 컨슈머가 느려도 브로커가 컨슈머를 덮치지 않아요. Kafka 문서는 당겨 가는 방식의 장점을 컨슈머가 "뒤처졌다가 따라잡을 수 있다"는 점으로 설명해요. 컨슈머가 원하면 예전 오프셋으로 되돌아가 다시 읽을 수도 있어요.
+
+## 오프셋 커밋
+
+컨슈머의 위치는 파티션마다 숫자 하나예요. 다음에 읽을 이벤트의 오프셋이에요. 이 위치를 Kafka에 안전하게 저장하는 걸 <Term term="messaging/offset-commit">커밋</Term>이라고 해요.
+
+컨슈머가 죽었다 다시 뜨면, 커밋된 위치부터 읽어요. 그래서 언제 커밋하느냐가 "한 번은 처리했는가"를 정해요.
+
+<Figure caption="처리한 뒤에 커밋하면, 커밋 직전에 죽었을 때 그 이벤트를 다시 처리해요. 커밋한 뒤에 처리하면, 처리 중에 죽었을 때 그 이벤트를 놓쳐요.">
+  <Compare
+    columns={['처리 → 커밋', '커밋 → 처리']}
+    rows={[
+      { label: '사이에 죽으면', values: ['같은 이벤트를 다시 처리해요', '그 이벤트를 놓쳐요'] },
+      { label: '결과', values: ['중복은 있어도 잃지 않아요', '중복은 없어도 잃을 수 있어요'] },
+      { label: '부르는 말', values: ['최소 한 번', '최대 한 번'] },
+    ]}
+  />
+</Figure>
+
+기본 설정에서는 자동 커밋이 켜져 있고, 5초마다 커밋해요. 자동 커밋으로도 "최소 한 번"을 지킬 수 있어요. 다만 한 번 가져온 이벤트를 다음에 가져가기 전에 모두 처리해야 해요.
+
+처리를 끝낸 시점에 직접 커밋하려면 자동 커밋을 끄고 커밋 함수를 불러요. 전달 보장은 <Term slug="messaging/delivery-guarantees">전달 보장</Term>에서 더 자세히 다뤄요.
+
+## 처음 읽을 때는 어디부터?
+
+새 컨슈머 그룹은 커밋된 위치가 없어요. 이때 어디서 시작할지는 `auto.offset.reset`이 정해요. 커밋된 위치의 이벤트가 보관 기간이 지나 지워졌을 때도 이 설정을 따라요.
+
+| 값 | 시작 위치 |
+| --- | --- |
+| latest | 지금부터 새로 들어오는 이벤트. 기본값이에요 |
+| earliest | 남아 있는 가장 오래된 이벤트 |
+| none | 시작하지 않고 오류를 내요 |
+
+## 컨슈머 그룹과 파티션 나누기
+
+같은 `group.id`를 쓴 컨슈머들은 하나의 <Term term="messaging/consumer-group">컨슈머 그룹</Term>이 돼요. 그룹은 토픽의 파티션을 구성원에게 나눠 주고, 파티션 하나는 그룹 안의 컨슈머 하나에게만 가요.
+
+<Figure caption="파티션 4개를 컨슈머 2개가 둘씩 나눠 맡아요. 다른 그룹은 같은 파티션을 자기 위치에서 따로 읽어요.">
+  <Flow
+    ariaLabel="파티션 0과 1은 그룹 A의 컨슈머 1이, 파티션 2와 3은 그룹 A의 컨슈머 2가 맡는 구조도"
+    nodes={[
+      { id: 'p0', label: '파티션 0', col: 0, row: 0 },
+      { id: 'p1', label: '파티션 1', col: 0, row: 1 },
+      { id: 'p2', label: '파티션 2', col: 0, row: 2 },
+      { id: 'p3', label: '파티션 3', col: 0, row: 3 },
+      { id: 'c1', label: '컨슈머 1', col: 2, row: 0, tone: 'accent' },
+      { id: 'c2', label: '컨슈머 2', col: 2, row: 3, tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'p0', to: 'c1' },
+      { from: 'p1', to: 'c1' },
+      { from: 'p2', to: 'c2' },
+      { from: 'p3', to: 'c2' },
+    ]}
+    groups={[{ label: '그룹 A', cols: [2, 2], rows: [0, 3] }]}
+  />
+</Figure>
+
+그래서 그룹 안에서 동시에 일하는 컨슈머 수는 파티션 수를 넘지 못해요. 파티션이 4개인데 컨슈머를 6개 띄우면, 2개는 맡을 파티션 없이 놀아요.
+
+## 리밸런스
+
+그룹 구성원이 바뀌면 파티션을 다시 나눠요. 이걸 <Term term="messaging/rebalance">리밸런스</Term>라고 해요. 컨슈머가 죽거나 새로 들어오거나, 구독한 토픽에 파티션이 늘면 일어나요.
+
+컨슈머가 살아 있는지는 두 가지로 판단해요.
+
+| 기준 | 기본값 | 넘으면 |
+| --- | --- | --- |
+| `session.timeout.ms` | 45초 | 하트비트가 이 시간 동안 없으면 그룹에서 빼요 |
+| `max.poll.interval.ms` | 5분 | 다음 이벤트를 이 시간 안에 가져가지 않으면 그룹을 떠나요 |
+
+두 번째 기준이 자주 문제가 돼요. 하트비트는 잘 보내는데 처리 하나가 너무 오래 걸리면, 컨슈머가 그룹에서 빠지고 리밸런스가 일어나요. 이때 커밋도 실패해서 같은 이벤트를 다른 컨슈머가 다시 처리해요.
+
+## 모니터링에서는
+
+컨슈머 그룹에서 가장 먼저 보는 숫자는 지연(lag)이에요. 파티션 끝의 오프셋과 컨슈머가 읽은 위치의 차이예요. 읽는 법은 <Term slug="apm/consumer-lag">메시지 큐 지연</Term>에서 다뤄요.
+
+| 지표 | 뜻 |
+| --- | --- |
+| records-lag-max | 이 컨슈머가 맡은 파티션 중 가장 큰 지연(이벤트 수) |
+| rebalance-rate-per-hour | 한 시간에 참여한 리밸런스 수 |
+| commit-latency-avg | 커밋 요청의 평균 시간 |
+| last-poll-seconds-ago | 마지막으로 이벤트를 가져간 뒤 지난 초 |
+
+<Checkpoints>
+  <Check>지연을 줄이려고 컨슈머를 파티션 수보다 많이 늘렸다면 다시 보세요. 남는 컨슈머는 놀아요. 파티션 수를 함께 봐요.</Check>
+  <Check>리밸런스가 자주 일어나면, 이벤트 하나를 처리하는 시간이 max.poll.interval.ms에 가까운지 보세요.</Check>
+  <Check>새 컨슈머 그룹을 띄웠는데 예전 이벤트를 하나도 안 읽는다면, auto.offset.reset이 기본값 latest인지 보세요.</Check>
+  <Check>장애 뒤 같은 이벤트가 두 번 처리됐다면, 처리 후 커밋 전에 죽은 경우예요. 최소 한 번 방식에선 정상이라, 받는 쪽이 중복을 견디게 만들어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 새 리밸런스 프로토콜
+
+  Kafka 4.0부터 새 리밸런스 프로토콜(KIP-848)이 정식으로 쓰여요. 그룹 전체를 한꺼번에 멈추지 않고 조금씩 바꿔서 리밸런스 시간이 줄어요. 컨슈머의 `group.protocol` 기본값은 아직 classic이에요.
+
+  ### records-lag-max의 기준
+
+  이 지표는 커밋된 위치가 아니라 컨슈머의 현재 위치로 계산해요. 그래서 바깥 도구가 커밋된 위치로 잰 지연과 조금 다를 수 있어요.
+</Deeper>

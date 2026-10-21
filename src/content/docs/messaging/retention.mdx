@@ -1,0 +1,112 @@
+---
+title: 보관과 정리
+summary: Kafka는 읽어도 지우지 않고 정한 기간·크기만큼 둬요. 키마다 최신 값만 남기는 압축도 있어요.
+domain: messaging
+type: concept
+stage: basics
+order: 50
+icon: messages-square
+keywords: [retention, 보관, retention.ms, retention.bytes, segment, 세그먼트, log compaction, 압축, tombstone, cleanup.policy]
+related: [messaging/topics-and-partitions, messaging/consumers-and-groups, server/filesystem-and-capacity]
+sources:
+  - title: Apache Kafka 4.3 — Introduction
+    url: https://kafka.apache.org/43/getting-started/introduction/
+  - title: Apache Kafka 4.3 — Topic Configs
+    url: https://kafka.apache.org/43/configuration/topic-configs/
+  - title: Apache Kafka 4.3 — Log (implementation)
+    url: https://kafka.apache.org/43/implementation/log/
+  - title: Apache Kafka 4.3 — Design (log compaction)
+    url: https://kafka.apache.org/43/design/design/
+  - title: Apache Kafka 4.3 — Consumer Configs (auto.offset.reset)
+    url: https://kafka.apache.org/43/configuration/consumer-configs/
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="읽어도 지워지지 않아요">
+    이벤트는 읽혔는지와 상관없이, 토픽마다 정한 기간 동안 남아요. 기본은 7일이에요.
+  </Point>
+  <Point title="세그먼트 단위로 지워요">
+    파티션은 세그먼트 파일 여러 개로 나뉘어 있고, 오래된 세그먼트 파일을 통째로 지워요.
+  </Point>
+  <Point title="압축은 키마다 최신 값만 남겨요">
+    정리 방식을 compact로 하면, 같은 키의 옛 값은 지우고 마지막 값은 남겨요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="게시판은 글을 한 장씩 떼어 내지만, Kafka는 글 여러 장을 묶은 철(세그먼트)째로 떼어 내요. 그래서 철 안에 기간이 안 지난 글이 하나라도 있으면 철째 남아요.">
+  게시판은 공지를 붙인 지 일주일이 지나면 떼어 내요. 어떤 게시판은 주제마다 최신 공지 한 장만 남기고 옛 공지는 떼어 내요. 둘 다 누가 읽었는지와는 상관없어요.
+</Analogy>
+
+## 시간과 크기로 보관해요
+
+Kafka는 읽어 간 이벤트를 지우지 않아요. 토픽마다 <Term term="messaging/retention">보관 기간</Term>을 정하고, 그 기간이 지나면 오래된 이벤트부터 버려요. Kafka 문서는 성능이 데이터 크기와 거의 상관없어서 오래 보관해도 괜찮다고 해요.
+
+| 설정 | 기본값 | 뜻 |
+| --- | --- | --- |
+| `retention.ms` | 7일 | 이보다 오래된 세그먼트를 지워요. -1이면 시간 제한이 없어요 |
+| `retention.bytes` | -1(제한 없음) | 파티션 크기가 이를 넘으면 오래된 세그먼트부터 지워요 |
+| `cleanup.policy` | delete | 지우는 방식이에요. compact를 쓰면 압축해요 |
+
+Kafka 문서는 `retention.ms`를 "컨슈머가 데이터를 읽어야 하는 마감"이라고도 설명해요. 컨슈머가 이 기간보다 오래 멈춰 있으면, 아직 안 읽은 이벤트가 지워질 수 있어요.
+
+## 세그먼트
+
+파티션 하나는 디스크의 디렉터리 하나이고, 그 안에 로그 파일이 여러 개 있어요. 이 파일 하나하나를 <Term term="messaging/segment">세그먼트</Term>라고 해요. 새 이벤트는 가장 최근 세그먼트(활성 세그먼트) 끝에 붙어요.
+
+세그먼트가 일정 크기(기본 1GiB)에 이르거나 일정 시간이 지나면, 그 세그먼트를 닫고 새 세그먼트를 열어요. 지울 때도 세그먼트 단위로 지워요.
+
+<Figure caption="세그먼트 셋으로 나뉜 파티션이에요. 보관 기간이 지난 가장 오래된 세그먼트를 통째로 지우고, 새 이벤트는 활성 세그먼트에 붙어요.">
+  <Layers
+    ariaLabel="가장 오래된 세그먼트는 보관 기간이 지나 지울 대상이고, 가운데 세그먼트는 보관 중이며, 활성 세그먼트에 새 이벤트가 붙는 그림"
+    layers={[
+      { label: '세그먼트 0~999', note: '8일 전 · 통째로 지워요', tone: 'warn' },
+      { label: '세그먼트 1000~1999', note: '3일 전 · 보관 중' },
+      { label: '활성 세그먼트 2000~', note: '지금 · 새 이벤트가 붙어요', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+세그먼트를 통째로 지우기 때문에, 보관 기간이 정확히 지나는 순간 이벤트가 사라지지는 않아요. 시간 기준으로 지울 때는 세그먼트 안에서 가장 늦은 이벤트의 시각을 기준으로 삼아요.
+
+## 로그 압축
+
+어떤 토픽은 "지금 상태"가 중요해요. 예를 들어 사용자마다 바뀐 이메일을 계속 보내는 토픽이라면, 사용자마다 마지막 이메일만 있으면 돼요.
+
+<Term term="messaging/log-compaction">로그 압축</Term>은 같은 키의 옛 이벤트를 지우고, 키마다 최소한 마지막 값은 남겨요. 앱이 다시 시작할 때 이 토픽을 처음부터 읽으면, 키마다 최신 상태를 되살릴 수 있어요.
+
+<Figure caption="압축 전에는 같은 키의 이벤트가 여러 번 쌓여 있어요. 압축 뒤에는 키마다 마지막 값만 남고, 남은 이벤트의 오프셋은 그대로예요.">
+  <Compare
+    columns={['압축 전', '압축 뒤']}
+    rows={[
+      { label: '키 user1', values: ['a@ → b@ → c@', 'c@ (오프셋 그대로)'] },
+      { label: '키 user2', values: ['x@ → y@', 'y@'] },
+      { label: '키 user3', values: ['m@ → 값 없음', '잠시 뒤 키가 사라져요'] },
+    ]}
+  />
+</Figure>
+
+키는 있고 값이 비어 있는 이벤트는 "이 키를 지워 달라"는 표시예요. 이걸 툼스톤(tombstone)이라고 불러요. 툼스톤은 같은 키의 옛 이벤트를 지우게 하고, 일정 시간(기본 1일)이 지나면 툼스톤 자신도 지워져요.
+
+## 모니터링에서는
+
+보관은 곧 디스크 크기예요. 브로커 디스크 사용량은 들어오는 양과 보관 기간으로 거의 정해져요. 들어오는 양이 두 배가 되면, 같은 보관 기간에 디스크도 두 배가 필요해요.
+
+컨슈머 쪽에서는 지연이 보관 기간에 가까워지는지 봐요. 지연된 이벤트가 지워지면 컨슈머는 그 이벤트를 영영 못 읽고, `auto.offset.reset`에 따라 다른 위치로 건너뛰어요.
+
+<Checkpoints>
+  <Check>브로커 디스크가 차오른다면, 들어오는 양이 늘었는지와 보관 기간을 함께 보세요. 디스크 읽는 법은 서버·OS의 <Term slug="server/filesystem-and-capacity">파일 시스템과 용량</Term>과 같아요.</Check>
+  <Check>오래 멈췄던 컨슈머가 이벤트를 건너뛰었다면, 그사이 보관 기간이 지나 이벤트가 지워진 거예요.</Check>
+  <Check>보관 기간을 줄였는데 디스크가 바로 줄지 않는다고 놀랐다면 다시 보세요. 세그먼트에 기간이 안 지난 이벤트가 하나라도 있으면 그 세그먼트는 통째로 남아요.</Check>
+  <Check>압축 토픽에 키 없이 이벤트를 보냈다면 다시 보세요. 압축은 키를 기준으로 하니 키가 꼭 있어야 해요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 압축과 보관을 함께
+
+  `cleanup.policy`에 delete와 compact를 함께 줄 수도 있어요. 키마다 최신 값만 남기면서, 너무 오래된 값은 기간에 따라 지워요.
+
+  ### 압축되지 않는 부분
+
+  압축은 활성 세그먼트를 건드리지 않아요. 그래서 막 들어온 이벤트에는 같은 키의 값이 여러 개 남아 있을 수 있어요.
+</Deeper>
