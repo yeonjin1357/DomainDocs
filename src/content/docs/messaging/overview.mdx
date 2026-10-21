@@ -1,0 +1,87 @@
+---
+title: 메시지 큐가 하는 일
+summary: 보내는 쪽과 받는 쪽 사이에 이벤트를 쌓아 두는 곳이에요. 서로 몰라도 되고, 속도가 달라도 돼요.
+domain: messaging
+type: overview
+order: 0
+icon: messages-square
+keywords: [message queue, 메시지 큐, Kafka, 카프카, event, 이벤트, producer, consumer, broker, 비동기]
+related: [messaging/topics-and-partitions, messaging/producers, apm/consumer-lag]
+sources:
+  - title: Apache Kafka 4.3 — Introduction
+    url: https://kafka.apache.org/43/getting-started/introduction/
+  - title: Apache Kafka 4.3 — Design
+    url: https://kafka.apache.org/43/design/design/
+  - title: Apache Kafka 4.3 — KafkaConsumer (consumer groups)
+    url: https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html
+  - title: Apache Kafka 4.3 — KRaft vs ZooKeeper
+    url: https://kafka.apache.org/43/getting-started/zk2kraft/
+updated: 2026-10-21
+---
+
+<Analogy limit="실제 게시판은 누가 어디까지 읽었는지 모르지만, Kafka는 읽는 쪽마다 어디까지 읽었는지 번호로 따로 기록해요.">
+  메시지 큐는 사내 게시판과 같아요. 글쓴이는 게시판에 글을 붙이고 바로 자기 일로 돌아가요. 읽는 사람은 자기 속도로 와서 읽고, 여러 팀이 같은 글을 각자 읽을 수도 있어요.
+</Analogy>
+
+## 왜 사이에 두나
+
+서비스 A가 서비스 B를 직접 부르면, B가 느리거나 멈췄을 때 A도 함께 기다리거나 실패해요. <Term term="messaging/message-queue">메시지 큐</Term>를 사이에 두면 A는 이벤트를 큐에 넣고 바로 다음 일을 해요. B는 준비되는 대로 꺼내 처리해요.
+
+<Figure caption="주문 서비스는 '주문됨' 이벤트를 Kafka에 한 번만 보내요. 결제 서비스와 알림 서비스는 각자 자기 속도로 같은 이벤트를 읽어 가요.">
+  <Sequence
+    ariaLabel="주문 서비스가 Kafka에 주문됨 이벤트를 보내고 바로 응답을 받은 뒤, 결제 서비스와 알림 서비스가 각자 Kafka에서 그 이벤트를 가져가는 순서"
+    participants={['주문', 'Kafka', '결제', '알림']}
+    messages={[
+      { from: '주문', to: 'Kafka', label: '주문됨 보내기', tone: 'accent' },
+      { from: 'Kafka', to: '주문', label: '받았어요', dashed: true },
+      { from: '결제', to: 'Kafka', label: '새 이벤트 가져가기' },
+      { from: '알림', to: 'Kafka', label: '새 이벤트 가져가기' },
+    ]}
+  />
+</Figure>
+
+이렇게 하면 좋은 점이 세 가지예요.
+
+- 보내는 쪽과 받는 쪽이 서로를 몰라도 돼요. Kafka 문서는 이 분리가 높은 확장성의 핵심이라고 해요.
+- 받는 쪽이 잠깐 느려도 이벤트가 큐에 쌓여 기다려요. 나중에 따라잡으면 돼요.
+- 같은 이벤트를 여러 서비스가 각자 읽어요. 새 서비스를 붙여도 보내는 쪽은 바뀌지 않아요.
+
+## 큐와 발행·구독
+
+전통적인 메시지 시스템은 두 가지 방식이 있어요. 큐 방식은 메시지 하나를 받는 쪽 하나가 가져가요. 발행·구독 방식은 구독한 모두가 같은 메시지를 받아요.
+
+Kafka는 <Term term="messaging/consumer-group">컨슈머 그룹</Term>으로 둘을 함께 해요. 같은 그룹 안에서는 이벤트 하나를 한 컨슈머만 처리해서 큐처럼 일을 나눠요. 그룹이 여럿이면 그룹마다 같은 이벤트를 모두 받아서 발행·구독처럼 동작해요.
+
+또 Kafka는 읽어 간 이벤트를 지우지 않아요. 토픽마다 정한 기간 동안 보관하고, 그 기간이 지나면 오래된 것부터 버려요. 그래서 필요하면 예전 이벤트를 다시 읽을 수 있어요.
+
+## 꼭 알아야 할 말
+
+| 말 | 뜻 |
+| --- | --- |
+| 이벤트 | "무언가 일어났다"는 기록이에요. 레코드, 메시지라고도 해요. 키, 값, 시각, 헤더로 이뤄져요 |
+| 프로듀서 | 이벤트를 Kafka에 쓰는 프로그램 |
+| 컨슈머 | 이벤트를 Kafka에서 읽어 처리하는 프로그램 |
+| 토픽 | 이벤트를 담는 이름 붙은 묶음이에요. 파일 시스템의 폴더와 비슷해요 |
+| 파티션 | 토픽을 나눈 칸이에요. 여러 브로커에 흩어져 있어요 |
+| 오프셋 | 파티션 안에서 이벤트마다 붙는 순번 |
+| 브로커 | 이벤트를 저장하고 내주는 Kafka 서버 |
+| 컨슈머 그룹 | 같은 일을 나눠 맡는 컨슈머 묶음 |
+
+## Kafka 클러스터
+
+Kafka는 서버 여러 대가 하나의 클러스터로 돌아요. 이벤트를 저장하는 서버를 <Term term="messaging/broker">브로커</Term>라고 불러요. 서버 하나가 고장 나도 다른 서버가 그 일을 넘겨받아요.
+
+이벤트는 여러 브로커에 복사해 둬요. 운영에서는 복사본 3개가 흔한 설정이에요. 그래서 브로커 하나가 멈춰도 이벤트를 잃지 않아요.
+
+## 단계를 하나씩 확대해 봐요
+
+- 이벤트가 담기는 곳은 <Term slug="messaging/topics-and-partitions">토픽과 파티션</Term>에서 다뤄요.
+- 이벤트를 보내는 쪽은 <Term slug="messaging/producers">프로듀서</Term>에서 다뤄요.
+
+받는 쪽이 얼마나 밀렸는지 읽는 법은 애플리케이션의 <Term slug="apm/consumer-lag">메시지 큐 지연</Term>에서 다뤄요.
+
+<Deeper>
+  ### ZooKeeper와 KRaft
+
+  예전 Kafka는 클러스터 정보를 ZooKeeper라는 별도 시스템에 맡겼어요. 지금 Kafka는 KRaft라는 방식으로 Kafka 서버가 직접 이 정보를 관리해요. KRaft 모드에서는 서버마다 컨트롤러, 브로커, 또는 둘 다의 역할을 맡아요.
+</Deeper>

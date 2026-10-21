@@ -1,0 +1,53 @@
+terms:
+  - id: message-queue
+    name: 메시지 큐
+    en: Message queue
+    aliases: [message queue, MQ, 메시지 브로커, message broker, 이벤트 스트리밍, pub/sub, 발행 구독]
+    short: 보내는 쪽과 받는 쪽 사이에 이벤트를 쌓아 두는 곳이에요. 서로 몰라도, 속도가 달라도 돼요.
+    analogy: 글쓴이와 읽는 사람이 따로 오가는 사내 게시판과 같아요.
+    doc: messaging/overview
+  - id: broker
+    name: 브로커
+    en: Broker
+    aliases: [broker, Kafka broker, 카프카 서버, KRaft, controller, 컨트롤러]
+    short: 이벤트를 저장하고 프로듀서·컨슈머에 내주는 Kafka 서버예요. 여러 대가 클러스터를 이뤄요.
+    doc: messaging/overview
+  - id: topic
+    name: 토픽
+    en: Topic
+    aliases: [topic, topics, 토픽 이름]
+    short: 이벤트를 담는 이름 붙은 묶음이에요. 여러 프로듀서가 쓰고 여러 컨슈머가 읽어요.
+    analogy: 주제별로 나눈 게시판 하나와 같아요.
+    doc: messaging/topics-and-partitions
+  - id: partition
+    name: 파티션
+    en: Partition
+    aliases: [partition, partitions, 파티션 키, partition key]
+    short: 토픽을 나눈 칸이에요. 끝에 덧붙이기만 하는 로그이고, 순서는 파티션 안에서만 지켜져요.
+    analogy: 게시판을 세로로 나눈 칸과 같아요.
+    doc: messaging/topics-and-partitions
+  - id: offset
+    name: 오프셋
+    en: Offset
+    aliases: [offset, 오프셋 번호, position]
+    short: 파티션 안에서 이벤트마다 붙는 순번이에요. 파티션마다 0부터 따로 늘어나요.
+    analogy: 게시판 칸 안의 글 번호와 같아요.
+    doc: messaging/topics-and-partitions
+  - id: producer
+    name: 프로듀서
+    en: Producer
+    aliases: [producer, 생산자, publisher, 발행자, acks, linger.ms, batch.size]
+    short: 이벤트를 Kafka에 쓰는 프로그램이에요. 모아서 파티션 리더에게 보내고 확인을 받아요.
+    doc: messaging/producers
+  - id: idempotent-producer
+    name: 멱등 프로듀서
+    en: Idempotent producer
+    aliases: [idempotence, enable.idempotence, 멱등성, 중복 방지]
+    short: 다시 보내도 같은 이벤트가 두 번 쌓이지 않게, 브로커가 순번으로 중복을 걸러내는 방식이에요.
+    doc: messaging/producers
+  - id: consumer-group
+    name: 컨슈머 그룹
+    en: Consumer group
+    aliases: [consumer group, group.id, 소비자 그룹, consumer, 컨슈머]
+    short: 같은 일을 나눠 맡는 컨슈머 묶음이에요. 그룹 안에서 파티션 하나는 컨슈머 하나만 맡아요.
+    doc: messaging/overview

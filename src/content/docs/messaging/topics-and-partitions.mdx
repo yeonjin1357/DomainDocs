@@ -1,0 +1,123 @@
+---
+title: 토픽과 파티션
+summary: 토픽은 이벤트 묶음이고, 파티션은 그 토픽을 나눈 칸이에요. 순서는 파티션 안에서만 지켜져요.
+domain: messaging
+type: concept
+stage: basics
+order: 10
+icon: messages-square
+keywords: [topic, 토픽, partition, 파티션, offset, 오프셋, key, 키, ordering, 순서]
+related: [messaging/overview, messaging/producers, apm/consumer-lag]
+sources:
+  - title: Apache Kafka 4.3 — Introduction
+    url: https://kafka.apache.org/43/getting-started/introduction/
+  - title: Apache Kafka 4.3 — Design
+    url: https://kafka.apache.org/43/design/design/
+  - title: Apache Kafka 4.3 — Producer Configs (partitioner.class)
+    url: https://kafka.apache.org/43/configuration/producer-configs/
+  - title: Apache Kafka 4.3 — Basic Kafka Operations (modifying topics)
+    url: https://kafka.apache.org/43/operations/basic-kafka-operations/
+  - title: Apache Kafka 4.3 — Broker Configs (num.partitions)
+    url: https://kafka.apache.org/43/configuration/broker-configs/
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="파티션은 덧붙이기만 하는 로그예요">
+    새 이벤트는 파티션 끝에 붙고, 순번(오프셋)을 받아요. 중간에 끼워 넣거나 고치지 않아요.
+  </Point>
+  <Point title="순서는 파티션 안에서만 지켜져요">
+    한 파티션의 이벤트는 쓴 순서대로 읽혀요. 파티션끼리는 순서가 정해져 있지 않아요.
+  </Point>
+  <Point title="같은 키는 같은 파티션으로 가요">
+    고객 번호 같은 키를 붙이면 같은 키의 이벤트가 한 파티션에 모여, 그 순서가 지켜져요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="게시판은 글을 아무 칸에나 붙이지만, Kafka는 키를 보고 칸을 정해요. 같은 고객의 글은 늘 같은 칸으로 가요.">
+  토픽은 "주문" 게시판이고, 파티션은 그 게시판을 세로로 나눈 칸이에요. 칸마다 글이 위에서 아래로 쌓이고, 글마다 0번, 1번처럼 번호가 붙어요.
+</Analogy>
+
+## 토픽
+
+<Term term="messaging/topic">토픽</Term>은 이벤트를 담는 이름 붙은 묶음이에요. `payments`, `orders`처럼 이름을 붙여요. Kafka 문서는 토픽을 폴더, 이벤트를 그 안의 파일에 빗대요.
+
+토픽에는 여러 프로듀서가 쓰고 여러 컨슈머가 읽을 수 있어요. 읽어 간 이벤트는 지워지지 않고, 토픽마다 정한 보관 기간 동안 남아요.
+
+## 파티션과 오프셋
+
+토픽은 여러 <Term term="messaging/partition">파티션</Term>으로 나뉘어 여러 브로커에 흩어져 있어요. 그래서 많은 프로듀서와 컨슈머가 여러 브로커에서 동시에 쓰고 읽을 수 있어요.
+
+파티션은 끝에 덧붙이기만 하는 로그예요. 새 이벤트는 파티션 끝에 붙고, 파티션 안에서 하나씩 늘어나는 순번인 <Term term="messaging/offset">오프셋</Term>을 받아요.
+
+<Figure caption="파티션 셋으로 나뉜 토픽이에요. 칸마다 오프셋이 0부터 따로 늘어나고, 새 이벤트는 각 칸의 끝에 붙어요.">
+  <Layers
+    ariaLabel="파티션 0에는 오프셋 0부터 5까지, 파티션 1에는 0부터 3까지, 파티션 2에는 0부터 4까지 이벤트가 쌓여 있고 새 이벤트는 끝에 붙는 그림"
+    layers={[
+      { label: '파티션 0', note: '0 · 1 · 2 · 3 · 4 · 5 ← 새 이벤트', tone: 'accent' },
+      { label: '파티션 1', note: '0 · 1 · 2 · 3 ← 새 이벤트' },
+      { label: '파티션 2', note: '0 · 1 · 2 · 3 · 4 ← 새 이벤트' },
+    ]}
+  />
+</Figure>
+
+오프셋은 파티션마다 따로 매겨요. 그래서 "오프셋 3"만으로는 이벤트를 하나로 가리킬 수 없고, "파티션 1의 오프셋 3"처럼 말해야 해요.
+
+## 순서는 파티션 안에서만
+
+Kafka는 한 파티션의 이벤트를 쓴 순서 그대로 읽게 보장해요. 하지만 파티션이 다르면 서로 순서가 없어요. 파티션 0의 이벤트와 파티션 1의 이벤트 중 무엇이 먼저 읽힐지는 정해져 있지 않아요.
+
+그래서 순서가 중요한 이벤트는 같은 파티션에 들어가게 해야 해요. 이때 쓰는 게 키예요.
+
+## 키가 파티션을 정해요
+
+이벤트에 키가 있으면, 프로듀서는 키의 해시값으로 파티션을 골라요. 같은 키는 늘 같은 파티션으로 가서, 같은 키끼리는 순서가 지켜져요.
+
+<Figure caption="고객 A의 이벤트는 둘 다 파티션 0으로, 고객 B의 이벤트는 파티션 1로 가요. 고객 A의 '주문'과 '취소'는 순서대로 읽혀요.">
+  <Flow
+    ariaLabel="키가 고객 A인 주문 이벤트와 취소 이벤트는 파티션 0으로 가고, 키가 고객 B인 주문 이벤트는 파티션 1로 가는 구조도"
+    nodes={[
+      { id: 'a1', label: 'A: 주문', col: 0, row: 0, tone: 'accent', note: '첫째로 보냄' },
+      { id: 'a2', label: 'A: 취소', col: 0, row: 1, tone: 'accent', note: '셋째로 보냄' },
+      { id: 'b1', label: 'B: 주문', col: 0, row: 2, note: '둘째로 보냄' },
+      { id: 'p0', label: '파티션 0', col: 2, row: 0, tone: 'accent' },
+      { id: 'p1', label: '파티션 1', col: 2, row: 2 },
+    ]}
+    edges={[
+      { from: 'a1', to: 'p0', tone: 'accent' },
+      { from: 'a2', to: 'p0', tone: 'accent' },
+      { from: 'b1', to: 'p1' },
+    ]}
+  />
+</Figure>
+
+키가 없으면 프로듀서는 한 파티션을 골라 일정량이 찰 때까지 그 파티션으로 보내요. 그 양을 채우면 다른 파티션으로 바꿔요. 그래서 키 없는 이벤트는 여러 파티션에 흩어지고, 서로 순서가 없어요.
+
+## 파티션은 몇 개로?
+
+파티션 수는 한 토픽을 동시에 처리할 수 있는 정도를 정해요. 컨슈머 그룹 안에서 파티션 하나는 컨슈머 하나만 맡기 때문이에요. 파티션이 4개면 한 그룹에서 동시에 일하는 컨슈머도 4개까지예요.
+
+파티션 수는 나중에 늘릴 수 있지만 줄일 수는 없어요. 늘리면 키와 파티션의 짝이 바뀌어, 같은 키가 다른 파티션으로 갈 수 있어요. 그래서 키로 순서를 지키는 토픽은 처음부터 넉넉히 잡아요.
+
+## 모니터링에서는
+
+토픽 화면은 토픽과 파티션마다 들어오는 이벤트 수와 바이트를 보여 줘요. 파티션별로 나눠 보면, 한 파티션에만 이벤트가 몰리는지 알 수 있어요.
+
+키가 고르게 퍼지지 않으면 특정 파티션만 바빠져요. 예를 들어 큰 고객 하나의 이벤트가 전체의 절반이면, 그 고객의 파티션을 맡은 컨슈머만 밀려요.
+
+<Checkpoints>
+  <Check>이벤트 순서가 뒤섞인다면, 키 없이 보내고 있지 않은지 보세요. 키가 없으면 파티션이 흩어져 순서가 지켜지지 않아요.</Check>
+  <Check>한 파티션만 이벤트가 많고 그 파티션의 지연만 커진다면, 키가 한쪽으로 쏠렸는지 보세요.</Check>
+  <Check>파티션을 늘린 뒤 같은 고객의 이벤트 순서가 깨졌다면, 키와 파티션의 짝이 바뀐 거예요.</Check>
+  <Check>컨슈머를 파티션 수보다 많이 띄웠다면 다시 보세요. 남는 컨슈머는 맡을 파티션이 없어 놀아요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 브로커 기본 파티션 수
+
+  토픽을 만들 때 파티션 수를 적지 않으면 브로커의 `num.partitions`를 따르고, 기본값은 1이에요. 파티션 1개짜리 토픽은 한 그룹에서 컨슈머 하나만 일할 수 있어요.
+
+  ### 다른 파티셔너
+
+  프로듀서의 `partitioner.class`를 바꾸면 다른 규칙도 쓸 수 있어요. 예를 들어 RoundRobinPartitioner는 연속된 이벤트를 파티션마다 하나씩 돌아가며 보내요.
+</Deeper>
