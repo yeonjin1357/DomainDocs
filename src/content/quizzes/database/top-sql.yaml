@@ -1,0 +1,36 @@
+questions:
+  - id: total-time-wins
+    type: choice
+    prompt: 최근 1시간 동안 DB 시간을 가장 많이 쓴 SQL은?
+    choices:
+      - 평균 2ms인 SQL을 100만 번 실행
+      - 평균 5초인 SQL을 10번 실행
+      - 평균 1초인 SQL을 100번 실행
+      - 평균 100ms인 SQL을 5,000번 실행
+    answer: 0
+    explain: SQL 하나가 쓴 시간은 호출 수 × 평균이에요. 2ms × 100만 번은 2,000초로, 나머지보다 훨씬 커요.
+  - id: constants-grouped
+    type: ox
+    prompt: pg_stat_statements는 WHERE id = 1과 WHERE id = 2를 서로 다른 항목으로 따로 세나요?
+    answer: false
+    explain: 상수 값만 다른 SQL은 한 항목으로 묶고, 상수 자리를 $1처럼 바꿔 보여 줘요. 묶지 않으면 순위에서 하나하나가 작아 보여요.
+  - id: cumulative-graph
+    type: choice
+    prompt: pg_stat_statements의 total_exec_time을 받은 그대로 그래프로 그리면 생기는 문제는?
+    choices:
+      - 누적값이라 오르기만 해서 지금 무거운 SQL이 보이지 않아요
+      - 평균값이라 호출 수가 지워져요
+      - 1분마다 0으로 돌아가서 선이 끊겨요
+      - 앱이 직접 보낸 SQL이 빠져요
+    answer: 0
+    explain: 호출 수와 시간은 마지막 초기화 뒤로 쌓인 값이에요. 구간을 보려면 두 시점 값의 차이를 써요.
+  - id: fast-sql-long-db-span
+    type: ox
+    prompt: SQL 평균은 빠른데 앱 트레이스의 DB 구간이 길다면, 같은 SQL을 요청마다 여러 번 부르는지 의심해 볼 만한가요?
+    answer: true
+    explain: N+1 질의처럼 같은 SQL을 여러 번 부르면, 한 번은 빨라도 합이 커요. 그래서 호출 수를 함께 봐요.
+  - id: statements-extension
+    type: input
+    prompt: PostgreSQL에서 SQL별 호출 수와 실행 시간 합을 모아 보여 주는 확장의 이름은?
+    answer: [pg_stat_statements]
+    explain: pg_stat_statements는 calls와 total_exec_time 같은 열로 SQL별 누적값을 보여 줘요.

@@ -1,0 +1,41 @@
+questions:
+  - id: connected-vs-active
+    type: ox
+    prompt: DB에 붙은 세션이 200개라면 액티브 세션도 200개인가요?
+    answer: false
+    explain: 붙은 세션 대부분은 다음 명령을 기다리며 쉬어요. 액티브 세션은 그중 쿼리를 실행하고 있는 세션만 세요.
+  - id: lock-wait-surge
+    type: choice
+    prompt: 액티브 세션이 3개에서 12개로 늘었는데, 늘어난 9개가 모두 Lock을 기다려요. 가장 알맞은 해석은?
+    choices:
+      - 세션들이 서로의 잠금을 기다리며 줄을 섰어요
+      - SQL이 무거워져 CPU를 더 쓰고 있어요
+      - 디스크 읽기가 느려졌어요
+      - 앱이 다음 명령을 보내지 않고 쉬고 있어요
+    answer: 0
+    explain: 대기 종류가 원인의 갈래를 알려 줘요. Lock 대기만 늘었다면 쿼리가 무거워진 게 아니라 잠금 때문에 줄을 선 거예요.
+  - id: idle-wait-excluded
+    type: choice
+    prompt: PostgreSQL에서 성능 문제를 찾을 때 빼고 보는 쉬는 대기는?
+    choices:
+      - 앱이 다음 데이터를 보내길 기다리는 ClientRead
+      - 표 데이터 파일을 읽는 DataFileRead
+      - 다른 트랜잭션이 끝나길 기다리는 transactionid
+      - 공유 메모리 구조를 기다리는 LWLock
+    answer: 0
+    explain: ClientRead는 DB가 할 일이 없어 앱을 기다리는 대기예요. Oracle도 Idle 종류의 대기는 빼고 보라고 해요.
+  - id: rank-waits-by-time
+    type: ox
+    prompt: 대기 이벤트를 일어난 횟수 순으로 줄 세우면, DB 시간을 가장 많이 쓴 대기가 맨 위에 오나요?
+    answer: false
+    explain: 횟수로는 짧은 대기가 아주 많은 것과 긴 대기가 몇 번인 것을 가리지 못해요. 대기 시간으로 줄 세워요.
+  - id: aas-calculation
+    type: choice
+    prompt: 30분 동안 액티브 세션 4개가 쉬지 않고 일했어요. 평균 액티브 세션(AAS)은?
+    choices:
+      - 4개
+      - 120개
+      - 30개
+      - 34개
+    answer: 0
+    explain: 세션들이 쓴 시간의 합(DB time)은 약 120분이에요. 이를 경과 시간 30분으로 나누면 4예요.

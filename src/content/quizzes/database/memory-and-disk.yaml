@@ -1,0 +1,37 @@
+questions:
+  - id: block-unit-read
+    type: ox
+    prompt: 행 하나만 필요하면 DB는 디스크에서 그 행만 쏙 골라 읽나요?
+    answer: false
+    explain: DB는 블록(페이지) 단위로 읽어요. 행 하나가 필요해도 그 행이 든 블록을 통째로 읽어요.
+  - id: innodb-page-size
+    type: choice
+    prompt: 다음 중 기본 블록(페이지) 크기가 나머지와 다른 것은?
+    choices:
+      - MySQL InnoDB
+      - PostgreSQL
+      - Oracle
+      - SQL Server
+    answer: 0
+    explain: MySQL InnoDB의 기본 페이지는 16KB이고, 나머지는 기본 8KB예요.
+  - id: dirty-block-checkpoint
+    type: choice
+    prompt: 메모리에서만 바뀌고 아직 디스크에 쓰지 않은 블록을 한꺼번에 디스크에 쓰는 때를 무엇이라고 하나요?
+    choices:
+      - 체크포인트
+      - 커밋
+      - 하드 파스
+      - 장애 조치
+    answer: 0
+    explain: 체크포인트에서 더티 블록을 디스크에 써요. 그 사이 장애가 나면 먼저 적어 둔 로그로 메워요.
+  - id: restart-cold-cache
+    type: ox
+    prompt: DB를 다시 시작한 직후 한동안 디스크 읽기가 늘어나는 건 이상한 일인가요?
+    answer: false
+    explain: 다시 시작하면 버퍼 캐시가 비어 있어요. 자주 쓰는 블록이 다시 캐시에 찰 때까지 디스크에서 읽어요.
+  - id: dirty-block-name
+    type: input
+    prompt: 메모리에서 바뀌었지만 아직 디스크에 쓰지 않은 블록을 부르는 이름은?
+    answer: [더티 블록, 더티 페이지, dirty page, dirty block]
+    term: database/dirty-block
+    explain: 더티 블록은 체크포인트 같은 때 디스크에 써요. 그 전에 장애가 나면 로그로 되살려요.

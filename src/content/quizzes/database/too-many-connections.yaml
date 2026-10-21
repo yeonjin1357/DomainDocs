@@ -1,0 +1,41 @@
+questions:
+  - id: mostly-idle-action
+    type: choice
+    prompt: DB 연결 수가 한도에 붙었는데, 연결 대부분이 idle이에요. 먼저 검토할 조치는?
+    choices:
+      - 앱 풀의 최대치나 최소 유지 수를 줄여요
+      - 느린 SQL의 실행 계획을 고쳐요
+      - 버퍼 캐시를 키워요
+      - 잠금을 쥔 세션을 끊어요
+    answer: 0
+    explain: 대부분 쉬고 있다면 DB가 바쁜 게 아니에요. 앱 풀들이 연결을 넉넉히 쥐고 있어서, 쥐는 연결 수를 줄이는 쪽이 맞아요.
+  - id: pool-times-servers
+    type: choice
+    prompt: 앱 서버 4대가 서버마다 최대 30개짜리 풀을 쓰고, 일이 없어도 최대치만큼 열어 둬요. 이 앱이 쥐는 DB 연결은?
+    choices:
+      - 120개
+      - 30개
+      - 34개
+      - 60개
+    answer: 0
+    explain: 풀 최대치에 서버 수를 곱해요. 30 × 4 = 120개라서, 한도가 100이면 이 앱만으로도 넘쳐요.
+  - id: admin-reserved
+    type: ox
+    prompt: PostgreSQL에서 연결 수가 한도에 닿으면, 관리자 계정도 접속하지 못하나요?
+    answer: false
+    explain: 마지막 몇 자리(superuser_reserved_connections, 기본 3개)는 관리자 몫으로 남겨 둬요. 그래서 관리자는 들어와 상황을 볼 수 있어요.
+  - id: hikari-min-idle
+    type: ox
+    prompt: HikariCP에서 minimumIdle을 따로 정하지 않으면, 일이 없을 때는 연결을 조금만 열어 두나요?
+    answer: false
+    explain: minimumIdle을 정하지 않으면 maximumPoolSize와 같아요. 그래서 일이 없어도 최대치만큼 연결을 열어 둬요.
+  - id: pgbouncer-transaction-mode
+    type: choice
+    prompt: PgBouncer의 transaction 모드에 대한 설명으로 맞는 것은?
+    choices:
+      - 트랜잭션 동안에만 DB 연결을 내줘서, 많은 앱 연결이 적은 DB 연결을 나눠 써요
+      - 세션 단위 기능을 모두 그대로 지원해요
+      - 앱이 연결을 끊을 때까지 DB 연결을 쥐어요
+      - DB의 max_connections를 자동으로 올려요
+    answer: 0
+    explain: 대신 세션 설정 변경 같은 세션 단위 기능 몇 가지가 깨져요. 연결을 끊을 때까지 쥐는 건 기본값인 session 모드예요.

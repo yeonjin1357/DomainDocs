@@ -1,0 +1,41 @@
+questions:
+  - id: high-ratio-not-healthy
+    type: ox
+    prompt: 버퍼 캐시 적중률이 99.9%라면 SQL들이 효율적으로 돌고 있다고 볼 수 있나요?
+    answer: false
+    explain: 나쁜 계획이 같은 블록을 몇 번이고 다시 읽으면 적중률은 오히려 올라가요. 비율보다 SQL마다 읽은 블록 수를 봐요.
+  - id: rank-by-blocks
+    type: choice
+    prompt: 캐시 안에서 일을 지나치게 많이 하는 SQL을 찾으려면 무엇으로 줄 세워요?
+    choices:
+      - SQL마다 읽은 블록 수(hit + read)
+      - SQL마다 계산한 적중률
+      - DB 전체의 적중률
+      - SQL 글자의 길이
+    answer: 0
+    explain: 비율은 일의 양을 지워요. 읽은 블록 수로 줄 세우면 캐시 안에서 많이 일하는 SQL이 위로 올라와요.
+  - id: read-not-always-disk
+    type: choice
+    prompt: PostgreSQL이 캐시에 없어 읽었다고 센 블록(blks_read)에 대해 맞는 말은?
+    choices:
+      - 운영체제의 파일 캐시에서 나왔을 수도 있어요
+      - 언제나 디스크에서 직접 읽은 블록이에요
+      - 버퍼 캐시에서 찾은 블록이에요
+      - 커밋할 때 디스크에 쓴 블록이에요
+    answer: 0
+    explain: PostgreSQL은 자기 버퍼 캐시에서 찾은 것만 적중으로 세요. 그 밖에서 읽은 블록도 운영체제 캐시에서 나왔을 수 있어요.
+  - id: bigger-cache-not-always
+    type: ox
+    prompt: 적중률이 낮다면 버퍼 캐시를 키우는 것만으로 언제나 나아지나요?
+    answer: false
+    explain: 한 번 읽고 마는 데이터가 많으면 캐시를 키워도 소용없어요. Oracle 문서도 낮은 적중률이 곧 캐시를 키우라는 뜻은 아니라고 해요.
+  - id: shared-buffers-start
+    type: choice
+    prompt: 메모리가 1GB를 넘는 전용 DB 서버에서, PostgreSQL 문서가 shared_buffers의 출발점으로 드는 값은?
+    choices:
+      - 메모리의 25%
+      - 메모리의 90%
+      - 메모리의 5%
+      - 메모리와 상관없이 128MB
+    answer: 0
+    explain: PostgreSQL은 운영체제 캐시에도 기대서 25%쯤에서 시작해요. 128MB는 보통의 기본값이에요.

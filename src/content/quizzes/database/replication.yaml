@@ -1,0 +1,37 @@
+questions:
+  - id: async-loses-recent
+    type: ox
+    prompt: 비동기 복제를 쓰면, 주 서버가 갑자기 죽어도 커밋된 데이터는 하나도 잃지 않나요?
+    answer: false
+    explain: 비동기는 복제 서버가 받기 전에 커밋을 끝내요. 로그를 보내기 전에 주 서버가 죽으면 그 최근 커밋은 사라질 수 있어요.
+  - id: sync-cost
+    type: choice
+    prompt: 동기 복제의 대가로 맞는 것은?
+    choices:
+      - 커밋마다 복제 서버까지 다녀오는 시간을 더 기다려요
+      - 주 서버가 죽으면 최근 커밋을 잃어요
+      - 복제 서버에서 읽기를 할 수 없어요
+      - 로그를 보내지 않아 복제 서버가 따라오지 못해요
+    answer: 0
+    explain: 동기 복제는 복제 서버가 받았다고 답해야 커밋을 끝내요. 그래서 안전한 대신, 멀리 떨어질수록 커밋이 느려져요.
+  - id: read-your-write
+    type: choice
+    prompt: 주 서버에 방금 쓴 값을 비동기 복제 서버에서 곧바로 읽었더니 옛 값이 나왔어요. 왜일까요?
+    choices:
+      - 변경이 복제 서버에 아직 도착하지 않아서
+      - 복제 서버는 커밋된 값을 보여 주지 않아서
+      - 주 서버의 커밋이 실패해서
+      - 복제 서버의 버퍼 캐시가 꺼져 있어서
+    answer: 0
+    explain: 비동기 복제 서버에는 변경이 조금 늦게 도착해요. 방금 쓴 데이터는 주 서버에서 읽어요.
+  - id: replica-not-backup
+    type: ox
+    prompt: 복제 서버가 있으면 실수로 지운 데이터도 복제 서버에서 되찾을 수 있나요?
+    answer: false
+    explain: 복제는 주 서버의 변경을 그대로 따라 해요. 실수로 지운 것도 복제 서버에서 똑같이 지워져요.
+  - id: failover-name
+    type: input
+    prompt: 주 서버가 죽었을 때 복제 서버가 주 서버 역할을 넘겨받는 일을 무엇이라고 하나요?
+    answer: [장애 조치, 페일오버, failover]
+    term: database/failover
+    explain: 장애 조치 뒤에는 앱이 새 주 서버로 붙어야 해요. 비동기 복제였다면 넘겨받기 직전의 커밋을 잃을 수 있어요.

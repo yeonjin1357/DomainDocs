@@ -1,0 +1,37 @@
+questions:
+  - id: many-rows-full-scan
+    type: choice
+    prompt: 주문 테이블의 행 대부분을 가져오는 SQL에서, 옵티마이저가 인덱스를 두고도 쓰지 않았어요. 왜일까요?
+    choices:
+      - 행 대부분을 가져올 땐 처음부터 다 읽는 편이 더 싸서
+      - 인덱스가 깨져 있어서
+      - 인덱스는 SELECT에 쓸 수 없어서
+      - 통계가 있으면 인덱스를 쓰지 않아서
+    answer: 0
+    explain: 인덱스로 찾으면 행마다 테이블의 다른 위치를 찾아가 읽어요. 가져올 행이 많으면 이어서 쭉 읽는 쪽이 싸요.
+  - id: more-indexes-faster-insert
+    type: ox
+    prompt: 인덱스를 많이 만들어 둘수록 INSERT도 빨라지나요?
+    answer: false
+    explain: 행을 넣을 때마다 모든 인덱스도 함께 고쳐야 해요. 인덱스가 많을수록 쓰기가 느려지고 공간도 더 써요.
+  - id: composite-leading-column
+    type: choice
+    prompt: (고객, 주문일) 복합 인덱스가 있어요. 이 인덱스를 잘 쓰지 못하는 조건은?
+    choices:
+      - 주문일만으로 찾는 조건
+      - 고객으로 찾는 조건
+      - 고객과 주문일로 함께 찾는 조건
+      - 고객을 정하고 주문일 범위로 찾는 조건
+    answer: 0
+    explain: 이 인덱스는 고객으로 먼저 정렬돼 있어요. 앞 열인 고객 조건이 없으면 주문일 순서를 바로 따라가기 어려워요.
+  - id: function-on-column
+    type: ox
+    prompt: "WHERE lower(email) = 'a@x.com'은 email 열에 만든 보통 인덱스를 그대로 잘 쓸 수 있나요?"
+    answer: false
+    explain: 인덱스는 email 값 순서로 정렬돼 있어요. lower(email) 순서로 찾으려면 그 함수 결과로 만든 인덱스가 따로 필요해요.
+  - id: btree-name
+    type: input
+    prompt: 대부분의 DB에서 기본 인덱스로 쓰는, 값을 정렬해 나무 모양으로 쌓은 구조는?
+    answer: [B-tree, B트리, 비트리, btree]
+    term: database/b-tree
+    explain: B-tree는 위에서부터 범위를 좁혀 내려가며 원하는 값에 닿아요. 그래서 큰 테이블에서도 빨리 찾아요.

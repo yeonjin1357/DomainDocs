@@ -1,0 +1,37 @@
+questions:
+  - id: many-connections-busy
+    type: ox
+    prompt: DB 연결 수가 한도에 닿았다면, DB가 SQL을 처리하느라 그만큼 바쁘다는 뜻인가요?
+    answer: false
+    explain: 쉬는 연결도 자리를 차지해요. 연결 대부분이 쉬고 있을 수 있으니, 지금 일하는 액티브 세션 수를 함께 봐요.
+    doc: database/too-many-connections
+  - id: postgres-process-per-connection
+    type: choice
+    prompt: PostgreSQL이 연결 하나를 맡는 방식은?
+    choices:
+      - 연결마다 서버 프로세스를 하나씩 띄워요
+      - 연결마다 전용 스레드를 하나씩 붙여요
+      - 작업 스레드 풀에서 요청마다 하나씩 맡겨요
+      - 디스패처가 요청을 큐에 넣어 나눠 줘요
+    answer: 0
+    explain: PostgreSQL은 연결마다 서버 프로세스를 띄워요. MySQL은 연결마다 스레드, SQL Server는 작업 스레드 풀을 써요.
+  - id: why-connection-pool
+    type: choice
+    prompt: 앱이 커넥션 풀로 연결을 돌려 쓰는 가장 큰 이유는?
+    choices:
+      - 요청마다 연결을 맺고 인증하는 비용을 줄이려고
+      - DB의 연결 수 한도를 없애려고
+      - 옵티마이저가 더 빠른 계획을 고르게 하려고
+      - 세션 설정을 요청마다 새로 정하려고
+    answer: 0
+    explain: 연결을 맺으려면 네트워크를 여러 번 오가고 인증하고 서버 쪽 일꾼을 준비해야 해요. 풀은 맺어 둔 연결을 다시 써요.
+  - id: session-setting-sticks
+    type: ox
+    prompt: 풀에서 빌린 연결에서 바꾼 세션 설정(예를 들어 시간대)은, 연결을 풀에 돌려주면 저절로 원래대로 돌아가나요?
+    answer: false
+    explain: 세션 설정은 세션이 끝날 때까지 남아요. 그래서 다음에 그 연결을 빌린 요청도 바뀐 설정으로 일할 수 있어요.
+  - id: activity-view
+    type: input
+    prompt: PostgreSQL에서 세션마다 한 줄씩, 지금 무엇을 하는지 보여 주는 뷰의 이름은?
+    answer: [pg_stat_activity]
+    explain: pg_stat_activity의 state가 active면 SQL을 실행하는 중이고, idle이면 다음 명령을 기다리는 중이에요.

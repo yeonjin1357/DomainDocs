@@ -1,0 +1,32 @@
+questions:
+  - id: cost-is-estimate
+    type: ox
+    prompt: 옵티마이저가 계획마다 매기는 비용은 실제로 실행해서 잰 시간인가요?
+    answer: false
+    explain: 비용은 통계로 어림한 추정값이에요. 그래서 통계가 실제와 다르면 계획도 틀릴 수 있어요.
+  - id: stale-statistics
+    type: choice
+    prompt: 코드는 그대로인데 테이블 데이터가 100배로 늘어난 뒤 SQL이 갑자기 느려졌어요. 가장 먼저 의심할 것은?
+    choices:
+      - 통계가 낡아 옵티마이저가 틀린 계획을 골랐는지
+      - 파서가 문법 오류를 냈는지
+      - 커넥션 풀이 작아졌는지
+      - 바인드 변수 때문에 결과가 달라졌는지
+    answer: 0
+    explain: 옵티마이저는 통계로 행 수를 어림해요. 통계가 작은 테이블 시절 그대로면, 작은 테이블에 맞는 방법을 골라요.
+  - id: oracle-literal-hard-parse
+    type: choice
+    prompt: Oracle에 값만 다른 SQL을 매번 문자열로 이어 붙여 보내면 어떻게 될까요?
+    choices:
+      - 값마다 다른 SQL로 보고 매번 하드 파스를 해요
+      - 첫 번째 계획을 캐시에서 계속 다시 써요
+      - 소프트 파스만 일어나서 더 빨라져요
+      - 옵티마이저를 건너뛰고 바로 실행해요
+    answer: 0
+    explain: Oracle은 SQL 글자로 캐시를 찾아서, 값만 달라도 다른 SQL로 봐요. 그래서 계획을 처음부터 다시 세워요.
+  - id: bind-variable-name
+    type: input
+    prompt: 값이 바뀌는 자리는 비워 두고 값은 따로 넘겨서, 같은 SQL의 계획을 다시 쓰게 하는 방법은?
+    answer: [바인드 변수, 바인딩, 파라미터 바인딩]
+    term: database/bind-variable
+    explain: "WHERE id = :id처럼 자리만 두고 값은 따로 넘겨요. SQL 글자가 같아서 만든 계획을 다시 쓸 수 있어요."

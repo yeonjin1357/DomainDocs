@@ -1,0 +1,36 @@
+questions:
+  - id: app-db-span-not-db
+    type: ox
+    prompt: APM 트레이스의 DB 구간이 2초로 늘었다면, DB 안에서 SQL 실행이 느려진 게 확실한가요?
+    answer: false
+    explain: 앱이 잰 DB 구간에는 커넥션을 얻기까지의 대기와 네트워크 시간도 섞여요. DB가 잰 실행 시간을 함께 봐요.
+  - id: nothing-grew
+    type: choice
+    prompt: 앱은 느린데, DB의 액티브 세션 수와 대기 종류는 평소와 같아요. 다음에 볼 곳은?
+    choices:
+      - 앱 커넥션 풀이나 네트워크 같은 DB 밖
+      - 잠금을 쥐고 있는 세션
+      - 늘어난 SQL의 실행 계획
+      - DB의 버퍼 캐시 크기
+    answer: 0
+    explain: DB 안에서 늘어난 일이 없다면 DB는 한가해요. 시간은 DB에 닿기 전이나 돌아오는 길에서 쓰이고 있어요.
+  - id: more-calls-app-side
+    type: choice
+    prompt: 장애 시각에 실행 시간 합이 늘어난 SQL을 찾았더니, 평균은 그대로이고 호출 수가 크게 늘었어요. 먼저 볼 곳은?
+    choices:
+      - 배포나 캐시 만료 같은 앱 쪽 변화
+      - 그 SQL의 실행 계획
+      - 플래너 통계를 다시 모았는지
+      - 그 표에 걸린 잠금
+    answer: 0
+    explain: SQL 하나는 그대로인데 더 자주 불렸어요. 같은 SQL을 더 부르게 된 앱 쪽 변화부터 찾아요.
+  - id: lock-wait-low-cpu
+    type: ox
+    prompt: 잠금을 기다리는 세션이 많으면 DB의 CPU 사용률도 함께 높아지나요?
+    answer: false
+    explain: 잠금을 기다리는 세션은 CPU를 쓰지 않아요. 그래서 DB가 막혀 있어도 CPU는 한가해 보일 수 있어요.
+  - id: blocking-pids-name
+    type: input
+    prompt: PostgreSQL에서 어떤 세션을 막고 있는 세션들의 pid를 돌려주는 함수는?
+    answer: [pg_blocking_pids, pg_blocking_pids(), pg_blocking_pids(pid)]
+    explain: 막힌 세션의 pid를 넣으면 막고 있는 세션들의 pid 목록이 나와요. 그 pid로 다시 조회해 무엇을 하는지 봐요.

@@ -1,0 +1,32 @@
+questions:
+  - id: transfer-atomic
+    type: choice
+    prompt: 이체에서 출금 SQL은 성공하고 입금 SQL 직전에 장애가 났어요. 두 SQL이 한 트랜잭션이었다면 결과는?
+    choices:
+      - 출금까지 되돌려져 두 잔액 모두 그대로예요
+      - 출금만 반영되고 입금은 빠져요
+      - 입금이 자동으로 다시 실행돼요
+      - 장애가 풀릴 때까지 출금 행이 잠긴 채로 남아요
+    answer: 0
+    explain: 트랜잭션은 전부 아니면 전무예요. 커밋 전에 끊기면 이미 바꾼 출금까지 되돌려요.
+  - id: uncommitted-invisible
+    type: ox
+    prompt: 기본 설정에서, 커밋하지 않은 변경도 다른 세션의 조회에 바로 보이나요?
+    answer: false
+    explain: 기본 설정에서는 커밋하는 순간 변경이 한꺼번에 보여요. READ UNCOMMITTED나 NOLOCK 같은 설정은 예외예요.
+  - id: external-api-in-tx
+    type: choice
+    prompt: 트랜잭션 안에서 느린 외부 API를 부르는 코드의 가장 큰 문제는?
+    choices:
+      - 응답을 기다리는 동안 잡은 잠금을 놓지 않아요
+      - 외부 API 응답이 자동으로 롤백돼요
+      - 트랜잭션이 자동으로 커밋돼요
+      - 실행 계획이 매번 새로 만들어져요
+    answer: 0
+    explain: 트랜잭션은 끝날 때까지 잡은 잠금을 쥐고 있어요. 기다리는 동안 같은 행을 바꾸려는 다른 세션이 줄을 서요.
+  - id: autocommit-name
+    type: input
+    prompt: 트랜잭션을 직접 열지 않으면 SQL 한 문장마다 트랜잭션을 열고 커밋하는 동작을 무엇이라고 하나요?
+    answer: [자동 커밋, 오토커밋, autocommit, auto commit]
+    term: database/autocommit
+    explain: PostgreSQL은 BEGIN이 없으면 문장마다 커밋하고, JDBC 연결도 기본이 자동 커밋이에요.
