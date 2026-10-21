@@ -76,7 +76,7 @@ available이 바닥에 가까워지면 커널은 덜 쓰는 메모리를 스왑�
 
 이때 커널 로그에는 `Killed process 1234 (java)`처럼 끝낸 프로세스의 번호와 이름이 남아요. 프로세스가 사라진 시각과 이 기록의 시각을 맞춰 봐요.
 
-**확인 방법**: `dmesg -T` 또는 `journalctl -k`로 커널 로그를 보고, `Killed process`를 찾아요. 컨테이너라면 서버 전체가 아니라 컨테이너 한도를 넘었을 수 있어요. 이건 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>의 OOMKilled예요.
+**확인 방법**: `dmesg -T` 또는 `journalctl -k`로 <Term slug="server/services-and-logs">커널 로그</Term>를 보고, `Killed process`를 찾아요. 컨테이너라면 서버 전체가 아니라 컨테이너 한도를 넘었을 수 있어요. 이건 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>의 OOMKilled예요.
 
 <Checkpoints>
   <Check>메모리 알림이 늘 90%대에 붙어 있다면, 사용률을 free로 계산하는지 보세요. available로 계산하면 알림이 진짜 부족할 때만 울려요.</Check>

@@ -1,0 +1,183 @@
+---
+title: 서비스와 시스템 로그
+summary: systemd는 서비스를 띄우고 지켜봐요. 로그는 journald와 커널 로그에 모여요.
+domain: server
+type: concept
+stage: basics
+order: 60
+icon: server
+keywords: [systemd, systemctl, journald, journalctl, dmesg, 서비스, 데몬, 커널 로그, Restart, 재시작]
+related: [server/processes-and-threads, server/server-not-reporting, server/low-memory, server/disk-filling-up]
+sources:
+  - title: Linux man-pages — systemd(1)
+    url: https://man7.org/linux/man-pages/man1/systemd.1.html
+  - title: Linux man-pages — systemd.unit(5)
+    url: https://man7.org/linux/man-pages/man5/systemd.unit.5.html
+  - title: Linux man-pages — systemd.service(5)
+    url: https://man7.org/linux/man-pages/man5/systemd.service.5.html
+  - title: Linux man-pages — systemd-system.conf(5)
+    url: https://man7.org/linux/man-pages/man5/systemd-system.conf.5.html
+  - title: Linux man-pages — systemctl(1)
+    url: https://man7.org/linux/man-pages/man1/systemctl.1.html
+  - title: Linux man-pages — systemd-journald.service(8)
+    url: https://man7.org/linux/man-pages/man8/systemd-journald.service.8.html
+  - title: Linux man-pages — journald.conf(5)
+    url: https://man7.org/linux/man-pages/man5/journald.conf.5.html
+  - title: Linux man-pages — journalctl(1)
+    url: https://man7.org/linux/man-pages/man1/journalctl.1.html
+  - title: Linux man-pages — dmesg(1)
+    url: https://man7.org/linux/man-pages/man1/dmesg.1.html
+  - title: Linux man-pages — syslog(2)
+    url: https://man7.org/linux/man-pages/man2/syslog.2.html
+  - title: systemd NEWS (CHANGES WITH 235, NRestarts)
+    url: https://github.com/systemd/systemd/blob/main/NEWS
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="서비스는 systemd가 띄우고 지켜봐요">
+    부팅 때 가장 먼저 뜬 systemd가 설정대로 서비스를 띄워요. 죽으면 다시 띄울지도 설정으로 정해요.
+  </Point>
+  <Point title="로그는 journald 한곳에 모여요">
+    서비스가 내보낸 글과 커널 메시지를 journald가 모아요. 읽을 때는 journalctl을 써요.
+  </Point>
+  <Point title="active여도 계속 죽고 있을 수 있어요">
+    다시 띄우기를 켠 서비스는 죽었다 살아나도 active로 보여요. 재시작 횟수를 함께 봐요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="총무는 팀이 왜 쓰러졌는지 살피지만, systemd는 이유를 묻지 않고 정해 둔 대로 다시 띄울 뿐이에요. 짧은 시간에 너무 자주 쓰러지면 그마저 멈춰요.">
+  systemd는 사무실의 총무예요. 아침에 정해진 팀(서비스)을 출근시키고, 팀이 쓰러지면 설정대로 다시 불러요. 팀마다 쓴 업무 일지는 한 보관함(journald)에 모여요.
+</Analogy>
+
+## 서비스는 systemd가 띄워요
+
+<Figure caption="systemd가 서비스를 띄워요(실선). 서비스가 내보낸 글과 커널 메시지는 journald로 모여요(점선).">
+  <Flow
+    ariaLabel="systemd가 웹 서버와 수집 에이전트를 띄우고, 두 서비스와 커널의 메시지가 journald로 모이는 구조도"
+    nodes={[
+      { id: 'systemd', label: 'systemd', col: 1, row: 0, note: 'PID 1', tone: 'accent' },
+      { id: 'web', label: '웹 서버', col: 0, row: 1, note: '서비스' },
+      { id: 'agent', label: '수집 에이전트', col: 2, row: 1, note: '서비스' },
+      { id: 'kernel', label: '커널', col: 0, row: 2 },
+      { id: 'journald', label: 'journald', col: 1, row: 2, note: '로그 모음', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'systemd', to: 'web' },
+      { from: 'systemd', to: 'agent' },
+      { from: 'web', to: 'journald', dashed: true },
+      { from: 'agent', to: 'journald', dashed: true },
+      { from: 'kernel', to: 'journald', dashed: true },
+    ]}
+  />
+</Figure>
+
+<Term term="server/service">서비스</Term>는 화면 없이 뒤에서 계속 도는 프로그램이에요. 웹 서버, DB, 모니터링 에이전트가 모두 서비스예요. 데몬(daemon)이라고도 불러요.
+
+많은 리눅스 배포판은 부팅 때 <Term term="server/systemd">systemd</Term>를 가장 먼저 띄워요. 그래서 systemd의 PID는 1이에요. systemd가 나머지 서비스를 차례로 띄워요.
+
+서비스마다 유닛 파일이 하나씩 있어요. 무엇을 실행할지, 부팅 때 띄울지, 죽으면 다시 띄울지를 적은 설정 파일이에요. 이름은 `nginx.service`처럼 `.service`로 끝나요.
+
+## 서비스 상태는 Active 줄로 읽어요
+
+`systemctl status 서비스이름`은 서비스 상태를 한눈에 보여 줘요. 가장 먼저 볼 줄은 Active예요.
+
+| Active 값 | 뜻 |
+| --- | --- |
+| active (running) | 돌고 있어요 |
+| inactive | 멈춰 있어요. 멈추라고 했거나 아직 띄우지 않았어요 |
+| activating | 띄우는 중이에요 |
+| failed | 죽었거나, 오류 코드로 끝났거나, 정한 시간 안에 뜨지 못했어요 |
+
+Active 줄에는 언제부터 그 상태인지(since)도 나와요. 서비스를 다시 띄우면 이 시각도 새로 바뀌어요.
+
+Loaded 줄에는 유닛 파일의 위치와 enabled 여부가 나와요. enabled는 부팅 때 저절로 띄운다는 뜻이에요. status 아래에는 그 서비스의 최근 로그 몇 줄도 붙어 나와요.
+
+## 죽으면 다시 띄울지 정해요
+
+서비스가 죽었을 때 다시 띄울지는 유닛 파일의 `Restart=`로 정해요. 기본값 `no`는 다시 띄우지 않아요. 문서는 오래 도는 서비스에 `on-failure`를 권해요.
+
+`on-failure`는 오류 코드로 끝나거나, 신호를 받아 죽거나, 정한 시간을 넘기면 다시 띄워요. 기본으로 100ms 쉬었다가 띄워요.
+
+<Figure caption="같은 서비스가 계속 죽을 때의 두 모습이에요. 다시 띄우기를 켜면 상태만으로는 죽고 있다는 걸 알기 어려워요.">
+  <Compare
+    columns={['끔(no, 기본값)', '켬(on-failure)']}
+    rows={[
+      { label: '죽으면', values: ['멈춘 채로 있어요', '100ms 뒤 다시 띄워요'] },
+      { label: '화면의 상태', values: ['failed', '대부분 active'] },
+      { label: '알아채려면', values: ['상태가 failed인지 봐요', '재시작 횟수와 켜진 시각을 봐요'] },
+    ]}
+  />
+</Figure>
+
+다시 띄우기에도 한도가 있어요. 기본 설정에서 10초 안에 5번보다 많이 띄우려 하면 systemd는 더 띄우지 않아요. 이때 서비스는 failed로 남아요.
+
+## 로그는 journald에 모여요
+
+<Term term="server/journald">journald</Term>(systemd-journald)는 여러 곳의 로그를 받아 한곳에 저장해요. 서비스가 표준 출력과 표준 오류로 내보낸 글, syslog로 보낸 메시지, 커널 메시지가 모두 여기로 와요.
+
+읽을 때는 `journalctl`을 써요.
+
+| 명령 | 보여 주는 것 |
+| --- | --- |
+| `journalctl -u nginx` | nginx 로그 |
+| `journalctl -k` | 커널 메시지 |
+| `journalctl -b -1` | 지난 부팅 로그 |
+| `journalctl --list-boots` | 부팅 목록 |
+
+`-k`는 이번 부팅의 커널 메시지만 보여 줘요. `--list-boots`는 부팅마다 첫 기록과 마지막 기록의 시각을 함께 보여 줘요.
+
+앱이 따로 파일에 쓰는 로그는 journald를 거치지 않아요. 그런 로그는 그 파일을 직접 읽어야 해요.
+
+## 저널은 재부팅 때 사라질 수 있어요
+
+저널을 어디에 둘지는 `journald.conf`의 `Storage=`로 정해요. 디스크(`/var/log/journal`)에 두면 재부팅 뒤에도 남아요. 메모리(`/run/log/journal`)에만 두면 재부팅 때 사라져요.
+
+기본값은 systemd를 빌드할 때 정해져서, 배포판과 버전마다 다를 수 있어요. 재부팅 전 로그가 필요한 서버라면 디스크에 남는지 미리 확인해요.
+
+## 커널 로그에는 커널만 아는 일이 남아요
+
+<Term term="server/kernel-log">커널 로그</Term>는 커널이 남기는 메시지예요. 커널은 이 메시지를 메모리 안의 정해진 크기 공간(링 버퍼)에 쌓아요. 가득 차면 오래된 메시지부터 밀려나요.
+
+`dmesg`로 이 공간을 읽어요. journald도 커널 메시지를 받아 두어서, `journalctl -k`로도 볼 수 있어요.
+
+커널 로그에는 앱이 모르는 사건이 남아요. <Term term="server/oom-killer">OOM killer</Term>가 끝낸 프로세스, 디스크 입출력 오류, 네트워크 링크가 끊긴 일 같은 것들이에요.
+
+## 모니터링에서는
+
+<Figure caption="결제 서비스의 예시예요. 상태는 active인데 켜진 지 4초뿐이고, 재시작이 37번이에요. 죽었다 살아나기를 되풀이하는 중이에요.">
+  <StatTile label="상태" value="active" note="running" />
+  <StatTile label="켜진 지" value="4" unit="초" tone="warn" />
+  <StatTile label="재시작" value="37" unit="번" tone="warn" />
+</Figure>
+
+서비스 화면이 상태만 보여 주면 이런 반복을 놓쳐요. 재시작 횟수는 `systemctl show -p NRestarts 서비스이름`으로 봐요. systemd 235부터 있는 값이에요.
+
+모니터링 에이전트도 서비스로 도는 경우가 많아요. 에이전트가 멈추면 그 서버의 지표가 끊겨요. 이때 볼 순서는 <Term slug="server/server-not-reporting">서버 수집이 끊겼을 때</Term>에 있어요.
+
+<Checkpoints>
+  <Check>서비스가 active라서 정상으로 보여 주는 화면이라면, 재시작 횟수와 켜진 시각도 함께 보여 주세요. 다시 띄우기를 켠 서비스는 계속 죽어도 대부분 active로 보여요.</Check>
+  <Check>재부팅 전 로그를 보려는데 `journalctl -b -1`이 비어 있다면 저널 저장 위치를 보세요. 메모리에만 두면 재부팅 때 사라져요.</Check>
+  <Check>앱이 로그도 없이 사라졌다면 앱 로그보다 커널 로그를 먼저 보세요. OOM killer가 끝낸 기록은 커널 로그에 남아요.</Check>
+  <Check>`journalctl -u`로 앱 로그가 안 보인다면, 앱이 자기 파일에만 로그를 쓰는지 보세요. 로그 수집도 그 파일을 읽게 설정해야 해요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 유닛 파일은 어디에 있나
+
+  관리자가 만든 유닛 파일은 `/etc/systemd/system`에 둬요. 패키지가 설치한 유닛 파일은 `/usr/lib/systemd/system`에 있어요. `systemctl status`의 Loaded 줄에 실제로 읽은 파일의 경로가 나와요.
+
+  ### 재시작 한도
+
+  한도는 유닛 파일의 `StartLimitIntervalSec=`와 `StartLimitBurst=`로 정해요. 따로 정하지 않으면 시스템 설정의 기본값(10초, 5번)을 따라요. 이 한도는 다시 띄우기뿐 아니라 손으로 띄우는 것까지 모두 세요.
+
+  한도에 걸린 서비스는 `systemctl reset-failed`로 횟수를 비운 뒤 다시 띄울 수 있어요. 죽는 원인을 고치지 않으면 같은 일이 되풀이돼요.
+
+  ### 저널의 크기
+
+  디스크에 둔 저널은 기본으로 그 파일 시스템의 10%까지 써요. 다른 쓰임을 위해 15%는 비워 두고, 두 값 모두 4G를 넘지 않아요. `journald.conf`의 `SystemMaxUse=`와 `SystemKeepFree=`로 바꿔요.
+
+  ### dmesg -T의 시각
+
+  `dmesg -T`는 커널 메시지에 사람이 읽는 시각을 붙여 보여 줘요. 문서는 이 시각이 부정확할 수 있다고 경고해요. 절전(suspend) 뒤에는 시각 계산이 어긋나요.
+</Deeper>

@@ -1,0 +1,42 @@
+questions:
+  - id: restart-looks-active
+    type: ox
+    prompt: Restart=on-failure로 설정한 서비스가 계속 죽었다 살아나요. systemctl status의 상태는 대부분 failed로 보이나요?
+    answer: false
+    explain: 죽을 때마다 다시 띄워서 대부분 active로 보여요. 켜진 시각(since)과 재시작 횟수를 함께 봐야 반복을 알아채요.
+  - id: start-limit
+    type: choice
+    prompt: 기본 설정에서, 서비스를 10초 안에 5번보다 많이 띄우려 하면 systemd는 어떻게 할까요?
+    choices:
+      - 더는 띄우지 않고, 서비스는 failed로 남아요
+      - 1분 쉬었다가 계속 다시 띄워요
+      - 서버를 다시 시작해요
+      - 다시 띄우는 간격을 두 배씩 늘려 가며 계속 띄워요
+    answer: 0
+    explain: 시작 횟수에 한도가 있어서, 짧은 시간에 너무 자주 죽으면 다시 띄우기를 멈춰요. 원인을 고친 뒤 reset-failed로 횟수를 비워요.
+  - id: previous-boot-empty
+    type: choice
+    prompt: 재부팅 전 로그를 보려고 journalctl -b -1을 했는데 아무것도 나오지 않아요. 가장 그럴듯한 이유는?
+    choices:
+      - 저널을 메모리(/run/log/journal)에만 두고 있어서
+      - 커널 로그의 링 버퍼가 가득 차서
+      - 서비스의 Restart=가 꺼져 있어서
+      - journalctl은 지난 부팅을 볼 수 없어서
+    answer: 0
+    explain: 메모리에만 둔 저널은 재부팅 때 사라져요. 디스크(/var/log/journal)에 둬야 재부팅 뒤에도 남아요.
+  - id: not-in-journald
+    type: choice
+    prompt: 다음 중 journald가 모으지 않는 로그는?
+    choices:
+      - 앱이 자기 파일에 따로 쓰는 로그
+      - 서비스가 표준 출력으로 내보낸 글
+      - 커널 메시지
+      - syslog로 보낸 메시지
+    answer: 0
+    explain: journald는 서비스의 출력, syslog, 커널 메시지 같은 것을 받아요. 앱이 따로 쓰는 파일은 그 파일을 직접 읽어야 해요.
+  - id: systemd-name
+    type: input
+    prompt: 리눅스 부팅 때 가장 먼저 떠서(PID 1) 다른 서비스를 띄우고 지켜보는 프로그램은?
+    answer: [systemd]
+    term: server/systemd
+    explain: systemd는 유닛 파일 설정대로 서비스를 띄우고, 죽으면 다시 띄울지도 정해요.

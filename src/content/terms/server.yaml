@@ -169,3 +169,30 @@ terms:
     aliases: [mount, mount point, 마운트 지점]
     short: 파일 시스템을 디렉터리 하나에 붙여 쓰는 일이에요. 예를 들어 /var에 디스크 하나를 붙여요.
     doc: server/filesystem-and-capacity
+  - id: service
+    name: 서비스
+    en: Service
+    aliases: [데몬, daemon, 서비스 유닛]
+    short: 화면 없이 뒤에서 계속 도는 프로그램이에요. 웹 서버나 DB 같은 것들이에요.
+    analogy: 출근해서 하루 종일 자리를 지키는 상주 팀과 같아요.
+    doc: server/services-and-logs
+  - id: systemd
+    name: systemd
+    aliases: [시스템디, 시스템 매니저, init]
+    short: 부팅 때 가장 먼저 떠서 다른 서비스를 띄우고 지켜보는 프로그램이에요.
+    analogy: 아침에 팀들을 출근시키고, 쓰러지면 다시 부르는 총무와 같아요.
+    doc: server/services-and-logs
+  - id: journald
+    name: journald
+    en: systemd-journald
+    aliases: [저널, journal, systemd-journald]
+    short: 서비스의 출력과 커널 메시지 같은 로그를 한곳에 모아 두는 서비스예요.
+    analogy: 모든 팀의 업무 일지를 모아 두는 보관함과 같아요.
+    doc: server/services-and-logs
+  - id: kernel-log
+    name: 커널 로그
+    en: Kernel log
+    aliases: [dmesg, kernel log, 커널 메시지, 커널 링 버퍼, kernel ring buffer]
+    short: 커널이 남기는 메시지예요. 메모리 안의 정해진 크기 공간에 쌓여요.
+    analogy: 관리자가 따로 쓰는 관리 일지와 같아요.
+    doc: server/services-and-logs
