@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { homeLists, inDomain, nextInDomain, recentlyUpdated, sortByOrder, type DocCard } from '../../src/lib/catalog';
+import { domainSections, homeLists, inDomain, nextInDomain, readingSequence, recentlyUpdated, sortByOrder, type DocCard } from '../../src/lib/catalog';
 
-const card = (id: string, order: number, updated: string, domain: DocCard['domain'] = 'foundations', type: DocCard['type'] = 'concept'): DocCard => ({
+const card = (
+  id: string,
+  order: number,
+  updated: string,
+  domain: DocCard['domain'] = 'foundations',
+  type: DocCard['type'] = 'concept',
+  stage?: DocCard['stage'],
+): DocCard => ({
   id,
   domain,
+  stage,
   type,
   order,
   title: id,
@@ -57,5 +65,30 @@ describe('homeLists', () => {
   });
   it('모든 글이 처음 목록에 있으면 최근 목록은 비어 있다', () => {
     expect(homeLists(inDomain(DOCS, 'foundations')).recent).toEqual([]);
+  });
+  it('처음 목록은 영역 순서대로 한눈에 보기 글을 고른다', () => {
+    const docs = [...DOCS, card('database/ov', 0, '2026-10-01', 'database', 'overview'), card('network/ov', 0, '2026-10-01', 'network', 'overview')];
+    expect(ids(homeLists(docs).starter)).toEqual(['network/ov', 'database/ov']);
+  });
+});
+
+describe('readingSequence', () => {
+  const docs = [
+    card('apm/g', 5, '2026-10-01', 'apm', 'guide'),
+    card('apm/m', 1, '2026-10-01', 'apm', 'concept', 'monitoring'),
+    card('apm/b2', 30, '2026-10-01', 'apm', 'concept', 'basics'),
+    card('apm/b1', 20, '2026-10-01', 'apm', 'concept', 'basics'),
+    card('apm/ov', 99, '2026-10-01', 'apm', 'overview'),
+  ];
+  it('한눈에 보기 → 기초 → 나머지(order 순) 순서다', () => {
+    expect(readingSequence(docs).map((d) => d.id)).toEqual(['apm/ov', 'apm/b1', 'apm/b2', 'apm/m', 'apm/g']);
+  });
+  it('다음 글도 이 순서를 따른다', () => {
+    expect(nextInDomain(docs, 'apm/b2')?.id).toBe('apm/m');
+    expect(nextInDomain(docs, 'apm/g')).toBeUndefined();
+  });
+  it('영역 페이지 묶음으로 나눈다', () => {
+    const s = domainSections(docs);
+    expect([s.overview, s.basics, s.monitoring, s.guides].map((l) => l.map((d) => d.id))).toEqual([['apm/ov'], ['apm/b1', 'apm/b2'], ['apm/m'], ['apm/g']]);
   });
 });

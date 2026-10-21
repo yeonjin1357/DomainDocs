@@ -1,0 +1,19 @@
+---
+title: 지도 글
+summary: 테스트용 한눈에 보기 글이에요. 영역 전체를 그려요.
+domain: foundations
+type: overview
+order: 0
+sources:
+  - title: 지도 테스트 출처
+    url: https://example.com/map
+updated: 2026-10-05
+---
+
+<Figure caption="테스트용 지도예요.">
+  <ServiceMap ariaLabel="주문 API가 결제 API와 DB를 부르는 서비스 맵" nodes={[{ id: 'order', label: '주문 API', x: 20, y: 50, tone: 'accent', note: '100건/초' }, { id: 'pay', label: '결제 API', x: 80, y: 20, tone: 'warn' }, { id: 'db', label: 'orders DB', x: 80, y: 80, virtual: true }]} edges={[{ from: 'order', to: 'pay', label: '에러 4%', tone: 'warn' }, { from: 'order', to: 'db' }]} />
+</Figure>
+
+## 지도 읽기
+
+왼쪽에서 오른쪽으로 읽어요. 선은 부르는 관계예요.

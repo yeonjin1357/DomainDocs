@@ -51,11 +51,20 @@ test.describe('개념 페이지', () => {
     await expect(page.locator('[data-sources] a')).toHaveAttribute('href', 'https://example.com/alpha');
     await expect(page.locator('[data-related] [data-row]')).toHaveCount(1);
     await expect(page.locator('[data-related] [data-row]')).toContainText('베타 개념');
-    await expect(page.locator('[data-next]')).toContainText('베타 개념');
+    await expect(page.locator('[data-next]')).toContainText('데모 모음');
   });
 
   test('뒤로 가기는 영역 페이지를 가리킨다', async ({ page }) => {
     await expect(page.getByRole('link', { name: '뒤로 가기' })).toHaveAttribute('href', '/DomainDocs/foundations/');
+  });
+});
+
+test.describe('한눈에 보기 페이지', () => {
+  test('종류는 한눈에 보기이고, 다음 글은 첫 기초 글이다', async ({ page }) => {
+    await page.goto('foundations/map/');
+    await expect(page.locator('[data-doc-type]')).toHaveText('한눈에 보기');
+    await expect(page.locator('article [data-block="figure"]')).toHaveCount(1);
+    await expect(page.locator('[data-next]')).toContainText('알파 개념');
   });
 });
 

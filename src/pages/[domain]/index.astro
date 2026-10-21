@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/ui/Card.astro';
 import ListRow from '../../components/ui/ListRow.astro';
 import { DOMAINS, type Domain } from '../../data/domains';
-import { inDomain, sortByOrder, TYPE_LABEL, type DocCard } from '../../lib/catalog';
+import { domainSections, inDomain, TYPE_LABEL, type DocCard } from '../../lib/catalog';
 import { getCards } from '../../lib/content';
 import { withBase } from '../../lib/paths';
 
@@ -18,9 +18,14 @@ interface Props {
 }
 
 const { domain } = Astro.props;
-const docs = sortByOrder(inDomain(await getCards(), domain.id));
-const guides = docs.filter((d) => d.type === 'guide');
-const concepts = docs.filter((d) => d.type === 'concept');
+const sections = domainSections(inDomain(await getCards(), domain.id));
+// 위에서부터 한눈에 보기 → 기초 → 모니터링에서는 → 상황 가이드. 빈 묶음은 숨긴다.
+const cards = [
+  { title: '한눈에 보기', docs: sections.overview },
+  { title: '기초', docs: sections.basics },
+  { title: '모니터링에서는', docs: sections.monitoring },
+  { title: '상황 가이드', docs: sections.guides },
+].filter((c) => c.docs.length > 0);
 const metaOf = (d: DocCard) => `${TYPE_LABEL[d.type]} · ${d.readingMinutes}분`;
 ---
 <BaseLayout title={domain.name} description={domain.description} surface="grey" backHref={withBase()} barTitle={domain.name}>
@@ -29,17 +34,10 @@ const metaOf = (d: DocCard) => `${TYPE_LABEL[d.type]} · ${d.readingMinutes}분`
     <p class="hero-desc">{domain.description}</p>
   </section>
   {
-    guides.length > 0 && (
-      <Card title="가이드">
-        {guides.map((d) => <ListRow href={d.url} icon={d.icon} title={d.title} description={d.summary} meta={metaOf(d)} />)}
+    cards.map((c) => (
+      <Card title={c.title}>
+        {c.docs.map((d) => <ListRow href={d.url} icon={d.icon} title={d.title} description={d.summary} meta={metaOf(d)} />)}
       </Card>
-    )
-  }
-  {
-    concepts.length > 0 && (
-      <Card title="개념">
-        {concepts.map((d) => <ListRow href={d.url} icon={d.icon} title={d.title} description={d.summary} meta={metaOf(d)} />)}
-      </Card>
-    )
+    ))
   }
 </BaseLayout>
