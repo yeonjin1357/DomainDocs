@@ -158,3 +158,58 @@ terms:
     aliases: [syslog, 시스로그, 로그 전송]
     short: 장비의 이벤트 기록을 심각도와 함께 다른 서버로 보내는 표준이에요. 0이 가장 심각해요.
     doc: network/traps-and-syslog
+  - id: tcp
+    name: TCP
+    en: Transmission Control Protocol
+    aliases: [tcp, 전송 제어 프로토콜]
+    short: 연결을 맺고, 받았다는 답이 없으면 다시 보내 데이터를 빠짐없이 순서대로 전하는 규약이에요.
+    doc: network/tcp-connections
+  - id: three-way-handshake
+    name: 3방향 핸드셰이크
+    en: Three-way handshake
+    aliases: [3-way handshake, 쓰리웨이 핸드셰이크, SYN, SYN-ACK]
+    short: SYN, SYN·ACK, ACK를 주고받아 TCP 연결을 맺는 과정이에요.
+    doc: network/tcp-connections
+  - id: retransmission
+    name: 재전송
+    en: Retransmission
+    aliases: [retransmission, TCP 재전송, RTO]
+    short: 받았다는 답이 정한 시간 안에 오지 않아 같은 데이터를 다시 보내는 일이에요.
+    doc: network/tcp-connections
+  - id: close-wait
+    name: CLOSE-WAIT
+    en: CLOSE-WAIT
+    aliases: [close wait, 클로즈 웨이트]
+    short: 상대가 연결을 닫았고 이쪽 앱이 닫기를 기다리는 TCP 상태예요. 쌓이면 앱이 연결을 안 닫는 거예요.
+    doc: network/tcp-connections
+  - id: time-wait
+    name: TIME-WAIT
+    en: TIME-WAIT
+    aliases: [time wait, 타임 웨이트]
+    short: 먼저 연결을 닫은 쪽이 마지막 확인이 닿도록 잠시 기다리는 TCP 상태예요. 정상 상태예요.
+    doc: network/tcp-connections
+  - id: icmp
+    name: ICMP
+    en: Internet Control Message Protocol
+    aliases: [icmp, 에코, echo]
+    short: 통신 중의 문제를 알리거나 에코로 상대를 확인할 때 쓰는 규약이에요. ping이 이걸 써요.
+    doc: network/ping-and-latency
+  - id: ping
+    name: ping
+    en: ping
+    aliases: [핑, ICMP echo]
+    short: 상대에게 ICMP 에코를 보내 살아 있는지와 왕복 시간, 손실을 재는 도구예요.
+    analogy: 산에 외친 메아리가 돌아오는 시간을 재는 것과 같아요.
+    doc: network/ping-and-latency
+  - id: rtt
+    name: 왕복 시간
+    en: Round-trip time
+    aliases: [RTT, round trip time, 레이턴시, latency, 지연]
+    short: 보낸 패킷의 응답이 돌아오기까지 걸린 시간이에요.
+    doc: network/ping-and-latency
+  - id: packet-loss
+    name: 패킷 손실
+    en: Packet loss
+    aliases: [packet loss, 손실률, loss]
+    short: 보낸 패킷이 상대에게 닿지 못하고 사라지는 일이에요. TCP에서는 재전송 지연으로 보여요.
+    doc: network/ping-and-latency
