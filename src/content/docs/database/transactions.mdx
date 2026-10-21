@@ -1,0 +1,146 @@
+---
+title: 트랜잭션과 커밋
+summary: 트랜잭션은 함께 성공하거나 함께 취소되는 작업 묶음이고, 커밋은 그 묶음을 확정하는 일이에요.
+domain: database
+type: concept
+stage: basics
+order: 50
+icon: layers
+keywords: [transaction, 트랜잭션, commit, 커밋, rollback, 롤백, autocommit, 자동 커밋, ACID, TPS]
+related: [database/memory-and-disk, database/locks-and-blocking, database/active-sessions, database/connections-and-sessions]
+sources:
+  - title: PostgreSQL — Tutorial, Transactions
+    url: https://www.postgresql.org/docs/current/tutorial-transactions.html
+  - title: PostgreSQL — Glossary (ACID)
+    url: https://www.postgresql.org/docs/current/glossary.html
+  - title: MySQL 8.4 — autocommit, Commit, and Rollback
+    url: https://dev.mysql.com/doc/refman/8.4/en/innodb-autocommit-commit-rollback.html
+  - title: Oracle Database Concepts 19c — Transactions
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/cncpt/transactions.html
+  - title: Java SE 21 — java.sql.Connection
+    url: https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/Connection.html
+  - title: PostgreSQL — Transaction Isolation
+    url: https://www.postgresql.org/docs/current/transaction-iso.html
+  - title: SQL Server — SET TRANSACTION ISOLATION LEVEL
+    url: https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql
+  - title: MySQL 8.4 — Transaction Isolation Levels
+    url: https://dev.mysql.com/doc/refman/8.4/en/innodb-transaction-isolation-levels.html
+  - title: PostgreSQL — Explicit Locking
+    url: https://www.postgresql.org/docs/current/explicit-locking.html
+  - title: PostgreSQL — The Cumulative Statistics System (pg_stat_database, pg_stat_activity)
+    url: https://www.postgresql.org/docs/current/monitoring-stats.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="트랜잭션은 전부 아니면 전무예요">
+    여러 SQL을 하나로 묶어, 모두 반영하거나 하나도 반영하지 않아요. 중간에 실패하면 이미 바꾼 것까지 되돌려요.
+  </Point>
+  <Point title="커밋 전 변경은 남에게 안 보여요">
+    기본 설정에서는 커밋해야 바뀐 내용이 다른 세션에 한꺼번에 보여요. 커밋이 끝났다고 알린 변경은 장애가 나도 남아요.
+  </Point>
+  <Point title="트랜잭션은 짧게 끝내요">
+    열려 있는 동안 잡은 잠금을 놓지 않아요. 오래 열어 두면 다른 세션이 줄을 서요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="식당에서는 이미 만든 요리를 되돌릴 수 없어요. DB는 커밋 전이라면 이미 바꾼 행도 모두 원래대로 되돌려요.">
+  단체 주문과 비슷해요. 열 접시를 한 주문으로 넣으면, 다 만들어 함께 내거나 주문 전체를 취소해요. 일곱 접시만 나가는 일은 없어요.
+</Analogy>
+
+## 이체로 보는 트랜잭션
+
+앨리스가 밥에게 10만 원을 보낸다고 해 봐요. 앨리스 잔액을 줄이는 SQL과 밥 잔액을 늘리는 SQL, 두 개가 필요해요.
+
+<Figure caption="두 UPDATE를 한 트랜잭션으로 묶었어요. 커밋하기 전에 실패하면 ROLLBACK으로 둘 다 취소해요.">
+  <Sequence
+    ariaLabel="앱이 BEGIN, 앨리스 잔액 차감, 밥 잔액 증가, COMMIT을 차례로 보내고 DB가 완료를 알리는 순서"
+    participants={['앱', 'DB']}
+    messages={[
+      { from: '앱', to: 'DB', label: 'BEGIN' },
+      { from: '앱', to: 'DB', label: '앨리스 -10만 원' },
+      { from: '앱', to: 'DB', label: '밥 +10만 원' },
+      { from: '앱', to: 'DB', label: 'COMMIT', tone: 'accent' },
+      { from: 'DB', to: '앱', label: '완료', tone: 'accent', dashed: true },
+    ]}
+  />
+</Figure>
+
+두 SQL을 따로 커밋하면 위험해요. 앨리스 잔액만 줄고 밥 잔액을 늘리기 전에 장애가 나면, 10만 원이 사라져요. <Term term="database/transaction">트랜잭션</Term>으로 묶으면 둘 다 반영되거나 둘 다 취소돼요.
+
+## 커밋과 롤백
+
+트랜잭션은 <Term term="database/commit">커밋</Term>이나 <Term term="database/rollback">롤백</Term>으로 끝나요.
+
+<Figure caption="커밋하면 바뀐 내용이 확정되고 다른 세션에 보여요. 롤백하면 처음부터 없던 일이 돼요.">
+  <Compare
+    columns={['커밋(COMMIT)', '롤백(ROLLBACK)']}
+    rows={[
+      { label: '바꾼 내용', values: ['모두 확정해요', '모두 되돌려요'] },
+      { label: '다른 세션에게', values: ['한꺼번에 보이기 시작해요', '끝까지 보이지 않아요'] },
+    ]}
+  />
+</Figure>
+
+기본 설정에서는 트랜잭션이 열려 있는 동안 바꾼 내용이 다른 세션에 보이지 않아요. 커밋하는 순간 모든 변경이 한꺼번에 보여요. 그래서 다른 세션은 앨리스 잔액만 줄어든 중간 상태를 보지 못해요.
+
+DB가 커밋이 끝났다고 알리면, 그 직후 장애가 나도 변경은 남아요. 커밋 때 바뀐 내용을 <Term term="database/wal">로그</Term>에 확실히 적어 두기 때문이에요. 자세한 흐름은 <Term slug="database/memory-and-disk">메모리와 디스크</Term>에 있어요.
+
+## 따로 묶지 않으면 문장마다 커밋해요
+
+트랜잭션을 직접 열지 않으면, DB나 드라이버가 SQL 한 문장마다 트랜잭션을 열고 커밋해요. 이것을 <Term term="database/autocommit">자동 커밋</Term>이라고 불러요.
+
+| 어디서 | 기본 동작 |
+| --- | --- |
+| PostgreSQL | `BEGIN`이 없으면 문장마다 커밋 |
+| MySQL | 새 연결은 자동 커밋으로 시작 |
+| Oracle | 첫 SQL에서 트랜잭션이 시작돼 `COMMIT`·`ROLLBACK`까지 열려 있음 |
+| JDBC 연결 | 기본으로 자동 커밋 |
+
+여러 SQL을 한 묶음으로 처리해야 한다면, 자동 커밋에 맡기지 말고 트랜잭션을 직접 열어요. 자동 커밋을 껐다면 반대로 커밋을 빠뜨리지 않아야 해요.
+
+## 모니터링에서는
+
+<Figure caption="주문 DB의 트랜잭션 현황 예시예요. 초당 처리량은 평소와 같은데, 14분째 열려 있는 트랜잭션이 하나 있어요.">
+  <StatTile label="커밋" value="1,180" unit="/초" />
+  <StatTile label="롤백" value="20" unit="/초" />
+  <StatTile label="가장 오래 열린 트랜잭션" value="14" unit="분" tone="warn" />
+</Figure>
+
+DB 화면의 TPS(초당 트랜잭션 수)는 보통 커밋과 롤백을 더한 값이에요. PostgreSQL은 데이터베이스마다 커밋 수(`xact_commit`)와 롤백 수(`xact_rollback`)를 세어요.
+
+롤백 비율이 갑자기 오르면 앱에서 오류가 늘었다는 신호일 수 있어요. 오래 열린 트랜잭션도 함께 봐요. PostgreSQL은 세션마다 트랜잭션을 연 시각(`xact_start`)을 보여 줘요.
+
+오래 열린 트랜잭션은 잠금을 쥔 채 다른 세션을 막기 쉬워요. 막힌 사슬을 찾는 법은 <Term slug="database/locks-and-blocking">잠금과 블로킹</Term>에 있어요.
+
+<Checkpoints>
+  <Check>AI가 짠 코드가 트랜잭션 안에서 외부 API를 부른다면 다시 보세요. 응답을 기다리는 동안 트랜잭션이 열려 있고, 잡은 잠금도 그대로예요. 외부 호출은 트랜잭션 밖으로 빼세요.</Check>
+  <Check>함께 성공해야 하는 여러 SQL을 자동 커밋으로 하나씩 보낸다면 다시 보세요. 중간에 실패하면 앞의 SQL만 반영된 채 남아요.</Check>
+  <Check>자동 커밋을 끈 코드라면 모든 경로에서 커밋이나 롤백을 하는지 보세요. 빠뜨리면 변경이 저장되지 않거나 트랜잭션이 열린 채 남아요.</Check>
+  <Check>SQL Server 쿼리에 `WITH (NOLOCK)`이 붙어 있거나 격리 수준을 READ UNCOMMITTED로 바꿨다면 다시 보세요. 커밋 전 값이나 나중에 롤백될 값을 읽을 수 있어요.</Check>
+  <Check>TPS 그래프만 보는 화면이라면 커밋과 롤백을 나눠 보여 주세요. 롤백이 늘어도 합계는 그대로일 수 있어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### ACID
+
+  트랜잭션이 지키는 네 가지 성질을 앞 글자를 따서 ACID라고 불러요. 원자성(Atomicity), 일관성(Consistency), 격리성(Isolation), 지속성(Durability)이에요.
+
+  이 글의 "전부 아니면 전무"가 원자성, "커밋 전 변경은 남에게 안 보여요"가 격리성, "장애가 나도 남아요"가 지속성이에요.
+
+  ### 격리 수준
+
+  격리성에는 여러 단계(격리 수준)가 있어요. 기본값은 PostgreSQL과 SQL Server가 READ COMMITTED, MySQL InnoDB가 REPEATABLE READ예요. 이 기본값에서는 커밋 전 변경을 읽지 않아요.
+
+  가장 느슨한 READ UNCOMMITTED에서는 커밋 전 변경까지 읽어요. 이를 dirty read라고 하고, SQL Server의 `NOLOCK` 힌트도 같은 효과예요. PostgreSQL은 READ UNCOMMITTED를 요청해도 READ COMMITTED처럼 동작해요.
+
+  ### Oracle에서 트랜잭션이 끝나는 때
+
+  Oracle의 트랜잭션은 `COMMIT`이나 `ROLLBACK` 말고도 끝나요. `CREATE`, `DROP`, `ALTER` 같은 DDL을 실행하면 트랜잭션이 끝나요.
+
+  도구를 정상적으로 끝내면 대부분 열린 트랜잭션을 커밋해요. 클라이언트가 비정상으로 끊기면 롤백해요.
+
+  ### MySQL의 자동 커밋 끄기
+
+  MySQL에서 `SET autocommit = 0`으로 자동 커밋을 끄면, 그 세션에는 늘 트랜잭션이 열려 있어요. `COMMIT`이나 `ROLLBACK`으로 끝내면 곧바로 새 트랜잭션이 시작돼요.
+</Deeper>

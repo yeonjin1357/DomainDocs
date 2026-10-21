@@ -1,0 +1,145 @@
+---
+title: 메모리와 디스크
+summary: DB는 데이터를 블록 단위로 읽고, 자주 쓰는 블록은 메모리(버퍼 캐시)에 둬요.
+domain: database
+type: concept
+stage: basics
+order: 40
+icon: database
+keywords: [block, page, 블록, 페이지, buffer cache, buffer pool, 버퍼 캐시, dirty page, 더티 블록, checkpoint]
+related: [database/buffer-cache-hit-ratio, database/indexes, database/transactions, database/active-sessions]
+sources:
+  - title: PostgreSQL — Database Page Layout
+    url: https://www.postgresql.org/docs/current/storage-page-layout.html
+  - title: SQL Server — Page and extent architecture guide
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/pages-and-extents-architecture-guide
+  - title: MySQL 8.4 — InnoDB Startup Configuration (innodb_page_size)
+    url: https://dev.mysql.com/doc/refman/8.4/en/innodb-init-startup-configuration.html
+  - title: Oracle Database Reference 19c — DB_BLOCK_SIZE
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/DB_BLOCK_SIZE.html
+  - title: MySQL 8.4 — Buffer Pool
+    url: https://dev.mysql.com/doc/refman/8.4/en/innodb-buffer-pool.html
+  - title: PostgreSQL — WAL Configuration (checkpoints)
+    url: https://www.postgresql.org/docs/current/wal-configuration.html
+  - title: PostgreSQL — Resource Consumption (shared_buffers)
+    url: https://www.postgresql.org/docs/current/runtime-config-resource.html
+  - title: PostgreSQL — pg_prewarm
+    url: https://www.postgresql.org/docs/current/pgprewarm.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="데이터는 블록 단위로 읽고 써요">
+    행 하나가 필요해도 그 행이 든 블록을 통째로 읽어요. 블록 크기는 보통 8KB예요.
+  </Point>
+  <Point title="자주 쓰는 블록은 메모리에 둬요">
+    읽은 블록은 버퍼 캐시에 남겨 둬요. 다음에 또 필요하면 디스크를 읽지 않고 메모리에서 꺼내요.
+  </Point>
+  <Point title="바꾼 블록은 나중에 디스크에 써요">
+    바꾼 블록은 한동안 메모리에만 있다가 체크포인트 때 디스크에 써요. 그 사이 장애는 로그로 메워요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="요리사는 조리대에서 손질한 재료를 언제 창고에 돌려놓든 상관없어요. DB는 바꾼 블록을 디스크에 쓰기 전에 로그부터 적고, 체크포인트라는 정해진 때에 몰아 써요.">
+  디스크는 창고, 버퍼 캐시는 조리대예요. 재료 하나가 필요해도 상자째(블록) 가져와 조리대에 올려요. 조리대가 차면 한동안 안 쓴 상자부터 창고로 돌려보내요.
+</Analogy>
+
+## 데이터는 블록에 담겨요
+
+DB는 테이블과 인덱스를 같은 크기의 조각으로 나눠 디스크에 저장해요. 이 조각을 <Term term="database/block">블록</Term>(또는 페이지)이라고 불러요. 읽고 쓸 때도 블록 하나가 단위예요.
+
+| DB | 부르는 이름 | 기본 크기 |
+| --- | --- | --- |
+| PostgreSQL | 페이지 | 8KB |
+| Oracle | 블록 | 8KB(`DB_BLOCK_SIZE`) |
+| MySQL InnoDB | 페이지 | 16KB(`innodb_page_size`) |
+| SQL Server | 페이지 | 8KB |
+
+그래서 행 하나만 필요해도 그 행이 든 블록을 통째로 읽어요. 같은 블록에 있는 다른 행도 함께 메모리로 올라와요.
+
+## 버퍼 캐시에서 먼저 찾아요
+
+<Term term="database/buffer-cache">버퍼 캐시</Term>는 디스크에서 읽은 블록을 담아 두는 메모리예요. DB는 블록이 필요하면 먼저 버퍼 캐시를 보고, 없을 때만 디스크에서 읽어 와요.
+
+<Figure caption="처음에는 캐시에 없어 디스크에서 읽어요. 두 번째부터는 캐시에서 바로 꺼내요.">
+  <Sequence
+    ariaLabel="실행 단계가 블록 7을 요청하자 버퍼 캐시가 디스크에서 읽어 오고, 다시 요청하자 캐시에서 바로 주는 순서"
+    participants={['실행', '버퍼 캐시', '디스크']}
+    messages={[
+      { from: '실행', to: '버퍼 캐시', label: '블록 7 주세요' },
+      { from: '버퍼 캐시', to: '디스크', label: '블록 7 읽기', tone: 'warn' },
+      { from: '디스크', to: '버퍼 캐시', label: '블록 7', dashed: true },
+      { from: '버퍼 캐시', to: '실행', label: '블록 7', dashed: true },
+      { from: '실행', to: '버퍼 캐시', label: '블록 7 또' },
+      { from: '버퍼 캐시', to: '실행', label: '바로 줌', tone: 'accent', dashed: true },
+    ]}
+  />
+</Figure>
+
+메모리는 디스크보다 훨씬 빨라서, 자주 쓰는 블록이 캐시에 있으면 쿼리가 빨라져요. 캐시에서 찾는 것을 적중, 못 찾아 디스크를 읽는 것을 실패라고 불러요.
+
+버퍼 캐시는 크기가 정해져 있어요. 자리가 모자라면 오래 안 쓴 블록부터 내보내고 새 블록을 들여요. MySQL InnoDB는 이를 LRU(최근에 가장 덜 쓴 것부터 내보내는 방식)를 고친 규칙으로 해요.
+
+## 바꾼 블록은 나중에 써요
+
+데이터를 바꾸면 DB는 버퍼 캐시의 블록을 고쳐요. 이렇게 메모리에서만 바뀌고 아직 디스크에 쓰지 않은 블록을 <Term term="database/dirty-block">더티 블록</Term>이라고 불러요.
+
+<Figure caption="블록은 메모리에서 고치고, 바뀐 내용은 로그에 먼저 적어요. 더티 블록은 체크포인트 때 데이터 파일에 써요.">
+  <Flow
+    ariaLabel="실행 단계가 버퍼 캐시의 블록을 고치고 로그에 먼저 기록하며, 버퍼 캐시의 더티 블록은 체크포인트 때 데이터 파일에 쓰이는 구조도"
+    nodes={[
+      { id: 'exec', label: '실행', col: 1, row: 0, tone: 'accent' },
+      { id: 'cache', label: '버퍼 캐시', col: 0, row: 1, note: '더티 블록' },
+      { id: 'wal', label: '로그', col: 2, row: 1, note: '바로 적기' },
+      { id: 'data', label: '데이터 파일', col: 0, row: 2, note: '나중에 쓰기' },
+    ]}
+    edges={[
+      { from: 'exec', to: 'cache', label: '블록 고치기' },
+      { from: 'exec', to: 'wal', label: '먼저 기록', tone: 'accent' },
+      { from: 'cache', to: 'data', label: '체크포인트', dashed: true },
+    ]}
+  />
+</Figure>
+
+더티 블록을 한꺼번에 디스크에 쓰는 때가 <Term term="database/checkpoint">체크포인트</Term>예요. PostgreSQL은 체크포인트에서 모든 더티 블록을 디스크에 쓰고, 그 지점을 로그에 표시해요.
+
+체크포인트 사이에 장애가 나면 디스크에 못 쓴 변경이 남아요. 이 변경은 먼저 적어 둔 <Term term="database/wal">로그</Term>로 되살려요. 그래서 블록을 매번 바로 쓰지 않아도 돼요.
+
+## 모니터링에서는
+
+<Figure caption="주문 DB의 디스크 쓰기량 예시예요. 체크포인트 때 더티 블록을 몰아 쓰면 쓰기가 일정한 간격으로 솟아요.">
+  <MiniLineChart
+    ariaLabel="디스크 쓰기량이 평소 낮다가 일정한 간격으로 세 번 솟는 그래프"
+    series={[{ label: '디스크 쓰기', values: [12, 14, 13, 60, 22, 13, 12, 14, 58, 20, 13, 12, 15, 61, 21, 13], tone: 'sub', value: 'MB/초' }]}
+  />
+</Figure>
+
+DB 화면의 디스크 읽기와 쓰기는 이 흐름을 그대로 보여 줘요. 읽기가 늘었다면 버퍼 캐시에서 못 찾은 블록이 늘었다는 뜻이에요. 쓰기가 주기적으로 솟는다면 체크포인트일 수 있어요.
+
+PostgreSQL은 체크포인트 쓰기를 다음 체크포인트 전까지 나눠 써서 봉우리를 낮춰요. 그래도 바꾸는 데이터가 많으면 이 시간에 디스크가 바빠져요.
+
+버퍼 캐시에서 찾은 비율(적중률)도 자주 보는 숫자예요. 다만 높다고 늘 좋은 건 아니에요. 그 함정은 <Term slug="database/buffer-cache-hit-ratio">버퍼 캐시 적중률의 함정</Term>에서 봐요.
+
+<Checkpoints>
+  <Check>버퍼 캐시 적중률 하나로 "메모리가 충분하다"고 판단했다면 다시 보세요. 같은 블록을 반복해 읽는 비효율적인 쿼리도 적중률을 높여요.</Check>
+  <Check>PostgreSQL의 `shared_buffers`를 메모리 대부분으로 잡자는 제안이라면 다시 보세요. PostgreSQL은 운영체제 캐시에도 기대서, 문서는 전용 서버에서 메모리의 25%쯤부터 시작하라고 해요.</Check>
+  <Check>DB를 다시 시작한 직후 느려졌다면 버퍼 캐시가 비어 있는지 보세요. 캐시가 다시 찰 때까지 디스크 읽기가 늘어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### PostgreSQL의 이중 캐시
+
+  PostgreSQL은 자기 버퍼 캐시(`shared_buffers`) 말고도 운영체제의 파일 캐시를 함께 써요. 그래서 버퍼 캐시에서 못 찾았다고 늘 디스크를 읽는 건 아니에요. 운영체제 캐시에서 찾을 수도 있어요.
+
+  `pg_prewarm` 확장은 테이블 데이터를 미리 캐시에 올려 둘 수 있어요. 다시 시작한 뒤 캐시를 채우는 데 쓸 수 있어요.
+
+  ### 블록 크기는 처음에 정해요
+
+  MySQL InnoDB의 페이지 크기는 데이터 디렉터리를 처음 만들 때만 정할 수 있어요. 64KB, 32KB, 16KB, 8KB, 4KB 중 하나예요.
+
+  PostgreSQL의 페이지 크기는 서버를 컴파일할 때 정해요. Oracle은 `DB_BLOCK_SIZE`로 2KB에서 32KB 사이를 고를 수 있어요.
+
+  ### SQL Server의 익스텐트
+
+  SQL Server는 연속된 페이지 8개(64KB)를 익스텐트로 묶어 관리해요. 데이터 파일 읽기와 쓰기는 페이지 단위로 해요.
+</Deeper>

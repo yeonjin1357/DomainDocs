@@ -113,9 +113,14 @@ const marker = (tone: FigureTone) => `url(#${uid}-${tone})`;
     stroke-width: 1.5;
   }
 
-  .flow-edge.tone-sub,
-  .flow-edge.tone-accent {
+  .flow-edge.tone-sub {
     stroke: var(--color-text-weak);
+  }
+
+  /* 따라가야 할 경로는 강조색으로 그린다 */
+  .flow-edge.tone-accent {
+    stroke: var(--color-accent);
+    stroke-width: 2;
   }
 
   .flow-edge.tone-warn {
@@ -127,9 +132,12 @@ const marker = (tone: FigureTone) => `url(#${uid}-${tone})`;
     stroke-dasharray: 4 3;
   }
 
-  .head.tone-sub,
-  .head.tone-accent {
+  .head.tone-sub {
     fill: var(--color-text-weak);
+  }
+
+  .head.tone-accent {
+    fill: var(--color-accent);
   }
 
   .head.tone-warn {

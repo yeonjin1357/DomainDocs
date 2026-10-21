@@ -1,0 +1,132 @@
+---
+title: 인덱스
+summary: 인덱스는 값을 정렬해 둔 찾아보기예요. 찾기는 빨라지고, 쓰기에는 비용이 들어요.
+domain: database
+type: concept
+stage: basics
+order: 30
+icon: layers
+keywords: [index, 인덱스, B-tree, 비트리, 전체 스캔, full scan, seq scan, 복합 인덱스, clustered index, 클러스터형 인덱스]
+related: [database/query-processing, database/execution-plans, database/top-sql, database/memory-and-disk]
+sources:
+  - title: PostgreSQL — Indexes, Introduction
+    url: https://www.postgresql.org/docs/current/indexes-intro.html
+  - title: PostgreSQL — Index Types
+    url: https://www.postgresql.org/docs/current/indexes-types.html
+  - title: PostgreSQL — Multicolumn Indexes
+    url: https://www.postgresql.org/docs/current/indexes-multicolumn.html
+  - title: PostgreSQL — Indexes on Expressions
+    url: https://www.postgresql.org/docs/current/indexes-expressional.html
+  - title: SQL Server — Clustered and nonclustered indexes
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/indexes/clustered-and-nonclustered-indexes-described
+  - title: MySQL 8.4 — Clustered and Secondary Indexes
+    url: https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html
+  - title: Oracle Database Concepts 19c — Tables and Table Clusters
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/cncpt/tables-and-table-clusters.html
+  - title: PostgreSQL — The Cumulative Statistics System (pg_stat_all_indexes)
+    url: https://www.postgresql.org/docs/current/monitoring-stats.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="인덱스는 정렬해 둔 찾아보기예요">
+    열 값을 정렬해 두고, 값마다 행이 어디 있는지 적어 둔 별도 구조예요. 없으면 테이블을 처음부터 끝까지 읽어요.
+  </Point>
+  <Point title="인덱스는 공짜가 아니에요">
+    행을 넣고 고칠 때마다 인덱스도 함께 고쳐야 해요. 인덱스가 많을수록 쓰기가 느려지고 공간도 더 써요.
+  </Point>
+  <Point title="있어도 안 쓰일 때가 있어요">
+    가져올 행이 많으면 테이블 전체를 읽는 편이 싸요. 조건 모양이 인덱스와 맞지 않아도 쓰지 못해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="책은 인쇄한 뒤 찾아보기가 바뀌지 않아요. DB는 행을 넣고 고칠 때마다 인덱스도 고쳐서, 찾아보기를 늘릴수록 쓰기가 느려져요.">
+  인덱스는 책 뒤의 찾아보기와 같아요. "트랜잭션"을 찾을 때 책을 처음부터 넘기지 않고, 가나다순 찾아보기에서 쪽수를 확인해 바로 펼쳐요.
+</Analogy>
+
+## 인덱스가 없으면 다 읽어요
+
+`id`가 102인 주문 하나를 찾는다고 해 봐요. 인덱스가 없으면 DB는 테이블을 처음부터 끝까지 한 행씩 읽어 맞는 행을 골라요. 이렇게 테이블 전체를 읽는 것을 <Term term="database/full-scan">전체 스캔</Term>이라고 불러요.
+
+<Figure caption="주문 100만 개 중 하나를 찾을 때 읽는 양이에요. 인덱스가 있으면 정렬된 트리를 몇 단계만 내려가요.">
+  <Compare
+    columns={['인덱스 없이', '인덱스로']}
+    rows={[
+      { label: '찾는 방법', values: ['테이블을 처음부터 끝까지 읽어요', '정렬된 트리를 따라 내려가요'] },
+      { label: '주문 100만 개 중 1개', values: ['100만 행을 모두 봐요', '트리 몇 단계와 행 하나만 봐요'] },
+    ]}
+  />
+</Figure>
+
+## 인덱스는 이렇게 생겼어요
+
+대부분의 DB에서 기본 인덱스는 <Term term="database/b-tree">B-tree</Term>예요. 값을 정렬해 나무 모양으로 쌓은 구조라, 위에서부터 범위를 좁혀 내려가면 원하는 값에 닿아요.
+
+<Figure caption="id 102를 찾을 때는 뿌리에서 범위가 맞는 가지로, 가지에서 잎으로 내려가요. 잎에 적힌 위치로 테이블의 행을 바로 읽어요.">
+  <Flow
+    ariaLabel="뿌리에서 id 1~500 가지로, 가지에서 id 102가 적힌 잎으로 내려간 뒤, 잎에 적힌 위치로 테이블의 행을 읽는 B-tree 구조도"
+    nodes={[
+      { id: 'root', label: '뿌리', col: 1, row: 0, note: 'id 1~1000' },
+      { id: 'left', label: '가지', col: 0, row: 1, note: 'id 1~500', tone: 'accent' },
+      { id: 'right', label: '가지', col: 2, row: 1, note: 'id 501~1000' },
+      { id: 'leaf', label: '잎', col: 0, row: 2, note: 'id 102 → 위치', tone: 'accent' },
+      { id: 'table', label: '테이블', col: 2, row: 2, note: '주문 행' },
+    ]}
+    edges={[
+      { from: 'root', to: 'left', tone: 'accent' },
+      { from: 'root', to: 'right' },
+      { from: 'left', to: 'leaf', tone: 'accent' },
+      { from: 'leaf', to: 'table', label: '행 위치', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+인덱스는 테이블과 따로 저장돼요. 인덱스에는 정렬한 값과 그 값이 든 행의 위치만 있어서, 테이블보다 훨씬 작고 빨리 훑을 수 있어요.
+
+## 쓰기에는 비용이 들어요
+
+인덱스를 만들면 DB는 테이블이 바뀔 때마다 인덱스도 맞춰 고쳐요. 인덱스가 5개인 테이블에 행 하나를 넣으면, 테이블과 인덱스 5개에 모두 적어야 해요.
+
+그래서 PostgreSQL 문서도 거의 쓰이지 않는 인덱스는 지우라고 해요. 찾기에 도움이 되지 않으면서 쓰기만 느리게 하기 때문이에요.
+
+## 있어도 안 쓰일 때가 있어요
+
+인덱스를 쓸지는 <Term term="database/optimizer">옵티마이저</Term>가 비용을 어림해 정해요. 이런 경우에는 인덱스가 있어도 쓰지 않거나, 써도 효과가 작아요.
+
+- 가져올 행이 많을 때예요. 테이블의 행 대부분을 가져온다면 처음부터 다 읽는 편이 더 싸요.
+- 열에 함수를 씌운 조건이에요. `WHERE lower(email) = …`은 `email` 순서로 정렬한 인덱스와 모양이 달라요. `lower(email)`로 만든 인덱스가 따로 있어야 써요.
+- 여러 열을 묶은 <Term term="database/composite-index">복합 인덱스</Term>에서 앞 열 조건이 없을 때예요. `(고객, 주문일)` 인덱스는 고객으로 먼저 정렬돼 있어서, 주문일만으로 찾으면 효율이 크게 떨어져요.
+
+## 모니터링에서는
+
+<Figure caption="주문 조회 SQL의 실행 계획 예시예요. 행 1개를 돌려주려고 100만 행을 읽었어요. 조건에 맞는 인덱스가 없거나 쓰이지 않을 때 이렇게 보여요.">
+  <StatTile label="읽은 행" value="1,000,000" unit="행" tone="warn" />
+  <StatTile label="돌려준 행" value="1" unit="행" />
+</Figure>
+
+인덱스 문제는 <Term slug="database/execution-plans">실행 계획</Term>에서 드러나요. 읽은 행이 돌려준 행보다 훨씬 많다면, 인덱스가 없거나 쓰이지 않는지 봐요. 그런 SQL은 <Term slug="database/top-sql">SQL별 부하 순위</Term> 위쪽에 자주 올라와요.
+
+반대로 쓰이지 않는 인덱스도 찾아요. PostgreSQL은 인덱스마다 쓰인 횟수(`idx_scan`)를 세어요. 오래 0이라면 지울 후보예요.
+
+<Checkpoints>
+  <Check>AI가 짠 SQL이 WHERE에서 열에 함수를 씌웠다면(예: `lower(email) = …`) 다시 보세요. 그 열의 보통 인덱스로는 찾기 어려워요. 함수 결과로 만든 인덱스가 있는지 확인하세요.</Check>
+  <Check>"혹시 몰라" 열마다 인덱스를 만드는 제안이라면 다시 보세요. 인덱스마다 쓰기 비용과 공간이 들어요. 실제로 자주 쓰는 조건에 맞춰 만드세요.</Check>
+  <Check>쓰인 횟수가 0인 인덱스를 지우자는 제안이라면, 기본 키나 유니크 제약을 지키는 인덱스인지 먼저 보세요. 검색에 쓰이지 않아도 중복을 막는 일을 해요.</Check>
+  <Check>복합 인덱스 `(a, b)`가 있는데 `b`만으로 찾는 SQL이 많다면 다시 보세요. 앞 열 `a` 조건이 없으면 이 인덱스는 효율이 크게 떨어져요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 테이블을 인덱스 순서로 저장하는 DB
+
+  PostgreSQL과 Oracle의 테이블은 기본으로 힙(heap)이에요. 행을 특별한 순서 없이 빈자리에 저장하고, 인덱스는 따로 둬요.
+
+  MySQL InnoDB는 테이블마다 클러스터형 인덱스가 있고, 행 데이터가 그 안에 저장돼요. 보통 기본 키가 클러스터형 인덱스예요.
+
+  InnoDB의 보조 인덱스에는 행 위치 대신 기본 키 값이 들어 있어요. 그래서 보조 인덱스로 찾으면, 얻은 기본 키로 클러스터형 인덱스를 한 번 더 찾아요.
+
+  SQL Server도 클러스터형 인덱스가 있으면 행을 그 키 순서로 저장해요. 행은 한 가지 순서로만 저장할 수 있어서, 클러스터형 인덱스는 테이블마다 하나예요.
+
+  ### 기본 키와 유니크 제약
+
+  SQL Server는 기본 키나 유니크 제약을 정의하면 인덱스를 자동으로 만들어요. 이 인덱스는 같은 값이 두 번 들어오지 않게 막는 데 쓰여요.
+</Deeper>
