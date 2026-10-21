@@ -1,0 +1,41 @@
+questions:
+  - id: ping-fail-not-dead
+    type: ox
+    prompt: 장비가 ping에 응답하지 않아요. 그 장비는 꺼져 있다고 봐도 되나요?
+    answer: false
+    explain: 방화벽이 ICMP만 막았을 수 있어요. SNMP나 서비스 포트처럼 다른 방법으로도 확인해요.
+  - id: ping-ok-app-down
+    type: choice
+    prompt: 서버로 ping은 잘 되는데 웹 서비스가 응답하지 않아요. 맞는 해석은?
+    choices:
+      - 장비와 경로는 살아 있으니, 앱 쪽을 봐야 해요
+      - 방화벽이 ICMP를 막고 있어요
+      - 네트워크가 끊겼어요
+      - 서버가 꺼졌어요
+    answer: 0
+    explain: ping은 장비와 경로가 살아 있다는 것만 알려 줘요. 앱이 응답하는지는 그 앱의 포트로 직접 확인해요.
+  - id: loss-and-average
+    type: choice
+    prompt: 에코 요청 4개를 보냈더니 3개가 12ms, 14ms, 40ms에 돌아왔어요. 손실률과 평균 왕복 시간은?
+    choices:
+      - 손실률 25%, 평균 22ms
+      - 손실률 75%, 평균 22ms
+      - 손실률 25%, 평균 14ms
+      - 손실률 1%, 평균 66ms
+    answer: 0
+    explain: 4개 중 1개가 안 돌아와서 1 ÷ 4 = 25%예요. 평균은 돌아온 셋으로 (12 + 14 + 40) ÷ 3 = 22ms예요.
+  - id: mdev-meaning
+    type: choice
+    prompt: ping의 평균 왕복 시간은 그대로인데 mdev가 크게 늘었어요. 무슨 뜻일까요?
+    choices:
+      - 왕복 시간이 매번 들쭉날쭉해요
+      - 패킷이 더 많이 사라져요
+      - 장비가 다시 시작됐어요
+      - 모든 응답이 똑같이 느려졌어요
+    answer: 0
+    explain: mdev는 왕복 시간이 평균에서 얼마나 벗어나는지의 표준 편차예요. 평균이 같아도 가끔 크게 늦는 응답이 섞였다는 뜻이에요.
+  - id: small-loss-matters
+    type: ox
+    prompt: 손실률 1~2%는 앱 응답시간에 거의 영향이 없나요?
+    answer: false
+    explain: TCP는 사라진 패킷을 다시 보내기 전에 정해 둔 시간만큼 기다려요. 그래서 그 몫의 요청은 크게 늦어질 수 있어요.

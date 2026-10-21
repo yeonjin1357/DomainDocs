@@ -1,0 +1,42 @@
+questions:
+  - id: close-wait-app
+    type: choice
+    prompt: API 서버에 CLOSE-WAIT 연결이 계속 쌓여요. 어디를 고쳐야 할까요?
+    choices:
+      - 상대가 닫은 연결을 닫지 않는 앱 코드
+      - 패킷이 사라지는 네트워크 경로
+      - 서버 앞의 방화벽 규칙
+      - 상대 서버의 TIME-WAIT 설정
+    answer: 0
+    explain: CLOSE-WAIT는 상대가 닫은 뒤 이쪽 앱이 닫아 주길 기다리는 상태예요. 앱이 닫아야 끝나서, 쌓인다면 앱 코드 문제예요.
+  - id: time-wait-normal
+    type: ox
+    prompt: 서버에 TIME-WAIT 연결이 많이 보이면, 그 자체로 장애인가요?
+    answer: false
+    explain: TIME-WAIT는 먼저 닫은 쪽이 마지막 확인이 닿도록 잠시 기다리는 정상 상태예요. 짧은 연결을 아주 많이 맺고 끊으면 많이 쌓여요.
+  - id: refused-meaning
+    type: choice
+    prompt: 연결 실패 중 '연결 거부'가 뜻하는 것은?
+    choices:
+      - 서버에 닿았지만 그 포트에서 받는 프로그램이 없어요
+      - 답 자체가 오지 않았어요
+      - 연결은 됐지만 응답이 느려요
+      - 이름을 IP 주소로 바꾸지 못했어요
+    answer: 0
+    explain: 거부는 서버 프로그램 쪽부터, 답이 오지 않는 시간 초과는 경로나 방화벽 쪽부터 봐요.
+  - id: retransmit-spikes
+    type: choice
+    prompt: 네트워크 오류 카운터는 그대로인데, 앱 응답시간이 가끔 1초, 3초씩 튀어요. 먼저 의심할 것은?
+    choices:
+      - 사라진 패킷을 TCP가 기다렸다가 다시 보내느라 늦어짐
+      - 서버 CPU의 부하
+      - DNS 레코드의 TTL
+      - 스위치의 플러딩
+    answer: 0
+    explain: TCP는 답이 없으면 정한 시간만큼 기다렸다 다시 보내고, 그 시간은 매번 두 배로 늘어요. 오류로는 안 보이고 느려짐으로만 보여요.
+  - id: handshake-name
+    type: input
+    prompt: TCP 연결을 맺을 때 SYN, SYN·ACK, ACK를 주고받는 과정을 무엇이라고 하나요?
+    answer: [3방향 핸드셰이크, 쓰리웨이 핸드셰이크, three-way handshake]
+    term: network/three-way-handshake
+    explain: 연결을 맺는 데 왕복이 한 번 더 들어요. 그래서 앱은 연결을 매번 새로 맺기보다 열어 둔 연결을 돌려 써요.

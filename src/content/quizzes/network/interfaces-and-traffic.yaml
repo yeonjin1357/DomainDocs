@@ -1,0 +1,41 @@
+questions:
+  - id: octets-to-bps
+    type: choice
+    prompt: 1Gbps 인터페이스의 ifHCInOctets가 60초 동안 3,750,000,000 늘었어요. 받는 트래픽은 얼마일까요?
+    choices:
+      - 500Mbps
+      - 62.5Mbps
+      - 4Gbps
+      - 3,750Mbps
+    answer: 0
+    explain: 바이트에 8을 곱해 비트로 바꾸고, 걸린 초로 나눠요. 3,750,000,000 × 8 ÷ 60 = 500,000,000bps예요.
+  - id: counter-wrap
+    type: choice
+    prompt: 10Gbps 인터페이스를 32비트 카운터(ifInOctets)로 1분마다 읽었더니, 트래픽이 실제보다 훨씬 작게 나와요. 왜일까요?
+    choices:
+      - 읽는 사이에 카운터가 한 바퀴 넘게 돌아서
+      - 장비의 시계가 어긋나서
+      - SNMP 커뮤니티 문자열이 틀려서
+      - 받은 양과 보낸 양을 더해서
+    answer: 0
+    explain: 32비트 카운터는 빠른 인터페이스에서 1분도 안 돼 한 바퀴를 돌아요. 그러면 몇 바퀴 돌았는지 몰라 값이 틀려요. 64비트 ifHC 카운터로 읽어요.
+  - id: admin-down-ok
+    type: ox
+    prompt: 관리자가 꺼 둔(ifAdminStatus가 down인) 포트의 동작 상태가 down이에요. 장애 알림을 보내야 하나요?
+    answer: false
+    explain: 꺼 둔 포트가 down인 건 정상이에요. 관리 상태가 up인데 동작 상태가 down일 때가 고장이에요.
+  - id: errors-physical
+    type: choice
+    prompt: 업링크 포트의 ifInErrors가 분당 120개씩 늘어요. 흔히 먼저 의심하는 것은?
+    choices:
+      - 케이블이나 포트 같은 물리 문제
+      - 버퍼를 비우려고 일부러 버린 패킷
+      - 카운터가 한 바퀴 돈 것
+      - DNS 이름 찾기 실패
+    answer: 0
+    explain: ifInErrors는 패킷에 오류가 있어 받지 못한 수예요. 오류 없이 버린 패킷은 ifInDiscards로 따로 세요.
+  - id: utilization-per-direction
+    type: ox
+    prompt: 받은 양과 보낸 양을 더한 뒤 인터페이스 속도 하나로 나누면 맞는 사용률인가요?
+    answer: false
+    explain: 받는 쪽과 보내는 쪽은 보통 동시에 각자 속도만큼 쓸 수 있어요. 그래서 사용률은 방향마다 따로 나눠요.

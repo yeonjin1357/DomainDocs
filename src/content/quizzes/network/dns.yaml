@@ -1,0 +1,42 @@
+questions:
+  - id: ttl-old-answer
+    type: choice
+    prompt: DNS 레코드의 IP를 새 서버로 바꿨는데, 일부 사용자는 한동안 옛 서버로 가요. 왜일까요?
+    choices:
+      - 리졸버가 옛 답을 TTL이 끝날 때까지 캐시해서 써서
+      - DNS는 하루에 한 번만 갱신돼서
+      - 사용자 쪽 스위치의 MAC 주소 표가 낡아서
+      - 새 서버의 포트 번호가 달라서
+    answer: 0
+    explain: 리졸버는 받은 답을 TTL 동안 다시 묻지 않고 써요. 주소를 옮기기 전에 TTL을 미리 짧게 줄여 둬요.
+  - id: five-second-delay
+    type: choice
+    prompt: 앱 요청이 가끔 정확히 5초나 10초씩 늦어져요. 먼저 의심할 것은?
+    choices:
+      - 리졸버가 답하지 않아 기본 대기 시간만큼 기다림
+      - 디스크 쓰기 지연
+      - 스위치의 플러딩
+      - 서버의 TCP 연결 수 한도
+    answer: 0
+    explain: 리눅스 리졸버 설정의 기본 대기 시간은 한 서버당 5초예요. 그래서 5초 단위로 딱 떨어지는 지연은 DNS를 먼저 봐요.
+  - id: negative-cache
+    type: ox
+    prompt: "\"그런 이름은 없다\"는 DNS 답도 캐시될 수 있나요?"
+    answer: true
+    explain: 없다는 답도 캐시되는데, 이를 부정 캐시라고 해요. 그래서 이름을 만들기 전에 물었던 리졸버는 한동안 계속 없다고 답할 수 있어요.
+  - id: a-record
+    type: choice
+    prompt: shop.example.com의 IPv4 주소를 담는 DNS 레코드는?
+    choices:
+      - A
+      - AAAA
+      - CNAME
+      - MX
+    answer: 0
+    explain: A는 IPv4, AAAA는 IPv6 주소를 담아요. CNAME은 다른 이름의 별칭, MX는 메일 받을 서버예요.
+  - id: resolver-name
+    type: input
+    prompt: 서버나 PC 대신 네임 서버들에 차례로 물어 답을 모아 주는 프로그램은?
+    answer: [리졸버]
+    term: network/resolver
+    explain: 서버는 보통 리졸버 하나에 묻고, 리졸버가 루트부터 차례로 물어 답을 가져와요. 받은 답은 TTL 동안 캐시해요.

@@ -1,0 +1,42 @@
+questions:
+  - id: agent-port
+    type: choice
+    prompt: 장비의 SNMP 에이전트가 관리 서버의 요청을 보통 기다리는 포트는?
+    choices:
+      - UDP 161번
+      - UDP 162번
+      - TCP 443번
+      - UDP 514번
+    answer: 0
+    explain: 요청은 161번으로 받아요. 162번은 장비가 먼저 보내는 Trap을 받는 쪽, 514번은 Syslog를 받는 쪽이에요.
+  - id: vendor-oid
+    type: ox
+    prompt: CPU 사용률은 어느 제조사 장비든 같은 OID 하나로 읽을 수 있나요?
+    answer: false
+    explain: CPU·메모리 같은 값은 표준 MIB에 없어서 제조사가 자기 MIB에 따로 정해요. 그래서 제조사마다 OID가 달라요.
+  - id: uptime-dropped
+    type: choice
+    prompt: 장비의 sysUpTime 값이 갑자기 작아졌어요. 무슨 뜻일까요?
+    choices:
+      - 장비의 관리 기능이 다시 시작됐어요
+      - 장비의 시계가 늦어졌어요
+      - 인터페이스 하나가 꺼졌어요
+      - SNMP 버전이 바뀌었어요
+    answer: 0
+    explain: sysUpTime은 다시 시작된 뒤 흐른 시간이에요. 이때 트래픽 카운터도 0부터 다시 세서, 그 구간의 계산은 버려요.
+  - id: community-plaintext
+    type: choice
+    prompt: SNMP v2c의 커뮤니티 문자열에 대해 맞는 말은?
+    choices:
+      - 평문으로 오가서, 네트워크를 엿보면 그대로 보여요
+      - 오가는 동안 암호화돼요
+      - 장비가 주기적으로 알아서 바꿔요
+      - 값을 읽을 때는 쓰지 않아요
+    answer: 0
+    explain: 커뮤니티 문자열은 비밀번호처럼 쓰이지만 암호화되지 않아요. 표준 문서도 v3를 쓰라고 강하게 권해요.
+  - id: oid-name
+    type: input
+    prompt: SNMP에서 장비가 내놓는 값 하나하나에 붙은, 점으로 이은 숫자 주소를 무엇이라고 하나요?
+    answer: [OID]
+    term: network/oid
+    explain: OID는 나무처럼 위에서부터 갈라져요. 표준 MIB의 OID는 어느 제조사 장비든 같은 뜻이에요.

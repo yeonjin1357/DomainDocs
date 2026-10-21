@@ -1,0 +1,46 @@
+questions:
+  - id: severity-direction
+    type: ox
+    prompt: Syslog 심각도는 숫자가 클수록 더 심각한가요?
+    answer: false
+    explain: 0(Emergency)이 가장 심각하고 7(Debug)이 가장 가벼워요. 오류 이상만 보려면 3 이하를 걸러요.
+  - id: trap-only-risk
+    type: choice
+    prompt: 인터페이스 장애를 linkDown Trap만으로 알아채고 있어요. 무엇이 문제일까요?
+    choices:
+      - Trap은 UDP라서 중간에 사라져도 아무도 몰라요
+      - Trap은 하루에 한 번만 모아서 와요
+      - Trap에는 어느 인터페이스인지가 없어요
+      - Trap은 관리 서버가 물어야만 와요
+    answer: 0
+    explain: Trap에는 받았다는 확인이 없어요. 폴링한 동작 상태(ifOperStatus)로도 함께 확인해요.
+  - id: inform-acked
+    type: choice
+    prompt: 받는 쪽이 받았다고 답을 돌려줘서, 보낸 쪽이 전달 여부를 알 수 있는 SNMP 알림은?
+    choices:
+      - Inform
+      - Trap
+      - GetRequest
+      - SetRequest
+    answer: 0
+    explain: Inform을 받은 쪽은 같은 요청 번호로 Response를 보내요. 그래서 받는 쪽이 꺼져 있었다면 보낸 쪽이 알 수 있어요.
+  - id: event-order-clock
+    type: choice
+    prompt: 여러 장비의 이벤트를 보낸 시각으로 줄 세웠더니 순서가 엉켜 보여요. 먼저 의심할 것은?
+    choices:
+      - 장비들의 시계가 서로 어긋났어요
+      - Syslog 심각도가 잘못 붙었어요
+      - Trap 몇 개가 사라졌어요
+      - 폴링 간격이 너무 길어요
+    answer: 0
+    explain: 이벤트 시각은 각 장비의 시계로 찍혀요. 시계가 어긋난 장비의 이벤트는 순서가 뒤섞여 보여요.
+  - id: push-strength
+    type: choice
+    prompt: 폴링과 견준 Trap·Syslog의 장점은?
+    choices:
+      - 장비에 일이 생기면 바로 알 수 있어요
+      - 중간에 사라지지 않고 반드시 도착해요
+      - 받았다는 확인이 늘 함께 와요
+      - 장비 설정 없이도 저절로 와요
+    answer: 0
+    explain: 폴링은 다음에 물을 때까지 모르지만, Trap과 Syslog는 장비가 바로 보내요. 대신 사라질 수 있어서 폴링과 함께 써요.

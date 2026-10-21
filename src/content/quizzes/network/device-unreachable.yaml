@@ -1,0 +1,41 @@
+questions:
+  - id: snmp-only-causes
+    type: choice
+    prompt: 장비가 ping에는 답하는데 SNMP에는 답하지 않아요. 흔한 원인이 아닌 것은?
+    choices:
+      - 장비의 전원이 꺼졌어요
+      - 커뮤니티 문자열이나 v3 계정 정보가 바뀌었어요
+      - 장비의 접근 목록(ACL)이 모니터링 서버 주소를 막아요
+      - 중간 방화벽이 UDP 161번 포트를 막아요
+    answer: 0
+    explain: ping에 답한다면 장비는 살아 있어요. 질문 쪽인 SNMP 설정이나 그 길이 막힌 거예요.
+  - id: moved-monitoring-server
+    type: choice
+    prompt: 모니터링 서버를 옮긴 뒤 여러 장비가 한꺼번에 응답 없음이 됐어요. 먼저 볼 곳은?
+    choices:
+      - 장비 ACL에 새 모니터링 서버 주소가 들어 있는지
+      - 장비마다 전원이 들어와 있는지
+      - 장비마다 CPU 사용률이 높은지
+      - 장비마다 가동 시간이 줄었는지
+    answer: 0
+    explain: 여러 장비가 같은 때 함께 끊겼다면 공통으로 바뀐 것부터 봐요. 장비는 허용하지 않은 주소의 질문에 답하지 않아요.
+  - id: uptime-reset
+    type: choice
+    prompt: 응답 없음이 풀린 뒤, 장비 가동 시간이 41일에서 6분으로 줄었어요. 무슨 일이 있었을까요?
+    choices:
+      - 그사이 장비가 다시 시작했어요
+      - 장비의 시계가 늦어졌어요
+      - SNMP 버전이 바뀌었어요
+      - 모니터링 서버가 다시 시작했어요
+    answer: 0
+    explain: 가동 시간은 다시 시작한 뒤 흐른 시간이에요. 재시작 직전의 Syslog에서 전원, 과열 같은 원인을 찾아봐요.
+  - id: busy-cpu-flaps
+    type: ox
+    prompt: 응답 없음이 짧게 났다 풀렸다를 되풀이한다면, 장비 CPU가 바빠 SNMP 답이 늦는 것도 의심할 만한가요?
+    answer: true
+    explain: 바쁜 장비는 SNMP 답을 제한 시간 안에 못 줘서, 응답 없음이 났다 풀렸다를 되풀이해요.
+  - id: whole-site-down
+    type: ox
+    prompt: 같은 지점의 장비가 모두 응답 없음이에요. 장비를 하나씩 먼저 살펴봐야 할까요?
+    answer: false
+    explain: 모두 함께 끊겼다면 그 지점으로 가는 회선이나 앞단 라우터를 먼저 봐요.

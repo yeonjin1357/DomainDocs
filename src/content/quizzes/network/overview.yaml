@@ -1,0 +1,32 @@
+questions:
+  - id: router-between-networks
+    type: choice
+    prompt: 서버 A와 서버 B가 서로 다른 네트워크에 있어요. 두 네트워크 사이로 데이터를 넘겨 주는 장비는?
+    choices:
+      - 라우터
+      - 스위치
+      - 방화벽
+      - 로드 밸런서
+    answer: 0
+    explain: 라우터는 경로표를 보고 받는 곳이 있는 네트워크 쪽으로 넘겨요. 같은 네트워크 안은 스위치가 맡아요.
+  - id: load-balancer-role
+    type: choice
+    prompt: 들어온 요청을 여러 서버에 나눠 주는 장비는?
+    choices:
+      - 로드 밸런서
+      - 스위치
+      - 라우터
+      - 방화벽
+    answer: 0
+    explain: 로드 밸런서는 요청을 여러 서버로 나눠요. 방화벽은 규칙에 따라 통신을 막거나 통과시켜요.
+  - id: packets-split
+    type: ox
+    prompt: 큰 데이터를 보내면, 그 데이터는 한 덩어리 그대로 끝까지 같은 길로 가나요?
+    answer: false
+    explain: 데이터는 잘게 나뉜 패킷 여러 개로 가요. 패킷마다 다른 길로 갈 수도 있어요.
+  - id: interface-name
+    type: input
+    prompt: 네트워크 장비에서 데이터가 드나드는 구멍(포트) 하나하나를 부르는 이름은?
+    answer: [인터페이스]
+    term: network/interface
+    explain: 네트워크 장비 모니터링은 대부분 인터페이스마다 무엇이 오가는지 보는 일이에요.
