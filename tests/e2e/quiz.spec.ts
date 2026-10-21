@@ -2,11 +2,20 @@ import { expect, test, type Page } from '@playwright/test';
 import { expectNoHorizontalOverflow } from './helpers';
 
 const DOC_QUIZ = 'quiz/play/?scope=doc%3Afoundations%2Falpha';
-const ANSWERS: Record<string, { index?: number; text?: string }> = {
+/** index는 OX(O=0, X=1), choice는 정답 보기의 글(보기 순서는 풀 때마다 섞여요), text는 주관식 정답 */
+const ANSWERS: Record<string, { index?: number; choice?: string; text?: string }> = {
   'foundations/alpha#alpha-ox': { index: 0 },
-  'foundations/alpha#alpha-choice': { index: 0 },
+  'foundations/alpha#alpha-choice': { choice: '모니터링 기초' },
   'foundations/alpha#alpha-input': { text: 'SNMP' },
 };
+
+/** 지금 화면에서 정답 보기의 순서(0부터) */
+async function rightIndex(page: Page, key: string): Promise<number> {
+  const a = ANSWERS[key];
+  if (a.choice === undefined) return a.index!;
+  const texts = await page.locator('[data-quiz-choice]').allInnerTexts();
+  return texts.findIndex((t) => t.includes(a.choice!));
+}
 
 /** 지금 문제를 맞히거나 일부러 틀린다. 문제 순서는 섞이므로 키를 읽어 답을 고른다. */
 async function answer(page: Page, correct: boolean): Promise<string> {
@@ -17,7 +26,8 @@ async function answer(page: Page, correct: boolean): Promise<string> {
     await page.locator('[data-quiz-input]').fill(correct ? a.text : '전혀 다른 답');
     await page.getByRole('button', { name: '확인' }).click();
   } else {
-    await q.locator('[data-quiz-choice]').nth(correct ? a.index! : a.index === 0 ? 1 : 0).click();
+    const right = await rightIndex(page, key);
+    await q.locator('[data-quiz-choice]').nth(correct ? right : right === 0 ? 1 : 0).click();
   }
   return key;
 }
@@ -55,12 +65,32 @@ test.describe('퀴즈 풀이', () => {
         await page.locator('[data-quiz-input]').fill(' snmp ');
         await page.keyboard.press('Enter');
       } else {
-        await page.keyboard.press(String(ANSWERS[key].index! + 1));
+        await page.keyboard.press(String((await rightIndex(page, key)) + 1));
       }
       await expect(page.locator('[data-quiz-verdict]')).toHaveText('정답이에요');
       await page.keyboard.press('Enter');
     }
     await expect(page.locator('[data-quiz-result] h2')).toHaveText('3문제 중 3문제 맞혔어요');
+  });
+
+  test('객관식 보기는 섞여서 나오고, 섞인 자리로 채점한다', async ({ page }) => {
+    // Math.random이 늘 0이면 보기 [모니터링 기초, 네트워크, 서버·OS, 데이터베이스]는 정답이 맨 뒤로 가요.
+    await page.addInitScript(() => {
+      Math.random = () => 0;
+    });
+    await page.goto(DOC_QUIZ);
+    for (let i = 0; i < 3; i++) {
+      const q = page.locator('[data-quiz-question]');
+      if ((await q.getAttribute('data-key')) === 'foundations/alpha#alpha-choice') {
+        await expect(q.locator('[data-quiz-choice]')).toHaveText([/네트워크/, /서버·OS/, /데이터베이스/, /모니터링 기초/]);
+        await q.locator('[data-quiz-choice]').nth(3).click();
+        await expect(page.locator('[data-quiz-verdict]')).toHaveText('정답이에요');
+        return;
+      }
+      await answer(page, true);
+      await next(page);
+    }
+    throw new Error('객관식 문제가 나오지 않았어요');
   });
 
   test('틀린 문제만 다시 풀 수 있다', async ({ page }) => {

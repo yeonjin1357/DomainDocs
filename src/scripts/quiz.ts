@@ -1,5 +1,6 @@
 import { isInputCorrect } from '../lib/quiz/answer';
 import type { QuizQuestion } from '../lib/quiz/bank';
+import { shuffleChoices } from '../lib/quiz/choices';
 import { parseScope } from '../lib/quiz/scope';
 import { applyResult, pickSession, todayString, type Records, type Scope } from '../lib/quiz/schedule';
 import { loadRecords, pruneRecords, saveRecords } from '../lib/quiz/storage';
@@ -89,7 +90,7 @@ export async function initQuiz(): Promise<void> {
   }
 
   function start(list: QuizQuestion[]): void {
-    questions = list;
+    questions = list.map((q) => (q.type === 'choice' ? { ...q, ...shuffleChoices(q.choices!, q.answer as number) } : q));
     index = 0;
     results = [];
     if (questions.length === 0) showEmpty();
