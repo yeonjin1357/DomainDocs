@@ -88,3 +88,84 @@ terms:
     aliases: [uninterruptible sleep, 깨울 수 없는 잠, D state]
     short: 보통 디스크 입출력을 기다리며 깨울 수 없게 잠든 상태예요. 리눅스 부하에 들어가요.
     doc: server/processes-and-threads
+  - id: page-cache
+    name: 페이지 캐시
+    en: Page cache
+    aliases: [page cache, 파일 캐시, buff/cache, Cached]
+    short: 디스크에서 읽은 파일 내용을 메모리에 담아 두는 곳이에요. 필요하면 비워 내줘요.
+    analogy: 빈 책상에 펼쳐 둔 자주 보는 서류 사본과 같아요.
+    doc: server/memory
+  - id: available-memory
+    name: available
+    en: Available memory
+    aliases: [MemAvailable, 가용 메모리, 사용 가능 메모리]
+    short: 스왑 없이 새 프로그램에 줄 수 있는 메모리의 추정값이에요.
+    doc: server/memory
+  - id: rss
+    name: RSS
+    en: Resident set size
+    aliases: [VmRSS, 상주 메모리, resident memory]
+    short: 프로세스의 메모리 중 실제 메모리에 올라와 있는 양이에요.
+    doc: server/memory
+  - id: virtual-memory
+    name: 가상 메모리
+    en: Virtual memory
+    aliases: [virtual memory, VmSize, VSZ, 주소 공간]
+    short: 프로세스마다 받는 자기만의 주소 공간이에요. 잡아 둔 크기라 실제 사용량보다 커요.
+    doc: server/memory
+  - id: swap
+    name: 스왑
+    en: Swap
+    aliases: [swap, 스왑 공간, swap space]
+    short: 메모리 내용을 잠시 디스크에 내보내는 공간이에요. 자주 오가면 서버가 느려져요.
+    analogy: 책상이 모자랄 때 덜 보는 서류를 캐비닛에 잠시 넣어 두는 것과 같아요.
+    doc: server/memory
+  - id: oom-killer
+    name: OOM killer
+    en: Out-of-memory killer
+    aliases: [OOM, out of memory, 메모리 부족 종료]
+    short: 메모리가 끝내 모자랄 때 커널이 점수가 높은 프로세스를 골라 끝내는 기능이에요.
+    doc: server/memory
+  - id: iops
+    name: IOPS
+    en: I/O operations per second
+    aliases: [초당 입출력 수, r/s, w/s]
+    short: 디스크가 초당 끝낸 읽기·쓰기 요청 수예요.
+    doc: server/disk-io
+  - id: disk-throughput
+    name: 디스크 처리량
+    en: Disk throughput
+    aliases: [throughput, 대역폭, bandwidth, MB/s]
+    short: 디스크가 초당 읽고 쓴 데이터의 양이에요. 요청 수 × 요청 크기예요.
+    doc: server/disk-io
+  - id: io-latency
+    name: 입출력 지연
+    en: I/O latency
+    aliases: [await, r_await, w_await, 디스크 지연, disk latency]
+    short: 디스크 요청 하나가 끝나기까지 걸린 시간이에요. 줄에서 기다린 시간도 들어가요.
+    doc: server/disk-io
+  - id: disk-util
+    name: "%util"
+    en: Device utilization
+    aliases: [util, 디스크 사용률, disk utilization]
+    short: 디스크에 요청이 하나라도 걸려 있던 시간의 비율이에요. SSD에서는 한계를 뜻하지 않아요.
+    doc: server/disk-io
+  - id: file-system
+    name: 파일 시스템
+    en: File system
+    aliases: [filesystem, 파일시스템, ext4, xfs]
+    short: 디스크에 파일을 정리해 두는 방식이에요. 데이터 블록과 inode를 따로 관리해요.
+    doc: server/filesystem-and-capacity
+  - id: inode
+    name: inode
+    en: Index node
+    aliases: [아이노드, i-node]
+    short: 파일마다 하나씩 있는 정보 묶음이에요. 크기, 권한, 시각, 내용의 위치를 담아요.
+    analogy: 서류마다 위치와 정보를 적어 둔 색인 카드와 같아요.
+    doc: server/filesystem-and-capacity
+  - id: mount
+    name: 마운트
+    en: Mount
+    aliases: [mount, mount point, 마운트 지점]
+    short: 파일 시스템을 디렉터리 하나에 붙여 쓰는 일이에요. 예를 들어 /var에 디스크 하나를 붙여요.
+    doc: server/filesystem-and-capacity

@@ -6,7 +6,7 @@ type: overview
 order: 0
 icon: server
 keywords: [서버, OS, 운영체제, 커널, kernel, 리눅스, linux, 호스트, host, /proc]
-related: [server/processes-and-threads, server/cpu-usage, foundations/red-and-use, foundations/counters-and-rate]
+related: [server/processes-and-threads, server/cpu-usage, server/memory, server/disk-io, foundations/red-and-use]
 sources:
   - title: Linux man-pages — syscalls(2)
     url: https://man7.org/linux/man-pages/man2/syscalls.2.html
@@ -65,3 +65,6 @@ CPU가 어떤 일에 시간을 썼는지는 `/proc/stat`에, 부하는 `/proc/lo
 
 - 프로세스와 스레드가 CPU를 나눠 쓰는 법은 <Term slug="server/processes-and-threads">프로세스와 스레드</Term>에서 다뤄요.
 - CPU 숫자를 읽는 법은 <Term slug="server/cpu-usage">CPU 사용률과 부하</Term>에서 다뤄요.
+- 메모리 숫자와 스왑, OOM은 <Term slug="server/memory">메모리</Term>에서 다뤄요.
+- 디스크가 얼마나 바쁜지는 <Term slug="server/disk-io">디스크 입출력</Term>에서 다뤄요.
+- 디스크가 차는 여러 방식은 <Term slug="server/filesystem-and-capacity">파일 시스템과 디스크 용량</Term>에서 다뤄요.
