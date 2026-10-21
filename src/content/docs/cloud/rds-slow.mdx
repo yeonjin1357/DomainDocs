@@ -1,0 +1,75 @@
+---
+title: 관리형 DB가 느려졌을 때
+summary: CPU·메모리·디스크·연결 순서로 자원부터 보고, 넉넉하면 DB 안의 쿼리로 내려가요.
+domain: cloud
+type: guide
+order: 110
+icon: cloud
+keywords: [RDS slow, 관리형 DB 느림, CPUCreditBalance, FreeableMemory, SwapUsage, ReadIOPS, ReadLatency, DatabaseConnections, working set, 원인 찾기]
+related: [cloud/managed-databases, database/slow-database, cloud/virtual-machines, cloud/storage]
+sources:
+  - title: AWS — Best practices for Amazon RDS
+    url: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_BestPractices.html
+  - title: AWS — Amazon CloudWatch metrics for Amazon RDS
+    url: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html
+  - title: AWS — Monitoring OS metrics with Enhanced Monitoring
+    url: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.html
+updated: 2026-10-21
+---
+
+<Situation>
+  RDS로 운영하는 주문 DB가 오후부터 느려졌어요. 관리형이라 OS에 들어가 볼 수도 없어요.
+
+  관리형 DB는 쓸 수 있는 도구가 다를 뿐, 보는 순서는 같아요. 클라우드 지표로 자원이 모자란지 먼저 보고, 모자란 게 없으면 DB 안의 쿼리로 내려가요.
+</Situation>
+
+<FirstLook>
+  <Item title="CPU와 크레딧">CPU가 꽉 찼는지, 버스트형이라 묶였는지 봐요.</Item>
+  <Item title="메모리와 읽기">자주 쓰는 데이터가 메모리에 다 안 들어가는지 봐요.</Item>
+  <Item title="디스크 지연">읽기·쓰기 지연이 늘었는지 봐요.</Item>
+</FirstLook>
+
+## 1. CPU와 크레딧을 보세요
+
+CPUUtilization이 높다면 DB가 일을 많이 하고 있어요. 다만 AWS 문서는 높은 CPU가 목표한 처리량에 맞는 값이라면 괜찮을 수 있다고 해요. 평소와 견줘 갑자기 올랐는지가 중요해요.
+
+db.t 같은 버스트형 클래스라면 CPUCreditBalance를 함께 봐요. 크레딧이 바닥나면 CPU 사용률이 낮아 보여도 기준선에 묶여 느려져요. 원리는 <Term slug="cloud/virtual-machines">가상 머신</Term>의 크레딧과 같아요.
+
+## 2. 메모리와 읽기 IOPS를 보세요
+
+AWS 문서는 자주 쓰는 데이터와 인덱스(작업 집합)가 거의 다 메모리에 들어가게 하라고 권해요. 그렇지 않으면 같은 데이터를 디스크에서 자꾸 다시 읽어요.
+
+<Figure caption="같은 DB의 예시예요. 메모리 여유가 줄면서 읽기 IOPS가 평소의 다섯 배로 늘었어요. 작업 집합이 메모리를 넘친 모습이에요.">
+  <StatTile label="쓸 수 있는 메모리" value="0.4" unit="GB" tone="warn" note="평소 3GB" />
+  <StatTile label="읽기 IOPS" value="5,200" tone="warn" note="평소 1,000" />
+  <StatTile label="스왑 사용량" value="1.1" unit="GB" tone="warn" />
+</Figure>
+
+**확인 방법**: 부하가 있을 때 ReadIOPS가 작고 안정적인지 봐요. AWS 문서는 더 큰 메모리 클래스로 올렸을 때 ReadIOPS가 크게 줄었다면, 작업 집합이 메모리에 다 들어가지 않았던 거라고 설명해요. 스왑 사용량(SwapUsage)이 늘었다면 메모리가 모자란 신호예요.
+
+## 3. 디스크 지연과 한도를 보세요
+
+ReadLatency와 WriteLatency는 디스크 읽기·쓰기 한 번에 걸린 평균 시간이에요. 지연이 늘었는데 IOPS가 볼륨이 낼 수 있는 한도에 붙어 있다면, 디스크가 모자란 거예요.
+
+AWS 문서는 I/O가 모자랄 때 더 높은 I/O를 내는 클래스로 옮기거나, 저장소 종류를 바꾸거나, 더 많은 IOPS를 프로비저닝하라고 해요. 저장소의 IOPS·처리량 한도는 <Term slug="cloud/storage">블록·파일·오브젝트 저장소</Term>에서 다뤄요.
+
+FreeStorageSpace도 함께 봐요. 남은 공간이 바닥에 가까우면 쓰기가 멈출 수 있어요.
+
+## 4. 연결 수를 보세요
+
+DatabaseConnections가 평소보다 크게 늘었다면, 앱 쪽에서 연결을 많이 열었거나 쿼리가 느려져 연결이 오래 붙잡혀 있어요. 연결이 한도에 닿으면 새 연결이 실패해요.
+
+이때 어디부터 볼지는 <Term slug="database/too-many-connections">DB 연결이 한도에 닿았을 때 어디부터 볼까</Term>와 같아요.
+
+## 5. 자원이 넉넉하다면 쿼리로 내려가세요
+
+자원 지표가 모두 평소와 같다면 DB 안에서 일이 바뀐 거예요. 늘어난 SQL, 바뀐 실행 계획, 잠금 대기를 찾아요. 순서는 <Term slug="database/slow-database">DB가 느려졌을 때 어디부터 볼까</Term>와 같아요.
+
+관리형 DB도 SQL로 DB 안을 들여다볼 수 있어요. PostgreSQL이라면 `pg_stat_activity`와 `pg_stat_statements`를 그대로 써요. OS 수준의 숫자가 필요하면 Enhanced Monitoring 같은 사업자 기능을 켜요.
+
+<Checkpoints>
+  <Check>RDS CPU 사용률이 낮다고 DB가 한가하다고 판단했다면, 버스트형 클래스의 크레딧 잔량을 보세요.</Check>
+  <Check>읽기 IOPS가 갑자기 늘었다면 메모리 여유와 함께 보세요. 작업 집합이 메모리를 넘쳤을 수 있어요.</Check>
+  <Check>DB를 큰 클래스로 올리기 전에, 늘어난 SQL이 있는지 먼저 보세요. 쿼리 하나가 원인이면 클래스를 올려도 다시 느려져요.</Check>
+  <Check>관리형이라 OS를 못 봐서 원인을 못 찾는다고 여겼다면 다시 보세요. DB 안의 통계 뷰와 사업자의 OS 지표 기능은 그대로 쓸 수 있어요.</Check>
+</Checkpoints>

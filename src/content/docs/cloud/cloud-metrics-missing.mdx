@@ -1,0 +1,79 @@
+---
+title: 클라우드 지표가 비어 있을 때
+summary: 일이 없으면 점을 안 찍는 지표, 5분 간격, 사라진 자원, 에이전트 지표를 차례로 의심해요.
+domain: cloud
+type: guide
+order: 100
+icon: cloud
+keywords: [missing metrics, 지표 없음, CloudWatch, INSUFFICIENT_DATA, reporting criteria, nonzero, basic monitoring, 5분 간격, 차원, 에이전트]
+related: [cloud/cloud-metrics, foundations/no-data-vs-zero, foundations/empty-graph, cloud/virtual-machines]
+sources:
+  - title: AWS — CloudWatch metrics for your Application Load Balancer (reporting criteria)
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html
+  - title: AWS — Manage detailed monitoring for your EC2 instances
+    url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/manage-detailed-monitoring.html
+  - title: AWS — Amazon CloudWatch concepts
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html
+  - title: AWS — Configuring how CloudWatch alarms treat missing data
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarms-and-missing-data.html
+updated: 2026-10-21
+---
+
+<Situation>
+  로드 밸런서의 5xx 그래프가 대부분 비어 있고, 가끔 점이 하나씩 찍혀요. 그 지표에 건 경보는 자꾸 INSUFFICIENT_DATA로 바뀌어요.
+
+  클라우드 지표가 비는 이유는 고장만이 아니에요. 일이 없으면 점을 찍지 않는 지표도 있고, 간격이 길거나, 자원이 바뀌었을 수도 있어요.
+</Situation>
+
+<FirstLook>
+  <Item title="0일 때 점을 찍는 지표인가">보고 기준(reporting criteria)을 봐요.</Item>
+  <Item title="간격이 맞는가">5분 간격 지표를 1분으로 보고 있지 않은지 봐요.</Item>
+  <Item title="같은 대상을 가리키나">차원 값이 바뀌지 않았는지 봐요.</Item>
+</FirstLook>
+
+## 1. 0일 때도 점을 찍는 지표인지 보세요
+
+어떤 클라우드 지표는 값이 0이면 아예 점을 찍지 않아요. AWS 문서는 지표마다 보고 기준을 적어 두는데, 로드 밸런서의 5xx 수 같은 지표는 "0이 아닌 값이 있을 때"만 보고해요.
+
+그래서 오류가 없는 동안 그래프는 0이 아니라 비어 있어요. 이건 수집 고장이 아니라, 일어난 일이 없다는 뜻이에요. 데이터 없음과 0의 차이는 <Term slug="foundations/no-data-vs-zero">데이터 없음과 0은 달라요</Term>에 있어요.
+
+<Figure caption="같은 1시간의 5xx 수예요. 클라우드 지표는 오류가 난 3분에만 점이 있고 나머지는 비어 있어요. 빈칸을 0으로 채워 보면 뜻이 또렷해져요.">
+  <Compare
+    columns={['그대로 본 지표', '0으로 채운 그래프']}
+    rows={[
+      { label: '오류가 없던 57분', values: ['비어 있어요', '0이에요'] },
+      { label: '오류가 난 3분', values: ['4, 2, 7', '4, 2, 7'] },
+    ]}
+  />
+</Figure>
+
+CloudWatch 경보는 빠진 데이터를 어떻게 다룰지 정할 수 있어요. 기본값은 missing이라, 자료가 모두 비면 INSUFFICIENT_DATA가 돼요. 0일 때 비는 지표라면 notBreaching으로 바꿔 빈 구간을 "기준 안"으로 다뤄요.
+
+## 2. 간격을 맞춰 보세요
+
+EC2의 기본 지표는 5분 간격이에요. 이걸 1분 간격 그래프로 그리면 점 사이가 비어 보여요. 상세 모니터링을 켜면 1분 간격이 돼요.
+
+간격은 <Term slug="cloud/virtual-machines">가상 머신</Term>에서 다뤄요.
+
+오래된 구간이라면 해상도도 봐요. CloudWatch는 15일이 지난 1분 자료를 5분으로, 63일이 지나면 1시간으로 묶어 남겨요.
+
+## 3. 같은 대상을 가리키는지 보세요
+
+클라우드 지표는 차원으로 대상을 가려요. 인스턴스를 새로 만들면 인스턴스 ID가 바뀌어, 지표는 새 ID로 쌓이고 옛 ID의 지표는 거기서 끊겨요. 오토스케일링으로 서버가 자주 바뀌는 환경에서 흔해요.
+
+차원은 <Term slug="cloud/cloud-metrics">클라우드 지표 서비스</Term>에서 다뤄요.
+
+**확인 방법**: 그래프가 끊긴 시각에 그 자원이 지워지거나 바뀌었는지 봐요. 개별 인스턴스 대신 오토스케일링 그룹 같은 묶음 단위로 보면 끊기지 않아요.
+
+## 4. 에이전트 지표라면 에이전트를 보세요
+
+메모리나 디스크 사용률처럼 서버 안에서만 보이는 지표는 클라우드가 아니라 에이전트가 보내요. 이 지표만 비었다면 서버 안의 에이전트가 멈췄거나, 지표를 보낼 권한이나 네트워크 길이 막혔어요.
+
+이때는 서버를 보는 순서가 같아요. <Term slug="server/server-not-reporting">서버 수집이 끊겼을 때</Term>를 봐요.
+
+<Checkpoints>
+  <Check>오류 수 그래프가 비어 있다고 수집 고장으로 판단했다면, 그 지표의 보고 기준을 보세요. 0이면 점을 찍지 않는 지표가 있어요.</Check>
+  <Check>0일 때 비는 지표에 건 경보가 INSUFFICIENT_DATA를 오간다면, 빠진 데이터 처리를 notBreaching으로 바꾸세요.</Check>
+  <Check>EC2 지표를 1분 간격으로 그렸는데 점이 띄엄띄엄이라면, 기본 5분 간격인지 보세요.</Check>
+  <Check>오토스케일링 서버의 그래프가 자꾸 끊긴다면, 인스턴스마다가 아니라 그룹 단위로 보세요.</Check>
+</Checkpoints>

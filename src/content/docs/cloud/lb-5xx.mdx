@@ -1,0 +1,77 @@
+---
+title: 로드 밸런서에서 5xx가 늘 때
+summary: 누가 만든 5xx인지 먼저 가르고, 502·503·504 코드마다 다른 원인을 따라가요.
+domain: cloud
+type: guide
+order: 90
+icon: cloud
+keywords: [ALB 5xx, "502", "503", "504", HTTPCode_ELB_5XX_Count, HTTPCode_Target_5XX_Count, idle timeout, keep-alive, 정상 대상, 원인 찾기]
+related: [cloud/load-balancers, apm/http-basics, apm/error-spike, apm/timeouts-and-retries]
+sources:
+  - title: AWS — Troubleshoot your Application Load Balancers
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-troubleshooting.html
+  - title: AWS — CloudWatch metrics for your Application Load Balancer
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html
+  - title: AWS — Health checks for Application Load Balancer target groups
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html
+updated: 2026-10-21
+---
+
+<Situation>
+  쇼핑몰의 5xx 비율이 0.1%에서 4%로 뛰었다는 알림이 왔어요. 그런데 앱 서버 로그에는 5xx가 거의 없어요.
+
+  로드 밸런서를 거치는 요청의 5xx는 두 곳에서 생겨요. 앱(대상)이 직접 돌려준 것과, 로드 밸런서가 대신 만든 것이에요. 이 둘부터 가르면 볼 곳이 반으로 줄어요.
+</Situation>
+
+<FirstLook>
+  <Item title="누가 만든 5xx인가">로드 밸런서와 대상의 5xx 수를 나눠 봐요.</Item>
+  <Item title="어떤 코드인가">502, 503, 504 중 무엇이 늘었는지 봐요.</Item>
+  <Item title="정상 대상이 몇 개인가">상태 확인에 통과한 대상 수를 봐요.</Item>
+</FirstLook>
+
+## 1. 누가 만든 5xx인지 가르세요
+
+AWS Application Load Balancer는 두 수를 따로 세요. 대상이 만든 5xx는 HTTPCode_Target_5XX_Count, 로드 밸런서가 만든 5xx는 HTTPCode_ELB_5XX_Count예요. 지표 읽는 법은 <Term slug="cloud/load-balancers">로드 밸런서</Term>에 있어요.
+
+<Figure caption="같은 10분 동안의 예시예요. 대상이 만든 5xx는 평소 수준인데, 로드 밸런서가 만든 504가 크게 늘었어요. 앱 로그에는 이 오류가 남지 않아요.">
+  <StatTile label="대상이 만든 5xx" value="12" unit="건" />
+  <StatTile label="LB가 만든 504" value="1,840" unit="건" tone="warn" />
+  <StatTile label="LB가 만든 502" value="35" unit="건" />
+</Figure>
+
+- **대상이 만든 5xx가 늘었다면**: 앱 안의 오류예요. 앱 쪽 오류 분석으로 가요. <Term slug="apm/error-spike">에러가 늘었을 때 어디부터 볼까</Term>를 봐요.
+- **로드 밸런서가 만든 5xx가 늘었다면**: 대상까지 가지 못했거나 대상이 제대로 답하지 못했어요. 아래 단계에서 코드별로 봐요.
+
+## 2. 502라면 연결이 끊긴 이유를 보세요
+
+502(Bad Gateway)는 로드 밸런서가 대상과 주고받다 문제가 생겼다는 뜻이에요. AWS 문서가 꼽는 원인은 이래요.
+
+- 대상이 연결을 거부했어요. 대상이 TCP RST로 답한 경우예요. 앱이 그 포트에서 듣고 있지 않거나, 앱이 막 다시 시작하는 중이에요.
+- 요청을 처리하는 도중에 대상이 연결을 닫았어요. 대상의 keep-alive 시간이 로드 밸런서의 유휴 시간 제한보다 짧으면 흔히 생겨요.
+- 대상의 응답이 깨졌거나, 응답 헤더 전체가 32K를 넘었어요.
+
+keep-alive 문제라면 대상(웹 서버, WAS)의 keep-alive 시간을 로드 밸런서의 유휴 시간 제한보다 길게 잡아요.
+
+## 3. 503이라면 받을 대상이 있는지 보세요
+
+503(Service Unavailable)은 요청을 넘길 대상이 없다는 뜻이에요. AWS 문서는 대상 그룹에 등록된 대상이 없거나, 등록된 대상이 모두 쓰지 않는 상태일 때를 꼽아요.
+
+배포 중에 대상을 모두 빼고 새로 넣는 사이, 또는 대상 그룹을 잘못 바꿨을 때 흔해요.
+
+**확인 방법**: 대상 그룹의 등록 대상과 HealthyHostCount를 봐요. 모든 대상이 상태 확인에 실패한 경우는 4단계를 함께 봐요.
+
+## 4. 504라면 어디서 시간이 넘었는지 보세요
+
+504(Gateway Timeout)는 로드 밸런서가 기다리다 시간이 넘었다는 뜻이에요. 원인은 크게 둘이에요.
+
+- 대상과 연결을 10초 안에 맺지 못했어요. 대상이 너무 바쁘거나, 보안 그룹·네트워크 ACL이 길을 막았어요.
+- 연결은 맺었지만, 대상이 유휴 시간 제한 안에 답하지 않았어요. 앱 응답이 느려진 거예요.
+
+두 번째라면 대상의 응답시간(TargetResponseTime)이 함께 늘었을 거예요. 앱이 느려진 이유는 <Term slug="apm/slow-response">응답이 느려졌을 때 어디부터 볼까</Term>의 순서로 찾아요. 네트워크 ACL이라면 대상에서 로드 밸런서로 돌아오는 임시 포트(1024~65535)가 열려 있는지 봐요.
+
+<Checkpoints>
+  <Check>앱 로그에 5xx가 없다는 이유로 앱은 정상이라고 판단했다면, 로드 밸런서가 만든 5xx를 보세요. 대상까지 못 간 오류는 앱 로그에 남지 않아요.</Check>
+  <Check>502가 낮은 비율로 꾸준히 난다면, 대상의 keep-alive 시간이 로드 밸런서의 유휴 시간 제한보다 짧은지 보세요.</Check>
+  <Check>배포할 때마다 503이 잠깐 튄다면, 새 대상이 정상으로 들어오기 전에 옛 대상이 빠지는지 보세요.</Check>
+  <Check>504와 함께 대상 응답시간이 늘었다면, 로드 밸런서 설정보다 앱이 느려진 원인을 먼저 보세요.</Check>
+</Checkpoints>
