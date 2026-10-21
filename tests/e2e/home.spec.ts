@@ -3,20 +3,21 @@ import { expect, test } from '@playwright/test';
 const cardWithTitle = (page: import('@playwright/test').Page, title: string) =>
   page.locator('[data-card]').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
 
-test('홈에 영역 4개가 있고, 글이 없는 영역은 준비 중이다', async ({ page }) => {
+test('홈에 영역 8개가 있고, 글이 없는 영역은 준비 중이다', async ({ page }) => {
   await page.goto('./');
   const rows = cardWithTitle(page, '영역').locator('[data-row]');
-  await expect(rows).toHaveCount(4);
+  await expect(rows).toHaveCount(8);
   await expect(rows.nth(0)).toHaveAttribute('href', '/DomainDocs/foundations/');
-  await expect(rows.nth(0)).toContainText('공통 기초');
+  await expect(rows.nth(0)).toContainText('모니터링 기초');
   await expect(rows.nth(0)).toContainText('4편');
-  for (const i of [1, 2, 3]) {
+  await expect(rows.nth(1)).toContainText('네트워크');
+  for (const i of [1, 2, 3, 4, 5, 6, 7]) {
     await expect(rows.nth(i)).toContainText('준비 중');
     await expect(rows.nth(i)).not.toHaveAttribute('href');
   }
 });
 
-test('처음이라면 여기부터는 공통 기초를 순서대로 보여 준다', async ({ page }) => {
+test('처음이라면 여기부터는 모니터링 기초를 순서대로 보여 준다', async ({ page }) => {
   await page.goto('./');
   await expect(cardWithTitle(page, '처음이라면 여기부터').locator('.row-title')).toHaveText(['데모 모음', '알파 개념', '베타 개념', '감마 가이드']);
 });
@@ -30,7 +31,7 @@ test('처음 목록에 이미 있는 글은 최근 추가된 글에 다시 나�
 
 test('영역 페이지는 가이드와 개념을 나눠 보여 준다', async ({ page }) => {
   await page.goto('foundations/');
-  await expect(page.locator('h1')).toHaveText('공통 기초');
+  await expect(page.locator('h1')).toHaveText('모니터링 기초');
   await expect(cardWithTitle(page, '가이드').locator('.row-title')).toHaveText(['감마 가이드']);
   await expect(cardWithTitle(page, '개념').locator('.row-title')).toHaveText(['데모 모음', '알파 개념', '베타 개념']);
   await expect(page.getByRole('link', { name: '뒤로 가기' })).toHaveAttribute('href', '/DomainDocs/');

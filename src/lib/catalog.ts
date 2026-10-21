@@ -40,7 +40,7 @@ export function recentlyUpdated<T extends Pick<DocCard, 'updated' | 'id' | 'orde
     .slice(0, limit);
 }
 
-/** 홈의 두 목록. 처음 목록은 공통 기초를 순서대로, 최근 목록은 처음 목록에 없는 글만 최근 수정 순, 같은 날이면 나중 순서(order)부터 고른다. */
+/** 홈의 두 목록. 처음 목록은 모니터링 기초를 순서대로, 최근 목록은 처음 목록에 없는 글만 최근 수정 순, 같은 날이면 나중 순서(order)부터 고른다. */
 export function homeLists<T extends Pick<DocCard, 'id' | 'domain' | 'order' | 'updated'>>(
   docs: readonly T[],
   limit = 5,

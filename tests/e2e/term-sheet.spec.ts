@@ -9,7 +9,7 @@ test.describe('개념 미리보기 시트', () => {
     await page.locator('a.term[data-term="foundations/beta"]').click();
     const sheet = page.locator('#term-sheet');
     await expect(sheet).toBeVisible();
-    await expect(sheet.locator('[data-term-meta]')).toHaveText('공통 기초 · 개념');
+    await expect(sheet.locator('[data-term-meta]')).toHaveText('모니터링 기초 · 개념');
     await expect(sheet.locator('[data-term-title]')).toHaveText('베타 개념');
     await expect(sheet.locator('[data-term-summary]')).toHaveText('두 번째 테스트용 개념 글이에요.');
     await expect(sheet.locator('[data-term-points] li')).toHaveText(['베타의 첫 핵심', '베타의 둘째 핵심']);
@@ -73,7 +73,7 @@ test('핵심이 없는 가이드를 가리키면 핵심 목록을 숨긴다', as
   await page.goto('foundations/beta/');
   await page.locator('a.term[data-term="foundations/gamma-guide"]').click();
   const sheet = page.locator('#term-sheet');
-  await expect(sheet.locator('[data-term-meta]')).toHaveText('공통 기초 · 가이드');
+  await expect(sheet.locator('[data-term-meta]')).toHaveText('모니터링 기초 · 가이드');
   await expect(sheet.locator('[data-term-points-wrap]')).toBeHidden();
 });
 

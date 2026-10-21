@@ -12,6 +12,11 @@ export const ICON_NAMES = [
   'hash',
   'clock',
   'trending-up',
+  'network',
+  'container',
+  'cloud',
+  'messages-square',
+  'book-open',
 ] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];

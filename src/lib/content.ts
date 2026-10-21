@@ -60,7 +60,7 @@ export interface TermPreview {
   summary: string;
   points: string[];
   url: string;
-  /** '공통 기초 · 개념' 형태 */
+  /** '모니터링 기초 · 개념' 형태 */
   meta: string;
 }
 

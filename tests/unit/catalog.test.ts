@@ -47,7 +47,7 @@ describe('catalog', () => {
 
 describe('homeLists', () => {
   const ids = (docs: readonly DocCard[]) => docs.map((d) => d.id);
-  it('처음 목록은 공통 기초를 order 순으로 limit개까지 고른다', () => {
+  it('처음 목록은 모니터링 기초를 order 순으로 limit개까지 고른다', () => {
     expect(ids(homeLists(DOCS).starter)).toEqual(['foundations/a', 'foundations/b', 'foundations/c']);
     expect(ids(homeLists(DOCS, 2).starter)).toEqual(['foundations/a', 'foundations/b']);
   });
