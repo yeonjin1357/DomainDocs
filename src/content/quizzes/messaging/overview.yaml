@@ -1,0 +1,32 @@
+questions:
+  - id: kafka-keeps-events
+    type: ox
+    prompt: Kafka는 컨슈머가 읽어 간 이벤트를 바로 지우나요?
+    answer: false
+    explain: 읽어 가도 지우지 않고, 토픽마다 정한 보관 기간 동안 남겨요. 그래서 필요하면 예전 이벤트를 다시 읽을 수 있어요.
+  - id: separate-groups
+    type: choice
+    prompt: 결제 서비스와 알림 서비스가 같은 '주문됨' 이벤트를 각자 모두 받아야 해요. 어떻게 할까요?
+    choices:
+      - 두 서비스가 서로 다른 컨슈머 그룹을 써요
+      - 두 서비스가 같은 컨슈머 그룹을 써요
+      - 주문 서비스가 토픽을 두 개 만들어 따로 보내요
+      - 파티션을 하나로 줄여요
+    answer: 0
+    explain: 그룹이 다르면 그룹마다 같은 이벤트를 모두 받아요. 같은 그룹 안에서는 이벤트 하나를 한 컨슈머만 처리해요.
+  - id: not-an-advantage
+    type: choice
+    prompt: 서비스 사이에 메시지 큐를 둘 때의 장점이 아닌 것은?
+    choices:
+      - 받는 쪽이 느리면 보내는 쪽도 함께 느려져요
+      - 보내는 쪽과 받는 쪽이 서로를 몰라도 돼요
+      - 받는 쪽이 잠깐 느려도 이벤트가 쌓여 기다려요
+      - 새 서비스를 붙여도 보내는 쪽은 바뀌지 않아요
+    answer: 0
+    explain: 큐를 두면 보내는 쪽은 이벤트를 넣고 바로 다음 일을 해요. 받는 쪽의 속도에 묶이지 않는 게 큐의 장점이에요.
+  - id: broker-name
+    type: input
+    prompt: 이벤트를 저장하고 컨슈머에게 내주는 Kafka 서버를 무엇이라고 하나요?
+    answer: [브로커, broker]
+    term: messaging/broker
+    explain: Kafka는 브로커 여러 대가 하나의 클러스터로 돌고, 이벤트를 여러 브로커에 복사해 둬요.

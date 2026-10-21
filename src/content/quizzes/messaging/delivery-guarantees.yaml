@@ -1,0 +1,41 @@
+questions:
+  - id: at-least-once
+    type: choice
+    prompt: 이벤트를 잃지는 않지만, 같은 이벤트가 두 번 처리될 수는 있는 보장은?
+    choices:
+      - 최소 한 번
+      - 최대 한 번
+      - 정확히 한 번
+      - 아무 보장도 아니에요
+    answer: 0
+    explain: 실패하면 다시 보내고 다시 읽어서 잃지 않는 대신, 가끔 겹쳐요. Kafka의 기본이 최소 한 번이에요.
+  - id: duplicates-possible
+    type: ox
+    prompt: Kafka를 기본 설정으로 쓰면, 같은 이벤트를 두 번 처리하는 일은 절대 생기지 않나요?
+    answer: false
+    explain: 기본은 최소 한 번이라, 장애나 리밸런스 뒤에는 같은 이벤트가 다시 올 수 있어요.
+  - id: commit-before-process
+    type: choice
+    prompt: 커밋을 먼저 하고 처리하는 컨슈머가, 처리하는 중에 죽었어요. 그 이벤트는 어떻게 될까요?
+    choices:
+      - 놓쳐요
+      - 다시 처리해요
+      - 두 번 커밋돼요
+      - 다른 그룹이 대신 처리해요
+    answer: 0
+    explain: 다시 뜨면 커밋된 다음 위치부터 읽어서, 처리 못 한 이벤트를 건너뛰어요. 최대 한 번이에요.
+  - id: not-dedup-method
+    type: choice
+    prompt: 받는 쪽이 중복 이벤트를 견디게 만드는 방법이 아닌 것은?
+    choices:
+      - 프로듀서의 재시도 횟수를 늘려요
+      - 처리한 이벤트 ID를 기록해 두고, 다시 오면 건너뛰어요
+      - 잔액에 1,000원을 더하는 대신, 잔액을 5,000원으로 바꾸는 작업으로 만들어요
+      - 결과를 같은 키로 덮어써요
+    answer: 0
+    explain: 재시도를 늘리면 오히려 중복이 더 생길 수 있어요. 두 번 해도 결과가 같게 만드는 게 핵심이에요.
+  - id: eos-not-external-db
+    type: ox
+    prompt: Kafka 트랜잭션으로 정확히 한 번을 켜면, 결과를 쓰는 바깥 데이터베이스에도 한 번만 쓰이나요?
+    answer: false
+    explain: 정확히 한 번은 Kafka에서 읽고 Kafka에 쓰는 흐름까지예요. 바깥 시스템은 함께 맞춰야 해서 Kafka 혼자 보장하지 못해요.

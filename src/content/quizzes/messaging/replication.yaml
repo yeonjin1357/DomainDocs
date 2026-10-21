@@ -1,0 +1,42 @@
+questions:
+  - id: isr-lag-time
+    type: choice
+    prompt: 팔로워가 기본 설정에서 얼마 동안 리더를 따라잡지 못하면 ISR에서 빠질까요?
+    choices:
+      - 30초
+      - 5초
+      - 5분
+      - 빠지지 않아요
+    answer: 0
+    explain: replica.lag.time.max.ms 기본값이 30초예요. 나중에 다시 따라잡으면 ISR로 돌아와요.
+  - id: unclean-election-off
+    type: ox
+    prompt: ISR의 복제본이 모두 죽으면, Kafka는 기본 설정에서 아무 복제본이나 먼저 살아난 것을 바로 리더로 뽑나요?
+    answer: false
+    explain: 기본값은 unclean leader election을 끈 상태라, ISR 복제본이 돌아올 때까지 기다려요. 잃는 것보다 멈추는 쪽을 골라요.
+  - id: offline-partition
+    type: choice
+    prompt: OfflinePartitionsCount가 1이에요. 무슨 뜻일까요?
+    choices:
+      - 리더가 없는 파티션이 있어 그 파티션으로 쓰지도 읽지도 못해요
+      - 복제가 조금 늦어지고 있어요
+      - 모든 파티션이 정상이에요
+      - 활성 컨트롤러가 둘이에요
+    answer: 0
+    explain: 쓸 수 없는 파티션은 1개라도 바로 봐야 해요. 복제가 모자란 것과는 달라요.
+  - id: rf-one-risk
+    type: choice
+    prompt: 복제 계수를 1로 둔 운영 토픽에는 어떤 위험이 있을까요?
+    choices:
+      - 브로커 하나만 멈춰도 그 파티션을 쓸 수 없어요
+      - 디스크를 세 배로 써요
+      - 쓰기가 크게 느려져요
+      - 이벤트 순서가 깨져요
+    answer: 0
+    explain: 복제본이 하나뿐이면 그 브로커가 멈추는 순간 넘겨받을 곳이 없어요. 운영에서는 3이 흔해요.
+  - id: isr-name
+    type: input
+    prompt: 리더를 잘 따라오고 있어서, 리더가 죽으면 새 리더가 될 수 있는 복제본 묶음을 부르는 약어는?
+    answer: [ISR]
+    term: messaging/isr
+    explain: 이벤트는 ISR 모두가 받아야 커밋돼요. 그래서 ISR 안에서 새 리더를 뽑으면 커밋된 이벤트를 잃지 않아요.

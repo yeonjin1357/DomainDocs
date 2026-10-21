@@ -1,0 +1,41 @@
+questions:
+  - id: order-per-partition
+    type: ox
+    prompt: 한 토픽의 이벤트는, 파티션이 달라도 쓴 순서대로 읽히나요?
+    answer: false
+    explain: 순서는 한 파티션 안에서만 지켜져요. 파티션끼리는 무엇이 먼저 읽힐지 정해져 있지 않아요.
+  - id: key-keeps-order
+    type: choice
+    prompt: 같은 고객의 '주문'과 '취소' 이벤트 순서를 지키려면 어떻게 보낼까요?
+    choices:
+      - 고객 번호를 키로 붙여 같은 파티션에 들어가게 해요
+      - 키 없이 보내요
+      - 파티션 수를 늘려요
+      - 컨슈머 수를 늘려요
+    answer: 0
+    explain: 프로듀서는 키의 해시값으로 파티션을 골라서, 같은 키는 늘 같은 파티션으로 가요.
+  - id: max-consumers
+    type: choice
+    prompt: 파티션이 4개인 토픽을 한 컨슈머 그룹이 읽어요. 동시에 일하는 컨슈머는 최대 몇 개일까요?
+    choices:
+      - 4개
+      - 제한 없이 늘릴 수 있어요
+      - 1개
+      - 8개
+    answer: 0
+    explain: 그룹 안에서 파티션 하나는 컨슈머 하나만 맡아요. 파티션보다 많은 컨슈머는 맡을 파티션 없이 놀아요.
+  - id: no-shrink
+    type: ox
+    prompt: 토픽의 파티션 수는 나중에 줄일 수 있나요?
+    answer: false
+    explain: 늘릴 수는 있지만 줄일 수는 없어요. 그래서 처음에 넉넉히 잡아요.
+  - id: added-partitions-reorder
+    type: choice
+    prompt: 파티션을 늘린 뒤, 같은 고객 이벤트의 순서가 깨졌어요. 왜일까요?
+    choices:
+      - 키와 파티션의 짝이 바뀌어 같은 키가 다른 파티션으로 갔어요
+      - 브로커 하나가 죽었어요
+      - 오프셋이 0으로 초기화됐어요
+      - 보관 기간이 지나 이벤트가 지워졌어요
+    answer: 0
+    explain: 파티션 수가 바뀌면 키의 해시로 고른 파티션이 달라져요. 키로 순서를 지키는 토픽은 파티션 수를 바꿀 때 조심해요.

@@ -1,0 +1,46 @@
+questions:
+  - id: read-not-deleted
+    type: ox
+    prompt: 모든 컨슈머가 읽어 간 이벤트는, 보관 기간이 남았어도 지워지나요?
+    answer: false
+    explain: 이벤트는 읽혔는지와 상관없이 보관 기간 동안 남아요. 그래서 새 컨슈머도 예전 이벤트를 읽을 수 있어요.
+  - id: retention-default
+    type: choice
+    prompt: 토픽의 retention.ms를 따로 정하지 않으면, 기본 보관 기간은?
+    choices:
+      - 7일
+      - 1일
+      - 30일
+      - 제한 없음
+    answer: 0
+    explain: 기본은 7일이에요. 크기 제한인 retention.bytes는 기본으로 없어요.
+  - id: segment-granularity
+    type: choice
+    prompt: 보관 기간을 줄였는데 브로커 디스크가 바로 줄지 않아요. 왜일까요?
+    choices:
+      - 세그먼트를 통째로 지워서, 기간이 안 지난 이벤트가 하나라도 있으면 그 세그먼트는 남아요
+      - 설정이 아직 저장되지 않았어요
+      - 컨슈머가 그 이벤트를 읽고 있어서 지우지 못해요
+      - 복제본이 많아서 지우는 데 하루가 걸려요
+    answer: 0
+    explain: 지울 때는 세그먼트 파일 단위로 지워요. 활성 세그먼트도 닫히기 전에는 지우지 않아요.
+  - id: compact-latest
+    type: choice
+    prompt: 사용자마다 마지막으로 바뀐 이메일만 있으면 되는 토픽이에요. 맞는 정리 방식은?
+    choices:
+      - compact(로그 압축)
+      - delete
+      - retention.bytes만 걸기
+      - 아무것도 지우지 않기
+    answer: 0
+    explain: 로그 압축은 같은 키의 옛 이벤트를 지우고 키마다 마지막 값은 남겨요. 그래서 키가 꼭 있어야 해요.
+  - id: skipped-after-stop
+    type: choice
+    prompt: 오래 멈춰 있던 컨슈머가 다시 뜨자, 일부 이벤트를 건너뛰었어요. 왜일까요?
+    choices:
+      - 그사이 보관 기간이 지나 안 읽은 이벤트가 지워졌어요
+      - 리밸런스가 일어났어요
+      - 프로듀서의 멱등성이 꺼져 있었어요
+      - 프로듀서가 acks=0이었어요
+    answer: 0
+    explain: 보관 기간은 컨슈머가 읽어야 하는 마감이기도 해요. 지워진 뒤에는 auto.offset.reset에 따라 다른 위치로 건너뛰어요.

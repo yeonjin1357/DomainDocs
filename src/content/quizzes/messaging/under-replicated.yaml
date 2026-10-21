@@ -1,0 +1,41 @@
+questions:
+  - id: concentrated-broker
+    type: choice
+    prompt: 복제가 모자란 파티션들의 빠진 복제본이 모두 같은 브로커에 있어요. 무엇을 의심할까요?
+    choices:
+      - 그 브로커가 멈췄거나 아파요
+      - 클러스터 전체가 버거워요
+      - 프로듀서가 너무 많아요
+      - 컨슈머가 느려요
+    answer: 0
+    explain: 한 브로커에 몰렸다면 그 브로커 문제예요. 여러 브로커에 고루 퍼졌다면 클러스터 전체가 버거운 거예요.
+  - id: restart-transient
+    type: ox
+    prompt: 브로커를 재시작하는 동안, 복제가 모자란 파티션이 잠깐 생기는 건 정상인가요?
+    answer: true
+    explain: 재시작한 브로커의 팔로워가 다시 따라잡으면 ISR로 돌아오고 숫자는 0이 돼요.
+  - id: below-min-isr
+    type: choice
+    prompt: 파티션의 ISR이 토픽의 min.insync.replicas보다 적어지면 어떻게 될까요?
+    choices:
+      - acks=all로 쓰는 프로듀서의 쓰기가 실패해요
+      - 아무 영향이 없어요
+      - 컨슈머의 읽기가 멈춰요
+      - 파티션이 지워져요
+    answer: 0
+    explain: 이벤트를 잃지 않으려고 쓰기를 일부러 막아요. UnderMinIsrPartitionCount가 0이 아니면 바로 봐요.
+  - id: follower-flapping
+    type: choice
+    prompt: 브로커는 살아 있는데, 그 브로커의 팔로워들이 ISR에서 자꾸 빠졌다 돌아와요. 먼저 볼 것은?
+    choices:
+      - 그 브로커의 디스크 쓰기 지연과 네트워크 사용률
+      - 토픽의 이름
+      - 컨슈머 그룹 설정
+      - 프로듀서의 파티션 키
+    answer: 0
+    explain: 팔로워가 30초 동안 리더를 따라잡지 못하면 ISR에서 빠져요. 디스크나 네트워크가 버거우면 그래요.
+  - id: isr-shrinks-zero
+    type: ox
+    prompt: 브로커가 내려갔다 올라오는 때를 빼면, IsrShrinksPerSec는 0이어야 정상인가요?
+    answer: true
+    explain: Kafka 문서는 그 밖의 때에는 IsrShrinksPerSec와 IsrExpandsPerSec 모두 0이어야 한다고 해요.

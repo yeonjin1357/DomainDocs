@@ -1,0 +1,46 @@
+questions:
+  - id: not-enough-replicas
+    type: choice
+    prompt: 프로듀서가 NotEnoughReplicas 오류를 받아요. 어디를 고쳐야 할까요?
+    choices:
+      - 클러스터의 복제 부족(브로커와 팔로워)
+      - 프로듀서의 acks를 1로 낮추기
+      - 이벤트 크기 줄이기
+      - 프로듀서 버퍼 키우기
+    answer: 0
+    explain: ISR이 최소 수보다 적어 브로커가 일부러 막은 거예요. acks를 낮추면 이벤트를 잃을 수 있어요.
+  - id: error-after-retries
+    type: ox
+    prompt: 앱 로그에 프로듀서의 보내기 오류가 보였다면, 프로듀서가 이미 다시 보내기까지 해 보고 실패한 뒤인가요?
+    answer: true
+    explain: 프로듀서는 실패하면 알아서 다시 보내요. 그래서 오류 전에 늘어난 재시도 수를 함께 봐요.
+  - id: record-too-large
+    type: choice
+    prompt: RecordTooLargeException이 나요. 먼저 고려할 방법은?
+    choices:
+      - 큰 데이터는 저장소에 두고, 위치만 이벤트로 보내요
+      - 프로듀서의 acks를 바꿔요
+      - 토픽의 파티션을 늘려요
+      - 컨슈머를 늘려요
+    answer: 0
+    explain: 기본 한도는 대략 1MB예요. 한도를 늘린다면 프로듀서와 브로커(또는 토픽) 설정을 함께 맞춰야 해요.
+  - id: delivery-timeout
+    type: choice
+    prompt: 프로듀서가 기본 설정에서 다시 보내기를 되풀이하다 실패로 끝내기까지의 시간은?
+    choices:
+      - 2분
+      - 30초
+      - 5분
+      - 1시간
+    answer: 0
+    explain: delivery.timeout.ms 기본값이 2분이에요. 시간 초과가 났다면 그동안 내내 브로커가 제대로 답하지 못한 거예요.
+  - id: buffer-full
+    type: choice
+    prompt: 보내기 호출이 기다리다 실패하고, 프로듀서 버퍼의 남은 양이 0이에요. 먼저 볼 것은?
+    choices:
+      - 브로커가 느려진 원인
+      - buffer.memory를 바로 키우기
+      - 이벤트의 키
+      - 컨슈머의 지연
+    answer: 0
+    explain: 버퍼가 찬 건 대개 결과예요. 브로커로 보내는 속도가 느려져 쌓인 거라, 그 원인을 먼저 찾아요.

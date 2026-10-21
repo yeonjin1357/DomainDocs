@@ -1,0 +1,42 @@
+questions:
+  - id: acks-1-risk
+    type: choice
+    prompt: 프로듀서를 acks=1로 두면 어떤 위험이 있을까요?
+    choices:
+      - 리더가 확인한 직후, 복제되기 전에 죽으면 그 이벤트를 잃어요
+      - 복제본이 모두 받을 때까지 기다려서 너무 느려요
+      - 브로커가 받았는지조차 알 수 없어요
+      - 같은 이벤트가 반드시 두 번 써져요
+    answer: 0
+    explain: acks=1은 리더가 자기 로그에 쓸 때까지만 기다려요. 받았는지조차 모르는 건 acks=0이에요.
+  - id: min-isr-one
+    type: ox
+    prompt: acks=all인데 min.insync.replicas가 1이면, 복제본이 리더 하나로 줄어도 쓰기가 성공하나요?
+    answer: true
+    explain: 동기화된 복제본이 리더 하나뿐이어도 '모두'가 돼요. 그 리더가 죽으면 잃으니, 복제본 3개에 최소 2개를 흔히 함께 걸어요.
+  - id: linger-tradeoff
+    type: choice
+    prompt: 프로듀서의 linger.ms를 늘리면 어떻게 될까요?
+    choices:
+      - 더 크게 모여 처리량은 늘지만, 이벤트 하나가 도착하는 시간은 늦어져요
+      - 처리량이 줄고 도착도 늦어져요
+      - 모으던 이벤트가 사라질 수 있어요
+      - 같은 이벤트가 두 번 써져요
+    answer: 0
+    explain: linger.ms는 묶음을 채우려고 기다리는 최대 시간이에요. 오래 기다릴수록 크게 모이지만 그만큼 늦게 보내요.
+  - id: retry-rate-rising
+    type: choice
+    prompt: 프로듀서의 오류율은 0인데 record-retry-rate가 계속 올라요. 먼저 볼 곳은?
+    choices:
+      - 브로커와 네트워크
+      - 컨슈머의 지연
+      - 토픽 이름
+      - 파티션 키
+    answer: 0
+    explain: 재시도가 문제를 잠시 가리고 있을 수 있어요. 오류로 바뀌기 전에 브로커 상태부터 봐요.
+  - id: idempotent-name
+    type: input
+    prompt: 프로듀서가 다시 보내다 같은 이벤트를 두 번 쓰는 일을, 브로커가 순번으로 걸러 막는 기능은?
+    answer: [멱등성, 멱등성 프로듀서, 멱등 프로듀서, idempotent producer]
+    term: messaging/idempotent-producer
+    explain: 브로커가 프로듀서마다 ID를 주고 이벤트 순번으로 같은 이벤트를 걸러요. 지금은 기본으로 켜져 있어요.
