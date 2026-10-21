@@ -1,0 +1,135 @@
+---
+title: 설정과 저장소
+summary: 설정은 이미지 밖에 두고, 파드가 사라져도 남아야 할 데이터는 따로 빌린 저장소에 둬요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 70
+icon: container
+keywords: [ConfigMap, Secret, 시크릿, volume, 볼륨, emptyDir, PersistentVolume, PVC, StorageClass, access mode]
+related: [kubernetes/containers, kubernetes/workloads, server/filesystem-and-capacity]
+sources:
+  - title: Kubernetes — ConfigMaps
+    url: https://kubernetes.io/docs/concepts/configuration/configmap/
+  - title: Kubernetes — Secrets
+    url: https://kubernetes.io/docs/concepts/configuration/secret/
+  - title: Kubernetes — Volumes
+    url: https://kubernetes.io/docs/concepts/storage/volumes/
+  - title: Kubernetes — Persistent Volumes
+    url: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="설정은 이미지 밖에 둬요">
+    같은 이미지를 개발과 운영에 함께 쓰고, 환경마다 다른 설정은 ConfigMap으로 넣어요.
+  </Point>
+  <Point title="Secret은 기본으로 암호화가 아니에요">
+    비밀번호 같은 값은 Secret에 두지만, 기본 설정에서는 암호화 없이 저장돼요. 접근 권한을 막아야 해요.
+  </Point>
+  <Point title="남길 데이터는 빌린 저장소에 둬요">
+    컨테이너 안의 파일은 다시 시작하면 사라져요. 남겨야 하는 데이터는 PVC로 저장소를 빌려 써요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="화물과 운송장은 서로 떨어질 일이 거의 없지만, ConfigMap은 이미지와 따로 바뀌어서 '어떤 설정으로 돌았는지'를 따로 기록해야 해요.">
+  화물(이미지)은 그대로 두고, 운송장(설정)만 목적지에 맞게 바꿔 붙이는 것과 같아요. 오래 보관할 짐은 배에 두지 않고, 항구의 창고(저장소)를 빌려 맡겨요.
+</Analogy>
+
+## ConfigMap: 이미지 밖의 설정
+
+<Term term="kubernetes/configmap">ConfigMap</Term>은 비밀이 아닌 설정을 키-값으로 담는 객체예요. 파드는 이걸 환경 변수, 실행 인자, 볼륨 안의 설정 파일로 받아요.
+
+설정을 이미지 밖에 두면, 같은 이미지를 개발·검증·운영에 그대로 쓸 수 있어요. 바뀌는 건 환경마다 붙이는 ConfigMap뿐이에요. 다만 큰 데이터를 담는 용도는 아니라서, 1MiB를 넘을 수 없어요.
+
+ConfigMap을 고친 뒤 언제 반영되는지는 받는 방법에 따라 달라요.
+
+| 받는 방법 | 고치면 |
+| --- | --- |
+| 볼륨 안의 파일 | 시간이 조금 지나면 파일 내용이 바뀌어요 |
+| 환경 변수 | 자동으로 바뀌지 않아요. 파드를 다시 시작해야 해요 |
+
+볼륨 파일이 바뀌어도, 앱이 그 파일을 시작할 때 한 번만 읽는다면 앱은 그대로예요. 앱이 파일을 다시 읽는지도 함께 봐요.
+
+## Secret: 비밀 값
+
+<Term term="kubernetes/secret">Secret</Term>은 비밀번호, 토큰, 키처럼 민감한 값을 담는 객체예요. 이런 값을 이미지나 코드에 넣지 않으려고 써요.
+
+Secret에 넣는 값은 base64로 적어요. base64는 글자를 바꿔 적는 방식일 뿐 암호화가 아니라, 누구나 원래 값으로 되돌릴 수 있어요.
+
+쿠버네티스 문서는 Secret이 기본 설정에서 etcd에 암호화 없이 저장된다고 해요. API나 etcd에 접근할 수 있으면 Secret을 읽을 수 있어요. 한 네임스페이스에서 파드를 만들 수 있는 사람도 그 네임스페이스의 Secret을 읽을 수 있어요.
+
+## 컨테이너의 파일은 사라져요
+
+컨테이너 안에 쓴 파일은 컨테이너가 끝나면 사라져요. 컨테이너가 죽으면 kubelet은 깨끗한 상태에서 다시 시작해요. 그래서 남겨야 할 데이터를 컨테이너 안에 쓰면 안 돼요.
+
+가장 간단한 볼륨은 emptyDir이에요. 파드가 노드에 머무는 동안 남아서, 컨테이너가 죽었다 살아나도 데이터가 그대로예요. 하지만 파드가 노드에서 사라지면 emptyDir의 데이터도 영영 지워져요.
+
+## PV와 PVC: 저장소 빌리기
+
+파드보다 오래 남아야 하는 데이터는 따로 빌린 저장소에 둬요. 쿠버네티스는 이걸 둘로 나눠요.
+
+- <Term term="kubernetes/persistent-volume">PV</Term>(PersistentVolume)는 클러스터에 있는 저장소 한 조각이에요. 관리자가 만들거나 StorageClass로 자동으로 만들어요.
+- <Term term="kubernetes/pvc">PVC</Term>(PersistentVolumeClaim)는 사용자가 "10Gi짜리 저장소가 필요해요"라고 내는 요청서예요.
+
+파드가 노드의 CPU·메모리를 쓰듯, PVC는 PV를 써요. 파드는 PVC를 볼륨으로 붙이고, PVC가 묶인 PV가 실제 디스크로 이어져요.
+
+<Figure caption="파드는 PVC를 붙이고, PVC는 조건이 맞는 PV에 묶여요. PV는 파드와 따로 살아서, 파드가 바뀌어도 데이터가 남아요.">
+  <Flow
+    ariaLabel="파드가 PVC 10Gi를 붙이고, PVC가 PV에 묶이고, PV가 클라우드 디스크로 이어지는 구조도"
+    nodes={[
+      { id: 'pod', label: '파드', col: 0, row: 0 },
+      { id: 'pvc', label: 'PVC', col: 1, row: 0, tone: 'accent', note: '10Gi 요청' },
+      { id: 'pv', label: 'PV', col: 2, row: 0, note: '10Gi' },
+      { id: 'disk', label: '실제 디스크', col: 2, row: 1, note: '클라우드 디스크' },
+    ]}
+    edges={[
+      { from: 'pod', to: 'pvc' },
+      { from: 'pvc', to: 'pv', tone: 'accent' },
+      { from: 'pv', to: 'disk' },
+    ]}
+  />
+</Figure>
+
+PVC에는 크기와 함께 접근 모드를 적어요.
+
+| 접근 모드 | 뜻 |
+| --- | --- |
+| ReadWriteOnce | 노드 하나에서 읽고 써요. 같은 노드의 파드 여럿은 함께 쓸 수 있어요 |
+| ReadOnlyMany | 여러 노드에서 읽기만 해요 |
+| ReadWriteMany | 여러 노드에서 읽고 써요 |
+| ReadWriteOncePod | 클러스터 전체에서 파드 하나만 읽고 써요 |
+
+## PVC를 지우면 데이터는?
+
+PV에는 회수 정책이 있어요. Retain이면 PVC를 지워도 PV와 데이터가 남고, 사람이 직접 정리해요. Delete면 PV와 함께 바깥의 실제 저장소까지 지워요.
+
+StorageClass로 자동으로 만든 PV는 StorageClass의 정책을 따르고, 그 기본값이 Delete예요. 그래서 PVC 하나를 지운 것만으로 디스크와 데이터가 함께 사라질 수 있어요.
+
+## 모니터링에서는
+
+<Figure caption="한 PVC의 사용량 예시예요. 노드 디스크는 여유가 있지만, 데이터베이스가 쓰는 PVC는 거의 가득 찼어요.">
+  <StatTile label="노드 디스크" value="41" unit="%" />
+  <StatTile label="DB PVC 사용률" value="93" unit="%" tone="warn" note="10Gi 중 9.3Gi" />
+</Figure>
+
+PVC의 용량은 노드 디스크와 따로 봐요. 노드 디스크가 한가해도 PVC가 가득 차면 그 앱은 더 쓰지 못해요. 디스크 용량 읽는 법은 서버·OS의 <Term slug="server/filesystem-and-capacity">파일 시스템과 용량</Term>과 같아요.
+
+설정이 바뀐 시점도 기록해 둬요. 배포 없이 ConfigMap만 바뀌어도 앱의 동작이 달라질 수 있어요.
+
+<Checkpoints>
+  <Check>ConfigMap을 고쳤는데 앱이 그대로라면, 환경 변수로 받는지 보세요. 환경 변수는 파드를 다시 시작해야 바뀌어요.</Check>
+  <Check>Secret이 base64라서 안전하다고 판단했다면 다시 보세요. base64는 암호화가 아니에요. 접근 권한과 저장 암호화를 따로 챙겨요.</Check>
+  <Check>데이터베이스 데이터를 emptyDir에 두었다면 다시 보세요. 파드가 노드에서 사라지면 데이터도 함께 지워져요.</Check>
+  <Check>PVC를 지우기 전에는 회수 정책을 보세요. Delete면 실제 디스크와 데이터까지 사라져요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### Secret을 안전하게 쓰려면
+
+  쿠버네티스 문서는 저장할 때 Secret을 암호화하도록 켜고, Secret 접근 권한을 좁히라고 권해요. 바깥의 비밀 저장소를 함께 쓰는 방법도 있어요.
+
+  ### 볼륨의 다른 종류
+
+  볼륨에는 emptyDir 말고도 여러 종류가 있어요. 노드의 디렉터리를 붙이는 hostPath, ConfigMap·Secret을 파일로 붙이는 볼륨이 그 예예요. 파드보다 오래 남아야 할 데이터라면 PVC를 써요.
+</Deeper>

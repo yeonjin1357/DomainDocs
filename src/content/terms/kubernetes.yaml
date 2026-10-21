@@ -170,3 +170,53 @@ terms:
     aliases: [probe, liveness probe, readiness probe, startup probe, 헬스 체크, health check]
     short: kubelet이 컨테이너를 주기적으로 찔러 보는 검사예요. 결과에 따라 다시 시작하거나 요청을 끊어요.
     doc: kubernetes/pod-status
+  - id: service
+    name: 서비스
+    en: Service
+    aliases: [service, svc, ClusterIP, NodePort, LoadBalancer, 쿠버네티스 서비스]
+    short: 같은 일을 하는 파드 묶음 앞에 두는 고정 주소예요. 요청을 지금 떠 있는 파드로 넘겨요.
+    analogy: 어느 배가 떠 있든 화물을 받아 넘겨주는 항구 접수처와 같아요.
+    doc: kubernetes/services-and-ingress
+  - id: label
+    name: 레이블
+    en: Label
+    aliases: [label, labels, selector, 셀렉터, label selector]
+    short: 파드 같은 객체에 붙이는 키-값 이름표예요. 서비스와 워크로드가 이걸로 파드를 골라요.
+    doc: kubernetes/services-and-ingress
+  - id: ingress
+    name: 인그레스
+    en: Ingress
+    aliases: [ingress, ingress controller, 인그레스 컨트롤러, Gateway API, 게이트웨이]
+    short: 바깥에서 온 HTTP 요청을 호스트 이름과 경로에 따라 서비스로 넘기는 규칙이에요.
+    doc: kubernetes/services-and-ingress
+  - id: configmap
+    name: ConfigMap
+    en: ConfigMap
+    aliases: [configmap, 컨피그맵, config map]
+    short: 비밀이 아닌 설정을 키-값으로 담아, 이미지 밖에서 파드에 넣어 주는 객체예요.
+    doc: kubernetes/config-and-storage
+  - id: secret
+    name: Secret
+    en: Secret
+    aliases: [secret, 시크릿, secrets]
+    short: 비밀번호·토큰 같은 민감한 값을 담는 객체예요. 기본 설정에서는 암호화 없이 저장돼요.
+    doc: kubernetes/config-and-storage
+  - id: persistent-volume
+    name: PV
+    en: PersistentVolume
+    aliases: [PV, persistent volume, 퍼시스턴트 볼륨, StorageClass, 스토리지 클래스]
+    short: 클러스터에 있는 저장소 한 조각이에요. 파드와 따로 살아서, 파드가 바뀌어도 데이터가 남아요.
+    analogy: 항구에서 빌려 쓰는 창고 한 칸과 같아요.
+    doc: kubernetes/config-and-storage
+  - id: pvc
+    name: PVC
+    en: PersistentVolumeClaim
+    aliases: [PVC, persistent volume claim, 볼륨 클레임]
+    short: 크기와 접근 모드를 적어 내는 저장소 요청서예요. 조건이 맞는 PV에 묶여요.
+    doc: kubernetes/config-and-storage
+  - id: hpa
+    name: HPA
+    en: HorizontalPodAutoscaler
+    aliases: [HPA, horizontal pod autoscaler, 오토스케일러, autoscaler, 자동 확장]
+    short: 사용률 같은 지표를 보고 워크로드의 파드 수를 자동으로 늘리고 줄이는 객체예요.
+    doc: kubernetes/autoscaling

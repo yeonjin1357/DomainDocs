@@ -1,0 +1,137 @@
+---
+title: 서비스와 인그레스
+summary: 서비스는 바뀌는 파드들 앞에 고정 주소를 두고, 인그레스는 바깥 요청을 서비스로 이어요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 60
+icon: container
+keywords: [Service, 서비스, ClusterIP, NodePort, LoadBalancer, Ingress, 인그레스, Gateway API, label selector, kube-proxy]
+related: [kubernetes/pods-and-nodes, kubernetes/pod-status, network/addresses, apm/web-server-and-was]
+sources:
+  - title: Kubernetes — Service
+    url: https://kubernetes.io/docs/concepts/services-networking/service/
+  - title: Kubernetes — DNS for Services and Pods
+    url: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/
+  - title: Kubernetes — Ingress
+    url: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  - title: Kubernetes — Gateway API
+    url: https://kubernetes.io/docs/concepts/services-networking/gateway/
+  - title: Kubernetes — Labels and Selectors
+    url: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="서비스는 고정된 대표 주소예요">
+    파드는 바뀌고 IP도 바뀌어요. 서비스는 같은 일을 하는 파드들 앞에 바뀌지 않는 주소 하나를 둬요.
+  </Point>
+  <Point title="이름으로 찾아가요">
+    서비스마다 DNS 이름이 생겨서, 다른 파드는 IP 대신 서비스 이름으로 요청을 보내요.
+  </Point>
+  <Point title="바깥 HTTP 요청은 인그레스가 받아요">
+    인그레스는 호스트 이름과 경로를 보고, 클러스터 바깥에서 온 요청을 알맞은 서비스로 넘겨요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="접수처는 실제 건물이 있지만, 서비스의 주소는 노드마다 깔린 네트워크 규칙으로만 존재하는 가상의 주소예요.">
+  항구의 "냉동 화물 접수처"와 같아요. 화주는 지금 어느 배가 떠 있는지 몰라도 접수처로 보내요. 접수처가 지금 떠 있는 냉동선 중 하나로 화물을 넘겨줘요.
+</Analogy>
+
+## 왜 서비스가 필요할까
+
+파드는 원하는 상태에 맞춰 생기고 사라져요. 다시 뜬 파드는 IP가 달라요. 그래서 다른 파드가 "주문 처리 파드"의 IP를 적어 두고 부르면, 파드가 바뀌는 순간 요청이 끊겨요.
+
+<Term term="kubernetes/service">서비스</Term>는 같은 일을 하는 파드 묶음 앞에 바뀌지 않는 주소를 하나 둬요. 요청은 서비스 주소로 보내고, 서비스가 지금 떠 있는 파드 중 하나로 넘겨요.
+
+<Figure caption="주문 파드는 결제 서비스의 고정 주소로 요청해요. 서비스는 레이블이 app=pay인 파드 셋 중 하나로 요청을 넘겨요.">
+  <Flow
+    ariaLabel="주문 파드가 결제 서비스 10.96.0.20에 요청하고, 서비스가 레이블 app=pay인 결제 파드 세 개로 요청을 나누는 구조도"
+    nodes={[
+      { id: 'client', label: '주문 파드', col: 0, row: 1 },
+      { id: 'svc', label: '결제 서비스', col: 1, row: 1, tone: 'accent', note: '10.96.0.20' },
+      { id: 'p1', label: '결제 파드', col: 2, row: 0, note: 'app=pay' },
+      { id: 'p2', label: '결제 파드', col: 2, row: 1, note: 'app=pay' },
+      { id: 'p3', label: '결제 파드', col: 2, row: 2, note: 'app=pay' },
+    ]}
+    edges={[
+      { from: 'client', to: 'svc', tone: 'accent' },
+      { from: 'svc', to: 'p1' },
+      { from: 'svc', to: 'p2' },
+      { from: 'svc', to: 'p3' },
+    ]}
+  />
+</Figure>
+
+## 레이블로 파드를 골라요
+
+서비스는 어떤 파드로 보낼지 <Term term="kubernetes/label">레이블</Term>로 골라요. 레이블은 파드 같은 객체에 붙이는 키-값 이름표예요. 서비스에 `app: pay`라는 셀렉터를 적으면, 이 레이블이 붙은 파드가 모두 대상이 돼요.
+
+새 파드가 같은 레이블을 달고 뜨면 대상에 자동으로 들어가요. 파드가 사라지면 대상에서 빠져요. 지금 대상인 파드의 IP 목록은 EndpointSlice라는 객체에 따로 적혀요.
+
+준비가 안 된 파드는 대상에서 빠져요. readiness 프로브가 실패하면 그 파드의 IP가 EndpointSlice에서 빠지기 때문이에요. 프로브는 <Term slug="kubernetes/pod-status">파드 상태와 재시작</Term>에서 다뤄요.
+
+## 이름으로 찾아가요
+
+쿠버네티스는 서비스마다 <Term term="network/dns">DNS</Term> 이름을 만들어요. 이름은 `서비스.네임스페이스.svc.클러스터도메인` 꼴이고, 서비스의 IP로 풀려요.
+
+같은 네임스페이스 안에서는 서비스 이름만 써도 돼요. kubelet이 파드의 DNS 설정에 검색 도메인을 넣어 두기 때문이에요. 그래서 주문 파드는 그냥 `http://pay`로 결제 서비스를 불러요.
+
+## 서비스의 종류
+
+| 종류 | 어디서 닿나요 | 쓰임 |
+| --- | --- | --- |
+| ClusterIP | 클러스터 안에서만 | 기본값이에요. 파드끼리 부를 때 써요 |
+| NodePort | 모든 노드 IP의 고정 포트 | 노드 주소로 바깥에서 닿게 해요. 포트는 기본 30000~32767이에요 |
+| LoadBalancer | 바깥 로드 밸런서 | 보통 클라우드가 로드 밸런서를 만들어 줘요 |
+| ExternalName | 바깥의 다른 이름 | 클러스터 밖 서비스에 클러스터 안 이름을 붙여요 |
+
+ClusterIP의 주소는 실제 장비에 붙은 주소가 아니에요. 노드마다 도는 kube-proxy가 네트워크 규칙을 깔아서, 이 주소로 가는 요청을 뒤의 파드 중 하나로 보내요.
+
+## 인그레스: 바깥 요청의 입구
+
+<Term term="kubernetes/ingress">인그레스</Term>는 클러스터 바깥에서 오는 HTTP 요청을 받아 서비스로 넘기는 규칙이에요. 호스트 이름과 경로를 보고 나누고, HTTPS의 TLS 처리도 맡을 수 있어요.
+
+<Figure caption="인그레스 컨트롤러가 바깥 요청을 받아 경로를 봐요. /api는 API 서비스로, 나머지는 웹 서비스로 넘겨요.">
+  <Flow
+    ariaLabel="사용자의 요청이 인그레스 컨트롤러로 들어와, /api 경로는 API 서비스로, 나머지 경로는 웹 서비스로 가는 구조도"
+    nodes={[
+      { id: 'user', label: '사용자', col: 0, row: 1 },
+      { id: 'ing', label: '인그레스', col: 1, row: 1, tone: 'accent', note: '경로를 봐요' },
+      { id: 'api', label: 'API 서비스', col: 2, row: 0, note: '/api' },
+      { id: 'web', label: '웹 서비스', col: 2, row: 2, note: '/' },
+    ]}
+    edges={[
+      { from: 'user', to: 'ing', tone: 'accent' },
+      { from: 'ing', to: 'api' },
+      { from: 'ing', to: 'web' },
+    ]}
+  />
+</Figure>
+
+인그레스는 규칙일 뿐이라, 이 규칙대로 요청을 실제로 받는 인그레스 컨트롤러가 따로 있어야 해요. 컨트롤러 없이 인그레스만 만들면 아무 일도 일어나지 않아요. 컨트롤러는 대개 <Term term="apm/reverse-proxy">리버스 프록시</Term> 소프트웨어예요.
+
+쿠버네티스 프로젝트는 이제 인그레스 대신 Gateway API를 쓰라고 권해요. 인그레스 API는 더 바꾸지 않기로 했지만, 없애지는 않아요. 그래서 지금도 많은 클러스터가 인그레스를 써요.
+
+## 모니터링에서는
+
+서비스는 파드가 바뀌어도 이름이 그대로예요. 그래서 요청 수와 응답시간, 오류는 파드보다 서비스 단위로 묶어 봐야 흐름이 이어져요.
+
+서비스 뒤에 준비된 파드가 몇 개인지도 함께 봐요. 0개면 서비스 주소는 있어도 요청을 받을 파드가 없어서 요청이 실패해요.
+
+<Checkpoints>
+  <Check>서비스로 보낸 요청이 어디에도 닿지 않는다면, 서비스의 셀렉터와 파드의 레이블이 정확히 같은지 보세요. 글자 하나만 달라도 대상이 0개가 돼요.</Check>
+  <Check>파드가 Running인데 서비스 요청을 안 받는다면, Ready인지 보세요. 준비가 안 된 파드는 서비스 대상에서 빠져요.</Check>
+  <Check>인그레스를 만들었는데 바깥에서 닿지 않는다면, 인그레스 컨트롤러가 클러스터에 있는지부터 보세요.</Check>
+  <Check>서비스 맵이 파드 IP마다 따로 노드를 그린다면 다시 보세요. 파드가 바뀔 때마다 노드가 늘어나니, 서비스 이름으로 묶어 그려요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 헤드리스 서비스
+
+  클러스터 IP 없이 만든 서비스를 헤드리스 서비스라고 해요. 이 서비스의 DNS 이름은 서비스 IP 하나가 아니라, 대상 파드들의 IP 목록으로 풀려요. StatefulSet처럼 파드마다 따로 찾아가야 할 때 써요.
+
+  ### NodePort와 ClusterIP
+
+  NodePort 서비스를 만들면 쿠버네티스는 클러스터 IP도 함께 만들어요. ClusterIP 서비스를 만들 때와 똑같은 주소예요. 그래서 NodePort 서비스는 클러스터 안에서도 이 주소로 부를 수 있어요.
+</Deeper>

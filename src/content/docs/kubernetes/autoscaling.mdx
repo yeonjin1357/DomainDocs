@@ -1,0 +1,116 @@
+---
+title: 자동 확장
+summary: HPA는 사용률을 보고 파드 수를 늘리고 줄여요. 늘릴 땐 바로, 줄일 땐 지켜본 뒤예요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 80
+icon: container
+keywords: [HPA, HorizontalPodAutoscaler, autoscaling, 자동 확장, 오토스케일링, scale out, 수평 확장, 수직 확장, Metrics Server, minReplicas]
+related: [kubernetes/workloads, kubernetes/requests-and-limits, kubernetes/pod-status]
+sources:
+  - title: Kubernetes — Horizontal Pod Autoscaling
+    url: https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/
+  - title: Kubernetes — Node Autoscaling
+    url: https://kubernetes.io/docs/concepts/cluster-administration/node-autoscaling/
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="파드 수를 바꿔요">
+    부하가 늘면 같은 파드를 더 띄우고, 줄면 내려요. 파드 하나의 CPU·메모리를 키우는 방식과는 달라요.
+  </Point>
+  <Point title="사용률은 요청 대비예요">
+    "CPU 60%"는 노드의 60%가 아니라, 컨테이너가 요청한 CPU의 60%예요. 요청이 없으면 계산이 안 돼요.
+  </Point>
+  <Point title="늘릴 땐 빠르게, 줄일 땐 천천히">
+    기본 설정에서 늘리는 건 바로 하고, 줄이는 건 5분 동안 지켜본 뒤에 해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="배는 항구가 준비해 두지만, HPA는 파드만 늘려요. 파드를 놓을 노드 자리가 없으면 새 파드는 Pending으로 기다려요.">
+  화물이 몰리면 같은 컨테이너 묶음을 더 싣고, 한가해지면 줄이는 것과 같아요. 다만 한가해졌다고 바로 줄이지 않고, 잠시 지켜본 뒤 정말 한가할 때 줄여요.
+</Analogy>
+
+## 수평 확장과 수직 확장
+
+<Figure caption="수평 확장은 파드 수를, 수직 확장은 파드 하나의 크기를 바꿔요. HPA는 수평 확장을 해요.">
+  <Compare
+    columns={['수평 확장', '수직 확장']}
+    rows={[
+      { label: '바꾸는 것', values: ['파드 수', '파드 하나의 CPU·메모리'] },
+      { label: '예', values: ['파드 3개 → 6개', '요청 1코어 → 2코어'] },
+      { label: '맞는 앱', values: ['파드끼리 일을 나눌 수 있는 앱', '나눠 돌리기 어려운 앱'] },
+    ]}
+  />
+</Figure>
+
+<Term term="kubernetes/hpa">HPA</Term>(HorizontalPodAutoscaler)는 Deployment나 StatefulSet 같은 워크로드의 파드 수를 자동으로 바꿔요. 부하가 늘면 파드를 더 띄워 일을 나눠요. 최소·최대 파드 수를 정해 두면 그 범위 안에서만 움직여요.
+
+## 몇 개로 바꿀지 계산해요
+
+HPA는 기본 15초마다 지표를 보고, 원하는 파드 수를 이렇게 계산해요.
+
+```text
+원하는 파드 수 = 올림(지금 파드 수 × 지금 값 ÷ 목표 값)
+```
+
+<Figure caption="파드 4개의 평균 CPU 사용률이 90%인데 목표가 60%예요. 4 × 90 ÷ 60 = 6이라 파드를 6개로 늘려요.">
+  <StatTile label="지금 파드" value="4" unit="개" />
+  <StatTile label="평균 CPU 사용률" value="90" unit="%" tone="warn" note="목표 60%" />
+  <StatTile label="원하는 파드" value="6" unit="개" tone="accent" />
+</Figure>
+
+여기서 CPU 사용률은 컨테이너가 요청한 CPU 대비 퍼센트예요. 요청이 0.5코어인데 0.45코어를 쓰면 90%예요. 그래서 파드의 컨테이너 중 하나라도 CPU 요청이 없으면 사용률을 못 정해, HPA가 그 지표로는 아무것도 하지 않아요.
+
+지금 값과 목표 값의 비율이 1에 가까우면 바꾸지 않아요. 기본 허용 범위는 0.1이라, 비율이 0.9에서 1.1 사이면 그대로 둬요. 작은 흔들림마다 파드 수가 바뀌지 않게 하려는 거예요.
+
+## 늘릴 땐 바로, 줄일 땐 천천히
+
+<Figure caption="1분 간격의 예시예요. 필요한 파드 수가 2개에서 6개로 오르자 바로 따라 늘고, 다시 2개로 내려가도 5분을 지켜본 뒤에 줄여요.">
+  <MiniLineChart
+    ariaLabel="필요한 파드 수가 2에서 6으로 올랐다가 다시 2로 내려가고, 실제 파드 수는 오를 때 바로 따라가지만 내려갈 때는 5분 늦게 2로 줄어드는 그래프"
+    yMax={7}
+    series={[
+      { label: '필요한 파드', values: [2, 2, 4, 6, 6, 2, 2, 2, 2, 2, 2, 2], tone: 'sub', value: '2 → 6 → 2개' },
+      { label: '실제 파드', values: [2, 2, 4, 6, 6, 6, 6, 6, 6, 6, 2, 2], tone: 'accent', value: '5분 뒤 줄어요' },
+    ]}
+  />
+</Figure>
+
+기본 설정에서 늘릴 때는 기다리지 않아요. 15초마다 4개와 지금 수의 100% 중 큰 쪽만큼까지 늘릴 수 있어요.
+
+줄일 때는 지난 5분(300초) 동안 계산한 값 중 가장 큰 값을 따라요. 그래서 부하가 잠깐 내려갔다 다시 오르는 상황에서도 파드 수가 출렁이지 않아요. 이 5분을 안정화 창(stabilization window)이라고 해요.
+
+## 지표는 어디서 오나요
+
+CPU·메모리 사용량은 Metrics Server가 모아 HPA에 줘요. Metrics Server는 따로 설치해야 해요. 요청 수나 큐 길이 같은 다른 지표로 확장하려면, 그 지표를 HPA에 넘겨주는 구성 요소가 더 필요해요.
+
+## 노드가 모자라면
+
+HPA는 파드만 늘려요. 새 파드를 놓을 노드에 자리가 없으면 파드는 Pending으로 기다려요.
+
+이때 노드 자체를 늘리는 건 노드 자동 확장 기능이 맡아요. 놓을 곳이 없는 파드가 생기면 클라우드에 가상 머신을 더 만들어 노드로 붙여요. 그래서 새 노드가 준비될 때까지 시간이 더 걸려요.
+
+## 모니터링에서는
+
+HPA 화면은 지금 지표와 목표, 지금 파드 수와 원하는 파드 수를 함께 보여 줘요. 원하는 파드 수가 최대값에 붙어 있다면, 더 늘릴 수 없는 상태예요.
+
+파드 수 그래프는 요청량, 응답시간 그래프와 같은 시간축에 놓고 봐요. 파드가 늘기 전에 응답시간이 먼저 튀었다면, 확장이 부하를 따라가지 못한 거예요.
+
+<Checkpoints>
+  <Check>파드 수가 최대값에 붙어 있다면 다시 보세요. 부하가 더 늘어도 파드가 늘지 않아 응답이 느려질 수 있어요.</Check>
+  <Check>HPA가 전혀 움직이지 않는다면, 컨테이너에 CPU 요청이 적혀 있는지와 Metrics Server가 도는지부터 보세요.</Check>
+  <Check>HPA가 파드를 늘렸는데 새 파드가 Pending이라면, 노드에 자리가 없는 거예요. 노드 자동 확장이 켜져 있는지 보세요.</Check>
+  <Check>부하가 끝났는데 파드가 그대로라고 이상하게 여겼다면 다시 보세요. 기본 설정에서는 5분을 지켜본 뒤에 줄여요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 계산식 예시
+
+  쿠버네티스 문서의 예시예요. 지금 값이 200m이고 목표가 100m이면 비율이 2라서 파드 수를 두 배로 늘려요. 지금 값이 50m이면 비율이 0.5라서 절반으로 줄여요.
+
+  ### 0개까지 줄이기
+
+  최소 파드 수를 0으로 두면, 부하가 없을 때 파드를 모두 내릴 수도 있어요. 다만 CPU 같은 파드 자원 지표만으로는 안 되고, 바깥 지표 같은 다른 지표가 하나 이상 있어야 해요.
+</Deeper>
