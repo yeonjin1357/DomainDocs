@@ -1,0 +1,133 @@
+---
+title: 복제
+summary: 복제는 주 서버의 변경 로그를 다른 서버로 보내, 같은 데이터를 한 벌 더 두는 일이에요.
+domain: database
+type: concept
+stage: basics
+order: 80
+icon: database
+keywords: [replication, 복제, primary, standby, replica, 레플리카, failover, 동기 복제, 비동기 복제, Data Guard]
+related: [database/replication-lag, database/logs-and-recovery, database/transactions, database/overview]
+sources:
+  - title: PostgreSQL — Log-Shipping Standby Servers (streaming, synchronous replication)
+    url: https://www.postgresql.org/docs/current/warm-standby.html
+  - title: PostgreSQL — Hot Standby
+    url: https://www.postgresql.org/docs/current/hot-standby.html
+  - title: MySQL 8.4 — Replication
+    url: https://dev.mysql.com/doc/refman/8.4/en/replication.html
+  - title: MySQL 8.4 — The Binary Log
+    url: https://dev.mysql.com/doc/refman/8.4/en/binary-log.html
+  - title: SQL Server — Availability modes for an availability group
+    url: https://learn.microsoft.com/en-us/sql/database-engine/availability-groups/windows/availability-modes-always-on-availability-groups
+  - title: Oracle Data Guard Concepts 19c — Introduction to Oracle Data Guard
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/sbydb/introduction-to-oracle-data-guard-concepts.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="복제는 로그를 보내 따라 하게 해요">
+    주 서버가 변경 로그를 보내면, 복제 서버가 받아 같은 변경을 다시 적용해요.
+  </Point>
+  <Point title="동기냐 비동기냐가 갈림길이에요">
+    동기는 복제 서버가 받았다고 해야 커밋을 끝내요. 비동기는 빠르지만, 주 서버가 죽으면 최근 커밋을 잃을 수 있어요.
+  </Point>
+  <Point title="복제 서버는 조금 늦어요">
+    복제 서버로 읽기를 나눌 수 있어요. 다만 방금 쓴 값이 아직 도착하지 않았을 수 있어요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="분점은 본점 장부를 따라 적을 뿐, 보통 주문을 직접 받지 않아요(읽기만 해요). 전달이 늦으면 분점 장부는 몇 줄 뒤처져요.">
+  본점 주방의 주문 장부를 분점이 실시간으로 받아 그대로 따라 적는 것과 같아요. 본점에 불이 나도 분점 장부를 보고 이어서 장사할 수 있어요.
+</Analogy>
+
+## 왜 복제하나요
+
+- 장애에 대비해요. 주 서버가 죽으면 복제 서버가 주 서버 역할을 넘겨받아요. 이를 <Term term="database/failover">장애 조치</Term>라고 불러요.
+- 읽기를 나눠요. 복제 서버에서 조회를 돌리면 주 서버의 부담이 줄어요.
+- 멀리 떨어진 곳에 사본을 둬요. 데이터센터 하나가 통째로 멈춰도 다른 곳에 데이터가 남아요.
+
+## 로그를 보내 따라 해요
+
+<Figure caption="앱은 주 서버에 쓰고, 조회는 복제 서버로도 보낼 수 있어요. 주 서버는 쌓이는 로그를 복제 서버로 보내요.">
+  <Flow
+    ariaLabel="앱이 주 서버에 쓰고 복제 서버에서 읽으며, 주 서버가 복제 서버로 로그를 보내는 구조도"
+    nodes={[
+      { id: 'app', label: '앱', col: 0, row: 1 },
+      { id: 'primary', label: '주 서버', col: 2, row: 0, note: '읽기·쓰기', tone: 'accent' },
+      { id: 'standby', label: '복제 서버', col: 2, row: 2, note: '읽기만' },
+    ]}
+    edges={[
+      { from: 'app', to: 'primary', label: '쓰기' },
+      { from: 'app', to: 'standby', label: '읽기', dashed: true },
+      { from: 'primary', to: 'standby', label: '로그 전송', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+복제의 재료는 <Term slug="database/logs-and-recovery">로그와 복구</Term>에서 본 그 로그예요. 주 서버는 변경을 로그에 적는 대로 복제 서버에 보내요. 복제 서버는 받은 로그를 다시 적용해 주 서버와 같은 데이터를 만들어요.
+
+| DB | 복제 기능 | 보내는 로그 |
+| --- | --- | --- |
+| PostgreSQL | 스트리밍 복제 | WAL |
+| MySQL | 복제(replication) | 바이너리 로그 |
+| Oracle | Data Guard | 리두 로그 |
+| SQL Server | Always On 가용성 그룹 | 트랜잭션 로그 |
+
+## 동기와 비동기
+
+복제에서 가장 중요한 선택은 커밋을 언제 끝내느냐예요. PostgreSQL과 MySQL의 복제는 기본이 비동기예요.
+
+<Figure caption="동기는 잃지 않는 대신 커밋이 느려지고, 비동기는 빠른 대신 주 서버가 죽으면 최근 커밋을 잃을 수 있어요.">
+  <Compare
+    columns={['동기 복제', '비동기 복제']}
+    rows={[
+      { label: '커밋 응답', values: ['복제 서버가 로그를 디스크에 적었다고 하면', '주 서버가 적으면 바로'] },
+      { label: '커밋 속도', values: ['복제 서버를 다녀오는 만큼 느려요', '빨라요'] },
+      { label: '주 서버가 죽으면', values: ['커밋한 데이터가 복제 서버에 있어요', '최근 커밋이 사라질 수 있어요'] },
+    ]}
+  />
+</Figure>
+
+<Term term="database/async-replication">비동기 복제</Term>에서는 주 서버가 로그를 보내기 전에 죽을 수 있어요. 그러면 앱은 커밋 완료를 받았는데, 넘겨받은 복제 서버에는 그 데이터가 없어요.
+
+<Term term="database/sync-replication">동기 복제</Term>는 이 위험을 막는 대신, 커밋마다 복제 서버까지 다녀오는 시간을 더 기다려요. 그래서 멀리 떨어진 복제 서버는 보통 비동기로 둬요.
+
+## 복제 서버는 조금 늦어요
+
+비동기 복제 서버에는 주 서버의 변경이 조금 늦게 도착해요. 같은 조회를 두 서버에서 동시에 돌리면 결과가 다를 수 있어요.
+
+그래서 방금 쓴 값을 복제 서버에서 바로 읽으면 옛 값이 나올 수 있어요. 이 늦음을 어떻게 재고 읽는지는 <Term slug="database/replication-lag">복제 지연</Term>에서 다뤄요.
+
+## 모니터링에서는
+
+<Figure caption="주문 DB 복제 현황 예시예요. 복제 서버가 주 서버보다 4.2초 늦고, 아직 보내지 못한 로그가 120MB 있어요.">
+  <StatTile label="복제 지연" value="4.2" unit="초" tone="warn" />
+  <StatTile label="보낼 로그" value="120" unit="MB" />
+</Figure>
+
+복제 화면에서는 복제 서버가 얼마나 늦는지, 보낼 로그가 얼마나 밀렸는지를 봐요. 숫자만큼 중요한 건 복제가 이어져 있는지예요. SQL Server는 복제 서버의 상태를 `SYNCHRONIZED`, `NOT SYNCHRONIZING`처럼 보여 줘요.
+
+<Checkpoints>
+  <Check>방금 쓴 값을 복제 서버에서 바로 읽는 코드라면 다시 보세요. 아직 도착하지 않아 옛 값이 나올 수 있어요. 방금 쓴 데이터는 주 서버에서 읽으세요.</Check>
+  <Check>비동기 복제인데 "복제가 있으니 데이터를 잃지 않는다"고 적힌 설계라면 다시 보세요. 주 서버가 죽기 직전의 커밋은 사라질 수 있어요.</Check>
+  <Check>복제 서버를 백업 대신으로 쓰는 설계라면 다시 보세요. 실수로 지운 데이터도 복제 서버에서 똑같이 지워져요.</Check>
+  <Check>복제 지연 그래프만 보는 화면이라면 복제 상태도 함께 보여 주세요. 복제가 끊기면 지연을 아예 잴 수 없을 수 있어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### PostgreSQL의 스트리밍 복제와 핫 스탠바이
+
+  복제 서버는 주 서버에 접속하고, 주 서버는 WAL이 생기는 대로 복제 서버로 흘려보내요. WAL 파일이 다 차기를 기다리지 않아요.
+
+  복제 서버에서 읽기 전용 조회를 돌리는 기능을 핫 스탠바이라고 불러요. 문서는 복제 서버의 데이터가 주 서버와 결국 같아진다(eventually consistent)고 해요.
+
+  ### SQL Server의 동기 커밋 시간 초과
+
+  SQL Server의 동기 복제 서버가 정해진 시간 안에 응답하지 않으면, 주 서버는 그 복제 서버를 실패로 표시하고 더는 기다리지 않아요. 복제 서버가 돌아오면 밀린 로그를 받아 다시 따라잡아요.
+
+  비동기 모드에서 넘겨받을 때는 강제 장애 조치만 할 수 있어요. 이때 주 서버가 아직 보내지 못한 로그는 잃어요.
+
+  ### Oracle Data Guard
+
+  Data Guard는 주 데이터베이스의 리두를 대기 데이터베이스로 보내고, 대기 쪽은 받은 리두를 적용해요. 이 적용을 Redo Apply라고 불러요. 주 데이터베이스가 실패하면 장애 조치로 대기 데이터베이스가 주 역할을 넘겨받아요.
+</Deeper>

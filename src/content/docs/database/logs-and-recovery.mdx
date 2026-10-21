@@ -1,0 +1,139 @@
+---
+title: 로그와 복구
+summary: DB는 바꾼 내용을 로그에 먼저 적어 두고, 장애가 나면 이 로그로 데이터를 되살려요.
+domain: database
+type: concept
+stage: basics
+order: 60
+icon: database
+keywords: [WAL, redo log, 리두 로그, transaction log, 트랜잭션 로그, crash recovery, 장애 복구, log file sync, PITR, 로그 백업]
+related: [database/transactions, database/memory-and-disk, database/replication, database/overview]
+sources:
+  - title: PostgreSQL — Write-Ahead Logging (WAL)
+    url: https://www.postgresql.org/docs/current/wal-intro.html
+  - title: PostgreSQL — WAL Configuration
+    url: https://www.postgresql.org/docs/current/wal-configuration.html
+  - title: SQL Server — Transaction log architecture and management guide
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-log-architecture-and-management-guide
+  - title: MySQL 8.4 — Redo Log
+    url: https://dev.mysql.com/doc/refman/8.4/en/innodb-redo-log.html
+  - title: MySQL 8.4 — The Binary Log
+    url: https://dev.mysql.com/doc/refman/8.4/en/binary-log.html
+  - title: Oracle Database Reference 19c — Descriptions of Wait Events (log file sync)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/descriptions-of-wait-events.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="로그는 변경을 순서대로 적은 기록이에요">
+    DB는 데이터 파일보다 로그에 먼저 적어요. 로그는 끝에 이어 붙이기만 해서 빨리 쓸 수 있어요.
+  </Point>
+  <Point title="장애가 나면 로그로 되살려요">
+    다시 켤 때 마지막 체크포인트부터 로그를 다시 적용해요. 끝나지 않은 트랜잭션은 되돌려요.
+  </Point>
+  <Point title="로그는 비워 줘야 해요">
+    더는 필요 없는 로그는 지우거나 다시 써요. 비우지 못하면 로그가 디스크를 채워요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="식당 장부는 계속 쌓아 둬도 되지만, DB 로그는 필요 없어진 앞부분을 지우거나 다시 써야 해요. 못 지우면 디스크가 가득 차요.">
+  주문 장부와 같아요. 요리를 시작하기 전에 주문을 장부 끝에 한 줄씩 적어요. 정전이 나도 장부를 보면 무엇을 덜 만들었는지 알 수 있어요.
+</Analogy>
+
+## 왜 로그에 먼저 적나요
+
+커밋할 때마다 바뀐 데이터 파일을 모두 디스크에 쓰면 느려요. 바뀐 블록이 파일 여기저기에 흩어져 있기 때문이에요. 그래서 DB는 바뀐 내용을 <Term term="database/wal">로그</Term>에만 확실히 적고, 데이터 파일은 나중에 써요.
+
+<Figure caption="커밋 때는 로그만 디스크에 확실히 쓰면 돼요. 로그는 한 줄로 이어 붙여서 데이터 파일보다 쓰기 비용이 훨씬 작아요.">
+  <Compare
+    columns={['데이터 파일', '로그']}
+    rows={[
+      { label: '쓰는 방식', values: ['흩어진 블록을 고쳐 써요', '끝에 이어 붙여요'] },
+      { label: '커밋할 때', values: ['바로 쓰지 않아도 돼요', '디스크에 꼭 써요'] },
+    ]}
+  />
+</Figure>
+
+이 원칙을 로그 선행 기록(write-ahead logging)이라고 불러요. 데이터 파일의 변경은 그 변경을 적은 로그가 디스크에 닿은 뒤에만 쓸 수 있어요.
+
+| DB | 로그 이름 |
+| --- | --- |
+| PostgreSQL | WAL |
+| Oracle | 리두 로그(redo log) |
+| MySQL InnoDB | 리두 로그(redo log) |
+| SQL Server | 트랜잭션 로그 |
+
+## 장애가 나면 이렇게 되살려요
+
+<Figure caption="평소에는 체크포인트 뒤의 변경이 로그에만 있어요. 장애 뒤에는 마지막 체크포인트부터 로그를 다시 적용해 장애 직전 상태로 돌아가요.">
+  <Flow
+    ariaLabel="평소에는 체크포인트, 로그 기록, 장애 순으로 흐르고, 복구 때는 마지막 체크포인트를 찾아 로그를 다시 적용해 장애 직전 상태로 돌아가는 구조도"
+    nodes={[
+      { id: 'cp', label: '체크포인트', col: 0, row: 0, note: '여기까지 파일에' },
+      { id: 'log', label: '로그 기록', col: 1, row: 0, note: '변경 1, 2, 3' },
+      { id: 'crash', label: '장애', col: 2, row: 0, tone: 'warn' },
+      { id: 'find', label: '시작점 찾기', col: 0, row: 1, note: '마지막 체크포인트' },
+      { id: 'redo', label: '로그 재적용', col: 1, row: 1, note: '변경 1, 2, 3' },
+      { id: 'back', label: '복구 완료', col: 2, row: 1, note: '장애 직전', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'cp', to: 'log' },
+      { from: 'log', to: 'crash' },
+      { from: 'cp', to: 'find', label: '여기부터', dashed: true },
+      { from: 'find', to: 'redo', tone: 'accent' },
+      { from: 'redo', to: 'back', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+DB를 다시 켜면 먼저 마지막 <Term term="database/checkpoint">체크포인트</Term>를 찾아요. 그 뒤로 로그에 적힌 변경을 차례로 다시 적용해서, 데이터 파일에 미처 못 쓴 변경을 채워요.
+
+커밋하지 못하고 끊긴 트랜잭션도 있어요. SQL Server 문서는 복구 때 이런 트랜잭션의 변경을 모두 되돌린다고 해요. MySQL InnoDB는 이 복구를 마친 뒤에야 연결을 받아요.
+
+## 로그는 비워 줘야 해요
+
+체크포인트가 지나면 그 앞의 로그는 장애 복구에 더는 필요 없어요. DB는 이 부분을 지우거나 새 로그로 다시 써요. 그런데 아직 다른 일에 필요한 로그는 지우지 못해요.
+
+- 아직 끝나지 않은 트랜잭션의 로그예요. 오래 열린 트랜잭션이 하나 있으면, 그 시작점 뒤의 로그를 모두 남겨 둬야 해요.
+- 백업이나 보관이 아직 안 된 로그예요. PostgreSQL은 보관 명령이 계속 실패하면 옛 WAL이 쌓여요. SQL Server는 전체 복구 모델에서 로그 백업을 해야 로그를 비워요.
+- 복제 서버가 아직 받지 못한 로그예요. 복제가 밀리면 보낼 로그가 남아요.
+
+이 중 하나라도 걸리면 로그가 계속 커지고, 끝내 디스크를 채워요. SQL Server는 로그를 더 늘릴 수 없으면 9002 오류를 내요.
+
+## 모니터링에서는
+
+<Figure caption="주문 DB의 로그 현황 예시예요. 로그 디스크가 92% 찼고, 커밋 한 번이 로그 쓰기를 평균 18ms 기다려요.">
+  <StatTile label="로그 디스크 사용" value="92" unit="%" tone="warn" />
+  <StatTile label="커밋당 로그 쓰기 대기" value="18" unit="ms" />
+</Figure>
+
+커밋은 로그가 디스크에 닿을 때까지 기다려요. 그래서 로그 디스크가 느리면 모든 커밋이 함께 느려져요. Oracle에서는 이 기다림이 `log file sync` 대기 이벤트로 보여요.
+
+로그 디스크 사용량이 계속 오르면 위의 세 가지 원인을 봐요. 오래 열린 트랜잭션은 <Term slug="database/transactions">트랜잭션과 커밋</Term>에서, 밀린 복제는 <Term slug="database/replication-lag">복제 지연</Term>에서 찾는 법을 봐요.
+
+<Checkpoints>
+  <Check>로그 파일이 커졌으니 지우자는 제안이라면 다시 보세요. 아직 복구나 백업, 복제에 필요한 로그를 지우면 DB를 되살릴 수 없어요. 먼저 왜 비워지지 않는지 찾으세요.</Check>
+  <Check>반복문 안에서 행마다 커밋하는 코드라면 다시 보세요. 커밋마다 로그를 디스크에 쓰고 기다려요. 적당한 크기로 묶어 커밋하세요.</Check>
+  <Check>커밋이 느려졌는데 CPU와 잠금은 평소라면 로그 쓰기 대기를 보세요. 로그 디스크가 느려지면 모든 쓰기가 함께 느려져요.</Check>
+  <Check>SQL Server DB를 전체 복구 모델로 두고 로그 백업을 하지 않는다면 다시 보세요. 로그가 비워지지 않고 계속 커져요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 백업과 로그로 원하는 시점까지
+
+  로그를 보관해 두면 장애 복구보다 더 많은 일을 할 수 있어요. 예전 백업을 복원하고, 보관한 로그를 원하는 시각까지만 다시 적용하면 그 시점의 데이터로 돌아가요. PostgreSQL은 이를 시점 복구(PITR)라고 불러요.
+
+  SQL Server는 끊기지 않은 로그 백업의 연결(log chain)이 있어야 장애 시점까지 복원할 수 있어요.
+
+  ### MySQL의 두 로그
+
+  MySQL에는 로그가 두 가지 있어요. InnoDB 리두 로그는 장애 복구용이에요. 바이너리 로그(binlog)는 데이터 변경 이벤트를 담아 복제와 시점 복구에 써요.
+
+  ### Oracle의 커밋
+
+  Oracle에서 커밋하면 세션이 LGWR(로그를 쓰는 백그라운드 프로세스)에 리두 기록을 부탁해요. LGWR이 다 쓰면 세션에 알려 주고, 그동안 세션은 `log file sync`로 기다려요.
+
+  ### SQL Server의 로그가 비워지는 때
+
+  단순 복구 모델에서는 체크포인트 뒤에 로그를 비워요. 전체 복구 모델에서는 로그 백업 뒤에 비워요. 어느 쪽이든 아직 끝나지 않은 트랜잭션의 로그는 남겨 둬요.
+</Deeper>

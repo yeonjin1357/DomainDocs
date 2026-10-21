@@ -106,6 +106,7 @@ terms:
     aliases: [redo, 리두 로그, redo log, 트랜잭션 로그]
     short: 바꾼 내용을 데이터 파일보다 먼저 적는 기록이에요. 장애 뒤 이 기록으로 되살려요.
     analogy: 요리를 내기 전에 주문 장부에 먼저 적어 두는 것과 같아요.
+    doc: database/logs-and-recovery
   - id: transaction
     name: 트랜잭션
     en: Transaction
@@ -182,3 +183,71 @@ terms:
     aliases: [checkpoint]
     short: 메모리의 더티 블록을 데이터 파일에 몰아 쓰는 때예요.
     doc: database/memory-and-disk
+  - id: row-lock
+    name: 행 잠금
+    en: Row lock
+    aliases: [row lock, row-level lock, 로우 락]
+    short: 행을 바꾸는 동안 다른 세션이 같은 행을 바꾸지 못하게 거는 잠금이에요.
+    doc: database/concurrency
+  - id: mvcc
+    name: MVCC
+    en: Multi-Version Concurrency Control
+    aliases: [다중 버전 동시성 제어, 다중 버전]
+    short: 한 행의 여러 버전을 두어 읽기와 쓰기가 서로를 기다리지 않게 하는 방식이에요.
+    analogy: 고치는 중인 문서 대신 마지막 저장본을 읽게 하는 것과 같아요.
+    doc: database/concurrency
+  - id: snapshot
+    name: 스냅숏
+    en: Snapshot
+    aliases: [snapshot, 스냅샷]
+    short: 한 시점에 커밋돼 있던 데이터로 고정해 보는 모습이에요.
+    doc: database/concurrency
+  - id: undo
+    name: 언두
+    en: Undo
+    aliases: [undo, 롤백 세그먼트, rollback segment, 언두 로그]
+    short: 바꾸기 전의 옛 값을 담아 두는 곳이에요. 롤백과 옛 버전 읽기에 써요.
+    doc: database/concurrency
+  - id: vacuum
+    name: VACUUM
+    en: Vacuum
+    aliases: [vacuum, 배큠, autovacuum]
+    short: PostgreSQL에서 아무도 보지 않는 옛 행 버전을 치워 자리를 다시 쓰게 하는 작업이에요.
+    doc: database/concurrency
+  - id: deadlock
+    name: 교착
+    en: Deadlock
+    aliases: [deadlock, 데드락, 교착 상태]
+    short: 두 트랜잭션이 서로 상대가 쥔 잠금을 기다려 둘 다 못 나아가는 상태예요.
+    doc: database/locks-and-blocking
+  - id: replication
+    name: 복제
+    en: Replication
+    aliases: [replication, 리플리케이션]
+    short: 주 서버의 변경 로그를 다른 서버로 보내 같은 데이터를 한 벌 더 두는 일이에요.
+    analogy: 본점 장부를 분점이 그대로 따라 적는 것과 같아요.
+    doc: database/replication
+  - id: standby
+    name: 복제 서버
+    en: Standby / Replica
+    aliases: [standby, replica, 레플리카, 스탠바이, 대기 서버, 슬레이브]
+    short: 주 서버의 로그를 받아 같은 데이터를 유지하는 서버예요. 보통 읽기만 해요.
+    doc: database/replication
+  - id: failover
+    name: 장애 조치
+    en: Failover
+    aliases: [failover, 페일오버]
+    short: 주 서버가 죽었을 때 복제 서버가 주 서버 역할을 넘겨받는 일이에요.
+    doc: database/replication
+  - id: sync-replication
+    name: 동기 복제
+    en: Synchronous replication
+    aliases: [synchronous replication, synchronous commit, 동기 커밋]
+    short: 복제 서버가 로그를 적었다고 확인해 줘야 커밋을 끝내는 복제예요.
+    doc: database/replication
+  - id: async-replication
+    name: 비동기 복제
+    en: Asynchronous replication
+    aliases: [asynchronous replication, 비동기 커밋]
+    short: 주 서버가 로그를 적으면 바로 커밋을 끝내고, 복제 서버에는 나중에 보내는 복제예요.
+    doc: database/replication

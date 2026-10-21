@@ -1,0 +1,127 @@
+---
+title: 동시에 읽고 쓰기
+summary: 여러 세션이 같은 데이터를 다룰 때, DB는 잠금과 여러 버전(MVCC)으로 서로 엉키지 않게 해요.
+domain: database
+type: concept
+stage: basics
+order: 70
+icon: layers
+keywords: [MVCC, 다중 버전, concurrency, 동시성, row lock, 행 잠금, snapshot, 스냅숏, VACUUM, undo]
+related: [database/locks-and-blocking, database/transactions, database/logs-and-recovery, database/active-sessions]
+sources:
+  - title: PostgreSQL — Concurrency Control, Introduction (MVCC)
+    url: https://www.postgresql.org/docs/current/mvcc-intro.html
+  - title: PostgreSQL — Explicit Locking
+    url: https://www.postgresql.org/docs/current/explicit-locking.html
+  - title: PostgreSQL — Routine Vacuuming
+    url: https://www.postgresql.org/docs/current/routine-vacuuming.html
+  - title: PostgreSQL — Transaction Isolation
+    url: https://www.postgresql.org/docs/current/transaction-iso.html
+  - title: PostgreSQL — SELECT (The Locking Clause)
+    url: https://www.postgresql.org/docs/current/sql-select.html
+  - title: Oracle Database Concepts 19c — Data Concurrency and Consistency
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/cncpt/data-concurrency-and-consistency.html
+  - title: MySQL 8.4 — InnoDB Multi-Versioning
+    url: https://dev.mysql.com/doc/refman/8.4/en/innodb-multi-versioning.html
+  - title: SQL Server — SET TRANSACTION ISOLATION LEVEL
+    url: https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql
+  - title: PostgreSQL — The Cumulative Statistics System (n_dead_tup, deadlocks)
+    url: https://www.postgresql.org/docs/current/monitoring-stats.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="같은 행을 함께 바꾸면 한쪽이 기다려요">
+    행을 바꾸는 쪽은 그 행에 잠금을 걸고 트랜잭션이 끝날 때까지 쥐어요. 뒤에 온 쪽은 기다려요.
+  </Point>
+  <Point title="읽는 쪽은 커밋된 버전을 봐요">
+    바뀌는 중인 행을 읽으면 DB는 커밋된 직전 버전을 보여 줘요. 그래서 읽기와 쓰기가 서로를 기다리지 않아요.
+  </Point>
+  <Point title="옛 버전은 나중에 치워요">
+    옛 버전은 볼 사람이 아무도 없을 때 치울 수 있어요. 오래 열린 트랜잭션이 있으면 치우지 못하고 쌓여요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="공유 문서 앱은 남이 고치는 중인 글자를 실시간으로 보여 주기도 해요. DB는 기본 설정에서 커밋 전 내용을 보여 주지 않아요.">
+  여럿이 함께 쓰는 공유 문서와 비슷해요. 한 사람이 문단을 고치는 동안, 다른 사람들은 마지막으로 저장된 문서를 읽어요. 같은 문단을 고치려는 두 번째 사람은 앞사람이 저장할 때까지 기다려요.
+</Analogy>
+
+## 같은 행을 바꾸면 기다려요
+
+두 세션이 같은 주문의 상태를 동시에 바꾸려 한다고 해 봐요. 먼저 온 세션이 그 행에 <Term term="database/row-lock">행 잠금</Term>을 걸어요. 뒤에 온 세션은 앞 세션의 트랜잭션이 끝날 때까지 기다려요.
+
+이 잠금은 같은 행을 바꾸려는 쪽만 막아요. 그 행을 읽기만 하는 쪽은 막지 않아요. 기다리는 세션이 줄줄이 이어지는 모습과 교착은 <Term slug="database/locks-and-blocking">잠금과 블로킹</Term>에서 다뤄요.
+
+## 읽기는 커밋된 버전을 봐요
+
+읽는 쪽까지 잠금을 기다리면, 쓰기가 많은 DB에서는 조회가 한참 멈춰요. 그래서 대부분의 DB는 한 행의 여러 버전을 함께 들고 있어요. 이 방식을 <Term term="database/mvcc">MVCC</Term>(다중 버전 동시성 제어)라고 불러요.
+
+<Figure caption="세션 A가 행을 바꾸는 동안 세션 B의 조회는 커밋된 옛 버전을 바로 받아요. 같은 행을 바꾸려는 B의 UPDATE만 A가 끝날 때까지 기다려요.">
+  <Sequence
+    ariaLabel="세션 A가 주문 42를 바꾸는 동안 세션 B의 조회는 옛 버전을 바로 받고, B의 수정은 A가 커밋할 때까지 기다리는 순서"
+    participants={['세션 A', '주문 42', '세션 B']}
+    messages={[
+      { from: '세션 A', to: '주문 42', label: 'UPDATE(잠금)' },
+      { from: '세션 B', to: '주문 42', label: 'SELECT' },
+      { from: '주문 42', to: '세션 B', label: '커밋된 옛 버전', dashed: true },
+      { from: '세션 B', to: '주문 42', label: 'UPDATE(대기)', tone: 'warn' },
+      { from: '세션 A', to: '주문 42', label: 'COMMIT', tone: 'accent' },
+      { from: '주문 42', to: '세션 B', label: '이제 진행', tone: 'accent', dashed: true },
+    ]}
+  />
+</Figure>
+
+읽는 쪽은 자기가 시작한 시점에 커밋돼 있던 데이터만 봐요. 이렇게 한 시점에 고정된 데이터를 <Term term="database/snapshot">스냅숏</Term>이라고 불러요.
+
+옛 버전을 어디에 두는지는 DB마다 달라요.
+
+| DB | 옛 버전을 두는 곳 |
+| --- | --- |
+| PostgreSQL | 테이블 안에 옛 행을 그대로 남겨요 |
+| Oracle | 언두(undo)에 옛 값을 따로 둬요 |
+| MySQL InnoDB | 언두 로그에 옛 값을 따로 둬요 |
+| SQL Server | 기본 설정에서는 버전을 쓰지 않아요 |
+
+SQL Server는 기본 설정(`READ_COMMITTED_SNAPSHOT` 꺼짐)에서 읽기에도 공유 잠금을 써요. 그래서 바뀌는 중인 행을 읽으려면 쓰는 쪽이 끝날 때까지 기다려요. 이 설정을 켜면 다른 DB처럼 행 버전을 읽어요.
+
+## 옛 버전은 나중에 치워요
+
+PostgreSQL에서 행을 바꾸거나 지워도 옛 버전은 바로 사라지지 않아요. 다른 트랜잭션이 아직 볼 수 있기 때문이에요. 볼 트랜잭션이 없어지면 <Term term="database/vacuum">VACUUM</Term>이 그 자리를 치워 다시 쓰게 해요.
+
+그런데 오래 열린 트랜잭션이 하나 있으면, 그 트랜잭션이 볼 수도 있는 옛 버전은 모두 남겨 둬야 해요. 그동안 테이블과 인덱스에 치우지 못한 옛 행이 쌓여 점점 커져요.
+
+## 모니터링에서는
+
+<Figure caption="주문 DB의 동시성 현황 예시예요. 같은 행을 기다리는 세션이 9개이고, 치우지 못한 옛 행이 120만 개 쌓였어요.">
+  <StatTile label="잠금 대기 세션" value="9" unit="개" tone="warn" />
+  <StatTile label="치우지 못한 옛 행" value="1.2" unit="백만 개" />
+</Figure>
+
+잠금 대기는 <Term slug="database/active-sessions">액티브 세션</Term>의 대기 종류로 보여요. PostgreSQL은 Lock, SQL Server와 Oracle은 잠금 관련 대기 이벤트로 나와요.
+
+PostgreSQL은 테이블마다 치우지 못한 옛 행 수(`n_dead_tup`)와 교착이 난 횟수(`deadlocks`)도 세어요. 옛 행이 계속 늘면 오래 열린 트랜잭션부터 찾아요.
+
+<Checkpoints>
+  <Check>잔액을 읽고 그 값으로 다시 쓰는 코드라면 다시 보세요. 두 요청이 같은 잔액을 읽고 각자 쓰면 한쪽 변경이 사라져요. 읽을 때 `SELECT … FOR UPDATE`로 잠그거나, `SET balance = balance - 10`처럼 한 문장으로 바꾸세요.</Check>
+  <Check>여러 행을 바꾸는 코드들이 서로 다른 순서로 잠근다면 다시 보세요. 교착이 생기기 쉬워요. 모든 코드가 같은 순서로 잠그게 하세요.</Check>
+  <Check>SQL Server에서 조회가 쓰기 때문에 자주 막힌다면 `READ_COMMITTED_SNAPSHOT` 설정을 보세요. 꺼져 있으면 읽기도 쓰기가 끝나길 기다려요.</Check>
+  <Check>PostgreSQL 테이블이 데이터는 그대로인데 계속 커진다면 오래 열린 트랜잭션을 찾으세요. 옛 행을 치우지 못하고 있을 수 있어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 스냅숏을 뜨는 시점
+
+  PostgreSQL의 기본 격리 수준(READ COMMITTED)에서는 문장마다 그 문장이 시작할 때의 스냅숏을 봐요. 그래서 한 트랜잭션 안에서도 두 번째 SELECT는 그 사이 커밋된 변경을 볼 수 있어요.
+
+  REPEATABLE READ에서는 트랜잭션의 첫 문장을 시작할 때 뜬 스냅숏을 끝까지 써요. 같은 SELECT를 여러 번 해도 결과가 같아요.
+
+  ### 행 잠금과 조회
+
+  PostgreSQL 문서는 행 잠금이 조회에 영향을 주지 않는다고 해요. 같은 행을 바꾸거나 잠그려는 쪽만 막아요. `SELECT … FOR UPDATE`는 읽은 행을 바꿀 때처럼 잠가서, 트랜잭션이 끝날 때까지 다른 트랜잭션이 그 행을 바꾸지 못하게 해요.
+
+  ### Oracle과 InnoDB의 언두
+
+  Oracle은 언두 세그먼트에 커밋 전이거나 최근 커밋된 변경의 옛 값을 둬요. 쓰는 중인 행을 읽으면 이 언두로 일관된 옛 모습을 만들어 보여 줘요. 그래서 Oracle 문서는 읽기와 쓰기가 서로를 막지 않는다고 해요.
+
+  MySQL InnoDB도 바뀐 행의 옛 정보를 언두 테이블스페이스의 롤백 세그먼트에 둬요. 이 정보로 롤백도 하고, 일관된 읽기를 위해 행의 옛 버전도 만들어요.
+</Deeper>
