@@ -1,0 +1,42 @@
+questions:
+  - id: schedule-by-request
+    type: choice
+    prompt: CPU 4코어 노드의 요청 합계가 3코어이고, 실제 사용은 1코어예요. CPU 1.5코어를 요청한 새 파드는 이 노드에 놓일까요?
+    choices:
+      - 놓이지 않아요
+      - 실제 사용이 1코어뿐이라 놓여요
+      - 1코어만 받고 놓여요
+      - 다른 파드를 쫓아내고 놓여요
+    answer: 0
+    explain: 스케줄러는 실제 사용량이 아니라 요청 합계로 자리를 따져요. 3 + 1.5가 4를 넘어서 이 노드에는 자리가 없어요.
+  - id: cpu-limit-throttles
+    type: choice
+    prompt: 컨테이너가 CPU 한도에 닿으면 어떻게 될까요?
+    choices:
+      - 실행이 잠깐씩 멈춰서 느려져요
+      - 컨테이너가 강제로 끝나요
+      - 노드에서 쫓겨나요
+      - 한도가 저절로 늘어나요
+    answer: 0
+    explain: CPU는 짧은 주기마다 쓸 몫을 다 쓰면 다음 주기까지 멈춰요. 메모리와 달리 CPU 때문에 끝나지는 않아요.
+  - id: avg-hides-throttling
+    type: ox
+    prompt: CPU 평균 사용률이 한도보다 낮으면, 스로틀링은 일어나지 않나요?
+    answer: false
+    explain: 기본 주기 100ms 안에서 몫을 다 쓰면 잠깐씩 멈춰요. 평균이 낮아도 순간적으로는 막힐 수 있어요.
+  - id: oomkilled-name
+    type: input
+    prompt: 컨테이너가 메모리 한도를 넘어 프로세스가 끝났을 때, 종료 이유로 남는 이름은?
+    answer: [OOMKilled]
+    term: kubernetes/oomkilled
+    explain: 메모리는 한도를 넘으면 프로세스가 끝나고, 쿠버네티스가 컨테이너를 다시 시작해요.
+  - id: besteffort-first
+    type: choice
+    prompt: 요청과 한도를 하나도 적지 않은 파드는 어떤 QoS 등급이 되고, 노드 메모리가 모자랄 때 어떻게 될까요?
+    choices:
+      - BestEffort가 되어 가장 먼저 쫓겨나요
+      - Guaranteed가 되어 가장 나중에 쫓겨나요
+      - Burstable이 되어 중간 순서로 쫓겨나요
+      - 등급이 없어서 쫓겨나지 않아요
+    answer: 0
+    explain: 아무것도 적지 않으면 BestEffort예요. 노드 메모리가 모자라면 kubelet이 BestEffort부터 쫓아내요.

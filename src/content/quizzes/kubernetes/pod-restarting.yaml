@@ -1,0 +1,46 @@
+questions:
+  - id: exit-137
+    type: choice
+    prompt: 직전 종료 이유가 OOMKilled이고 종료 코드가 137이에요. 137은 흔히 어떻게 읽을까요?
+    choices:
+      - 128에 강제 종료 신호 번호 9를 더한 값
+      - 메모리를 137MiB 썼다는 뜻
+      - 137번째 재시작이라는 뜻
+      - 앱이 직접 정한 오류 코드
+    answer: 0
+    explain: 신호를 받아 끝난 프로세스의 종료 코드는 흔히 128 + 신호 번호로 읽어요. 9는 강제 종료 신호예요.
+  - id: same-size-oom
+    type: choice
+    prompt: 컨테이너가 매번 같은 메모리 크기에서 OOMKilled로 끝나요. 알맞은 조치는?
+    choices:
+      - 한도를 앱에 필요한 만큼 늘리거나, 앱의 메모리 설정을 줄여요
+      - liveness 프로브를 꺼요
+      - 노드를 더 늘려요
+      - 이미지 태그를 latest로 바꿔요
+    answer: 0
+    explain: 매번 같은 크기라면 앱이 원래 그만큼 필요한 거예요. 실행할수록 바닥이 높아진다면 그때는 누수를 의심해요.
+  - id: oom-with-free-node
+    type: ox
+    prompt: 컨테이너가 OOMKilled로 끝났는데 노드 메모리는 여유로워요. 이상한 일인가요?
+    answer: false
+    explain: 컨테이너 메모리 한도는 노드 여유와 상관없이 걸려요. 한도를 넘으면 노드에 메모리가 남아도 끝나요.
+  - id: all-pods-restart
+    type: choice
+    prompt: 같은 Deployment의 파드가 모두 함께 재시작하기 시작했어요. 먼저 볼 것은?
+    choices:
+      - 새 배포, 설정 변경, 바깥 의존성 같은 공통 원인
+      - 파드 하나의 로그만
+      - 노드 하나의 디스크
+      - 파드 하나의 IP 주소
+    answer: 0
+    explain: 모두 함께라면 모두에게 함께 일어난 변화가 원인일 가능성이 커요. 배포 시각과 재시작 시각을 맞춰 봐요.
+  - id: probe-killing
+    type: choice
+    prompt: 파드 이벤트에 Unhealthy와 Killing이 되풀이돼요. 무엇이 컨테이너를 다시 시작시키고 있을까요?
+    choices:
+      - liveness 프로브 실패
+      - 메모리 한도 초과
+      - 앱이 스스로 종료
+      - 노드 재부팅
+    answer: 0
+    explain: liveness가 정한 횟수를 넘게 실패하면 kubelet이 컨테이너를 다시 시작해요. 시작이 느린 앱이라면 startup 프로브를 둬요.

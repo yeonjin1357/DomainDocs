@@ -1,0 +1,41 @@
+questions:
+  - id: empty-endpoints
+    type: choice
+    prompt: 서비스 pay의 EndpointSlice를 봤더니 대상 파드 IP가 하나도 없어요. 먼저 볼 것은?
+    choices:
+      - 서비스 셀렉터와 파드 레이블이 글자 그대로 같은지
+      - 노드의 디스크 사용률
+      - 이미지 태그
+      - HPA 설정
+    answer: 0
+    explain: 셀렉터와 레이블이 조금만 달라도 대상이 0개가 돼요. 파드가 준비되지 않아 빠졌는지도 함께 봐요.
+  - id: target-port
+    type: choice
+    prompt: 이름도 풀리고 EndpointSlice에 파드 IP도 있는데 연결이 안 돼요. 다음에 볼 것은?
+    choices:
+      - 서비스의 targetPort가 앱이 실제로 듣는 포트와 같은지
+      - 클러스터 DNS 서버
+      - 파드의 레이블
+      - 노드의 Ready 조건
+    answer: 0
+    explain: targetPort가 앱의 포트와 다르면 요청이 파드에 닿아도 받을 곳이 없어요.
+  - id: short-name-namespace
+    type: ox
+    prompt: 다른 네임스페이스에 있는 서비스도, 짧은 이름(pay)만으로 부를 수 있나요?
+    answer: false
+    explain: 짧은 이름은 같은 네임스페이스에서만 풀려요. 다른 네임스페이스라면 pay.네임스페이스처럼 붙여 불러요.
+  - id: direct-ok-service-fails
+    type: choice
+    prompt: 파드 IP와 포트로 직접 요청하면 되는데, 서비스 IP로는 안 돼요. 의심할 것은?
+    choices:
+      - 노드마다 서비스 규칙을 까는 kube-proxy
+      - 파드의 레이블
+      - 앱이 듣는 포트
+      - 컨테이너 이미지
+    answer: 0
+    explain: 파드까지는 닿으니 앱과 포트는 괜찮아요. 서비스 IP를 파드로 이어 주는 규칙 쪽이 문제예요.
+  - id: running-in-endpoints
+    type: ox
+    prompt: 결제 파드 3개가 모두 Running이면, 서비스 대상에도 반드시 들어 있나요?
+    answer: false
+    explain: Running이어도 readiness 프로브가 실패해 Ready가 아니면 대상에서 빠져요.

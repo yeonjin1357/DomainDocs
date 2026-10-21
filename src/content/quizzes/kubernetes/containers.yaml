@@ -1,0 +1,42 @@
+questions:
+  - id: shared-kernel
+    type: ox
+    prompt: 컨테이너는 가상 머신처럼 저마다 자기 커널을 따로 돌리나요?
+    answer: false
+    explain: 컨테이너는 서버의 커널을 함께 써요. 그래서 가볍지만, 가상 머신보다 격리가 느슨해요.
+  - id: namespace-isolation
+    type: choice
+    prompt: 컨테이너 안의 프로세스가 서버의 다른 프로세스를 보지 못하게 하는 리눅스 커널 기능은?
+    choices:
+      - 네임스페이스
+      - cgroup
+      - 이미지 태그
+      - 스케줄러
+    answer: 0
+    explain: 네임스페이스는 서버 전체의 자원을 그 안의 프로세스에게 자기만의 것처럼 보이게 감싸요. 쿠버네티스의 네임스페이스와는 다른 기능이에요.
+  - id: cgroup-name
+    type: input
+    prompt: 컨테이너가 쓸 수 있는 CPU와 메모리를 묶어 제한하고 재는 리눅스 커널 기능은?
+    answer: [cgroup]
+    term: kubernetes/cgroup
+    explain: 그래서 컨테이너의 CPU·메모리 숫자는 서버 전체가 아니라 그 컨테이너의 cgroup이 센 값으로 봐요.
+  - id: latest-risk
+    type: choice
+    prompt: 운영 배포의 이미지를 latest 태그로 가리키면 생기는 문제는?
+    choices:
+      - 같은 태그가 나중에 다른 이미지를 가리킬 수 있어, 무엇이 배포됐는지 알기 어려워요
+      - 이미지를 내려받을 수 없어요
+      - 컨테이너가 커널을 따로 쓰게 돼요
+      - 메모리 한도가 사라져요
+    answer: 0
+    explain: 태그는 바뀔 수 있어요. 정확히 같은 이미지를 원하면 이미지 내용의 지문인 다이제스트로 가리켜요.
+  - id: default-tag
+    type: choice
+    prompt: 이미지를 태그 없이 nginx라고만 적으면, 쿠버네티스는 어떤 태그로 알아들을까요?
+    choices:
+      - latest
+      - stable
+      - 가장 먼저 만든 태그
+      - 태그가 없으니 오류를 내요
+    answer: 0
+    explain: 태그를 빼면 latest로 알아들어요. 그래서 운영에서는 버전을 적거나 다이제스트로 가리켜요.

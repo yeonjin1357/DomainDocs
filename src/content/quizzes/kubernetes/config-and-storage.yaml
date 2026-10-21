@@ -1,0 +1,41 @@
+questions:
+  - id: base64-not-encryption
+    type: ox
+    prompt: Secret 값은 base64로 적혀 있으니, 암호화돼서 안전한가요?
+    answer: false
+    explain: base64는 글자를 바꿔 적는 방식일 뿐 누구나 되돌릴 수 있어요. 기본 설정에서는 etcd에 암호화 없이 저장돼서, 접근 권한을 따로 막아야 해요.
+  - id: env-needs-restart
+    type: choice
+    prompt: ConfigMap을 고쳤는데 앱이 그대로예요. 앱이 그 값을 환경 변수로 받는다면 어떻게 해야 할까요?
+    choices:
+      - 파드를 다시 시작해요
+      - 조금 기다리면 저절로 바뀌어요
+      - ConfigMap을 지웠다가 다시 만들어요
+      - 노드를 재부팅해요
+    answer: 0
+    explain: 환경 변수는 컨테이너가 시작할 때 정해져서 자동으로 바뀌지 않아요. 볼륨 파일로 받으면 시간이 지나 내용이 바뀌어요.
+  - id: emptydir-lost
+    type: ox
+    prompt: emptyDir에 둔 데이터는, 파드가 노드에서 사라진 뒤에도 남아 있나요?
+    answer: false
+    explain: emptyDir은 파드가 노드에 머무는 동안만 남아요. 파드보다 오래 남아야 할 데이터는 PVC로 빌린 저장소에 둬요.
+  - id: delete-reclaim
+    type: choice
+    prompt: StorageClass가 자동으로 만든 PV에 묶인 PVC를 지우면, 기본으로 어떻게 될까요?
+    choices:
+      - PV와 바깥의 실제 디스크까지 지워져요
+      - PV와 데이터는 그대로 남아요
+      - PVC만 지워지고 같은 PV에 다시 묶을 수 있어요
+      - 쓰고 있는 PVC라 지울 수 없어요
+    answer: 0
+    explain: 자동으로 만든 PV의 회수 정책 기본값이 Delete예요. 지우기 전에 회수 정책을 꼭 봐요.
+  - id: rwx-mode
+    type: choice
+    prompt: 여러 노드에 흩어진 파드가 한 볼륨을 함께 읽고 써야 해요. 맞는 접근 모드는?
+    choices:
+      - ReadWriteMany
+      - ReadWriteOnce
+      - ReadOnlyMany
+      - ReadWriteOncePod
+    answer: 0
+    explain: ReadWriteOnce는 노드 하나에서만, ReadOnlyMany는 읽기만 돼요. 여러 노드에서 읽고 쓰려면 ReadWriteMany예요.

@@ -1,0 +1,41 @@
+questions:
+  - id: progress-deadline
+    type: choice
+    prompt: Deployment가 진전이 없을 때 멈췄다고 표시하기까지, 기본으로 얼마나 기다릴까요?
+    choices:
+      - 600초(10분)
+      - 60초
+      - 5분
+      - 1시간
+    answer: 0
+    explain: progressDeadlineSeconds 기본값은 600초예요. 넘으면 Progressing 조건이 False, 이유는 ProgressDeadlineExceeded가 돼요.
+  - id: no-auto-rollback
+    type: ox
+    prompt: 배포가 멈췄다고 표시되면, 쿠버네티스가 저절로 이전 버전으로 되돌리나요?
+    answer: false
+    explain: 쿠버네티스는 멈췄다고 표시만 하고 계속 다시 시도해요. 되돌리기는 사람이나 배포 파이프라인이 해요.
+  - id: running-not-ready-rollout
+    type: choice
+    prompt: 새 버전 파드가 Running인데 READY가 0/1이라 배포가 멈췄어요. 먼저 볼 것은?
+    choices:
+      - readiness 프로브가 실패하는 이유(경로·포트·설정 변경)
+      - 노드의 요청 합계
+      - 이미지 태그
+      - HPA 설정
+    answer: 0
+    explain: 준비되지 않은 파드는 요청을 받지 않고, Deployment도 다음 파드로 넘어가지 않아요. 이번 배포에서 바뀐 것부터 봐요.
+  - id: undo-first
+    type: choice
+    prompt: 원인을 찾는 동안 사용자 영향을 줄이고 싶어요. 먼저 할 일은?
+    choices:
+      - kubectl rollout undo로 이전 버전으로 되돌려요
+      - 옛 버전 파드를 모두 지워요
+      - 파드 수를 0으로 줄여요
+      - 노드를 모두 재부팅해요
+    answer: 0
+    explain: 되돌리기도 롤링 업데이트라 준비된 옛 파드를 늘리고 새 파드를 줄여요. 고친 버전은 그다음에 다시 배포해요.
+  - id: apply-not-done
+    type: ox
+    prompt: 배포 명령이 성공으로 끝나면, 배포도 다 끝났다고 볼 수 있나요?
+    answer: false
+    explain: 명령은 원하는 상태를 적었을 뿐이에요. kubectl rollout status로 새 파드가 모두 준비될 때까지 확인해요.

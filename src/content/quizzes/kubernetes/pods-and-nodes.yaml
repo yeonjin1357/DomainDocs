@@ -1,0 +1,42 @@
+questions:
+  - id: same-pod-localhost
+    type: choice
+    prompt: 같은 파드 안의 두 컨테이너는 서로 어떻게 통신할까요?
+    choices:
+      - localhost로 통신해요
+      - 서로 다른 파드 IP로 통신해요
+      - 서비스 이름으로만 통신해요
+      - 서로 통신할 수 없어요
+    answer: 0
+    explain: 한 파드의 컨테이너들은 네트워크 네임스페이스를 함께 써서 IP가 같아요. 그래서 localhost로 통해요.
+  - id: new-pod-new-ip
+    type: ox
+    prompt: Deployment가 다시 띄운 파드는, 이전 파드의 이름과 IP를 그대로 이어받나요?
+    answer: false
+    explain: 다시 뜬 파드는 새 파드라서 이름과 IP를 새로 받아요. 그래서 바뀌지 않는 주소는 서비스로 가리켜요.
+  - id: bare-pod-node-dies
+    type: choice
+    prompt: 운영 앱을 워크로드 없이 파드 하나로 직접 띄웠어요. 그 노드가 죽으면 어떻게 될까요?
+    choices:
+      - 그 파드는 다시 뜨지 않아요
+      - 다른 노드에 저절로 다시 떠요
+      - 노드가 살아날 때까지 기다렸다가 이어져요
+      - 쿠버네티스가 Deployment를 대신 만들어 줘요
+    answer: 0
+    explain: 파드는 쓰고 버리는 단위라 노드와 함께 끝나요. 다시 띄우는 건 Deployment 같은 워크로드가 해요.
+  - id: group-by-workload
+    type: choice
+    prompt: 파드가 다시 떠도 대시보드와 알림 기록이 끊기지 않게 하려면 무엇으로 묶어야 할까요?
+    choices:
+      - 워크로드 이름이나 레이블
+      - 파드 이름
+      - 파드 IP
+      - 컨테이너 ID
+    answer: 0
+    explain: 파드 이름과 IP는 다시 뜰 때마다 바뀌어요. 바뀌지 않는 워크로드 이름이나 레이블로 묶어요.
+  - id: pod-name
+    type: input
+    prompt: 쿠버네티스에서 만들고 다룰 수 있는 가장 작은 실행 단위는?
+    answer: [파드, pod]
+    term: kubernetes/pod
+    explain: 파드는 컨테이너 하나 이상을 묶은 단위예요. 파드마다 클러스터 안에서 하나뿐인 IP를 받아요.

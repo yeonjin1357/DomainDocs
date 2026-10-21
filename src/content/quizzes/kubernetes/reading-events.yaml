@@ -1,0 +1,42 @@
+questions:
+  - id: events-expire
+    type: ox
+    prompt: 새벽 2시 장애의 이벤트를 아침 9시에 kubectl로 찾아요. 기본 설정에서도 볼 수 있나요?
+    answer: false
+    explain: 이벤트는 기본 1시간 뒤 지워져요. 그래서 운영에서는 이벤트를 모니터링 시스템이나 로그 저장소로 옮겨 둬요.
+  - id: warnings-first
+    type: choice
+    prompt: 이벤트가 너무 많아서 원인이 보이지 않아요. 먼저 할 일은?
+    choices:
+      - Warning만 골라 시간 순서로 봐요
+      - Normal 이벤트만 골라 봐요
+      - 오래된 이벤트를 지워요
+      - 이벤트 개수만 세어요
+    answer: 0
+    explain: 이벤트 대부분은 정상 기록이에요. 경고만 골라야 원인 쪽 기록이 묻히지 않아요.
+  - id: failed-scheduling-next
+    type: choice
+    prompt: 경고 이벤트의 이유가 FailedScheduling이에요. 다음에 볼 곳은?
+    choices:
+      - 파드를 놓을 노드를 못 찾은 이유(요청 합계, taint)
+      - 이전 실행의 컨테이너 로그
+      - 볼륨을 붙이는 설정
+      - 서비스의 셀렉터
+    answer: 0
+    explain: FailedScheduling은 스케줄러가 놓을 노드를 못 찾았다는 뜻이에요. 메시지에 노드 몇 개가 왜 안 되는지 적혀 있어요.
+  - id: alert-on-reason
+    type: choice
+    prompt: 이벤트로 알림을 건다면 무엇을 기준으로 거는 게 나을까요?
+    choices:
+      - 이유(reason)와 대상
+      - 메시지의 문구
+      - 이벤트의 개수
+      - 이벤트의 시각
+    answer: 0
+    explain: 쿠버네티스 문서는 이벤트의 문구와 계기가 바뀔 수 있다고 해요. 그래서 문구보다 이유와 대상으로 거는 편이 나아요.
+  - id: event-name
+    type: input
+    prompt: 파드가 노드에 놓였다, 프로브가 실패했다처럼 클러스터에서 일어난 일을 알리는 짧은 기록을 무엇이라고 하나요?
+    answer: [이벤트, event]
+    term: kubernetes/k8s-event
+    explain: 이벤트에는 종류, 이유, 대상, 메시지가 담겨요. 참고용 보조 자료라서 오래 남지 않아요.

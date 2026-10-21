@@ -1,0 +1,46 @@
+questions:
+  - id: selector-mismatch
+    type: choice
+    prompt: 서비스로 보낸 요청이 어떤 파드에도 닿지 않아요. 먼저 볼 것은?
+    choices:
+      - 서비스의 셀렉터와 파드의 레이블이 정확히 같은지
+      - 노드의 CPU 사용률
+      - 이미지 태그
+      - 파드의 재시작 횟수
+    answer: 0
+    explain: 서비스는 레이블로 파드를 골라요. 글자 하나만 달라도 대상이 0개가 돼요.
+  - id: ingress-needs-controller
+    type: ox
+    prompt: 인그레스 객체만 만들면, 인그레스 컨트롤러가 없어도 바깥 요청이 서비스로 들어오나요?
+    answer: false
+    explain: 인그레스는 규칙일 뿐이에요. 그 규칙대로 요청을 실제로 받는 인그레스 컨트롤러가 있어야 해요.
+  - id: call-by-service-name
+    type: choice
+    prompt: 같은 네임스페이스의 주문 파드가 결제 서비스(pay)를 부르는 가장 알맞은 방법은?
+    choices:
+      - http://pay처럼 서비스 이름으로 불러요
+      - 결제 파드의 IP를 적어 두고 불러요
+      - 결제 파드가 있는 노드의 IP로 불러요
+      - 결제 파드의 이름으로 불러요
+    answer: 0
+    explain: 파드 IP와 이름은 다시 뜨면 바뀌어요. 서비스 이름은 그대로라, 같은 네임스페이스에서는 이름만으로 찾아가요.
+  - id: running-not-ready
+    type: choice
+    prompt: 파드가 Running인데 서비스 요청을 받지 않아요. 먼저 볼 것은?
+    choices:
+      - 파드가 Ready인지(readiness 프로브)
+      - 이미지 태그
+      - 노드의 요청 합계
+      - 인그레스 규칙
+    answer: 0
+    explain: 준비가 안 된 파드는 서비스 대상(EndpointSlice)에서 빠져요.
+  - id: clusterip-default
+    type: choice
+    prompt: 서비스 종류를 적지 않으면 기본으로 만들어지는, 클러스터 안에서만 닿는 종류는?
+    choices:
+      - ClusterIP
+      - NodePort
+      - LoadBalancer
+      - ExternalName
+    answer: 0
+    explain: ClusterIP는 파드끼리 부를 때 써요. 바깥에서 닿게 하려면 NodePort, LoadBalancer나 인그레스를 써요.
