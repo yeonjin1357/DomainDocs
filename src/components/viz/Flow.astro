@@ -36,8 +36,8 @@ const marker = (tone: FigureTone) => `url(#${uid}-${tone})`;
     layout.groups.map((g) => (
       <>
         <rect class="flow-group" x={g.x} y={g.y} width={g.w} height={g.h} rx="12" />
-        {/* 이름은 아래 왼쪽에 둔다. 위쪽은 첫 줄 상자와 겹친다. */}
-        <text class="group-label" x={g.x + 10} y={g.y + g.h - 10}>{g.label}</text>
+        {/* 이름은 위쪽 테두리 선 위에 얹는다. 상자는 칸 안쪽 12부터 시작해서 이 자리와 겹치지 않는다. */}
+        <text class="group-label" x={g.x + 12} y={g.y}>{g.label}</text>
       </>
     ))
   }

@@ -1,0 +1,140 @@
+---
+title: SQL이 실행되는 과정
+summary: DB는 SQL을 해석하고, 가장 싸 보이는 실행 계획을 골라, 그 계획대로 실행해요.
+domain: database
+type: concept
+stage: basics
+order: 20
+icon: layers
+keywords: [query processing, parse, 파싱, optimizer, 옵티마이저, planner, 실행 계획, hard parse, 하드 파스, bind variable]
+related: [database/overview, database/connections-and-sessions, database/execution-plans, database/top-sql, database/buffer-cache-hit-ratio]
+sources:
+  - title: PostgreSQL — The Path of a Query
+    url: https://www.postgresql.org/docs/current/query-path.html
+  - title: Oracle SQL Tuning Guide 19c — SQL Processing
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/sql-processing.html
+  - title: SQL Server — Query processing architecture guide
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/query-processing-architecture-guide
+  - title: Oracle SQL Tuning Guide 19c — Improving Real-World Performance Through Cursor Sharing
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/improving-rwp-cursor-sharing.html
+  - title: PostgreSQL — PREPARE
+    url: https://www.postgresql.org/docs/current/sql-prepare.html
+  - title: MySQL 8.4 — Caching of Prepared Statements and Stored Programs
+    url: https://dev.mysql.com/doc/refman/8.4/en/statement-caching.html
+  - title: OWASP — SQL Injection Prevention Cheat Sheet
+    url: https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="SQL은 해석·계획·실행을 거쳐요">
+    DB는 SQL을 받으면 먼저 뜻을 확인하고, 어떻게 가져올지 계획을 세운 뒤, 그 계획대로 실행해요.
+  </Point>
+  <Point title="계획은 통계로 어림한 가장 싼 길이에요">
+    옵티마이저는 여러 방법의 비용을 어림해 가장 싼 것을 골라요. 어림이 틀리면 느린 계획이 나와요.
+  </Point>
+  <Point title="만든 계획은 다시 쓰기도 해요">
+    계획 세우기도 일이라, DB는 만든 계획을 담아 두고 다시 써요. 다시 쓸 수 있는 범위는 DB마다 달라요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="주방장은 재료가 얼마나 남았는지 직접 보지만, 옵티마이저는 미리 세어 둔 통계로 추정해요. 통계가 낡으면 조리 순서를 잘못 정해요.">
+  식당 주방을 떠올려 봐요. 해석은 주문서가 메뉴에 있는 음식인지 확인하는 일이에요. 계획은 재료 위치를 보고 조리 순서를 정하는 일이고, 실행은 그 순서대로 요리하는 일이에요.
+</Analogy>
+
+## 세 단계로 나뉘어요
+
+<Figure caption="SQL은 해석 → 계획 → 실행 순서로 지나가요. 계획 단계는 통계를 참고하고, 실행 단계는 데이터를 읽어요.">
+  <Flow
+    ariaLabel="해석, 계획, 실행이 차례로 이어지고, 계획은 통계를, 실행은 데이터를 참고하는 구조도"
+    nodes={[
+      { id: 'parse', label: '해석', col: 0, row: 0, note: '문법·뜻 확인' },
+      { id: 'plan', label: '계획', col: 1, row: 0, note: '가장 싼 길', tone: 'accent' },
+      { id: 'exec', label: '실행', col: 2, row: 0, note: '계획대로' },
+      { id: 'stats', label: '통계', col: 1, row: 1, note: '행 수·분포' },
+      { id: 'data', label: '데이터', col: 2, row: 1, note: '테이블·인덱스' },
+    ]}
+    edges={[
+      { from: 'parse', to: 'plan' },
+      { from: 'plan', to: 'exec' },
+      { from: 'stats', to: 'plan', label: '참고', dashed: true },
+      { from: 'exec', to: 'data', label: '읽기' },
+    ]}
+  />
+</Figure>
+
+**해석**: <Term term="database/parser">파서</Term>가 SQL의 문법이 맞는지 보고, DB가 다룰 수 있는 구조로 바꿔요. 이름이 가리키는 테이블과 열이 정말 있는지도 확인해요.
+
+**계획**: <Term term="database/optimizer">옵티마이저</Term>가 같은 결과를 내는 여러 방법을 떠올려요. 예를 들어 테이블을 처음부터 끝까지 읽을 수도 있고, 인덱스로 필요한 행만 찾을 수도 있어요.
+
+옵티마이저는 방법마다 비용을 어림하고, 가장 싼 방법을 <Term term="database/execution-plan">실행 계획</Term>으로 정해요. 이때 비용은 실제로 재 본 값이 아니라 추정값이에요.
+
+**실행**: 실행기가 계획을 한 단계씩 따라가며 행을 읽고, 정렬하고, 테이블끼리 합쳐요. 다 모은 행은 연결을 타고 앱으로 돌아가요.
+
+## 계획은 어림이에요
+
+옵티마이저가 비용을 어림할 때 기대는 것은 <Term term="database/statistics">통계</Term>예요. 통계는 테이블에 행이 몇 개쯤 있는지, 값이 어떻게 퍼져 있는지 미리 모아 둔 요약이에요.
+
+통계가 실제와 다르면 계획도 틀려요. 통계는 행이 100개라는데 실제로는 100만 개라면, 옵티마이저는 작은 테이블에 맞는 방법을 골라요. 그러면 실행이 한참 느려져요.
+
+계획이 실제로 어떻게 돌았는지, 추정과 실제가 얼마나 달랐는지는 <Term slug="database/execution-plans">실행 계획 읽기</Term>에서 봐요.
+
+## 만든 계획은 다시 쓰기도 해요
+
+해석과 계획에도 CPU와 시간이 들어요. 그래서 DB는 한 번 만든 계획을 <Term term="database/plan-cache">실행 계획 캐시</Term>에 담아 두고, 같은 SQL이 오면 다시 써요.
+
+<Figure caption="Oracle과 SQL Server는 계획을 서버 전체가 나눠 써요. PostgreSQL과 MySQL은 준비해 둔 문장(prepared statement)의 계획을 세션 안에서만 다시 써요.">
+  <Compare
+    columns={['Oracle, SQL Server', 'PostgreSQL, MySQL']}
+    rows={[
+      { label: '계획을 두는 곳', values: ['서버 전체가 쓰는 공유 메모리', '세션 하나 안'] },
+      { label: '다른 세션과', values: ['나눠 써요', '나눠 쓰지 않아요'] },
+      { label: '세션이 끝나면', values: ['다른 세션이 계속 써요', '함께 버려요'] },
+    ]}
+  />
+</Figure>
+
+Oracle은 SQL 문장 글자로 캐시를 찾아요. 그래서 값만 다른 SQL도 다른 SQL로 보고, 계획을 처음부터 다시 세워요. 이 일을 <Term term="database/hard-parse">하드 파스</Term>라고 불러요.
+
+그래서 값이 매번 바뀌는 자리에는 값을 직접 쓰지 않고 <Term term="database/bind-variable">바인드 변수</Term>를 써요. `WHERE id = 102` 대신 `WHERE id = :id`처럼 자리만 두고, 값은 따로 넘겨요. 그러면 값이 달라도 같은 SQL이라 계획을 다시 써요.
+
+## 모니터링에서는
+
+<Figure caption="배포 직후 1분 동안 주문 DB의 파싱 예시예요. 초당 1,200번 중 1,150번이 하드 파스예요. 값을 SQL 글자에 이어 붙이는 코드가 배포되면 이렇게 보여요.">
+  <StatTile label="파싱" value="1,200" unit="/초" />
+  <StatTile label="하드 파스" value="1,150" unit="/초" tone="warn" note="파싱의 96%" />
+</Figure>
+
+SQL 분석 화면은 SQL 문장마다 실행 횟수와 걸린 시간을 모아 보여 줘요. 무거운 SQL을 찾는 법은 <Term slug="database/top-sql">SQL별 부하 순위</Term>에 있어요.
+
+Oracle을 보는 화면이라면 하드 파스 수도 함께 봐요. 파싱 대부분이 하드 파스라면, 같은 SQL이 값만 바뀐 채 매번 새 SQL로 들어오는 중이에요. 하드 파스가 늘수록 계획을 담을 메모리를 더 쓰고, 그 메모리를 차지하려는 대기도 늘어요.
+
+<Checkpoints>
+  <Check>AI가 짠 코드가 값을 SQL 문자열에 이어 붙인다면 다시 보세요. 값마다 다른 SQL이라 Oracle에서는 매번 하드 파스를 해요. 바인드 변수(파라미터)로 넘기면 SQL 인젝션 위험도 함께 막아요.</Check>
+  <Check>어제까지 빠르던 SQL이 코드 변경 없이 느려졌다면 계획이 바뀌었는지 보세요. 데이터가 크게 늘었는데 통계가 그대로면 옵티마이저가 틀린 계획을 골라요.</Check>
+  <Check>SQL별 통계를 SQL 글자 그대로 묶는 화면이라면, 값만 다른 SQL이 수천 줄로 흩어지지 않는지 보세요. 바인드 변수를 쓰지 않는 앱에서는 같은 SQL이 값마다 한 줄씩 생겨요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### Oracle의 하드 파스와 소프트 파스
+
+  Oracle은 해석할 때 공유 풀(shared pool)부터 확인해요. SQL 문장마다 해시 값을 만들어, 다시 쓸 수 있는 같은 문장이 있는지 찾아요.
+
+  찾으면 소프트 파스예요. 계획 세우기를 건너뛰고 바로 실행해요.
+
+  못 찾으면 하드 파스예요. 해석, 최적화, 실행 준비를 모두 새로 해요.
+
+  ### PostgreSQL의 일반 계획과 맞춤 계획
+
+  PostgreSQL에서 `PREPARE`로 준비한 문장은 그 세션이 끝날 때까지만 남아요. 여러 클라이언트가 같은 준비 문장을 함께 쓸 수는 없어요.
+
+  준비한 문장은 처음 다섯 번은 넘어온 값에 맞춘 계획(맞춤 계획)을 새로 세워요. 그 뒤로는 값과 상관없는 일반 계획의 비용을 견줘 보고, 크게 비싸지 않으면 일반 계획을 계속 써요.
+
+  ### MySQL의 준비 문장 캐시
+
+  MySQL도 준비 문장을 세션마다 따로 캐시해요. 한 세션에 캐시된 문장은 다른 세션이 쓸 수 없고, 세션이 끝나면 버려요.
+
+  ### SQL Server의 계획 캐시
+
+  SQL Server는 메모리 일부를 계획 캐시로 써요. SQL을 실행할 때 먼저 같은 문장의 계획이 캐시에 있는지 보고, 있으면 다시 컴파일하지 않고 그 계획을 써요.
+</Deeper>

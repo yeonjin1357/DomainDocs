@@ -1,0 +1,80 @@
+---
+title: 쿼리 하나가 DB를 지나가는 길
+summary: 앱이 보낸 쿼리는 연결, 해석, 계획, 실행, 기록을 거쳐 결과로 돌아와요.
+domain: database
+type: overview
+order: 0
+icon: database
+keywords: [database overview, DB 구조, 쿼리 처리, query path, 데이터베이스 기초, 버퍼 캐시, WAL, redo]
+related: [database/connections-and-sessions, database/query-processing, database/active-sessions, database/execution-plans]
+sources:
+  - title: PostgreSQL — The Path of a Query
+    url: https://www.postgresql.org/docs/current/query-path.html
+  - title: PostgreSQL — How Connections Are Established
+    url: https://www.postgresql.org/docs/current/connect-estab.html
+  - title: PostgreSQL — Write-Ahead Logging (WAL)
+    url: https://www.postgresql.org/docs/current/wal-intro.html
+  - title: Oracle SQL Tuning Guide 19c — SQL Processing
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/sql-processing.html
+  - title: SQL Server — Query processing architecture guide
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/query-processing-architecture-guide
+updated: 2026-10-21
+---
+
+<Analogy limit="식당은 요리를 낸 뒤 장부를 정리해도 되지만, DB는 바뀐 내용을 로그에 먼저 적어야 커밋을 끝낼 수 있어요.">
+  DB는 큰 식당 주방과 비슷해요. 손님이 자리에 앉고(연결), 주문서를 읽고(해석), 조리 순서를 정하고(계획), 요리해서(실행) 내보내요. 자주 쓰는 재료는 조리대에, 나머지는 창고에 있어요.
+</Analogy>
+
+## 쿼리 하나가 지나가는 길
+
+<Figure caption="앱이 보낸 쿼리는 DB 서버 안에서 연결·세션 → 해석·계획 → 실행 순서로 지나가요. 실행은 버퍼 캐시에서 데이터를 찾고, 바뀐 내용은 로그에 적어요.">
+  <Flow
+    ariaLabel="앱이 연결·세션으로 들어와 해석·계획, 실행을 거치고, 실행이 버퍼 캐시와 로그로 이어지며, 버퍼 캐시는 디스크에서 데이터를 읽는 구조도"
+    nodes={[
+      { id: 'app', label: '앱', col: 0, row: 0 },
+      { id: 'session', label: '연결·세션', col: 1, row: 0 },
+      { id: 'plan', label: '해석·계획', col: 2, row: 0, tone: 'accent' },
+      { id: 'exec', label: '실행', col: 2, row: 1, tone: 'accent' },
+      { id: 'cache', label: '버퍼 캐시', col: 1, row: 1, note: '메모리' },
+      { id: 'disk', label: '데이터 파일', col: 1, row: 2, note: '디스크' },
+      { id: 'wal', label: '로그', col: 2, row: 2, note: 'WAL·redo' },
+    ]}
+    edges={[
+      { from: 'app', to: 'session' },
+      { from: 'session', to: 'plan' },
+      { from: 'plan', to: 'exec' },
+      { from: 'exec', to: 'cache' },
+      { from: 'cache', to: 'disk', label: '없으면 읽기', both: true },
+      { from: 'exec', to: 'wal', label: '변경 기록' },
+    ]}
+    groups={[{ label: 'DB 서버', cols: [1, 2], rows: [0, 2] }]}
+  />
+</Figure>
+
+그림을 따라 쿼리 하나를 보내 볼게요. 쿼리는 DB에 보내는 SQL 한 문장이에요.
+
+1. **연결·세션**: 앱이 DB에 <Term term="database/connection">연결</Term>을 맺어요. DB는 이 접속의 <Term term="database/session">세션</Term>을 만들고, 일을 맡을 프로세스나 스레드를 붙여요.
+2. **해석**: <Term term="database/parser">파서</Term>가 문법이 맞는지, 테이블과 열이 정말 있는지 확인해요.
+3. **계획**: <Term term="database/optimizer">옵티마이저</Term>가 데이터를 가져올 여러 방법 중 가장 싸 보이는 <Term term="database/execution-plan">실행 계획</Term>을 골라요.
+4. **실행**: 계획대로 데이터를 읽어요. 필요한 <Term term="database/block">블록</Term>이 <Term term="database/buffer-cache">버퍼 캐시</Term>에 있으면 메모리에서 읽고, 없으면 디스크에서 가져와요.
+5. **기록**: 데이터를 바꾸는 쿼리라면, 바뀐 내용을 <Term term="database/wal">로그</Term>에 먼저 적어요. 커밋할 때 데이터 파일까지 바로 쓰지 않아도 돼요.
+6. **결과**: 모은 행을 같은 연결로 앱에 돌려줘요.
+
+로그에 먼저 적는 이유는 장애에 대비하기 위해서예요. 데이터 파일에 미처 쓰지 못한 변경이 있어도, 다시 켤 때 로그를 보고 되살려요.
+
+## 단계를 하나씩 확대해 봐요
+
+기초 글은 그림의 칸 하나를 확대해서 설명해요.
+
+- 1단계(연결·세션)는 <Term slug="database/connections-and-sessions">연결과 세션</Term>에서 다뤄요.
+- 2~4단계(해석·계획·실행)는 <Term slug="database/query-processing">SQL이 실행되는 과정</Term>에서 다뤄요.
+
+## 단계마다 모니터링 화면이 있어요
+
+DB 모니터링 화면은 대부분 이 길의 한 칸을 들여다봐요. 기초를 읽은 뒤 이어 보면 화면의 숫자가 어디서 오는지 보여요.
+
+- 연결·세션: 지금 일하는 세션과 기다리는 대상은 <Term slug="database/active-sessions">액티브 세션과 대기 이벤트</Term>에서 봐요.
+- 해석·계획: 계획이 실제로 어떻게 돌았는지는 <Term slug="database/execution-plans">실행 계획 읽기</Term>에서 봐요.
+- 실행: 어떤 SQL이 DB 시간을 가장 많이 쓰는지는 <Term slug="database/top-sql">SQL별 부하 순위</Term>에서 봐요.
+- 버퍼 캐시: 메모리에서 찾은 비율의 함정은 <Term slug="database/buffer-cache-hit-ratio">버퍼 캐시 적중률</Term>에서 봐요.
+- 로그: 로그를 다른 서버로 보내 따라오게 하는 복제는 <Term slug="database/replication-lag">복제 지연</Term>에서 봐요.

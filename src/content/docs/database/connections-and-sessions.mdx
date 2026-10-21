@@ -1,0 +1,139 @@
+---
+title: 연결과 세션
+summary: 연결은 앱과 DB 사이의 통로, 세션은 DB가 그 접속마다 기억하는 상태예요.
+domain: database
+type: concept
+stage: basics
+order: 10
+icon: server
+keywords: [connection, session, 연결, 커넥션, 세션, 서버 프로세스, backend process, worker thread, 작업 스레드, dedicated server]
+related: [database/overview, database/query-processing, database/active-sessions, database/too-many-connections, apm/connection-pool]
+sources:
+  - title: PostgreSQL — How Connections Are Established
+    url: https://www.postgresql.org/docs/current/connect-estab.html
+  - title: Oracle Database Concepts 19c — Process Architecture (Connections and Sessions)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/cncpt/process-architecture.html
+  - title: MySQL 8.4 — Connection Interfaces
+    url: https://dev.mysql.com/doc/refman/8.4/en/connection-interfaces.html
+  - title: SQL Server — Thread and task architecture guide
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/thread-and-task-architecture-guide
+  - title: PostgreSQL — SET
+    url: https://www.postgresql.org/docs/current/sql-set.html
+  - title: PostgreSQL — The Cumulative Statistics System (pg_stat_activity)
+    url: https://www.postgresql.org/docs/current/monitoring-stats.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="연결은 통로, 세션은 상태예요">
+    연결은 앱과 DB 서버를 잇는 통신 통로예요. 세션은 DB가 그 접속에 대해 기억하는 상태예요.
+  </Point>
+  <Point title="연결 하나를 맡는 방식은 DB마다 달라요">
+    PostgreSQL은 연결마다 서버 프로세스를 하나씩 띄워요. MySQL은 연결마다 스레드를 하나씩 둬요.
+  </Point>
+  <Point title="쉬는 연결도 자리를 차지해요">
+    일하지 않는 연결도 프로세스나 스레드, 메모리를 쥐고 있어요. 그래서 연결 수에는 한도가 있어요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="식당은 손님이 떠나면 테이블이 비어요. 앱의 커넥션 풀은 손님(요청)이 없어도 테이블(연결)을 잡아 둬요.">
+  DB를 식당이라고 해 봐요. 연결은 손님이 앉은 테이블이고, 세션은 그 테이블에 놓인 주문서예요. 주문서에는 손님이 누구인지, 지금 무엇을 주문해 기다리는지 적혀 있어요.
+</Analogy>
+
+## 연결은 어떻게 생기나요
+
+앱이 DB에 SQL을 보내려면 먼저 <Term term="database/connection">연결</Term>을 맺어야 해요. 연결을 맺을 때 DB는 누가 접속했는지 확인하고, 이 접속을 맡을 준비를 해요.
+
+<Figure caption="연결을 맺을 때 한 번 인증해요. 그 뒤로는 같은 연결로 SQL을 여러 번 주고받아요.">
+  <Sequence
+    ariaLabel="앱이 연결을 요청하고, 인증을 마친 뒤 같은 연결로 SQL과 결과를 주고받는 순서"
+    participants={['앱', 'DB 서버']}
+    messages={[
+      { from: '앱', to: 'DB 서버', label: '연결 요청' },
+      { from: 'DB 서버', to: '앱', label: '누구세요?', dashed: true },
+      { from: '앱', to: 'DB 서버', label: '사용자·비밀번호' },
+      { from: 'DB 서버', to: '앱', label: '준비됐어요', dashed: true },
+      { from: '앱', to: 'DB 서버', label: 'SQL', tone: 'accent' },
+      { from: 'DB 서버', to: '앱', label: '결과', tone: 'accent', dashed: true },
+    ]}
+  />
+</Figure>
+
+연결을 맺는 데는 시간이 들어요. 네트워크를 몇 번 오가고, 인증을 하고, 서버 쪽 일꾼을 준비해야 하기 때문이에요. 그래서 앱은 <Term term="database/connection-pool">커넥션 풀</Term>로 연결을 미리 열어 두고 돌려 써요.
+
+## 세션에는 무엇이 담기나요
+
+<Term term="database/session">세션</Term>은 접속 하나에 대한 DB의 기억이에요. 같은 연결로 들어온 SQL은 같은 세션에서 처리돼요.
+
+- 누가 접속했는지: 사용자 이름, 접속한 데이터베이스, 앱 이름이에요.
+- 어떤 설정으로 일하는지: 시간대, 문자 인코딩 같은 세션 설정이에요.
+- 지금 무엇을 하는지: 실행 중인 SQL, 열려 있는 트랜잭션, 기다리는 대상이에요.
+
+PostgreSQL에서는 `pg_stat_activity`에서 세션마다 한 줄씩 볼 수 있어요. 상태 열 `state`가 `active`면 SQL을 실행하는 중이고, `idle`이면 다음 명령을 기다리며 쉬는 중이에요.
+
+## 연결 하나를 누가 맡나요
+
+DB 서버 안에서 연결의 일을 맡는 일꾼은 DB마다 달라요. 크게 연결마다 프로세스를 두는 쪽과, 스레드로 맡는 쪽으로 나뉘어요.
+
+<Figure caption="연결 100개가 들어왔을 때 서버 안의 일꾼 수예요. SQL Server는 연결이 아니라 요청이 일꾼을 빌려 써요.">
+  <Compare
+    columns={['연결마다 프로세스', '스레드로 맡기']}
+    rows={[
+      { label: 'DB', values: ['PostgreSQL, Oracle(전용 서버)', 'MySQL, SQL Server'] },
+      { label: '연결 100개면', values: ['서버 프로세스 100개', 'MySQL은 스레드 100개, SQL Server는 작업 스레드 풀을 나눠 써요'] },
+    ]}
+  />
+</Figure>
+
+PostgreSQL은 연결 요청이 올 때마다 <Term term="database/server-process">서버 프로세스</Term>를 새로 띄워요. 이 프로세스는 연결이 끊길 때까지 그 연결만 맡아요.
+
+MySQL은 연결마다 그 연결 전용 스레드를 붙여요. SQL Server는 <Term term="database/worker-thread">작업 스레드</Term> 풀(일꾼 묶음)을 두고, 실행할 요청이 생길 때 하나씩 맡겨요.
+
+## 모니터링에서는
+
+<Figure caption="주문 DB의 세션 현황 예시예요. 연결은 100개지만 지금 SQL을 실행하는 세션은 6개이고, 나머지 94개는 쉬고 있어요.">
+  <StatTile label="연결 수" value="100" unit="개" />
+  <StatTile label="액티브 세션" value="6" unit="개" tone="accent" />
+</Figure>
+
+세션 화면에서 가장 먼저 만나는 숫자는 연결 수와 <Term term="database/active-session">액티브 세션</Term> 수예요. 둘은 다른 숫자예요. 연결 수는 열려 있는 통로의 수이고, 액티브 세션은 지금 일하는 세션의 수예요.
+
+연결 수가 한도에 닿았는데 액티브 세션이 적다면, DB가 바쁜 게 아니에요. 앱들이 연결을 넉넉히 쥐고 쉬는 거예요. 이때 어디부터 볼지는 <Term slug="database/too-many-connections">연결 한도 가이드</Term>에 있어요.
+
+액티브 세션이 무엇을 기다리는지는 <Term slug="database/active-sessions">액티브 세션과 대기 이벤트</Term>에서 이어서 봐요.
+
+<Checkpoints>
+  <Check>연결 수만 보고 DB가 바쁘다고 판단했다면 다시 보세요. 연결 100개 중 일하는 세션은 몇 개뿐일 수 있어요. 액티브 세션 수를 같이 보세요.</Check>
+  <Check>요청마다 연결을 새로 맺고 끊는 코드라면 다시 보세요. 요청마다 인증과 서버 쪽 일꾼 준비가 반복돼요. 커넥션 풀로 연결을 돌려 쓰세요.</Check>
+  <Check>풀에서 빌린 연결에 세션 설정(시간대 등)을 바꾸고 되돌리지 않는 코드라면 다시 보세요. 세션 설정은 세션이 끝날 때까지 남아서, 다음에 그 연결을 빌린 요청도 바뀐 설정으로 일해요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### Oracle의 연결과 세션
+
+  Oracle 문서는 둘을 따로 정의해요. 연결은 클라이언트 프로세스와 DB 인스턴스 사이의 물리적 통로예요. 세션은 로그인 하나의 상태를 담은 인스턴스 메모리 안의 논리적 존재예요.
+
+  그래서 Oracle에서는 연결 하나에 세션이 0개, 1개, 또는 여러 개일 수 있어요. 세션끼리는 독립이라, 한 세션의 커밋이 다른 세션의 트랜잭션에 영향을 주지 않아요.
+
+  ### Oracle의 전용 서버와 공유 서버
+
+  전용 서버 방식에서는 클라이언트 연결 하나에 서버 프로세스가 딱 하나 붙어요. 클라이언트 20개면 서버 프로세스도 20개예요.
+
+  공유 서버 방식에서는 클라이언트가 디스패처 프로세스에 붙어요. 디스패처가 요청을 큐에 넣고, 비어 있는 공유 서버 프로세스가 꺼내 처리해요.
+
+  ### MySQL의 스레드 캐시
+
+  MySQL은 연결이 끝나면 그 스레드를 버리지 않고 스레드 캐시에 돌려 둬요. 새 연결이 오면 캐시에서 먼저 꺼내 써요. 캐시 크기는 `thread_cache_size`이고, 기본값은 서버가 시작할 때 알아서 정해요.
+
+  문서는 연결마다 스레드를 두는 이 방식이 연결이 아주 많아질 때 불리하다고 해요. 접속한 클라이언트 수만큼 스레드가 생기기 때문이에요.
+
+  ### SQL Server의 요청·태스크·작업 스레드
+
+  SQL Server에서 요청(request)은 쿼리나 배치 하나예요. 요청은 태스크로 나뉘고, 태스크마다 작업 스레드가 하나씩 붙어요. 작업 스레드는 CPU마다 하나씩 있는 스케줄러 위에서 돌아가요.
+
+  쉬는 세션은 작업 스레드를 쥐지 않아요. 그래서 연결이 수백 개여도 스레드 수는 `max worker threads` 설정 안에서 움직여요.
+
+  ### 세션 설정이 남는 범위
+
+  PostgreSQL의 `SET`은 트랜잭션이 커밋되면 세션이 끝날 때까지 남아요. 트랜잭션 안에서만 바꾸려면 `SET LOCAL`을 써요. 트랜잭션이 끝나면 원래대로 돌아와요.
+</Deeper>

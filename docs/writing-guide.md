@@ -125,7 +125,9 @@ p99, rate, span 같은 말은 영어 그대로 써요. 처음 나올 때 한 번
 - `stage: basics`: 도메인 기초. 무엇이고 어떻게 동작하는지가 중심이에요. `##` 본문 설명이 1개 이상 있어야 해요.
 - `stage: monitoring`: 모니터링 관점. 화면에서 무엇을 보고 어떻게 판단하는지가 중심이에요. 기존 글은 모두 이쪽이에요.
 
-복사해서 써요. 기초 글의 순서는 `KeyPoints` → `Analogy` → `##` 본문(`Figure`) → `## 모니터링에서는`(`OnDashboard`) → `Checkpoints` → `Deeper`예요.
+복사해서 써요. 기초 글의 순서는 `KeyPoints` → `Analogy` → `##` 본문(`Figure`) → `## 모니터링에서는`(`Figure`) → `Checkpoints` → `Deeper`예요.
+
+`## 모니터링에서는` 아래에는 `OnDashboard` 대신 `Figure`로 화면 예시를 그려요. `OnDashboard`는 자체 제목("대시보드에서는 이렇게 보여요")이 있어서 소제목이 두 번 나와요. `OnDashboard`는 모니터링 글의 맨 앞에 써요.
 
 ````mdx
 ---
@@ -168,9 +170,9 @@ updated: 2026-10-21
 
 ## 모니터링에서는
 
-<OnDashboard title="위젯 이름" caption="그림이 보여 주는 것 1~2문장">
+<Figure caption="어느 화면의 어떤 예시인지, 그림이 보여 주는 것 1~2문장">
   <MiniLineChart ariaLabel="그래프 설명" series={[{ label: '평균', values: [1, 2, 3], tone: 'sub' }]} />
-</OnDashboard>
+</Figure>
 
 화면에서 이 개념을 어떻게 만나는지 써요.
 
@@ -279,7 +281,7 @@ updated: 2026-10-13
 
 | 컴포넌트 | 속성 | 쓰는 곳 |
 | --- | --- | --- |
-| `OnDashboard` | `title`, `caption?` | 대시보드에서 만나는 모습을 작은 그림으로 보여 줘요. 기초 글에서는 `## 모니터링에서는` 아래에 둬요 |
+| `OnDashboard` | `title`, `caption?` | 대시보드에서 만나는 모습을 작은 그림으로 보여 줘요. 자체 제목이 있어서 모니터링 글의 맨 앞에 써요. 기초 글의 `## 모니터링에서는` 아래에는 `Figure`를 써요 |
 | `Analogy` | `limit` | 비유 한두 문장. `limit`에 비유가 안 맞는 곳을 꼭 적어요 |
 | `Figure` | `caption?` | 그림 틀. 그림 컴포넌트와 SVG 그림은 이 안(또는 `OnDashboard` 안)에 둬요 |
 | `KeyPoints` | 없음 | 개념 글의 핵심. 안에 `Point` 1~3개 |
