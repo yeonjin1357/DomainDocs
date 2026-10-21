@@ -239,3 +239,24 @@ terms:
     aliases: [DNS TTL, TTL, 캐시 시간, negative caching, 부정 캐시]
     short: DNS 답을 몇 초 동안 캐시해도 되는지예요. 끝나기 전에는 바꾼 레코드가 퍼지지 않아요.
     doc: network/dns
+  - id: firewall
+    name: 방화벽
+    en: Firewall
+    aliases: [firewall, 파이어월]
+    short: 정해 둔 규칙에 따라 통신을 통과시키거나 막는 장비나 프로그램이에요.
+    analogy: 출입 명단을 보고 들여보낼지 정하는 경비실과 같아요.
+    doc: network/firewalls-and-nat
+  - id: nat
+    name: NAT
+    en: Network Address Translation
+    aliases: [주소 변환, 네트워크 주소 변환, NAPT]
+    short: 안쪽의 사설 주소를 바깥 주소로 바꿔 주는 일이에요.
+    analogy: 모든 우편을 회사 대표 주소로 바꿔 보내는 발송실과 같아요.
+    doc: network/firewalls-and-nat
+  - id: conntrack
+    name: 연결 추적 표
+    en: Connection tracking table
+    aliases: [conntrack, 연결 추적, 세션 테이블, session table, nf_conntrack]
+    short: 방화벽과 NAT가 지나가는 연결을 한 줄씩 적어 두는 표예요.
+    analogy: 경비실의 방문 기록부와 같아요.
+    doc: network/firewalls-and-nat

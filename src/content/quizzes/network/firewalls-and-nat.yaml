@@ -1,0 +1,42 @@
+questions:
+  - id: drop-means-timeout
+    type: choice
+    prompt: 방화벽 규칙을 바꾼 뒤, 앱의 연결 시간 초과가 갑자기 늘었어요. 가장 그럴듯한 이유는?
+    choices:
+      - 새 규칙이 패킷을 답 없이 버려요(DROP)
+      - 새 규칙이 거부 답을 돌려줘요(REJECT)
+      - 연결 추적 표의 유휴 시간이 길어졌어요
+      - DNS 레코드의 TTL이 바뀌었어요
+    answer: 0
+    explain: 버리는 규칙은 답이 없어서 보낸 쪽이 정한 시간까지 기다려요. 거부 답을 받으면 시간 초과가 아니라 바로 연결 거부로 끝나요.
+  - id: stateful-reply
+    type: ox
+    prompt: 상태를 기억하는(stateful) 방화벽에서, 서버가 밖으로 보낸 요청의 응답을 받으려면 들어오는 규칙을 따로 열어야 하나요?
+    answer: false
+    explain: 나간 연결을 표에 적어 두고, 그 연결로 돌아오는 응답은 알아서 통과시켜요.
+  - id: idle-entry-removed
+    type: choice
+    prompt: 커넥션 풀의 DB 연결이 한참 쉬고 난 뒤, 첫 쿼리에서 끊김이 나요. 앱과 DB 사이에 NAT가 있어요. 의심할 것은?
+    choices:
+      - NAT가 오래 쉰 연결을 표에서 지웠어요
+      - DB의 연결 수 한도가 꽉 찼어요
+      - 방화벽에 거부 규칙이 새로 생겼어요
+      - DNS 레코드의 TTL이 끝났어요
+    answer: 0
+    explain: 표에서 지워진 연결로 다시 보내면 장비가 그 연결을 몰라 막거나 끊어요. 풀이 그보다 먼저 쉬는 연결을 닫게 해요.
+  - id: conntrack-full-log
+    type: choice
+    prompt: 리눅스 게이트웨이에서 새 연결만 가끔 실패하고, 이미 맺은 연결은 멀쩡해요. 커널 로그에서 찾아볼 메시지는?
+    choices:
+      - "nf_conntrack: table full, dropping packet"
+      - "Out of memory: Killed process"
+      - "No space left on device"
+      - "link down"
+    answer: 0
+    explain: 연결 추적 표가 꽉 차면 새 연결의 패킷만 버려져요. nf_conntrack_count와 nf_conntrack_max의 비율을 미리 봐 둬요.
+  - id: nat-name
+    type: input
+    prompt: 사설 IP를 쓰는 서버가 밖으로 나갈 때, 보낸 쪽 주소를 바깥 주소로 바꿔 주는 일을 무엇이라고 하나요?
+    answer: [NAT, 주소 변환]
+    term: network/nat
+    explain: NAT 뒤의 서버들은 바깥에서 보면 모두 같은 주소예요. 그래서 바깥 서버의 로그로는 어느 서버가 보냈는지 구별하기 어려워요.

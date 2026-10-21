@@ -1,0 +1,154 @@
+---
+title: 방화벽과 NAT
+summary: 방화벽은 규칙으로 통신을 거르고, NAT는 주소를 바꿔요. 둘 다 연결을 표에 적어 둬요.
+domain: network
+type: concept
+stage: basics
+order: 65
+icon: network
+keywords: [firewall, 방화벽, NAT, NAPT, conntrack, 연결 추적, DROP, REJECT, stateful, 유휴 시간]
+related: [network/tcp-connections, network/addresses, cloud/networking, apm/connection-pool]
+sources:
+  - title: RFC 3022 — Traditional IP Network Address Translator
+    url: https://www.rfc-editor.org/rfc/rfc3022
+  - title: RFC 1918 — Address Allocation for Private Internets
+    url: https://www.rfc-editor.org/rfc/rfc1918
+  - title: Linux man-pages — iptables(8)
+    url: https://man7.org/linux/man-pages/man8/iptables.8.html
+  - title: Linux man-pages — iptables-extensions(8)
+    url: https://man7.org/linux/man-pages/man8/iptables-extensions.8.html
+  - title: Linux kernel — Netfilter Conntrack Sysfs variables
+    url: https://docs.kernel.org/networking/nf_conntrack-sysctl.html
+  - title: Linux kernel source — nf_conntrack_core.c
+    url: https://github.com/torvalds/linux/blob/master/net/netfilter/nf_conntrack_core.c
+  - title: AWS — Security groups
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html
+  - title: AWS — Troubleshoot NAT gateways
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/nat-gateway-troubleshooting.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="방화벽은 규칙으로 통신을 걸러요">
+    주소, 포트, 프로토콜을 규칙과 맞춰 보고 통과시키거나 막아요.
+  </Point>
+  <Point title="NAT는 안쪽 주소를 바깥 주소로 바꿔요">
+    사설 IP를 쓰는 서버 여럿이 바깥 주소 하나를 나눠 써요. 바깥에서는 그 주소 하나만 보여요.
+  </Point>
+  <Point title="연결 표가 차거나 지워지면 끊겨요">
+    둘 다 연결마다 표에 한 줄을 적어요. 표가 꽉 차면 새 연결을 버리고, 오래 쉰 연결은 표에서 지워요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="경비실 기록부는 꽉 차면 새 장을 덧대지만, 방화벽과 NAT의 연결 표는 꽉 차면 새 연결을 그냥 버려요. 오래 조용했던 방문자는 기록부에서 지워서, 다시 나타나면 모르는 사람이 돼요.">
+  방화벽은 건물 경비실이에요. 출입 명단(규칙)을 보고 들여보낼지 정하고, 오가는 사람은 방문 기록부(연결 표)에 적어요. NAT는 회사 발송실이라, 모든 우편을 회사 대표 주소로 바꿔 보내고 답장이 오면 기록부를 보고 부서로 돌려줘요.
+</Analogy>
+
+## 방화벽은 규칙으로 걸러요
+
+<Term term="network/firewall">방화벽</Term>은 정해 둔 규칙에 따라 통신을 통과시키거나 막아요. 규칙은 보낸 쪽과 받는 쪽의 주소, 포트, 프로토콜(TCP·UDP·ICMP)로 써요.
+
+| 순서 | 보낸 쪽 | 받는 쪽 포트 | 동작 |
+| --- | --- | --- | --- |
+| 1 | 모니터링 서버 | UDP 161 | 통과 |
+| 2 | 모두 | TCP 443 | 통과 |
+| 3 | 모두 | 모두 | 막음 |
+
+규칙을 맞춰 보는 방식은 제품마다 달라요. 리눅스 iptables는 위에서부터 차례로 맞춰 보고, 처음 맞은 규칙의 통과·막음을 따라요. 클라우드의 보안 그룹은 통과 규칙만 적고, 어디에도 맞지 않으면 막아요.
+
+보안 그룹은 <Term slug="cloud/networking">가상 네트워크</Term>에서 다뤄요.
+
+## 막는 방식에 따라 증상이 달라요
+
+막는 방법은 두 가지예요. 아무 답 없이 버리는 DROP과, 거부한다는 답을 돌려주는 REJECT예요. 어느 쪽이냐에 따라 보낸 쪽 앱이 받는 오류가 달라요.
+
+<Figure caption="DROP은 답이 없어서 보낸 쪽이 정한 시간까지 기다려요. REJECT는 거부 답이 바로 와서 곧바로 실패해요.">
+  <Compare
+    columns={['DROP(버림)', 'REJECT(거부)']}
+    rows={[
+      { label: '보낸 쪽이 받는 것', values: ['아무것도 없어요', '거부 응답'] },
+      { label: '앱이 보는 오류', values: ['연결 시간 초과', '연결 거부, 도달 불가'] },
+      { label: '실패까지 걸리는 시간', values: ['정한 시간만큼 기다려요', '바로 실패해요'] },
+    ]}
+  />
+</Figure>
+
+그래서 연결 시간 초과가 갑자기 늘었다면, 길 위의 방화벽이 버리고 있는지 의심해요. 두 오류의 차이는 <Term slug="network/tcp-connections">TCP 연결</Term>에서도 다뤄요.
+
+## 나간 연결의 답은 알아서 들여보내요
+
+많은 방화벽은 연결의 상태를 기억하는(stateful) 방식으로 일해요. 안에서 밖으로 연결을 맺으면 그 연결을 표에 적어 두고, 돌아오는 답은 들어오는 규칙이 따로 없어도 통과시켜요.
+
+<Figure caption="서버가 외부 API에 요청을 보내면 방화벽이 그 연결을 표에 적어요. 돌아온 응답은 표에 있는 연결이라 통과해요.">
+  <Sequence
+    ariaLabel="서버의 요청이 방화벽을 지나 외부 API로 가고, 외부 API의 응답이 방화벽의 연결 표와 맞아 서버로 돌아오는 순서"
+    participants={['서버', '방화벽', '외부 API']}
+    messages={[
+      { from: '서버', to: '방화벽', label: '요청' },
+      { from: '방화벽', to: '외부 API', label: '표에 적고 보냄', tone: 'accent' },
+      { from: '외부 API', to: '방화벽', label: '응답', dashed: true },
+      { from: '방화벽', to: '서버', label: '표와 맞아 통과', dashed: true, tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+리눅스는 이 표를 <Term term="network/conntrack">연결 추적 표</Term>(conntrack)라고 불러요. 규칙에서는 이미 양쪽으로 패킷이 오간 연결(ESTABLISHED)과 새 연결(NEW)을 나눠 다룰 수 있어요.
+
+## NAT는 주소를 바꿔요
+
+사설 IP는 인터넷으로 내보내지 않는 주소예요. 그래서 사설 IP를 쓰는 서버가 밖으로 나갈 때, 경계의 장비가 보낸 쪽 주소를 자기 바깥 주소로 바꿔 줘요. 이 일을 <Term term="network/nat">NAT</Term>(주소 변환)라고 해요.
+
+주소와 함께 포트까지 바꾸면, 여러 서버가 바깥 주소 하나를 함께 쓸 수 있어요. 표준은 이 방식을 NAPT라고 부르고, 주소만 바꾸는 방식과 묶어 NAT라고 해요.
+
+| 안쪽 주소:포트 | 바깥에 보이는 주소:포트 |
+| --- | --- |
+| 10.0.0.5:51234 | 203.0.113.7:40001 |
+| 10.0.0.6:51234 | 203.0.113.7:40002 |
+
+답이 돌아오면 NAT 장비가 이 표를 보고 받는 쪽을 안쪽 주소로 되돌려요. 따로 정해 두지 않으면, 밖에서 안으로는 연결을 새로 시작할 수 없어요.
+
+NAT 뒤의 서버들은 바깥에서 보면 모두 같은 주소예요. 그래서 바깥 서버의 로그에는 여러 서버의 요청이 주소 하나에서 온 것처럼 남아요. 사설 IP는 <Term slug="network/addresses">주소: IP, MAC, 포트</Term>에서 다뤄요.
+
+## 연결 표가 차거나 지워지면 끊겨요
+
+상태를 기억하는 방화벽과 NAT는 모두 연결마다 표에 한 줄을 적어요. 이 표 때문에 생기는 장애가 두 가지 있어요.
+
+첫째, 표가 꽉 차면 새 연결을 버려요. 리눅스는 이때 커널 로그에 `nf_conntrack: table full, dropping packet`을 남겨요. 이미 표에 있는 연결은 그대로라서, 새 연결만 조용히 실패해요.
+
+둘째, 오래 쉬는 연결은 표에서 지워요. 지워진 뒤 그 연결로 다시 보내면 장비가 그 연결을 몰라서 막거나 끊어요. 앱은 오래 쉬던 연결의 첫 요청에서 멈추거나 끊김을 받아요.
+
+얼마나 쉬면 지우는지는 장비마다 달라요. 리눅스 연결 추적은 기본으로 열린 TCP 연결을 5일 동안 둬요. AWS NAT 게이트웨이는 350초만 쉬어도 연결을 끊어요.
+
+## 모니터링에서는
+
+<Figure caption="리눅스 게이트웨이 서버의 예시예요. 연결 추적 표가 꽉 차서, 새 연결의 패킷을 1분에 1,200개씩 버리고 있어요.">
+  <StatTile label="연결 추적 표" value="100" unit="%" tone="warn" note="262,144 / 262,144" />
+  <StatTile label="버린 패킷" value="1,200" unit="/분" tone="warn" />
+</Figure>
+
+리눅스에서는 연결 추적 표에 지금 담긴 줄 수를 `nf_conntrack_count`로 읽어요. 최대 몇 줄까지 담는지는 `nf_conntrack_max`예요. 둘의 비율을 사용률로 그려 두면 꽉 차기 전에 알아요.
+
+방화벽 장비 화면은 보통 규칙마다 막은 횟수와 지금 연결 수를 보여 줘요. 연결 시간 초과가 늘어난 시각에 막은 횟수도 함께 늘었다면, 그때 바뀐 규칙부터 봐요.
+
+<Checkpoints>
+  <Check>연결 시간 초과가 갑자기 늘었다면, 그 시각에 방화벽 규칙이 바뀌었는지 보세요. 버리는(DROP) 규칙은 답이 없어서 시간 초과로만 보여요.</Check>
+  <Check>오래 쉬던 DB 연결의 첫 쿼리가 멈추거나 끊긴다면, 중간 방화벽이나 NAT의 유휴 시간을 의심하세요. <Term slug="apm/connection-pool">커넥션 풀</Term>이 그보다 먼저 쉬는 연결을 닫게 하거나, TCP keepalive 간격을 그보다 짧게 둬요.</Check>
+  <Check>새 연결만 가끔 실패하고 이미 맺은 연결은 멀쩡하다면, 연결 추적 표가 꽉 찼는지 보세요. 리눅스라면 커널 로그에 table full이 남아요.</Check>
+  <Check>바깥 서버 로그의 IP 주소로 보낸 서버를 구별하고 있다면 다시 보세요. NAT 뒤의 서버들은 모두 같은 주소로 보여요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 연결 추적 표의 크기
+
+  리눅스의 `nf_conntrack_max`는 따로 정하지 않으면 해시 표 크기(`nf_conntrack_buckets`)와 같아요. 해시 표 크기는 메모리 크기로 정해지고, 1,024에서 262,144 사이예요. 값은 `/proc/sys/net/netfilter/` 아래에서 읽어요.
+
+  ### 한 연결은 같은 NAT를 지나야 해요
+
+  RFC 3022는 한 세션의 요청과 답이 모두 같은 NAT 라우터를 지나야 한다고 해요. 가는 길과 오는 길이 서로 다른 NAT를 지나면, 답을 안쪽 주소로 되돌리지 못해요.
+
+  ### AWS NAT 게이트웨이의 끊김
+
+  AWS 문서는 NAT 게이트웨이를 지나는 연결이 350초 이상 쉬면 시간 초과로 끊긴다고 해요. 그 뒤 연결을 이어 가려 하면 NAT 게이트웨이가 RST를 돌려줘요. 문서는 그 전에 트래픽을 보내거나, TCP keepalive를 350초보다 짧게 두라고 해요.
+
+  같은 목적지로 동시에 맺을 수 있는 연결 수에도 한도가 있어요. 한도에 닿으면 이미 맺은 연결은 괜찮지만 새 연결을 맺지 못해요.
+</Deeper>
