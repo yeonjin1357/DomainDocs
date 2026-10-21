@@ -17,6 +17,8 @@ sources:
     url: https://dev.mysql.com/doc/refman/8.4/en/connection-interfaces.html
   - title: SQL Server — Thread and task architecture guide
     url: https://learn.microsoft.com/en-us/sql/relational-databases/thread-and-task-architecture-guide
+  - title: SQL Server — sys.dm_exec_connections (MARS)
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-connections-transact-sql
   - title: PostgreSQL — SET
     url: https://www.postgresql.org/docs/current/sql-set.html
   - title: PostgreSQL — The Cumulative Statistics System (pg_stat_activity)
@@ -114,6 +116,14 @@ MySQL은 연결마다 그 연결 전용 스레드를 붙여요. SQL Server는 <T
   Oracle 문서는 둘을 따로 정의해요. 연결은 클라이언트 프로세스와 DB 인스턴스 사이의 물리적 통로예요. 세션은 로그인 하나의 상태를 담은 인스턴스 메모리 안의 논리적 존재예요.
 
   그래서 Oracle에서는 연결 하나에 세션이 0개, 1개, 또는 여러 개일 수 있어요. 세션끼리는 독립이라, 한 세션의 커밋이 다른 세션의 트랜잭션에 영향을 주지 않아요.
+
+  Oracle 문서가 드는 예는 SQL*Plus의 `SET AUTOTRACE`예요. 실행 통계를 켜면 같은 연결 위에 세션이 하나 더 생겨요.
+
+  ### 다른 DB는 보통 연결 하나에 세션 하나예요
+
+  PostgreSQL은 연결마다 서버 프로세스를 딱 하나 띄우고, 그 프로세스가 세션을 맡아요. MySQL도 연결마다 전용 스레드 하나가 인증과 요청 처리를 맡아요. 그래서 둘 다 연결과 세션이 하나씩 짝을 이뤄요.
+
+  SQL Server도 보통 하나씩 짝을 이뤄요. 다만 MARS(Multiple Active Result Sets)를 켜면 세션 하나에 논리 연결이 여럿 붙을 수 있어요. 시스템이 쓰는 내부 세션에는 연결이 없어요.
 
   ### Oracle의 전용 서버와 공유 서버
 

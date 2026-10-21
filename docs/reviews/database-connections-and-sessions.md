@@ -15,3 +15,12 @@
 | state active/idle | https://www.postgresql.org/docs/current/monitoring-stats.html (database-active-sessions 검토에서 확인) |
 
 - 고친 것: "미리 만든 작업 스레드 묶음"을 "작업 스레드 풀"로 바꿨어요(미리 만든다는 근거 없음).
+
+## 추가 확인(2026-10-21): 다른 DB의 연결과 세션
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| Oracle: SET AUTOTRACE로 같은 연결 위에 세션이 하나 더 생김(Figure 16-3, Example 16-2) | https://docs.oracle.com/en/database/oracle/oracle-database/19/cncpt/process-architecture.html |
+| PostgreSQL: 클라이언트마다 백엔드 프로세스 정확히 하나 | https://www.postgresql.org/docs/current/connect-estab.html |
+| MySQL: 연결마다 전용 스레드가 인증과 요청 처리 | https://dev.mysql.com/doc/refman/8.4/en/connection-interfaces.html |
+| SQL Server: 세션↔연결은 "one-to-zero or one-to-many", MARS는 추가 논리 연결(net_transport = Session), 내부 태스크 세션(is_user_process 0) | https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-connections-transact-sql |
