@@ -1,0 +1,119 @@
+---
+title: "주소: IP, MAC, 포트"
+summary: IP는 어느 장비인지, MAC은 같은 네트워크 안의 카드, 포트는 장비 안의 프로그램을 가리켜요.
+domain: network
+type: concept
+stage: basics
+order: 10
+icon: network
+keywords: [IP address, IP 주소, MAC address, MAC 주소, port, 포트, ARP, CIDR, 서브넷, 사설 IP]
+related: [network/overview, network/switches-and-routers, database/connections-and-sessions]
+sources:
+  - title: RFC 791 — Internet Protocol
+    url: https://www.rfc-editor.org/rfc/rfc791.html
+  - title: RFC 8200 — Internet Protocol, Version 6 (IPv6)
+    url: https://www.rfc-editor.org/rfc/rfc8200.html
+  - title: RFC 4632 — Classless Inter-domain Routing (CIDR)
+    url: https://www.rfc-editor.org/rfc/rfc4632.html
+  - title: RFC 1918 — Address Allocation for Private Internets
+    url: https://www.rfc-editor.org/rfc/rfc1918.html
+  - title: RFC 826 — An Ethernet Address Resolution Protocol (ARP)
+    url: https://www.rfc-editor.org/rfc/rfc826.html
+  - title: RFC 9293 — Transmission Control Protocol (TCP)
+    url: https://www.rfc-editor.org/rfc/rfc9293.html
+  - title: RFC 793 — Transmission Control Protocol (sockets)
+    url: https://www.rfc-editor.org/rfc/rfc793.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="IP 주소는 네트워크 위의 위치예요">
+    앞부분은 어느 네트워크인지, 뒷부분은 그 안의 어느 장비인지를 가리켜요.
+  </Point>
+  <Point title="MAC 주소는 같은 네트워크 안에서 써요">
+    네트워크 카드마다 붙은 주소예요. 같은 네트워크 안에서 실제로 전할 때는 이 주소를 봐요.
+  </Point>
+  <Point title="포트는 장비 안의 프로그램을 가리켜요">
+    같은 서버의 웹 서버와 DB를 포트 번호로 구별해요. 연결 하나는 양쪽의 IP와 포트로 정해져요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="택배는 끝까지 건물 주소를 보고 가지만, 네트워크는 같은 네트워크 안에서는 이름표(MAC)를 보고 전해요. 그래서 IP를 MAC으로 바꿔 주는 단계(ARP)가 따로 있어요.">
+  IP 주소는 건물 주소, MAC 주소는 그 건물 우편함에 붙은 이름표, 포트는 받는 부서예요. 이사하면 건물 주소는 바뀌지만 이름표는 사람을 따라가요.
+</Analogy>
+
+## IP 주소
+
+IPv4 주소는 32비트예요. 8비트씩 끊어 `192.168.10.25`처럼 숫자 네 개로 써요. IPv6는 주소를 128비트로 늘린 새 버전이에요.
+
+<Term term="network/ip-address">IP 주소</Term>는 두 부분으로 읽어요. 앞부분은 어느 네트워크인지, 뒷부분은 그 네트워크 안의 어느 장비인지예요. 앞부분이 몇 비트인지는 주소 뒤에 `/24`처럼 붙여 써요.
+
+<Figure caption="/24는 앞 24비트(숫자 세 개)가 네트워크 부분이라는 뜻이에요. 192.168.10.으로 시작하는 장비끼리는 같은 네트워크예요.">
+  <Compare
+    columns={['네트워크 부분', '장비 부분']}
+    rows={[
+      { label: '192.168.10.25/24', values: ['192.168.10', '25'] },
+      { label: '같은 네트워크의 다른 서버', values: ['192.168.10', '30'] },
+      { label: '읽는 법', values: ['같은 네트워크면 같아요', '네트워크 안에서 장비마다 달라요'] },
+    ]}
+  />
+</Figure>
+
+앞부분이 같은 장비끼리를 같은 네트워크(<Term term="network/subnet">서브넷</Term>)라고 불러요. 같은 네트워크 안은 스위치가, 다른 네트워크로는 라우터가 넘겨 줘요.
+
+## MAC 주소와 ARP
+
+<Term term="network/mac-address">MAC 주소</Term>는 네트워크 카드마다 붙은 48비트 주소예요. `aa:bb:cc:11:22:33`처럼 16진수 여섯 묶음으로 써요.
+
+같은 네트워크 안에서 데이터를 실제로 전할 때는 MAC 주소를 봐요. 그래서 보내는 쪽은 받는 쪽의 IP 주소를 MAC 주소로 바꿔야 해요. 이 일을 하는 규약이 <Term term="network/arp">ARP</Term>예요.
+
+<Figure caption="서버 A는 같은 네트워크 모두에게 '이 IP는 누구예요?'라고 묻고, 그 IP를 가진 서버 B가 자기 MAC 주소로 답해요. 그다음부터는 MAC 주소로 보내요.">
+  <Sequence
+    ariaLabel="서버 A가 192.168.10.30의 주인을 묻고, 서버 B가 MAC 주소로 답한 뒤, 서버 A가 그 MAC으로 데이터를 보내는 순서"
+    participants={['서버 A', '서버 B']}
+    messages={[
+      { from: '서버 A', to: '서버 B', label: '10.30은 누구? (모두에게)' },
+      { from: '서버 B', to: '서버 A', label: '나예요, MAC은 aa:bb…', dashed: true },
+      { from: '서버 A', to: '서버 B', label: '데이터 (MAC으로)', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+## 포트
+
+한 서버에서 웹 서버와 DB가 함께 돌면, IP 주소만으로는 어느 프로그램에 줄지 알 수 없어요. 그래서 <Term term="network/port">포트</Term> 번호로 프로그램을 구별해요. 예를 들어 HTTPS는 보통 443번, PostgreSQL은 보통 5432번이에요.
+
+연결 하나는 양쪽 끝의 IP와 포트로 정해져요. IP와 포트를 묶은 것을 <Term term="network/socket">소켓</Term>이라고 불러요.
+
+| | IP | 포트 |
+| --- | --- | --- |
+| 클라이언트 | 10.0.0.5 | 51234 |
+| 서버 | 10.0.0.9 | 443 |
+
+서버 쪽 포트는 정해 둔 번호를 쓰고, 클라이언트 쪽 포트는 보통 운영체제가 비어 있는 번호를 골라 줘요. 그래서 같은 클라이언트가 같은 서버에 연결을 여러 개 맺어도 서로 구별돼요.
+
+## 모니터링에서는
+
+네트워크 화면에서 연결이나 트래픽은 보통 출발지와 도착지의 IP·포트로 보여 줘요. 어느 서버의 어느 프로그램끼리 통신하는지 알려면 포트까지 함께 봐야 해요.
+
+장비 목록에서는 장비마다 IP 주소와, 인터페이스마다 MAC 주소가 붙어요. 한 서버에 인터페이스가 여러 개면 IP 주소도 여러 개예요.
+
+<Checkpoints>
+  <Check>서버를 IP 주소 하나로만 식별하는 화면이라면 다시 보세요. 인터페이스가 여러 개인 서버는 IP도 여러 개예요.</Check>
+  <Check>사설 IP(10.x, 172.16~31.x, 192.168.x)만으로 장비를 구별한다면 다시 보세요. 서로 다른 데이터센터나 클라우드 환경에서 같은 사설 IP를 함께 쓸 수 있어요.</Check>
+  <Check>포트 번호만 보고 어떤 앱인지 단정했다면 다시 보세요. 443이나 5432는 흔한 기본값일 뿐, 앱은 다른 포트를 쓸 수 있어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 사설 IP 대역
+
+  RFC 1918은 인터넷에 내보내지 않고 조직 안에서 쓰라고 세 대역을 남겨 뒀어요. `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`이에요. 여러 조직이 저마다 같은 대역을 써요.
+
+  ### /숫자 읽기
+
+  `/24`는 32비트 중 앞 24비트가 네트워크 부분이라는 뜻이에요. 남은 8비트로 장비를 가리키니, 한 네트워크에 주소가 256개 있어요. `/16`이면 앞 16비트가 네트워크 부분이에요.
+
+  ### 소켓과 연결
+
+  TCP 문서는 포트를 IP 주소와 이어 붙인 것을 소켓이라 부르고, 소켓 한 쌍이 연결 하나를 정한다고 해요. 같은 서버의 443번 포트에 클라이언트 수천 개가 붙어도, 클라이언트 쪽 주소와 포트가 달라서 연결마다 구별돼요.
+</Deeper>

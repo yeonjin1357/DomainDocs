@@ -1,0 +1,97 @@
+terms:
+  - id: interface
+    name: 인터페이스
+    en: Network interface
+    aliases: [interface, NIC, 네트워크 카드, 포트, 랜카드]
+    short: 장비에서 네트워크로 데이터가 드나드는 구멍 하나예요.
+    doc: network/overview
+  - id: packet
+    name: 패킷
+    en: Packet
+    aliases: [packet, datagram, 데이터그램, frame, 프레임]
+    short: 네트워크로 보내려고 잘게 나눈 데이터 덩어리예요. 보내는 곳과 받는 곳의 주소가 붙어요.
+    analogy: 주소를 적은 택배 상자와 같아요.
+    doc: network/overview
+  - id: switch
+    name: 스위치
+    en: Switch
+    aliases: [switch, L2 스위치, 스위칭 허브]
+    short: 같은 네트워크 안에서 MAC 주소를 보고 데이터를 받는 쪽 포트로 넘기는 장비예요.
+    analogy: 호실마다 이름표를 외워 둔 건물 우편실과 같아요.
+    doc: network/switches-and-routers
+  - id: router
+    name: 라우터
+    en: Router
+    aliases: [router, L3 장비, 게이트웨이]
+    short: 서로 다른 네트워크 사이에서 IP 주소와 경로표를 보고 데이터를 넘기는 장비예요.
+    analogy: 주소의 지역을 보고 다음 우체국으로 넘기는 우체국과 같아요.
+    doc: network/switches-and-routers
+  - id: ip-address
+    name: IP 주소
+    en: IP address
+    aliases: [IP, IPv4, IPv6, 아이피]
+    short: 네트워크 위에서 장비의 위치를 가리키는 주소예요. 앞부분은 네트워크, 뒷부분은 장비예요.
+    analogy: 건물 주소와 같아요.
+    doc: network/addresses
+  - id: subnet
+    name: 서브넷
+    en: Subnet
+    aliases: [subnet, 서브네트워크, CIDR, prefix, /24]
+    short: IP 주소의 앞부분(네트워크 부분)이 같은 장비들의 묶음이에요.
+    doc: network/addresses
+  - id: mac-address
+    name: MAC 주소
+    en: MAC address
+    aliases: [MAC, 맥 주소, 하드웨어 주소, 물리 주소]
+    short: 네트워크 카드마다 붙은 48비트 주소예요. 같은 네트워크 안에서 전할 때 써요.
+    analogy: 우편함에 붙은 이름표와 같아요.
+    doc: network/addresses
+  - id: arp
+    name: ARP
+    en: Address Resolution Protocol
+    aliases: [주소 결정 프로토콜]
+    short: 같은 네트워크에서 IP 주소를 MAC 주소로 바꿔 알아내는 규약이에요.
+    doc: network/addresses
+  - id: port
+    name: 포트
+    en: Port
+    aliases: [port, 포트 번호, port number]
+    short: 한 장비 안에서 어느 프로그램에 줄지 가리키는 번호예요.
+    analogy: 같은 건물 안의 받는 부서와 같아요.
+    doc: network/addresses
+  - id: socket
+    name: 소켓
+    en: Socket
+    aliases: [socket, IP:포트]
+    short: IP 주소와 포트를 묶은 것이에요. 소켓 한 쌍이 연결 하나를 정해요.
+    doc: network/addresses
+  - id: private-ip
+    name: 사설 IP
+    en: Private IP address
+    aliases: [private IP, 사설 주소, RFC 1918]
+    short: 인터넷에 내보내지 않고 조직 안에서 쓰는 IP 대역이에요. 여러 조직이 같은 대역을 써요.
+    doc: network/addresses
+  - id: mac-table
+    name: MAC 주소 표
+    en: MAC address table
+    aliases: [MAC table, CAM table, 포워딩 테이블, forwarding database, FDB]
+    short: 스위치가 어느 포트에 어떤 MAC 주소가 있는지 배워 적어 둔 표예요.
+    doc: network/switches-and-routers
+  - id: flooding
+    name: 플러딩
+    en: Flooding
+    aliases: [flooding, unknown unicast flooding]
+    short: 스위치가 받는 쪽 자리를 몰라 받은 포트만 빼고 모든 포트로 데이터를 내보내는 일이에요.
+    doc: network/switches-and-routers
+  - id: routing-table
+    name: 경로표
+    en: Routing table
+    aliases: [routing table, 라우팅 테이블, route, 경로]
+    short: 받는 곳의 네트워크마다 어느 인터페이스로 어느 다음 장비에 넘길지 적은 표예요.
+    doc: network/switches-and-routers
+  - id: default-gateway
+    name: 기본 게이트웨이
+    en: Default gateway
+    aliases: [default gateway, gateway, 게이트웨이]
+    short: 서버가 다른 네트워크로 보낼 때 넘기는 같은 네트워크 안의 라우터예요.
+    doc: network/switches-and-routers

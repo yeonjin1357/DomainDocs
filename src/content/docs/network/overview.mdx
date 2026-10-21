@@ -1,0 +1,70 @@
+---
+title: 데이터가 네트워크를 지나가는 길
+summary: 서버가 보낸 데이터는 인터페이스를 나와 스위치와 라우터를 거쳐 다른 서버에 닿아요.
+domain: network
+type: overview
+order: 0
+icon: network
+keywords: [네트워크, network, 네트워크 장비, 스위치, 라우터, 방화벽, 로드 밸런서, 인터페이스, NDM, 패킷]
+related: [network/addresses, network/switches-and-routers, server/overview]
+sources:
+  - title: RFC 791 — Internet Protocol
+    url: https://www.rfc-editor.org/rfc/rfc791.html
+  - title: RFC 1812 — Requirements for IP Version 4 Routers
+    url: https://www.rfc-editor.org/rfc/rfc1812.html
+  - title: RFC 4188 — Definitions of Managed Objects for Bridges
+    url: https://www.rfc-editor.org/rfc/rfc4188.html
+updated: 2026-10-21
+---
+
+<Analogy limit="택배는 상자 하나가 그대로 끝까지 가지만, 네트워크 데이터는 잘게 나뉜 패킷 여러 개로 가고, 패킷마다 다른 길로 갈 수도 있어요.">
+  네트워크는 택배와 비슷해요. 상자(패킷)에 보내는 곳과 받는 곳의 주소를 적어요. 같은 건물 안이면 건물 우편실(스위치)이 바로 전해 주고, 다른 동네면 우체국(라우터)이 다음 우체국으로 넘겨요.
+</Analogy>
+
+## 데이터가 지나가는 길
+
+<Figure caption="서버 A의 데이터는 같은 네트워크의 스위치를 거쳐 라우터로 가고, 라우터가 서버 B가 있는 네트워크로 넘겨요.">
+  <Flow
+    ariaLabel="네트워크 1의 서버 A가 스위치를 거쳐 라우터로, 라우터가 네트워크 2의 스위치를 거쳐 서버 B로 데이터를 보내는 구조도"
+    nodes={[
+      { id: 'a', label: '서버 A', col: 0, row: 0 },
+      { id: 'sw1', label: '스위치', col: 0, row: 1 },
+      { id: 'router', label: '라우터', col: 1, row: 1, tone: 'accent' },
+      { id: 'sw2', label: '스위치', col: 2, row: 1 },
+      { id: 'b', label: '서버 B', col: 2, row: 0 },
+    ]}
+    edges={[
+      { from: 'a', to: 'sw1', tone: 'accent' },
+      { from: 'sw1', to: 'router', tone: 'accent' },
+      { from: 'router', to: 'sw2', tone: 'accent' },
+      { from: 'sw2', to: 'b', tone: 'accent' },
+    ]}
+    groups={[
+      { label: '네트워크 1', cols: [0, 0], rows: [0, 1] },
+      { label: '네트워크 2', cols: [2, 2], rows: [0, 1] },
+    ]}
+  />
+</Figure>
+
+1. **보내기**: 서버 A의 앱이 데이터를 보내면, 운영체제가 받는 곳의 주소를 붙여 <Term term="network/interface">인터페이스</Term>(네트워크 카드)로 내보내요.
+2. **같은 네트워크 안**: <Term term="network/switch">스위치</Term>가 받는 쪽 장비가 어느 포트에 있는지 보고 그 포트로 넘겨요.
+3. **네트워크 사이**: 받는 곳이 다른 네트워크라면 <Term term="network/router">라우터</Term>가 경로표를 보고 다음 장비로 넘겨요.
+4. **받기**: 서버 B가 있는 네트워크의 스위치가 서버 B에게 전해 주고, 서버 B의 운영체제가 맞는 앱에 넘겨요.
+
+인터넷 프로토콜(IP)은 데이터를 데이터그램(패킷)이라는 덩어리로 나눠, 주소로 가리킨 곳까지 보내요. 문서는 이름은 무엇을 찾는지, 주소는 어디 있는지, 경로는 어떻게 가는지를 뜻한다고 나눠 말해요.
+
+## 네트워크 장비들
+
+| 장비 | 하는 일 |
+| --- | --- |
+| 스위치 | 같은 네트워크 안의 장비끼리 데이터를 넘겨요 |
+| 라우터 | 서로 다른 네트워크 사이로 데이터를 넘겨요 |
+| 방화벽 | 정해 둔 규칙에 따라 통신을 막거나 통과시켜요 |
+| 로드 밸런서 | 들어온 요청을 여러 서버에 나눠 줘요 |
+
+장비마다 데이터가 드나드는 구멍(포트)이 여러 개 있어요. 장비 쪽에서는 이 구멍 하나하나를 인터페이스라고 불러요. 네트워크 장비 모니터링은 대부분 이 인터페이스마다 무엇이 오가는지 보는 일이에요.
+
+## 단계를 하나씩 확대해 봐요
+
+- 받는 곳을 가리키는 세 가지 주소는 <Term slug="network/addresses">주소: IP, MAC, 포트</Term>에서 다뤄요.
+- 스위치와 라우터가 데이터를 넘기는 법은 <Term slug="network/switches-and-routers">스위치와 라우터</Term>에서 다뤄요.
