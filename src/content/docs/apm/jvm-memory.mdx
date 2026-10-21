@@ -1,0 +1,110 @@
+---
+title: JVM과 힙 메모리
+summary: 자바 앱은 JVM 위에서 돌고 객체는 힙에 담겨요. JVM은 힙 밖에서도 메모리를 써요.
+domain: apm
+type: concept
+stage: basics
+order: 40
+icon: layers
+keywords: [JVM, heap, 힙, Xmx, GC, garbage collection, metaspace, 메타스페이스, OutOfMemoryError, young generation]
+related: [apm/gc-pause, apm/thread-pools, server/memory, apm/thread-dumps]
+sources:
+  - title: Java SE 21 — The java Command (-Xmx, -Xms, -Xss, MaxMetaspaceSize)
+    url: https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html
+  - title: Java SE 21 GC Tuning Guide — Garbage-First (G1) Garbage Collector
+    url: https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-g1-garbage-collector1.html
+  - title: Java SE 21 GC Tuning Guide — Available Collectors
+    url: https://docs.oracle.com/en/java/javase/21/gctuning/available-collectors.html
+  - title: Java SE 21 Troubleshooting Guide — Troubleshoot Memory Leaks
+    url: https://docs.oracle.com/en/java/javase/21/troubleshoot/troubleshooting-memory-leaks.html
+  - title: Java SE 21 — The jcmd Command
+    url: https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="객체는 힙에 담겨요">
+    자바 코드가 만든 객체는 JVM의 힙에 담겨요. 힙의 최대 크기는 `-Xmx`로 정해요.
+  </Point>
+  <Point title="GC가 안 쓰는 객체를 치워요">
+    더는 쓰지 않는 객체는 GC가 치워 자리를 만들어요. 치우는 동안 앱 스레드를 잠깐 멈추기도 해요.
+  </Point>
+  <Point title="JVM 메모리는 힙보다 커요">
+    클래스 정보, 스레드 스택 같은 힙 밖 메모리도 써요. 그래서 프로세스 메모리는 `-Xmx`보다 커요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="은행의 서류 정리 담당은 일하는 사이사이 조용히 치우지만, GC는 치우는 동안 앱 스레드를 잠깐 멈추게 하기도 해요.">
+  힙은 지점의 서류 보관실이에요. 새 서류는 오늘 들어온 서류함(young)에 두고, 오래 남은 서류는 장기 보관함(old)으로 옮겨요. 정리 담당(GC)이 더는 찾지 않는 서류를 치워요.
+</Analogy>
+
+## JVM이 쓰는 메모리
+
+<Figure caption="JVM 프로세스의 메모리는 힙만이 아니에요. 메타스페이스, 스레드마다의 스택, 그 밖의 네이티브 메모리를 더한 만큼 서버 메모리를 써요.">
+  <Layers
+    ariaLabel="JVM 프로세스 메모리를 힙, 메타스페이스, 스레드 스택, 그 밖의 네이티브 메모리로 나눈 계층도"
+    layers={[
+      { label: '힙', note: '객체가 담기는 곳. 최대 크기 -Xmx', tone: 'accent' },
+      { label: '메타스페이스', note: '클래스 정보. 기본으로 크기 제한 없음' },
+      { label: '스레드 스택', note: '스레드마다 하나씩(-Xss)' },
+      { label: '그 밖의 네이티브 메모리', note: 'JVM 자체, 직접 버퍼 등' },
+    ]}
+  />
+</Figure>
+
+<Term term="apm/jvm">JVM</Term>은 자바 코드를 실행하는 프로그램이에요. 서버 입장에서는 프로세스 하나예요.
+
+<Term term="apm/heap">힙</Term>은 자바 코드가 만든 객체가 담기는 곳이에요. `-Xmx`가 힙의 최대 크기를, `-Xms`가 처음 크기를 정해요.
+
+힙 밖에도 메모리를 써요. 클래스 정보는 <Term term="apm/metaspace">메타스페이스</Term>에 담기는데, 기본으로 크기 제한이 없어요. 스레드마다 스택이 하나씩 있어서, 스레드가 많으면 스택 메모리도 그만큼 늘어요.
+
+## 힙과 GC
+
+자바 코드는 객체를 직접 지우지 않아요. 더는 아무도 가리키지 않는 객체는 <Term term="apm/gc">GC</Term>(가비지 컬렉터)가 찾아 치워요.
+
+요즘 기본 GC인 G1은 힙을 young과 old 두 세대로 나눠요. 새 객체는 young에 담기고, young을 치울 때 살아남은 객체는 old로 옮겨요. G1은 힙을 같은 크기의 영역(region) 여러 개로 나눠 관리해요.
+
+GC는 치우는 동안 앱 스레드를 잠깐 멈추는 구간(stop-the-world)이 있어요. 이 멈춤이 응답시간에 주는 영향은 <Term slug="apm/gc-pause">GC 멈춤</Term>에서 다뤄요.
+
+## 힙이 모자라면
+
+GC가 치워도 새 객체를 담을 자리가 없으면 `OutOfMemoryError: Java heap space`가 나요. 자바 문서는 이 오류가 꼭 메모리 누수를 뜻하지는 않는다고 해요. 앱에 비해 힙 크기를 작게 잡은 설정 문제일 수도 있어요.
+
+메타스페이스가 바닥나면 `OutOfMemoryError: Metaspace`가 나요. 오류 뒤의 이름을 보면 어느 메모리가 모자랐는지 알 수 있어요.
+
+## 모니터링에서는
+
+<Figure caption="힙 사용량 예시예요. 객체가 쌓이면 오르고 GC가 치우면 내려가는 톱니 모양이에요. GC 직후 바닥이 40%에서 55%로 계속 올라가요.">
+  <MiniLineChart
+    ariaLabel="힙 사용량이 오르고 내리는 톱니 모양이고, GC 직후의 바닥이 40%에서 55%로 점점 올라가는 그래프"
+    yMax={100}
+    series={[{ label: '힙 사용률', values: [40, 55, 70, 85, 45, 60, 75, 90, 50, 65, 80, 95, 55], tone: 'accent', value: '%' }]}
+  />
+  <StatTile label="GC 직후 바닥(처음)" value="40" unit="%" />
+  <StatTile label="GC 직후 바닥(지금)" value="55" unit="%" tone="warn" />
+</Figure>
+
+힙 사용량은 객체가 쌓이면 오르고 GC가 치우면 내려가는 톱니 모양이 정상이에요. 봐야 할 것은 GC 직후에 남는 양이에요. 이 바닥이 계속 올라가면 치울 수 없는 객체가 쌓이고 있는 거예요.
+
+서버나 컨테이너의 메모리 숫자와 힙 숫자는 달라요. 서버가 보는 프로세스 메모리(RSS)에는 힙 밖의 메모리까지 들어가요. RSS는 서버·OS의 <Term slug="server/memory">메모리</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>컨테이너 메모리 한도를 `-Xmx`와 같게 잡았다면 다시 보세요. 힙 밖 메모리까지 더하면 한도를 넘어, 힙은 여유가 있는데 프로세스가 강제로 끝날 수 있어요.</Check>
+  <Check>OutOfMemoryError가 났다고 바로 누수로 단정했다면 다시 보세요. 힙을 앱에 비해 작게 잡았을 수도 있어요. GC 직후 바닥이 계속 오르는지 보세요.</Check>
+  <Check>힙 사용률이 90%를 넘으면 알리는 규칙이라면 다시 보세요. GC 직전에는 높은 게 정상이라 알림이 쏟아져요. GC 직후 남는 양을 기준으로 보세요.</Check>
+  <Check>스레드를 수천 개 쓰는 앱이라면 스레드 스택 메모리도 계산에 넣으세요. 스레드마다 스택을 따로 잡아요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 힙 크기 옵션
+
+  `-Xmx`는 힙의 최대 크기, `-Xms`는 힙의 최소이자 처음 크기, `-Xss`는 스레드 스택 크기를 정해요. `-XX:MaxMetaspaceSize`는 클래스 정보에 쓸 네이티브 메모리의 최대치이고, 정하지 않으면 제한이 없어요.
+
+  ### G1의 young 수집
+
+  G1의 young 전용 단계는 보통 young 수집 몇 번으로 시작해요. 이때 살아남은 객체를 old 세대로 옮기는데, 이를 승격(promote)이라고 불러요.
+
+  ### 힙 정보 보기
+
+  `jcmd <PID> GC.heap_info`로 실행 중인 JVM의 힙 정보를 볼 수 있어요. 운영 중에 쓸 때는 문서가 적은 부하(Impact)를 확인해요.
+</Deeper>

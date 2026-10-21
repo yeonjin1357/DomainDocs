@@ -51,3 +51,61 @@ terms:
     short: 요청을 처리할 스레드를 정해 둔 수만큼 묶어 두고 돌려 쓰는 방식이에요.
     analogy: 정해진 수의 창구 직원이 손님을 번갈아 맡는 것과 같아요.
     doc: apm/web-server-and-was
+  - id: request-queue
+    name: 대기열
+    en: Request queue
+    aliases: [queue, 큐, 작업 대기열, task queue, backlog]
+    short: 빈 스레드가 없을 때 요청이 차례를 기다리는 줄이에요. 가득 차면 요청을 거부해요.
+    analogy: 창구 직원이 모두 바쁠 때 손님이 앉는 대기석과 같아요.
+    doc: apm/thread-pools
+  - id: jvm
+    name: JVM
+    en: Java Virtual Machine
+    aliases: [자바 가상 머신, HotSpot, java]
+    short: 자바 코드를 실행하는 프로그램이에요. 서버에서는 프로세스 하나로 보여요.
+    doc: apm/jvm-memory
+  - id: heap
+    name: 힙
+    en: Heap
+    aliases: [heap, 자바 힙, Java heap, Xmx]
+    short: 자바 코드가 만든 객체가 담기는 메모리예요. 최대 크기는 -Xmx로 정해요.
+    analogy: 지점의 서류 보관실과 같아요.
+    doc: apm/jvm-memory
+  - id: gc
+    name: GC
+    en: Garbage collection
+    aliases: [garbage collection, 가비지 컬렉션, 가비지 컬렉터, G1]
+    short: 더는 아무도 쓰지 않는 객체를 찾아 치워 힙에 자리를 만드는 일이에요.
+    analogy: 아무도 찾지 않는 서류를 치우는 정리 담당과 같아요.
+    doc: apm/jvm-memory
+  - id: metaspace
+    name: 메타스페이스
+    en: Metaspace
+    aliases: [metaspace, MaxMetaspaceSize]
+    short: 클래스 정보를 담는 힙 밖 메모리예요. 기본으로 크기 제한이 없어요.
+    doc: apm/jvm-memory
+  - id: out-of-memory-error
+    name: OutOfMemoryError
+    en: OutOfMemoryError
+    aliases: [OOM, OOME, Java heap space, 메모리 부족 오류]
+    short: JVM이 새 객체를 담을 자리를 못 찾을 때 나는 오류예요. 꼭 누수를 뜻하지는 않아요.
+    doc: apm/jvm-memory
+  - id: thread-dump
+    name: 스레드 덤프
+    en: Thread dump
+    aliases: [thread dump, jstack, Thread.print]
+    short: 한순간 JVM의 모든 스레드가 어떤 상태로 어디서 무엇을 하는지 찍은 기록이에요.
+    analogy: 지점 CCTV로 한순간을 찍은 사진과 같아요.
+    doc: apm/thread-dumps
+  - id: stack-trace
+    name: 스택 트레이스
+    en: Stack trace
+    aliases: [stack trace, 스택, call stack, 호출 스택]
+    short: 스레드가 어떤 코드를 거쳐 지금 어디를 실행 중인지 차례로 적은 목록이에요.
+    doc: apm/thread-dumps
+  - id: thread-state
+    name: 스레드 상태
+    en: Thread state
+    aliases: [Thread.State, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING]
+    short: 자바 스레드가 실행 중인지, 잠금을 기다리는지, 무엇을 기다리는지 나눈 이름이에요.
+    doc: apm/thread-dumps

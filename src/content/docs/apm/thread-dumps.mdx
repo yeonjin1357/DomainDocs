@@ -1,0 +1,99 @@
+---
+title: 스레드 덤프
+summary: 스레드 덤프는 한순간 JVM의 모든 스레드가 어디서 무엇을 하는지 찍은 사진이에요.
+domain: apm
+type: concept
+stage: basics
+order: 50
+icon: layers
+keywords: [thread dump, 스레드 덤프, jstack, jcmd, Thread.State, RUNNABLE, BLOCKED, WAITING, stack trace, 스택 트레이스]
+related: [apm/thread-pools, apm/jvm-memory, apm/slow-response, database/locks-and-blocking]
+sources:
+  - title: Java SE 21 — Thread.State
+    url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.State.html
+  - title: Java SE 21 — The jcmd Command (Thread.print)
+    url: https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="한순간을 찍은 사진이에요">
+    스레드마다 지금 상태와, 어떤 코드를 거쳐 어디서 멈춰 있는지(스택)를 보여 줘요.
+  </Point>
+  <Point title="상태 이름을 그대로 믿지 마세요">
+    RUNNABLE은 CPU를 쓰는 중일 수도, 소켓 응답을 기다리는 중일 수도 있어요.
+  </Point>
+  <Point title="여러 장을 견줘 봐요">
+    몇 초 간격으로 여러 번 떠서, 계속 같은 자리에 멈춰 있는 스레드를 찾아요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="CCTV 사진 한 장으로는 직원이 일하는 중인지 멈춰 있는지 알 수 없어요. 몇 초 간격으로 여러 장을 봐야 같은 자세로 멈춘 직원이 보여요.">
+  지점 CCTV로 한순간을 찍은 사진과 같아요. 직원(스레드)마다 지금 무엇을 하고 있는지, 누구를 기다리는지가 찍혀요.
+</Analogy>
+
+## 덤프에는 무엇이 있나요
+
+<Term term="apm/thread-dump">스레드 덤프</Term>는 JVM 안의 모든 스레드를 한순간에 찍어, 스레드마다 이름, 상태, <Term term="apm/stack-trace">스택 트레이스</Term>를 적어 줘요. 아래는 그중 스레드 하나의 예시예요.
+
+```text
+"http-nio-8080-exec-12" #45 daemon prio=5
+   java.lang.Thread.State: BLOCKED (on object monitor)
+        at com.example.OrderService.reserve(OrderService.java:88)
+        - waiting to lock <0x000000076b1c2a10>
+        at com.example.OrderController.create(OrderController.java:41)
+```
+
+첫 줄은 스레드 이름이에요. 둘째 줄이 상태이고, 그 아래가 스택이에요. 스택은 위로 갈수록 지금 실행 중인 곳이라, 이 스레드는 `OrderService.reserve`의 88번째 줄에서 잠금을 기다리고 있어요.
+
+실행 중인 JVM에서는 `jcmd <PID> Thread.print`로 덤프를 떠요.
+
+## 스레드 상태
+
+| 상태 | 뜻 |
+| --- | --- |
+| RUNNABLE | JVM 안에서 실행 중이에요. 운영체제의 자원(CPU 등)을 기다릴 수도 있어요 |
+| BLOCKED | `synchronized` 잠금을 얻으려고 기다려요 |
+| WAITING | 다른 스레드가 무언가 해 주길 기한 없이 기다려요 |
+| TIMED_WAITING | 정한 시간까지만 기다려요(`sleep` 등) |
+
+## RUNNABLE의 함정
+
+자바 문서는 RUNNABLE 스레드가 JVM 안에서 실행 중이지만, 운영체제의 자원을 기다리고 있을 수 있다고 해요. 그래서 DB나 외부 API의 응답을 소켓에서 읽으며 기다리는 스레드도 RUNNABLE로 보여요.
+
+RUNNABLE이 많다고 CPU가 바쁘다고 읽으면 안 돼요. 스택 맨 위가 소켓 읽기라면, 그 스레드는 상대의 응답을 기다리는 중이에요.
+
+## 쉬는 스레드도 WAITING이에요
+
+스레드 풀의 쉬는 스레드는 새 일이 오기를 기다리며 WAITING이나 TIMED_WAITING으로 보여요. 그래서 WAITING이 많다는 것만으로는 문제가 아니에요. 문제는 요청을 처리하던 스레드가 무언가에 막혀 기다릴 때예요.
+
+## 모니터링에서는
+
+<Figure caption="응답이 느려졌을 때 5초 간격으로 세 번 뜬 덤프 예시예요. 요청 스레드 30개가 세 번 모두 같은 잠금에서 BLOCKED였어요.">
+  <StatTile label="요청 스레드" value="200" unit="개" />
+  <StatTile label="같은 잠금에서 BLOCKED" value="30" unit="개" tone="warn" />
+  <StatTile label="소켓 읽기 RUNNABLE" value="120" unit="개" />
+</Figure>
+
+APM 화면의 스레드 덤프 기능은 버튼 하나로 이 사진을 떠 줘요. 응답이 느려졌을 때 여러 번 떠서, 상태별로 묶고 같은 스택끼리 세어 봐요.
+
+같은 잠금에서 BLOCKED가 몰리면 한 스레드가 잠금을 오래 쥐고 있는 거예요. 같은 소켓 읽기에서 RUNNABLE이 몰리면 그 상대(DB나 외부 API)가 느린 거예요. DB 쪽 잠금은 <Term slug="database/locks-and-blocking">잠금과 블로킹</Term>에서 봐요.
+
+<Checkpoints>
+  <Check>스레드 덤프 한 장만 보고 원인을 정했다면 다시 보세요. 몇 초 간격으로 여러 번 떠서, 계속 같은 자리에 있는 스레드를 찾으세요.</Check>
+  <Check>RUNNABLE 스레드가 많다고 CPU가 모자란다고 판단했다면, 스택 맨 위를 보세요. 소켓 읽기라면 상대의 응답을 기다리는 중이에요.</Check>
+  <Check>WAITING 스레드가 많다고 문제로 본다면 다시 보세요. 스레드 풀의 쉬는 스레드도 WAITING이에요. 요청을 처리하던 스레드인지 먼저 보세요.</Check>
+  <Check>운영 서버에서 덤프를 아주 자주 뜨는 자동화라면 다시 보세요. 스레드가 많을수록 덤프를 뜨는 부담도 커져요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 상태의 정확한 뜻
+
+  BLOCKED는 모니터 잠금을 기다리는 상태예요. `synchronized` 블록에 들어가거나, `Object.wait` 뒤에 다시 들어가려고 기다려요. WAITING은 기한 없는 `Object.wait`, `Thread.join`, `LockSupport.park`를 부른 상태예요.
+
+  TIMED_WAITING은 `Thread.sleep`처럼 기다릴 시간을 정해 부른 상태예요. 스레드 풀의 쉬는 스레드는 보통 `LockSupport.park` 계열로 일을 기다려서 WAITING이나 TIMED_WAITING으로 보여요.
+
+  ### 덤프의 부담
+
+  jcmd 문서는 `Thread.print`의 부담(Impact)을 "중간, 스레드 수에 따라 달라짐"으로 적어요. 스레드가 수천 개인 JVM이라면 덤프 한 번에도 시간이 걸려요.
+</Deeper>

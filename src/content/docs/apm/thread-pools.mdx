@@ -1,0 +1,97 @@
+---
+title: 스레드 풀과 요청 처리
+summary: WAS는 정해진 수의 스레드로 요청을 처리해요. 스레드가 다 바쁘면 요청은 줄을 서요.
+domain: apm
+type: concept
+stage: basics
+order: 30
+icon: layers
+keywords: [thread pool, 스레드 풀, worker thread, 대기열, queue, ThreadPoolExecutor, maxThreads, 스레드 고갈, saturation, 동시 처리]
+related: [apm/web-server-and-was, apm/throughput-and-concurrency, apm/connection-pool, apm/cascading-failure, apm/timeouts-and-retries]
+sources:
+  - title: Java SE 21 — ThreadPoolExecutor
+    url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html
+  - title: Apache Tomcat 10.1 — The HTTP Connector
+    url: https://tomcat.apache.org/tomcat-10.1-doc/config/http.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="스레드 수가 동시 처리 한도예요">
+    스레드 하나가 요청 하나를 맡아요. 스레드가 200개면 동시에 처리하는 요청도 200개까지예요.
+  </Point>
+  <Point title="다 바쁘면 줄을 서요">
+    빈 스레드가 없으면 요청은 대기열에서 기다려요. 대기열마저 차면 요청을 거부해요.
+  </Point>
+  <Point title="느린 곳이 스레드를 붙잡아요">
+    DB나 외부 API를 기다리는 동안에도 스레드는 그 요청에 묶여 있어요. 그래서 한 곳이 느려지면 다른 요청까지 막혀요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="은행 창구 직원은 금고를 기다리는 동안 다른 손님을 잠깐 받을 수도 있지만, 보통의 WAS 스레드는 DB 응답을 기다리는 동안 다른 요청을 받지 못해요.">
+  스레드 풀은 정해진 수의 창구 직원이에요. 직원이 모두 손님을 맡고 있으면 새 손님은 대기석에 앉아요. 대기석까지 차면 번호표를 더 주지 않아요.
+</Analogy>
+
+## 스레드 풀은 이렇게 움직여요
+
+<Figure caption="요청은 빈 스레드가 있으면 바로 처리되고, 없으면 대기열에서 기다려요. 대기열이 가득 차면 거부돼요.">
+  <Flow
+    ariaLabel="요청이 스레드 풀로 가고, 스레드가 다 바쁘면 대기열로, 대기열이 가득 차면 거부로 이어지는 구조도"
+    nodes={[
+      { id: 'req', label: '요청', col: 0, row: 0 },
+      { id: 'pool', label: '스레드 풀', col: 1, row: 0, note: '빈 스레드가 맡음', tone: 'accent' },
+      { id: 'queue', label: '대기열', col: 1, row: 1, note: '차례를 기다림' },
+      { id: 'reject', label: '거부', col: 1, row: 2, tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'req', to: 'pool', tone: 'accent' },
+      { from: 'pool', to: 'queue', label: '다 바쁘면' },
+      { from: 'queue', to: 'reject', label: '가득 차면', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+<Term term="apm/thread-pool">스레드 풀</Term>은 요청을 처리할 스레드를 정해 둔 수만큼 두고 돌려 써요. 요청마다 스레드를 새로 만들면 만드는 비용이 들고, 몰릴 때 스레드가 끝없이 늘어나기 때문이에요.
+
+자바의 표준 스레드 풀(`ThreadPoolExecutor`)은 이 순서로 움직여요. 기본 스레드 수(core)보다 적게 돌고 있으면 새 스레드를 만들어요. 기본 수만큼 돌고 있으면 새 일을 <Term term="apm/request-queue">대기열</Term>에 넣어요.
+
+대기열에도 못 넣으면 최대 수(max)까지 스레드를 늘리고, 그것도 넘으면 거부해요.
+
+## 동시에 몇 개가 필요할까요
+
+동시에 처리 중인 요청 수는 처리량에 응답시간을 곱한 값과 같아요. 초당 100건이 들어오고 하나에 평균 0.5초가 걸리면, 평균 50개를 동시에 처리하고 있어요. 이 관계는 <Term slug="apm/throughput-and-concurrency">처리량과 동시성</Term>에서 다뤄요.
+
+같은 초당 100건이라도 DB가 느려져 응답이 3초가 되면, 동시에 300개가 필요해요. 스레드가 200개뿐이면 나머지 100개는 대기열에서 기다리고, 기다린 만큼 응답이 더 느려져요.
+
+## 느린 곳이 스레드를 붙잡아요
+
+보통의 WAS 스레드는 DB나 외부 API의 응답을 기다리는 동안 그 요청에 묶여 있어요. CPU를 쓰지 않아도 스레드는 반납되지 않아요.
+
+그래서 외부 API 하나가 느려지면 그 API를 부르는 요청들이 스레드를 하나씩 붙잡아요. 결국 스레드가 바닥나면, 그 API와 상관없는 요청까지 대기열에서 기다려요. 이렇게 번지는 모습은 <Term slug="apm/cascading-failure">연쇄 장애</Term>에서 다뤄요.
+
+## 모니터링에서는
+
+<Figure caption="주문 API 서버의 예시예요. 스레드 200개가 모두 바쁘고 대기열에 340개가 쌓였어요. 평균 응답시간은 3.1초로 올랐어요.">
+  <StatTile label="바쁜 스레드" value="200" unit="/ 200" tone="warn" />
+  <StatTile label="대기 중인 요청" value="340" unit="개" />
+  <StatTile label="평균 응답시간" value="3.1" unit="초" />
+</Figure>
+
+APM 화면의 WAS 지표에는 보통 바쁜 스레드 수와 최대 스레드 수가 있어요. 바쁜 스레드가 최대치에 붙어 평평하다면 스레드가 바닥난 거예요. 이때 응답시간이 오른 원인은 대부분 스레드가 기다리는 곳(DB, 외부 API)에 있어요.
+
+<Checkpoints>
+  <Check>AI가 짠 코드가 기본 10, 최대 100에 크기 제한 없는 대기열로 스레드 풀을 만든다면 다시 보세요. 대기열이 차지 않으니 스레드는 10개를 넘지 않고, 최대 100은 쓰이지 않아요.</Check>
+  <Check>대기열 크기를 무제한으로 두는 코드라면 다시 보세요. 몰릴 때 거부 대신 끝없이 쌓여, 메모리와 응답시간이 함께 늘어나요.</Check>
+  <Check>외부 API나 DB 호출에 타임아웃이 없다면 다시 보세요. 상대가 멈추면 스레드가 끝없이 묶여 스레드 풀이 바닥나요. 정하는 법은 <Term slug="apm/timeouts-and-retries">타임아웃과 재시도</Term>에 있어요.</Check>
+  <Check>스레드 수를 DB 커넥션 풀보다 훨씬 크게 늘리자는 제안이라면 다시 보세요. 늘어난 스레드는 <Term slug="apm/connection-pool">커넥션 풀</Term> 앞에서 커넥션을 기다리며 줄만 바꿔 서요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 무제한 대기열의 함정
+
+  자바 문서는 크기를 정하지 않은 대기열을 쓰면, 기본 스레드가 모두 바쁠 때 새 일이 대기열에서 기다린다고 해요. 그래서 기본 수보다 많은 스레드는 만들어지지 않고, 최대 수 설정은 아무 효과가 없어요.
+
+  ### Tomcat의 스레드 수
+
+  Tomcat의 `maxThreads`는 동시에 처리할 수 있는 요청 수를 정해요. 기본값은 200이에요. 따로 정한 executor를 연결하면 이 값 대신 executor의 설정을 써요.
+</Deeper>
