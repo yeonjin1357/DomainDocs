@@ -1,0 +1,79 @@
+---
+title: 장비가 응답 없음으로 보일 때
+summary: ping과 SNMP 중 무엇이 안 되는지 가르고, 장비가 재시작했는지 가동 시간으로 확인해요.
+domain: network
+type: guide
+order: 80
+icon: network
+keywords: [device down, 장비 다운, SNMP timeout, 응답 없음, ping, sysUpTime, coldStart, warmStart, 커뮤니티, UDP 161]
+related: [network/snmp, network/ping-and-latency, network/traps-and-syslog, server/server-not-reporting]
+sources:
+  - title: RFC 3418 — MIB for SNMP (sysUpTime, coldStart, warmStart)
+    url: https://www.rfc-editor.org/rfc/rfc3418
+  - title: RFC 3417 — Transport Mappings for SNMP (UDP 161, 162)
+    url: https://www.rfc-editor.org/rfc/rfc3417
+  - title: RFC 1812 — Requirements for IP Version 4 Routers
+    url: https://www.rfc-editor.org/rfc/rfc1812
+updated: 2026-10-21
+---
+
+<Situation>
+  네트워크 장비 목록에서 지점 스위치 한 대가 "응답 없음"으로 바뀌었어요. 그런데 그 지점에서 일하는 사람들은 아무 문제가 없다고 해요.
+
+  "응답 없음"은 장비가 죽었다는 뜻이 아닐 수 있어요. 모니터링 서버가 장비에 닿지 못했거나, SNMP 질문에만 답하지 않는 걸 수도 있어요.
+</Situation>
+
+<FirstLook>
+  <Item title="ping은 되나">장비가 네트워크에서 살아 있는지 봐요.</Item>
+  <Item title="SNMP만 안 되나">질문에 답하는 기능만 막혔는지 봐요.</Item>
+  <Item title="재시작했나">가동 시간이 갑자기 줄었는지 봐요.</Item>
+</FirstLook>
+
+## 1. ping과 SNMP를 따로 보세요
+
+장비 모니터링은 보통 두 가지로 살아 있는지 봐요. ping(ICMP)에 답하는지, <Term slug="network/snmp">SNMP</Term> 질문에 답하는지예요. 둘의 결과를 짝지으면 갈래가 정해져요.
+
+| ping | SNMP | 뜻 |
+| --- | --- | --- |
+| 안 돼요 | 안 돼요 | 장비가 꺼졌거나, 모니터링 서버에서 장비까지 가는 길이 끊겼어요 |
+| 돼요 | 안 돼요 | 장비는 살아 있어요. SNMP 설정이나 방화벽을 봐요 |
+| 안 돼요 | 돼요 | 장비는 살아 있어요. ICMP만 막혔거나 우선순위가 낮아요 |
+
+장비 하나만이 아니라 같은 지점의 장비가 모두 응답 없음이라면, 그 지점으로 가는 회선이나 앞단 라우터를 먼저 봐요.
+
+## 2. SNMP만 안 된다면 설정과 길을 보세요
+
+ping은 되는데 SNMP만 답이 없다면, 장비는 살아 있고 질문 쪽이 막힌 거예요. 흔한 원인은 이래요.
+
+- 커뮤니티 문자열이나 SNMPv3 계정 정보가 바뀌었어요. 틀린 질문에는 장비가 답하지 않아요.
+- 장비의 접근 목록(ACL)이 모니터링 서버의 주소를 허용하지 않아요. 모니터링 서버를 옮겼을 때 흔해요.
+- 중간 방화벽이 UDP 161번 포트를 막았어요. SNMP 에이전트는 보통 이 포트에서 질문을 기다려요.
+- 장비 CPU가 바빠서 SNMP 답이 제한 시간 안에 오지 않아요. 이때는 응답 없음이 났다 풀렸다를 되풀이해요.
+
+**확인 방법**: 모니터링 서버에서 그 장비로 `snmpget`을 직접 보내 봐요. 답이 오는데 화면만 응답 없음이라면 모니터링 쪽 설정을 봐요.
+
+## 3. ping만 안 된다면 막혔는지 보세요
+
+라우터나 방화벽은 ICMP를 막거나, 처리 우선순위를 낮게 둘 수 있어요. 라우터 요구 사항 문서(RFC 1812)도 라우터가 ICMP 오류 메시지의 양을 제한할 수 있어야 한다고 해요.
+
+그래서 ping 손실이 조금 있어도 SNMP와 실제 트래픽이 멀쩡하다면, 장비가 아프다는 뜻은 아니에요. 자세한 건 <Term slug="network/ping-and-latency">ping과 지연·손실</Term>에 있어요.
+
+## 4. 다시 살아났다면 재시작했는지 보세요
+
+응답이 돌아왔다면, 그사이 장비가 다시 시작했는지 확인해요. 장비 가동 시간(sysUpTime)이 직전보다 작아졌다면 다시 시작한 거예요.
+
+<Figure caption="응답 없음이 풀린 뒤 가동 시간이 수십 일에서 몇 분으로 줄었어요. 그사이 장비가 다시 시작한 거예요.">
+  <StatTile label="이전 가동 시간" value="41" unit="일" />
+  <StatTile label="지금 가동 시간" value="6" unit="분" tone="warn" note="다시 시작했어요" />
+</Figure>
+
+SNMP Trap을 받고 있다면 재시작 알림도 와요. coldStart는 설정이 바뀌었을 수 있는 재시작이고, warmStart는 설정이 그대로인 재시작이에요. Trap은 사라질 수 있으니, 가동 시간으로도 꼭 확인해요.
+
+재시작했다면 그 직전의 Syslog를 봐요. 전원, 과열, 소프트웨어 오류 같은 원인이 남아 있을 수 있어요. Trap과 Syslog는 <Term slug="network/traps-and-syslog">SNMP Trap과 Syslog</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>장비 응답 없음 알림을 장비 고장과 같은 것으로 다룬다면 다시 보세요. 모니터링 서버에서 가는 길이나 SNMP 설정만 바뀌어도 같은 알림이 울려요.</Check>
+  <Check>응답 없음이 짧게 났다 풀렸다를 되풀이한다면, 장비 CPU와 SNMP 제한 시간을 보세요. 바쁜 장비는 SNMP 답을 늦게 줘요.</Check>
+  <Check>재시작 뒤 트래픽 그래프가 크게 튀었다면, 카운터가 0부터 다시 센 구간을 계산에서 뺐는지 보세요.</Check>
+  <Check>모니터링 서버를 옮긴 뒤 여러 장비가 한꺼번에 응답 없음이라면, 장비 ACL에 새 주소가 들어 있는지 보세요.</Check>
+</Checkpoints>
