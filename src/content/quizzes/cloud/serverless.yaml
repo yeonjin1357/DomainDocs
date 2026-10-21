@@ -1,0 +1,41 @@
+questions:
+  - id: duration-excludes-cold
+    type: ox
+    prompt: Lambda의 Duration 지표에는 콜드 스타트 시간이 들어 있나요?
+    answer: false
+    explain: Duration은 함수 코드가 이벤트를 처리한 시간이에요. Duration은 짧은데 사용자가 느리다면 콜드 스타트를 의심해요.
+  - id: concurrency-calc
+    type: choice
+    prompt: 함수에 초당 400건이 오고, 한 건에 평균 3초가 걸려요. 필요한 동시성은?
+    choices:
+      - 1,200
+      - "133"
+      - "400"
+      - "3"
+    answer: 0
+    explain: 동시성은 초당 요청 수 × 평균 실행 시간이에요. 400 × 3 = 1,200이라, 리전 기본 한도 1,000을 넘어요.
+  - id: throttles-not-errors
+    type: ox
+    prompt: 동시성 한도에 걸려 스로틀된 요청은 Errors 지표에 들어가나요?
+    answer: false
+    explain: 스로틀된 요청은 Invocations에도 Errors에도 들어가지 않아요. Throttles를 따로 봐야 해요.
+  - id: shared-region-limit
+    type: choice
+    prompt: 함수 하나에 요청이 몰리자, 상관없는 다른 함수까지 스로틀돼요. 왜일까요?
+    choices:
+      - 리전 안의 모든 함수가 동시성 한도를 함께 써서
+      - 함수끼리 같은 코드를 나눠 써서
+      - 콜드 스타트가 길어져서
+      - 다른 함수의 메모리가 모자라서
+    answer: 0
+    explain: 기본 한도는 계정의 리전마다 하나라 모든 함수가 함께 써요. 중요한 함수에는 동시성을 따로 떼어 둬요.
+  - id: default-timeout
+    type: choice
+    prompt: Lambda 함수의 기본 제한 시간은?
+    choices:
+      - 3초
+      - 15분
+      - 1분
+      - 제한이 없어요
+    answer: 0
+    explain: 기본은 3초이고, 최대 900초(15분)까지 늘릴 수 있어요. 제한 시간 초과도 Errors에 들어가요.

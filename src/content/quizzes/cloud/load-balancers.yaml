@@ -1,0 +1,46 @@
+questions:
+  - id: health-check-delay
+    type: choice
+    prompt: AWS Application Load Balancer 기본값은 30초마다 확인하고, 2번 연속 실패하면 대상을 빼요. 대상이 죽은 뒤 빠지기까지 대략 얼마나 걸릴까요?
+    choices:
+      - 1분 안쪽
+      - 바로
+      - 약 5분
+      - 약 30분
+    answer: 0
+    explain: 30초 간격으로 두 번 실패해야 빠져요. 그사이 그 대상으로 간 요청은 실패해요.
+  - id: fail-open
+    type: ox
+    prompt: 모든 대상이 상태 확인에 실패하면, Application Load Balancer는 요청을 하나도 보내지 않나요?
+    answer: false
+    explain: 모든 대상이 실패하면 상태와 상관없이 모두에게 보내요. 이걸 fail open이라고 해요.
+  - id: elb-5xx
+    type: choice
+    prompt: 사용자는 오류를 겪는데 앱 로그는 깨끗해요. 먼저 볼 로드 밸런서 지표는?
+    choices:
+      - 로드 밸런서가 직접 만든 5xx 수(HTTPCode_ELB_5XX_Count)
+      - 대상이 만든 5xx 수(HTTPCode_Target_5XX_Count)
+      - 처리한 요청 수(RequestCount)
+      - 대상의 응답시간(TargetResponseTime)
+    answer: 0
+    explain: 대상까지 가지 못한 오류는 앱 로그에 남지 않고, 로드 밸런서 지표로만 보여요.
+  - id: l7-routing
+    type: choice
+    prompt: /api로 오는 요청은 API 서버로, 나머지는 웹 서버로 나누고 싶어요. 무엇을 써야 할까요?
+    choices:
+      - HTTP 내용을 보는 7계층 로드 밸런서
+      - 연결의 주소와 포트만 보는 4계층 로드 밸런서
+      - 보안 그룹
+      - 네트워크 ACL
+    answer: 0
+    explain: 경로처럼 요청 내용을 보고 나누는 건 7계층이에요. 4계층은 내용을 보지 않는 대신 빠르고 많은 요청을 감당해요.
+  - id: cross-zone-off
+    type: choice
+    prompt: 가용 영역 넘나들기를 끈 로드 밸런서에서, A 영역에 대상 2대, B 영역에 8대가 있어요. A의 대상 한 대는 B의 대상 한 대보다 몇 배 많은 요청을 받을까요?
+    choices:
+      - 4배
+      - 같아요
+      - 2배
+      - 8배
+    answer: 0
+    explain: 영역마다 절반씩 받으니 A의 대상은 25%씩, B의 대상은 6.25%씩 받아요. 그래서 A 쪽이 4배예요.

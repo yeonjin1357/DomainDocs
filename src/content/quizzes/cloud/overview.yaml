@@ -1,0 +1,37 @@
+questions:
+  - id: iaas-os-patch
+    type: choice
+    prompt: EC2 같은 IaaS로 가상 서버를 빌렸어요. 그 서버의 운영체제 보안 패치는 누가 맡을까요?
+    choices:
+      - 고객
+      - 클라우드 사업자
+      - 패치가 저절로 적용돼서 아무도 안 맡아요
+      - 하드웨어 제조사
+    answer: 0
+    explain: IaaS에서는 가상 머신 아래는 사업자가, 운영체제부터 위는 고객이 맡아요.
+  - id: saas-example
+    type: choice
+    prompt: 다음 중 완성된 소프트웨어를 빌려 쓰는 SaaS에 가장 가까운 것은?
+    choices:
+      - 웹 메일
+      - EC2 가상 머신
+      - Azure App Service
+      - VPC
+    answer: 0
+    explain: SaaS는 고객이 데이터와 계정만 맡아요. EC2는 IaaS, App Service는 앱을 올리는 PaaS예요.
+  - id: s3-azure-pair
+    type: choice
+    prompt: AWS S3와 같은 일을 하는 Azure 서비스는?
+    choices:
+      - Blob Storage
+      - Managed Disks
+      - Virtual Network
+      - Functions
+    answer: 0
+    explain: S3와 Blob Storage는 파일을 통째로 담는 오브젝트 저장소예요. 서버에 붙이는 디스크는 EBS와 Managed Disks예요.
+  - id: shared-responsibility-name
+    type: input
+    prompt: 사업자는 클라우드 자체의 보안을, 고객은 클라우드 안에 둔 것의 보안을 맡는 식으로 책임을 나누는 방식을 무엇이라고 하나요?
+    answer: [책임 공유 모델, 공동 책임 모델, shared responsibility model]
+    term: cloud/shared-responsibility
+    explain: 어떤 형태로 빌리든 데이터와 계정은 고객이 지켜요.

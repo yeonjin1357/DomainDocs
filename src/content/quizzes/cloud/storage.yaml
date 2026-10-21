@@ -1,0 +1,41 @@
+questions:
+  - id: shared-files
+    type: choice
+    prompt: 여러 웹 서버가 업로드된 같은 파일을 함께 읽고 써야 해요. 어떤 저장소가 맞을까요?
+    choices:
+      - 여러 서버가 함께 붙이는 파일 저장소
+      - 서버 한 대에 붙이는 블록 저장소
+      - 인스턴스 스토어
+      - 서버마다 따로 쓰는 로컬 디스크
+    answer: 0
+    explain: 파일 저장소는 여러 서버가 네트워크로 같은 폴더를 붙여요. 오브젝트 저장소를 HTTP로 쓰는 방법도 있어요.
+  - id: ebs-same-az
+    type: ox
+    prompt: EBS 볼륨을 다른 가용 영역에 있는 인스턴스에 바로 붙일 수 있나요?
+    answer: false
+    explain: 볼륨과 인스턴스는 같은 가용 영역에 있어야 해요. 옮기려면 스냅숏을 떠서 그 영역에 새 볼륨을 만들어요.
+  - id: s3-key
+    type: choice
+    prompt: S3에서 버킷 안의 객체 하나를 가리키는 하나뿐인 이름은?
+    choices:
+      - 키
+      - 버킷
+      - 메타데이터
+      - 리전
+    answer: 0
+    explain: S3는 폴더 없이 평평해요. 폴더처럼 보이는 건 logs/2026/처럼 키의 앞부분이 같은 객체를 묶어 보여 주는 거예요.
+  - id: volume-iops-limit
+    type: choice
+    prompt: EBS 디스크의 용량은 여유로운데, 디스크 I/O 대기가 길어요. 먼저 볼 것은?
+    choices:
+      - 볼륨의 IOPS·처리량 한도에 붙어 있는지
+      - 남은 디스크 용량
+      - 보안 그룹 규칙
+      - 인스턴스 유형 이름
+    answer: 0
+    explain: 클라우드 디스크는 볼륨마다 낼 수 있는 IOPS와 처리량에 한도가 있어요. 한도에 붙으면 용량과 상관없이 느려요.
+  - id: s3-read-after-write
+    type: ox
+    prompt: S3에 객체를 넣은 직후에 읽어도, 바로 새 내용이 보이나요?
+    answer: true
+    explain: S3는 강한 read-after-write 일관성을 줘서, 넣거나 지운 직후에 읽어도 새 내용이 보여요.

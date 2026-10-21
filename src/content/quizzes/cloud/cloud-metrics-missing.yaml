@@ -1,0 +1,46 @@
+questions:
+  - id: zero-not-reported
+    type: ox
+    prompt: 로드 밸런서의 5xx 수 그래프가 대부분 비어 있어요. 수집이 고장 났다는 뜻인가요?
+    answer: false
+    explain: 이 지표는 0이 아닌 값이 있을 때만 점을 찍어요. 오류가 없는 동안은 0이 아니라 비어 있어요.
+  - id: not-breaching
+    type: choice
+    prompt: 0일 때 점이 비는 지표에 건 경보가 INSUFFICIENT_DATA를 오가요. 어떻게 바꾸면 될까요?
+    choices:
+      - 빠진 데이터 처리를 notBreaching으로 바꿔요
+      - 기본값 missing을 그대로 둬요
+      - 빠진 데이터를 breaching으로 다뤄요
+      - 경보를 지워요
+    answer: 0
+    explain: notBreaching이면 빈 구간을 기준 안으로 다뤄요. 일어난 일이 없어서 빈 거라 경보가 오가지 않아요.
+  - id: five-minute-default
+    type: choice
+    prompt: EC2의 CPU 사용률을 1분 간격 그래프로 그렸는데 점이 띄엄띄엄이에요. 왜일까요?
+    choices:
+      - 기본 지표가 5분 간격이라서
+      - 에이전트가 멈춰서
+      - 인스턴스가 자주 꺼져서
+      - 차원 값이 바뀌어서
+    answer: 0
+    explain: EC2 기본 지표는 5분 간격이에요. 상세 모니터링을 켜면 1분 간격이 돼요.
+  - id: group-dimension
+    type: choice
+    prompt: 오토스케일링으로 서버가 자주 바뀌는 환경에서, 서버 그래프가 자꾸 끊겨요. 끊기지 않게 보려면?
+    choices:
+      - 오토스케일링 그룹 같은 묶음 단위로 봐요
+      - 인스턴스 ID마다 따로 봐요
+      - 1초 간격으로 모아요
+      - 평균 대신 최댓값으로 봐요
+    answer: 0
+    explain: 새 인스턴스는 ID가 바뀌어 새 지표로 쌓여요. 바뀌지 않는 묶음 단위로 보면 이어져요.
+  - id: agent-metric-missing
+    type: choice
+    prompt: CPU 지표는 잘 들어오는데, 메모리 사용률 지표만 비어 있어요. 의심할 것은?
+    choices:
+      - 서버 안 에이전트(멈춤, 권한, 네트워크 길)
+      - 클라우드 지표 서비스 전체의 장애
+      - 인스턴스가 종료된 것
+      - 지표의 보고 기준
+    answer: 0
+    explain: 메모리 사용률은 클라우드가 아니라 서버 안 에이전트가 보내요. 그 지표만 비었다면 에이전트 쪽이에요.

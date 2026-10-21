@@ -1,0 +1,41 @@
+questions:
+  - id: az-isolated
+    type: ox
+    prompt: 한 가용 영역에 화재가 나면, 같은 리전의 다른 가용 영역도 함께 멈추나요?
+    answer: false
+    explain: 가용 영역마다 전력, 냉방, 네트워크가 따로이고 물리적으로 떨어져 있어요. 그래서 한 곳만 영향을 받아요.
+  - id: single-az-risk
+    type: choice
+    prompt: 운영 서버를 모두 한 가용 영역에 두면 어떤 위험이 있을까요?
+    choices:
+      - 그 가용 영역이 멈추면 서비스 전체가 멈춰요
+      - 다른 리전으로 저절로 옮겨지지 않아 요금이 늘어요
+      - 사용자와의 네트워크 지연이 크게 늘어요
+      - 지표가 모이지 않아요
+    answer: 0
+    explain: 여러 가용 영역에 나눠 둬야 한 곳이 멈춰도 다른 곳이 요청을 받아요.
+  - id: wrong-region
+    type: choice
+    prompt: 콘솔에서 어제 만든 서버가 보이지 않아요. 먼저 볼 것은?
+    choices:
+      - 콘솔에서 고른 리전이 맞는지
+      - 서버가 지워졌는지
+      - 보안 그룹 규칙
+      - CPU 크레딧 잔량
+    answer: 0
+    explain: 대부분의 자원은 리전에 속해서, 다른 리전을 고르면 보이지 않아요. 흔한 실수예요.
+  - id: az-latency
+    type: choice
+    prompt: Azure가 같은 리전의 가용 영역 사이에 맞추려는 왕복 지연은 대략 얼마일까요?
+    choices:
+      - 약 2ms 아래
+      - 약 50ms 아래
+      - 약 200ms
+      - 약 1초
+    answer: 0
+    explain: 이 정도로 가까워서 가용 영역 사이에 데이터를 동기로 복제할 수 있어요.
+  - id: split-by-az
+    type: ox
+    prompt: 오류율을 가용 영역별로 나눠 보면, 한 가용 영역만의 문제가 전체 평균에 묻히는 걸 막을 수 있나요?
+    answer: true
+    explain: 한 곳만 아픈데 전체 평균만 보면, 정상인 곳에 가려 문제가 작아 보여요.

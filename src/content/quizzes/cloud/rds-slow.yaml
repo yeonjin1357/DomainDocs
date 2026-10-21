@@ -1,0 +1,31 @@
+questions:
+  - id: working-set-overflow
+    type: choice
+    prompt: RDS의 쓸 수 있는 메모리가 줄면서, 읽기 IOPS가 평소의 다섯 배가 됐어요. 의심할 것은?
+    choices:
+      - 자주 쓰는 데이터가 메모리에 다 들어가지 않아 디스크에서 다시 읽어요
+      - 들어오는 쿼리가 줄었어요
+      - 연결 수가 한도에 닿았어요
+      - 저장 공간이 꽉 찼어요
+    answer: 0
+    explain: 작업 집합이 메모리를 넘치면 같은 데이터를 디스크에서 자꾸 다시 읽어요. 스왑 사용량이 늘었는지도 함께 봐요.
+  - id: burstable-db-credits
+    type: ox
+    prompt: db.t 계열 RDS의 CPU 사용률이 낮다면, CPU 때문에 느려질 일은 없다고 볼 수 있나요?
+    answer: false
+    explain: 버스트형은 크레딧이 바닥나면 CPU가 기준선에 묶여 느려져요. CPUCreditBalance를 함께 봐요.
+  - id: resources-fine-go-sql
+    type: choice
+    prompt: CPU, 메모리, 디스크, 연결 수가 모두 평소와 같은데 DB가 느려요. 다음에 볼 것은?
+    choices:
+      - DB 안에서 늘어난 SQL, 바뀐 실행 계획, 잠금 대기
+      - DB 클래스를 바로 키워요
+      - 다중 AZ를 꺼요
+      - 지표를 처음부터 다시 모아요
+    answer: 0
+    explain: 자원이 넉넉하다면 DB 안에서 일이 바뀐 거예요. 쿼리 하나가 원인이면 클래스를 키워도 다시 느려져요.
+  - id: managed-still-sql-views
+    type: ox
+    prompt: RDS는 관리형이라 pg_stat_activity 같은 DB 안의 통계 뷰를 쓸 수 없나요?
+    answer: false
+    explain: OS에는 못 들어가도 SQL로 DB 안은 그대로 볼 수 있어요. OS 수준 숫자는 Enhanced Monitoring 같은 기능으로 봐요.

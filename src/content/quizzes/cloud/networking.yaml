@@ -1,0 +1,36 @@
+questions:
+  - id: sg-stateful
+    type: ox
+    prompt: 보안 그룹에서 들어오는 요청을 허용했다면, 그 응답이 나갈 길도 따로 열어야 하나요?
+    answer: false
+    explain: 보안 그룹은 상태를 기억해서, 허용한 요청의 응답은 나가는 규칙과 상관없이 나가요.
+  - id: nacl-stateless
+    type: ox
+    prompt: 네트워크 ACL에서 들어오는 쪽만 열면, 응답도 알아서 나가나요?
+    answer: false
+    explain: 네트워크 ACL은 상태를 기억하지 않아요. 그래서 응답이 나가는 방향도 따로 허용해야 해요.
+  - id: public-subnet-route
+    type: choice
+    prompt: 공개 서브넷과 비공개 서브넷을 가르는 것은?
+    choices:
+      - 라우팅 테이블에 인터넷 게이트웨이로 바로 가는 경로가 있는지
+      - 서브넷의 IP 범위 크기
+      - 붙은 보안 그룹의 개수
+      - 서브넷이 걸친 가용 영역 수
+    answer: 0
+    explain: 서브넷의 성격은 라우팅 테이블이 어디로 길을 내 주느냐로 정해져요.
+  - id: private-egress-nat
+    type: choice
+    prompt: 비공개 서브넷의 앱 서버가 보안 패치를 받으러 인터넷으로 나가야 해요. 무엇을 거쳐야 할까요?
+    choices:
+      - NAT 게이트웨이
+      - 서버에 바로 붙인 인터넷 게이트웨이
+      - 로드 밸런서
+      - 네트워크 ACL
+    answer: 0
+    explain: NAT 게이트웨이를 거치면 안에서 밖으로는 나갈 수 있지만, 밖에서 안으로는 연결을 시작할 수 없어요.
+  - id: subnet-one-az
+    type: ox
+    prompt: 서브넷 하나가 여러 가용 영역에 걸쳐 있을 수 있나요?
+    answer: false
+    explain: 서브넷 하나는 가용 영역 하나 안에만 있어요. 서버를 여러 가용 영역에 두려면 서브넷도 가용 영역마다 만들어요.

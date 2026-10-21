@@ -1,0 +1,46 @@
+questions:
+  - id: credits-exhausted
+    type: choice
+    prompt: t3.large 인스턴스가 느린데, CPU 사용률은 30%에 딱 머물러 있어요. 먼저 볼 것은?
+    choices:
+      - CPU 크레딧 잔량
+      - 디스크 용량
+      - 보안 그룹 규칙
+      - 고른 리전
+    answer: 0
+    explain: Standard 모드에서 크레딧이 바닥나면 CPU가 기준선(t3.large는 30%)에 묶여 더 오르지 못해요.
+  - id: type-letter
+    type: choice
+    prompt: 인스턴스 유형 m5.xlarge에서 맨 앞 m은 무엇을 뜻할까요?
+    choices:
+      - 범용 시리즈
+      - 메모리 최적화 시리즈
+      - 세대
+      - 크기
+    answer: 0
+    explain: 앞 글자는 용도, 숫자는 세대, 점 뒤는 크기예요. 메모리 최적화는 R 시리즈예요.
+  - id: instance-store-lost
+    type: choice
+    prompt: 인스턴스를 중지했다가 다시 켜면 지워지는 것은?
+    choices:
+      - 인스턴스 스토어의 데이터
+      - EBS 디스크의 데이터
+      - 인스턴스를 만든 이미지(AMI)
+      - 보안 그룹 규칙
+    answer: 0
+    explain: 인스턴스 스토어는 호스트 서버에 붙은 임시 디스크라, 다른 호스트로 옮겨지면 지워져요. EBS 디스크는 남아요.
+  - id: no-memory-metric
+    type: ox
+    prompt: EC2 기본 지표에 메모리 사용률이 들어 있나요?
+    answer: false
+    explain: 메모리나 파일 시스템 사용률은 OS 안에서만 보여요. 인스턴스 안에 에이전트를 깔아서 모아요.
+  - id: credit-unit
+    type: choice
+    prompt: 버스트형 인스턴스의 CPU 크레딧 1개는 얼마만큼의 CPU일까요?
+    choices:
+      - vCPU 하나를 1분 동안 100% 쓰는 양
+      - vCPU 하나를 1시간 동안 100% 쓰는 양
+      - 모든 vCPU를 1초 동안 쓰는 양
+      - CPU 사용률 1%
+    answer: 0
+    explain: 기준선보다 덜 쓰면 크레딧이 쌓이고, 더 쓰면 쌓인 크레딧을 꺼내 써요.

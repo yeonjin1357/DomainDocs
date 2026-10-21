@@ -1,0 +1,36 @@
+questions:
+  - id: system-check-failed
+    type: choice
+    prompt: EC2의 시스템 검사만 실패했어요. 알맞은 대응은?
+    choices:
+      - AWS 쪽 문제라 기다리거나, 멈췄다 켜서 새 호스트로 옮겨요
+      - 서버 안의 메모리를 정리해요
+      - 커널을 바꿔 다시 부팅해요
+      - 보안 그룹 규칙을 고쳐요
+    answer: 0
+    explain: 시스템 검사는 인스턴스가 도는 AWS 쪽 시스템을 봐요. EBS로 부팅하는 인스턴스는 멈췄다 켜면 대개 새 호스트로 옮겨져요.
+  - id: not-instance-check-cause
+    type: choice
+    prompt: 인스턴스 검사만 실패했어요. 흔한 원인이 아닌 것은?
+    choices:
+      - 물리 호스트의 전원이 나갔어요
+      - 메모리를 다 써 버렸어요
+      - 파일 시스템이 깨졌어요
+      - 네트워크나 부팅 설정이 잘못됐어요
+    answer: 0
+    explain: 전원이나 물리 호스트 문제는 시스템 검사가 잡아요. 인스턴스 검사는 서버 안의 문제라 대개 직접 고쳐요.
+  - id: reboot-same-host
+    type: ox
+    prompt: 시스템 검사가 실패했을 때 재부팅하면, 늘 새 호스트로 옮겨지나요?
+    answer: false
+    explain: 재부팅은 같은 호스트에 머물 수 있어요. 새 호스트로 옮기려면 멈췄다가 다시 켜요.
+  - id: reboot-brief-fail
+    type: ox
+    prompt: 재부팅하는 동안 인스턴스 검사가 잠깐 실패로 보이는 건 정상인가요?
+    answer: true
+    explain: 재부팅 중에는 서버가 잠시 응답하지 못해요. 재부팅 직후의 짧은 실패는 걱정하지 않아도 돼요.
+  - id: auto-recovery-limit
+    type: ox
+    prompt: 자동 복구를 걸어 두면, 메모리 부족 같은 서버 안의 문제로 생긴 인스턴스 검사 실패도 고쳐지나요?
+    answer: false
+    explain: 자동 복구는 같은 설정으로 새 호스트에 옮겨 띄울 뿐이에요. 서버 안의 원인은 직접 고쳐야 되풀이되지 않아요.
