@@ -6,7 +6,7 @@ type: overview
 order: 0
 icon: container
 keywords: [kubernetes, 쿠버네티스, k8s, cluster, 클러스터, control plane, 컨트롤 플레인, desired state, 원하는 상태, kubelet]
-related: [kubernetes/containers, kubernetes/pods-and-nodes, server/overview, network/overview]
+related: [kubernetes/containers, kubernetes/pods-and-nodes, kubernetes/workloads, server/overview, network/overview]
 sources:
   - title: Kubernetes — Kubernetes Components
     url: https://kubernetes.io/docs/concepts/overview/components/
@@ -60,5 +60,8 @@ updated: 2026-10-21
 
 - 쿠버네티스가 다루는 기본 단위는 <Term slug="kubernetes/containers">컨테이너</Term>에서 다뤄요.
 - 컨테이너를 묶어 노드에 띄우는 단위는 <Term slug="kubernetes/pods-and-nodes">파드와 노드</Term>에서 다뤄요.
+- 파드를 대신 만들고 지키는 객체는 <Term slug="kubernetes/workloads">워크로드</Term>에서 다뤄요.
+- 파드가 쓸 CPU와 메모리를 정하는 법은 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>에서 다뤄요.
+- 파드가 뜨지 않거나 계속 죽을 때 읽는 법은 <Term slug="kubernetes/pod-status">파드 상태와 재시작</Term>에서 다뤄요.
 
 노드는 결국 리눅스 서버이고, 파드끼리는 네트워크로 이어져요. 그래서 <Term slug="server/overview">서버·OS</Term>와 <Term slug="network/overview">네트워크</Term> 기초를 함께 알면 쿠버네티스가 훨씬 잘 읽혀요.

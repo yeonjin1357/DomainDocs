@@ -84,3 +84,89 @@ terms:
     aliases: [cgroup, cgroups, control group, 컨트롤 그룹]
     short: 프로세스를 묶어, 그 묶음이 쓰는 CPU·메모리 같은 자원을 제한하고 재는 커널 기능이에요.
     doc: kubernetes/containers
+  - id: workload
+    name: 워크로드
+    en: Workload
+    aliases: [workload, workloads, 워크로드 리소스, controller, 컨트롤러]
+    short: 파드를 어떻게 몇 개 띄울지 적어 두면, 대신 파드를 만들고 지켜 주는 객체예요.
+    analogy: 늘 몇 개를 실어 둘지 정해 둔 항구 운송 계약서와 같아요.
+    doc: kubernetes/workloads
+  - id: deployment
+    name: Deployment
+    en: Deployment
+    aliases: [deployment, 디플로이먼트, ReplicaSet, 레플리카셋, replicas]
+    short: 상태 없는 앱의 파드를 원하는 개수만큼 유지하고, 버전을 조금씩 바꿔 끼우는 워크로드예요.
+    doc: kubernetes/workloads
+  - id: rolling-update
+    name: 롤링 업데이트
+    en: Rolling update
+    aliases: [rolling update, 롤링 배포, maxSurge, maxUnavailable]
+    short: 새 버전 파드를 조금씩 띄우고 옛 파드를 조금씩 내려, 앱을 멈추지 않고 바꾸는 방식이에요.
+    doc: kubernetes/workloads
+  - id: daemonset
+    name: DaemonSet
+    en: DaemonSet
+    aliases: [daemonset, 데몬셋]
+    short: 모든 노드(또는 고른 노드)에 파드를 하나씩 띄우는 워크로드예요. 로그 수집기나 에이전트에 써요.
+    doc: kubernetes/workloads
+  - id: statefulset
+    name: StatefulSet
+    en: StatefulSet
+    aliases: [statefulset, 스테이트풀셋]
+    short: 파드마다 번호 붙은 이름과 자기 저장소를 고정해 주는 워크로드예요. 데이터베이스에 써요.
+    doc: kubernetes/workloads
+  - id: job
+    name: Job
+    en: Job
+    aliases: [job, 잡, CronJob, 크론잡, cronjob, backoffLimit]
+    short: 끝까지 돌고 멈추는 일을 맡는 워크로드예요. CronJob은 일정마다 Job을 만들어요.
+    doc: kubernetes/workloads
+  - id: resource-request
+    name: 요청
+    en: Resource request
+    aliases: [requests, request, 리소스 요청, CPU request, memory request]
+    short: 컨테이너가 쓸 CPU·메모리로 미리 잡아 두는 양이에요. 스케줄러가 이걸 보고 노드를 골라요.
+    analogy: 배에 싣기 전에 미리 잡아 두는 자리 예약과 같아요.
+    doc: kubernetes/requests-and-limits
+  - id: resource-limit
+    name: 한도
+    en: Resource limit
+    aliases: [limits, limit, 리소스 한도, CPU limit, memory limit, 리밋]
+    short: 컨테이너가 넘지 못하는 CPU·메모리 선이에요. CPU는 느려지고, 메모리는 넘으면 프로세스가 끝나요.
+    doc: kubernetes/requests-and-limits
+  - id: cpu-throttling
+    name: 스로틀링
+    en: CPU throttling
+    aliases: [throttling, CPU throttling, 쓰로틀링, nr_throttled, CFS quota]
+    short: CPU 한도의 몫을 주기 안에 다 써서, 다음 주기까지 실행이 멈추는 일이에요.
+    doc: kubernetes/requests-and-limits
+  - id: oomkilled
+    name: OOMKilled
+    en: OOMKilled
+    aliases: [oomkilled, OOM killed, OOM, 오오엠]
+    short: 컨테이너가 메모리 한도를 넘게 쓰려 해서, 커널이 프로세스를 끝냈다는 종료 이유예요.
+    doc: kubernetes/requests-and-limits
+  - id: qos-class
+    name: QoS 등급
+    en: Quality of Service class
+    aliases: [QoS, QoS class, Guaranteed, Burstable, BestEffort]
+    short: 요청·한도를 적은 방식으로 정해지는 파드 등급이에요. 노드 자원이 모자랄 때 쫓겨나는 순서를 정해요.
+    doc: kubernetes/requests-and-limits
+  - id: pod-phase
+    name: 파드 단계
+    en: Pod phase
+    aliases: [pod phase, phase, Pending, Running, Succeeded, Failed, Unknown, 파드 상태]
+    short: 파드가 생애의 어디쯤인지 보여 주는 값이에요. Pending, Running 등 다섯 가지예요.
+    doc: kubernetes/pod-status
+  - id: crashloopbackoff
+    name: CrashLoopBackOff
+    en: CrashLoopBackOff
+    aliases: [crashloopbackoff, 크래시루프, crash loop, back-off, 백오프]
+    short: 컨테이너가 죽고 다시 뜨기를 되풀이해, 다음 재시작까지 기다리는 시간이 걸린 상태예요.
+    doc: kubernetes/pod-status
+  - id: probe
+    name: 프로브
+    en: Probe
+    aliases: [probe, liveness probe, readiness probe, startup probe, 헬스 체크, health check]
+    short: kubelet이 컨테이너를 주기적으로 찔러 보는 검사예요. 결과에 따라 다시 시작하거나 요청을 끊어요.
+    doc: kubernetes/pod-status

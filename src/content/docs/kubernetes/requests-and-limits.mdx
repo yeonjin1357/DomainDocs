@@ -1,0 +1,141 @@
+---
+title: 요청과 한도
+summary: 요청은 노드에 자리를 잡는 기준이고, 한도는 넘으면 막히는 선이에요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 40
+icon: container
+keywords: [requests, limits, 요청, 한도, CPU throttling, 스로틀링, OOMKilled, QoS, BestEffort, millicpu]
+related: [kubernetes/containers, kubernetes/pods-and-nodes, kubernetes/pod-status, server/cpu-usage, server/memory]
+sources:
+  - title: Kubernetes — Resource Management for Pods and Containers
+    url: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  - title: Kubernetes — Pod Quality of Service Classes
+    url: https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/
+  - title: Linux kernel — CFS Bandwidth Control
+    url: https://docs.kernel.org/scheduler/sched-bwc.html
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="요청은 자리 예약이에요">
+    스케줄러는 컨테이너의 요청을 보고, 그만큼 자리가 남은 노드에 파드를 놓아요.
+  </Point>
+  <Point title="한도는 넘지 못하는 선이에요">
+    컨테이너가 한도보다 더 쓰려 하면 커널이 막아요. 요청보다 더 쓰는 건 노드에 여유가 있으면 괜찮아요.
+  </Point>
+  <Point title="CPU는 느려지고, 메모리는 죽어요">
+    CPU 한도에 닿으면 실행이 잠깐씩 멈춰 느려져요. 메모리 한도를 넘으면 프로세스가 강제로 끝나요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="배의 예약 공간은 실제로 비어 있으면 남이 쓸 수 없지만, 컨테이너는 노드에 여유가 있으면 요청보다 더 쓸 수 있어요.">
+  배에 싣기 전에 자리를 예약하는 것과 같아요. 배정 담당은 예약 합계를 보고 자리가 남은 배를 골라요. 실제로는 텅 비어 있어도 예약이 꽉 찬 배에는 더 싣지 않아요.
+</Analogy>
+
+## 무엇을 적나요
+
+컨테이너마다 CPU와 메모리의 <Term term="kubernetes/resource-request">요청</Term>(requests)과 <Term term="kubernetes/resource-limit">한도</Term>(limits)를 적을 수 있어요.
+
+```yaml
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+```
+
+CPU 1은 코어 1개예요. 노드가 물리 서버면 물리 코어 하나, 가상 머신이면 가상 코어 하나예요. `250m`은 0.25 CPU이고 "250밀리코어"라고 읽어요.
+
+메모리의 `Mi`는 2의 20제곱 바이트, `M`은 10의 6제곱 바이트예요. 소문자 `m`은 1/1000바이트라서, `400m`이라고 쓰면 0.4바이트가 돼요. 메모리는 늘 `Mi`나 `Gi`로 적어요.
+
+## 요청: 어느 노드에 놓을까
+
+스케줄러는 노드마다 이미 놓인 파드의 요청 합계를 봐요. 새 파드의 요청까지 더해도 노드 용량을 넘지 않는 노드에만 파드를 놓아요.
+
+<Figure caption="CPU 4코어 노드에 요청 합계가 3코어 차 있어요. 실제 사용은 1코어뿐이지만, 1.5코어를 요청한 새 파드는 이 노드에 놓이지 않아요.">
+  <StatTile label="노드 CPU 용량" value="4" unit="코어" />
+  <StatTile label="요청 합계" value="3" unit="코어" />
+  <StatTile label="실제 사용" value="1" unit="코어" />
+  <StatTile label="새 파드 요청" value="1.5" unit="코어" tone="warn" note="자리가 없어요" />
+</Figure>
+
+실제 사용량이 아니라 요청을 보는 게 핵심이에요. 지금은 한가해도 나중에 바빠질 때 자원이 모자라지 않게 하려는 거예요. 그래서 요청을 크게 잡으면 노드가 놀고 있어도 파드가 못 들어가요.
+
+요청은 바닥이지 천장이 아니에요. 노드에 여유가 있으면 컨테이너는 요청보다 더 쓸 수 있어요. CPU가 모자랄 때는 요청이 큰 컨테이너가 CPU 시간을 더 많이 받아요.
+
+## 한도: 넘으면 어떻게 되나
+
+한도를 넘으려 할 때 CPU와 메모리는 다르게 막혀요.
+
+<Figure caption="CPU 한도는 실행을 잠깐씩 멈춰 느리게 만들고, 메모리 한도는 프로세스를 끝내 버려요.">
+  <Compare
+    columns={['CPU 한도', '메모리 한도']}
+    rows={[
+      { label: '막는 방법', values: ['한도만큼만 실행하게 멈춰요', '넘으면 프로세스를 끝내요'] },
+      { label: '앱에서 보이는 것', values: ['느려져요', '컨테이너가 다시 시작돼요'] },
+      { label: '남는 흔적', values: ['스로틀링 횟수·시간', '종료 이유 OOMKilled'] },
+    ]}
+  />
+</Figure>
+
+CPU 한도는 짧은 주기마다 쓸 수 있는 CPU 시간으로 걸어요. 리눅스의 기본 주기는 100ms예요.
+
+그 주기 안에서 몫을 다 쓰면, 다음 주기가 올 때까지 실행이 멈춰요. 이걸 <Term term="kubernetes/cpu-throttling">스로틀링</Term>이라고 해요.
+
+메모리 한도를 넘으면 보통 커널의 OOM(메모리 부족) 처리가 컨테이너 안의 프로세스를 끝내요. 그 프로세스가 컨테이너의 첫 프로세스면 컨테이너가 끝나고, 쿠버네티스가 다시 시작해요. 이때 종료 이유가 <Term term="kubernetes/oomkilled">OOMKilled</Term>로 남아요.
+
+한도만 적고 요청을 안 적으면, 쿠버네티스는 한도를 요청으로 그대로 써요.
+
+## QoS 등급: 누가 먼저 쫓겨나나
+
+요청과 한도를 어떻게 적었는지에 따라 파드는 세 가지 <Term term="kubernetes/qos-class">QoS 등급</Term> 중 하나가 돼요.
+
+| 등급 | 조건 | 노드 자원이 모자랄 때 |
+| --- | --- | --- |
+| Guaranteed | 모든 컨테이너가 CPU·메모리 요청과 한도를 같게 적었어요 | 가장 나중에 쫓겨나요 |
+| Burstable | Guaranteed는 아니지만 요청이나 한도를 하나라도 적었어요 | 그다음이에요 |
+| BestEffort | 아무것도 안 적었어요 | 가장 먼저 쫓겨나요 |
+
+노드의 메모리가 모자라면 kubelet이 파드를 노드에서 쫓아내요. 이걸 축출(eviction)이라고 하고, BestEffort부터 Burstable, Guaranteed 순으로 쫓아내요. 이때는 요청보다 더 쓰고 있는 파드만 후보가 돼요.
+
+## 모니터링에서는
+
+<Figure caption="한 컨테이너의 메모리 예시예요. 사용량이 오르다 한도 512Mi에 닿자 프로세스가 끝나고, 다시 시작해 처음부터 올라가요.">
+  <MiniLineChart
+    ariaLabel="메모리 사용량이 200에서 512Mi 한도까지 오른 뒤 뚝 떨어져 다시 오르는 그래프와 512Mi에 가로로 놓인 한도선"
+    yMax={600}
+    series={[
+      { label: '메모리 사용', values: [200, 260, 320, 380, 440, 500, 512, 180, 240, 300, 360], tone: 'accent', value: '최고 512Mi' },
+      { label: '한도', values: [512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512], tone: 'warn', value: '512Mi' },
+    ]}
+  />
+</Figure>
+
+컨테이너 화면은 사용량만 보지 말고 요청·한도와 같이 봐요. 메모리가 한도에 붙어 있으면 곧 OOMKilled로 끝날 수 있어요. CPU가 한도 근처면 스로틀링으로 느려지고 있을 수 있어요.
+
+노드 화면에서는 실제 사용량과 요청 합계를 따로 봐요. 사용량은 낮은데 요청 합계가 꽉 찼다면, 새 파드가 못 들어가는 이유가 거기 있어요.
+
+<Checkpoints>
+  <Check>CPU 사용률 평균이 한도보다 낮다는 이유로 스로틀링이 없다고 판단했다면 다시 보세요. 100ms 주기 안에서 몫을 다 쓰면, 평균이 낮아도 잠깐씩 멈춰요.</Check>
+  <Check>컨테이너가 자꾸 다시 시작되는데 종료 이유가 OOMKilled라면, 앱의 메모리 누수나 너무 작은 한도를 의심해 보세요.</Check>
+  <Check>운영 파드에 요청과 한도를 하나도 안 적었다면 다시 보세요. BestEffort가 되어 노드 메모리가 모자랄 때 가장 먼저 쫓겨나요.</Check>
+  <Check>노드 사용률이 낮은데 새 파드가 Pending이라면, 노드의 요청 합계를 보세요. 스케줄러는 사용량이 아니라 요청으로 자리를 따져요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 스로틀링 흔적
+
+  리눅스 cgroup은 몫을 다 써서 멈춘 횟수와 멈춘 시간을 따로 세요. cgroup v1에서는 `cpu.stat`의 `nr_throttled`와 `throttled_time`이에요. 이 값이 늘고 있으면 한도 때문에 느려지고 있는 거예요.
+
+  ### 메모리 요청의 쓰임
+
+  쿠버네티스 문서는 메모리 요청이 주로 파드를 놓을 노드를 고를 때 쓰인다고 해요. cgroup v2 노드에서는 컨테이너 런타임이 메모리 요청을 보호선 설정의 힌트로 쓸 수도 있어요.
+
+  ### CPU 사용이 많아도 죽지 않아요
+
+  컨테이너 런타임은 CPU를 많이 썼다는 이유로 파드나 컨테이너를 끝내지 않아요. CPU 한도는 느려지게 할 뿐이에요.
+</Deeper>
