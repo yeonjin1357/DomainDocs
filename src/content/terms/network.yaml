@@ -213,3 +213,9 @@ terms:
     aliases: [packet loss, 손실률, loss]
     short: 보낸 패킷이 상대에게 닿지 못하고 사라지는 일이에요. TCP에서는 재전송 지연으로 보여요.
     doc: network/ping-and-latency
+  - id: dns
+    name: DNS
+    en: Domain Name System
+    aliases: [도메인 이름 시스템, 네임 서버, name server, 이름 풀이]
+    short: shop.example.com 같은 도메인 이름을 IP 주소로 바꿔 주는 체계예요.
+    analogy: 상호를 대면 지점 주소를 알려 주는 안내 전화와 같아요.

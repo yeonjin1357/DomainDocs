@@ -109,3 +109,27 @@ terms:
     aliases: [Thread.State, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING]
     short: 자바 스레드가 실행 중인지, 잠금을 기다리는지, 무엇을 기다리는지 나눈 이름이에요.
     doc: apm/thread-dumps
+  - id: ttfb
+    name: TTFB
+    en: Time to First Byte
+    aliases: [첫 바이트까지 시간, time to first byte, responseStart]
+    short: 요청을 시작해 응답의 첫 바이트를 받기까지 걸린 시간이에요. 서버 처리와 네트워크 왕복이 함께 들어 있어요.
+    doc: apm/page-load
+  - id: rum
+    name: RUM
+    en: Real User Monitoring
+    aliases: [실제 사용자 모니터링, 필드 데이터, field data]
+    short: 실제 사용자의 브라우저에서 페이지 속도와 오류를 재서 모으는 모니터링이에요.
+    doc: apm/page-load
+  - id: core-web-vitals
+    name: Core Web Vitals
+    en: Core Web Vitals
+    aliases: [코어 웹 바이탈, Web Vitals, LCP, INP, CLS]
+    short: 사용자 체감에 가까운 세 숫자 LCP(로딩), INP(반응), CLS(화면 안정)를 묶은 기준이에요.
+    doc: apm/page-load
+  - id: synthetic-monitoring
+    name: 외부 감시
+    en: Synthetic monitoring
+    aliases: [synthetic monitoring, URL 모니터링, 랩 데이터, lab data, 신세틱 모니터링]
+    short: 정해 둔 곳에서 주기적으로 주소를 열어 보며 속도와 정상 여부를 재는 감시예요.
+    doc: apm/page-load
