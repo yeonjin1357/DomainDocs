@@ -102,6 +102,8 @@ const title = `${domain.name} 용어 사전`;
 
   .entry-analogy {
     display: flex;
+    /* 비유 글이 여러 줄이어도 표시는 첫 줄 높이에 맞춘다 */
+    align-items: baseline;
     gap: 8px;
     margin: 8px 0 0;
     color: var(--color-text-sub);

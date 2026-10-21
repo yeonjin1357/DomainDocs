@@ -37,7 +37,7 @@ const marker = (tone: FigureTone) => `url(#${uid}-${tone})`;
       <>
         <rect class="flow-group" x={g.x} y={g.y} width={g.w} height={g.h} rx="12" />
         {/* 이름은 아래 왼쪽에 둔다. 위쪽은 첫 줄 상자와 겹친다. */}
-        <text class="group-label" x={g.x + 8} y={g.y + g.h - 6}>{g.label}</text>
+        <text class="group-label" x={g.x + 10} y={g.y + g.h - 10}>{g.label}</text>
       </>
     ))
   }
@@ -156,5 +156,9 @@ const marker = (tone: FigureTone) => `url(#${uid}-${tone})`;
     font-size: 11px;
     text-anchor: start;
     fill: var(--color-text-sub);
+    paint-order: stroke;
+    stroke: var(--color-bg);
+    stroke-width: 4px;
+    stroke-linejoin: round;
   }
 </style>

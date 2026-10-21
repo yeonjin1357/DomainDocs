@@ -57,6 +57,12 @@ test('용어 사전은 가나다 다음 ABC 순이고, 글이 있으면 자세�
   await expect(page.getByRole('link', { name: '뒤로 가기' })).toHaveAttribute('href', '/DomainDocs/foundations/');
 });
 
+test('비유 표시는 비유 글이 여러 줄이어도 한 줄 높이다', async ({ page }) => {
+  await page.goto('terms/foundations/');
+  const tag = await page.locator('#term-snmp .entry-tag').boundingBox();
+  expect(tag!.height).toBeLessThan(30);
+});
+
 test('용어 사전도 검색된다', async ({ page }) => {
   await page.goto('./');
   await page.getByRole('button', { name: '검색' }).click();
