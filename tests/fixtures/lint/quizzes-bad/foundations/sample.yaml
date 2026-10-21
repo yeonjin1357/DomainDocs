@@ -1,0 +1,6 @@
+questions:
+  - id: bad-explain
+    type: ox
+    prompt: 테스트 문제인가요?
+    answer: true
+    explain: 해설이 해요체가 아니다.

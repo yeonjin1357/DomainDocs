@@ -1,9 +1,9 @@
 import { spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 
-function runLint(dir: string, termsDir = 'tests/fixtures/lint/no-terms') {
+function runLint(dir: string, termsDir = 'tests/fixtures/lint/no-terms', quizzesDir = 'tests/fixtures/lint/no-quizzes') {
   return spawnSync(process.execPath, ['--import', 'tsx', 'scripts/lint-content/index.ts'], {
-    env: { ...process.env, DOCS_CONTENT_DIR: dir, TERMS_CONTENT_DIR: termsDir },
+    env: { ...process.env, DOCS_CONTENT_DIR: dir, TERMS_CONTENT_DIR: termsDir, QUIZZES_CONTENT_DIR: quizzesDir },
     encoding: 'utf8',
   });
 }
@@ -26,6 +26,12 @@ describe('lint:content CLI', () => {
     const res = runLint('tests/fixtures/lint/good', 'tests/fixtures/lint/terms-bad');
     expect(res.stdout).toMatch(/foundations\.yaml:\d+:\d+ \[formal-ending\]/);
     expect(res.stdout).toContain('용어 파일 1개');
+    expect(res.status).toBe(1);
+  });
+  it('문제 파일의 위반도 파일:줄과 규칙 이름을 출력하고 1로 끝난다', () => {
+    const res = runLint('tests/fixtures/lint/good', undefined, 'tests/fixtures/lint/quizzes-bad');
+    expect(res.stdout).toMatch(/foundations[\\/]sample\.yaml:\d+:\d+ \[formal-ending\]/);
+    expect(res.stdout).toContain('문제 파일 1개');
     expect(res.status).toBe(1);
   });
 });

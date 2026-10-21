@@ -42,4 +42,24 @@ const glossary = defineCollection({
   schema: z.object({ terms: z.array(termSchema).min(1) }),
 });
 
-export const collections = { docs, glossary };
+// 문제는 글마다 YAML 파일 하나(src/content/quizzes/{domain}/{slug}.yaml). 파일 경로가 곧 글 id다.
+// 줄 번호와 참조 검사는 글 검사기(scripts/lint-content/quiz.ts)가 맡는다.
+const questionBase = {
+  id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
+  prompt: z.string().min(1).max(200),
+  explain: z.string().min(1),
+  doc: z.string().optional(),
+};
+const questionSchema = z.discriminatedUnion('type', [
+  z.object({ ...questionBase, type: z.literal('ox'), answer: z.boolean() }),
+  z.object({ ...questionBase, type: z.literal('choice'), choices: z.array(z.string()).length(4), answer: z.number().int().min(0).max(3) }),
+  z.object({ ...questionBase, type: z.literal('input'), answer: z.array(z.string().min(1)).min(1), term: z.string().optional() }),
+]);
+
+const quizzes = defineCollection({
+  // 화면 테스트는 QUIZZES_CONTENT_DIR=./tests/fixtures/quizzes로 테스트 전용 문제를 쓴다.
+  loader: glob({ pattern: '**/*.yaml', base: process.env.QUIZZES_CONTENT_DIR ?? './src/content/quizzes' }),
+  schema: z.object({ questions: z.array(questionSchema).min(1) }),
+});
+
+export const collections = { docs, glossary, quizzes };

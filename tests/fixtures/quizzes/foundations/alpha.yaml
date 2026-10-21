@@ -1,0 +1,18 @@
+questions:
+  - id: alpha-ox
+    type: ox
+    prompt: 알파 개념은 테스트용 글인가요?
+    answer: true
+    explain: 알파 개념은 화면 테스트에 쓰는 글이에요.
+  - id: alpha-choice
+    type: choice
+    prompt: 알파 개념 글이 속한 영역은?
+    choices: [모니터링 기초, 네트워크, 서버·OS, 데이터베이스]
+    answer: 0
+    explain: 테스트 글은 모두 모니터링 기초 영역에 있어요.
+  - id: alpha-input
+    type: input
+    prompt: 장비의 상태를 묻고 답하는 표준 규약의 이름은?
+    answer: [SNMP]
+    term: foundations/snmp
+    explain: SNMP는 관리 서버가 장비에 상태를 묻고 답을 받는 규약이에요.

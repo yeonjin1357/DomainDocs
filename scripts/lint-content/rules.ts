@@ -26,6 +26,7 @@ export type RuleId =
   | 'banned-phrase'
   | 'analogy-limit'
   | 'glossary'
+  | 'quiz'
   | 'reference'
   | 'markdown-link'
   | 'unknown-component'
