@@ -255,6 +255,11 @@ describe('머리말과 참조 규칙', () => {
   it('domain이 폴더와 다르면 잡는다', () => {
     expect(rules(FRONT('', 'concept', 'apm') + CONCEPT_BODY)).toEqual(['domain-folder']);
   });
+  it('머리말 YAML 문법이 틀리면 멈추지 않고 frontmatter 위반 하나로 알린다', () => {
+    const issues = lint(FRONT('keywords: [disk, %util]\n') + CONCEPT_BODY);
+    expect(issues.map((i) => i.rule)).toEqual(['frontmatter']);
+    expect(issues[0].message).toContain('머리말');
+  });
   it('type이 잘못되면 잡는다', () => {
     expect(rules(FRONT('', 'essay') + CONCEPT_BODY)).toEqual(['frontmatter']);
   });

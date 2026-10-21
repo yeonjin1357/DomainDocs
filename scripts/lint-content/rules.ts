@@ -375,7 +375,15 @@ export function lintSource(src: SourceFile, ctx: LintContext): LintIssue[] {
     return issues;
   }
 
-  const fm = readFrontmatter(tree);
+  let fm: Record<string, unknown> | null;
+  try {
+    fm = readFrontmatter(tree);
+  } catch (e) {
+    // 머리말 YAML 문법 오류(예: 따옴표 없는 %util)는 검사기를 멈추지 않고 위반 하나로 알린다.
+    const pos = (e as { linePos?: { line: number; col: number }[] }).linePos?.[0];
+    report('frontmatter', (pos?.line ?? 0) + 1, pos?.col ?? 1, `머리말 YAML을 읽을 수 없어요: ${(e as Error).message.split('\n')[0]}`);
+    return issues;
+  }
   if (!fm) {
     report('frontmatter', 1, 1, '머리말(---)이 없어요.');
     return issues;
