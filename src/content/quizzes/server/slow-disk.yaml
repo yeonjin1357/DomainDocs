@@ -1,0 +1,41 @@
+questions:
+  - id: latency-and-queue-up
+    type: choice
+    prompt: 평소 2ms이던 읽기 지연이 35ms로, 요청 줄(aqu-sz)이 3에서 48로 늘었어요. %util은 평소에도 90%대예요. 맞는 판단은?
+    choices:
+      - 디스크가 밀리고 있어요
+      - '%util이 평소와 비슷하니 디스크는 문제없어요'
+      - CPU가 모자라 디스크가 느려 보여요
+      - 지연은 평균이라 판단할 수 없어요
+    answer: 0
+    explain: 지연과 기다리는 요청 줄이 함께 크게 늘었어요. %util은 평소에도 높아서 이 변화를 보여 주지 못해요.
+  - id: same-requests-slower
+    type: choice
+    prompt: 디스크 지연이 늘었는데, 초당 읽기·쓰기 수와 처리량은 평소와 같아요. 먼저 의심할 것은?
+    choices:
+      - 디스크나 그 뒤 저장 장치 쪽이 느려졌는지(볼륨 한도, 같은 저장 장치를 쓰는 다른 서버)
+      - 어느 프로세스가 읽기·쓰기를 늘렸는지
+      - 파일 시스템의 inode가 찼는지
+      - 시간 동기화가 꺼졌는지
+    answer: 0
+    explain: 일이 늘지 않았는데 느려졌다면 디스크 쪽이 변했어요. 일이 늘었다면 그때 누가 늘렸는지 프로세스를 찾아요.
+  - id: cache-shrank
+    type: choice
+    prompt: 앱의 요청 수는 그대로인데 디스크 읽기가 갑자기 늘었어요. 함께 볼 것은?
+    choices:
+      - 메모리가 모자라 파일 캐시가 줄었는지
+      - CPU의 us 시간
+      - 네트워크 오류
+      - 서버의 시간대
+    answer: 0
+    explain: 파일 캐시가 줄면 예전엔 메모리에서 꺼내던 것을 디스크에서 다시 읽어요. available과 캐시 크기를 함께 봐요.
+  - id: not-a-disk-culprit
+    type: choice
+    prompt: 디스크 읽기·쓰기를 갑자기 늘리는 흔한 범인이 아닌 것은?
+    choices:
+      - 시간 동기화(NTP)
+      - 백업
+      - 로그 압축
+      - 인덱스 다시 만들기
+    answer: 0
+    explain: 백업, 로그 압축, 인덱스 다시 만들기, 큰 배치는 디스크를 크게 써요. 매일 같은 시각에 느려진다면 그 시각의 작업부터 봐요.

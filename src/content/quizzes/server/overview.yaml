@@ -1,0 +1,32 @@
+questions:
+  - id: app-asks-kernel
+    type: ox
+    prompt: 앱이 디스크의 파일을 읽을 때, 앱이 디스크 장치를 직접 다루나요?
+    answer: false
+    explain: 앱은 하드웨어를 직접 만지지 않아요. 시스템 콜로 커널에 부탁하면, 커널이 디스크 입출력을 대신해 줘요.
+  - id: proc-is-virtual
+    type: choice
+    prompt: 리눅스의 /proc에 대한 설명으로 맞는 것은?
+    choices:
+      - 읽을 때마다 커널이 지금 값을 만들어 주는 가상 파일이에요
+      - 커널이 1분마다 디스크에 써 두는 로그 파일이에요
+      - 모니터링 에이전트가 설치될 때 만드는 설정 파일이에요
+      - 부팅할 때 한 번 만들어지고 다시 바뀌지 않는 파일이에요
+    answer: 0
+    explain: /proc은 실제 디스크에 있는 파일이 아니에요. 커널이 자기 상태를 내놓는 창구라서, 읽는 순간의 값을 보여 줘요.
+  - id: cumulative-cpu-time
+    type: choice
+    prompt: /proc/stat의 CPU 시간 값으로 최근 1분의 CPU 사용률을 구하는 방법은?
+    choices:
+      - 1분 전과 지금 값의 차이로 계산해요
+      - 지금 읽은 값을 그대로 퍼센트로 읽어요
+      - 지금 값을 1분 부하로 나눠요
+      - 코어마다 읽은 값 중 가장 큰 값을 골라요
+    answer: 0
+    explain: 이 값은 부팅 뒤 계속 쌓이는 누적값이에요. 두 시점의 차이를 내야 그 구간에 쓴 시간이 나와요.
+  - id: system-call-name
+    type: input
+    prompt: 프로세스가 파일을 읽거나 네트워크로 보내려고 커널에 일을 부탁하는 방법을 무엇이라고 하나요?
+    answer: [시스템 콜]
+    term: server/system-call
+    explain: 앱은 시스템 콜로 커널에 부탁하고, 커널이 하드웨어를 대신 다뤄요. 시스템 콜이 아주 많으면 CPU의 sy 시간이 올라가요.

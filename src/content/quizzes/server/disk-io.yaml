@@ -1,0 +1,41 @@
+questions:
+  - id: throughput-from-iops
+    type: choice
+    prompt: 한 번에 4KB씩 읽는 요청을 초당 1,000번 처리해요. 읽기 처리량은 얼마쯤일까요?
+    choices:
+      - 약 4MB/초
+      - 약 4KB/초
+      - 약 1MB/초
+      - 약 4GB/초
+    answer: 0
+    explain: 처리량은 횟수 × 한 번의 크기예요. 4KB × 1,000번 = 약 4MB/초라서, 작은 요청은 많이 해도 옮기는 양이 적어요.
+  - id: low-throughput-busy
+    type: choice
+    prompt: DB 서버 디스크의 처리량이 초당 몇 MB로 낮아요. 그래도 디스크가 한가하다고 단정할 수 없는 이유는?
+    choices:
+      - 작은 요청이 몰리면 처리량은 낮아도 초당 횟수 한계에 닿을 수 있어서
+      - 처리량은 쓰기만 세고 읽기는 세지 않아서
+      - 처리량은 부팅 뒤 쌓인 누적값이라서
+      - 처리량은 SSD에서는 재지 않아서
+    answer: 0
+    explain: 디스크는 옮기는 양뿐 아니라 초당 처리할 수 있는 요청 수에도 한계가 있어요. 그래서 처리량과 IOPS를 함께 봐요.
+  - id: util-100-ssd
+    type: ox
+    prompt: SSD의 %util이 100%예요. 디스크가 더는 요청을 받을 수 없는 상태인가요?
+    answer: false
+    explain: '%util은 요청이 하나라도 걸려 있던 시간의 비율이에요. 여러 요청을 함께 처리하는 SSD는 100%여도 여유가 있을 수 있어요.'
+  - id: saturation-signal
+    type: choice
+    prompt: SSD에서 디스크가 정말 한계에 닿았는지 볼 때 더 확실한 신호는?
+    choices:
+      - 지연(await)과 줄 길이(aqu-sz)가 평소보다 늘었는지
+      - 파일 시스템 용량이 몇 % 찼는지
+      - inode가 얼마나 남았는지
+      - CPU의 iowait가 얼마인지
+    answer: 0
+    explain: 요청이 감당하는 것보다 많이 오면 줄이 길어지고 기다리는 시간도 늘어요. 앱이 먼저 느끼는 것도 지연이에요.
+  - id: await-includes-queue
+    type: ox
+    prompt: iostat의 await에는 요청이 줄에서 기다린 시간도 들어 있나요?
+    answer: true
+    explain: await는 디스크가 처리한 시간에 줄에서 기다린 시간까지 더한 값이에요. 요청이 밀리면 await도 함께 커져요.

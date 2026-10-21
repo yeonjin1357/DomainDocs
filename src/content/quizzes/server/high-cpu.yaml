@@ -1,0 +1,41 @@
+questions:
+  - id: sy-grew
+    type: choice
+    prompt: CPU 사용률이 올랐는데, 늘어난 몫 대부분이 sy(시스템)예요. 먼저 의심할 동작은?
+    choices:
+      - 아주 작은 단위로 자주 읽고 쓰거나, 연결을 자주 맺고 끊는 코드
+      - 앱 코드 안의 무거운 계산
+      - 같은 물리 서버의 다른 가상 머신
+      - 응답이 느려진 디스크
+    answer: 0
+    explain: sy는 커널 코드를 실행한 시간이에요. 앱이 시스템 콜로 커널을 아주 자주 부르면 늘어요. 앱 계산은 us, 다른 가상 머신은 st로 잡혀요.
+  - id: vmstat-first-line
+    type: ox
+    prompt: vmstat 5를 실행하면 처음 나오는 줄이 지난 5초 동안의 값인가요?
+    answer: false
+    explain: 첫 줄은 부팅 뒤 평균이에요. 둘째 줄부터가 지정한 간격 동안의 값이라, 첫 줄은 건너뛰고 읽어요.
+  - id: same-requests-more-cpu
+    type: choice
+    prompt: 요청 수는 그대로인데 CPU 사용률만 두 배가 됐어요. 먼저 볼 것은?
+    choices:
+      - 배포된 코드나 데이터가 바뀌어 요청 하나가 무거워졌는지
+      - 요청이 늘어 서버 대수가 모자란지
+      - 코어 수를 늘리면 해결되는지
+      - 디스크 inode가 찼는지
+    answer: 0
+    explain: 요청이 그대로라면 요청 하나가 쓰는 CPU가 늘었어요. 서버를 늘려도 같은 일이 되풀이되니, 바뀐 코드나 데이터를 먼저 봐요.
+  - id: is-work-queuing
+    type: choice
+    prompt: CPU가 95%일 때, 일이 밀려 응답이 느려지는지 보려면 무엇을 봐야 할까요?
+    choices:
+      - vmstat의 r이 코어 수보다 계속 큰지
+      - CPU 사용률이 100%에 닿았는지
+      - iowait가 0인지
+      - 전체 프로세스 수가 늘었는지
+    answer: 0
+    explain: r은 실행 중이거나 차례를 기다리는 프로세스 수예요. 코어 수보다 계속 크면 차례를 기다리는 일이 생겨 응답이 느려져요.
+  - id: gc-with-cpu
+    type: ox
+    prompt: 자바 서버에서 CPU와 함께 GC 시간이 늘었다면, 힙이 모자라 GC가 쉬지 않고 도는지 의심해 볼 만한가요?
+    answer: true
+    explain: 힙이 모자라면 GC가 자주 돌며 CPU를 써요. 이때는 CPU보다 힙 사용량과 GC 멈춤을 함께 봐요.
