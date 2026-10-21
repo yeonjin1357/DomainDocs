@@ -64,7 +64,7 @@ const DOC_BLOCKS = ['OnDashboard', 'KeyPoints', 'Analogy', 'Figure', 'Checkpoint
 /** 글마다 한 번까지만 쓰는 블록 */
 const ONCE_BLOCKS = ['KeyPoints', 'Analogy', 'Checkpoints', 'Deeper'];
 /** 그림 컴포넌트. <Figure>나 <OnDashboard> 안에만 둔다. */
-const FIGURE_COMPONENTS = ['MiniLineChart', 'StatTile', 'Waterfall', 'Scatter', 'ServiceMap'];
+const FIGURE_COMPONENTS = ['MiniLineChart', 'StatTile', 'Waterfall', 'Scatter', 'ServiceMap', 'Flow', 'Sequence'];
 const GUIDE_BLOCKS = ['Situation', 'FirstLook', 'Checkpoints'];
 const GUIDE_FREE_COMPONENTS = ['OnDashboard', 'Figure', 'Analogy'];
 const FREE_NODES = ['paragraph', 'heading', 'list', 'table', 'code', 'blockquote'];

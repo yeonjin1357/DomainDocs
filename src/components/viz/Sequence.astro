@@ -1,0 +1,128 @@
+---
+import { SEQ, layoutSequence, type SeqMessage } from '../../lib/viz/sequence';
+import type { FigureTone } from '../../lib/viz/flow';
+import { svgId } from '../../lib/viz/svg-id';
+
+interface Props {
+  participants: string[];
+  messages: SeqMessage[];
+  ariaLabel: string;
+}
+
+const { participants, messages, ariaLabel } = Astro.props;
+const layout = layoutSequence(participants, messages);
+const uid = svgId('seq', ariaLabel);
+const TONES: FigureTone[] = ['sub', 'accent', 'warn'];
+// 참여자 상자 폭. 넷이면 서로 붙지 않게 좁힌다.
+const boxW = Math.min(84, (SEQ.width - 2 * SEQ.padX) / participants.length - 8);
+// 화살촉이 생명선에 닿도록 끝을 조금 당긴다
+const inset = (x1: number, x2: number) => (x2 > x1 ? x2 - 2 : x2 + 2);
+---
+<svg class="sequence" data-sequence viewBox={`0 0 ${layout.width} ${layout.height}`} role="img" aria-label={ariaLabel}>
+  <defs>
+    {
+      TONES.map((tone) => (
+        <marker id={`${uid}-${tone}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path class={`head tone-${tone}`} d="M0,0 L10,5 L0,10 z" />
+        </marker>
+      ))
+    }
+  </defs>
+  {
+    layout.lanes.map((l) => (
+      <g class="seq-lane">
+        <line class="lifeline" x1={l.x} y1={SEQ.headH - 4} x2={l.x} y2={layout.height - SEQ.footH / 2} />
+        <rect class="lane-box" x={l.x - boxW / 2} y="4" width={boxW} height="28" rx="8" />
+        <text class="lane-label" x={l.x} y="18">{l.label}</text>
+      </g>
+    ))
+  }
+  {
+    layout.arrows.map((a) => (
+      <>
+        <line
+          class:list={['seq-arrow', `tone-${a.tone}`, { dashed: a.dashed }]}
+          x1={a.x1}
+          y1={a.y}
+          x2={inset(a.x1, a.x2)}
+          y2={a.y}
+          marker-end={`url(#${uid}-${a.tone})`}
+        />
+        <text class="arrow-label" x={(a.x1 + a.x2) / 2} y={a.y - 8}>{a.label}</text>
+      </>
+    ))
+  }
+</svg>
+
+<style>
+  .sequence {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    margin: 0 auto;
+    overflow: visible;
+  }
+
+  text {
+    dominant-baseline: central;
+    text-anchor: middle;
+    font-family: inherit;
+  }
+
+  .lifeline {
+    stroke: var(--color-line);
+    stroke-width: 1.5;
+    stroke-dasharray: 3 3;
+  }
+
+  .lane-box {
+    fill: var(--color-card);
+    stroke: var(--color-line);
+    stroke-width: 1.5;
+  }
+
+  .lane-label {
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--color-text);
+  }
+
+  .seq-arrow {
+    stroke-width: 1.5;
+  }
+
+  .seq-arrow.tone-sub {
+    stroke: var(--color-text-sub);
+  }
+
+  .seq-arrow.tone-accent {
+    stroke: var(--color-accent);
+  }
+
+  .seq-arrow.tone-warn {
+    stroke: var(--color-warn);
+    stroke-width: 2;
+  }
+
+  .seq-arrow.dashed {
+    stroke-dasharray: 4 3;
+  }
+
+  .head.tone-sub {
+    fill: var(--color-text-sub);
+  }
+
+  .head.tone-accent {
+    fill: var(--color-accent);
+  }
+
+  .head.tone-warn {
+    fill: var(--color-warn);
+  }
+
+  .arrow-label {
+    font-size: 11px;
+    fill: var(--color-text-sub);
+  }
+</style>
