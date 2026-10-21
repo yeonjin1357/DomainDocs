@@ -1,0 +1,91 @@
+---
+title: 노드가 NotReady일 때
+summary: 노드 조건으로 kubelet이 연락을 끊었는지, 자원 압박인지 가르고, 그 위 파드가 어떻게 되는지 봐요.
+domain: kubernetes
+type: guide
+order: 110
+icon: container
+keywords: [NotReady, node condition, 노드 조건, Unknown, MemoryPressure, DiskPressure, kubelet, eviction, 축출, taint unreachable]
+related: [kubernetes/pods-and-nodes, kubernetes/requests-and-limits, server/server-not-reporting, server/disk-filling-up]
+sources:
+  - title: Kubernetes — Node Status
+    url: https://kubernetes.io/docs/reference/node/node-status/
+  - title: Kubernetes — Nodes
+    url: https://kubernetes.io/docs/concepts/architecture/nodes/
+  - title: Kubernetes — Node-pressure Eviction
+    url: https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/
+  - title: Kubernetes — Taints and Tolerations
+    url: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+updated: 2026-10-21
+---
+
+<Situation>
+  노드 목록에서 worker-3이 NotReady로 바뀌었어요. 그 노드 위의 파드들은 아직 Running으로 보이는데, 몇 분 뒤 다른 노드에 같은 파드가 새로 뜨기 시작했어요.
+
+  NotReady는 노드가 아프다는 뜻이지만, 이유는 여러 가지예요. 노드 조건으로 갈래를 정하고, 그 위 파드에 무슨 일이 생기는지 알아 둬요.
+</Situation>
+
+<FirstLook>
+  <Item title="Ready가 False인가 Unknown인가">연락이 끊겼는지, 노드가 아프다고 알렸는지 봐요.</Item>
+  <Item title="압박 조건">메모리·디스크·프로세스 수 압박이 켜졌는지 봐요.</Item>
+  <Item title="파드의 운명">5분 뒤 파드가 쫓겨나는지 봐요.</Item>
+</FirstLook>
+
+## 1. Ready 조건의 값을 보세요
+
+노드는 몇 가지 조건(condition)으로 상태를 알려요. 가장 중요한 건 Ready예요.
+
+| Ready 값 | 뜻 |
+| --- | --- |
+| True | 노드가 건강하고 파드를 받을 수 있어요 |
+| False | 노드가 아프고 파드를 받지 않아요 |
+| Unknown | 노드 컨트롤러가 정해진 시간(기본 50초) 동안 노드 소식을 못 들었어요 |
+
+Unknown이라면 노드 쪽 kubelet이 컨트롤 플레인과 연락이 끊긴 거예요. 노드가 꺼졌거나, 네트워크가 끊겼거나, kubelet이 멈췄어요. 이때는 노드를 서버로 보고 <Term slug="server/server-not-reporting">서버 수집이 끊겼을 때</Term>의 순서로 봐요.
+
+**확인 방법**: `kubectl describe node 노드이름`의 Conditions 칸을 봐요. Ready의 값과 바뀐 시각, 메시지가 있어요.
+
+## 2. 압박 조건이 켜졌는지 보세요
+
+Ready 말고도 노드는 자원 압박을 조건으로 알려요.
+
+| 조건 | True일 때 |
+| --- | --- |
+| MemoryPressure | 노드 메모리가 모자라요 |
+| DiskPressure | 노드 디스크 용량이 모자라요 |
+| PIDPressure | 노드에 프로세스가 너무 많아요 |
+
+압박 조건이 켜지면 kubelet은 노드를 지키려고 파드를 쫓아내기 시작해요. 이걸 노드 압박 축출(node-pressure eviction)이라고 해요. 기본 기준은 리눅스 노드에서 쓸 수 있는 메모리 100Mi 미만, 노드 파일 시스템 여유 10% 미만 같은 값이에요.
+
+디스크 압박이라면 노드의 로그와 컨테이너 이미지가 쌓이지 않았는지 봐요. 서버 디스크를 보는 순서는 <Term slug="server/disk-filling-up">디스크가 차오를 때</Term>와 같아요.
+
+## 3. 그 위 파드에 무슨 일이 생기는지 알아 두세요
+
+노드가 NotReady나 연락 끊김이 되면, 쿠버네티스는 그 노드에 taint를 붙여요. 그리고 파드마다 이 taint를 5분(300초) 동안 견디는 toleration을 자동으로 붙여 둬요.
+
+<Figure caption="노드 연락이 끊긴 뒤의 흐름이에요. 50초 동안 소식이 없으면 Unknown이 되고, 5분을 더 견딘 뒤 파드가 쫓겨나 다른 노드에 새로 떠요.">
+  <Waterfall
+    ariaLabel="노드 연락이 끊긴 뒤 50초 동안 기다려 Unknown이 되고, 그 뒤 300초 동안 파드가 노드에 남아 있다가, 쫓겨난 뒤 다른 노드에 새 파드가 뜨는 타임라인"
+    unit="초"
+    spans={[
+      { label: '연락 끊김 → Unknown', start: 0, duration: 50, tone: 'warn' },
+      { label: '파드가 노드에 남아 있음', start: 50, duration: 300 },
+      { label: '쫓겨나고 다른 노드에 새로 뜸', start: 350, duration: 40, tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+그래서 노드가 짧게 끊겼다 돌아오면 파드는 그대로 남아요. 5분 넘게 돌아오지 않으면 Deployment 같은 워크로드가 다른 노드에 새 파드를 띄워요. 그사이 몇 분은 원하는 개수보다 적은 파드로 버텨야 해요.
+
+## 4. 노드 안에서 kubelet을 보세요
+
+노드에 들어갈 수 있다면 kubelet이 도는지, 무슨 로그를 남겼는지 봐요. 컨테이너 런타임이 멈췄거나, 인증서가 만료됐거나, 노드 자원이 바닥나 kubelet이 버티지 못하는 경우가 있어요.
+
+**확인 방법**: kubelet이 systemd 서비스라면 `systemctl status kubelet`으로 상태를 봐요. 로그는 `journalctl -u kubelet`으로 봐요.
+
+<Checkpoints>
+  <Check>NotReady 노드의 파드가 Running으로 보인다고 안심했다면 다시 보세요. Unknown 노드의 파드 상태는 마지막으로 들은 값일 수 있어요.</Check>
+  <Check>노드가 끊긴 뒤 몇 분 동안 파드가 다시 뜨지 않는다고 놀랐다면, 기본 5분 toleration을 떠올리세요.</Check>
+  <Check>노드 한 대가 빠지면 서비스가 버티지 못한다면, 파드가 여러 노드에 흩어져 있는지와 워크로드의 파드 수를 보세요.</Check>
+  <Check>DiskPressure가 자주 켜지는 노드라면, 쌓이는 로그와 쓰지 않는 컨테이너 이미지를 먼저 보세요.</Check>
+</Checkpoints>

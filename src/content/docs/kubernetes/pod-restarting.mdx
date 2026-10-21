@@ -1,0 +1,96 @@
+---
+title: 파드가 계속 재시작될 때
+summary: 마지막 종료 이유와 종료 코드로 갈래를 정하고, 이전 실행의 로그와 프로브 설정을 봐요.
+domain: kubernetes
+type: guide
+order: 90
+icon: container
+keywords: [CrashLoopBackOff, restart, 재시작, OOMKilled, exit code, "137", Last State, kubectl logs --previous, liveness probe, 원인 찾기]
+related: [kubernetes/pod-status, kubernetes/requests-and-limits, server/low-memory, apm/jvm-memory]
+sources:
+  - title: Kubernetes — Pod Lifecycle
+    url: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
+  - title: Kubernetes — Debug Running Pods
+    url: https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/
+  - title: Kubernetes — Determine the Reason for Pod Failure
+    url: https://kubernetes.io/docs/tasks/debug/debug-application/determine-reason-pod-failure/
+  - title: Kubernetes — Resource Management for Pods and Containers
+    url: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  - title: Kubernetes — kubectl logs
+    url: https://kubernetes.io/docs/reference/kubectl/generated/kubectl_logs/
+updated: 2026-10-21
+---
+
+<Situation>
+  주문 서비스의 파드 하나가 재시작 횟수 47회에 상태는 CrashLoopBackOff예요. 같은 Deployment의 다른 파드도 하나둘 재시작하기 시작했어요.
+
+  CrashLoopBackOff는 "계속 죽고 있다"는 표시일 뿐 원인이 아니에요. 마지막으로 어떻게 끝났는지부터 보고, 그 갈래를 따라 원인을 좁혀요.
+</Situation>
+
+<FirstLook>
+  <Item title="마지막 종료 이유">OOMKilled인지, Error인지 봐요.</Item>
+  <Item title="이전 실행의 로그">죽기 직전 로그에 남은 말을 봐요.</Item>
+  <Item title="프로브가 죽였나">liveness 실패로 끝났는지 이벤트를 봐요.</Item>
+</FirstLook>
+
+## 1. 마지막 종료 이유를 보세요
+
+지금 상태가 아니라 직전 실행이 어떻게 끝났는지가 실마리예요. `kubectl describe pod`의 Last State에 종료 이유(Reason)와 종료 코드(Exit Code)가 남아요.
+
+| 종료 이유 | 뜻 | 다음에 볼 곳 |
+| --- | --- | --- |
+| OOMKilled | 메모리 한도를 넘어 커널이 프로세스를 끝냈어요 | 2단계 |
+| Error | 앱이 0이 아닌 코드로 스스로 끝났어요 | 3단계 |
+| Completed | 앱이 0으로 정상 종료했어요. 계속 도는 앱이라면 이상해요 | 3단계 |
+
+**확인 방법**: `kubectl describe pod 파드이름`에서 Last State 칸과 Restart Count를 봐요. 상태 이름의 뜻은 <Term slug="kubernetes/pod-status">파드 상태와 재시작</Term>에 있어요.
+
+## 2. OOMKilled라면 메모리 한도와 사용량을 견주세요
+
+OOMKilled는 컨테이너가 메모리 한도보다 더 쓰려 해서 끝난 거예요. 쿠버네티스 문서의 예에서는 이때 종료 코드가 137이에요. 137은 흔히 128에 강제 종료 신호 번호 9를 더한 값으로 읽어요.
+
+<Figure caption="한 파드의 메모리 예시예요. 사용량이 한도 512Mi에 닿을 때마다 OOMKilled로 끝나고, 다시 시작해 처음부터 올라가요.">
+  <MiniLineChart
+    ariaLabel="메모리 사용량이 200Mi에서 512Mi 한도까지 오르면 뚝 떨어지기를 세 번 되풀이하는 그래프와 512Mi 한도선"
+    yMax={600}
+    series={[
+      { label: '메모리 사용', values: [200, 350, 512, 200, 360, 512, 210, 370, 512, 220], tone: 'warn', value: '한도에서 끊김' },
+      { label: '한도', values: [512, 512, 512, 512, 512, 512, 512, 512, 512, 512], tone: 'sub', value: '512Mi' },
+    ]}
+  />
+</Figure>
+
+- **매번 같은 크기에서 끊긴다면**: 앱이 원래 그만큼 필요해요. 한도를 늘리거나 앱의 메모리 설정을 줄여요.
+- **실행할수록 바닥이 높아진다면**: 메모리 누수를 의심해요.
+
+자바라면 컨테이너 한도를 힙 크기(`-Xmx`)와 같게 잡지 않았는지 봐요. JVM은 힙 밖에서도 메모리를 써요.
+
+자세한 건 <Term slug="apm/jvm-memory">JVM과 힙 메모리</Term>에 있어요. 한도의 뜻은 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>에서 다뤄요.
+
+## 3. Error라면 이전 실행의 로그를 보세요
+
+앱이 스스로 끝났다면 그 이유는 앱 로그에 있어요. 그런데 지금 컨테이너는 새로 뜬 것이라, 그냥 로그를 보면 방금 시작한 로그만 보여요.
+
+**확인 방법**: `kubectl logs 파드이름 --previous`로 직전에 끝난 컨테이너의 로그를 봐요. 시작하자마자 죽는다면 맨 끝의 몇 줄에 원인이 있는 경우가 많아요.
+
+흔한 원인은 이래요.
+
+- 환경 변수나 설정 파일이 빠졌거나 틀렸어요. ConfigMap·Secret을 바꾼 뒤라면 그 변경부터 봐요.
+- 시작할 때 붙어야 하는 DB나 다른 서비스에 닿지 못해 앱이 포기했어요.
+- 새로 배포한 이미지에 버그가 있어요. 배포 시각과 재시작이 시작된 시각을 맞춰 봐요.
+
+## 4. 프로브가 죽였는지 보세요
+
+앱은 멀쩡한데 liveness 프로브가 실패해서 kubelet이 다시 시작시키는 경우도 있어요. 이때 이벤트에 프로브 실패(Unhealthy)가 남아요.
+
+- 시작이 느린 앱이라면 liveness가 시작을 기다려 주지 않았을 수 있어요. startup 프로브나 첫 검사 지연을 둬요.
+- liveness가 DB 같은 바깥 의존성까지 확인한다면, 바깥이 잠깐 느려져도 멀쩡한 파드가 다시 시작돼요.
+
+**확인 방법**: `kubectl describe pod`의 Events에서 Unhealthy와 Killing 기록을 찾아요.
+
+<Checkpoints>
+  <Check>지금 컨테이너의 로그만 보고 원인이 없다고 판단했다면, `--previous`로 직전 실행의 로그를 보세요.</Check>
+  <Check>같은 Deployment의 파드가 모두 함께 재시작한다면, 파드 하나보다 공통 원인(새 배포, 설정 변경, 바깥 의존성)을 먼저 보세요.</Check>
+  <Check>OOMKilled인데 노드 메모리는 여유롭다고 놀랐다면 다시 보세요. 컨테이너 한도는 노드 여유와 상관없이 걸려요.</Check>
+  <Check>재시작 횟수가 오르는데 단계가 Running이라 정상으로 봤다면 다시 보세요. 재시작 중인 컨테이너도 Running에 들어가요.</Check>
+</Checkpoints>
