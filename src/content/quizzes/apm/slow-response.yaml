@@ -1,0 +1,31 @@
+questions:
+  - id: all-endpoints-slow
+    type: choice
+    prompt: 모든 엔드포인트가 같은 시각부터 함께 느려졌어요. 먼저 의심할 것은?
+    choices:
+      - 함께 쓰는 DB, 네트워크, 서버 자원
+      - 한 기능의 코드
+      - 한 기능만 부르는 외부 API
+      - 사용자 브라우저
+    answer: 0
+    explain: 모두가 함께 느려졌다면 모두가 함께 쓰는 곳이 원인일 가능성이 커요. 한 엔드포인트만 느리면 그 기능 쪽을 봐요.
+  - id: rollback-first
+    type: choice
+    prompt: 느려진 시각에 배포가 있었고, 되돌릴 수 있어요. 가장 먼저 할 일은?
+    choices:
+      - 원인을 찾기 전에 되돌려 피해부터 멈춰요
+      - 원인을 끝까지 찾은 뒤 고쳐서 다시 배포해요
+      - 서버 대수를 늘려요
+      - 응답시간 알림을 잠시 꺼요
+    answer: 0
+    explain: 문제 해결의 첫째 일은 피해를 멈추는 거예요. 되돌릴 수 있다면 먼저 되돌리고 원인은 그다음에 찾아요.
+  - id: service-wide-p95
+    type: ox
+    prompt: 서비스 전체 p95 하나로만 알림을 걸면, 한 엔드포인트가 크게 느려져도 놓칠 수 있나요?
+    answer: true
+    explain: 빠른 엔드포인트와 섞이면 전체 p95는 덜 오르게 보여요. 엔드포인트마다 p95를 나눠 봐요.
+  - id: correlation-not-cause
+    type: ox
+    prompt: 어떤 지표가 응답시간과 함께 움직였다면, 그것만으로 원인이 확실한가요?
+    answer: false
+    explain: 함께 움직였다고 원인은 아니에요. 원인으로 본 것을 고친 뒤 p95가 평소로 돌아오는지까지 확인해요.

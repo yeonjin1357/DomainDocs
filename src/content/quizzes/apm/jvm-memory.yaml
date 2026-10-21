@@ -1,0 +1,37 @@
+questions:
+  - id: process-bigger-than-heap
+    type: ox
+    prompt: JVM 프로세스가 서버에서 쓰는 메모리는 -Xmx로 정한 힙 크기를 넘지 않나요?
+    answer: false
+    explain: JVM은 힙 밖에도 메타스페이스, 스레드 스택 같은 메모리를 써요. 그래서 프로세스 메모리는 -Xmx보다 커요.
+  - id: container-limit-equals-xmx
+    type: choice
+    prompt: 컨테이너 메모리 한도를 -Xmx와 똑같이 잡았어요. 생길 수 있는 일은?
+    choices:
+      - 힙은 여유가 있는데, 힙 밖 메모리까지 더해져 한도를 넘고 강제로 끝나요
+      - GC가 영영 돌지 않아요
+      - 힙 크기가 한도에 맞춰 저절로 줄어요
+      - 메타스페이스를 쓰지 않게 돼요
+    answer: 0
+    explain: 컨테이너 한도는 프로세스 전체 메모리에 걸려요. 힙 밖 메모리만큼 여유를 더 둬야 해요.
+  - id: leak-signal
+    type: choice
+    prompt: 힙 사용량 그래프에서 메모리 누수를 의심할 만한 모습은?
+    choices:
+      - GC 직후에 남는 바닥이 계속 올라가요
+      - 톱니 모양으로 오르내려요
+      - GC 직전에 90%까지 올라가요
+      - GC가 자주 돌아요
+    answer: 0
+    explain: 오르내리는 톱니는 정상이에요. GC가 치운 뒤에도 바닥이 계속 높아지면 치울 수 없는 객체가 쌓이는 중이에요.
+  - id: oom-not-always-leak
+    type: ox
+    prompt: OutOfMemoryError(Java heap space)가 났다면 언제나 메모리 누수인가요?
+    answer: false
+    explain: 앱에 비해 힙 크기를 작게 잡은 설정 문제일 수도 있어요. GC 직후 바닥이 계속 오르는지 함께 봐요.
+  - id: heap-name
+    type: input
+    prompt: 자바 코드가 만든 객체가 담기는 JVM의 메모리 영역은?
+    answer: [힙, heap]
+    term: apm/heap
+    explain: 힙의 최대 크기는 -Xmx로 정해요. 더는 쓰지 않는 객체는 GC가 치워요.

@@ -1,0 +1,31 @@
+questions:
+  - id: p95-not-additive
+    type: ox
+    prompt: DB 구간의 p95와 외부 API 구간의 p95를 더하면, 전체 응답시간의 p95가 되나요?
+    answer: false
+    explain: 느린 요청이 구간마다 다른 요청일 수 있어서 더해도 맞지 않아요. 나눠 더하는 건 평균이나 합계일 때만 맞아요.
+  - id: biggest-share
+    type: choice
+    prompt: 평균 응답시간 600ms가 DB 300ms, 외부 API 180ms, 앱 코드 120ms로 나뉘어요. 먼저 줄여 볼 곳은?
+    choices:
+      - DB 구간
+      - 외부 API 구간
+      - 앱 코드
+      - 셋 다 똑같이 줄여요
+    answer: 0
+    explain: 평균은 구간별로 나눠 더할 수 있어서, 가장 큰 몫인 DB가 절반을 차지해요. 줄일 곳은 큰 몫부터예요.
+  - id: not-outside-server
+    type: choice
+    prompt: 서버의 트랜잭션 응답시간에 들어 있는 시간은?
+    choices:
+      - 앱 코드가 DB 응답을 기다린 시간
+      - 앞단 서버를 거쳐 앱에 닿기까지 기다린 시간
+      - 사용자와 서버 사이의 네트워크 시간
+      - 브라우저가 화면을 그리는 시간
+    answer: 0
+    explain: 트랜잭션 시간은 앱이 요청을 받아 처리한 시간이라, DB를 기다린 시간은 그 안에 있어요. 나머지 셋은 서버 밖에서 쓴 시간이에요.
+  - id: health-check-dilution
+    type: ox
+    prompt: 몇 ms짜리 헬스체크 요청이 섞인 응답시간 평균은, 실제 기능의 느린 요청을 가릴 수 있나요?
+    answer: true
+    explain: 빠른 요청이 많이 섞이면 평균이 내려가요. 실제 기능의 트랜잭션만 따로 봐요.

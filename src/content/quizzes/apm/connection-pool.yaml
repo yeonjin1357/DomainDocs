@@ -1,0 +1,41 @@
+questions:
+  - id: query-fast-response-slow
+    type: choice
+    prompt: 응답시간은 늘었는데 DB 쿼리 시간은 50ms 그대로예요. 먼저 볼 지표는?
+    choices:
+      - 커넥션을 얻기까지의 대기 시간과 대기 스레드 수
+      - DB 서버의 CPU 사용률
+      - DB 디스크의 지연
+      - 버퍼 캐시 적중률
+    answer: 0
+    explain: 풀이 바닥나면 쿼리 밖에서 커넥션을 기다려요. 그래서 쿼리는 빠른데 응답시간만 늘어요.
+  - id: pool-size-calc
+    type: choice
+    prompt: 초당 400번 커넥션을 빌리고, 한 번 빌리면 50ms 동안 쥐어요. 평균 몇 개를 동시에 쓸까요?
+    choices:
+      - 20개
+      - 8개
+      - 400개
+      - 50개
+    answer: 0
+    explain: 동시에 쓰는 수는 빌리는 횟수 × 쥐는 시간이에요. 400 × 0.05 = 20개라서, 최대 10개짜리 풀이면 나머지는 기다려요.
+  - id: hikari-default-max
+    type: choice
+    prompt: HikariCP에서 maximumPoolSize를 따로 정하지 않으면 최대 몇 개일까요?
+    choices:
+      - 10개
+      - 100개
+      - 200개
+      - 30개
+    answer: 0
+    explain: 기본 최대는 10개예요. 다 빌려 가면 다음 요청은 connectionTimeout(기본 30초)까지 기다리다 예외를 던져요.
+  - id: scale-out-connections
+    type: ox
+    prompt: 풀이 20개인 앱 서버를 10대로 늘려도, DB에 맺는 연결 수는 늘지 않나요?
+    answer: false
+    explain: 서버마다 풀을 가지니 최대 20 × 10 = 200개까지 늘어요. DB의 연결 한도와 견줘 봐요.
+  - id: api-inside-tx
+    type: ox
+    prompt: 트랜잭션 안에서 외부 API를 부르면, 응답을 기다리는 동안에도 DB 커넥션을 쥐고 있나요?
+    answer: true
+    explain: 쥐는 시간은 빌려서 돌려줄 때까지라 기다리는 시간도 들어가요. 그래서 풀이 빨리 바닥나요.

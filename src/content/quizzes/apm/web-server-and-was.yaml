@@ -1,0 +1,42 @@
+questions:
+  - id: tomcat-max-threads
+    type: choice
+    prompt: Tomcat이 기본 설정에서 동시에 요청을 처리하는 스레드는 최대 몇 개일까요?
+    choices:
+      - 200개
+      - 10개
+      - 8,192개
+      - 100개
+    answer: 0
+    explain: maxThreads 기본값은 200이에요. 8,192는 연결 수 한도(maxConnections), 100은 운영체제 대기열(acceptCount)의 기본값이에요.
+  - id: nginx-timeout-504
+    type: choice
+    prompt: WAS가 느려져 nginx가 기본 시간 제한 동안 응답을 받지 못했어요. 브라우저가 받는 상태 코드는 보통?
+    choices:
+      - "504"
+      - "502"
+      - "500"
+      - "404"
+    answer: 0
+    explain: 504는 뒤의 서버에서 제때 응답을 받지 못했다는 뜻이에요. WAS가 죽었거나 이상한 응답을 주면 502가 나요.
+  - id: apm-misses-front-wait
+    type: ox
+    prompt: APM의 응답시간에는 웹 서버 앞이나 WAS 대기열에서 기다린 시간까지 들어 있나요?
+    answer: false
+    explain: APM 에이전트는 보통 WAS 안에서 요청이 들어오고 나가는 지점을 재요. 그 바깥에서 기다린 시간은 빠져요.
+  - id: request-time-gap
+    type: choice
+    prompt: nginx 로그의 $request_time이 같은 요청의 APM 응답시간보다 훨씬 길어요. 무슨 뜻일까요?
+    choices:
+      - WAS 바깥(대기열, 웹 서버, 네트워크)에서 기다렸어요
+      - APM이 시간을 잘못 쟀어요
+      - WAS 안의 앱 코드가 느려요
+      - DB 쿼리가 느려요
+    answer: 0
+    explain: 웹 서버는 요청을 받은 때부터 응답을 다 보낼 때까지 재요. 그 차이만큼 WAS 밖에서 시간을 쓴 거예요.
+  - id: reverse-proxy-name
+    type: input
+    prompt: 앞에서 요청을 받아 뒤의 서버로 넘겨 주는 역할을 무엇이라고 하나요?
+    answer: [리버스 프록시, reverse proxy]
+    term: apm/reverse-proxy
+    explain: nginx 같은 웹 서버가 이 역할을 하며, 앱 코드가 필요한 요청을 뒤의 WAS로 넘겨요.

@@ -1,0 +1,46 @@
+questions:
+  - id: head-count-shrinks
+    type: choice
+    prompt: head 샘플링으로 요청의 10%만 남겨요. 저장된 트레이스 개수로 센 처리량은 실제의 얼마일까요?
+    choices:
+      - 1/10
+      - 실제와 같아요
+      - 10배
+      - 1/2
+    answer: 0
+    explain: 남긴 비율만큼 트레이스가 줄어요. 그래서 트레이스 개수로 처리량을 그리면 실제보다 작게 나와요.
+  - id: adjusted-count
+    type: choice
+    prompt: 비율이 5%인 head 샘플링에서, 남은 트레이스 하나는 요청 몇 건으로 어림할까요?
+    choices:
+      - 20건
+      - 5건
+      - 1건
+      - 100건
+    answer: 0
+    explain: 샘플 비율의 역수를 곱해요. 1 ÷ 0.05 = 20이라 트레이스 하나를 20건으로 세요.
+  - id: tail-skews-errors
+    type: ox
+    prompt: 에러 트레이스는 모두 남기고 나머지만 10% 남기는 tail 샘플링에서, 남은 트레이스로 센 에러율은 실제와 같나요?
+    answer: false
+    explain: 에러 쪽을 더 남겼으니 에러율이 부풀어요. 이렇게 고른 트레이스는 비율을 곱해도 바로잡을 수 없어요.
+  - id: metrics-before-sampling
+    type: choice
+    prompt: APM의 요청 수, 에러 수, 응답시간 지표는 무엇으로 세야 정확할까요?
+    choices:
+      - 샘플링하기 전의 모든 요청
+      - 샘플링하고 남은 트레이스
+      - 에러 트레이스만
+      - 가장 느린 트레이스 100개
+    answer: 0
+    explain: 지표는 샘플링 설정과 상관없이 모든 요청으로 세요. 트레이스는 하나하나 자세히 볼 때 써요.
+  - id: spanmetrics-order
+    type: choice
+    prompt: Collector에서 span으로 지표를 만든다면, 그 단계는 tail 샘플링 프로세서와 견줘 어디에 둬야 할까요?
+    choices:
+      - 샘플링 프로세서 앞
+      - 샘플링 프로세서 뒤
+      - 어디에 둬도 결과가 같아요
+      - 저장소에 쓴 다음
+    answer: 0
+    explain: 샘플링 뒤에 두면 남은 트레이스로만 세서 숫자가 틀려요. 모든 span을 본 다음 샘플링해요.
