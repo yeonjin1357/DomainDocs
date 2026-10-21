@@ -6,9 +6,19 @@
 
 독자는 모니터링 제품을 만드는 개발자예요. 코드는 AI가 쓰고, 독자는 그 결과가 맞는지 판단해요.
 
-판단하려면 도메인 지식이 필요해요. 이 사이트는 그 지식을 짧고 분명하게 전해요.
+판단하려면 도메인 지식이 필요해요. 이 사이트는 그 지식을 쉽고 분명하게 전해요.
 
-최우선 가치는 가독성이에요. 읽혀야 머리에 들어와요.
+최우선 가치는 가독성과 쉬운 이해예요. 읽혀야 머리에 들어오고, 이해돼야 남아요.
+
+### 기초가 먼저, 모니터링은 그 위에
+
+글은 그 도메인이 무엇이고 어떻게 동작하는지부터 다뤄요. 네트워크라면 장비, 인터페이스, 스위치, SNMP가 무엇인지가 먼저예요.
+
+모니터링 관점(화면에 무엇을 보여 주고, 어떤 숫자를 조심할지)은 그 위에 얹어요. 한 글 안에서는 `## 모니터링에서는` 소제목으로, 영역 안에서는 기초 글 뒤에 이어지는 모니터링 글로 얹어요.
+
+기초 글은 처음 보는 사람 기준으로 써요. 같은 영역의 다른 기초 글 말고는 아는 것을 가정하지 않아요.
+
+분량 제한은 없어요. 설명할 게 많으면 길어져도 괜찮아요. 대신 아래 규칙으로 읽히게 써요.
 
 ### 반면교사
 
@@ -26,7 +36,7 @@
 
 ## 2. 글쓰기 규칙
 
-규칙은 아홉 가지예요. 규칙마다 나쁜 예와 좋은 예를 하나씩 달았어요.
+규칙은 열두 가지예요. 규칙마다 나쁜 예와 좋은 예를 하나씩 달았어요.
 
 ### 2.1 해요체로 써요
 
@@ -87,48 +97,100 @@ p99, rate, span 같은 말은 영어 그대로 써요. 처음 나올 때 한 번
 - 나쁜 예: p99는 99번째 백분위수예요. 히스토그램은 값을 구간별로 세어요. 샘플링은 일부만 모아요.
 - 좋은 예: p99는 99번째 백분위수예요. 요청의 99%가 이 값 안에 끝나요. 나머지 1%가 느린 꼬리예요.
 
+### 2.10 비유를 쓰고, 어디까지 맞는지 밝혀요
+
+낯선 개념은 일상의 비유로 먼저 잡아 줘요. 비유는 틀린 이해도 심을 수 있어서, `<Analogy limit="...">`의 `limit`에 비유가 안 맞는 곳을 꼭 적어요.
+
+- 나쁜 예: 스위치는 우편함 분류실이에요. (어디까지 같은지 말하지 않음)
+- 좋은 예: 스위치는 우편함 분류실과 비슷해요. 받는 사람 주소를 보고 맞는 칸에 넣어요. (limit: 실제 스위치는 어느 칸에 누가 사는지 처음엔 몰라서, 오가는 데이터를 보며 스스로 배워요.)
+
+### 2.11 구조·순서·비교는 그림으로 먼저 보여 줘요
+
+여러 부품이 이어진 모습, 주고받는 순서, 쌓인 층, 두 방식의 차이는 글보다 그림이 빨라요. 그림을 먼저 두고, 글은 그림을 읽는 법을 알려 줘요. 그림 컴포넌트는 5장에 있어요.
+
+- 나쁜 예: 관리 서버가 장비에 요청을 보내고, 장비가 응답하고, 장비에 일이 생기면 장비가 먼저 알림을 보내요.
+- 좋은 예: `<Sequence>`로 요청·응답·알림을 그리고, "위 두 줄은 관리 서버가 묻는 쪽, 마지막 줄은 장비가 먼저 알리는 쪽이에요."라고 써요.
+
+### 2.12 새 용어는 용어 사전에 올리고 이어 줘요
+
+처음 나오는 업계 용어는 `src/content/terms/{영역}.yaml`에 올리고, 본문에서는 `<Term term="영역/id">`로 이어요. 독자가 누르면 뜻과 비유가 시트로 떠요. 쓰는 법은 10장에 있어요.
+
+- 나쁜 예: OID로 값을 가져와요. (OID가 무엇인지 모름)
+- 좋은 예: `<Term term="network/oid">OID</Term>`(값마다 붙은 주소)로 값을 가져와요.
+
 ## 3. 개념 글 뼈대
 
-복사해서 써요. 블록 순서는 `OnDashboard` → `KeyPoints` → (데모) → `Checkpoints` → (`Deeper`)예요.
+개념 글은 "무엇 → 어떻게 → 모니터링" 순서로 써요. 머리말 `stage`로 층을 정해요.
+
+- `stage: basics`: 도메인 기초. 무엇이고 어떻게 동작하는지가 중심이에요. `##` 본문 설명이 1개 이상 있어야 해요.
+- `stage: monitoring`: 모니터링 관점. 화면에서 무엇을 보고 어떻게 판단하는지가 중심이에요. 기존 글은 모두 이쪽이에요.
+
+복사해서 써요. 기초 글의 순서는 `KeyPoints` → `Analogy` → `##` 본문(`Figure`) → `## 모니터링에서는`(`OnDashboard`) → `Checkpoints` → `Deeper`예요.
 
 ````mdx
 ---
 title: 제목(30자 이하)
-summary: 한 문장 요약(15~60자). 앞 25자만 읽어도 무엇인지 알게 써요.
-domain: foundations
+summary: 그게 무엇인지 한 문장(15~60자). 앞 25자만 읽어도 알게 써요.
+domain: network
 type: concept
+stage: basics
 order: 10
-icon: chart-column
+icon: network
 keywords: [검색 별칭, 영어 용어]
-related: [foundations/다른-글]
+related: [network/다른-글]
 sources:
   - title: 출처 제목
     url: https://...
-updated: 2026-10-13
+updated: 2026-10-21
 ---
-import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';
-
-<OnDashboard title="위젯 이름" caption="그림이 보여 주는 것 1~2문장">
-  <MiniLineChart ariaLabel="그래프 설명" series={[{ label: '평균', values: [1, 2, 3], tone: 'sub' }]} />
-  <StatTile label="p99" value="3,000" unit="ms" tone="warn" />
-</OnDashboard>
 
 <KeyPoints>
   <Point title="결론으로 쓴 핵심 1 (30자 이하)">
-    결론부터 5문장 안팎, 두 단락 이하로 써요.
+    결론만 한두 문장으로 써요. 설명은 아래 본문에 둬요.
   </Point>
 </KeyPoints>
 
-<PercentileDemo client:visible />
+<Analogy limit="비유가 안 맞는 곳 한두 문장">
+  일상의 비유 한두 문장이에요.
+</Analogy>
+
+## 무엇인가요
+
+그림을 먼저 보여 주고, 그림을 읽는 법을 써요.
+
+<Figure caption="그림이 보여 주는 것 1~2문장">
+  <Flow ariaLabel="그림 설명" nodes={[{ id: 'sw', label: '스위치', col: 1, row: 0 }, { id: 's1', label: '서버', col: 0, row: 1 }]} edges={[{ from: 's1', to: 'sw' }]} />
+</Figure>
+
+## 어떻게 동작하나요
+
+순서가 있으면 `Sequence`로, 층이 있으면 `Layers`로 그려요.
+
+## 모니터링에서는
+
+<OnDashboard title="위젯 이름" caption="그림이 보여 주는 것 1~2문장">
+  <MiniLineChart ariaLabel="그래프 설명" series={[{ label: '평균', values: [1, 2, 3], tone: 'sub' }]} />
+</OnDashboard>
+
+화면에서 이 개념을 어떻게 만나는지 써요.
 
 <Checkpoints>
   <Check>AI나 동료의 구현에서 의심해야 할 지점이에요.</Check>
 </Checkpoints>
 
 <Deeper>
-  공식, 예외, 세부 동작이에요.
+  몰라도 되는 세부만 둬요. 동작 원리는 본문에 써요.
 </Deeper>
 ````
+
+블록 사이 순서는 검사기가 강제하지 않아요. 검사기가 보는 것은 이것뿐이에요.
+
+- `KeyPoints`는 꼭 하나 있어요.
+- `Analogy`, `Checkpoints`, `Deeper`는 한 번까지 써요. `Checkpoints` 뒤에는 `Deeper`만, `Deeper`는 맨 끝에 와요.
+- 그림 컴포넌트는 `Figure`나 `OnDashboard` 안에 둬요.
+- 소제목은 `##`부터 써요.
+
+그래서 기존 모니터링 글(`OnDashboard` → `KeyPoints` → (데모) → `Checkpoints` → (`Deeper`))도 그대로 통과해요.
 
 ### `Point` 제목은 결론으로 써요
 
@@ -141,11 +203,12 @@ import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';
 
 ### 블록마다 분량을 지켜요
 
-검사기는 본문 전체 분량만 봐요. 블록마다의 분량은 이 표로 손으로 확인해요.
+본문 전체 분량은 제한하지 않아요. 블록마다의 분량은 이 표로 손으로 확인해요.
 
 | 블록 | 분량 |
 | --- | --- |
-| `Point` | 5문장 안팎, 두 단락 이하. 넘치는 내용은 `Deeper`로 보내요 |
+| `Point` | 기초 글은 결론만 한두 문장. 설명은 본문 `##`에 둬요. 모니터링 글은 5문장 안팎, 두 단락 이하 |
+| `Analogy` | 비유 한두 문장, `limit` 한두 문장 |
 | `caption` | 1~2문장 |
 | `summary` | 한 문장. 목록은 두 줄까지만 보여 줘서 좁은 화면에선 뒤가 잘려요. 앞 25자 안팎만 읽어도 뜻이 통하게 써요 |
 | `Deeper` | 2,000자 안팎 |
@@ -161,12 +224,21 @@ import PercentileDemo from '../../../components/demos/PercentileDemo.tsx';
   - 10, 20, 30처럼 10씩 띄워 써요. 그래야 사이에 글을 끼워도 다른 글 번호를 고치지 않아요.
   - 0부터 쓸 수 있고, 값이 같으면 파일 이름 순이에요.
 - `draft: true`: 초안이에요. 운영 빌드(`npm run build`)에서 빠지고 개발 서버에서만 보여요. 공개 글은 `<Term>`이나 `related`로 초안을 가리킬 수 없어요. 공개할 때 이 줄을 지워요.
+- 영역 페이지와 "다음에 읽을 글"은 한눈에 보기 → 기초(`order` 순) → 나머지(모니터링 글과 가이드를 섞어 `order` 순)로 줄을 세워요.
+
+### 한눈에 보기 글
+
+영역마다 첫 글로 하나 둬요(`type: overview`, `stage`는 쓰지 않아요). 영역의 구성 요소가 어떻게 이어지는지 그림 한 장으로 먼저 보여 주고, 기초 글로 안내해요.
+
+- `Figure`가 1개 이상, `##` 소제목이 1개 이상 있어야 해요.
+- `KeyPoints`는 쓰지 않아요.
+- 홈의 "처음이라면 여기부터"에 영역 순서대로 나와요.
 
 ## 4. 가이드 글 뼈대
 
 순서는 `Situation` → `FirstLook` → 단계별 설명 → `Checkpoints`예요. `FirstLook`에는 `Item`을 1~3개 둬요.
 
-단계는 `##` 소제목으로 나눠요. 소제목은 1개 이상 필요해요.
+단계는 `##` 소제목으로 나눠요. 소제목은 1개 이상 필요해요. 단계 사이에는 `OnDashboard`, `Figure`, `Analogy`도 둘 수 있어요.
 
 ````mdx
 ---
@@ -207,7 +279,9 @@ updated: 2026-10-13
 
 | 컴포넌트 | 속성 | 쓰는 곳 |
 | --- | --- | --- |
-| `OnDashboard` | `title`, `caption?` | 대시보드에서 만나는 모습을 작은 그림으로 보여 줘요 |
+| `OnDashboard` | `title`, `caption?` | 대시보드에서 만나는 모습을 작은 그림으로 보여 줘요. 기초 글에서는 `## 모니터링에서는` 아래에 둬요 |
+| `Analogy` | `limit` | 비유 한두 문장. `limit`에 비유가 안 맞는 곳을 꼭 적어요 |
+| `Figure` | `caption?` | 그림 틀. 그림 컴포넌트와 SVG 그림은 이 안(또는 `OnDashboard` 안)에 둬요 |
 | `KeyPoints` | 없음 | 개념 글의 핵심. 안에 `Point` 1~3개 |
 | `Point` | `title` (30자 이하) | `KeyPoints` 안의 핵심 하나 |
 | `Checkpoints` | 없음 | 다시 확인할 지점. 안에 `Check` 1개 이상 |
@@ -216,15 +290,20 @@ updated: 2026-10-13
 | `Situation` | 없음 | 가이드의 상황 설명 |
 | `FirstLook` | 없음 | 가이드의 먼저 볼 것. 안에 `Item` 1~3개 |
 | `Item` | `title` (30자 이하) | `FirstLook` 안의 항목 하나 |
-| `Term` | `slug` | 다른 글로 잇는 링크. 예: `foundations/percentiles` |
+| `Term` | `slug` 또는 `term` | `slug`는 다른 글로 잇는 링크(예: `foundations/percentiles`), `term`은 용어 사전의 용어(예: `network/snmp`). 둘 중 하나만 써요 |
 | `MiniLineChart` | `series`, `ariaLabel`, `yMax?`, `height?` | 작은 선 그래프. 단위는 범례 `value`에 직접 써요 |
 | `StatTile` | `label`, `value`, `unit?`, `tone?`, `note?` | 숫자 하나를 크게 보여 줘요 |
 | `Waterfall` | `spans`, `ariaLabel`, `unit?` | 트레이스 워터폴. `spans`는 `{ label, start, duration, depth?, tone? }` 배열이고, 가장 늦게 끝나는 구간이 막대 끝이에요 |
 | `Scatter` | `groups`, `ariaLabel`, `xMax`, `yMax`, `yTicks?`, `unit?`, `xLabels?` | 응답시간 분포도. `groups`는 `{ count, x: [시작, 끝], y: [아래, 위], skew?, tone?, label? }` 배열이고, 범위 안에 점을 `count`개 흩뿌려요. 범위의 두 값이 같으면 가로줄·세로줄이 돼요 |
 | `ServiceMap` | `nodes`, `edges`, `ariaLabel`, `height?` | 서비스 맵. `nodes`는 `{ id, label, x, y, note?, tone?, virtual? }`(x·y는 %), `edges`는 `{ from, to, label?, tone? }` 배열이에요. 화살표가 없어서 부르는 쪽을 왼쪽에 두고 `caption`에 밝혀요. `virtual`은 점선으로 그려요 |
+| `Flow` | `nodes`, `edges`, `ariaLabel`, `groups?` | 구조도(화살표 있는 상자). `nodes`는 `{ id, label, col, row, note?, tone? }`(칸 위치), `edges`는 `{ from, to, label?, tone?, both?, dashed? }`, `groups`는 `{ label, cols: [시작, 끝], rows: [시작, 끝] }` 배열이에요. 한 줄에 3칸까지가 360px에서 읽혀요. 상자 이름은 8자 안팎으로 써요. 글자를 붙인 가로 화살표는 상자 사이에 빈 칸을 하나 둬요 |
+| `Sequence` | `participants`, `messages`, `ariaLabel` | 주고받기 순서. 참여자 2~4명, `messages`는 `{ from, to, label, tone?, dashed? }` 배열이고 위에서 아래로 시간 순이에요. 돌아오는 응답은 `dashed`로 그려요 |
+| `Layers` | `layers`, `ariaLabel` | 계층도. `layers`는 위층부터 `{ label, note?, tone? }` 배열이에요 |
+| `Compare` | `columns`, `rows` | 두 가지 비교. `columns`는 두 열 이름, `rows`는 `{ label, values: [왼쪽, 오른쪽] }` 배열이에요 |
+| SVG 그림 | `aria-label` | 위 그림으로 안 되는 그림은 `src/assets/figures/{domain}/{name}.svg`에 그려 default import해요. `Figure` 안에 두고 `aria-label`을 꼭 붙여요. 색은 `currentColor`나 `var(--color-…)`만 써야 다크 모드에서도 보여요 |
 | `PercentileDemo`, `DownsamplingDemo` | 없음 | 직접 만져 보는 데모. default import 후 `client:visible`로 써요 |
 
-`MiniLineChart`와 `StatTile` 같은 viz 컴포넌트는 한 줄에 하나씩 써요. 한 줄에 여러 개를 쓰면 단락으로 묶여 배치가 깨져요.
+`MiniLineChart`, `StatTile`, `Flow` 같은 그림 컴포넌트는 한 줄에 하나씩 써요. 한 줄에 여러 개를 쓰면 단락으로 묶여 배치가 깨져요.
 
 ## 6. 검사 규칙과 기준값
 
@@ -234,7 +313,8 @@ updated: 2026-10-13
 
 | 규칙 | 기준 | 출력 이름 |
 | --- | --- | --- |
-| 개념 글 블록 순서와 필수 여부 | 3장 순서. 최상위에는 틀 블록과 데모만 둬요 | `structure` |
+| 개념·한눈에 보기 글 틀 | 3장. `KeyPoints` 필수(한눈에 보기는 금지), `Analogy`·`Checkpoints`·`Deeper`는 한 번까지, `Checkpoints` 뒤에는 `Deeper`만, `Deeper`는 맨 끝, 기초 글은 `##` 1개 이상, 한눈에 보기는 `Figure`와 `##` 1개 이상, 그림은 `Figure`나 `OnDashboard` 안, `#` 소제목 금지 | `structure` |
+| 머리말 `stage` | 개념 글에 `basics`나 `monitoring`. 다른 글에는 쓰지 않아요 | `frontmatter` |
 | 가이드 글 블록 순서와 필수 여부 | 4장 순서 | `structure` |
 | `KeyPoints` 안 `Point` 개수 | 1~3개 | `block-children` |
 | `FirstLook` 안 `Item` 개수 | 1~3개 | `block-children` |
@@ -242,13 +322,14 @@ updated: 2026-10-13
 | 단락 길이 | 3문장 이하 | `paragraph-length` |
 | 문체 | 본문 문장은 "요"나 "죠"로 끝나요. 뒤에 붙는 문장 부호와 닫는 따옴표·괄호는 괜찮아요. "~니다"(합쇼체)와 "~다"(해라체)는 위반 | `formal-ending` |
 | 금지 표현 | "주장하지 않", "단정하지 않", "보장하지 않", "일반화하지 않", "이 문서에서는", "이 장에서는" | `banned-phrase` |
-| 본문 분량 | 개념 1,500자 이하, 가이드 4,000자 이하 (`Deeper` 제외) | `body-length` |
-| `Term`의 `slug`와 `related` | 존재하는 글. 공개 글은 초안(`draft`)을 가리킬 수 없어요 | `reference` |
+| `Term`의 `slug`·`term`과 `related` | 존재하는 글이나 용어. 공개 글은 초안(`draft`)을 가리킬 수 없어요. `slug`와 `term`은 하나만 | `reference` |
 | `domain` | 파일이 있는 폴더 이름과 같아요 | `domain-folder` |
 | 마크다운 링크 | 본문에 쓰지 않아요 | `markdown-link` |
 | `Point`·`Item` 제목 | 30자 이하 | `block-title` |
-| 쓸 수 있는 요소 | 5장의 컴포넌트와 default import한 데모만 써요. `<a href="/...">`, `<img>` 같은 HTML 요소도 위반 | `unknown-component` |
+| `Analogy`의 `limit` | 꼭 있어요 | `analogy-limit` |
+| 쓸 수 있는 요소 | 5장의 컴포넌트와 default import한 데모·SVG 그림만 써요. `<a href="/...">`, `<img>` 같은 HTML 요소도 위반. SVG 그림은 `Figure` 안에 `aria-label`과 함께 둬요(어기면 `structure`) | `unknown-component` |
 | 데모의 client 지시어 | import한 데모에는 `client:visible`을 붙여요. 없으면 움직이지 않는 그림으로만 보여서 위반 | `demo-hydration` |
+| 용어 파일 | 10장 형식. 파일 이름은 영역 id, 필수 필드, `name` 30자·`short` 60자 이하, 같은 id 금지. `short`·`analogy`는 문장 규칙도 봐요. `doc`은 공개 글 | `glossary`(문장 규칙은 각 규칙 이름) |
 
 인라인 코드로 끝나는 문장(예: "이렇게 써요: `rate(x[5m])`")은 코드 앞의 마지막 한글로 문체를 판단해요. 코드만 있는 문장은 문체를 보지 않아요.
 
@@ -288,27 +369,45 @@ updated: 2026-10-13
 
 ## 8. 작성 절차
 
-1. 출처를 조사해요. 공식 문서, 명세, 원 논문을 먼저 봐요.
-2. 초안을 써요.
-3. 숫자 예시는 직접 다시 계산해요. PromQL은 promtool(Prometheus 명령줄 도구)이나 로컬 Prometheus로, JavaScript 식은 node로 돌려 봐요. 띄운 서버는 끝나면 꼭 꺼요.
-4. `npm run lint:content`를 돌려요.
-5. 초안을 다 쓴 뒤 따로 사실 검토 단계를 둬요. 글의 주장을 하나씩 뽑아 1차 자료 원문과 대조하고, 숫자와 질의는 다시 돌려 봐요. 쓸 때와 다른 방법으로 확인하면 맹점이 줄어요. 결과는 `docs/reviews/{domain}-{slug}.md`에 남겨요.
-6. 검토 내용을 반영하고 다시 검사해요. 같은 주장이 나오는 곳은 모두 고쳐요(7장).
-7. 사이트 주인이 화면에서 확인해요.
+정확도는 중요하지만, 글이 나오지 못할 만큼 무겁게 확인하지 않아요. 한 편씩 써서 바로 공개해요.
+
+1. 공식 문서, 표준, 원 논문을 먼저 보고 초안을 써요. 용어 파일과 그림도 함께 써요.
+2. 틀리면 위험한 주장만 골라 따로 확인해요. 숫자, 기본값, 버전마다 다른 동작, 명령어·질의, 표준의 정의예요. "스위치는 같은 네트워크 안에서 데이터를 넘겨요" 같은 교과서 내용은 공식 문서를 한 번 훑는 정도면 돼요.
+3. 질의와 명령어는 실제로 돌려 봐요(PromQL은 promtool, SQL은 PGlite 같은 로컬 DB, JavaScript 식은 node). 돌리기 어려우면 공식 문서와 대조해요. 띄운 서버는 끝나면 꼭 꺼요.
+4. 확인한 주장과 근거를 `docs/reviews/{domain}-{slug}.md`에 몇 줄로 남겨요(9장).
+5. 가독성을 스스로 점검해요. 처음 보는 사람이 그림과 비유만 보고도 감을 잡는지, 7장 표의 지적이 없는지 봐요.
+6. `npm run lint:content`를 돌리고, 사이트 주인이 화면에서 확인해요.
 
 ## 9. 사실 검토 기록 형식
 
 ````md
-# 사실 검토: <제목>
+# 사실 확인: <제목>
 
 - 글: src/content/docs/<domain>/<slug>.mdx
-- 검토일: YYYY-MM-DD
-- 결과: 수정 필요 N건 / 확인 N건
+- 확인일: YYYY-MM-DD
 
-| 주장(인용) | 판정 | 근거(URL과 인용) | 수정 제안 |
-| --- | --- | --- | --- |
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 기본 포트는 161이에요 | https://... |
 
-## 반영
-
-- 무엇을 어떻게 고쳤는지
+- 고친 것: (있으면 한 줄씩)
 ````
+
+## 10. 용어 쓰는 법
+
+용어는 영역마다 파일 하나에 모아요: `src/content/terms/{영역}.yaml`. 파일 이름이 영역 id예요.
+
+```yaml
+terms:
+  - id: snmp                                 # 필수. 소문자·숫자·하이픈
+    name: SNMP                               # 필수. 30자 이하. 보여 줄 이름
+    en: Simple Network Management Protocol   # 선택. 영어 원말
+    aliases: [에스엔엠피]                      # 선택. 검색·퀴즈 채점에 쓰는 다른 이름
+    short: 장비의 상태를 묻고 답하는 표준 규약이에요.   # 필수. 60자 이하 해요체 한 문장
+    analogy: 관리 서버가 장비마다 놓인 문진표를 돌며 읽는 것과 같아요.   # 선택. 한 줄 비유
+    doc: network/snmp                        # 선택. 자세히 설명한 공개 글
+```
+
+- 본문에서 처음 나올 때 `<Term term="network/snmp">SNMP</Term>`로 이어요. 누르면 이름, 영어 원말, 뜻, 비유가 시트로 떠요. `doc`이 있으면 "전체 보기"가 그 글로, 없으면 "용어 사전에서 보기"가 용어 사전의 그 위치로 가요.
+- `short`는 "그게 무엇인지"만 써요. 동작 설명은 글로 보내요.
+- 용어가 있는 영역에는 용어 사전 페이지(`/terms/{영역}/`)가 생기고, 영역 페이지 아래에 줄이 생겨요.

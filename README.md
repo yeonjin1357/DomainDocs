@@ -1,10 +1,10 @@
 # DomainDocs
 
 모니터링 제품을 만들고 판단하는 개발자를 위한 한국어 개념 노트예요.
-숫자 뒤의 의미를 짧고 쉽게 정리해요.
+도메인 기초부터 쉽게 설명하고, 그 위에 모니터링 관점을 얹어요.
 
 - 사이트: https://yeonjin1357.github.io/DomainDocs/
-- 지금 있는 영역: 공통 기초 (APM, DB 모니터링, 인프라·쿠버네티스는 준비 중이에요)
+- 영역: 모니터링 기초, 네트워크, 서버·OS, 컨테이너·쿠버네티스, 클라우드, 애플리케이션, 데이터베이스, 메시지 큐(글이 없는 영역은 준비 중이에요)
 
 ## 로컬에서 보기
 
@@ -17,7 +17,7 @@ npm run dev        # http://localhost:4321/DomainDocs/
 
 ## 글 쓰기
 
-글은 `src/content/docs/{영역}/{글이름}.mdx`예요. 쓰기 전에 [글쓰기 가이드](docs/writing-guide.md)를 읽어 주세요.
+글은 `src/content/docs/{영역}/{글이름}.mdx`, 용어는 `src/content/terms/{영역}.yaml`이에요. 쓰기 전에 [글쓰기 가이드](docs/writing-guide.md)를 읽어 주세요.
 `npm run lint:content`가 글의 틀과 문장을 검사해요.
 
 ## 검사
