@@ -220,3 +220,9 @@ terms:
     aliases: [HPA, horizontal pod autoscaler, 오토스케일러, autoscaler, 자동 확장]
     short: 사용률 같은 지표를 보고 워크로드의 파드 수를 자동으로 늘리고 줄이는 객체예요.
     doc: kubernetes/autoscaling
+  - id: k8s-event
+    name: 이벤트(쿠버네티스)
+    en: Kubernetes event
+    aliases: [event, events, kubectl events, Warning event, 경고 이벤트, event-ttl]
+    short: 클러스터에서 무슨 일이 왜 일어났는지 남기는 짧은 기록이에요. 기본 1시간 뒤 지워져요.
+    doc: kubernetes/reading-events

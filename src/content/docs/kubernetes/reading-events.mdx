@@ -1,0 +1,89 @@
+---
+title: 이벤트로 원인 찾기
+summary: 이벤트는 무슨 일이 왜 일어났는지 남긴 짧은 기록이에요. 기본 1시간이면 사라지니 따로 모아요.
+domain: kubernetes
+type: guide
+order: 120
+icon: container
+keywords: [Kubernetes events, 이벤트, Warning, reason, FailedScheduling, BackOff, Unhealthy, kubectl events, event-ttl, 원인 찾기]
+related: [kubernetes/pod-pending, kubernetes/pod-restarting, kubernetes/overview, foundations/logs-metrics-traces]
+sources:
+  - title: Kubernetes API — Event
+    url: https://kubernetes.io/docs/reference/kubernetes-api/cluster-resources/event-v1/
+  - title: Kubernetes — kubectl events
+    url: https://kubernetes.io/docs/reference/kubectl/generated/kubectl_events/
+  - title: Kubernetes — kube-apiserver (--event-ttl)
+    url: https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
+  - title: Kubernetes — Debug Pods
+    url: https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/
+updated: 2026-10-21
+---
+
+<Situation>
+  어젯밤 2시에 결제 서비스 파드들이 줄줄이 다시 시작됐다는 걸 아침에 알았어요. `kubectl describe`로 이벤트를 보려 했는데, 이벤트가 하나도 없어요.
+
+  이벤트는 쿠버네티스가 "무슨 일이 왜 일어났는지"를 남기는 짧은 기록이에요. 무엇을 담는지, 언제 사라지는지 알면 장애 원인을 훨씬 빨리 찾아요.
+</Situation>
+
+<FirstLook>
+  <Item title="Warning만 골라 보기">정상 기록에 묻히지 않게 경고만 봐요.</Item>
+  <Item title="이유(reason)로 갈래 정하기">이유 하나가 다음 단계를 정해요.</Item>
+  <Item title="사라지기 전에 모으기">기본 1시간 뒤 지워져요.</Item>
+</FirstLook>
+
+## 1. 이벤트가 무엇을 담는지 알아 두세요
+
+<Term term="kubernetes/k8s-event">이벤트</Term>는 클러스터 어딘가에서 일어난 일을 알리는 기록이에요. 파드가 노드에 놓였다, 이미지를 받았다, 프로브가 실패했다 같은 일이 하나씩 남아요.
+
+| 칸 | 뜻 | 예 |
+| --- | --- | --- |
+| 종류(type) | 정상(Normal)인지 경고(Warning)인지 | Warning |
+| 이유(reason) | 왜 일어났는지 짧은 이름 | FailedScheduling |
+| 대상 | 어느 객체에 대한 일인지 | Pod/payment-7d9f |
+| 메시지 | 사람이 읽는 설명 | 0/42 nodes available |
+
+쿠버네티스 문서는 이벤트를 "참고용, 최선을 다할 뿐인 보조 자료"로 다루라고 해요. 같은 이유의 이벤트가 늘 같은 원인에서 나온다고 믿지 말라는 뜻이에요.
+
+## 2. 경고만 골라 보세요
+
+이벤트 대부분은 정상 기록이에요. 원인을 찾을 때는 Warning만 골라, 시간 순서로 봐요.
+
+**확인 방법**: `kubectl events --types=Warning`으로 경고만 봐요. 특정 객체만 보려면 `kubectl events --for pod/파드이름`을 써요. 파드 하나라면 `kubectl describe pod`의 Events 칸에도 나와요.
+
+## 3. 이유로 갈래를 정하세요
+
+자주 보는 경고 이유와 다음에 볼 글이에요.
+
+| 이유 | 뜻 | 다음에 볼 곳 |
+| --- | --- | --- |
+| FailedScheduling | 파드를 놓을 노드를 못 찾았어요 | <Term slug="kubernetes/pod-pending">파드가 Pending에 머물 때</Term> |
+| BackOff | 컨테이너가 죽어 다시 띄우기를 미루고 있어요 | <Term slug="kubernetes/pod-restarting">파드가 계속 재시작될 때</Term> |
+| Unhealthy | 프로브가 실패했어요 | <Term slug="kubernetes/pod-status">파드 상태와 재시작</Term> |
+| FailedMount | 볼륨을 붙이지 못했어요 | <Term slug="kubernetes/config-and-storage">설정과 저장소</Term> |
+| Failed(이미지) | 이미지를 받지 못했어요 | 이미지 이름·태그와 인증 정보 |
+
+같은 시각에 여러 객체에서 같은 이유가 쏟아진다면, 파드 하나보다 공통 원인을 먼저 봐요. 예를 들어 여러 노드의 파드가 동시에 Unhealthy라면 그 파드들이 함께 기대는 DB나 네트워크를 봐요.
+
+## 4. 사라지기 전에 모아 두세요
+
+이벤트는 오래 남지 않아요. API 서버의 `--event-ttl` 기본값은 1시간이라, 1시간이 지난 이벤트는 지워져요. 그래서 새벽 장애의 이벤트를 아침에 찾으면 이미 없어요.
+
+<Figure caption="새벽 2시 장애의 이벤트는 3시쯤 지워져요. 아침 9시에 kubectl로 찾으면 남은 게 없고, 따로 모아 둔 곳에서만 찾을 수 있어요.">
+  <Waterfall
+    ariaLabel="새벽 2시에 이벤트가 생기고 3시에 지워지며, 아침 9시에 확인할 때는 따로 모아 둔 기록만 남아 있는 타임라인"
+    unit="시간"
+    spans={[
+      { label: '이벤트가 클러스터에 남는 시간', start: 2, duration: 1, tone: 'warn' },
+      { label: '따로 모아 둔 기록', start: 2, duration: 7, tone: 'accent' },
+      { label: '아침 9시에 확인', start: 9, duration: 0.2 },
+    ]}
+  />
+</Figure>
+
+그래서 운영에서는 이벤트를 모니터링 시스템이나 로그 저장소로 꾸준히 옮겨 둬요. 그러면 지표 그래프와 같은 시간축에서 "그때 무슨 일이 있었는지"를 맞춰 볼 수 있어요.
+
+<Checkpoints>
+  <Check>장애 몇 시간 뒤에 `kubectl`로 이벤트를 찾았는데 없다면, 기본 1시간이 지나 지워진 거예요. 이벤트를 따로 모으는지 보세요.</Check>
+  <Check>이벤트가 너무 많아 원인이 안 보인다면 Warning만 골라 보세요.</Check>
+  <Check>이벤트 메시지 문구로 알림을 걸어 두었다면 다시 보세요. 문서는 이벤트의 문구와 계기가 바뀔 수 있다고 해요. 이유(reason)와 대상으로 거는 편이 나아요.</Check>
+</Checkpoints>
