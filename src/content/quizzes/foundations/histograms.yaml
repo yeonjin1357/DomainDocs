@@ -1,0 +1,41 @@
+questions:
+  - id: cumulative-bucket
+    type: ox
+    prompt: Prometheus 클래식 히스토그램의 le="0.5" 버킷에는, 바로 앞 경계(0.25초) 초과 0.5초 이하인 요청만 들어가나요?
+    answer: false
+    explain: 버킷은 그 경계 이하를 모두 세는 누적 개수예요. le="+Inf"는 전체 요청 수와 같아요.
+  - id: interpolated-p99
+    type: choice
+    prompt: 5분 동안 1,000건 중 0.5초 이하가 985건, 1초 이하가 995건이에요. histogram_quantile이 내는 p99 추정값은?
+    choices:
+      - 0.75초
+      - 0.5초
+      - 1초
+      - 0.99초
+    answer: 0
+    explain: 990번째 요청은 0.5~1초 버킷 10건 중 5번째예요. 고르게 퍼졌다고 보고 한가운데인 0.75초로 추정해요.
+  - id: no-rate
+    type: ox
+    prompt: histogram_quantile에 _bucket을 rate 없이 넣어도, 최근 5분의 p99가 나오나요?
+    answer: false
+    explain: 버킷은 프로세스가 뜬 뒤 쌓인 카운터라, 그동안 전체의 p99가 나와요. 최근 느려진 것이 거의 안 보여요.
+  - id: stuck-at-top-bucket
+    type: choice
+    prompt: p99가 늘 +Inf 바로 앞 경계인 2.5초와 똑같아요. 무슨 뜻일까요?
+    choices:
+      - 요청의 1% 넘게 2.5초를 넘어서, 실제 p99는 그보다 커요
+      - p99가 정확히 2.5초예요
+      - 요청이 하나도 없어요
+      - 버킷이 너무 많아요
+    answer: 0
+    explain: p99가 +Inf 버킷에 들면 추정 없이 바로 앞 경계값을 돌려줘요. 더 큰 경계를 더해야 얼마나 느린지 보여요.
+  - id: slo-boundary
+    type: choice
+    prompt: SLO 임계값이 300ms라면, 버킷 경계에 꼭 넣어 둘 값은?
+    choices:
+      - 0.3초
+      - 0.25초
+      - 0.5초
+      - 1초
+    answer: 0
+    explain: 경계가 0.3초에 있으면 300ms 안에 끝난 요청을 추정 없이 셀 수 있어요.

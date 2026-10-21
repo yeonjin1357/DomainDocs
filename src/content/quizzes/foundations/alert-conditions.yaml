@@ -1,0 +1,46 @@
+questions:
+  - id: for-tradeoff
+    type: choice
+    prompt: 알림 규칙에 for 3m(지속 시간 3분)을 두면 어떻게 될까요?
+    choices:
+      - 한 번 튄 값은 거르지만, 문제가 시작되고 3분 늦게 울려요
+      - 문제가 시작되기 3분 전에 울려요
+      - 조건이 맞는 즉시 울려요
+      - 3분마다 같은 알림을 되풀이해요
+    answer: 0
+    explain: 지속 시간은 흔들림과 늦음을 맞바꿔요. 길수록 조용하지만 늦게 울리고, 짧게 끝난 문제는 놓칠 수 있어요.
+  - id: no-for-flapping
+    type: ox
+    prompt: 지속 시간 없이 1분 에러율에 알림을 걸면, 한 번 튄 값에도 울렸다가 곧 해제되나요?
+    answer: true
+    explain: 울림과 해제를 되풀이하는 걸 flapping이라고 해요. 너무 잦으면 진짜 문제도 훑어보다 놓쳐요.
+  - id: pending-reset
+    type: choice
+    prompt: 알림이 pending(대기)인 동안 조건이 한 번 깨지면 어떻게 될까요?
+    choices:
+      - pending이 사라지고, 다음엔 처음부터 다시 세요
+      - 남은 시간을 그대로 이어서 세요
+      - 바로 firing(울림)이 돼요
+      - 알림 규칙이 꺼져요
+    answer: 0
+    explain: 지속 시간을 끊김 없이 채워야 울려요. 그래서 수집이 한 번 빠져 값이 비면 처음부터 다시 세요.
+  - id: page-on-symptoms
+    type: choice
+    prompt: 사람을 부르는 알림은 무엇에 거는 게 좋을까요?
+    choices:
+      - 에러, 느린 응답처럼 사용자가 겪는 증상
+      - CPU 사용률
+      - 메모리 사용률
+      - 스레드 수
+    answer: 0
+    explain: CPU 같은 원인 지표는 사용자가 멀쩡해도 울리고, 정작 다른 원인의 장애엔 조용할 수 있어요.
+  - id: burn-days
+    type: choice
+    prompt: SLO가 '30일 동안 99%'(에러 버짓 1%)인데, 에러율 2%가 계속 이어져요. 버짓을 며칠 만에 다 쓸까요?
+    choices:
+      - 15일
+      - 30일
+      - 2일
+      - 60일
+    answer: 0
+    explain: 버짓을 2배 빠르게 쓰니 30일의 절반인 15일이에요. 임계값을 이런 속도로 바꿔 보면 얼마나 급한지 따질 수 있어요.

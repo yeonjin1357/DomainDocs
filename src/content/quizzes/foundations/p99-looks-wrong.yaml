@@ -1,0 +1,46 @@
+questions:
+  - id: query-order
+    type: choice
+    prompt: 히스토그램으로 서비스 전체 p99를 구하는 질의의 바른 순서(안쪽부터)는?
+    choices:
+      - rate → sum by (le) → histogram_quantile
+      - sum → rate → histogram_quantile
+      - histogram_quantile → sum → rate
+      - histogram_quantile → avg
+    answer: 0
+    explain: 버킷마다 rate를 구하고, 서버들의 같은 le끼리 더한 뒤, 마지막에 p99를 계산해요.
+  - id: le-dropped
+    type: choice
+    prompt: histogram_quantile 안에서 sum(...)으로 le까지 지우고 합치면 어떻게 될까요?
+    choices:
+      - 결과가 비어요
+      - 정상적인 p99가 나와요
+      - p99가 두 배로 나와요
+      - 0이 나와요
+    answer: 0
+    explain: histogram_quantile은 le로 버킷을 알아봐요. sum by (le)나 sum by (job, le)처럼 le를 남겨요.
+  - id: low-traffic-spike
+    type: choice
+    prompt: 1건만 1~2.5초 걸리고 나머지는 0.1초 안에 끝나요. 5분에 요청이 50건뿐이라면 p99는 얼마쯤일까요?
+    choices:
+      - 약 1.75초
+      - 0.1초 아래
+      - 2.5초
+      - 계산되지 않아요
+    answer: 0
+    explain: 요청이 100건보다 적으면 느린 1건이 벌써 1%를 넘어요. 같은 상황에 1,000건이면 p99는 0.1초 아래예요.
+  - id: zero-requests-nan
+    type: ox
+    prompt: 5분 동안 요청이 하나도 없으면, 그 구간의 p99는 0이 되나요?
+    answer: false
+    explain: 0이 아니라 NaN이에요. '빠르다'가 아니라 '잴 요청이 없다'는 뜻이라, 0으로 바꿔 그리면 안 돼요.
+  - id: mixed-buckets
+    type: choice
+    prompt: 버킷 경계를 더하는 배포가 반쯤 끝났을 때, 합친 p99가 갑자기 10초로 튀어요. 왜일까요?
+    choices:
+      - 서버마다 버킷 경계가 달라 같은 le끼리 더한 값이 틀려서
+      - 서비스가 정말 10초씩 느려져서
+      - 요청이 너무 적어서
+      - rate를 빼먹어서
+    answer: 0
+    explain: 한 서버에만 있는 경계는 그 서버의 요청만 세요. 경계가 같아질 때까지는 서버마다 p99를 따로 봐요.

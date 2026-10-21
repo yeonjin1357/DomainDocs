@@ -1,0 +1,41 @@
+questions:
+  - id: avg-hides-peak
+    type: choice
+    prompt: 평소 40% 안팎인 서버가 30초 동안 95%였어요. 5분씩 평균으로 묶으면 그 피크가 든 점은 대략 얼마로 보일까요?
+    choices:
+      - 약 45%
+      - 95%
+      - 약 67%
+      - 40%
+    answer: 0
+    explain: 5분 중 30초만 95%라서 평균에 묻혀요. 1분씩 묶으면 67%, 15분씩 묶으면 42%예요.
+  - id: max-stretches
+    type: choice
+    prompt: 같은 피크를 5분씩 평균 대신 최댓값으로 묶으면 어떻게 보일까요?
+    choices:
+      - 95%는 남지만, 30초 피크가 5분 내내 이어진 것처럼 보여요
+      - 피크가 아예 사라져요
+      - 약 45%로 보여요
+      - 피크의 길이까지 정확히 보여요
+    answer: 0
+    explain: 최댓값은 피크를 남기는 대신 길이를 부풀려요. 무엇으로 묶었는지 툴팁에 함께 보여 줘요.
+  - id: different-max-not-bug
+    type: ox
+    prompt: 1시간 그래프와 7일 그래프의 최고값이 다르면, 반드시 버그인가요?
+    answer: false
+    explain: 긴 기간은 점 간격이 넓어지고 값을 묶는 방법도 달라져요. 버그를 의심하기 전에 점 간격과 묶는 방법부터 봐요.
+  - id: keep-peaks-query
+    type: choice
+    prompt: 짧은 피크를 놓치면 안 되는 긴 기간 패널을 Prometheus로 그리려면?
+    choices:
+      - max_over_time(cpu_usage[$__interval])
+      - cpu_usage 그대로
+      - avg(cpu_usage)
+      - avg_over_time(cpu_usage[5m])
+    answer: 0
+    explain: 구간 없이 쓴 질의는 점마다 최근 값 하나만 골라 피크가 걸릴 때만 보여요. 구간마다 최댓값을 고르면 피크가 남아요.
+  - id: downsampling-name
+    type: input
+    prompt: 긴 기간을 그릴 때 점 사이 간격을 벌려, 그릴 점의 수를 줄이는 일을 무엇이라고 하나요?
+    answer: [다운샘플링, downsampling]
+    explain: 다운샘플링을 하면 짧은 피크가 빠지거나 묻힐 수 있어요. 그래서 점 하나가 맡는 시간과 묶는 방법을 함께 봐요.

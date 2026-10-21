@@ -1,0 +1,41 @@
+questions:
+  - id: no-action-alerts
+    type: choice
+    prompt: 받은 사람이 할 일이 없었던 CPU 알림이 자주 울려요. 먼저 할 일은?
+    choices:
+      - 대시보드로 옮기거나, 에러·지연 같은 증상 알림으로 바꿔요
+      - 알림을 받는 사람을 늘려요
+      - 임계값을 더 낮춰요
+      - 모든 알림을 한꺼번에 꺼요
+    answer: 0
+    explain: 사람을 부르는 알림은 모두 조치할 수 있어야 해요. 원인 지표는 증상 알림이 울렸을 때 이유를 찾는 데 써요.
+  - id: slo-threshold-noisy
+    type: ox
+    prompt: 30일 99.9% SLO에서, 10분 에러율이 0.1% 이상이면 울리게 걸면 조용하고 정확한 알림이 되나요?
+    answer: false
+    explain: 하루 최대 144번까지 울릴 수 있고, 0.1%에 머물면 아무것도 안 해도 SLO는 지켜져요. 버짓을 쓰는 속도로 임계값을 정해요.
+  - id: burn-rate-basis
+    type: choice
+    prompt: SLO 알림의 임계값을 정할 때, Google SRE Workbook이 권하는 기준은?
+    choices:
+      - 에러 버짓을 쓰는 속도(burn rate)
+      - 서버 CPU 사용률
+      - 평균 응답시간
+      - 하루에 울린 알림 수
+    answer: 0
+    explain: 긴 구간과 짧은 구간을 함께 걸면, 작은 스파이크는 거르고 장애가 끝나면 곧 풀려요.
+  - id: group-by-cluster
+    type: choice
+    prompt: 서버 수백 대가 같은 규칙으로 울리는 알림을, 클러스터마다 하나로 받으려면?
+    choices:
+      - Alertmanager의 group_by를 [cluster, alertname]으로 둬요
+      - 사일런스로 잠시 꺼요
+      - 지속 시간(for)을 늘려요
+      - 임계값을 높여요
+    answer: 0
+    explain: group_by에 적은 레이블 값이 같은 알림을 한 알림으로 묶어요. instance를 넣으면 서버마다 따로 와요.
+  - id: silence-not-fix
+    type: ox
+    prompt: 시끄러운 규칙을 사일런스로 꺼 두면, 규칙을 고친 것과 같은가요?
+    answer: false
+    explain: 사일런스는 끝나는 시각이 있어서 지나면 다시 울려요. 점검처럼 울릴 줄 아는 때에만 잠깐 써요.

@@ -1,0 +1,41 @@
+questions:
+  - id: budget-requests
+    type: choice
+    prompt: SLO가 '30일 동안 99.9%'이고, 30일 요청이 100만 건이에요. 실패해도 되는 요청은 몇 건일까요?
+    choices:
+      - 1,000건
+      - 100건
+      - 10,000건
+      - 999건
+    answer: 0
+    explain: 에러 버짓은 100%에서 SLO를 뺀 0.1%예요. 100만 건의 0.1%는 1,000건이에요.
+  - id: budget-minutes
+    type: choice
+    prompt: 같은 SLO(30일 99.9%)를 정상이던 시간으로 재면, 30일(43,200분) 중 허용되는 시간은?
+    choices:
+      - 43.2분
+      - 4.32분
+      - 432분
+      - 1.44분
+    answer: 0
+    explain: 43,200분의 0.1%는 43.2분이에요. 99.99%로 9를 하나 더하면 4.32분으로 10분의 1이 돼요.
+  - id: cpu-not-sli
+    type: ox
+    prompt: 서버 CPU 사용률은 좋은 SLI인가요?
+    answer: false
+    explain: SLI는 사용자가 겪는 품질을 재요. CPU 과부하는 원인일 뿐이라, CPU가 낮아도 사용자는 에러를 받을 수 있어요.
+  - id: sla-looser
+    type: choice
+    prompt: 계약인 SLA와 내부 목표인 SLO의 관계로 맞는 것은?
+    choices:
+      - 보통 SLA를 내부 SLO보다 느슨하게 둬요
+      - 보통 SLA를 내부 SLO보다 엄격하게 둬요
+      - 둘은 늘 같은 값이에요
+      - 둘은 서로 관계가 없어요
+    answer: 0
+    explain: 내부 목표가 먼저 깨져야 계약을 어기기 전에 손볼 수 있어요.
+  - id: slo-100
+    type: ox
+    prompt: SLO를 100%로 정하면, 배포할 여유(에러 버짓)가 넉넉해지나요?
+    answer: false
+    explain: 100%면 에러 버짓이 0이라 실패 한 건이 곧 위반이에요. 배포할 여유도 없어요.

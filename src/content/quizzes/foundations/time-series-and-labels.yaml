@@ -1,0 +1,41 @@
+questions:
+  - id: cardinality-calc
+    type: choice
+    prompt: 레이블 method 값 5개, status 값 10개, route 값 200개인 지표는 서버 한 대에서 시계열이 최대 몇 개일까요?
+    choices:
+      - 10,000개
+      - 215개
+      - 1,000개
+      - 2,000개
+    answer: 0
+    explain: 최대 시계열 수는 레이블 값 수의 곱이에요. 5 × 10 × 200 = 10,000개예요.
+  - id: user-id-label
+    type: ox
+    prompt: 사용자 ID를 지표 레이블에 넣어도 괜찮나요?
+    answer: false
+    explain: 새 사용자마다 시계열이 생기고, 시계열마다 메모리와 디스크를 써요. 사용자별로 봐야 하면 로그나 트레이스에 남겨요.
+  - id: route-template
+    type: choice
+    prompt: 경로 레이블에는 어떤 값을 넣어야 할까요?
+    choices:
+      - /users/:id 같은 경로 틀
+      - /users/123 같은 실제 경로
+      - 쿼리 문자열까지 든 원본 URL
+      - 요청 ID
+    answer: 0
+    explain: 실제 경로를 넣으면 사용자 ID를 넣은 것과 같아요. 값이 몇 개로 정해진 경로 틀을 넣어요.
+  - id: one-label-differs
+    type: choice
+    prompt: 지표 이름이 같고 레이블 값이 하나만 다른 두 값은 어떻게 저장될까요?
+    choices:
+      - 서로 다른 시계열이 돼요
+      - 같은 시계열로 합쳐져요
+      - 저장할 때 오류가 나요
+      - 나중에 온 값이 앞의 값을 덮어써요
+    answer: 0
+    explain: 지표 이름과 레이블 조합이 시계열을 가려요. 대시보드에 그리면 선도 따로 생겨요.
+  - id: cardinality-name
+    type: input
+    prompt: 레이블 값 조합의 수, 곧 시계열이 몇 개인지를 무엇이라고 하나요?
+    answer: [카디널리티, cardinality]
+    explain: 카디널리티가 끝없이 늘면 메모리와 디스크가 함께 늘어요. 레이블마다 값이 최대 몇 개인지 답할 수 있어야 해요.

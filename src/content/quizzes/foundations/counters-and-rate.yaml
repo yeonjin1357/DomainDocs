@@ -1,0 +1,41 @@
+questions:
+  - id: rate-calc
+    type: choice
+    prompt: 요청 수 카운터가 5분 동안 1,000,000에서 1,030,000이 됐어요. rate는?
+    choices:
+      - 초당 100건
+      - 초당 30,000건
+      - 초당 6,000건
+      - 초당 1,030,000건
+    answer: 0
+    explain: 늘어난 30,000을 구간 길이 300초로 나눠요. 30,000 ÷ 300 = 초당 100건이에요.
+  - id: restart-increase
+    type: choice
+    prompt: 카운터가 1,000 → 1,050 → (재시작) → 20으로 바뀌었어요. Prometheus increase는 이 구간에서 얼마로 셀까요?
+    choices:
+      - "70"
+      - "−1,030"
+      - "20"
+      - "1,070"
+    answer: 0
+    explain: 값이 줄어든 순간을 재시작으로 봐요. 재시작 전에 늘어난 50과 뒤의 20을 더해 70으로 세요.
+  - id: sum-then-rate
+    type: ox
+    prompt: 여러 서버의 카운터를 먼저 더한 다음 rate를 구해도 괜찮나요?
+    answer: false
+    explain: 한 서버만 재시작해도 합계가 줄어, 전체를 재시작으로 보고 rate가 튀어요. 서버마다 rate를 먼저 구한 뒤 더해요.
+  - id: gauge-change
+    type: choice
+    prompt: 메모리 사용량 같은 게이지가 얼마나 변했는지 보려면 어떤 함수를 쓸까요?
+    choices:
+      - delta()나 deriv()
+      - rate()
+      - increase()
+      - irate()
+    answer: 0
+    explain: rate 계열은 값이 줄면 재시작으로 보고 더해서, 게이지에 쓰면 의미 없는 값이 나와요.
+  - id: raw-counter-graph
+    type: ox
+    prompt: 카운터 값을 그대로 그린 그래프로, 지금 얼마나 바쁜지 알 수 있나요?
+    answer: false
+    explain: 카운터는 시작부터 쌓인 값이라 오르기만 해요. 지금 상태는 rate로 봐요.
