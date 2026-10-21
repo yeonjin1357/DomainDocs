@@ -1,0 +1,84 @@
+---
+title: 서버리스 함수 오류가 늘 때
+summary: 함수 오류인지, 시간 초과인지, 스로틀인지 가르고, 비동기 호출이라면 다시 시도되는 몫도 셈에 넣어요.
+domain: cloud
+type: guide
+order: 120
+icon: cloud
+keywords: [Lambda errors, 함수 오류, Throttles, 스로틀, Task timed out, 시간 초과, reserved concurrency, 비동기 재시도, ConcurrentExecutions, 원인 찾기]
+related: [cloud/serverless, apm/error-spike, apm/timeouts-and-retries, messaging/delivery-guarantees]
+sources:
+  - title: AWS — Types of metrics for Lambda functions
+    url: https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html
+  - title: AWS — Troubleshoot invocation issues in Lambda
+    url: https://docs.aws.amazon.com/lambda/latest/dg/troubleshooting-invocation.html
+  - title: AWS — Understanding Lambda function scaling
+    url: https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html
+  - title: AWS — Error handling and automatic retries for asynchronous invocation
+    url: https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-error-handling.html
+  - title: AWS — Configure Lambda function timeout
+    url: https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html
+updated: 2026-10-21
+---
+
+<Situation>
+  이미지 변환 함수의 Errors 지표가 평소의 열 배로 뛰었어요. 같은 시각에 다른 함수에서는 Throttles가 생기기 시작했어요.
+
+  서버리스 함수의 실패는 셋으로 나뉘어요. 코드가 오류를 낸 것, 제한 시간을 넘긴 것, 실행할 자리가 없어 거절된 것이에요. 무엇인지에 따라 고칠 곳이 달라요.
+</Situation>
+
+<FirstLook>
+  <Item title="오류인가 스로틀인가">Errors와 Throttles를 나눠 봐요.</Item>
+  <Item title="시간 초과인가">로그에 Task timed out이 있는지 봐요.</Item>
+  <Item title="다시 시도되나">비동기 호출이면 재시도가 몫을 부풀려요.</Item>
+</FirstLook>
+
+## 1. 오류와 스로틀을 나눠 보세요
+
+Lambda는 함수 오류와 스로틀을 따로 세요. 지표 뜻은 <Term slug="cloud/serverless">서버리스 함수</Term>에 있어요.
+
+| 지표 | 세는 것 | 볼 곳 |
+| --- | --- | --- |
+| Errors | 코드나 런타임이 낸 오류로 끝난 호출. 시간 초과도 들어가요 | 2·3단계 |
+| Throttles | 쓸 수 있는 동시성이 없어 거절된 요청 | 4단계 |
+
+스로틀된 요청은 Invocations에도, Errors에도 들어가지 않아요. 그래서 오류율을 Errors ÷ Invocations로만 보면 스로틀이 안 보여요.
+
+## 2. 시간 초과인지 보세요
+
+함수가 제한 시간 안에 끝나지 못하면 로그에 `Task timed out after 3.00 seconds`처럼 남아요. 기본 제한 시간은 3초이고, 최대 900초까지 늘릴 수 있어요.
+
+시간 초과라면 함수가 부르는 바깥 서비스(DB, 다른 API)가 느려졌는지부터 봐요. 함수 자체보다 기다리는 쪽이 원인인 경우가 많아요. 바깥 호출에 함수 제한 시간보다 짧은 타임아웃을 걸어 두면, 어디서 기다렸는지 로그에 남길 수 있어요.
+
+원리는 <Term slug="apm/timeouts-and-retries">타임아웃과 재시도</Term>에 있어요.
+
+## 3. 코드 오류라면 바뀐 것을 찾으세요
+
+시간 초과가 아닌 오류라면 함수 로그의 오류 메시지를 봐요. 배포 시각, 설정 변경 시각과 오류가 늘기 시작한 시각을 맞춰 봐요.
+
+흔한 원인은 새 코드의 버그, 바뀐 환경 변수, 권한(IAM) 변경, 들어오는 이벤트 모양의 변화예요. 앱 오류를 좁히는 일반 순서는 <Term slug="apm/error-spike">에러가 늘었을 때 어디부터 볼까</Term>와 같아요.
+
+## 4. 스로틀이라면 누가 동시성을 가져갔는지 보세요
+
+동시성 한도는 리전 안의 모든 함수가 함께 써요. 그래서 함수 하나가 갑자기 몰리면 다른 함수까지 스로틀돼요. AWS 문서도 "함수 하나가 동시성을 다 써서 다른 함수가 스로틀되는" 경우를 흔한 문제로 꼽아요.
+
+<Figure caption="리전 동시성 한도 1,000 중 이미지 변환 함수 하나가 950을 쓰고 있어요. 남은 50으로는 다른 함수들의 요청을 다 받지 못해 스로틀이 생겨요.">
+  <StatTile label="리전 동시성 한도" value="1,000" />
+  <StatTile label="이미지 변환 함수" value="950" tone="warn" note="갑자기 몰림" />
+  <StatTile label="다른 함수 스로틀" value="320" unit="건/분" tone="warn" />
+</Figure>
+
+**확인 방법**: 함수별 ConcurrentExecutions를 견줘, 한도를 차지한 함수를 찾아요. 중요한 함수에는 예약 동시성(reserved concurrency)을 걸어요. 예약 동시성은 그 함수가 늘 그만큼까지는 늘어날 수 있게 하고, 그 이상은 넘지 않게 해요.
+
+## 5. 비동기 호출이라면 재시도를 셈에 넣으세요
+
+다른 서비스가 이벤트를 넘겨 비동기로 부르는 함수는, Lambda가 대신 다시 시도해요. 함수가 오류를 내면 기본으로 두 번 더 시도해요. 스로틀이나 시스템 오류라면 기본 6시간까지 이벤트를 다시 넣어 시도해요.
+
+그래서 실패한 이벤트 하나가 오류 지표에 여러 번 찍히고, 같은 이벤트가 여러 번 처리될 수 있어요. 같은 이벤트를 두 번 처리해도 괜찮게 만드는 법은 <Term slug="messaging/delivery-guarantees">전달 보장</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>오류율을 Errors ÷ Invocations로만 보고 있다면 Throttles를 따로 보세요. 스로틀은 두 지표 어디에도 들어가지 않아요.</Check>
+  <Check>함수 하나만 바쁜데 다른 함수까지 실패한다면, 리전 동시성 한도를 함께 쓰는지 보고 중요한 함수에 예약 동시성을 거세요.</Check>
+  <Check>시간 초과가 늘었다면 제한 시간을 늘리기 전에, 함수가 기다리는 바깥 서비스부터 보세요.</Check>
+  <Check>비동기 함수의 오류 수가 실제 실패 이벤트보다 많아 보인다면, 자동 재시도로 같은 이벤트가 여러 번 세진 거예요.</Check>
+</Checkpoints>
