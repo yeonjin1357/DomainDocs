@@ -17,7 +17,12 @@ const json = JSON.stringify(previews).replace(/</g, '\\u003c');
       <BottomSheet id="term-sheet" label="개념 미리보기">
         <p class="sheet-meta" data-term-meta></p>
         <h2 class="sheet-title" data-term-title></h2>
+        <p class="sheet-en" data-term-en></p>
         <p class="sheet-summary" data-term-summary></p>
+        <div class="sheet-analogy-wrap" data-term-analogy-wrap>
+          <h3 class="sheet-subtitle">비유</h3>
+          <p class="sheet-analogy" data-term-analogy></p>
+        </div>
         <div class="sheet-points-wrap" data-term-points-wrap>
           <h3 class="sheet-subtitle">핵심</h3>
           <ol class="sheet-points" data-term-points></ol>
@@ -54,6 +59,16 @@ const json = JSON.stringify(previews).replace(/</g, '\\u003c');
   .sheet-summary {
     margin: 0;
     color: var(--color-text-sub);
+  }
+
+  .sheet-en {
+    margin: -4px 0 8px;
+    font-size: 14px;
+    color: var(--color-text-weak);
+  }
+
+  .sheet-analogy {
+    margin: 0;
   }
 
   .sheet-subtitle {

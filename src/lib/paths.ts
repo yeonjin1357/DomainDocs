@@ -17,3 +17,8 @@ export function docPath(id: string): string {
 export function domainPath(domain: string): string {
   return withBase(`${domain}/`);
 }
+
+/** 영역의 용어 사전. 글 주소(/{domain}/{slug}/)와 겹치지 않게 terms/ 아래에 둔다. */
+export function glossaryPath(domain: string): string {
+  return withBase(`terms/${domain}/`);
+}

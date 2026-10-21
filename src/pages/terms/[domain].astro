@@ -1,0 +1,127 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { DOMAINS, type Domain } from '../../data/domains';
+import { inDomain } from '../../lib/catalog';
+import { getCards, getGlossary } from '../../lib/content';
+import { sortTerms, termAnchor, type GlossaryTerm } from '../../lib/glossary';
+import { docPath, domainPath, withBase } from '../../lib/paths';
+
+// 용어가 있는 영역만 용어 사전을 만든다.
+export const getStaticPaths = (async () => {
+  const terms = await getGlossary();
+  return DOMAINS.flatMap((domain) => {
+    const own = terms.filter((t) => t.domain === domain.id);
+    return own.length > 0 ? [{ params: { domain: domain.id }, props: { domain, terms: sortTerms(own) } }] : [];
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  domain: Domain;
+  terms: GlossaryTerm[];
+}
+
+const { domain, terms } = Astro.props;
+// 영역 페이지는 글이 있어야 생긴다. 없으면 홈으로 돌아간다.
+const hasDocs = inDomain(await getCards(), domain.id).length > 0;
+const title = `${domain.name} 용어 사전`;
+---
+<BaseLayout title={title} description={`${domain.name}에서 쓰는 용어를 한 줄 뜻과 비유로 모았어요.`} surface="white" backHref={hasDocs ? domainPath(domain.id) : withBase()} barTitle={title}>
+  <article class="glossary" data-pagefind-body>
+    <header class="glossary-header">
+      <p class="glossary-domain" data-pagefind-ignore>{domain.name}</p>
+      <h1 class="glossary-title" data-page-title>{title}</h1>
+      <p class="glossary-desc">용어 {terms.length}개를 한 줄 뜻과 비유로 모았어요.</p>
+    </header>
+    {
+      terms.map((t) => (
+        <section class="entry" id={termAnchor(t.id)} data-term-entry>
+          <h2 class="entry-name">{t.name}</h2>
+          {t.en && <p class="entry-en">{t.en}</p>}
+          <p class="entry-short">{t.short}</p>
+          {t.analogy && <p class="entry-analogy"><span class="entry-tag">비유</span>{t.analogy}</p>}
+          {t.doc && <a class="entry-link" href={docPath(t.doc)}>자세히 보기</a>}
+        </section>
+      ))
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  .glossary-header {
+    padding: 16px 0 8px;
+  }
+
+  .glossary-domain {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .glossary-title {
+    margin: 6px 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+  }
+
+  .glossary-desc {
+    margin: 0;
+    color: var(--color-text-sub);
+  }
+
+  .entry {
+    padding: 24px 0;
+    border-top: 1px solid var(--color-line);
+    /* 링크로 건너왔을 때 상단 바에 가리지 않게 */
+    scroll-margin-top: 72px;
+  }
+
+  .entry:first-of-type {
+    margin-top: 24px;
+  }
+
+  .entry-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .entry-en {
+    margin: 2px 0 0;
+    font-size: 14px;
+    color: var(--color-text-weak);
+  }
+
+  .entry-short {
+    margin: 8px 0 0;
+  }
+
+  .entry-analogy {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0 0;
+    color: var(--color-text-sub);
+  }
+
+  .entry-tag {
+    flex: none;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--color-accent-weak);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.9;
+    color: var(--color-accent);
+  }
+
+  .entry-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+</style>

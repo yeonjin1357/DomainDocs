@@ -6,6 +6,9 @@ interface TermPreview {
   points: string[];
   url: string;
   meta: string;
+  en?: string;
+  analogy?: string;
+  linkLabel: string;
 }
 
 export function initTermSheet(): void {
@@ -36,7 +39,13 @@ export function initTermSheet(): void {
       ...preview.points.map((p) => Object.assign(document.createElement('li'), { textContent: p })),
     );
     part('[data-term-points-wrap]').hidden = preview.points.length === 0;
-    part<HTMLAnchorElement>('[data-term-link]').href = preview.url;
+    part('[data-term-en]').textContent = preview.en ?? '';
+    part('[data-term-en]').hidden = !preview.en;
+    part('[data-term-analogy]').textContent = preview.analogy ?? '';
+    part('[data-term-analogy-wrap]').hidden = !preview.analogy;
+    const action = part<HTMLAnchorElement>('[data-term-link]');
+    action.href = preview.url;
+    action.textContent = preview.linkLabel;
     openDialog(dialog, link);
   });
 }

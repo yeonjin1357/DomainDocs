@@ -1,12 +1,21 @@
 ---
-import { docPath } from '../../lib/paths';
+import { termAnchor } from '../../lib/glossary';
+import { docPath, glossaryPath } from '../../lib/paths';
 
 interface Props {
-  slug: string;
+  /** 글로 이을 때: 글 id(예: foundations/percentiles) */
+  slug?: string;
+  /** 용어로 이을 때: 영역/용어 id(예: network/snmp) */
+  term?: string;
 }
-const { slug } = Astro.props;
+const { slug, term } = Astro.props;
+if ((slug === undefined) === (term === undefined)) throw new Error('<Term>에는 slug와 term 중 하나만 써요.');
+// 용어는 미리보기 데이터에서 글과 키가 겹치지 않게 term: 을 붙인다. 스크립트가 없으면 용어 사전의 그 위치로 간다.
+const [domain, id] = (term ?? '').split('/');
+const href = slug !== undefined ? docPath(slug) : `${glossaryPath(domain)}#${termAnchor(id)}`;
+const key = slug ?? `term:${term}`;
 ---
-<a class="term" href={docPath(slug)} data-term={slug}><slot /></a>
+<a class="term" href={href} data-term={key}><slot /></a>
 
 <style>
   .term {

@@ -26,7 +26,7 @@ const usedConcepts = entry.data.type === 'guide' ? pick(analysis.termSlugs) : []
 const shown = new Set(usedConcepts.map((c) => c.id));
 const related = pick(entry.data.related.map((r) => r.id)).filter((c) => !shown.has(c.id));
 const next = nextInDomain(cards, entry.id);
-const termPreviews = await getTermPreviews(analysis.termSlugs);
+const termPreviews = await getTermPreviews(analysis.termSlugs, analysis.glossaryKeys);
 ---
 <BaseLayout title={entry.data.title} description={entry.data.summary} surface="white" backHref={domainPath(domain.id)} barTitle={entry.data.title}>
   <article class="doc" data-pagefind-body>

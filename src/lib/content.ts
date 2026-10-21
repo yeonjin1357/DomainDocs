@@ -2,8 +2,8 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { TYPE_LABEL, type DocCard } from './catalog';
 import { getDomain } from '../data/domains';
 import { analyzeBody, type BodyAnalysis } from './mdx/analyze';
-import { flattenGlossary, type GlossaryTerm } from './glossary';
-import { docPath } from './paths';
+import { flattenGlossary, termAnchor, type GlossaryTerm } from './glossary';
+import { docPath, glossaryPath } from './paths';
 
 export type DocEntry = CollectionEntry<'docs'>;
 
@@ -79,11 +79,22 @@ export interface TermPreview {
   url: string;
   /** '모니터링 기초 · 개념' 형태 */
   meta: string;
+  /** 용어의 영어 원말 */
+  en?: string;
+  /** 용어의 한 줄 비유 */
+  analogy?: string;
+  /** 시트의 이동 버튼 글자 */
+  linkLabel: string;
 }
 
-/** 페이지에 쓰인 Term의 미리보기 데이터. 빌드할 때 페이지 안에 넣어 두므로 시트를 열 때 네트워크 요청이 없다. */
-export async function getTermPreviews(slugs: readonly string[]): Promise<Record<string, TermPreview>> {
-  if (slugs.length === 0) return {};
+const domainName = (id: string) => getDomain(id)?.name ?? id;
+
+/**
+ * 페이지에 쓰인 Term의 미리보기 데이터. 빌드할 때 페이지 안에 넣어 두므로 시트를 열 때 네트워크 요청이 없다.
+ * 키는 글이면 글 id, 용어면 term:{영역/id}다(Term.astro의 data-term과 같다).
+ */
+export async function getTermPreviews(slugs: readonly string[], glossaryKeys: readonly string[] = []): Promise<Record<string, TermPreview>> {
+  if (slugs.length === 0 && glossaryKeys.length === 0) return {};
   const byId = new Map((await getPublishedDocs()).map((e) => [e.id, e]));
   const previews: Record<string, TermPreview> = {};
   for (const slug of slugs) {
@@ -94,8 +105,26 @@ export async function getTermPreviews(slugs: readonly string[]): Promise<Record<
       summary: target.data.summary,
       points: analyzeEntry(target).pointTitles,
       url: docPath(target.id),
-      meta: `${getDomain(target.data.domain)?.name ?? target.data.domain} · ${TYPE_LABEL[target.data.type]}`,
+      meta: `${domainName(target.data.domain)} · ${TYPE_LABEL[target.data.type]}`,
+      linkLabel: '전체 보기',
     };
+  }
+  if (glossaryKeys.length > 0) {
+    const terms = new Map((await getGlossary()).map((t) => [t.key, t]));
+    for (const key of glossaryKeys) {
+      const t = terms.get(key);
+      if (!t) continue;
+      previews[`term:${key}`] = {
+        title: t.name,
+        summary: t.short,
+        points: [],
+        url: t.doc ? docPath(t.doc) : `${glossaryPath(t.domain)}#${termAnchor(t.id)}`,
+        meta: `${domainName(t.domain)} · 용어`,
+        en: t.en,
+        analogy: t.analogy,
+        linkLabel: t.doc ? '전체 보기' : '용어 사전에서 보기',
+      };
+    }
   }
   return previews;
 }

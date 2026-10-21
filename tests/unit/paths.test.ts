@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { joinBase } from '../../src/lib/paths';
+import { glossaryPath, joinBase } from '../../src/lib/paths';
 
 describe('joinBase', () => {
   it('base 뒤에 경로를 붙인다', () => {
@@ -15,5 +15,11 @@ describe('joinBase', () => {
   it('base가 루트(/)여도 동작한다', () => {
     expect(joinBase('/', 'foundations/')).toBe('/foundations/');
     expect(joinBase('/')).toBe('/');
+  });
+});
+
+describe('glossaryPath', () => {
+  it('영역의 용어 사전 주소는 base 아래 terms/{영역}/이다', () => {
+    expect(glossaryPath('network')).toMatch(/\/terms\/network\/$/);
   });
 });

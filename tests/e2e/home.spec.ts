@@ -32,7 +32,7 @@ test('처음 목록에 이미 있는 글은 최근 추가된 글에 다시 나�
 test('영역 페이지는 한눈에 보기·기초·모니터링에서는·상황 가이드로 묶어 보여 준다', async ({ page }) => {
   await page.goto('foundations/');
   await expect(page.locator('h1')).toHaveText('모니터링 기초');
-  await expect(page.locator('[data-card] h2')).toHaveText(['한눈에 보기', '기초', '모니터링에서는', '상황 가이드']);
+  await expect(page.locator('[data-card] h2')).toHaveText(['한눈에 보기', '기초', '모니터링에서는', '상황 가이드', '더 알아보기']);
   await expect(cardWithTitle(page, '한눈에 보기').locator('.row-title')).toHaveText(['지도 글']);
   await expect(cardWithTitle(page, '기초').locator('.row-title')).toHaveText(['알파 개념', '그림 모음']);
   await expect(cardWithTitle(page, '모니터링에서는').locator('.row-title')).toHaveText(['데모 모음', '베타 개념']);
