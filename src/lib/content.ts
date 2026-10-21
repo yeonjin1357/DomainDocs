@@ -133,23 +133,17 @@ export async function getTermPreviews(slugs: readonly string[], glossaryKeys: re
 let bankPromise: Promise<QuizQuestion[]> | undefined;
 
 /**
- * 글 문제와 용어 문제를 합친 문제 은행. 없는 글·용어를 가리키면 빌드를 멈춘다.
+ * 문제 파일의 문제를 모은 문제 은행. 없는 글·용어를 가리키면 빌드를 멈춘다.
  * 초안 글은 운영 빌드에서 빠지므로, 초안 글의 문제 파일은 글 검사가 막는다.
  */
 export function getQuizBank(): Promise<QuizQuestion[]> {
   bankPromise ??= (async () => {
     const [files, cards, terms] = await Promise.all([getCollection('quizzes'), getCards(), getGlossary()]);
-    const titles = new Map(cards.map((c) => [c.id, c.title]));
     const docs = cards.map((c) => ({ id: c.id, domain: c.domain, title: c.title, url: c.url }));
-    const linkOf = (t: GlossaryTerm) =>
-      t.doc && titles.has(t.doc)
-        ? { url: docPath(t.doc), title: titles.get(t.doc)! }
-        : { url: `${glossaryPath(t.domain)}#${termAnchor(t.id)}`, title: `${domainName(t.domain)} 용어 사전` };
     return buildBank(
       files.map((f) => ({ docId: f.id, questions: f.data.questions })),
       docs,
       terms,
-      linkOf,
     );
   })();
   return bankPromise;

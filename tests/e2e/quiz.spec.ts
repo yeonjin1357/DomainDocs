@@ -63,24 +63,6 @@ test.describe('퀴즈 풀이', () => {
     await expect(page.locator('[data-quiz-result] h2')).toHaveText('3문제 중 3문제 맞혔어요');
   });
 
-  test('틀린 문제 목록에 용어 문제의 뜻도 함께 보인다', async ({ page }) => {
-    await page.goto('quiz/play/?scope=domain%3Afoundations');
-    for (let i = 0; i < 20; i++) {
-      if (await page.locator('[data-quiz-result]').count()) break;
-      const type = await page.locator('[data-quiz-question]').getAttribute('data-type');
-      if (type === 'input') {
-        await page.locator('[data-quiz-input]').fill('전혀 다른 답');
-        await page.getByRole('button', { name: '확인' }).click();
-      } else {
-        await page.locator('[data-quiz-choice]').first().click();
-      }
-      await next(page);
-    }
-    const defItems = page.locator('[data-quiz-wrong] li').filter({ hasText: '이 뜻을 가진 용어는 무엇인가요?' });
-    await expect(defItems).not.toHaveCount(0);
-    for (const item of await defItems.all()) await expect(item.locator('blockquote')).not.toBeEmpty();
-  });
-
   test('틀린 문제만 다시 풀 수 있다', async ({ page }) => {
     await page.goto(DOC_QUIZ);
     for (let i = 0; i < 3; i++) {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { QuizQuestion } from '../../src/lib/quiz/bank';
 import { addDays, applyResult, isDue, pickSession, todayString, type Records } from '../../src/lib/quiz/schedule';
 
-const q = (key: string, domain = 'network', docId?: string): QuizQuestion => ({
+const q = (key: string, domain = 'network', docId = `${domain}/overview`): QuizQuestion => ({
   key,
   domain,
   docId,
