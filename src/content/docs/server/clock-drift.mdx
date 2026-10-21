@@ -1,0 +1,67 @@
+---
+title: 서버 시계가 어긋날 때
+summary: 서버마다 시계가 다르면 그래프와 로그의 순서가 뒤섞여요. 시간 동기화가 도는지와 어긋난 크기를 봐요.
+domain: server
+type: guide
+order: 110
+icon: clock
+keywords: [clock drift, 시계 어긋남, NTP, chrony, timedatectl, time sync, 시간 동기화, offset, 타임스탬프, 시간대]
+related: [foundations/collection-interval, foundations/empty-graph, apm/trace-waterfall]
+sources:
+  - title: Linux man-pages — timedatectl(1)
+    url: https://man7.org/linux/man-pages/man1/timedatectl.1.html
+  - title: chrony — chronyc(1)
+    url: https://chrony-project.org/doc/4.6/chronyc.html
+  - title: RFC 5905 — Network Time Protocol Version 4
+    url: https://www.rfc-editor.org/rfc/rfc5905
+updated: 2026-10-21
+---
+
+<Situation>
+  장애를 되짚는데, 앱 서버 로그로는 10시 00분 05초에 요청을 보냈고 DB 서버 로그로는 10시 00분 02초에 받았어요. 받은 게 보낸 것보다 3초 빨라요.
+
+  서버마다 시계가 조금씩 다르면 이런 일이 생겨요. 그래프에서 점이 미래에 찍히거나, 트레이스 구간의 순서가 뒤집히기도 해요.
+</Situation>
+
+<FirstLook>
+  <Item title="시간 동기화가 도는가">서버가 시간 서버와 맞추고 있는지 봐요.</Item>
+  <Item title="얼마나 어긋났나">기준 시각과의 차이(오프셋)를 봐요.</Item>
+  <Item title="시간대 문제는 아닌가">시계가 아니라 표시하는 시간대가 다를 수 있어요.</Item>
+</FirstLook>
+
+## 1. 시간 동기화가 도는지 보세요
+
+서버의 시계는 조금씩 빨라지거나 느려져요. 그래서 보통은 NTP로 시간 서버와 주기적으로 맞춰요. 리눅스에서는 chrony나 systemd-timesyncd가 이 일을 해요.
+
+**확인 방법**: `timedatectl`의 `System clock synchronized`가 yes인지, `NTP service`가 active인지 봐요. 동기화 서비스가 꺼져 있다면 시계는 점점 더 어긋나요.
+
+## 2. 얼마나 어긋났는지 보세요
+
+동기화가 돌아도 시간 서버에 닿지 못하면 맞추지 못해요. 기준 시각과 지금 시계의 차이(오프셋)를 직접 봐요.
+
+**확인 방법**: chrony를 쓴다면 `chronyc tracking`의 `System time` 줄을 봐요. "0.000006523 seconds slow of NTP time"처럼 NTP 시간보다 얼마나 늦거나 빠른지 보여 줘요. `chronyc sources`로 어느 시간 서버에 닿고 있는지도 봐요.
+
+<Figure caption="세 서버의 오프셋 예시예요. 두 대는 1ms 안쪽으로 맞지만, 한 대는 시간 서버에 닿지 못해 3초 가까이 늦어요.">
+  <StatTile label="앱 서버" value="+0.4" unit="ms" />
+  <StatTile label="DB 서버" value="−2.9" unit="초" tone="warn" note="시간 서버에 못 닿음" />
+  <StatTile label="모니터링 서버" value="−0.2" unit="ms" />
+</Figure>
+
+## 3. 시간대 문제가 아닌지 가르세요
+
+로그의 시각이 정확히 몇 시간 단위로 어긋난다면, 시계가 아니라 시간대 문제예요. 한 서버는 UTC로, 다른 서버는 한국 시간(UTC+9)으로 적으면 정확히 9시간 차이가 나요.
+
+**확인 방법**: `timedatectl`의 Time zone 줄을 서버마다 견줘요. 모니터링 화면이 어느 시간대로 보여 주는지도 함께 봐요.
+
+## 4. 크게 어긋났다면 조심해서 맞추세요
+
+시간 동기화 프로그램은 보통 시계를 조금씩 빠르게 또는 느리게 돌려 서서히 맞춰요. 한 번에 훌쩍 건너뛰면 시간을 기준으로 동작하는 프로그램이 크게 흔들릴 수 있기 때문이에요.
+
+chrony에는 시계를 한 번에 맞추는 `makestep`이 있지만, 문서는 일부 소프트웨어가 이런 건너뜀에 심각한 영향을 받는다고 경고해요. 운영 중인 서버라면 영향을 받을 프로그램을 먼저 살펴요.
+
+<Checkpoints>
+  <Check>트레이스에서 자식 구간이 부모보다 먼저 시작한다면, 두 서비스가 도는 서버의 시계 차이를 의심하세요. 구간 시각은 각 서버의 시계로 찍혀요.</Check>
+  <Check>그래프에 미래 시각의 점이 보인다면, 그 서버의 시계가 빠른지 보세요.</Check>
+  <Check>두 서버 로그가 정확히 9시간씩 어긋난다면 시계가 아니라 시간대를 보세요.</Check>
+  <Check>시간 동기화가 꺼진 서버가 있다면 바로 켜세요. 시계는 시간이 갈수록 더 어긋나요.</Check>
+</Checkpoints>
