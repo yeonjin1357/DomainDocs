@@ -52,3 +52,44 @@ terms:
     aliases: [burstable, T 시리즈, CPU credit, CPU 크레딧, 크레딧, CPUCreditBalance]
     short: 평소엔 기준선만큼 쓰다가 모아 둔 CPU 크레딧으로 잠깐 더 쓰는 인스턴스예요.
     doc: cloud/virtual-machines
+  - id: vpc
+    name: VPC
+    en: Virtual Private Cloud
+    aliases: [VPC, VNet, Virtual Network, 가상 네트워크, 가상 사설 클라우드]
+    short: 내 계정 안에 만드는, 다른 고객과 논리적으로 떨어진 가상 네트워크예요.
+    analogy: 빌딩에서 우리 회사만 쓰는 층과 같아요.
+    doc: cloud/networking
+  - id: subnet
+    name: 서브넷
+    en: Subnet
+    aliases: [subnet, public subnet, private subnet, 공개 서브넷, 비공개 서브넷, 라우팅 테이블]
+    short: VPC의 IP 범위를 나눈 조각이에요. 가용 영역 하나에 있고, 경로에 따라 공개·비공개로 나뉘어요.
+    doc: cloud/networking
+  - id: security-group
+    name: 보안 그룹
+    en: Security group
+    aliases: [security group, SG, NSG, 네트워크 보안 그룹, NACL, 네트워크 ACL]
+    short: 서버 같은 자원에 붙는 방화벽이에요. 허용한 트래픽만 통과시키고, 응답은 알아서 통과시켜요.
+    analogy: 방문 앞에 붙은 출입 명단과 같아요.
+    doc: cloud/networking
+  - id: block-storage
+    name: 블록 저장소
+    en: Block storage
+    aliases: [block storage, EBS, Managed Disks, 볼륨, volume, gp3]
+    short: 서버 한 대에 붙여 하드디스크처럼 쓰는 가상 디스크예요. 서버와 같은 가용 영역에 있어야 해요.
+    analogy: 내 방에 들여놓은 캐비닛과 같아요.
+    doc: cloud/storage
+  - id: file-storage
+    name: 파일 저장소
+    en: File storage
+    aliases: [file storage, EFS, Azure Files, NFS, 공유 폴더]
+    short: 여러 서버가 네트워크로 함께 붙여 쓰는 공유 폴더예요.
+    analogy: 층 사람들이 함께 쓰는 공용 캐비닛과 같아요.
+    doc: cloud/storage
+  - id: object-storage
+    name: 오브젝트 저장소
+    en: Object storage
+    aliases: [object storage, S3, Blob Storage, bucket, 버킷, 객체]
+    short: 파일을 통째로 키를 붙여 HTTP로 넣고 꺼내는 저장소예요. 용량이 거의 끝없이 늘어나요.
+    analogy: 상자째 맡기고 번호표로 찾는 보관 창고와 같아요.
+    doc: cloud/storage

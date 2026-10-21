@@ -1,0 +1,133 @@
+---
+title: 가상 네트워크
+summary: VPC는 내 계정 전용 네트워크예요. 서브넷으로 나누고, 보안 그룹으로 드나들 길을 정해요.
+domain: cloud
+type: concept
+stage: basics
+order: 30
+icon: cloud
+keywords: [VPC, VNet, subnet, 서브넷, security group, 보안 그룹, NACL, NAT gateway, internet gateway, NSG]
+related: [cloud/regions-and-zones, cloud/load-balancers, network/addresses, network/switches-and-routers]
+sources:
+  - title: AWS — What is Amazon VPC?
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html
+  - title: AWS — Subnets for your VPC
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html
+  - title: AWS — Security groups
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html
+  - title: AWS — Security group rules
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+  - title: AWS — Network ACLs
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html
+  - title: AWS — NAT gateways
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html
+  - title: Microsoft Learn — Network security groups
+    url: https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="VPC는 나만의 네트워크예요">
+    클라우드 안에 다른 고객과 논리적으로 떨어진 네트워크를 만들고, 내 서버를 그 안에 둬요.
+  </Point>
+  <Point title="서브넷은 공개와 비공개로 나눠요">
+    인터넷으로 바로 나가는 길이 있으면 공개 서브넷, 없으면 비공개 서브넷이에요.
+  </Point>
+  <Point title="보안 그룹이 서버의 문지기예요">
+    허용한 트래픽만 들어오고 나가요. 들어온 요청의 응답은 따로 허용하지 않아도 나가요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="빌딩 층은 벽이 실제로 있지만, VPC의 경계는 설정으로만 있어요. 그래서 규칙 하나를 잘못 열면 벽에 문이 난 것처럼 바로 바깥과 이어져요.">
+  VPC는 빌딩에서 우리 회사만 쓰는 층이에요. 손님을 맞는 로비 쪽 구역(공개 서브넷)과 직원만 있는 안쪽 구역(비공개 서브넷)으로 나눠요. 방마다 출입 명단(보안 그룹)이 붙어 있어요.
+</Analogy>
+
+## VPC
+
+<Term term="cloud/vpc">VPC</Term>(Virtual Private Cloud)는 내 계정 안에 만드는 가상 네트워크예요. 다른 가상 네트워크와 논리적으로 떨어져 있고, 회사 데이터센터의 네트워크와 비슷하게 생겼어요. Azure에서는 Virtual Network(VNet)라고 불러요.
+
+VPC를 만들 때는 `10.0.0.0/16`처럼 쓸 IP 주소 범위를 정해요. 그 안의 서버는 이 범위에서 사설 IP를 받아요. IP 주소와 범위 표기는 <Term slug="network/addresses">주소: IP, MAC, 포트</Term>에서 다뤄요.
+
+## 서브넷
+
+<Term term="cloud/subnet">서브넷</Term>은 VPC의 IP 범위를 잘게 나눈 조각이에요. 서브넷 하나는 가용 영역 하나 안에만 있어요. 그래서 서버를 여러 가용 영역에 두려면 서브넷도 가용 영역마다 만들어요.
+
+서브넷마다 라우팅 테이블이 붙어서, 나가는 트래픽이 어디로 갈지 정해요. 이 경로에 따라 서브넷의 성격이 갈려요.
+
+| 서브넷 | 인터넷 쪽 경로 | 들어가는 것 |
+| --- | --- | --- |
+| 공개 | 인터넷 게이트웨이로 바로 나가요 | 로드 밸런서, 바깥에서 닿아야 하는 서버 |
+| 비공개 | 바로 나가는 길이 없어요 | 앱 서버, 데이터베이스 |
+
+비공개 서브넷의 서버가 밖으로 나가야 할 때는 NAT 게이트웨이를 거쳐요. 보안 패치를 받으러 나가는 경우가 대표적이에요. NAT 게이트웨이를 쓰면 안에서 밖으로는 연결을 맺을 수 있지만, 밖에서 안으로는 연결을 시작할 수 없어요.
+
+<Figure caption="공개 서브넷의 로드 밸런서만 인터넷에서 닿아요. 앱 서버와 DB는 비공개 서브넷에 두고, 밖으로 나갈 때만 NAT 게이트웨이를 거쳐요.">
+  <Flow
+    ariaLabel="인터넷에서 인터넷 게이트웨이를 지나 공개 서브넷의 로드 밸런서로 들어오고, 로드 밸런서가 비공개 서브넷의 앱 서버로, 앱 서버가 DB로 이어지며, 앱 서버는 공개 서브넷의 NAT 게이트웨이를 거쳐 밖으로 나가는 구조도"
+    nodes={[
+      { id: 'net', label: '인터넷', col: 0, row: 0 },
+      { id: 'lb', label: '로드 밸런서', col: 1, row: 0, tone: 'accent' },
+      { id: 'nat', label: 'NAT', col: 2, row: 0, note: '게이트웨이' },
+      { id: 'app', label: '앱 서버', col: 1, row: 1 },
+      { id: 'db', label: 'DB', col: 1, row: 2 },
+    ]}
+    edges={[
+      { from: 'net', to: 'lb', tone: 'accent' },
+      { from: 'lb', to: 'app', tone: 'accent' },
+      { from: 'app', to: 'db' },
+      { from: 'app', to: 'nat', dashed: true },
+    ]}
+    groups={[
+      { label: '공개 서브넷', cols: [1, 2], rows: [0, 0] },
+      { label: '비공개 서브넷', cols: [0, 2], rows: [1, 2] },
+    ]}
+  />
+</Figure>
+
+## 보안 그룹과 네트워크 ACL
+
+<Term term="cloud/security-group">보안 그룹</Term>은 서버 같은 자원에 붙는 방화벽이에요. 붙은 자원으로 들어오고 나가는 트래픽 중 허용할 것을 적어요. 막는 규칙은 없고, 허용하는 규칙만 적어요.
+
+보안 그룹은 상태를 기억하는(stateful) 방화벽이에요. 허용한 요청이 들어오면, 그 응답은 나가는 규칙과 상관없이 나가요. 처음 만든 보안 그룹에는 들어오는 규칙이 없어서, 아무것도 들어오지 못해요.
+
+네트워크 ACL은 서브넷 단위로 한 번 더 거르는 규칙이에요. 허용과 거부를 모두 적을 수 있지만, 상태를 기억하지 않는(stateless) 규칙이에요. 그래서 들어오는 요청을 허용해도 응답이 나가는 길은 따로 열어 줘야 해요.
+
+<Figure caption="보안 그룹은 서버마다 붙고 응답을 알아서 통과시켜요. 네트워크 ACL은 서브넷 입구에서 거르고, 응답도 따로 허용해야 해요.">
+  <Compare
+    columns={['보안 그룹', '네트워크 ACL']}
+    rows={[
+      { label: '붙는 곳', values: ['서버 같은 자원', '서브넷'] },
+      { label: '규칙', values: ['허용만 적어요', '허용과 거부를 적어요'] },
+      { label: '응답 트래픽', values: ['알아서 통과해요', '따로 허용해야 해요'] },
+    ]}
+  />
+</Figure>
+
+Azure에서는 네트워크 보안 그룹(NSG)이 이 역할을 해요. 허용과 거부 규칙을 모두 적고, 상태를 기억해서 응답은 따로 허용하지 않아도 돼요.
+
+## 모니터링에서는
+
+클라우드에서 "연결이 안 된다"는 문제는 서버 고장보다 네트워크 설정인 경우가 많아요. 서버 지표가 멀쩡한데 연결만 실패한다면, 경로와 규칙을 순서대로 봐요.
+
+- 보내는 쪽 서브넷의 라우팅 테이블에 목적지로 가는 경로가 있는지 봐요.
+- 네트워크 ACL이 요청과 응답 방향을 모두 허용하는지 봐요.
+- 받는 쪽 보안 그룹이 그 포트와 출발지를 허용하는지 봐요.
+
+연결이 "거부"되는지 "시간 초과"되는지도 실마리예요. 둘의 차이는 <Term slug="network/tcp-connections">TCP 연결</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>보안 그룹에 응답용 포트를 따로 열고 있다면 다시 보세요. 보안 그룹은 허용한 요청의 응답을 알아서 통과시켜요.</Check>
+  <Check>네트워크 ACL에서 들어오는 쪽만 열었다면 다시 보세요. ACL은 상태를 기억하지 않아서 응답이 나갈 길도 열어야 해요.</Check>
+  <Check>데이터베이스를 공개 서브넷에 두었다면 다시 보세요. 바깥에서 닿을 필요가 없는 서버는 비공개 서브넷에 둬요.</Check>
+  <Check>비공개 서브넷의 서버가 밖으로 못 나간다면, NAT 게이트웨이로 가는 경로가 있는지 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 보안 그룹이 거르지 않는 것
+
+  AWS 문서는 보안 그룹이 AWS 기본 DNS 같은 일부 트래픽은 거르지 않는다고 적어요. 모든 트래픽이 보안 그룹을 거친다고 가정하지 말아요.
+
+  ### 서브넷의 다른 종류
+
+  AWS는 VPN 연결로만 나가는 서브넷처럼 다른 종류도 설명해요. 핵심은 같아요. 서브넷의 성격은 라우팅 테이블이 어디로 길을 내 주느냐로 정해져요.
+</Deeper>

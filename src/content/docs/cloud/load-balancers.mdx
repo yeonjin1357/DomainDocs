@@ -1,0 +1,136 @@
+---
+title: 로드 밸런서
+summary: 로드 밸런서는 요청을 여러 서버에 나누고, 상태 확인에 통과한 서버로만 보내요.
+domain: cloud
+type: concept
+stage: basics
+order: 40
+icon: cloud
+keywords: [load balancer, 로드 밸런서, ELB, ALB, NLB, Application Gateway, health check, 상태 확인, target group, cross-zone]
+related: [cloud/networking, cloud/regions-and-zones, apm/http-basics, apm/web-server-and-was]
+sources:
+  - title: AWS — What is Elastic Load Balancing?
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html
+  - title: AWS — How Elastic Load Balancing works
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html
+  - title: AWS — What is an Application Load Balancer?
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html
+  - title: AWS — What is a Network Load Balancer?
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html
+  - title: AWS — Health checks for Application Load Balancer target groups
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html
+  - title: AWS — CloudWatch metrics for your Application Load Balancer
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html
+  - title: Microsoft Learn — What is Azure Load Balancer?
+    url: https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-overview
+  - title: Microsoft Learn — What is Azure Application Gateway?
+    url: https://learn.microsoft.com/en-us/azure/application-gateway/overview
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="여러 대상에 나눠요">
+    들어온 요청을 서버, 컨테이너 같은 여러 대상에 나눠요. 대상은 여러 가용 영역에 있을 수 있어요.
+  </Point>
+  <Point title="건강한 대상에만 보내요">
+    대상을 주기적으로 찔러 보고, 상태 확인에 통과한 대상에만 요청을 보내요.
+  </Point>
+  <Point title="7계층과 4계층으로 나뉘어요">
+    HTTP 내용을 보고 나누면 7계층, TCP·UDP 연결만 보고 나누면 4계층 로드 밸런서예요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="안내 데스크 직원은 상담원이 아픈지 눈으로 보지만, 로드 밸런서는 정해 둔 주소를 주기적으로 찔러 본 결과로만 판단해요.">
+  빌딩 로비의 안내 데스크와 같아요. 방문객이 오면 비어 있는 상담실로 안내해요. 쓰러진 상담원이 있으면 명단에서 잠시 빼고, 다시 괜찮아지면 명단에 넣어요.
+</Analogy>
+
+## 로드 밸런서가 하는 일
+
+<Term term="apm/load-balancer">로드 밸런서</Term>는 들어온 요청을 여러 대상에 나눠 줘요. AWS의 Elastic Load Balancing은 대상을 하나 이상의 가용 영역에 두고, 건강한 대상에만 요청을 보내요. 들어오는 양에 맞춰 로드 밸런서 자체의 용량도 알아서 늘려요.
+
+요청을 받을 대상은 대상 그룹(target group)으로 묶어요. 로드 밸런서는 리스너가 받은 요청을 규칙에 따라 대상 그룹으로 넘기고, 대상 그룹 안에서 대상 하나를 골라요.
+
+## 7계층과 4계층
+
+<Figure caption="7계층 로드 밸런서는 HTTP 요청의 내용까지 보고 나누고, 4계층 로드 밸런서는 연결의 주소와 포트만 보고 나눠요.">
+  <Compare
+    columns={['7계층', '4계층']}
+    rows={[
+      { label: '보는 것', values: ['HTTP 경로, 호스트, 헤더', 'IP 주소, 포트'] },
+      { label: 'AWS', values: ['Application Load Balancer', 'Network Load Balancer'] },
+      { label: 'Azure', values: ['Application Gateway', 'Load Balancer'] },
+      { label: '맞는 일', values: ['웹, API', 'TCP·UDP 서비스, 아주 많은 연결'] },
+    ]}
+  />
+</Figure>
+
+7계층 로드 밸런서는 `/api`로 오는 요청은 API 서버로, 나머지는 웹 서버로 보내는 식으로 나눠요. HTTPS의 TLS 처리도 맡을 수 있어요. 4계층 로드 밸런서는 내용을 보지 않는 대신 빠르고, 아주 많은 요청을 감당해요.
+
+## 상태 확인
+
+로드 밸런서는 대상마다 정해 둔 주소로 상태 확인 요청을 주기적으로 보내요. 실패가 정해 둔 횟수만큼 이어지면 그 대상을 빼고, 성공이 정해 둔 횟수만큼 이어지면 다시 넣어요.
+
+AWS Application Load Balancer의 기본값으로 계산해 보면 이래요.
+
+| 설정 | 기본값 | 뜻 |
+| --- | --- | --- |
+| 확인 간격 | 30초 | 대상마다 30초에 한 번 찔러 봐요 |
+| 비정상 기준 | 2번 연속 실패 | 1분 안쪽에 빠져요 |
+| 정상 기준 | 5번 연속 성공 | 다시 들어오기까지 약 2분 30초 걸려요 |
+
+그래서 대상이 죽고 나서 빠지기까지 1분 가까이 걸릴 수 있어요. 그사이 그 대상으로 간 요청은 실패해요. 반대로 대상이 살아난 뒤에도 바로 요청을 받지는 않아요.
+
+모든 대상이 동시에 상태 확인에 실패하면 어떻게 될까요? AWS Application Load Balancer는 이때 상태와 상관없이 모든 대상에 요청을 보내요. 이걸 fail open이라고 해요.
+
+## 가용 영역을 넘나들며 나누기
+
+로드 밸런서는 가용 영역마다 노드를 두고, 각 노드가 요청을 나눠요. 이때 다른 가용 영역의 대상에도 보낼지(cross-zone)에 따라 결과가 달라요.
+
+<Figure caption="AWS 문서의 예시예요. 가용 영역 A에 대상 2대, B에 8대가 있어요. 넘나들기를 끄면 A의 대상이 B보다 네 배 많은 요청을 받아요.">
+  <Compare
+    columns={['넘나들기 켬', '넘나들기 끔']}
+    rows={[
+      { label: 'A의 대상 2대', values: ['한 대에 10%', '한 대에 25%'] },
+      { label: 'B의 대상 8대', values: ['한 대에 10%', '한 대에 6.25%'] },
+    ]}
+  />
+</Figure>
+
+넘나들기를 끄면 각 노드가 자기 가용 영역의 대상에만 보내요. 그래서 가용 영역마다 대상 수가 다르면 대상끼리 부하가 크게 달라져요. Application Load Balancer는 로드 밸런서 수준에서 늘 켜져 있고, 대상 그룹에서 끌 수 있어요.
+
+## 모니터링에서는
+
+<Figure caption="같은 5분 동안의 오류 예시예요. 대상이 만든 5xx는 없는데, 로드 밸런서가 만든 5xx가 쌓였어요. 앱 로그에는 이 오류가 남지 않아요.">
+  <StatTile label="LB가 만든 5xx" value="184" unit="건" tone="warn" />
+  <StatTile label="대상이 만든 5xx" value="0" unit="건" />
+  <StatTile label="정상 대상" value="0" unit="/ 3대" tone="warn" />
+</Figure>
+
+로드 밸런서 지표는 오류를 누가 만들었는지 나눠 줘요. AWS Application Load Balancer에서는 이렇게 봐요.
+
+| 지표 | 뜻 |
+| --- | --- |
+| RequestCount | 로드 밸런서가 처리한 요청 수 |
+| TargetResponseTime | 요청이 로드 밸런서를 떠나 대상이 응답 헤더를 보내기 시작할 때까지 |
+| HTTPCode_ELB_5XX_Count | 로드 밸런서가 직접 만든 5xx 수 |
+| HTTPCode_Target_5XX_Count | 대상이 만든 5xx 수 |
+| HealthyHostCount | 정상으로 판단한 대상 수 |
+
+로드 밸런서가 만든 5xx는 대상까지 가지 못했거나 대상이 제대로 답하지 못했을 때 생겨요. 이런 오류는 앱 로그에 남지 않아서, 로드 밸런서 지표로만 보여요. 상태 코드의 뜻은 <Term slug="apm/http-basics">HTTP 요청과 응답</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>사용자는 오류를 겪는데 앱 로그가 깨끗하다면, 로드 밸런서가 만든 5xx를 보세요. 대상까지 가지 못한 오류는 앱에 남지 않아요.</Check>
+  <Check>정상 대상 수가 0인데 요청이 계속 대상에 간다고 놀랐다면 다시 보세요. 모든 대상이 실패하면 fail open으로 모두에게 보내요.</Check>
+  <Check>상태 확인 주소가 DB까지 확인하는 무거운 주소라면 다시 보세요. DB가 잠깐 느려지면 멀쩡한 대상이 한꺼번에 빠질 수 있어요.</Check>
+  <Check>TargetResponseTime을 사용자 응답시간으로 본다면 다시 보세요. 로드 밸런서와 사용자 사이의 네트워크 시간은 들어 있지 않아요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 리스너 규칙
+
+  Application Load Balancer는 요청을 받으면 리스너 규칙을 우선순위 순서로 확인해요. 처음 맞는 규칙이 요청을 보낼 대상 그룹을 정해요.
+
+  ### 상태 확인의 다른 기본값
+
+  확인 간격은 5~300초 사이로 바꿀 수 있어요. 대상이 Lambda 함수면 기본 간격이 35초예요. 새로 등록한 대상은 상태 확인을 한 번 통과해야 정상으로 봐요.
+</Deeper>

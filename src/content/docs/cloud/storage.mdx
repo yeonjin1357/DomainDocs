@@ -1,0 +1,121 @@
+---
+title: 블록·파일·오브젝트 저장소
+summary: 서버에 붙이는 디스크, 여럿이 함께 쓰는 공유 폴더, HTTP로 넣고 꺼내는 창고가 있어요.
+domain: cloud
+type: concept
+stage: basics
+order: 50
+icon: cloud
+keywords: [block storage, EBS, Managed Disks, file storage, EFS, Azure Files, object storage, S3, Blob Storage, bucket]
+related: [cloud/virtual-machines, server/disk-io, server/filesystem-and-capacity, kubernetes/config-and-storage]
+sources:
+  - title: AWS — Amazon EBS volumes
+    url: https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volumes.html
+  - title: AWS — Amazon EBS General Purpose SSD volumes
+    url: https://docs.aws.amazon.com/ebs/latest/userguide/general-purpose.html
+  - title: AWS — What is Amazon Elastic File System?
+    url: https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html
+  - title: AWS — What is Amazon S3?
+    url: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
+  - title: AWS — Organizing objects in the Amazon S3 console by using folders
+    url: https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-folders.html
+  - title: AWS — Data protection in Amazon S3
+    url: https://docs.aws.amazon.com/AmazonS3/latest/userguide/DataDurability.html
+  - title: Microsoft Learn — Introduction to Azure Storage
+    url: https://learn.microsoft.com/en-us/azure/storage/common/storage-introduction
+updated: 2026-10-21
+---
+
+<KeyPoints>
+  <Point title="블록 저장소는 서버에 붙는 디스크예요">
+    서버 한 대에 붙여 하드디스크처럼 써요. 운영체제와 데이터베이스 파일이 여기 놓여요.
+  </Point>
+  <Point title="파일 저장소는 함께 쓰는 공유 폴더예요">
+    여러 서버가 네트워크로 같은 폴더를 붙여 함께 읽고 써요.
+  </Point>
+  <Point title="오브젝트 저장소는 HTTP로 쓰는 창고예요">
+    파일을 통째로 이름(키)을 붙여 넣고 꺼내요. 거의 끝없이 늘어나서 백업과 이미지 보관에 써요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="실제 창고는 꽉 차면 더 못 넣지만, 오브젝트 저장소는 용량을 미리 정하지 않고 넣는 만큼 늘어나요. 여러 곳에 나눠 보관해서 잃어버릴 일도 아주 드물어요.">
+  블록 저장소는 내 방에 들여놓은 캐비닛, 파일 저장소는 층 공용 캐비닛이에요. 오브젝트 저장소는 빌딩 밖 물품 보관 창고예요. 상자째 맡기고 번호표(키)로 다시 찾아요.
+</Analogy>
+
+## 세 가지 저장소
+
+<Figure caption="세 저장소는 붙는 곳과 쓰는 방법이 달라요. 서버 안에서 보면 블록은 디스크, 파일은 공유 폴더, 오브젝트는 HTTP 주소로 보여요.">
+  <Flow
+    ariaLabel="서버에 블록 디스크가 붙어 있고, 서버 두 대가 같은 공유 파일 저장소를 붙이며, 서버가 HTTP로 오브젝트 저장소에 파일을 넣고 꺼내는 구조도"
+    nodes={[
+      { id: 'blk', label: '블록 디스크', col: 0, row: 0, note: '서버 한 대에' },
+      { id: 's1', label: '서버 1', col: 0, row: 1, tone: 'accent' },
+      { id: 's2', label: '서버 2', col: 2, row: 1, tone: 'accent' },
+      { id: 'file', label: '파일 저장소', col: 1, row: 0, note: '함께 붙여요' },
+      { id: 'obj', label: '오브젝트', col: 1, row: 2, note: 'HTTP로' },
+    ]}
+    edges={[
+      { from: 's1', to: 'blk', both: true },
+      { from: 's1', to: 'file', both: true },
+      { from: 's2', to: 'file', both: true },
+      { from: 's1', to: 'obj', dashed: true },
+      { from: 's2', to: 'obj', dashed: true },
+    ]}
+  />
+</Figure>
+
+| 종류 | 붙는 곳 | 쓰는 방법 | AWS | Azure |
+| --- | --- | --- | --- | --- |
+| 블록 | 서버 한 대 | 디스크처럼 파일 시스템을 만들어 써요 | EBS | Managed Disks |
+| 파일 | 여러 서버 | 네트워크 공유 폴더로 붙여요 | EFS | Azure Files |
+| 오브젝트 | 어디서나 | HTTP API로 넣고 꺼내요 | S3 | Blob Storage |
+
+## 블록 저장소
+
+<Term term="cloud/block-storage">블록 저장소</Term>는 서버에 붙이는 가상 디스크예요. AWS의 EBS 볼륨은 인스턴스에 붙이면 물리 하드디스크처럼 쓸 수 있어요. 인스턴스와 따로 남아서, 인스턴스를 멈춰도 데이터가 그대로예요.
+
+볼륨과 인스턴스는 같은 가용 영역에 있어야 해요. 다른 가용 영역의 인스턴스에 붙이려면 스냅숏을 떠서 그 가용 영역에 새 볼륨을 만들어요.
+
+블록 디스크의 성능은 IOPS(초당 읽기·쓰기 횟수)와 처리량(초당 옮기는 양)으로 정해요. 범용 SSD인 gp3는 기본으로 3,000 IOPS가 요금에 들어 있고, 더 원하면 추가 요금을 내고 올려요. IOPS를 읽는 법은 서버·OS의 <Term slug="server/disk-io">디스크 I/O</Term>와 같아요.
+
+## 파일 저장소
+
+<Term term="cloud/file-storage">파일 저장소</Term>는 여러 서버가 네트워크로 함께 붙이는 공유 폴더예요. AWS EFS는 NFS 프로토콜을 써서, 서버에서는 평범한 폴더처럼 보여요. 파일을 넣고 지우는 만큼 용량이 알아서 늘고 줄어요.
+
+여러 서버가 같은 파일을 함께 읽고 써야 할 때 써요. 업로드한 파일을 여러 웹 서버가 함께 보여 줘야 하는 경우가 그 예예요.
+
+## 오브젝트 저장소
+
+<Term term="cloud/object-storage">오브젝트 저장소</Term>는 파일을 통째로 넣고 꺼내는 저장소예요. AWS S3에서는 이렇게 불러요.
+
+- 버킷은 객체를 담는 그릇이에요.
+- 객체는 파일과 그 파일을 설명하는 메타데이터예요.
+- 키는 버킷 안에서 객체를 가리키는 하나뿐인 이름이에요.
+
+S3는 폴더 없이 평평한 구조예요. 콘솔에서 폴더처럼 보이는 건 `logs/2026/10/app.log`처럼 키의 앞부분이 같은 객체를 묶어 보여 주는 거예요.
+
+S3는 넣거나 지운 직후에 읽어도 바로 새 내용이 보여요. 이걸 강한 read-after-write 일관성이라고 해요.
+
+일반 저장 등급은 1년 동안 객체를 99.999999999% 지키도록 설계됐어요. 그래서 백업, 로그 보관, 이미지·동영상 같은 큰 파일을 두는 데 많이 써요.
+
+## 모니터링에서는
+
+블록 디스크는 서버 디스크처럼 사용률, IOPS, 처리량을 봐요. 다만 클라우드 디스크는 볼륨마다 낼 수 있는 IOPS와 처리량에 한도가 있어요. 사용률은 여유로운데 디스크가 느리다면, 볼륨의 한도에 붙어 있는지 봐요.
+
+오브젝트 저장소는 디스크처럼 가득 차지 않아요. 대신 저장한 양과 요청 수가 그대로 요금이 돼요. 그래서 용량 경보보다 저장량과 요청 수의 추세를 봐요.
+
+<Checkpoints>
+  <Check>EBS 볼륨을 다른 가용 영역의 인스턴스에 붙이려 한다면 다시 보세요. 볼륨과 인스턴스는 같은 가용 영역에 있어야 해요.</Check>
+  <Check>여러 서버가 같은 파일을 함께 써야 하는데 블록 디스크를 쓰고 있다면, 파일 저장소나 오브젝트 저장소를 보세요.</Check>
+  <Check>디스크 사용률은 낮은데 I/O 대기가 길다면, 볼륨의 IOPS·처리량 한도부터 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 여러 인스턴스에 붙이는 EBS
+
+  EBS 볼륨은 보통 인스턴스 하나에 붙여요. 볼륨과 인스턴스 유형에 따라서는 Multi-Attach로 여러 인스턴스에 동시에 붙일 수도 있어요. 하지만 그때는 여러 서버의 쓰기가 서로 꼬이지 않게 따로 챙겨야 해요.
+
+  ### 디스크 종류를 바꾸기
+
+  최신 세대 볼륨과 인스턴스에서는 운영 중에도 크기를 늘리거나 IOPS·볼륨 종류를 바꿀 수 있어요.
+</Deeper>
