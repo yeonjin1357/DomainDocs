@@ -1,0 +1,37 @@
+questions:
+  - id: sockets-count
+    type: ox
+    prompt: 프로세스가 맺은 네트워크 연결(소켓)도 열 수 있는 파일 수 한도에 들어가나요?
+    answer: true
+    explain: 리눅스는 파일, 소켓, 파이프를 모두 파일 디스크립터 번호로 다뤄요. 연결이 많은 서버는 소켓만으로도 한도에 닿아요.
+  - id: soft-vs-hard
+    type: choice
+    prompt: Max open files의 소프트 한도와 하드 한도 가운데, 실제로 열기를 막는 값은?
+    choices:
+      - 소프트 한도
+      - 하드 한도
+      - 둘 중 큰 값
+      - 서버 전체 최대치(file-max)
+    answer: 0
+    explain: 커널은 소프트 한도로 막아요. 하드 한도는 소프트 한도를 올릴 수 있는 천장이에요.
+  - id: leak-or-low-limit
+    type: choice
+    prompt: 밤에 트래픽이 줄어도 한 프로세스의 열린 fd 수가 계단처럼 오르기만 해요. 무엇을 의심할까요?
+    choices:
+      - 연결이나 파일을 열고 닫지 않는 코드
+      - 소프트 한도가 너무 높음
+      - 서버의 디스크가 느림
+      - 시간 동기화가 어긋남
+    answer: 0
+    explain: 쓰고 나서 닫으면 트래픽이 줄 때 fd도 줄어야 해요. 늘기만 하면 새는 거라, 한도를 올려도 오류가 늦게 날 뿐이에요.
+  - id: limits-conf-service
+    type: ox
+    prompt: /etc/security/limits.conf의 nofile을 올리면, systemd가 띄운 서비스의 한도도 함께 올라가나요?
+    answer: false
+    explain: limits.conf는 로그인 세션에 걸리는 설정이에요. systemd 서비스는 유닛의 LimitNOFILE을 따라요.
+  - id: emfile-name
+    type: input
+    prompt: Too many open files 오류에서 말하는 '열린 파일'은 프로세스가 받은 번호로 세요. 이 번호를 뭐라고 부를까요?
+    answer: [파일 디스크립터, fd, file descriptor, 파일 기술자]
+    term: server/file-descriptor
+    explain: 프로세스가 파일, 소켓, 파이프를 열 때마다 커널이 붙여 주는 번호예요. /proc 아래 그 프로세스의 fd 폴더에서 볼 수 있어요.

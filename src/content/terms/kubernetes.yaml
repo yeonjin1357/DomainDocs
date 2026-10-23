@@ -226,3 +226,23 @@ terms:
     aliases: [event, events, kubectl events, Warning event, 경고 이벤트, event-ttl]
     short: 클러스터에서 무슨 일이 왜 일어났는지 남기는 짧은 기록이에요. 기본 1시간 뒤 지워져요.
     doc: kubernetes/reading-events
+  - id: k8s-namespace
+    name: 네임스페이스(쿠버네티스)
+    en: Kubernetes namespace
+    aliases: [kubernetes namespace, k8s namespace, ns]
+    short: 한 클러스터 안의 객체를 팀이나 환경별로 나눠 담는 이름 공간이에요.
+    analogy: 한 항구 안을 회사별 구역으로 나눈 것과 같아요.
+    doc: kubernetes/rbac
+  - id: rbac
+    name: RBAC
+    en: Role-Based Access Control
+    aliases: [역할 기반 접근 제어, Role, ClusterRole, RoleBinding, ClusterRoleBinding]
+    short: 역할에 적은 권한을 사용자나 서비스 계정에 묶어 주는 쿠버네티스의 권한 방식이에요.
+    analogy: 권한 목록을 출입증에 찍어 주는 항구 출입 관리와 같아요.
+    doc: kubernetes/rbac
+  - id: service-account
+    name: 서비스 계정
+    en: ServiceAccount
+    aliases: [ServiceAccount, service account, SA, 서비스 어카운트]
+    short: 사람이 아니라 파드 안의 프로그램이 API를 부를 때 쓰는 계정이에요.
+    doc: kubernetes/rbac

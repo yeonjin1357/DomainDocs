@@ -1,0 +1,142 @@
+---
+title: 권한과 서비스 계정(RBAC)
+summary: 쿠버네티스는 허락한 일만 하게 해요. 역할에 권한을 적고, 바인딩으로 누구에게 줄지 정해요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 85
+icon: container
+keywords: [RBAC, Role, ClusterRole, RoleBinding, ClusterRoleBinding, ServiceAccount, 서비스 계정, 네임스페이스, Forbidden, auth can-i]
+related: [kubernetes/overview, kubernetes/config-and-storage, kubernetes/reading-events, kubernetes/rollout-stuck]
+sources:
+  - title: Kubernetes — Using RBAC Authorization
+    url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  - title: Kubernetes — Authorization (403, kubectl auth can-i)
+    url: https://kubernetes.io/docs/reference/access-authn-authz/authorization/
+  - title: Kubernetes — Service Accounts
+    url: https://kubernetes.io/docs/concepts/security/service-accounts/
+  - title: Kubernetes — Configure Service Accounts for Pods
+    url: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  - title: Kubernetes — Namespaces
+    url: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+  - title: Kubernetes — Role Based Access Control Good Practices
+    url: https://kubernetes.io/docs/concepts/security/rbac-good-practices/
+updated: 2026-10-23
+---
+
+<KeyPoints>
+  <Point title="허락한 일만 할 수 있어요">
+    API 서버는 요청마다 누가 무엇을 하려는지 보고, 허락된 게 없으면 403 Forbidden으로 막아요. RBAC에는 금지 규칙이 없고, 허락을 더하기만 해요.
+  </Point>
+  <Point title="역할에 적고, 바인딩으로 줘요">
+    역할(Role)에 '어떤 자원에 어떤 동작'을 적고, 바인딩(RoleBinding)으로 그 역할을 사용자나 서비스 계정에 줘요.
+  </Point>
+  <Point title="파드는 서비스 계정으로 API를 불러요">
+    파드 안의 프로그램은 서비스 계정 이름으로 API를 불러요. 권한을 따로 주지 않으면 거의 아무것도 못 해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="실제 출입 관리는 금지 명단도 두지만, RBAC에는 금지 규칙이 없어요. 찍어 준 허락만 모여요.">
+  RBAC는 항구 출입 관리와 비슷해요. 역할은 '3번 구역 창고 열람' 같은 권한 목록이고, 바인딩은 그 목록을 누군가의 출입증에 찍어 주는 일이에요.
+</Analogy>
+
+## 네임스페이스로 나눠요
+
+권한을 말하려면 먼저 범위를 알아야 해요. <Term term="kubernetes/k8s-namespace">네임스페이스</Term>는 한 클러스터 안의 객체를 팀이나 환경별로 나눠 담는 이름 공간이에요. 컨테이너를 격리하는 <Term term="kubernetes/linux-namespace">리눅스 네임스페이스</Term>와는 다른 것이에요.
+
+클러스터에는 처음부터 `default`, `kube-system` 같은 네임스페이스가 있어요. 파드, 서비스, Secret은 네임스페이스 안에 들어가요. 노드처럼 클러스터 전체에 하나뿐인 객체는 어느 네임스페이스에도 속하지 않아요.
+
+## 요청이 허락되기까지
+
+<Figure caption="API 서버는 먼저 누가 보냈는지 확인(인증)하고, 그다음 그 일을 해도 되는지(인가) 봐요. RBAC는 인가 단계에서 쓰여요.">
+  <Flow
+    ariaLabel="파드의 요청이 인증과 인가를 거쳐, 허락되면 처리되고 허락이 없으면 403으로 거부되는 구조도"
+    nodes={[
+      { id: 'req', label: '파드의 요청', col: 0, row: 0, note: '토큰을 실어요' },
+      { id: 'authn', label: '인증', col: 1, row: 0, note: '누구인가' },
+      { id: 'authz', label: '인가', col: 2, row: 0, note: 'RBAC', tone: 'accent' },
+      { id: 'deny', label: '거부', col: 1, row: 1, note: '403', tone: 'warn' },
+      { id: 'ok', label: '처리', col: 2, row: 1, note: '허락됨' },
+    ]}
+    edges={[
+      { from: 'req', to: 'authn' },
+      { from: 'authn', to: 'authz' },
+      { from: 'authz', to: 'ok', tone: 'accent' },
+      { from: 'authz', to: 'deny', dashed: true },
+    ]}
+  />
+</Figure>
+
+인가는 '이 사용자가 이 네임스페이스에서 파드 목록을 봐도 되나'처럼 묻고 답해요. 읽는 동작은 `get`(하나 보기), `list`(목록 보기), `watch`(바뀔 때마다 받기)예요. 바꾸는 동작은 `create`, `update`, `delete` 등이에요.
+
+## 역할과 바인딩
+
+<Figure caption="역할은 한 네임스페이스에 쓰는 Role과 클러스터 전체에 쓰는 ClusterRole로 나뉘어요. 바인딩도 RoleBinding과 ClusterRoleBinding으로 나뉘어요.">
+  <Compare
+    columns={['Role', 'ClusterRole']}
+    rows={[
+      { label: '범위', values: ['한 네임스페이스', '클러스터 전체'] },
+      { label: '다룰 수 있는 것', values: ['그 네임스페이스의 자원', '모든 네임스페이스의 자원과 노드'] },
+      { label: '예', values: ['dev의 파드 읽기', '모든 파드와 노드 읽기'] },
+    ]}
+  />
+</Figure>
+
+역할에는 규칙(rules)을 적어요. 아래는 파드와 노드를 읽기만 하는 ClusterRole의 규칙이에요. `apiGroups`의 빈 문자열은 파드, 노드 같은 기본 자원 묶음을 뜻해요.
+
+```yaml
+rules:
+- apiGroups: [""]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list", "watch"]
+```
+
+바인딩은 이 역할을 받을 대상(subjects)과 역할 이름을 함께 적어요. 대상은 사용자, 그룹, 서비스 계정이에요. RoleBinding으로 ClusterRole을 묶으면, 그 바인딩이 있는 네임스페이스에서만 권한이 생겨요.
+
+## 파드는 서비스 계정으로 불러요
+
+사람은 사용자 계정으로, 파드 안의 프로그램은 <Term term="kubernetes/service-account">서비스 계정</Term>으로 API를 불러요. 네임스페이스마다 `default`라는 서비스 계정이 있고, 따로 정하지 않은 파드는 이 계정을 써요.
+
+파드에는 서비스 계정의 토큰이 `/var/run/secrets/kubernetes.io/serviceaccount/` 아래에 들어가요. 프로그램은 이 토큰을 실어 API 서버에 요청해요.
+
+쿠버네티스의 기본 RBAC 정책은 `kube-system` 밖의 서비스 계정에 권한을 주지 않아요. API 목록을 알아보는 정도만 할 수 있어요. 그래서 API를 읽는 프로그램에는 서비스 계정을 따로 만들고 필요한 역할을 묶어 줘요.
+
+## 모니터링에서는
+
+<Figure caption="권한이 모자란 모니터링 에이전트의 예시예요. 파드 목록은 읽지만 노드를 읽지 못해서, 노드 화면만 비어요.">
+  <StatTile label="파드 list" value="yes" />
+  <StatTile label="노드 list" value="no" tone="warn" note="403 Forbidden" />
+</Figure>
+
+모니터링 에이전트는 파드, 노드, 이벤트 같은 정보를 API로 읽어요. 그래서 보통 클러스터 전체를 읽는 ClusterRole을 받아요. 권한이 빠진 자원은 오류 화면 없이 그 부분만 비어 보여요.
+
+에이전트 로그에는 `forbidden`과 함께 어느 계정이 어떤 자원을 어떤 동작으로 못 했는지 남아요. 서비스 계정은 `system:serviceaccount:<네임스페이스>:<이름>` 꼴의 이름으로 나와요.
+
+권한은 `kubectl auth can-i`로 물어볼 수 있어요. `--as`로 그 서비스 계정인 척 물으면 yes나 no로 답해요. 아래는 `mon` 네임스페이스의 `agent` 계정이 노드 목록을 볼 수 있는지 물어요.
+
+```text
+SA=system:serviceaccount:mon:agent
+kubectl auth can-i list nodes \
+  --as "$SA"
+```
+
+<Checkpoints>
+  <Check>모니터링 화면에서 한 종류의 자원만 비어 있다면, 에이전트 로그에서 `forbidden`을 찾아보세요. 수집 실패가 아니라 권한이 빠진 거예요.</Check>
+  <Check>에이전트에 `cluster-admin`처럼 모든 걸 허락하는 역할을 줬다면 다시 보세요. 읽기만 하는 에이전트라면 `get`, `list`, `watch`면 충분해요.</Check>
+  <Check>Role과 RoleBinding만 만들었는데 다른 네임스페이스나 노드가 보이지 않는다면, 범위가 한 네임스페이스라서예요. 클러스터 전체를 보려면 ClusterRole과 ClusterRoleBinding이 필요해요.</Check>
+  <Check>API를 부르지 않는 앱 파드라면 `automountServiceAccountToken: false`로 토큰을 끄세요. 쓰지 않는 토큰은 새어 나갈 거리만 돼요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 금지 규칙이 없다는 것
+
+  RBAC는 허락을 더하기만 해서, 여러 바인딩이 있으면 그 권한이 모두 합쳐져요. 한 계정에서 권한 하나를 빼려면 그 권한을 준 바인딩을 찾아 고쳐야 해요.
+
+  ### Secret 읽기 권한
+
+  Secret을 `list`하거나 `watch`할 수 있으면 그 안의 값까지 받아요. 그래서 쿠버네티스의 RBAC 모범 사례 문서는 Secret 목록 권한을 조심해서 주라고 해요. Secret은 <Term slug="kubernetes/config-and-storage">설정과 저장소</Term>에서 다뤘어요.
+
+  ### 토큰 자동 마운트 끄기
+
+  `automountServiceAccountToken: false`는 서비스 계정이나 파드 명세에 적을 수 있어요. 둘 다 적혀 있으면 파드 명세의 값이 이겨요.
+</Deeper>

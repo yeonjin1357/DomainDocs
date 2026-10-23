@@ -1,0 +1,125 @@
+---
+title: 캐시와 적중률
+summary: 캐시는 자주 쓰는 답을 가까이 둬요. 적중률이 조금만 떨어져도 DB로 가는 요청은 몇 배가 돼요.
+domain: apm
+type: concept
+stage: basics
+order: 55
+icon: layers
+keywords: [cache, 캐시, cache hit ratio, 적중률, TTL, eviction, LRU, Redis, cache-aside, cache stampede]
+related: [apm/overview, apm/slow-response, database/buffer-cache-hit-ratio, foundations/counters-and-rate]
+sources:
+  - title: Redis — INFO (keyspace_hits, keyspace_misses, evicted_keys, expired_keys)
+    url: https://redis.io/docs/latest/commands/info/
+  - title: Redis — Key eviction (maxmemory, maxmemory-policy)
+    url: https://redis.io/docs/latest/develop/reference/eviction/
+  - title: Redis — redis.conf (maxmemory-policy 기본값)
+    url: https://github.com/redis/redis/blob/unstable/redis.conf
+  - title: AWS ElastiCache — Caching strategies (lazy loading, cache miss penalty, TTL)
+    url: https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html
+  - title: AWS Whitepaper — Database Caching Strategies Using Redis (Cache validity, TTL jitter)
+    url: https://docs.aws.amazon.com/whitepapers/latest/database-caching-strategies-using-redis/cache-validity.html
+updated: 2026-10-23
+---
+
+<KeyPoints>
+  <Point title="자주 쓰는 답을 가까이 둬요">
+    DB나 외부 API에서 가져온 결과를 메모리에 잠시 두고, 같은 요청에는 거기서 바로 답해요. 응답이 빨라지고, 뒤에 있는 DB의 일도 줄어요.
+  </Point>
+  <Point title="적중률이 조금 떨어지면 DB는 몇 배 맞아요">
+    적중률이 90%에서 80%로 떨어지면 DB로 가는 요청은 10%에서 20%, 곧 2배가 돼요.
+  </Point>
+  <Point title="캐시의 값은 늦을 수 있어요">
+    캐시에 둔 동안 원본이 바뀌어도, 지워질 때까지는 옛 값을 줘요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="환율표는 하루 한 번 바뀌지만, 앱의 데이터는 언제 바뀔지 몰라요. 그래서 얼마 동안 믿고 쓸지(TTL)를 정해 둬요.">
+  <Term term="apm/cache">캐시</Term>는 창구 직원이 자주 묻는 환율표를 책상에 꺼내 두는 것과 비슷해요. 손님이 물을 때마다 금고(DB)까지 가지 않고 책상에서 바로 답해요.
+</Analogy>
+
+## 캐시를 읽는 순서
+
+<Figure caption="가장 흔한 방식(cache-aside)이에요. 앱이 먼저 캐시를 보고, 없으면 DB에서 가져와 캐시에 넣어 둬요. 다음 같은 요청은 첫 줄에서 끝나요.">
+  <Sequence
+    ariaLabel="앱이 캐시에 값을 물었는데 없어서, DB에서 읽어 오고 캐시에 5분 동안 저장하는 순서도"
+    participants={['앱', '캐시', 'DB']}
+    messages={[
+      { from: '앱', to: '캐시', label: '상품 42 있어요?' },
+      { from: '캐시', to: '앱', label: '없어요 (miss)', dashed: true, tone: 'warn' },
+      { from: '앱', to: 'DB', label: '상품 42 조회' },
+      { from: 'DB', to: '앱', label: '결과', dashed: true },
+      { from: '앱', to: '캐시', label: '저장 (TTL 5분)', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+캐시에서 찾으면 적중(hit), 없으면 실패(miss)라고 해요. 적중이면 DB에 가지 않아서 몇 밀리초 안에 끝나요. 실패하면 DB 조회에 캐시 확인까지 더해져서 캐시가 없을 때보다 조금 더 느려요.
+
+전체 요청 가운데 적중한 비율이 <Term term="apm/cache-hit-ratio">캐시 적중률</Term>이에요. DB로 가는 요청은 '1 − 적중률'만큼이라, 적중률 99%와 98%는 DB 입장에서 2배 차이예요.
+
+## 캐시는 어디에 두나요
+
+<Figure caption="앱 프로세스 안에 두는 캐시와, Redis처럼 따로 띄운 캐시 서버예요. 빠르기와 함께 쓰기 사이에서 골라요.">
+  <Compare
+    columns={['앱 안의 캐시', '캐시 서버(Redis 등)']}
+    rows={[
+      { label: '빠르기', values: ['네트워크 없이 바로', '네트워크를 한 번 오가요'] },
+      { label: '서버끼리', values: ['서버마다 따로 가져요', '여러 서버가 함께 써요'] },
+      { label: '앱을 다시 시작하면', values: ['비어요', '그대로 남아요'] },
+    ]}
+  />
+</Figure>
+
+앱 안의 캐시는 서버가 10대면 같은 값을 10번 가져와요. 캐시 서버는 한 번 넣으면 모든 서버가 함께 써요. 그래서 서버가 많을수록 앱 안의 캐시보다 실패가 적어요.
+
+## 언제 지워지나요
+
+캐시의 값은 두 가지로 지워져요. 하나는 정해 둔 시간(<Term term="apm/ttl">TTL</Term>)이 지나서 만료되는 거예요. TTL이 길면 적중률은 오르지만, 옛 값을 주는 시간도 길어져요.
+
+다른 하나는 메모리가 차서 쫓겨나는 <Term term="apm/eviction">축출</Term>이에요. 보통은 가장 오래 쓰지 않은 값(LRU)부터 지워요. 축출이 잦으면 다시 쓸 값까지 지워져 적중률이 떨어져요.
+
+Redis는 메모리 한도(`maxmemory`)에 닿았을 때 어떻게 할지 `maxmemory-policy`로 정해요. 기본값은 `noeviction`이라, 아무것도 지우지 않고 새 값을 넣는 명령에 오류를 돌려줘요. 캐시로 쓴다면 `allkeys-lru` 같은 축출 정책을 골라요.
+
+## 한꺼번에 비면 DB로 몰려요
+
+캐시 서버를 다시 시작하거나, 많은 키가 같은 시각에 만료되면 그 순간 모든 요청이 실패해요. 그 요청이 한꺼번에 DB로 가면 DB가 느려지고, 느린 DB 때문에 캐시를 다시 채우는 것도 늦어져요.
+
+그래서 같은 종류의 값에도 TTL에 무작위로 몇 초를 더해 만료 시각을 흩어 둬요. 캐시 서버를 바꾸거나 다시 시작할 때는 DB 부하를 함께 지켜봐요.
+
+## 모니터링에서는
+
+<Figure caption="한 Redis의 지난 5분 예시예요. 적중률은 높아 보이지만 축출이 계속 일어나고, 메모리가 한도에 거의 닿았어요.">
+  <StatTile label="적중률" value="92" unit="%" note="5분 구간" />
+  <StatTile label="축출" value="1,200" unit="개/분" tone="warn" />
+  <StatTile label="메모리 / 한도" value="97" unit="%" tone="warn" />
+</Figure>
+
+Redis는 `INFO` 명령으로 상태를 보여 줘요. `keyspace_hits`와 `keyspace_misses`로 적중률을, `evicted_keys`로 축출을, `expired_keys`로 만료를 봐요. 메모리는 `used_memory`를 `maxmemory`와 견줘요.
+
+이 값들은 Redis가 시작한 뒤로 쌓인 <Term slug="foundations/counters-and-rate">카운터</Term>예요. 그래서 적중률도 최근 5분처럼 구간을 정해 늘어난 양으로 구해요.
+
+<Checkpoints>
+  <Check>적중률을 Redis 시작 이후의 누적값으로 보고 있다면 다시 보세요. 몇 달 돈 서버라면 오늘 떨어진 적중률이 누적값에 묻혀요. 구간마다 늘어난 hits와 misses로 계산하세요.</Check>
+  <Check>`evicted_keys`가 꾸준히 늘고 있다면 메모리가 모자라 쓸 값까지 쫓겨나는 거예요. 적중률과 함께 보세요.</Check>
+  <Check>캐시용 Redis의 `maxmemory-policy`가 `noeviction`이라면, 메모리가 찼을 때 저장 명령이 오류를 내요. 앱이 이 오류를 어떻게 다루는지 보세요.</Check>
+  <Check>모든 키에 같은 TTL을 준 코드라면, 한꺼번에 만료돼 DB로 몰릴 수 있어요. 만료 시각을 흩어 두세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 적중률 계산
+
+  적중률은 늘어난 hits를 늘어난 hits와 misses의 합으로 나눈 값이에요. Redis의 `keyspace_misses`는 없는 키를 찾은 모든 횟수예요. Redis를 잠금이나 대기열 같은 다른 용도로도 쓰면, 그 명령이 키를 못 찾은 것도 함께 세여요.
+
+  DB의 버퍼 캐시도 같은 원리로 적중률을 재요. 다만 적중률이 높다고 늘 좋다고 볼 수 없는 이유가 있어요. <Term slug="database/buffer-cache-hit-ratio">버퍼 캐시 적중률의 함정</Term>에서 다뤄요.
+
+  ### Redis의 LRU는 근삿값이에요
+
+  Redis는 모든 키를 줄 세우지 않고, 키를 몇 개 골라 그중 가장 오래 쓰지 않은 것을 지워요. 고르는 수는 `maxmemory-samples`(기본 5)예요. 문서는 이 방식이 실제 LRU와 거의 같다고 해요.
+
+  `maxmemory`가 0이면 한도가 없어요. 64비트 시스템의 기본값이에요. 이때는 축출이 일어나지 않고 서버 메모리가 찰 때까지 커져요.
+
+  ### 쓰기와 캐시
+
+  원본을 바꿀 때 캐시를 어떻게 할지도 정해야 해요. 흔한 방식은 원본을 바꾼 뒤 그 키를 캐시에서 지우는 거예요. 다음 읽기가 새 값을 가져와 다시 넣어요.
+</Deeper>

@@ -196,3 +196,10 @@ terms:
     short: 커널이 남기는 메시지예요. 메모리 안의 정해진 크기 공간에 쌓여요.
     analogy: 관리자가 따로 쓰는 관리 일지와 같아요.
     doc: server/services-and-logs
+  - id: file-descriptor
+    name: 파일 디스크립터
+    en: File descriptor
+    aliases: [fd, file descriptor, 파일 기술자, FD]
+    short: 프로세스가 연 파일·소켓·파이프마다 커널이 붙여 주는 번호예요.
+    analogy: 창구에서 서류를 맡기면 받는 번호표와 같아요.
+    doc: server/too-many-open-files

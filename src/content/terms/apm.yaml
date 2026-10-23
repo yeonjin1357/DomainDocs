@@ -133,3 +133,28 @@ terms:
     aliases: [synthetic monitoring, URL 모니터링, 랩 데이터, lab data, 신세틱 모니터링]
     short: 정해 둔 곳에서 주기적으로 주소를 열어 보며 속도와 정상 여부를 재는 감시예요.
     doc: apm/page-load
+  - id: cache
+    name: 캐시
+    en: Cache
+    aliases: [cache, 캐싱, caching, Redis, Memcached]
+    short: 느린 곳에서 가져온 결과를 가까운 메모리에 잠시 두고 다시 쓰는 저장소예요.
+    analogy: 창구 직원이 자주 묻는 환율표를 책상에 꺼내 두는 것과 같아요.
+    doc: apm/cache
+  - id: cache-hit-ratio
+    name: 캐시 적중률
+    en: Cache hit ratio
+    aliases: [hit ratio, hit rate, 히트율, 적중률, cache hit, cache miss]
+    short: 캐시에서 찾은 요청이 전체 요청 가운데 몇 퍼센트인지예요.
+    doc: apm/cache
+  - id: ttl
+    name: TTL
+    en: Time to live
+    aliases: [time to live, 만료 시간, expire, 유효 시간]
+    short: 저장한 값을 얼마 동안 쓸지 정한 시간이에요. 지나면 지워져요.
+    doc: apm/cache
+  - id: eviction
+    name: 축출
+    en: Eviction
+    aliases: [eviction, evict, 쫓아내기, 퇴출, LRU]
+    short: 캐시 메모리가 차면 덜 쓰는 값을 골라 지우는 일이에요.
+    doc: apm/cache

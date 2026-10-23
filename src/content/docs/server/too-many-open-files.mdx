@@ -1,0 +1,124 @@
+---
+title: Too many open files가 날 때
+summary: 프로세스가 연 파일과 소켓 수가 한도에 닿았다는 뜻이에요. 한도와 새는 곳을 함께 봐요.
+domain: server
+type: guide
+order: 115
+icon: server
+keywords: [Too many open files, EMFILE, ENFILE, file descriptor, 파일 디스크립터, ulimit, LimitNOFILE, nofile, process_open_fds, CLOSE-WAIT]
+related: [server/processes-and-threads, server/services-and-logs, network/tcp-connections, apm/connection-pool]
+sources:
+  - title: Linux man-pages — getrlimit(2) (RLIMIT_NOFILE, 소프트·하드 한도)
+    url: https://man7.org/linux/man-pages/man2/getrlimit.2.html
+  - title: Linux man-pages — errno(3) (EMFILE, ENFILE)
+    url: https://man7.org/linux/man-pages/man3/errno.3.html
+  - title: Linux man-pages — proc_pid_fd(5)
+    url: https://man7.org/linux/man-pages/man5/proc_pid_fd.5.html
+  - title: Linux man-pages — proc_pid_limits(5)
+    url: https://man7.org/linux/man-pages/man5/proc_pid_limits.5.html
+  - title: Linux man-pages — proc_sys_fs(5) (file-max, file-nr)
+    url: https://man7.org/linux/man-pages/man5/proc_sys_fs.5.html
+  - title: Linux man-pages — limits.conf(5)
+    url: https://man7.org/linux/man-pages/man5/limits.conf.5.html
+  - title: Linux man-pages — ss(8)
+    url: https://man7.org/linux/man-pages/man8/ss.8.html
+  - title: systemd — systemd.exec(5) (LimitNOFILE)
+    url: https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html
+  - title: systemd — systemd-system.conf(5) (DefaultLimitNOFILE)
+    url: https://www.freedesktop.org/software/systemd/man/latest/systemd-system.conf.html
+  - title: Prometheus — Writing client libraries (process_open_fds, process_max_fds)
+    url: https://prometheus.io/docs/instrumenting/writing_clientlibs/
+  - title: node_exporter — filefd collector (node_filefd_allocated, node_filefd_maximum)
+    url: https://github.com/prometheus/node_exporter/blob/master/collector/filefd_linux.go
+updated: 2026-10-23
+---
+
+<Situation>
+  결제 API 로그에 `java.net.SocketException: Too many open files`가 찍히고, 새 연결을 받지 못해요. 다시 시작하면 괜찮다가 며칠 뒤 또 나요.
+
+  리눅스에서 프로세스는 파일, 소켓, 파이프를 열 때마다 번호를 하나씩 받아요. 이 번호가 <Term term="server/file-descriptor">파일 디스크립터</Term>(fd)예요.
+
+  프로세스마다 열어 둘 수 있는 fd 수에 한도가 있고, 닿으면 이 오류가 나요. 한도가 낮은지, 닫지 않고 새는지를 가려요.
+</Situation>
+
+<FirstLook>
+  <Item title="몇 개를 열었나">열린 fd 수와 한도를 견줘요.</Item>
+  <Item title="무엇을 열었나">파일인지 소켓인지 봐요.</Item>
+  <Item title="계속 느는가">줄지 않고 늘기만 하면 새는 거예요.</Item>
+</FirstLook>
+
+## 1. 열린 수와 한도를 견주세요
+
+한도는 두 개예요. 소프트 한도는 실제로 걸리는 값이고, 하드 한도는 소프트 한도를 올릴 수 있는 천장이에요. 열린 fd가 소프트 한도에 닿으면 파일 열기, 연결 받기가 `EMFILE`(Too many open files) 오류로 실패해요.
+
+**확인 방법**: 열린 수는 `ls /proc/<PID>/fd | wc -l`로 세요. 한도는 `grep 'Max open files' /proc/<PID>/limits`로 소프트와 하드를 함께 봐요. 셸에서 `ulimit -n`으로 본 값은 그 셸의 한도라, 서비스 프로세스와 다를 수 있어요.
+
+<Figure caption="결제 API 프로세스의 예시예요. 열린 fd가 소프트 한도 1,024에 거의 닿았어요. 하드 한도는 넉넉해서, 소프트 한도는 올릴 수 있어요.">
+  <StatTile label="열린 fd" value="1,021" unit="개" tone="warn" />
+  <StatTile label="소프트 한도" value="1,024" />
+  <StatTile label="하드 한도" value="524,288" />
+</Figure>
+
+## 2. 무엇을 열었는지 보세요
+
+`/proc/<PID>/fd` 안의 항목은 연 대상을 가리키는 링크예요. 파일은 파일 경로로, 소켓은 `socket:[번호]`로, 파이프는 `pipe:[번호]`로 보여요.
+
+**확인 방법**: 아래 두 명령을 돌려요. 첫째는 소켓 수를, 둘째는 같은 대상을 몇 번씩 열었는지를 많은 순서로 보여 줘요.
+
+```text
+# 소켓 수
+ls -l /proc/<PID>/fd |
+  grep -c socket
+
+# 같은 대상을 연 횟수
+ls -l /proc/<PID>/fd |
+  awk '{print $NF}' |
+  sort | uniq -c |
+  sort -n | tail
+```
+
+- **소켓이 대부분이라면**: 연결 쪽이에요. 3단계에서 연결 상태를 봐요.
+- **같은 파일이 수백 번 열렸다면**: 파일을 열고 닫지 않는 코드예요.
+
+## 3. 계속 늘기만 하는지 보세요
+
+요청이 몰리면 fd가 늘었다가, 줄면 다시 내려와야 해요. 트래픽이 줄어도 fd 수가 계단처럼 올라가기만 한다면 어딘가에서 닫지 않는 거예요. 이때는 한도를 올려도 오류가 나는 날만 늦어져요.
+
+흔한 범인은 다 쓴 연결을 닫지 않는 코드예요. 상대가 연결을 끊었는데 앱이 소켓을 닫지 않으면, 연결이 CLOSE-WAIT 상태로 남아 fd를 계속 차지해요. 원리는 <Term slug="network/tcp-connections">TCP 연결</Term>에 있어요.
+
+**확인 방법**: `ss -tanp state close-wait`로 CLOSE-WAIT 연결과 그 연결을 가진 프로세스를 봐요. 이 수가 fd 수와 함께 늘고 있다면 앱 코드에서 연결을 닫는 곳을 찾아요. 연결 풀을 쓴다면 <Term slug="apm/connection-pool">연결 풀</Term>에서 빌린 연결을 돌려주는지도 봐요.
+
+## 4. 한도가 낮다면 서비스 설정에서 올리세요
+
+systemd 문서가 밝힌 서비스의 기본 한도는 소프트 1,024, 하드 524,288이에요. 하드 한도는 배포판이 바꿔 두기도 해서, 실제 값은 1단계처럼 확인해요.
+
+연결을 많이 받는 서버라면 소프트 1,024는 금방 차요. 서비스의 유닛 파일에서 `LimitNOFILE`로 올려요.
+
+```text
+# systemctl edit <서비스>
+[Service]
+LimitNOFILE=65536
+```
+
+저장한 뒤 서비스를 다시 시작해야 새 한도가 걸려요. 유닛을 직접 고쳤다면 그 전에 `systemctl daemon-reload`도 해요.
+
+`/etc/security/limits.conf`는 사용자가 로그인한 세션에 걸리는 설정이에요. 그래서 이 파일만 고치면 systemd가 띄운 서비스의 한도는 그대로예요.
+
+## 5. 서버 전체가 찼는지 보세요
+
+오류가 `Too many open files in system`(`ENFILE`)이라면 프로세스 하나가 아니라 서버 전체의 한도에 닿은 거예요. 이 한도는 `/proc/sys/fs/file-max`에 있어요.
+
+**확인 방법**: `cat /proc/sys/fs/file-nr`의 세 숫자를 봐요. 할당된 수, 비어 있는 수, 최대치예요. 첫째 숫자가 셋째에 가깝다면 서버 전체에서 여는 수를 줄이거나 최대치를 올려요.
+
+## 모니터링에서는
+
+Prometheus 클라이언트 라이브러리는 프로세스 지표로 `process_open_fds`와 `process_max_fds`를 내요. 앞은 열린 fd 수, 뒤는 소프트 한도예요. 둘을 나눈 비율을 그리면 한도에 얼마나 가까운지 보여요.
+
+서버 전체는 node_exporter의 `node_filefd_allocated`와 `node_filefd_maximum`으로 봐요. `/proc/sys/fs/file-nr`의 첫째와 셋째 숫자예요.
+
+<Checkpoints>
+  <Check>오류가 나서 한도만 올렸다면, fd 수가 시간에 따라 계속 느는지 보세요. 새는 거라면 오류가 나는 날만 늦어져요.</Check>
+  <Check>`/etc/security/limits.conf`를 고쳤는데 서비스의 한도가 그대로라면, systemd 유닛의 `LimitNOFILE`을 보세요.</Check>
+  <Check>한도를 셸의 `ulimit -n`으로 확인했다면 다시 보세요. 서비스 프로세스의 실제 한도는 `/proc/<PID>/limits`에 있어요.</Check>
+  <Check>`process_open_fds`를 그리기만 하고 알림이 없다면, `process_max_fds`에 대한 비율에 알림을 거세요. 한도에 닿은 뒤에는 새 연결을 못 받아 이미 장애예요.</Check>
+</Checkpoints>

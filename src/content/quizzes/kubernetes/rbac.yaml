@@ -1,0 +1,37 @@
+questions:
+  - id: no-deny-rules
+    type: ox
+    prompt: RBAC에서 '이 계정은 Secret을 읽지 못한다'는 금지 규칙을 따로 만들어 권한을 막을 수 있나요?
+    answer: false
+    explain: RBAC에는 금지 규칙이 없고 허락을 더하기만 해요. 권한을 빼려면 그 권한을 준 바인딩을 찾아 고쳐요.
+  - id: role-scope
+    type: choice
+    prompt: 모니터링 에이전트가 모든 네임스페이스의 파드와 노드를 읽어야 해요. 무엇으로 권한을 줄까요?
+    choices:
+      - ClusterRole과 ClusterRoleBinding
+      - Role과 RoleBinding
+      - ConfigMap
+      - 서비스(Service)
+    answer: 0
+    explain: Role과 RoleBinding은 한 네임스페이스 안에서만 통해요. 노드처럼 클러스터 전체에 하나뿐인 자원도 ClusterRole로만 다뤄요.
+  - id: default-sa-permissions
+    type: ox
+    prompt: 서비스 계정을 따로 정하지 않은 파드는 default 서비스 계정을 쓰고, 기본으로 그 네임스페이스의 파드 목록을 읽을 수 있나요?
+    answer: false
+    explain: default 계정을 쓰는 건 맞지만, 기본 RBAC 정책은 kube-system 밖의 서비스 계정에 권한을 주지 않아요. 필요한 역할을 따로 묶어 줘요.
+  - id: empty-node-view
+    type: choice
+    prompt: 모니터링 화면에서 파드 정보는 보이는데 노드 정보만 비어 있어요. 에이전트 로그에 무엇이 있을지 먼저 찾을까요?
+    choices:
+      - nodes에 대한 forbidden 오류
+      - OOMKilled
+      - CrashLoopBackOff
+      - ImagePullBackOff
+    answer: 0
+    explain: 권한이 빠진 자원은 오류 화면 없이 그 부분만 비어요. 로그의 forbidden 줄에 어느 계정이 무엇을 못 했는지 남아요.
+  - id: sa-term
+    type: input
+    prompt: 사람이 아니라 파드 안의 프로그램이 API 서버를 부를 때 쓰는 계정을 뭐라고 부를까요?
+    answer: [서비스 계정, ServiceAccount, service account, SA]
+    term: kubernetes/service-account
+    explain: 네임스페이스마다 default 서비스 계정이 있어요. 권한은 바인딩으로 따로 줘요.
