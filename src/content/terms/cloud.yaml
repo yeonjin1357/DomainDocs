@@ -125,3 +125,16 @@ terms:
     aliases: [CloudWatch, Azure Monitor, namespace, 네임스페이스, dimension, 차원, custom metric, 사용자 지정 지표]
     short: 사업자가 서비스마다 자동으로 모으는 지표예요. 네임스페이스·이름·차원으로 구분해요.
     doc: cloud/cloud-metrics
+  - id: data-transfer-cost
+    name: 데이터 전송 요금
+    en: Data transfer cost
+    aliases: [data transfer, egress, 이그레스, 송신 요금, 전송 비용, cross-AZ]
+    short: 클라우드 밖이나 다른 AZ·리전으로 옮긴 데이터 양만큼 내는 요금이에요.
+    analogy: 빌딩 밖으로 보내는 택배에만 붙는 운송비와 같아요.
+    doc: cloud/costs
+  - id: cost-allocation-tag
+    name: 비용 할당 태그
+    en: Cost allocation tag
+    aliases: [cost allocation tag, 태그, tag, 비용 태그]
+    short: 자원에 붙인 이름표로 요금을 팀이나 서비스별로 나눠 보는 기능이에요.
+    doc: cloud/costs

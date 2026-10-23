@@ -1,0 +1,41 @@
+questions:
+  - id: inbound-free
+    type: choice
+    prompt: AWS에서 데이터 전송 요금이 붙지 않는 쪽은?
+    choices:
+      - 인터넷에서 VPC 안의 서버로 들어오는 데이터
+      - 서버에서 인터넷으로 나가는 데이터
+      - 다른 리전으로 보내는 데이터
+      - 다른 AZ의 DB와 주고받는 데이터
+    answer: 0
+    explain: 들어오는 데이터는 모든 리전에서 무료예요. 나가는 쪽, 리전 사이, AZ 사이는 GB마다 요금이 붙어요.
+  - id: stopped-vm-disk
+    type: ox
+    prompt: 가상 머신을 멈춰 두면, 붙어 있는 블록 디스크 요금도 함께 멈추나요?
+    answer: false
+    explain: 인스턴스 요금은 멈추지만 디스크는 잡아 둔 양만큼 계속 요금이 나와요. 붙지 않은 디스크와 공인 IP도 마찬가지예요.
+  - id: dimension-multiplies
+    type: choice
+    prompt: CloudWatch 사용자 지정 지표 200개에 파드 이름(파드 30개) 차원을 더했어요. 지표 수는 어떻게 될까요?
+    choices:
+      - 6,000개로 늘어요
+      - 200개 그대로예요
+      - 230개가 돼요
+      - 30개로 줄어요
+    answer: 0
+    explain: CloudWatch는 차원 조합마다 지표 하나로 세요. 200개 × 30개라 요금도 30배가 돼요.
+  - id: polling-cost
+    type: ox
+    prompt: 모니터링 제품이 CloudWatch 지표를 GetMetricData로 가져오는 일에도, 가져온 지표 수만큼 요금이 붙나요?
+    answer: true
+    explain: GetMetricData는 무료 몫 없이 요청한 지표 수로 요금을 받아요. 가져오는 간격을 줄이면 요금도 그만큼 늘어요.
+  - id: cost-data-delay
+    type: choice
+    prompt: 오늘 아침 9시부터 데이터 전송이 폭증했어요. Cost Explorer의 비용 자료에는 언제쯤 보일까요?
+    choices:
+      - 하루쯤 늦게 보일 수 있어요
+      - 1분 안에 보여요
+      - 다음 달 청구서에만 보여요
+      - 비용 자료에는 전송 요금이 나오지 않아요
+    answer: 0
+    explain: Cost Explorer는 적어도 24시간마다 자료를 새로 고쳐요. 그래서 나간 바이트 같은 사용량을 직접 감시해요.

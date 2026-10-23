@@ -1,0 +1,42 @@
+questions:
+  - id: expiry-effect
+    type: choice
+    prompt: 결제 API의 TLS 인증서가 오늘 오전 9시에 만료됐어요. 9시 이후 접속은 어떻게 될까요?
+    choices:
+      - 새 연결이 모두 TLS 단계에서 실패해요
+      - 응답이 조금씩 느려져요
+      - 암호화 없이 그대로 연결돼요
+      - 다음 갱신 때까지 경고만 남기고 정상이에요
+    answer: 0
+    explain: 기간 검사에 걸리면 연결 맺기 자체가 실패해서, 앱은 HTTP 요청도 보내지 못해요. 서서히 나빠지는 장애가 아니에요.
+  - id: renewed-but-old
+    type: ox
+    prompt: 자동 갱신으로 서버의 인증서 파일이 새것으로 바뀌었다면, 접속하는 사람은 곧바로 새 인증서를 받나요?
+    answer: false
+    explain: 웹 서버나 로드 밸런서가 새 파일을 다시 읽어야 해요. 그래서 만료 감시는 밖에서 접속해 받은 인증서로 해요.
+  - id: missing-intermediate
+    type: choice
+    prompt: 브라우저로는 잘 열리는데, 같은 주소를 curl로 부르면 unable to get local issuer certificate 오류가 나요. 먼저 의심할 것은?
+    choices:
+      - 서버가 중간 인증서를 보내지 않아요
+      - 인증서가 만료됐어요
+      - DNS가 다른 서버를 가리켜요
+      - 서버의 디스크가 찼어요
+    answer: 0
+    explain: 브라우저는 빠진 중간 인증서를 스스로 구하기도 하지만, curl은 그러지 않아요. 서버는 자기 인증서와 중간 인증서를 함께 보내야 해요.
+  - id: max-validity-2026
+    type: choice
+    prompt: 2026년 4월에 공개 CA에서 새로 발급받는 서버 인증서의 최대 유효 기간은?
+    choices:
+      - 200일
+      - 398일
+      - 100일
+      - 47일
+    answer: 0
+    explain: CA/Browser Forum 규칙으로 2026년 3월 15일부터 200일이에요. 2027년 3월부터 100일, 2029년 3월부터 47일로 줄어요.
+  - id: chain-term
+    type: input
+    prompt: 서버 인증서에서 중간 인증서를 거쳐 믿는 루트 인증서까지 서명으로 이어진 줄을 뭐라고 부를까요?
+    answer: [인증서 체인, 체인, certificate chain, chain]
+    term: network/certificate-chain
+    explain: 루트는 클라이언트가 이미 갖고 있고, 서버는 그 앞의 인증서들을 보내야 해요.

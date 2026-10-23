@@ -1,0 +1,144 @@
+---
+title: 흐름 정보(NetFlow·sFlow)
+summary: 흐름 정보는 누가 누구와 얼마나 주고받았는지 알려 줘요. 인터페이스 카운터가 못 주는 내용이에요.
+domain: network
+type: concept
+stage: basics
+order: 55
+icon: network
+keywords: [NetFlow, IPFIX, sFlow, flow, 흐름, 플로우, top talkers, 샘플링, 수집기, collector]
+related: [network/interfaces-and-traffic, network/snmp, network/interface-saturated, network/addresses]
+sources:
+  - title: RFC 7011 — IPFIX Protocol Specification (Flow 정의, 버전 10, 포트 4739)
+    url: https://www.rfc-editor.org/rfc/rfc7011
+  - title: RFC 5470 — Architecture for IP Flow Information Export (Flow expiration)
+    url: https://www.rfc-editor.org/rfc/rfc5470
+  - title: RFC 3954 — Cisco Systems NetFlow Services Export Version 9
+    url: https://www.rfc-editor.org/rfc/rfc3954
+  - title: RFC 7012 — Information Model for IPFIX
+    url: https://www.rfc-editor.org/rfc/rfc7012
+  - title: sFlow.org — sFlow Version 5 (포트 6343, 패킷 샘플링, 카운터 샘플링)
+    url: https://sflow.org/sflow_version_5.txt
+  - title: sFlow.org — Packet Sampling Basics
+    url: https://sflow.org/packetSamplingBasics/index.htm
+updated: 2026-10-23
+---
+
+<KeyPoints>
+  <Point title="흐름은 같은 길로 오간 패킷 묶음이에요">
+    출발지·목적지 주소와 포트, 프로토콜이 같은 패킷을 한 흐름으로 묶어, 바이트와 패킷 수를 세요.
+  </Point>
+  <Point title="장비가 세어 수집기로 보내요">
+    라우터나 스위치가 흐름을 세어 수집기(collector)로 보내요. NetFlow, IPFIX, sFlow가 대표적인 형식이에요.
+  </Point>
+  <Point title="표본을 떴다면 곱해서 읽어요">
+    패킷 N개 중 1개만 보는 샘플링을 쓰면, 센 값에 N을 곱해 전체를 어림해요. 작은 흐름은 아예 안 보일 수 있어요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="발송 대장은 모든 상자를 적지만, 흐름 정보는 장비 부담 때문에 상자 몇 개 중 하나만 보고 어림하기도 해요.">
+  인터페이스 카운터가 우체국을 지난 상자의 수라면, 흐름 정보는 '어느 건물 어느 부서에서 어디로 몇 상자'를 적은 발송 대장이에요.
+</Analogy>
+
+## 흐름 하나는 이렇게 생겼어요
+
+<Term term="network/flow">흐름</Term>은 같은 속성을 가진 패킷을 한 덩어리로 본 거예요. IPFIX 표준(RFC 7011)은 흐름을 '일정 시간 동안 한 관찰 지점을 지난, 공통 속성을 가진 패킷의 모임'으로 정의해요. 흔히 쓰는 속성은 아래 다섯 가지예요.
+
+| 항목 | 예 |
+| --- | --- |
+| 출발지 IP | 10.0.1.5 |
+| 목적지 IP | 10.0.9.20 |
+| 출발지 포트 | 51234 |
+| 목적지 포트 | 443 |
+| 프로토콜 | TCP |
+
+이 다섯 가지가 같은 패킷을 모아 바이트 수, 패킷 수, 처음과 마지막 시각을 적어요. 들어온 인터페이스 번호도 함께 적어서, 어느 회선을 지났는지도 알 수 있어요.
+
+## 장비가 세어 보내요
+
+<Figure caption="라우터나 스위치가 흐름 기록을 만들어 수집기로 보내요. 수집기가 기록을 모아 '누가 얼마나 썼나'를 정렬해 보여 줘요.">
+  <Flow
+    ariaLabel="라우터가 흐름 기록을 수집기로 보내고, 수집기가 모은 기록을 분석 화면이 보여 주는 구조도"
+    nodes={[
+      { id: 'router', label: '라우터', col: 0, row: 0, note: '흐름을 세요' },
+      { id: 'collector', label: '수집기', col: 2, row: 0, note: '기록을 모아요', tone: 'accent' },
+      { id: 'ui', label: '분석 화면', col: 2, row: 1, note: '상위 사용자' },
+    ]}
+    edges={[
+      { from: 'router', to: 'collector', label: '흐름 기록', tone: 'accent' },
+      { from: 'collector', to: 'ui' },
+    ]}
+  />
+</Figure>
+
+흐름을 세어 보내는 쪽을 내보내는 쪽(exporter), 받아 모으는 쪽을 수집기라고 해요. 기록은 보통 UDP로 보내요. IPFIX 수집기는 기본으로 4739번 포트에서, sFlow 수집기는 UDP 6343번 포트에서 받아요.
+
+UDP는 받았다는 확인이 없어서, 중간에 기록이 사라져도 장비는 몰라요. 수집기 쪽 방화벽이 포트를 막으면 장비는 계속 보내는데 화면은 비어 있어요.
+
+## 흐름은 끝나야 보고돼요
+
+장비는 흐름마다 기록을 메모리에 두고 세다가, 흐름이 끝났다고 보면 수집기로 보내요. 한동안 패킷이 오지 않으면 끝난 것으로 봐요.
+
+몇 시간 이어지는 백업 같은 긴 흐름은 끝날 때까지 기다리지 않아요. 정해 둔 주기마다 끊어서 그때까지 센 양을 보내요. 이 두 시간 값은 장비마다 설정하고, 기본값도 장비마다 달라요.
+
+그래서 흐름 정보는 실시간이 아니에요. 긴 흐름은 보고 주기마다 몰려서 들어오고, 짧은 그래프 구간에서는 그 시각에 한꺼번에 찍혀요.
+
+## NetFlow·IPFIX와 sFlow
+
+<Figure caption="NetFlow·IPFIX는 장비가 흐름을 묶어 센 결과를 보내요. sFlow는 패킷 몇 개 중 하나를 떠서 그 머리 부분을 보내고, 묶는 일은 수집기가 해요.">
+  <Compare
+    columns={['NetFlow·IPFIX', 'sFlow']}
+    rows={[
+      { label: '보내는 것', values: ['장비가 묶어 센 흐름 기록', '표본 패킷의 머리 부분'] },
+      { label: '흐름으로 묶는 곳', values: ['장비', '수집기'] },
+      { label: '샘플링', values: ['설정에 따라 써요', '늘 N개 중 1개'] },
+      { label: '정한 곳', values: ['Cisco(v9), IETF(IPFIX)', 'sFlow.org'] },
+    ]}
+  />
+</Figure>
+
+<Term term="network/netflow">NetFlow</Term>는 Cisco가 만든 형식이고, 그 9판(v9)을 바탕으로 IETF가 IPFIX를 표준으로 만들었어요. IPFIX 메시지의 버전 번호는 10이라, NetFlow v10이라고도 불러요.
+
+<Term term="network/sflow">sFlow</Term>는 패킷을 N개 중 1개꼴로 떠요. 인터페이스 카운터도 주기적으로 함께 보내서, 흐름과 회선 사용량을 한 수집기에서 볼 수 있어요.
+
+## 샘플링한 값은 어림이에요
+
+1/N로 샘플링했다면, 표본에서 센 양에 N을 곱해 전체를 어림해요. sFlow 문서의 예는 패킷 100만 개에서 0.25%인 2,500개를 떴고, 그중 1,000개가 음성 패킷이었어요. 그러면 음성 패킷은 40만 개쯤이라고 어림해요.
+
+표본이 많은 큰 흐름은 어림이 꽤 맞아요. 표본이 적은 작은 흐름은 크게 틀려요. 같은 문서는 한 시간에 음성 표본이 9개뿐이면 어림이 65%까지 틀릴 수 있다고 해요.
+
+## 모니터링에서는
+
+<Figure caption="한 회선의 같은 5분을 두 방법으로 본 예시예요. 흐름 정보의 합은 샘플링 어림이라 SNMP 카운터와 조금 달라요.">
+  <StatTile label="SNMP 카운터" value="820" unit="Mbps" note="회선 전체" />
+  <StatTile label="흐름 정보 합계" value="790" unit="Mbps" note="1/1000 샘플링 어림" />
+</Figure>
+
+<Term slug="network/interfaces-and-traffic">인터페이스 카운터</Term>는 회선이 얼마나 찼는지 알려 주지만, 누가 썼는지는 몰라요. 회선이 찼을 때 흐름 정보를 주소와 포트별로 정렬하면, 가장 많이 쓴 상대(top talkers)를 찾을 수 있어요.
+
+두 숫자는 딱 맞지 않아요. 샘플링 어림, 보고 시점의 차이, 흐름을 내보내지 않는 인터페이스가 이유예요. 양은 SNMP 카운터로, 누가 썼는지는 흐름 정보로 봐요.
+
+<Checkpoints>
+  <Check>샘플링한 흐름 정보를 N을 곱하지 않고 그대로 더했다면, 트래픽이 N배 작게 보여요. 수집기가 기록의 샘플링 비율을 읽어 곱하는지 보세요.</Check>
+  <Check>흐름 정보의 합이 SNMP 카운터와 몇 % 다르다고 버그로 보지 마세요. 샘플링 어림과 보고 시점이 달라요. 크게 다르다면 내보내지 않는 인터페이스가 있는지 보세요.</Check>
+  <Check>같은 트래픽이 지나는 여러 장비에서 흐름을 모두 내보낸다면, 합칠 때 두 번 세요. 회선이나 장비별로 나눠서 보세요.</Check>
+  <Check>1분 그래프에서 흐름 트래픽이 몇 분마다 솟는다면, 긴 흐름이 보고 주기마다 몰려 들어온 것일 수 있어요. 실제 트래픽은 SNMP 카운터와 견줘 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 템플릿으로 칸을 정해요
+
+  NetFlow v9와 IPFIX는 먼저 템플릿을 보내 '이 기록은 어떤 칸이 어떤 순서로 있다'고 알려요. 그 뒤의 데이터 기록은 템플릿 번호로 읽어요.
+
+  그래서 템플릿보다 먼저 온 기록은 바로 읽을 수 없어요. IPFIX 표준은 이런 기록을 잠시 쌓아 두었다가 템플릿이 오면 읽어도 된다고 해요.
+
+  IPFIX가 쓰는 칸의 이름과 번호는 정보 모델(RFC 7012)에 있어요. 1~127번 칸은 NetFlow v9와 맞춰 두었어요.
+
+  ### 흐름이 끝났다고 보는 때
+
+  IPFIX 구조 문서(RFC 5470)는 흐름이 끝나는 경우를 세 가지로 들어요. 정해진 시간 동안 패킷이 없을 때, 장비 메모리가 모자랄 때, 긴 흐름을 정해진 주기로 끊을 때예요.
+
+  ### 보내는 쪽이 놓치는 표본
+
+  sFlow 기록에는 장비가 떠야 할 표본을 처리하지 못해 버린 수(drops)가 들어 있어요. 이 값이 늘면 샘플링 비율을 낮춰(N을 키워) 장비 부담을 줄여요.
+</Deeper>

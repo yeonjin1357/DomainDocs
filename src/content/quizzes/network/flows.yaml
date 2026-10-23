@@ -1,0 +1,37 @@
+questions:
+  - id: who-used-the-link
+    type: choice
+    prompt: 회선 사용률이 95%까지 찼어요. 어느 서버가 어디로 많이 보냈는지 찾으려면 무엇을 볼까요?
+    choices:
+      - 흐름 정보(NetFlow, sFlow)
+      - SNMP 인터페이스 카운터
+      - ping 왕복 시간
+      - 장비의 Syslog
+    answer: 0
+    explain: 인터페이스 카운터는 양만 알려 줘요. 흐름 정보를 주소와 포트별로 정렬하면 가장 많이 쓴 상대가 나와요.
+  - id: sampling-multiply
+    type: choice
+    prompt: 1/1000로 샘플링한 흐름 정보에서 어떤 서버의 트래픽이 2MB로 나왔어요. 실제 양은 어림잡아 얼마일까요?
+    choices:
+      - 2GB쯤
+      - 2MB 그대로
+      - 2KB쯤
+      - 알 수 없어요
+    answer: 0
+    explain: 표본에서 센 양에 N(1,000)을 곱해 전체를 어림해요. 곱하지 않으면 트래픽이 1,000배 작게 보여요.
+  - id: flow-not-realtime
+    type: ox
+    prompt: 몇 시간 이어지는 백업 흐름은, 패킷이 지나가는 순간마다 바로바로 수집기에 보고되나요?
+    answer: false
+    explain: 장비는 흐름을 세다가 끝났거나 정해진 주기가 되면 보내요. 그래서 긴 흐름은 주기마다 몰려서 들어와요.
+  - id: small-flow-error
+    type: ox
+    prompt: 샘플링한 흐름 정보에서 아주 작은 흐름은 어림이 크게 틀리거나 아예 안 보일 수 있나요?
+    answer: true
+    explain: 표본이 적을수록 어림이 흔들려요. 큰 흐름의 양은 꽤 맞지만, 드문 작은 흐름은 표본에 안 걸리기도 해요.
+  - id: ipfix-name
+    type: input
+    prompt: NetFlow v9를 바탕으로 IETF가 표준으로 만든 흐름 정보 형식의 이름은?
+    answer: [IPFIX, IP Flow Information Export, 아이피픽스]
+    term: network/netflow
+    explain: IPFIX 메시지의 버전 번호는 10이라 NetFlow v10이라고도 불러요.

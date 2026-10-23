@@ -1,0 +1,127 @@
+---
+title: 클라우드 비용은 어디서 나올까
+summary: 클라우드 요금은 켜 둔 시간, 잡아 둔 양, 옮긴 데이터로 쌓여요. 모니터링도 요금이 들어요.
+domain: cloud
+type: concept
+stage: basics
+order: 85
+icon: cloud
+keywords: [클라우드 비용, cost, 요금, data transfer, 데이터 전송 요금, NAT 게이트웨이, 공인 IPv4, Cost Explorer, 비용 할당 태그, GetMetricData]
+related: [cloud/overview, cloud/virtual-machines, cloud/networking, cloud/cloud-metrics, foundations/cardinality-explosion]
+sources:
+  - title: AWS — Amazon EC2 On-Demand Pricing (Data Transfer within the same AWS Region)
+    url: https://aws.amazon.com/ec2/pricing/on-demand/
+  - title: AWS Architecture Blog — Overview of Data Transfer Costs for Common Architectures
+    url: https://aws.amazon.com/blogs/architecture/overview-of-data-transfer-costs-for-common-architectures/
+  - title: AWS — Pricing for NAT gateways
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/nat-gateway-pricing.html
+  - title: AWS News Blog — New AWS Public IPv4 Address Charge
+    url: https://aws.amazon.com/blogs/aws/new-aws-public-ipv4-address-charge-public-ip-insights/
+  - title: AWS — Amazon CloudWatch Pricing
+    url: https://aws.amazon.com/cloudwatch/pricing/
+  - title: AWS Price List API — 가격 목록 파일(CloudWatch, VPC, Data Transfer, us-east-1)
+    url: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/price-changes.html
+  - title: AWS — Analyzing your costs with AWS Cost Explorer
+    url: https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html
+  - title: AWS — Using AWS cost allocation tags
+    url: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html
+  - title: AWS — Activating user-defined cost allocation tags
+    url: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/activating-tags.html
+updated: 2026-10-23
+---
+
+<KeyPoints>
+  <Point title="시간, 양, 옮긴 데이터로 쌓여요">
+    서버는 켜 둔 시간만큼, 디스크는 잡아 둔 양만큼, 네트워크는 옮긴 데이터만큼 요금이 붙어요.
+  </Point>
+  <Point title="나가는 데이터에 요금이 붙어요">
+    인터넷에서 들어오는 데이터는 무료예요. 인터넷으로 나가거나 AZ와 리전 사이를 오가는 데이터에는 GB마다 요금이 붙어요.
+  </Point>
+  <Point title="모니터링도 요금이 들어요">
+    지표 수, 로그 양, 지표를 읽는 API 호출 수가 모두 요금이에요. 자주, 잘게 모을수록 비싸져요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="관리비는 한 달에 한 번 나오지만, 클라우드 요금은 시간 단위로 쌓이고 하루쯤 늦게 집계돼요. 그래서 이번 달 요금을 미리 알기 어려워요.">
+  클라우드 요금은 빌딩 관리비 고지서와 비슷해요. 켜 둔 전등만큼 전기료, 빌린 평수만큼 임대료가 나와요. 건물 밖으로 보낸 짐에는 택배비도 붙어요.
+</Analogy>
+
+## 무엇에 요금이 붙나요
+
+| 자원 | 요금을 세는 단위 |
+| --- | --- |
+| 가상 머신 | 켜 둔 시간 |
+| 블록 디스크 | 잡아 둔 GB와 기간(쓰지 않아도 냄) |
+| 오브젝트 저장소 | 저장한 GB와 요청 수 |
+| 데이터 전송 | 옮긴 GB(방향과 목적지에 따라 다름) |
+| 관리형 서비스 | 켜 둔 시간과 처리한 양 |
+
+가상 머신을 멈추면 인스턴스 요금은 멈추지만, 붙은 디스크 요금은 계속 나와요. 이 차이는 <Term slug="cloud/virtual-machines">가상 머신</Term>에서 다뤘어요.
+
+공인 IPv4 주소도 요금이 있어요. AWS는 2024년 2월부터 공인 IPv4 주소마다 시간당 0.005달러를 받아요. 서버에 붙어 있든 아니든 같아서, 한 달(720시간)이면 주소 하나에 3.6달러예요.
+
+## 데이터 전송 요금
+
+<Figure caption="AWS us-east-1 기준이에요. 들어오는 건 무료, 인터넷으로 나가는 건 GB당 0.09달러부터, AZ 사이는 방향마다 GB당 0.01달러예요.">
+  <Flow
+    ariaLabel="인터넷에서 VPC로 들어오는 전송은 무료, VPC에서 인터넷으로 나가는 전송과 AZ 사이 전송은 유료인 구조도"
+    nodes={[
+      { id: 'net', label: '인터넷', col: 0, row: 0 },
+      { id: 'a', label: 'AZ A의 서버', col: 2, row: 0, tone: 'accent' },
+      { id: 'b', label: 'AZ B의 DB', col: 2, row: 1 },
+    ]}
+    edges={[
+      { from: 'net', to: 'a', label: '들어옴 무료', both: false },
+      { from: 'a', to: 'b', both: true, tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+<Term term="cloud/data-transfer-cost">데이터 전송 요금</Term>은 방향과 목적지로 정해져요. 인터넷에서 들어오는 데이터는 모든 리전에서 무료예요. 인터넷으로 나가는 데이터는 리전마다 값이 다르고, us-east-1에서는 첫 10TB까지 GB당 0.09달러예요.
+
+같은 리전 안이라도 AZ를 건너면 요금이 붙어요. us-east-1에서 EC2, RDS 같은 서비스가 AZ 사이로 주고받는 데이터는 방향마다 GB당 0.01달러예요. 앱 서버와 DB가 다른 AZ에 있으면, 질의와 결과가 오갈 때마다 쌓여요.
+
+NAT 게이트웨이(사설 서브넷의 서버가 인터넷에 나가는 출구)는 켜 둔 시간과 처리한 GB마다 요금을 받아요. 사설 서브넷의 서버가 내려받는 큰 파일도 이 출구를 지나면 GB마다 요금이 붙어요.
+
+## 요금은 하루쯤 늦게 보여요
+
+AWS Cost Explorer는 비용 자료를 적어도 24시간마다 새로 고쳐요. 그래서 오늘 아침 시작된 과금 폭주는 다음 날에야 보일 수 있어요.
+
+그래서 비용을 지키려면 요금이 되는 사용량을 직접 봐요. 나간 바이트, 켜진 인스턴스 수, 지표 수처럼 요금의 재료가 되는 숫자는 실시간으로 볼 수 있어요.
+
+누가 얼마를 썼는지 나누려면 자원에 <Term term="cloud/cost-allocation-tag">비용 할당 태그</Term>를 붙여요. AWS에서는 태그를 붙인 뒤 결제 화면에서 활성화해야 비용 보고서에 나타나요. 새 태그가 활성화 목록에 보이기까지, 그리고 활성화되기까지 각각 24시간까지 걸릴 수 있어요.
+
+## 모니터링에서는
+
+<Figure caption="us-east-1 CloudWatch 사용자 지정 지표의 예시예요. 파드 30개의 이름을 차원으로 더했더니, 조합마다 지표가 생겨 지표 수와 요금이 30배가 됐어요.">
+  <StatTile label="차원 추가 전" value="200" unit="개" note="월 60달러" />
+  <StatTile label="차원 추가 뒤" value="6,000" unit="개" tone="warn" note="월 1,800달러" />
+</Figure>
+
+모니터링도 요금이 들어요. CloudWatch는 차원(지표를 나누는 이름과 값)의 조합마다 지표 하나로 세어요. us-east-1에서 사용자 지정 지표는 첫 1만 개까지 지표당 한 달 0.30달러예요.
+
+그래서 파드 이름처럼 값이 많은 차원을 붙이면 지표 수가 그만큼 곱해져요. 시계열 수가 폭발하는 원리는 <Term slug="foundations/cardinality-explosion">시계열이 갑자기 늘었을 때</Term>와 같아요.
+
+지표를 읽는 쪽도 요금이 들어요. 모니터링 제품은 <Term slug="cloud/cloud-metrics">클라우드 지표</Term>를 API로 가져오는데, GetMetricData는 요청한 지표 1,000개마다 0.01달러예요. 지표 1,000개를 1분마다 가져오면 한 달에 4,320만 개라 432달러예요.
+
+<Checkpoints>
+  <Check>멈춘 가상 머신의 디스크, 어디에도 붙지 않은 디스크와 공인 IP가 남아 있지 않은지 보세요. 쓰지 않아도 잡아 둔 만큼 요금이 나와요.</Check>
+  <Check>앱 서버와 DB, 캐시가 서로 다른 AZ에 흩어져 있다면 AZ 사이 전송량을 보세요. 요청마다 오가는 데이터가 방향마다 요금이 돼요.</Check>
+  <Check>클라우드 지표를 가져오는 간격을 줄이기 전에 API 요금을 계산해 보세요. 5분에서 1분으로 줄이면 가져오는 지표 수가 5배가 돼요.</Check>
+  <Check>사용자 지정 지표에 사용자 ID, 파드 이름처럼 값이 많은 차원을 붙였다면 다시 보세요. 조합마다 지표 하나로 세어 요금이 곱해져요.</Check>
+  <Check>비용 알림을 결제 자료로만 걸었다면, 하루쯤 늦게 울린다는 걸 기억하세요. 나간 바이트처럼 요금의 재료가 되는 사용량에도 알림을 거세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 숫자는 리전과 시점마다 달라요
+
+  이 글의 금액은 2026년 10월에 확인한 AWS us-east-1 값이에요. 공인 IPv4 요금은 AWS 공지에서, 나머지는 AWS 가격 목록 파일과 요금 페이지에서 봤어요. 다른 리전이나 다른 사업자는 값이 다르니, 계산할 때는 그 사업자의 요금 페이지를 봐요.
+
+  ### 무료로 쓰는 몫
+
+  CloudWatch는 AWS 서비스가 기본으로 보내는 지표에 요금을 받지 않아요. 사용자 지정 지표와 상세 모니터링(1분 단위) 지표는 매달 몇 개까지 무료이고, 그 뒤로 요금을 받아요. GetMetricData 호출은 무료 몫 없이 늘 요금을 받아요.
+
+  ### 같은 AZ 안과 공인 IP
+
+  EC2, RDS 같은 서비스가 같은 AZ 안에서 주고받는 데이터는 무료예요. 다만 같은 리전 안이라도 공인 IP나 탄력적 IP 주소로 주고받으면, us-east-1에서 방향마다 GB당 0.01달러가 붙어요. 그래서 같은 VPC 안의 서버끼리는 사설 IP 주소로 주고받게 해요.
+</Deeper>

@@ -260,3 +260,41 @@ terms:
     short: 방화벽과 NAT가 지나가는 연결을 한 줄씩 적어 두는 표예요.
     analogy: 경비실의 방문 기록부와 같아요.
     doc: network/firewalls-and-nat
+  - id: flow
+    name: 흐름(플로우)
+    en: Flow
+    aliases: [flow, 플로우, 트래픽 흐름, flow record, 흐름 기록]
+    short: 주소·포트·프로토콜이 같은 패킷을 한 덩어리로 묶어 센 것이에요.
+    analogy: 같은 건물 같은 부서에서 같은 곳으로 간 상자를 한 줄로 적은 발송 대장과 같아요.
+    doc: network/flows
+  - id: netflow
+    name: NetFlow·IPFIX
+    en: NetFlow / IP Flow Information Export
+    aliases: [NetFlow, IPFIX, 넷플로우, NetFlow v9, flow export]
+    short: 장비가 흐름을 세어 수집기로 보내는 형식이에요. IPFIX는 NetFlow v9를 이은 IETF 표준이에요.
+    doc: network/flows
+  - id: sflow
+    name: sFlow
+    en: sFlow
+    aliases: [sflow, 에스플로우]
+    short: 패킷을 N개 중 1개꼴로 떠서 머리 부분을 보내는 흐름 정보 방식이에요.
+    doc: network/flows
+  - id: tls
+    name: TLS
+    en: Transport Layer Security
+    aliases: [tls, SSL, HTTPS, 전송 계층 보안]
+    short: 연결을 암호화하고, 상대 서버가 진짜인지 인증서로 확인하는 규약이에요.
+    doc: network/tls-certificates
+  - id: certificate
+    name: 인증서
+    en: X.509 certificate
+    aliases: [certificate, cert, 서버 인증서, SSL 인증서, TLS 인증서, X.509]
+    short: 서버 이름, 유효 기간, 발급 기관의 서명을 담은 서버의 전자 신분증이에요.
+    analogy: 발급 기관 도장이 찍힌 신분증과 같아요.
+    doc: network/tls-certificates
+  - id: certificate-chain
+    name: 인증서 체인
+    en: Certificate chain
+    aliases: [chain, 체인, 중간 인증서, intermediate certificate, 루트 인증서, root certificate]
+    short: 서버 인증서에서 중간 인증서를 거쳐 믿는 루트까지 서명으로 이어진 줄이에요.
+    doc: network/tls-certificates

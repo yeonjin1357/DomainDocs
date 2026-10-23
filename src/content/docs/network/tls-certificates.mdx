@@ -1,0 +1,144 @@
+---
+title: TLS 인증서와 만료
+summary: 인증서는 서버가 진짜인지 보여 주는 신분증이에요. 만료되면 그 순간부터 접속이 통째로 실패해요.
+domain: network
+type: concept
+stage: basics
+order: 75
+icon: network
+keywords: [TLS, SSL, HTTPS, 인증서, certificate, 만료, 중간 인증서, openssl, probe_ssl_earliest_cert_expiry, Let's Encrypt]
+related: [network/tcp-connections, network/dns, server/clock-drift, apm/http-basics]
+sources:
+  - title: RFC 8446 — The Transport Layer Security (TLS) Protocol Version 1.3
+    url: https://www.rfc-editor.org/rfc/rfc8446
+  - title: RFC 5280 — Internet X.509 Public Key Infrastructure Certificate Profile
+    url: https://www.rfc-editor.org/rfc/rfc5280
+  - title: RFC 9525 — Service Identity in TLS
+    url: https://www.rfc-editor.org/rfc/rfc9525
+  - title: CA/Browser Forum — Baseline Requirements (6.3.2 유효 기간)
+    url: https://github.com/cabforum/servercert/blob/main/docs/BR.md
+  - title: Let's Encrypt — FAQ (인증서 유효 기간)
+    url: https://letsencrypt.org/docs/faq/
+  - title: Mozilla Wiki — Intermediate CA Preloading
+    url: https://wiki.mozilla.org/Security/CryptoEngineering/Intermediate_Preloading
+  - title: OpenSSL — openssl-s_client(1)
+    url: https://docs.openssl.org/3.0/man1/openssl-s_client/
+  - title: OpenSSL — openssl-x509(1)
+    url: https://docs.openssl.org/3.0/man1/openssl-x509/
+  - title: blackbox_exporter 소스 — 인증서 만료 지표(prober/tls.go)
+    url: https://github.com/prometheus/blackbox_exporter/blob/master/prober/tls.go
+updated: 2026-10-23
+---
+
+<KeyPoints>
+  <Point title="인증서는 서버의 신분증이에요">
+    HTTPS로 접속하면 서버가 인증서를 보내요. 클라이언트는 이름이 맞는지, 기간 안인지, 믿는 기관이 서명했는지 봐요.
+  </Point>
+  <Point title="만료되면 접속이 통째로 막혀요">
+    느려지는 게 아니라, 만료 시각부터 새 연결이 모두 실패해요.
+  </Point>
+  <Point title="유효 기간이 점점 짧아져요">
+    공개 인증서의 최대 유효 기간은 2026년 3월부터 200일이고, 2029년에는 47일이 돼요. 자동 갱신과 만료 감시가 꼭 필요해져요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="사람은 만료된 신분증도 얼굴을 보고 넘어가 주기도 하지만, 프로그램은 기본 설정에서 만료된 인증서를 거부해요.">
+  <Term term="network/certificate">인증서</Term>는 발급 기관 도장이 찍힌 신분증과 비슷해요. 이름과 유효 기간이 적혀 있고, 받는 쪽은 그 도장을 찍은 기관을 믿는지 봐요.
+</Analogy>
+
+## 접속할 때 무엇을 확인하나요
+
+<Term term="network/tls">TLS</Term>는 연결을 암호화하기 전에 서버가 진짜인지 확인해요. 클라이언트는 서버가 보낸 인증서에서 세 가지를 봐요.
+
+- **이름**: 인증서의 이름 목록(SAN)에 접속한 주소가 있어야 해요. `api.example.com`으로 접속했는데 인증서에 `www.example.com`만 있으면 실패해요.
+- **기간**: 지금 시각이 시작 시각(notBefore)과 만료 시각(notAfter) 사이여야 해요.
+- **서명**: 클라이언트가 이미 믿는 발급 기관(CA)까지 서명이 이어져야 해요.
+
+셋 중 하나라도 어긋나면 TLS 연결 맺기(handshake)가 실패해요. 앱은 HTTP 요청을 보내 보지도 못하고 연결 오류를 받아요.
+
+## 인증서 체인
+
+<Figure caption="화살표는 서명하는 방향이에요. 루트는 클라이언트에 이미 있고, 서버는 중간 인증서와 서버 인증서를 보내야 해요.">
+  <Flow
+    ariaLabel="루트 인증서가 중간 인증서에 서명하고, 중간 인증서가 서버 인증서에 서명하는 체인. 루트는 클라이언트에 이미 있고, 서버는 중간 인증서와 서버 인증서를 보냄"
+    nodes={[
+      { id: 'root', label: '루트 인증서', col: 0, row: 0, note: '이미 있어요' },
+      { id: 'int', label: '중간 인증서', col: 2, row: 0, note: '서버가 보내요', tone: 'accent' },
+      { id: 'leaf', label: '서버 인증서', col: 2, row: 1, note: '서버가 보내요', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'root', to: 'int', label: '서명' },
+      { from: 'int', to: 'leaf', label: '서명' },
+    ]}
+  />
+</Figure>
+
+서버 인증서에서 루트까지 서명으로 이어진 줄을 <Term term="network/certificate-chain">인증서 체인</Term>이라고 해요. 서버는 자기 인증서와 중간 인증서를 함께 보내야 해요.
+
+중간 인증서를 빠뜨려도 브라우저는 열릴 때가 있어요. 빠진 중간 인증서를 발급 기관에서 받아 오거나, 미리 받아 둔 목록에서 찾기 때문이에요.
+
+curl처럼 그런 일을 하지 않는 프로그램은 실패해요. curl은 `unable to get local issuer certificate` 오류를 내요.
+
+## 만료와 갱신
+
+공개 인증서의 최대 유효 기간은 CA/Browser Forum 규칙으로 정해요. 2026년 3월 15일 전에 발급한 인증서는 398일까지, 그 뒤로는 200일까지예요. 2027년 3월부터는 100일, 2029년 3월부터는 47일로 줄어요.
+
+Let's Encrypt 인증서는 기본으로 90일짜리라, 60일마다 갱신하라고 권해요. 이렇게 짧으면 사람이 손으로 바꾸기 어려워서, 보통 프로그램이 자동으로 갱신해요.
+
+갱신은 새 인증서 파일을 받는 것으로 끝나지 않아요. 웹 서버나 로드 밸런서가 새 파일을 다시 읽어야 접속한 사람이 새 인증서를 받아요. 파일은 바뀌었는데 서버가 옛 인증서를 계속 내보내는 사고가 흔한 이유예요.
+
+## 직접 확인하는 법
+
+아래 명령은 서버에 접속해 실제로 받은 서버 인증서의 만료 시각을 보여 줘요. `-servername`에는 접속할 이름을 적어요. 한 서버가 이름마다 다른 인증서를 줄 수 있어서예요.
+
+```text
+echo | openssl s_client \
+  -connect api.example.com:443 \
+  -servername api.example.com \
+  2>/dev/null |
+  openssl x509 -noout -enddate
+```
+
+`notAfter=Nov 12 04:46:35 2026 GMT`처럼 나와요. 파일로 가진 인증서는 `-checkend`로 물어볼 수 있어요. `openssl x509 -in 파일 -noout -checkend 1209600`은 14일(1,209,600초) 안에 만료되는지 답해요.
+
+## 모니터링에서는
+
+<Figure caption="결제 API 인증서를 밖에서 접속해 본 예시예요. 90일짜리를 60일마다 갱신하는데, 남은 기간이 12일이라 갱신이 실패한 거예요.">
+  <StatTile label="만료까지" value="12" unit="일" tone="warn" note="갱신이 멈췄어요" />
+  <StatTile label="인증서 유효 기간" value="90" unit="일" />
+</Figure>
+
+만료 감시는 서버 안의 파일보다, 밖에서 접속해 실제로 받은 인증서로 해요. Prometheus의 blackbox_exporter는 접속해 받은 인증서 가운데 가장 이른 만료 시각을 내요. 지표 이름은 `probe_ssl_earliest_cert_expiry`이고, 값은 유닉스 시각(초)이에요.
+
+```text
+probe_ssl_earliest_cert_expiry
+  - time() < 20 * 86400
+```
+
+이 식은 만료까지 20일이 안 남았을 때 참이에요. 서버 인증서와 중간 인증서 가운데 먼저 만료되는 쪽을 봐요.
+
+<Checkpoints>
+  <Check>만료 감시를 서버 안의 인증서 파일로만 한다면, 밖에서 접속해 받은 인증서로도 보세요. 갱신한 파일을 서버가 다시 읽지 않았으면 옛 인증서가 나가요.</Check>
+  <Check>만료 알림 기준이 갱신 주기와 맞는지 보세요. 90일짜리를 60일마다 갱신한다면, 남은 기간 20일쯤에 울려야 갱신 실패만 잡아요. 30일로 잡으면 갱신 직전마다 울릴 수 있어요.</Check>
+  <Check>서버 인증서의 만료일만 보고 있다면 체인 전체를 보세요. 중간 인증서가 먼저 만료돼도 접속은 실패해요.</Check>
+  <Check>공개 사이트만 감시하고 있다면 내부 API, DB 연결, 쿠버네티스 구성 요소가 쓰는 인증서도 찾아보세요. 사설 인증서도 만료돼요.</Check>
+  <Check>특정 서버에서만 인증서가 '아직 유효하지 않음'이나 '만료됨'으로 나온다면 그 서버의 시계를 보세요. <Term slug="server/clock-drift">시계가 어긋나면</Term> 기간 검사가 틀려요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 이름은 SAN에서만 찾아요
+
+  예전에는 인증서의 Common Name(CN) 칸에 서버 이름을 적었어요. 지금 표준(RFC 9525)은 서비스를 확인하는 데 CN을 쓰지 말라고 해요. 이름은 SAN(subjectAltName) 목록에서 찾아요.
+
+  ### 규칙의 SHOULD와 MUST
+
+  CA/Browser Forum 규칙은 기간마다 두 값을 하루 차이로 둬요. 넘지 않는 게 좋은 값(SHOULD)과 넘으면 안 되는 값(MUST)이에요. 2026년 3월 15일부터는 199일과 200일이에요.
+
+  ### 아주 짧은 인증서
+
+  Let's Encrypt는 원하는 사용자에게 6일짜리 인증서도 줘요. 문서는 이런 인증서를 3일마다 갱신하라고 권해요.
+
+  ### 체인 만료일 지표
+
+  `probe_ssl_earliest_cert_expiry`는 서버가 보낸 인증서들 가운데 가장 이른 만료 시각이에요. 검증에 쓴 체인을 기준으로 보는 `probe_ssl_last_chain_expiry_timestamp_seconds`도 있어요.
+</Deeper>
