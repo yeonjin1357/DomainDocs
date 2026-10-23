@@ -29,7 +29,7 @@ questions:
     prompt: /var가 일주일 사이 70%에서 95%가 됐어요. 흔한 원인이 아닌 것은?
     choices:
       - CPU 사용률이 높아서
-      - 순환(rotation)되지 않는 로그 파일
+      - 회전(rotation)되지 않는 로그 파일
       - 지우지 않은 백업과 덤프 파일
       - 길게 잡힌 데이터 보관 기간
     answer: 0

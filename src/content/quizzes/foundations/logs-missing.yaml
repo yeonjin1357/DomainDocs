@@ -1,0 +1,41 @@
+questions:
+  - id: widen-time-range
+    type: choice
+    prompt: 로그 검색 화면에 한 서버의 로그가 30분째 안 보여요. 가장 먼저 해 볼 만한 것은?
+    choices:
+      - 검색 범위를 앞뒤로 넓혀 다른 시각에 저장됐는지 봐요
+      - 수집 에이전트를 지우고 다시 설치해요
+      - 저장소의 디스크를 늘려요
+      - 앱의 로그 레벨을 DEBUG로 바꿔요
+    answer: 0
+    explain: 시각을 잘못 읽으면 로그는 들어왔는데 엉뚱한 자리에 있어요. 범위를 넓혀 보는 건 거의 비용이 들지 않아요.
+  - id: kst-read-as-utc
+    type: choice
+    prompt: 앱이 시간대 없이 한국 시간으로 적은 로그를, 에이전트가 UTC로 읽었어요. 로그는 어느 시각에 저장될까요?
+    choices:
+      - 실제보다 9시간 뒤의 시각
+      - 실제보다 9시간 앞의 시각
+      - 실제와 같은 시각
+      - 시각 없이 저장돼요
+    answer: 0
+    explain: 한국 시간 10시는 UTC 1시인데, 이를 UTC 10시로 읽으니 9시간 뒤에 놓여요. 그래서 최근 30분을 검색하면 보이지 않아요.
+  - id: dropped-silently
+    type: ox
+    prompt: Fluent Bit이 재시도 한도를 넘겨 버린 로그는, 앱에 오류로 알려져 다시 쓰이나요?
+    answer: false
+    explain: 버린 로그는 조용히 사라져요. 그래서 재시도 실패나 버린 수 지표에 알림을 걸어 둬요.
+  - id: file-not-growing
+    type: choice
+    prompt: 에이전트가 읽는 로그 파일이 몇 분째 전혀 커지지 않아요. 무엇부터 의심할까요?
+    choices:
+      - 앱이 로그를 쓰지 않거나 다른 파일에 쓰고 있어요
+      - 저장소가 로그를 거부하고 있어요
+      - 검색 화면의 시간대 설정이 틀렸어요
+      - 에이전트의 재시도 한도가 낮아요
+    answer: 0
+    explain: 파일이 커지지 않으면 막힌 곳은 에이전트보다 앞, 앱 쪽이에요. 디스크가 찼거나 로그 레벨, 출력 위치가 바뀌었을 수 있어요.
+  - id: mem-buf-pause
+    type: ox
+    prompt: Fluent Bit은 메모리 버퍼 한도에 닿으면 그 입력의 읽기를 잠시 멈추나요?
+    answer: true
+    explain: 저장소가 다시 받기 시작하면 이어서 읽어요. 멈춘 동안 에이전트 로그에 paused 경고가 남아요.

@@ -1,0 +1,36 @@
+questions:
+  - id: restart-without-offset
+    type: choice
+    prompt: Fluent Bit tail에 위치 기록(db)을 두지 않았어요. 에이전트를 10분 껐다 켜면 그 사이 쓴 로그는?
+    choices:
+      - 파일 끝부터 읽어서 그 10분 치를 놓쳐요
+      - 파일 처음부터 다시 읽어 모두 겹쳐요
+      - 꺼진 위치부터 이어서 읽어요
+      - 앱이 쓰기를 멈추고 에이전트를 기다려요
+    answer: 0
+    explain: 위치 기록이 없으면 이미 있던 파일은 기본으로 끝부터 읽어요. 그래서 꺼져 있던 동안 쓴 줄은 다시 켜도 가져오지 않아요.
+  - id: copytruncate-risk
+    type: choice
+    prompt: 로그 회전을 '복사 후 비우기'(copytruncate)로 하면 생길 수 있는 일은?
+    choices:
+      - 복사와 비우기 사이에 쓴 줄이 사라져요
+      - 앱이 새 파일을 다시 열 때까지 옛 파일에 써요
+      - 원래 파일의 이름이 바뀌어 에이전트가 놓쳐요
+      - 회전할 때마다 앱을 다시 시작해야 해요
+    answer: 0
+    explain: 복사한 뒤 비우는 그 짧은 틈에 쓴 줄은 어느 파일에도 남지 않아요. 옛 파일에 계속 쓰는 건 이름 바꾸기 방식의 위험이에요.
+  - id: retry-limit-default
+    type: ox
+    prompt: Fluent Bit은 따로 정하지 않아도, 저장소가 돌아올 때까지 계속 다시 보내 로그를 지켜 주나요?
+    answer: false
+    explain: 재시도 한도(Retry_Limit) 기본값이 1이라, 한 번 다시 보내 실패한 묶음은 버려요. 저장소가 몇 분 멈출 수 있다면 한도를 늘려요.
+  - id: multiline-split
+    type: ox
+    prompt: 묶는 설정이 없으면, 여러 줄짜리 스택 트레이스가 줄마다 다른 로그로 저장될 수 있나요?
+    answer: true
+    explain: 에이전트는 보통 줄바꿈 하나를 로그 하나로 봐요. 줄 하나만 보면 어느 예외의 일부인지 알 수 없어요.
+  - id: rotation-term
+    type: input
+    prompt: 로그 파일이 커지면 이름을 바꿔 보관하고 새 파일에 쓰게 하는 일을 뭐라고 부를까요?
+    answer: [로그 회전, 회전, rotation, log rotation, 로테이션, 로그 로테이션, 순환, 로그 순환]
+    explain: 리눅스에서는 logrotate가 흔해요. 회전하는 방식에 따라 줄이 빠지거나 겹칠 수 있어요.

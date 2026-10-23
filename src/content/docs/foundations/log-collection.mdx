@@ -1,0 +1,162 @@
+---
+title: 로그가 모이는 길
+summary: 수집 에이전트가 로그 파일을 따라 읽어 보내요. 회전·재시작·막힘 때 줄이 빠지거나 겹쳐요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 155
+icon: layers
+keywords: [로그 수집, log collection, Fluent Bit, OpenTelemetry Collector, tail, logrotate, copytruncate, 구조화 로그, multiline, 수집 에이전트]
+related: [foundations/logs-metrics-traces, foundations/logs-missing, server/services-and-logs, server/disk-filling-up]
+sources:
+  - title: Fluent Bit — Tail input
+    url: https://docs.fluentbit.io/manual/pipeline/inputs/tail
+  - title: Fluent Bit — Backpressure
+    url: https://docs.fluentbit.io/manual/administration/backpressure
+  - title: Fluent Bit — Scheduling and retries
+    url: https://docs.fluentbit.io/manual/administration/scheduling-and-retries
+  - title: Fluent Bit — Monitoring
+    url: https://docs.fluentbit.io/manual/administration/monitoring
+  - title: Linux man-pages — logrotate(8)
+    url: https://man7.org/linux/man-pages/man8/logrotate.8.html
+  - title: OpenTelemetry Collector — Filelog receiver
+    url: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver
+  - title: Kubernetes — Logging Architecture
+    url: https://kubernetes.io/docs/concepts/cluster-administration/logging/
+updated: 2026-10-23
+---
+
+<OnDashboard title="결제 서버 · 로그 수집 에이전트 · 최근 1시간" caption="저장소가 10분 동안 응답하지 않는 사이, 에이전트가 재시도를 포기한 로그 묶음을 버렸어요. 그 10분의 로그는 검색해도 나오지 않아요.">
+  <StatTile label="읽은 로그" value="120,000" unit="줄" />
+  <StatTile label="보낸 로그" value="96,000" unit="줄" />
+  <StatTile label="버린 로그" value="24,000" unit="줄" tone="warn" note="재시도 한도 초과" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="에이전트가 파일 끝을 따라 읽어요">
+    앱은 로그를 파일이나 표준 출력에 쓰고, 수집 에이전트가 새로 붙은 줄을 읽어 저장소로 보내요. 에이전트는 파일마다 어디까지 읽었는지 기록해 두고, 다시 시작하면 거기서 이어 읽어요.
+    이 기록이 없으면 다시 시작할 때 파일 끝부터 읽어서, 꺼져 있던 동안 쓴 줄을 놓칠 수 있어요.
+  </Point>
+  <Point title="회전과 재시작 때 줄이 빠지거나 겹쳐요">
+    로그 파일은 커지면 잘라 새 파일로 바꾸는데, 이걸 회전(rotation)이라고 해요. 복사한 뒤 비우는 방식은 그 짧은 틈에 쓴 줄을 잃을 수 있어요.
+    에이전트가 갑자기 죽으면 반대로, 이미 보낸 줄을 다시 보내 겹치기도 해요.
+  </Point>
+  <Point title="저장소가 막히면 쌓였다가 버려져요">
+    저장소가 느리거나 멈추면 에이전트는 보낼 로그를 쌓아 두고 다시 보내요. 재시도 한도를 넘기면 버려요. Fluent Bit은 따로 정하지 않으면 한 번만 다시 보내고 버려요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="사람은 일지가 새 공책으로 바뀌면 알아채지만, 에이전트는 파일 이름과 파일 번호로만 알아봐요. 그래서 공책을 바꾸는 방식에 따라 몇 줄을 놓치거나 두 번 베껴요.">
+  로그 수집은 사무실마다 놓인 업무 일지를 돌며 새로 쓴 쪽만 베껴 오는 일과 같아요. 수거 담당(에이전트)은 일지마다 어디까지 베꼈는지 책갈피를 꽂아 둬요. 베낀 사본은 본사 보관소(저장소)로 보내요.
+</Analogy>
+
+## 로그가 지나는 길
+
+<Figure caption="앱이 파일에 쓴 줄을 에이전트가 따라 읽어 저장소로 보내요. 검색과 알림은 저장소에 들어간 로그만 볼 수 있어요.">
+  <Flow
+    ariaLabel="앱이 로그 파일에 쓰고, 수집 에이전트가 파일을 읽어 저장소로 보내고, 검색과 알림이 저장소를 보는 구조도"
+    nodes={[
+      { id: 'app', label: '앱', col: 0, row: 0, note: '로그를 써요' },
+      { id: 'file', label: '로그 파일', col: 1, row: 0, note: '회전돼요' },
+      { id: 'agent', label: '수집 에이전트', col: 2, row: 0, note: '위치 기록', tone: 'accent' },
+      { id: 'store', label: '저장소', col: 2, row: 1, note: '색인' },
+      { id: 'search', label: '검색·알림', col: 1, row: 1 },
+    ]}
+    edges={[
+      { from: 'app', to: 'file' },
+      { from: 'file', to: 'agent' },
+      { from: 'agent', to: 'store', tone: 'accent' },
+      { from: 'store', to: 'search' },
+    ]}
+  />
+</Figure>
+
+앱은 로그를 파일에 쓰거나 표준 출력(stdout)으로 내보내요. 컨테이너가 표준 출력으로 낸 로그는 노드의 파일로 저장되고, 에이전트는 그 파일을 읽어요.
+
+수집 에이전트는 Fluent Bit, OpenTelemetry Collector 같은 프로그램이에요. 서버마다 하나씩 돌며 정해 둔 경로의 파일을 따라 읽어요.
+
+검색 화면에 로그가 보이려면 이 길을 모두 지나야 해요. 그래서 로그가 안 보이면 어느 구간에서 멈췄는지부터 가려요. 그 순서는 <Term slug="foundations/logs-missing">로그가 안 들어올 때</Term>에 있어요.
+
+## 어디까지 읽었는지 기록해요
+
+에이전트는 파일마다 마지막으로 읽은 위치(오프셋)를 기록해요. Fluent Bit은 이 기록을 `db` 설정으로 정한 파일에 두고, 다시 시작하면 그 위치부터 이어 읽어요.
+
+위치 기록이 없으면, 시작할 때 이미 있던 파일을 어디부터 읽을지 기본값이 정해요. Fluent Bit tail과 OpenTelemetry Collector의 filelog는 기본으로 파일 끝부터 읽어요. 그래서 에이전트가 꺼져 있던 동안 쓴 줄은 다시 켜도 읽지 않아요.
+
+갑자기 죽었을 때는 반대로 겹칠 수 있어요. Fluent Bit 문서는 이때 기록이 실제로 보낸 위치보다 조금 뒤처질 수 있다고 해요. 그래서 다시 시작하면 이미 보낸 줄을 조금 다시 보내요.
+
+## 회전할 때 빠지거나 겹쳐요
+
+로그 파일은 계속 커져서, 일정 크기나 기간마다 이름을 바꿔 보관하고 새 파일에 써요. 이 일을 로그 회전이라고 하고, 리눅스에서는 logrotate가 흔해요.
+
+<Figure caption="회전 방식 두 가지예요. 이름 바꾸기는 앱이 새 파일을 다시 열어야 하고, 복사 후 비우기는 그 틈에 쓴 줄을 잃을 수 있어요.">
+  <Compare
+    columns={['이름 바꾸기', '복사 후 비우기']}
+    rows={[
+      { label: '하는 일', values: ['옛 파일 이름을 바꾸고 새 파일을 만들어요', '내용을 복사한 뒤 원래 파일을 비워요'] },
+      { label: '앱 쪽', values: ['새 파일을 다시 열어야 해요', '같은 파일에 계속 써요'] },
+      { label: '위험', values: ['다시 열기 전까지 옛 파일에 써요', '복사와 비우기 사이의 줄을 잃어요'] },
+    ]}
+  />
+</Figure>
+
+복사 후 비우기(copytruncate)는 앱이 파일을 다시 열지 못할 때 써요. logrotate 문서도 복사와 비우기 사이에 아주 짧은 틈이 있어 로그를 잃을 수 있다고 적어요.
+
+이름을 바꾸는 방식이면, 에이전트는 이름이 바뀐 파일을 잠시 더 따라 읽어 남은 줄을 마저 가져가요. Fluent Bit은 기본으로 5초 동안 더 읽어요(`rotate_wait`).
+
+쿠버네티스에서는 kubelet이 컨테이너 로그를 회전해요. 기본으로 10Mi마다 회전하고, 컨테이너마다 파일 5개까지 남겨요. 로그가 아주 빨리 쌓여 에이전트가 따라 읽기 전에 오래된 파일이 지워지면, 그 줄은 사라져요.
+
+## 저장소가 막히면 쌓였다가 버려져요
+
+에이전트는 읽은 로그를 묶음(chunk)으로 모아 보내요. 저장소가 느리거나 응답하지 않으면 묶음을 버퍼에 두고 다시 보내요.
+
+Fluent Bit은 재시도 한도(`Retry_Limit`)를 넘긴 묶음을 버려요. 기본값이 1이라, 따로 정하지 않으면 한 번 다시 보내 실패한 묶음은 사라져요. 저장소 점검처럼 몇 분 멈추는 일이 있다면 한도를 넉넉히 잡아요.
+
+메모리 버퍼에 한도(`mem_buf_limit`)를 걸면, 한도에 닿을 때 그 파일 읽기를 잠시 멈춰요. 멈춘 사이에 복사 후 비우기 회전이 일어나면, 아직 읽지 않은 줄을 잃을 수 있어요.
+
+## 한 줄이 로그 하나예요
+
+에이전트는 보통 줄바꿈 하나를 로그 하나로 봐요. 그래서 여러 줄짜리 스택 트레이스는 따로 묶지 않으면 줄마다 다른 로그로 쪼개져요. Fluent Bit tail과 OpenTelemetry filelog 모두 여러 줄을 하나로 묶는 설정이 있어요.
+
+로그를 JSON 한 줄처럼 구조화해서 쓰면, 레벨이나 trace id 같은 값을 필드로 찾을 수 있어요. 글자 검색보다 정확하고, 알림도 필드 값으로 걸 수 있어요. trace id로 트레이스와 잇는 법은 <Term slug="foundations/logs-metrics-traces">로그, 메트릭, 트레이스</Term>에서 다뤄요.
+
+아주 긴 한 줄도 조심해요. Fluent Bit tail은 한 줄이 버퍼 한도(`buffer_max_size`, 기본 32k)를 넘으면 그 파일을 더 따라 읽지 않아요. `skip_long_lines`를 켜면 긴 줄만 건너뛰고 계속 읽어요.
+
+## 모니터링에서는
+
+에이전트도 자기 지표를 내요. Fluent Bit은 HTTP 서버를 켜면 `/api/v2/metrics/prometheus`에서 지표를 내보내요.
+
+| 지표 | 뜻 |
+| --- | --- |
+| `fluentbit_input_bytes_total` | 입력이 읽어 들인 바이트 |
+| `fluentbit_output_proc_records_total` | 보내는 데 성공한 로그 수 |
+| `fluentbit_output_retries_total` | 다시 보내기를 요청한 횟수 |
+| `fluentbit_output_retries_failed_total` | 재시도 한도를 넘겨 버린 묶음 수 |
+| `fluentbit_output_dropped_records_total` | 버린 로그 수 |
+
+이 숫자들은 카운터라서 <Term slug="foundations/counters-and-rate">rate</Term>로 봐요. 버린 로그 수가 0보다 커지면, 그 시각의 로그는 검색해도 나오지 않아요.
+
+<Checkpoints>
+  <Check>수집 에이전트에 위치 기록(Fluent Bit의 `db`, OpenTelemetry filelog의 `storage`)이 없다면 다시 보세요. 다시 시작할 때마다 꺼져 있던 동안 쓴 줄을 놓쳐요.</Check>
+  <Check>로그 회전을 copytruncate로 한다면, 복사와 비우기 사이의 줄이 빠질 수 있어요. 앱이 파일을 다시 열 수 있다면 이름 바꾸기 방식이 안전해요.</Check>
+  <Check>Fluent Bit의 `Retry_Limit`을 기본값으로 두었다면 다시 보세요. 저장소가 잠깐만 멈춰도 그 사이 로그가 버려져요. `retries_failed` 지표에 알림을 걸어 두세요.</Check>
+  <Check>스택 트레이스가 줄마다 따로 검색된다면, 여러 줄을 묶는 설정이 빠진 거예요. 줄 하나만 보면 어느 예외인지 알 수 없어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 시작 뒤에 새로 생긴 파일
+
+  Fluent Bit tail은 시작할 때 이미 있던 파일과, 그 뒤에 새로 찾은 파일을 다르게 다뤄요. 위치 기록이 없으면 앞의 것은 끝부터 읽어요. `read_from_head`의 기본값이 false이기 때문이에요.
+
+  뒤의 것은 처음부터 읽어요. `read_newly_discovered_files_from_head`의 기본값이 true이기 때문이에요.
+
+  새 파일은 파일 목록을 다시 훑을 때 찾아요. 기본 간격(`refresh_interval`)이 60초라, 새 파일은 최대 1분쯤 늦게 읽기 시작할 수 있어요.
+
+  ### 회전한 파일을 다시 읽는 실수
+
+  Fluent Bit 문서는 경로 패턴(`Path`)이 회전된 파일까지 고르면, 그 파일을 다시 읽어 로그가 겹친다고 경고해요. `app.log*`처럼 넓게 잡지 말고 `app.log`만 골라요.
+
+  ### OpenTelemetry Collector의 위치 기록
+
+  filelog 수신기는 저장소 확장(`storage`)을 정하지 않으면 위치를 메모리에만 둬요. 그래서 Collector를 다시 시작하면 위치를 잃고, `start_at` 기본값(end)대로 끝부터 읽어요.
+</Deeper>

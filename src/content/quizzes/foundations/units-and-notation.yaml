@@ -1,0 +1,41 @@
+questions:
+  - id: gbps-to-bytes
+    type: choice
+    prompt: 1Gbps 회선이 꽉 차면 초당 몇 바이트를 옮길까요?
+    choices:
+      - 125MB
+      - 1GB
+      - 8GB
+      - 1,024MB
+    answer: 0
+    explain: 회선 속도는 비트로 세고, 1바이트는 8비트예요. 1,000Mbps를 8로 나누면 초당 125MB예요.
+  - id: tb-shown-as-gib
+    type: ox
+    prompt: 1TB 디스크를 OS가 931GiB로 보여 준다면, 디스크 일부가 망가졌다는 뜻인가요?
+    answer: false
+    explain: 제조사의 TB는 1000씩, GiB는 1024씩 커지는 단위예요. 같은 크기를 다른 단위로 적은 거예요.
+  - id: percentage-point
+    type: choice
+    prompt: 에러율이 1%에서 3%가 됐어요. 바르게 말한 것은?
+    choices:
+      - 2%p 올랐어요
+      - 2% 올랐어요
+      - 3%p 올랐어요
+      - 300% 올랐어요
+    answer: 0
+    explain: 퍼센트 값끼리의 차이는 %p(퍼센트포인트)로 말해요. 비율로는 세 배라, 200% 오른 거예요.
+  - id: ratio-unit-in-grafana
+    type: choice
+    prompt: Grafana 패널에서 0~1 비율 값(예 0.99)을 99%로 보여 주려면 어떤 단위를 고를까요?
+    choices:
+      - Percent (0.0-1.0)
+      - Percent (0-100)
+      - bytes(IEC)
+      - bits(SI)
+    answer: 0
+    explain: Percent (0.0-1.0)는 100을 곱해서 보여 줘요. Percent (0-100)를 고르면 99%가 0.99%로 보여요.
+  - id: kib-symbol
+    type: input
+    prompt: 1,024바이트를 뜻하는 단위 기호는 무엇일까요? (KB가 아니에요)
+    answer: [KiB, 키비바이트, kibibyte]
+    explain: Ki는 2의 10제곱(1,024)을 뜻하는 접두어예요. KB의 k는 원래 1,000이에요.

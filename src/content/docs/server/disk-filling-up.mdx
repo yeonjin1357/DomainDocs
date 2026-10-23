@@ -5,7 +5,7 @@ domain: server
 type: guide
 order: 80
 icon: layers
-keywords: [disk full, 디스크 꽉 참, df, du, inode, lsof, deleted, 로그 순환, logrotate, 용량 예측]
+keywords: [disk full, 디스크 꽉 참, df, du, inode, lsof, deleted, 로그 회전, logrotate, 용량 예측]
 related: [server/filesystem-and-capacity, server/disk-io, messaging/retention, foundations/alert-conditions]
 sources:
   - title: GNU coreutils — df(1)
@@ -45,8 +45,9 @@ updated: 2026-10-21
 
 흔한 범인은 이런 것들이에요.
 
-- 순환(rotation)되지 않는 로그 파일이 계속 커져요.
+- 회전(rotation)되지 않는 로그 파일이 계속 커져요. 회전 방식은 <Term slug="foundations/log-collection">로그가 모이는 길</Term>에서 다뤄요.
 - 지우지 않은 백업, 덤프, 임시 파일이 쌓여요.
+- 데이터베이스의 표나 로그가 커져요. <Term slug="database/storage-growing">DB 저장 공간이 계속 늘 때</Term>를 봐요.
 - 데이터의 보관 기간이 길게 잡혀 있어요. Kafka라면 <Term slug="messaging/retention">보관과 정리</Term>를 봐요.
 
 ## 3. 지웠는데 안 줄어든다면 열린 파일을 찾으세요

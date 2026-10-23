@@ -1,0 +1,158 @@
+---
+title: 이상 탐지와 기준선
+summary: 값을 '이 시각의 평소'와 견줘요. 고정 임계값이 놓치는 변화를 잡지만, 이유 있는 변화에도 울려요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 115
+icon: activity
+keywords: [이상 탐지, anomaly detection, 기준선, baseline, 표준편차, z-score, 계절성, seasonality, offset, predict_linear]
+related: [foundations/alert-conditions, foundations/alert-fatigue, foundations/slo-and-error-budget, foundations/aggregation-and-downsampling, server/disk-filling-up]
+sources:
+  - title: Prometheus — Querying basics (offset modifier)
+    url: https://prometheus.io/docs/prometheus/latest/querying/basics/
+  - title: Prometheus — Query functions (predict_linear, double_exponential_smoothing)
+    url: https://prometheus.io/docs/prometheus/latest/querying/functions/
+  - title: Prometheus — Feature flags (promql-experimental-functions)
+    url: https://prometheus.io/docs/prometheus/latest/feature_flags/
+  - title: Prometheus — Migration to 3.0 (holt_winters 이름 바뀜)
+    url: https://prometheus.io/docs/prometheus/latest/migration/
+  - title: GitLab Blog — How to use Prometheus for anomaly detection in GitLab
+    url: https://about.gitlab.com/blog/anomaly-detection-using-prometheus/
+  - title: Datadog — Anomaly Monitor (algorithms, seasonality)
+    url: https://docs.datadoghq.com/monitors/types/anomaly/
+  - title: NIST/SEMATECH e-Handbook — Double Exponential Smoothing
+    url: https://www.itl.nist.gov/div898/handbook/pmc/section4/pmc433.htm
+  - title: Google SRE Book — Monitoring Distributed Systems (증상과 원인)
+    url: https://sre.google/sre-book/monitoring-distributed-systems/
+updated: 2026-10-23
+---
+
+<OnDashboard title="분당 주문 수 · 오늘과 지난주 같은 요일" caption="오후 2시부터 주문이 지난주의 절반이에요. 새벽에도 15건은 들어와서, 고정 임계값을 '10건 미만'보다 높이기 어려워요. 그래서 이 하락에 울리지 않아요.">
+  <MiniLineChart
+    ariaLabel="0시부터 24시까지 2시간마다 그린 분당 주문 수. 오늘과 지난주 같은 요일 선이 거의 겹치다가, 오늘만 14시와 16시에 지난주의 절반으로 떨어졌다가 18시에 돌아오는 그래프"
+    series={[{ label: '오늘', values: [42, 18, 16, 28, 125, 255, 310, 150, 140, 290, 245, 155, 58], tone: 'warn', value: '14시 150건' }, { label: '지난주 같은 요일', values: [40, 20, 15, 30, 120, 260, 320, 300, 280, 300, 250, 150, 60], tone: 'sub', value: '14시 300건' }]}
+  />
+  <StatTile label="지난주 대비" value="50" unit="%" tone="warn" note="절반으로 줄었어요" />
+  <StatTile label="고정 임계값" value="0" unit="번 울림" note="10건 미만일 때 울려요" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="고정 임계값은 시간대를 몰라요">
+    주문, 요청 수 같은 값은 낮과 밤, 평일과 주말에 몇 배씩 달라요. 새벽에 울리지 않게 임계값을 낮추면, 그림처럼 낮에 절반으로 줄어도 조용해요. 낮에 맞추면 반대로 새벽마다 울려요.
+
+    이 틈을 메우려고, 값을 '이 시각의 평소'와 견주는 게 이상 탐지(anomaly detection)예요.
+  </Point>
+  <Point title="기준선은 이 시각의 평소 값이에요">
+    기준선(baseline)은 지금 시각에 나올 법한 값과 그 범위예요. 가장 쉬운 기준선은 지난주 같은 요일, 같은 시각의 값이에요. Prometheus에서는 `offset 1w`로 일주일 전 값을 가져와요.
+
+    범위는 보통 평균에서 표준편차(σ, 값이 평균에서 흩어진 정도)의 몇 배까지로 잡아요. 값이 범위를 벗어나면 이상으로 표시해요.
+  </Point>
+  <Point title="이상은 장애가 아니에요">
+    이상 탐지는 '평소와 다르다'만 알려 줘요. 할인 행사로 주문이 늘어도, 배포 뒤 응답시간이 조금 바뀌어도 이상이에요.
+
+    그래서 사람을 부르는 알림은 사용자가 겪는 증상에 걸고, 이상 표시는 살펴볼 단서로 써요. 증상 알림은 <Term slug="foundations/alert-conditions">알림 조건</Term>에서 다뤄요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="사장님은 비가 와서, 공휴일이라서 손님이 적은 걸 알아요. 기준선은 숫자만 봐서, 이유 있는 변화도 이상으로 표시해요.">
+  단골 식당 사장님이 "이 시간엔 보통 열 명은 오는데, 오늘은 다섯 명이네" 하고 알아채는 것과 비슷해요.
+</Analogy>
+
+## 고정 임계값과 무엇이 다른가요
+
+<Figure caption="고정 임계값은 넘으면 안 되는 한계를, 기준선 비교는 평소와 달라진 변화를 잡아요. 둘은 바꿔 쓰는 게 아니라 함께 써요.">
+  <Compare columns={['고정 임계값', '기준선 비교']} rows={[{ label: '기준', values: ['정해 둔 숫자 하나', '이 시각의 평소 값'] }, { label: '잘 잡는 것', values: ['넘으면 안 되는 한계', '평소와 달라진 변화'] }, { label: '잘못 울릴 때', values: ['한계가 시간대마다 다를 때', '이유 있는 변화가 생겼을 때'] }, { label: '준비', values: ['바로 쓸 수 있어요', '평소 데이터가 쌓여야 해요'] }]} />
+</Figure>
+
+디스크 사용률 95%처럼 시간대와 상관없이 넘으면 안 되는 한계는 고정 임계값이 맞아요. 평소의 모양이 뚜렷한 값이 갑자기 달라졌는지는 기준선 비교가 잘 잡아요.
+
+## 기준선을 만드는 방법
+
+- **최근 평균과 견주기**: 지난 몇 시간의 평균에서 크게 벗어나면 이상이에요. 갑자기 튀는 값은 잘 잡아요. 천천히 줄어드는 변화는 평균도 함께 내려가서 놓쳐요.
+- **지난주 같은 시각과 견주기**: 요일과 시간대의 모양을 그대로 따라가요. 대신 지난주에 장애나 공휴일이 있었으면, 그 시간이 기준이 돼요.
+- **계절성 모델**: 몇 주 치 데이터로 하루, 한 주마다 되풀이되는 모양(계절성)을 배워 예측해요. 모양을 배우려면 데이터가 몇 주 필요해요.
+
+GitLab은 1주, 2주, 3주 전 같은 시간대의 값으로 예측을 하나씩 만들고, 그 가운데 값(중앙값)을 썼어요. 한 주에 공휴일이 끼어도 나머지 두 주가 기준을 지켜 줘요.
+
+## 범위는 얼마나 넓게 잡을까요
+
+값이 정규분포(평균 가까이 많고, 멀어질수록 드문 종 모양)를 따르면 ±3σ 안에 99.73%가 들어요. 남은 0.27%는 아무 일 없어도 범위를 벗어나요. 1분마다 판정하면 하루 1,440번이라, 장애가 없어도 하루 4번쯤 벗어나요.
+
+범위를 넓히면 잘못된 표시는 줄지만, 작은 변화는 놓쳐요. 그래서 '5분 넘게 벗어나 있을 때'처럼 지속 시간을 함께 걸어요.
+
+실제 지표는 정규분포가 아닐 때가 많아요. 에러율, 응답시간, 대기열 길이는 한쪽으로 꼬리가 길어서 σ 범위가 잘 맞지 않아요. GitLab도 이런 지표는 고정 임계값이 더 잘 맞는 경우가 많다고 했어요.
+
+## 이럴 때 잘못 울려요
+
+- **이유 있는 변화**: 할인 행사, 배포로 바뀐 동작, 공휴일이에요. 새 수준이 기준선에 반영될 때까지 계속 이상으로 표시돼요.
+- **기준 기간에 장애가 섞임**: 지난주 장애 시간이 기준이 되면, 오늘의 정상 값이 '평소와 다르다'고 나와요.
+- **값이 작고 들쭉날쭉함**: 분당 요청 3건인 서비스는 0건, 8건이 흔해요. 범위가 넓어져 쓸모가 없거나, 자주 벗어나요.
+
+작은 값의 출렁임은 여러 인스턴스를 합치거나 긴 구간으로 <Term slug="foundations/aggregation-and-downsampling">집계</Term>하면 줄어요. GitLab도 합친 값에 이상 탐지를 쓰라고 했어요.
+
+## 모니터링에서는
+
+이상 탐지는 대시보드의 범위 띠나 채팅방 알림처럼, 사람이 살펴볼 단서로 쓰기 좋아요. GitLab은 이상을 찾으면 Slack에만 알리고, 당직자는 부르지 않았어요.
+
+당직자를 부르는 알림은 <Term slug="foundations/slo-and-error-budget">SLO</Term> 같은 증상 기준에 걸어요. 이상 표시까지 당직 알림으로 보내면, 이유 있는 변화마다 울려서 <Term slug="foundations/alert-fatigue">알림 피로</Term>가 쌓여요.
+
+<Checkpoints>
+  <Check>이상 탐지 결과로 당직자를 부르게 했다면 다시 보세요. 할인 행사나 배포에도 울려요. 사람을 부르는 알림은 증상에 걸고, 이상은 단서로 보여 주세요.</Check>
+  <Check>±3σ로 판정한다면, 장애가 없어도 1분마다 판정하는 지표 하나가 하루 4번쯤 벗어나요. 지표 100개면 하루 390번쯤이에요. 지속 시간을 함께 거세요.</Check>
+  <Check>기준선을 만든 기간에 장애나 공휴일이 끼었는지 보세요. 지난주 장애가 기준이 되면, 오늘의 정상 값이 이상으로 보여요.</Check>
+  <Check>에러율이나 응답시간처럼 한쪽 꼬리가 긴 지표에 σ 범위를 그대로 썼다면 다시 보세요. 이런 지표는 고정 임계값이나 SLO 기준이 더 맞을 때가 많아요.</Check>
+  <Check>요청이 적은 서비스나 인스턴스 하나의 값에 이상 탐지를 걸었다면 다시 보세요. 값이 크게 출렁여서, 여러 인스턴스를 합친 값에 거는 편이 나아요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### Prometheus로 만드는 기준선
+
+  Prometheus에서는 질의로 기준선을 직접 만들어요. 아래는 지난주 같은 시각보다 40% 넘게 줄었는지 보는 질의예요. `offset`은 지표 이름 바로 뒤에 붙여야 해요.
+
+  ```text
+  job:http_requests:rate5m
+    / job:http_requests:rate5m
+      offset 1w
+    < 0.6
+  ```
+
+  아래는 지난 1주의 평균에서 몇 σ 떨어졌는지(z-score) 구하는 질의예요. 결과가 3보다 크거나 -3보다 작으면 ±3σ 밖이에요.
+
+  ```text
+  (
+    job:http_requests:rate5m
+    - avg_over_time(
+      job:http_requests:rate5m[1w])
+  )
+  / stddev_over_time(
+    job:http_requests:rate5m[1w])
+  ```
+
+  1주 평균은 낮과 밤을 섞은 값이라, 하루의 모양이 뚜렷한 지표에는 이 질의만으로 맞지 않아요. GitLab은 그래서 지난 주들의 값으로 만든 예측에서 몇 σ 떨어졌는지를 봤어요.
+
+  ### 추세를 이어 그리는 함수
+
+  `predict_linear(v[구간], t)`는 단순 선형 회귀로 구간의 값에 직선을 그어, t초 뒤의 값을 예측해요. 오르내리는 값(게이지)에만 써요. 아래 질의는 지난 6시간의 추세대로면 4시간 안에 디스크 남은 공간이 0 아래로 가는지 봐요.
+
+  ```text
+  predict_linear(
+    node_filesystem_avail_bytes[6h],
+    4 * 3600
+  ) < 0
+  ```
+
+  디스크가 차는 다른 이유는 <Term slug="server/disk-filling-up">디스크가 차오를 때</Term>에 있어요.
+
+  `double_exponential_smoothing()`은 최근 값에 무게를 더 주어 값을 부드럽게 만들어요. Prometheus 2에서는 이름이 `holt_winters`였는데, 3에서 이름이 바뀌었어요. 지금은 `--enable-feature=promql-experimental-functions`를 켜야 써요.
+
+  Holt-Winters는 보통 계절성까지 다루는 방식을 뜻해서, 수준과 추세만 다루는 이 함수와 헷갈렸어요. 그래서 이름을 바꿨어요.
+
+  ### 상용 도구의 방식
+
+  Datadog의 이상 탐지는 세 가지 방식을 골라 써요. basic은 계절성 없이 최근 값만 보고, agile과 robust는 계절성을 배워요.
+
+  agile은 값의 수준이 바뀌면 빨리 따라가요. 대신 오래 이어지는 이상도 금방 '새 평소'로 받아들여요. robust는 반대로 오래 이어지는 이상에도 기준이 흔들리지 않지만, 배포처럼 의도한 수준 변화를 늦게 따라가요.
+
+  주 단위 계절성은 최소 3주 치 데이터가 있어야 해요. 새 서비스는 처음 몇 주 동안 기준선이 부정확해요.
+</Deeper>

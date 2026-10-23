@@ -1,0 +1,73 @@
+---
+title: 단위와 숫자 표기
+summary: 단위를 잘못 읽으면 숫자가 8배, 1,000배 틀려요. KB와 KiB, 비트와 바이트를 가려요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 15
+icon: hash
+keywords: [단위, unit, KiB, KB, '1024', bit, byte, bps, 퍼센트, 퍼센트포인트]
+related: [foundations/percentiles, network/interfaces-and-traffic, server/cpu-usage, kubernetes/requests-and-limits]
+sources:
+  - title: NIST — Prefixes for binary multiples
+    url: https://physics.nist.gov/cuu/Units/binary.html
+  - title: Linux man-pages — df(1)
+    url: https://man7.org/linux/man-pages/man1/df.1.html
+  - title: Prometheus — Metric and label naming
+    url: https://prometheus.io/docs/practices/naming/
+  - title: Grafana — value format categories (source)
+    url: https://github.com/grafana/grafana/blob/main/packages/grafana-data/src/valueFormats/categories.ts
+updated: 2026-10-23
+---
+
+<OnDashboard title="같은 장비, 다른 숫자" caption="같은 디스크가 1TB로도, 931GiB로도 보여요. 1Gbps 회선은 바이트로 바꾸면 초당 125MB예요.">
+  <StatTile label="디스크 표기" value="1" unit="TB" note="1000 기준" />
+  <StatTile label="OS 표기" value="931" unit="GiB" note="1024 기준" />
+  <StatTile label="1Gbps 회선" value="125" unit="MB/초" note="8로 나눔" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="KB와 KiB는 다른 단위예요">
+    킬로(k), 메가(M), 기가(G)는 1000씩 커지는 단위예요. 키비(Ki), 메비(Mi), 기비(Gi)는 1024씩 커져요. 디스크 제조사는 1TB를 10¹²바이트로 세는데, 1024로 나눠 가면 약 931GiB예요.
+
+    문제는 글자만 보고 어느 쪽인지 모를 때가 많다는 거예요. 리눅스 `df -h`는 1024로 나누면서도 `G`라고 적고, `df -H`는 1000으로 나눠요.
+  </Point>
+  <Point title="네트워크는 비트, 저장은 바이트예요">
+    회선 속도는 초당 비트(bps)로, 파일과 디스크는 바이트(B)로 세요. 1바이트는 8비트라서, 1Gbps 회선은 초당 125MB를 옮겨요.
+
+    그래서 인터페이스의 바이트 카운터로 회선 사용률을 구할 때는 8을 곱해 비트로 바꿔요. 계산은 <Term slug="network/interfaces-and-traffic">인터페이스와 트래픽</Term>에 있어요.
+  </Point>
+  <Point title="퍼센트는 무엇에 대한 비율인지 봐요">
+    프로세스 CPU 사용률은 코어 하나를 100%로 세서, 코어 4개를 다 쓰면 400%예요. 서버 전체 사용률은 모든 코어를 합쳐 100%로 세요. 기준은 <Term slug="server/cpu-usage">CPU 사용률과 부하</Term>에서 다뤄요.
+
+    에러율이 1%에서 2%가 되면 1%p(퍼센트포인트) 오른 거예요. 비율로는 두 배라, "1% 올랐다"와 "100% 올랐다"가 같은 변화를 말할 수 있어요.
+  </Point>
+</KeyPoints>
+
+<Checkpoints>
+  <Check>바이트를 사람이 읽는 단위로 바꾸는 함수가 1000으로 나누는지 1024로 나누는지 보세요. 1024로 나누고 `KB`, `TB`라고 붙이면 TB에서는 약 10% 차이가 나요. 나눈 수에 맞게 `KiB`·`KB`를 고르세요.</Check>
+  <Check>응답시간 지표가 초인지 밀리초인지 이름과 문서로 확인하세요. Prometheus는 초를 기본 단위로 권해요. 밀리초 값을 초로 읽으면 1,000배 틀려요.</Check>
+  <Check>네트워크 그래프의 단위가 bps인지 B/s인지 보세요. 바이트 카운터를 8을 곱하지 않고 bps로 표시하면, 트래픽이 8분의 1로 보여요.</Check>
+  <Check>작은 비율을 반올림해 0%로 보여 주지 마세요. 에러율 0.04%도 요청 100만 건이면 400건이에요. 값의 크기에 맞게 소수점 자리를 늘리세요.</Check>
+  <Check>비율 값이 0~1인지 0~100인지 확인하세요. 0~1 값에 100을 곱하지 않고 퍼센트로 그리면 99%가 0.99%로 보여요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 2의 거듭제곱 접두어
+
+  국제전기기술위원회(IEC)는 1998년에 2의 거듭제곱을 뜻하는 접두어를 따로 정했어요. Ki는 2¹⁰(1,024), Mi는 2²⁰, Gi는 2³⁰이에요. 그래서 k, M, G는 원래 뜻대로 1000의 거듭제곱으로 남겨 둘 수 있어요.
+
+  쿠버네티스 메모리 단위도 이 규칙을 따라서 `Mi`와 `M`이 달라요. 소문자 `m`은 1/1000이라 메모리에 쓰면 안 돼요. 자세한 건 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>에 있어요.
+
+  ### 지표 이름에 단위 남기기
+
+  Prometheus 문서는 지표에 기본 단위를 쓰라고 해요. 시간은 초, 크기는 바이트예요. 비트가 더 흔해 보이는 곳에서도 바이트를 쓰고, 퍼센트 대신 0~1 비율을 쓰라고 해요.
+
+  단위는 `http_request_duration_seconds`, `node_memory_usage_bytes`처럼 이름 끝에 붙여요. 한 지표 안에서 초와 밀리초를 섞으면 안 된다고도 해요. 사람이 읽기 좋은 단위로 바꾸는 일은 그래프 도구에 맡겨요.
+
+  ### Grafana의 단위 설정
+
+  Grafana 패널의 단위 목록에는 바이트가 두 가지 있어요. `bytes(IEC)`는 1024로, `bytes(SI)`는 1000으로 나눠 보여 줘요. 비트도 `bits(IEC)`와 `bits(SI)`로 나뉘어요.
+
+  퍼센트도 `Percent (0-100)`와 `Percent (0.0-1.0)`가 따로 있어요. 값이 0~1 비율이면 뒤의 것을 골라야 100을 곱해서 보여 줘요.
+</Deeper>
