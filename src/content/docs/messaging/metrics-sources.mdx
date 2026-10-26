@@ -1,0 +1,112 @@
+---
+title: Kafka 지표 읽는 법
+summary: 브로커는 JMX로 지표를 내요. 0이어야 할 숫자부터 보고, 컨슈머 지연은 따로 계산해요.
+domain: messaging
+type: concept
+stage: monitoring
+order: 65
+icon: messages-square
+keywords: [Kafka 지표, JMX, MBean, UnderReplicatedPartitions, OfflinePartitionsCount, ActiveControllerCount, BytesInPerSec, TotalTimeMs, RequestHandlerAvgIdlePercent, JMX Exporter]
+related: [messaging/replication, messaging/under-replicated, messaging/lag-growing, messaging/consumers-and-groups, messaging/producer-send-failing]
+sources:
+  - title: Apache Kafka 4.3 — Monitoring
+    url: https://kafka.apache.org/43/operations/monitoring/
+  - title: Prometheus JMX Exporter — README
+    url: https://github.com/prometheus/jmx_exporter/blob/main/README.md
+  - title: Prometheus JMX Exporter — Documentation (Deployment modes)
+    url: https://prometheus.github.io/jmx_exporter/
+updated: 2026-10-26
+---
+
+<OnDashboard title="Kafka 클러스터 · 브로커 3대" caption="0이어야 할 숫자는 모두 0이에요. 그런데 요청을 처리하는 스레드가 쉬는 비율이 12%로, 문서가 권하는 30%보다 낮아요. 곧 요청이 밀리기 시작해요.">
+  <StatTile label="복제 모자란 파티션" value="0" unit="개" />
+  <StatTile label="리더 없는 파티션" value="0" unit="개" />
+  <StatTile label="활성 컨트롤러" value="1" unit="개" note="클러스터에 하나" />
+  <StatTile label="요청 스레드 쉬는 비율" value="12" unit="%" tone="warn" note="30% 이상 권장" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="브로커는 JMX로 지표를 내요">
+    Kafka는 자바 프로그램이라, 브로커와 클라이언트 모두 지표를 JMX(자바 프로그램의 관리 창구)로 내놓아요. Prometheus로 모으려면 JMX 값을 바꿔 주는 exporter를 붙여요.
+  </Point>
+  <Point title="0이어야 할 숫자부터 봐요">
+    복제가 모자란 파티션과 리더가 없는 파티션은 평소 0이에요. 활성 컨트롤러는 클러스터 전체에 딱 하나예요. 이 숫자들이 어긋나면 데이터를 잃거나 쓰지 못할 수 있어요.
+  </Point>
+  <Point title="지연은 브로커가 모르는 숫자예요">
+    컨슈머가 얼마나 밀렸는지는 컨슈머가 스스로 내거나, 그룹이 커밋한 오프셋과 파티션 끝을 견줘 따로 계산해요. 브로커 지표에는 없어요.
+  </Point>
+</KeyPoints>
+
+## 지표가 나오는 곳
+
+<Figure caption="브로커 지표는 JMX에서 exporter를 거쳐 모여요. 컨슈머 지연은 컨슈머 쪽 지표나, 그룹 오프셋을 묻는 별도의 계산기에서 와요.">
+  <Flow
+    ariaLabel="브로커의 JMX 지표를 exporter가 바꿔 모니터링 서버로 보내고, 컨슈머 지연은 컨슈머 지표나 그룹 오프셋 계산기에서 오는 구조도"
+    nodes={[
+      { id: 'broker', label: '브로커', col: 0, row: 0, note: 'JMX' },
+      { id: 'exp', label: 'exporter', col: 1, row: 0, note: '형식 바꾸기' },
+      { id: 'mon', label: '모니터링 서버', col: 2, row: 0, tone: 'accent' },
+      { id: 'consumer', label: '컨슈머', col: 0, row: 1, note: 'records-lag-max' },
+      { id: 'lag', label: '지연 계산기', col: 1, row: 1, note: '그룹 오프셋 조회' },
+    ]}
+    edges={[
+      { from: 'broker', to: 'exp' },
+      { from: 'exp', to: 'mon', tone: 'accent' },
+      { from: 'consumer', to: 'mon' },
+      { from: 'lag', to: 'mon' },
+    ]}
+  />
+</Figure>
+
+JMX 지표는 MBean 이름이라는 긴 이름을 가져요. 예를 들면 `kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions`예요.
+
+exporter가 이를 Prometheus 이름으로 바꾸는데, 바뀐 이름은 exporter의 설정 규칙마다 달라요. 그래서 아래부터는 원래 JMX 이름의 끝부분으로 불러요.
+
+Kafka 문서는 비율로 세는 지표마다 누적값도 함께 낸다고 해요. 이름 끝에 `-total`이 붙은 쪽이 누적값이에요.
+
+## 0이어야 할 지표
+
+| 지표 | 평소 값 | 뜻 |
+| --- | --- | --- |
+| `UnderReplicatedPartitions` | 0 | 따라오는 복제본(ISR)이 모든 복제본보다 적은 파티션 |
+| `UnderMinIsrPartitionCount` | 0 | ISR이 `min.insync.replicas`보다 적은 파티션 |
+| `OfflinePartitionsCount` | 0 | 리더가 없어 읽고 쓸 수 없는 파티션 |
+| `ActiveControllerCount` | 클러스터 합 1 | 지금 컨트롤러 역할을 하는지 |
+| `IsrShrinksPerSec` | 0 | ISR에서 복제본이 빠지는 빈도 |
+
+복제가 모자란 파티션은 <Term slug="messaging/under-replicated">복제가 모자란 파티션이 생길 때</Term>의 순서로 봐요. `UnderMinIsrPartitionCount`가 0이 아니면, `acks=all`로 보내는 프로듀서는 그 파티션에 쓰지 못해요.
+
+## 들어오고 나가는 양
+
+`MessagesInPerSec`, `BytesInPerSec`, `BytesOutPerSec`는 클라이언트와 주고받은 양이에요. 토픽(`topic`)마다 따로 나오고, 토픽을 빼면 모든 토픽을 합친 값이 나와요.
+
+브로커끼리 복제하느라 주고받은 양은 `ReplicationBytesInPerSec`와 `ReplicationBytesOutPerSec`로 따로 세요. 네트워크 사용량을 볼 때는 둘을 더해야 회선에 실린 양과 맞아요.
+
+## 요청이 늦을 때
+
+`TotalTimeMs`는 요청 하나가 브로커에서 걸린 시간이에요. 요청 종류(`Produce`, `FetchConsumer`, `FetchFollower`)마다 따로 나와요. 대기열에서 기다린 시간, 직접 처리한 시간, 다른 복제본을 기다린 시간, 응답을 보낸 시간으로 나눠 볼 수도 있어요.
+
+`RequestHandlerAvgIdlePercent`는 요청을 처리하는 스레드가 쉬는 비율이에요. Kafka 문서는 0~1 사이에서 0.3보다 크길 권해요. 이 값이 낮으면 스레드가 모자라 요청이 대기열에서 기다리기 시작해요.
+
+## 컨슈머 지연
+
+`records-lag-max`는 컨슈머가 내는 지표라 브로커를 모아서는 볼 수 없어요. 앱의 지표로 따로 모아야 해요. 뜻은 <Term slug="messaging/consumers-and-groups">컨슈머와 컨슈머 그룹</Term>에서 다뤘어요.
+
+컨슈머 앱의 지표를 모으기 어렵다면, 그룹이 커밋한 오프셋과 파티션의 끝 오프셋을 물어 차이를 구해요. `kafka-consumer-groups.sh`가 보여 주는 LAG가 이 값이에요. 지연이 쌓일 때의 순서는 <Term slug="messaging/lag-growing">컨슈머 지연이 쌓일 때</Term>에 있어요.
+
+<Checkpoints>
+  <Check>토픽별 `BytesInPerSec`를 모두 더했는데 실제보다 두 배라면, 모든 토픽을 합친 줄까지 함께 더한 건 아닌지 보세요. 토픽 레이블이 없는 줄이 합계예요.</Check>
+  <Check>`ActiveControllerCount`를 브로커마다 따로 보고 0이라 걱정했다면, 클러스터 전체의 합을 보세요. 합이 1이면 정상이고, 0이거나 2 이상이면 문제예요.</Check>
+  <Check>브로커 지표만 모으면서 컨슈머 지연 화면을 만들었다면 다시 보세요. 지연은 컨슈머 지표나 그룹 오프셋에서 따로 가져와야 해요.</Check>
+  <Check>네트워크 사용량을 클라이언트 바이트만으로 그렸다면, 복제 바이트도 더하세요. 복제본이 셋이면 브로커끼리 주고받는 양이 꽤 커요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 원격 JMX는 꺼져 있어요
+
+  Kafka 문서는 원격 JMX를 기본으로 꺼 두고, 켤 때는 운영 환경에서 보안을 꼭 함께 켜라고 해요. JMX Exporter 문서도 브로커 프로세스 안에 자바 에이전트로 붙이는 방식을 권해요. 원격 JMX를 따로 열지 않아도 되기 때문이에요.
+
+  ### KRaft 모드의 컨트롤러 지표
+
+  KRaft 모드에서는 컨트롤러가 브로커와 다른 노드일 수 있어요. 그러면 `ActiveControllerCount` 같은 컨트롤러 지표는 컨트롤러 노드에서 모아야 해요. Kafka 문서는 KRaft 쿼럼, 컨트롤러, 브로커 지표를 따로 나눠 적어요.
+</Deeper>

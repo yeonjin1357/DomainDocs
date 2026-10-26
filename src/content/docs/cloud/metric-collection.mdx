@@ -1,0 +1,95 @@
+---
+title: 클라우드 지표를 가져오는 두 방식
+summary: API로 주기마다 묻거나, 지표 스트림으로 밀어 받아요. 많이 자주 볼수록 스트림이 싸고 빨라요.
+domain: cloud
+type: concept
+stage: monitoring
+order: 89
+icon: cloud
+keywords: [Metric Streams, 지표 스트림, GetMetricData, CloudWatch, Firehose, 폴링, push, OpenTelemetry, 지표 수집 비용, 지연]
+related: [cloud/cloud-metrics, cloud/cloud-metrics-missing, cloud/throttling, cloud/costs, foundations/collection-interval]
+sources:
+  - title: AWS — Use metric streams
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Metric-Streams.html
+  - title: AWS — Statistics that can be streamed
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-metric-streams-statistics.html
+  - title: AWS — Metric streams output formats
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-metric-streams-formats.html
+  - title: AWS — Troubleshooting metric streams
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-metric-streams-troubleshoot.html
+  - title: AWS — CloudWatch service quotas (GetMetricData)
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html
+  - title: AWS Price List API — CloudWatch 가격 목록 파일(us-east-1)
+    url: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/price-changes.html
+updated: 2026-10-26
+---
+
+<OnDashboard title="지표 1,000개를 1분마다 · 한 달 요금" caption="us-east-1 단가로 계산했어요. 스트림 쪽은 CloudWatch 요금만이고, 전달하는 Firehose 요금은 따로예요.">
+  <StatTile label="API로 묻기" value="432" unit="달러" note="GetMetricData" />
+  <StatTile label="지표 스트림" value="130" unit="달러" tone="accent" note="+ Firehose 요금" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="묻거나, 밀어 받아요">
+    모니터링 제품은 API로 주기마다 지표를 묻거나(GetMetricData), 지표 스트림(Metric Streams)으로 밀어 받아요. 앞은 수집기가, 뒤는 CloudWatch가 보내기를 시작해요.
+  </Point>
+  <Point title="많이, 자주 볼수록 스트림이 싸요">
+    API는 요청한 지표 수로, 스트림은 보낸 지표 갱신 수로 요금을 받아요. us-east-1 단가로는 스트림이 3분의 1쯤이에요. 다만 스트림은 전달 경로(Firehose) 요금이 따로 붙어요.
+  </Point>
+  <Point title="스트림은 보낸 값을 다시 보내지 않아요">
+    스트림은 한 시각의 값을 한 번 보내면, 나중에 그 값이 바뀌어도 다시 보내지 않아요. API는 같은 구간을 다시 물으면 바뀐 값을 받아요.
+  </Point>
+</KeyPoints>
+
+## 두 방식
+
+<Figure caption="같은 CloudWatch 지표라도 가져오는 길이 달라요. API는 수집기가 시작하고, 스트림은 CloudWatch가 Firehose를 거쳐 보내요.">
+  <Compare
+    columns={['API로 묻기', '지표 스트림']}
+    rows={[
+      { label: '누가 시작', values: ['수집기가 주기마다', 'CloudWatch가 생기는 대로'] },
+      { label: '길', values: ['GetMetricData 호출', 'Firehose로 전달'] },
+      { label: '요금', values: ['요청한 지표 수', '보낸 갱신 수 + Firehose'] },
+      { label: '늦게 바뀐 값', values: ['다시 물으면 받아요', '다시 보내지 않아요'] },
+    ]}
+  />
+</Figure>
+
+API 방식은 <Term slug="cloud/cloud-metrics">클라우드 지표</Term>를 수집기가 정해 둔 간격마다 물어요. 묻는 만큼 API 한도를 쓰고, 계정과 지표가 늘면 <Term slug="cloud/throttling">스로틀링</Term>에 걸리기 쉬워요.
+
+지표 스트림은 CloudWatch가 지표를 거의 실시간으로 계속 보내 줘요. 받는 곳은 Amazon Data Firehose를 거쳐 S3나 다른 업체의 수집 주소예요. AWS는 Datadog, Dynatrace, New Relic 같은 몇몇 업체로 바로 이어 주는 설정도 제공해요.
+
+## 스트림이 보내는 것
+
+스트림은 지표마다 최솟값(Minimum), 최댓값(Maximum), 개수(SampleCount), 합(Sum)을 늘 보내요. 평균은 합을 개수로 나눠 구해요. p95, p99 같은 백분위수는 지표마다 골라서 더 보낼 수 있어요.
+
+보내는 형식은 JSON과 OpenTelemetry(1.0.0, 0.7.0) 가운데서 골라요. 스트림 하나에는 이름 공간이나 지표를 고르는 필터를 1,000개까지 둘 수 있어요. 다만 한 스트림에 포함 필터와 제외 필터를 섞어 쓸 수는 없어요.
+
+## 요금 견주기
+
+us-east-1 가격 목록으로 GetMetricData는 요청한 지표 1,000개마다 0.01달러예요. 스트림은 갱신 1,000건마다 0.003달러예요. 지표 1,000개를 1분마다 한 달 동안 받으면 4,320만 건이에요.
+
+그래서 API로 묻는 쪽은 432달러, 스트림은 129.6달러예요. 스트림에는 Firehose 요금과 받는 쪽의 요금이 더해져요. 요금이 어디서 쌓이는지는 <Term slug="cloud/costs">클라우드 비용은 어디서 나올까</Term>에서 다뤘어요.
+
+## 모니터링에서는
+
+볼 지표가 적거나 가끔 보는 지표라면, API로 묻는 쪽이 설정이 간단해요. 계정이 여럿이고 지표가 수만 개라면, 스트림이 요금과 API 한도 양쪽에서 유리해요.
+
+스트림은 한 번 보낸 시각의 값을 다시 보내지 않아요. 그래서 늦게 들어와 고쳐진 값은 스트림으로 받은 그래프와 CloudWatch 콘솔에서 조금 다를 수 있어요.
+
+<Checkpoints>
+  <Check>스트림 비용을 CloudWatch 갱신 요금만으로 계산했다면 다시 보세요. Firehose로 전달하는 요금과 받는 쪽의 요금이 더해져요.</Check>
+  <Check>모든 지표에 백분위수까지 스트림으로 보내고 있다면, 정말 필요한 지표인지 보세요. 더한 통계도 갱신으로 세어 요금이 늘어요.</Check>
+  <Check>스트림으로 받은 값이 콘솔과 조금 다르다면, 늦게 고쳐진 값일 수 있어요. 스트림은 한 번 보낸 값을 다시 보내지 않아요.</Check>
+  <Check>API 방식으로 계정과 지표가 계속 늘고 있다면, 수집기 로그의 스로틀링 오류와 GetMetricData 요금을 함께 보세요. 스트림으로 옮길 때가 됐을 수 있어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 더한 통계의 요금
+
+  AWS 문서의 예는 지표 하나에 통계 여섯 개(p95, p99, p99.9 등)를 더한 경우예요. 그 지표의 갱신 하나가 세 건으로 세어져요. 기본 통계에 한 건, 더한 통계 다섯 개마다 한 건씩이에요.
+
+  ### 필터 뒤에 생긴 지표
+
+  스트림을 만든 뒤 새로 생긴 지표도 필터에 맞으면 함께 보내요. 그래서 이름 공간 단위로 포함 필터를 걸면, 새 자원의 지표가 저절로 따라와요.
+</Deeper>

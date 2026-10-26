@@ -1,0 +1,41 @@
+questions:
+  - id: who-starts
+    type: choice
+    prompt: CloudWatch 지표 스트림(Metric Streams)은 지표를 어떻게 전하나요?
+    choices:
+      - CloudWatch가 생기는 대로 Firehose를 거쳐 보내요
+      - 수집기가 주기마다 GetMetricData로 물어요
+      - 에이전트가 서버 안에서 직접 읽어 보내요
+      - 콘솔 화면을 내려받아 읽어요
+    answer: 0
+    explain: 스트림은 CloudWatch가 보내기를 시작해요. 주기마다 묻는 건 API 방식이에요.
+  - id: stream-cost-extra
+    type: ox
+    prompt: 지표 스트림의 비용은 CloudWatch의 지표 갱신 요금만 계산하면 되나요?
+    answer: false
+    explain: 스트림은 Firehose를 거쳐 전달돼서 그 요금이 따로 붙어요. 받는 쪽의 요금도 생각해요.
+  - id: late-update
+    type: ox
+    prompt: 스트림으로 이미 보낸 시각의 값이 나중에 고쳐지면, 스트림이 고친 값을 다시 보내 주나요?
+    answer: false
+    explain: 스트림은 한 시각의 값을 한 번만 보내요. API로 같은 구간을 다시 물으면 고친 값을 받을 수 있어요.
+  - id: average-from-stream
+    type: choice
+    prompt: 지표 스트림이 기본으로 보내는 통계만으로 평균을 구하려면?
+    choices:
+      - Sum을 SampleCount로 나눠요
+      - Maximum과 Minimum의 중간값을 구해요
+      - p50을 따로 켜야 해요
+      - 평균은 구할 수 없어요
+    answer: 0
+    explain: 스트림은 최솟값, 최댓값, 개수, 합을 늘 보내요. 합을 개수로 나누면 평균이에요.
+  - id: when-stream
+    type: choice
+    prompt: 계정 20개에서 지표 수만 개를 1분마다 모으는데, GetMetricData 요금과 스로틀링이 계속 늘어요. 먼저 검토할 방법은?
+    choices:
+      - 지표 스트림으로 옮겨요
+      - 수집 간격을 10초로 줄여요
+      - 계정을 하나로 합쳐요
+      - 모든 지표에 백분위수를 더해요
+    answer: 0
+    explain: 많이 자주 받을수록 스트림이 요금과 API 한도 양쪽에서 유리해요. 간격을 줄이면 둘 다 더 나빠져요.
