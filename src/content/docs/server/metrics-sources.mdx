@@ -1,0 +1,131 @@
+---
+title: 서버 지표는 어디서 오나
+summary: 커널이 센 누적값을 에이전트가 읽어 옮겨요. 화면의 숫자는 그 값을 계산한 결과라 도구마다 달라요.
+domain: server
+type: concept
+stage: monitoring
+order: 55
+icon: server
+keywords: [node_exporter, 에이전트, agent, /proc, 서버 지표, node_cpu_seconds_total, MemAvailable, cgroup, 컨테이너 메모리, pull]
+related: [server/overview, server/cpu-usage, server/memory, server/server-not-reporting, foundations/why-numbers-differ]
+sources:
+  - title: Linux man-pages — proc(5)
+    url: https://man7.org/linux/man-pages/man5/proc.5.html
+  - title: node_exporter — README (기본 포트 9100, 수집기, 컨테이너로 돌릴 때)
+    url: https://github.com/prometheus/node_exporter/blob/master/README.md
+  - title: Linux kernel — Control Group v2 (memory.current, memory.max, cpu.stat)
+    url: https://docs.kernel.org/admin-guide/cgroup-v2.html
+  - title: LXCFS — README (컨테이너에 맞춘 /proc)
+    url: https://github.com/lxc/lxcfs/blob/main/README.md
+  - title: Prometheus — Query functions (rate)
+    url: https://prometheus.io/docs/prometheus/latest/querying/functions/
+updated: 2026-10-26
+---
+
+<OnDashboard title="같은 서버의 CPU 사용률 · 같은 시각" caption="세 화면 모두 같은 커널 값에서 왔어요. 몇 초 동안의 평균인지가 달라서 숫자가 달라요.">
+  <StatTile label="터미널의 top" value="92" unit="%" note="몇 초 평균" />
+  <StatTile label="에이전트 그래프" value="41" unit="%" note="1분 평균" />
+  <StatTile label="클라우드 콘솔" value="38" unit="%" note="5분 평균" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="커널이 세고, 에이전트가 옮겨요">
+    커널은 CPU 시간, 메모리, 디스크, 네트워크의 값을 `/proc`와 `/sys`에 내놓아요. 에이전트가 이 값을 정해진 간격으로 읽어 모니터링 서버로 옮기고, 화면은 옮겨진 값을 계산해 그려요.
+  </Point>
+  <Point title="같은 값도 계산하는 쪽마다 달라요">
+    CPU 사용률은 누적값의 차이로 구해서, 몇 초 동안의 차이인지에 따라 달라져요. 어떤 시간을 '사용'에 넣는지, 코어를 어떻게 합치는지도 도구마다 달라요.
+  </Point>
+  <Point title="컨테이너 안의 /proc는 서버 전체예요">
+    컨테이너 안에서 `/proc/meminfo`를 읽으면 그 컨테이너가 아니라 서버 전체의 메모리가 나와요. 컨테이너가 쓰는 양은 cgroup 파일에서 읽어요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="출근부는 사람이 적어 두지만, /proc는 읽는 순간 커널이 그때의 값을 만들어 줘요. 베끼는 사이에 일어난 일은 다음에 베낄 때 늘어난 누적값으로만 알 수 있어요.">
+  커널은 사무실 관리자가 쓰는 출근부와 같아요. 에이전트는 이 출근부를 정해진 시각마다 베껴 본사로 보내는 사람이에요.
+</Analogy>
+
+## 커널에서 화면까지
+
+<Figure caption="에이전트는 서버마다 하나씩 돌며 커널 값을 읽어요. Prometheus 방식은 모니터링 서버가 에이전트에게 값을 받아 가고(pull), 많은 상용 에이전트는 직접 보내요(push).">
+  <Flow
+    ariaLabel="커널이 /proc와 /sys에 값을 내놓고, 에이전트가 읽어 모니터링 서버로 옮기고, 화면이 모니터링 서버의 값을 그리는 구조도"
+    nodes={[
+      { id: 'kernel', label: '커널', col: 0, row: 0, note: '/proc · /sys' },
+      { id: 'agent', label: '에이전트', col: 2, row: 0, note: '간격마다 읽기', tone: 'accent' },
+      { id: 'tsdb', label: '모니터링 서버', col: 2, row: 1, note: '시계열 저장' },
+      { id: 'ui', label: '화면', col: 0, row: 1, note: '계산해 그리기' },
+    ]}
+    edges={[
+      { from: 'kernel', to: 'agent', label: '읽기' },
+      { from: 'agent', to: 'tsdb', tone: 'accent' },
+      { from: 'tsdb', to: 'ui' },
+    ]}
+  />
+</Figure>
+
+`/proc`의 값 대부분은 부팅 뒤 계속 늘어나는 누적값이에요. 에이전트는 이 누적값을 그대로 옮기고, 사용률이나 초당 양은 모니터링 서버나 화면에서 두 시점의 차이로 계산해요. 원리는 <Term slug="foundations/counters-and-rate">카운터와 rate</Term>와 같아요.
+
+Prometheus 생태계의 서버 에이전트는 node_exporter예요. 기본으로 9100번 포트에서 지표를 보여 주고, Prometheus가 정해진 간격마다 가져가요. 상용 모니터링 에이전트는 보통 스스로 읽어서 서버로 보내요.
+
+## node_exporter가 내는 이름
+
+| 지표 | 뜻 |
+| --- | --- |
+| `node_cpu_seconds_total` | 코어(`cpu`)와 쓰임새(`mode`)마다 쓴 CPU 시간의 누적(초) |
+| `node_memory_MemAvailable_bytes` | 새 프로그램이 쓸 수 있는 메모리 |
+| `node_filesystem_avail_bytes` | 파일 시스템(`mountpoint`)마다 일반 사용자가 쓸 수 있는 공간 |
+| `node_disk_io_time_seconds_total` | 디스크가 입출력으로 바빴던 시간의 누적 |
+| `node_network_receive_bytes_total` | 인터페이스마다 받은 바이트의 누적 |
+
+`/proc/stat`의 CPU 시간은 틱 단위(보통 초당 100)인데, node_exporter는 이를 초로 바꿔 내요. 그래서 CPU 사용률은 쉬는 시간(`idle`)의 초당 증가량을 1에서 빼서 구해요.
+
+```text
+1 - avg by (instance) (
+  rate(
+    node_cpu_seconds_total{
+      mode="idle"
+    }[5m]
+  )
+)
+```
+
+`avg`로 모든 코어를 평균 내서, 서버 전체 사용률이 0~1로 나와요. 코어 하나만 바쁜지는 `by (instance, cpu)`로 나눠 봐야 보여요.
+
+## 같은 서버, 다른 숫자
+
+같은 커널 값에서 와도 화면마다 숫자가 다른 이유는 셋이에요.
+
+- **평균 낸 시간**: top처럼 몇 초마다 새로 고치는 도구는 짧은 폭주를 그대로 보여 주고, 1분이나 5분 평균은 그걸 깎아요.
+- **'사용'에 넣는 시간**: 디스크를 기다린 시간(iowait)을 쉬는 시간으로 보느냐에 따라 사용률이 달라요. 시간의 종류는 <Term slug="server/cpu-usage">CPU 사용률과 부하</Term>에 있어요.
+- **메모리의 '사용'**: 전체에서 MemFree를 빼느냐, MemAvailable을 빼느냐에 따라 크게 달라요. 차이는 <Term slug="server/memory">메모리</Term>에서 다뤘어요.
+
+두 화면의 숫자가 다르면 이 셋을 맞춰 보고 견줘요. 순서는 <Term slug="foundations/why-numbers-differ">같은 지표가 화면마다 다르게 보이는 이유</Term>에 있어요.
+
+## 컨테이너에서는
+
+`/proc/meminfo`, `/proc/stat` 같은 파일은 컨테이너 안에서 읽어도 서버 전체의 값을 보여 줘요. 그래서 컨테이너 안의 프로그램이 '메모리가 넉넉하다'고 잘못 판단하기도 해요. LXCFS 같은 도구는 이 파일들을 컨테이너에 맞춘 값으로 바꿔 보여 주려고 만들어졌어요.
+
+컨테이너가 쓰는 양은 리눅스가 컨테이너를 묶는 단위인 cgroup의 파일에 있어요. cgroup v2에서는 `memory.current`가 지금 쓰는 메모리, `memory.max`가 한도, `cpu.stat`이 쓴 CPU 시간이에요.
+
+반대로 서버 전체를 재는 node_exporter를 컨테이너로 돌리면, 서버의 파일 시스템과 프로세스를 보도록 따로 연결해 줘야 해요. README는 서버의 루트를 읽기 전용으로 붙이고 `--path.rootfs`로 알려 주라고 해요.
+
+## 에이전트도 지켜봐요
+
+에이전트가 멈추면 서버의 모든 그래프가 함께 비어요. Prometheus 방식이라면 `up`(수집 성공 1, 실패 0)으로 에이전트가 응답하는지 봐요. 그래프가 비었을 때의 순서는 <Term slug="server/server-not-reporting">서버 수집이 끊겼을 때</Term>에 있어요.
+
+<Checkpoints>
+  <Check>컨테이너 안의 에이전트가 `/proc/meminfo`로 컨테이너의 메모리 사용률을 그린다면 다시 보세요. 서버 전체 값이에요. cgroup의 `memory.current`와 `memory.max`로 구하세요.</Check>
+  <Check>파일 시스템 사용량을 모두 더했는데 실제 디스크보다 크다면, 같은 장치가 여러 곳에 마운트된 건 아닌지 보세요. 마운트마다 시계열이 생겨서 두 번 더해져요.</Check>
+  <Check>두 도구의 CPU 사용률이 다르다면, 평균 낸 시간과 iowait를 어디에 넣었는지부터 맞추세요. 어느 한쪽이 틀린 게 아닐 수 있어요.</Check>
+  <Check>서버 사용률만 보고 '여유 있음'으로 판단했다면, 코어별로도 나눠 보세요. 코어 하나만 꽉 찬 프로그램은 평균에 묻혀요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 수집기를 켜고 끄기
+
+  node_exporter는 기능별 수집기(collector)로 나뉘어 있고, 많은 수집기가 기본으로 켜져 있어요. `--collector.<이름>`으로 켜고, `--no-collector.<이름>`으로 꺼요. 필요한 것만 남기면 수집하는 양과 시계열 수가 줄어요.
+
+  ### 서버에 묶인 값 더하기
+
+  배치 작업 결과나 서버의 역할처럼 에이전트가 모르는 값은 textfile 수집기로 더할 수 있어요. 정해 둔 폴더에 지표 형식의 파일을 두면 node_exporter가 함께 내보내요. 서비스 단위의 값은 이 방식이 아니라 Pushgateway를 쓰라고 README는 권해요.
+</Deeper>
