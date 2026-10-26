@@ -1,0 +1,165 @@
+---
+title: OpenTelemetry의 구성
+summary: 앱에서 데이터를 만들어 백엔드까지 보내는 표준이에요. SDK, Collector, OTLP로 이뤄져요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 152
+icon: layers
+keywords: [OpenTelemetry, OTel, SDK, Collector, OTLP, 계측, instrumentation, service.name, semantic conventions, '4317']
+related: [foundations/logs-metrics-traces, foundations/log-collection, apm/sampling, apm/broken-traces, apm/service-map]
+sources:
+  - title: OpenTelemetry — What is OpenTelemetry?
+    url: https://opentelemetry.io/docs/what-is-opentelemetry/
+  - title: OpenTelemetry — Components
+    url: https://opentelemetry.io/docs/concepts/components/
+  - title: OpenTelemetry — Resources (service.name)
+    url: https://opentelemetry.io/docs/concepts/resources/
+  - title: OpenTelemetry — Service semantic conventions (unknown_service)
+    url: https://opentelemetry.io/docs/specs/semconv/resource/service/
+  - title: OpenTelemetry — Semantic Conventions
+    url: https://opentelemetry.io/docs/concepts/semantic-conventions/
+  - title: OTLP Specification (기본 포트 4317, 4318)
+    url: https://opentelemetry.io/docs/specs/otlp/
+  - title: OpenTelemetry Collector — Configuration
+    url: https://opentelemetry.io/docs/collector/configuration/
+  - title: OpenTelemetry Collector — Agent deployment pattern
+    url: https://opentelemetry.io/docs/collector/deploy/agent/
+  - title: OpenTelemetry Collector — Gateway deployment pattern
+    url: https://opentelemetry.io/docs/collector/deploy/gateway/
+  - title: OpenTelemetry Collector — No Collector pattern
+    url: https://opentelemetry.io/docs/collector/deploy/other/no-collector/
+  - title: opentelemetry-collector — OTLP gRPC Exporter README (기본 TLS)
+    url: https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/otlpexporter/README.md
+  - title: OpenTelemetry Collector — Internal telemetry
+    url: https://opentelemetry.io/docs/collector/internal-telemetry/
+  - title: opentelemetry-collector PR 14403 (otlp 내보내기를 otlp_grpc로 이름 바꿈)
+    url: https://github.com/open-telemetry/opentelemetry-collector/pull/14403
+updated: 2026-10-26
+---
+
+<OnDashboard title="서비스별 분당 요청 · 지난 1시간" caption="서비스 이름(service.name)을 정하지 않은 자바 앱은 unknown_service:java로 보여요. 이름이 없는 앱끼리는 한 서비스로 섞여요.">
+  <StatTile label="checkout" value="1,240" unit="/분" />
+  <StatTile label="payment" value="610" unit="/분" />
+  <StatTile label="unknown_service:java" value="2,050" unit="/분" tone="warn" note="앱 3개가 섞였어요" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="데이터를 만들고 보내는 표준이에요">
+    OpenTelemetry(줄여서 OTel)는 트레이스, 메트릭, 로그를 만들고 모아 보내는 방법을 정한 표준과 도구 모음이에요. 저장하고 화면에 그리는 일은 하지 않아요. 그 일은 Prometheus, Jaeger, 상용 모니터링 제품 같은 백엔드가 맡아요.
+  </Point>
+  <Point title="SDK, Collector, OTLP 세 조각이에요">
+    앱 안의 SDK가 데이터를 만들고, Collector가 받아 가공하고, 둘 사이는 OTLP라는 전송 규약으로 이어요. 백엔드를 바꿔도 앱의 계측 코드는 그대로 둘 수 있어요.
+  </Point>
+  <Point title="서비스 이름부터 정해요">
+    `service.name`을 정하지 않으면 `unknown_service:java`처럼 실행 파일 이름이 붙은 이름이 들어가요. 서비스 맵과 서비스 목록이 모두 이 이름으로 묶여요.
+  </Point>
+</KeyPoints>
+
+## 데이터가 지나는 길
+
+<Figure caption="앱 안의 SDK가 만든 데이터를 같은 서버의 Collector(에이전트)가 받아, 한곳에 모으는 Collector(게이트웨이)를 거쳐 백엔드로 보내요. 에이전트나 게이트웨이 없이 바로 보내도 돼요.">
+  <Flow
+    ariaLabel="앱의 SDK가 OTLP로 에이전트 Collector에 보내고, 에이전트가 게이트웨이 Collector로, 게이트웨이가 백엔드로 보내는 구조도"
+    nodes={[
+      { id: 'app', label: '앱 + SDK', col: 0, row: 0, note: '데이터를 만들어요' },
+      { id: 'agent', label: 'Collector', col: 2, row: 0, note: '에이전트' },
+      { id: 'gw', label: 'Collector', col: 2, row: 1, note: '게이트웨이', tone: 'accent' },
+      { id: 'be', label: '백엔드', col: 0, row: 1, note: '저장·화면' },
+    ]}
+    edges={[
+      { from: 'app', to: 'agent', label: 'OTLP' },
+      { from: 'agent', to: 'gw' },
+      { from: 'gw', to: 'be', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+앱이 보낸 데이터는 이 길을 모두 지나야 화면에 보여요. 그래서 데이터가 비면 앱, Collector, 백엔드 가운데 어디서 멈췄는지부터 가려요.
+
+## 앱 안에서: API, SDK, 계측 라이브러리
+
+API는 '이 구간을 span으로 기록해'처럼 계측 코드가 부르는 이름표예요. SDK는 그 호출을 받아 실제로 데이터를 만들고, 샘플링하고, 내보내요. <Term slug="apm/sampling">샘플링</Term>도 SDK 설정에서 정해요.
+
+모든 코드를 손으로 계측하지는 않아요. HTTP 서버, DB 드라이버 같은 흔한 라이브러리는 계측 라이브러리가 대신 span과 지표를 만들어요. 자바처럼 코드를 고치지 않고 에이전트를 붙여 계측하는 방식(zero-code)도 있어요.
+
+데이터에는 어느 앱에서 왔는지 알리는 속성(resource)이 붙어요. 그중 `service.name`이 가장 중요하고, 정하지 않으면 SDK가 `unknown_service:` 뒤에 실행 파일 이름을 붙여 넣어요. 보통 환경 변수 `OTEL_SERVICE_NAME`으로 정해요.
+
+## 이름을 맞추는 약속
+
+OpenTelemetry는 속성 이름도 정해 둬요. 이 약속을 semantic conventions라고 해요. 예를 들어 HTTP 요청 메서드는 `http.request.method`, 응답 코드는 `http.response.status_code`예요.
+
+이름이 같으면 백엔드가 어느 언어로 만든 앱의 데이터든 같은 방식으로 읽어요. 직접 만든 속성도 이 약속에 있는 이름이 있다면 그 이름을 써요.
+
+## 가운데서: Collector
+
+Collector는 데이터를 받고(receiver), 가공하고(processor), 내보내는(exporter) 프로그램이에요. 여러 형식을 받아 여러 백엔드로 보낼 수 있어서, 앱과 백엔드 사이의 중계소 역할을 해요.
+
+```yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+exporters:
+  otlp_grpc:
+    endpoint: backend:4317
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp_grpc]
+```
+
+받는 쪽, 보내는 쪽을 정의만 해서는 일하지 않아요. 맨 아래 `service.pipelines`에 신호(traces, metrics, logs)마다 무엇을 이을지 적어야 켜져요.
+
+Collector를 두는 방식은 둘이에요. 에이전트는 쿠버네티스의 사이드카나 DaemonSet처럼 앱 곁이나 같은 서버에 하나씩 둬요. 게이트웨이는 클러스터나 리전마다 따로 띄워 한곳에 모아요.
+
+## 둘 사이: OTLP
+
+OTLP는 OpenTelemetry의 전송 규약이에요. gRPC로 보내면 기본 포트가 4317, HTTP로 보내면 4318이에요. 백엔드가 OTLP를 바로 받는다면, Collector 없이 앱이 백엔드로 바로 보내기도 해요.
+
+## 모니터링에서는
+
+<Figure caption="Collector가 스스로 내는 지표의 예시예요. 받는 건 문제없지만 보내기가 실패하고 있고, 보내기 대기열이 거의 찼어요.">
+  <StatTile label="받은 span" value="12,000" unit="개/초" />
+  <StatTile label="보내기 실패" value="340" unit="개/초" tone="warn" />
+  <StatTile label="보내기 대기열" value="98" unit="%" tone="warn" note="크기 / 용량" />
+</Figure>
+
+Collector도 자기 지표를 내요. 기본으로 8888번 포트에서 Prometheus 형식으로 보여 줘요. 먼저 볼 지표는 아래와 같아요.
+
+| 지표 | 뜻 |
+| --- | --- |
+| `otelcol_receiver_accepted_spans` | 받은 span 수 |
+| `otelcol_receiver_refused_spans` | 받기를 거절한 span 수 |
+| `otelcol_exporter_send_failed_spans` | 보내기에 실패한 span 수 |
+| `otelcol_exporter_queue_size` | 보내기 대기열에 쌓인 양 |
+| `otelcol_exporter_queue_capacity` | 보내기 대기열의 용량 |
+
+대기열이 용량에 닿으면 새 데이터를 넣지 못해 버려요. 백엔드가 느리거나 막혔다는 신호예요.
+
+<Checkpoints>
+  <Check>서비스 목록에 `unknown_service`로 시작하는 이름이 있다면, 그 앱의 `service.name`이 빠진 거예요. 여러 앱이 한 서비스로 섞여 보여요.</Check>
+  <Check>다른 서버나 파드에서 보낸 데이터가 Collector에 오지 않는다면, receiver의 `endpoint`를 보세요. 최근 Collector는 기본으로 localhost에서만 받아요.</Check>
+  <Check>receiver와 exporter를 적었는데 데이터가 흐르지 않는다면 `service.pipelines`를 보세요. 정의만 하고 잇지 않은 부품은 켜지지 않아요.</Check>
+  <Check>Collector 자신의 보내기 실패와 대기열 지표에 알림이 없다면 거세요. 백엔드가 막히면 데이터가 조용히 버려져요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 내보내기 이름이 바뀌었어요
+
+  OTLP를 gRPC로 보내는 Collector 내보내기는 2026년 1월에 `otlp`에서 `otlp_grpc`로 이름이 바뀌었어요. 예전 이름 `otlp`는 앞으로 없어질 별칭으로 남아 있어요. 옛 설정 예시와 새 문서의 이름이 다르면 이 때문이에요.
+
+  ### 지표 이름 끝의 _total
+
+  Collector 지표를 Prometheus 형식으로 받을 때, 버전과 설정에 따라 카운터 이름 끝에 `_total`이 붙기도 해요. 최근 버전은 기본으로 붙이지 않아요. 질의가 비면 두 이름을 모두 찾아봐요.
+
+  ### 내보내기는 기본으로 TLS를 써요
+
+  OTLP gRPC 내보내기는 기본으로 TLS로 연결해요. TLS를 쓰지 않는 백엔드로 보내면 연결이 실패해서, 그때는 `tls` 설정을 백엔드에 맞춰요.
+
+  ### 수신 주소의 기본값
+
+  Collector 문서의 예시는 편의상 `0.0.0.0`으로 열어 두지만, Collector의 기본값은 localhost예요. 밖에서 받을 필요가 없다면 localhost로 두는 편이 안전해요.
+</Deeper>

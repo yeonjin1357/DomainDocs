@@ -1,0 +1,36 @@
+questions:
+  - id: otel-not-backend
+    type: ox
+    prompt: OpenTelemetry만 설치하면, 모은 트레이스를 저장하고 화면에 그려 보는 일까지 할 수 있나요?
+    answer: false
+    explain: OpenTelemetry는 데이터를 만들고 모아 보내는 쪽만 맡아요. 저장과 화면은 Prometheus, Jaeger, 상용 제품 같은 백엔드가 맡아요.
+  - id: unknown-service
+    type: choice
+    prompt: 서비스 목록에 unknown_service:java라는 이름이 보여요. 무엇이 빠졌을까요?
+    choices:
+      - 그 앱의 service.name 설정
+      - Collector의 exporter 설정
+      - 트레이스 샘플링 설정
+      - 백엔드의 저장 기간 설정
+    answer: 0
+    explain: service.name을 정하지 않으면 SDK가 unknown_service 뒤에 실행 파일 이름을 붙여 넣어요. 보통 OTEL_SERVICE_NAME 환경 변수로 정해요.
+  - id: pipeline-required
+    type: ox
+    prompt: Collector 설정의 receivers와 exporters에 부품을 적기만 하면, service.pipelines에 잇지 않아도 데이터가 흐르나요?
+    answer: false
+    explain: 정의한 부품은 service.pipelines에서 신호마다 이어 줘야 켜져요.
+  - id: otlp-grpc-port
+    type: choice
+    prompt: OTLP를 gRPC로 보낼 때의 기본 포트는?
+    choices:
+      - '4317'
+      - '4318'
+      - '8888'
+      - '9090'
+    answer: 0
+    explain: OTLP는 gRPC가 4317, HTTP가 4318이에요. 8888은 Collector가 자기 지표를 내는 기본 포트예요.
+  - id: collector-term
+    type: input
+    prompt: 여러 형식의 텔레메트리를 받아 가공한 뒤 하나 이상의 백엔드로 보내 주는 OpenTelemetry 프로그램은?
+    answer: [Collector, OpenTelemetry Collector, 컬렉터, otelcol]
+    explain: 받기(receiver), 가공(processor), 내보내기(exporter)를 파이프라인으로 이어 써요.
