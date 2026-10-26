@@ -1,0 +1,41 @@
+questions:
+  - id: top-row
+    type: choice
+    prompt: 서비스 대시보드의 맨 위 줄에 두기 가장 알맞은 것은?
+    choices:
+      - 에러율, p99 응답시간 같은 사용자가 겪는 증상
+      - 서버별 CPU 사용률
+      - JVM 힙 사용량
+      - 디스크 IOPS
+    answer: 0
+    explain: 사람은 위에서 아래로 읽어요. 증상을 먼저 보여 주고, 원인 후보인 자원 패널은 그 아래에 둬요.
+  - id: stacked-caution
+    type: ox
+    prompt: 서버별 요청 수를 누적 그래프(stacked)로 그리면, 각 서버의 값을 선 높이로 바로 읽을 수 있나요?
+    answer: false
+    explain: 누적 그래프는 선마다 아래 선 위에 얹혀 그려져서, 높이가 그 서버의 값이 아니에요. Grafana 문서도 대부분은 끄라고 해요.
+  - id: template-variable
+    type: choice
+    prompt: 서버 30대마다 같은 모양의 대시보드를 하나씩 복사해 두었어요. 더 나은 방법은?
+    choices:
+      - 서버를 고르는 변수를 둔 대시보드 한 벌로 합쳐요
+      - 서버마다 색을 다르게 칠해요
+      - 새로고침 간격을 줄여요
+      - 패널마다 평균만 남겨요
+    answer: 0
+    explain: 복사본은 하나를 고쳐도 나머지는 그대로라 금방 어긋나요. 템플릿 변수로 한 벌을 바꿔 봐요.
+  - id: refresh-rate
+    type: ox
+    prompt: 1분마다 모으는 지표를 보여 주는 대시보드를 5초마다 새로 고치면, 더 자주 바뀐 값을 볼 수 있나요?
+    answer: false
+    explain: 값은 1분에 한 번 바뀌어서 화면은 그대로이고 질의만 늘어요. 새로고침은 데이터가 바뀌는 속도에 맞춰요.
+  - id: golden-signals
+    type: choice
+    prompt: Google SRE Book이 서비스를 볼 때 먼저 보라고 한 네 가지 신호에 들지 않는 것은?
+    choices:
+      - 디스크 여유 공간
+      - 지연
+      - 에러
+      - 포화
+    answer: 0
+    explain: 네 가지는 지연, 트래픽, 에러, 포화예요. 디스크 여유 공간은 포화를 따질 때 쓰는 자원 지표 가운데 하나예요.

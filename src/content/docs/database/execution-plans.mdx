@@ -48,7 +48,7 @@ updated: 2026-10-15
 <Checkpoints>
   <Check>`UPDATE`나 `DELETE`를 `EXPLAIN ANALYZE`로 볼 때는 조심하세요. 실제로 실행되어 데이터가 바뀌어요. `BEGIN`과 `ROLLBACK` 사이에서 실행해요.</Check>
   <Check>`cost` 값을 밀리초로 읽는 화면이나 설명은 고치세요. `cost`는 디스크 페이지 하나를 차례로 읽는 비용을 1로 둔 임의 단위예요.</Check>
-  <Check>SQL은 그대로인데 실행 시간이 갑자기 늘었다면, 큰 데이터 변경 뒤 통계를 다시 모았는지 보세요. 플래너는 `ANALYZE`가 모은 통계로 행 수를 예상해서, 통계가 낡으면 계획이 나빠질 수 있어요.</Check>
+  <Check>SQL은 그대로인데 실행 시간이 갑자기 늘었다면, 큰 데이터 변경 뒤 통계를 다시 모았는지 보세요. 플래너는 `ANALYZE`가 모은 통계로 행 수를 예상해서, 통계가 낡으면 계획이 나빠질 수 있어요. 순서는 <Term slug="database/plan-changed">실행 계획이 갑자기 바뀌었을 때</Term>에 있어요.</Check>
   <Check>운영 중 느렸던 실행의 계획을 보려면 `auto_explain`을 쓰세요. `auto_explain.log_min_duration`보다 오래 걸린 SQL의 계획을 로그에 남겨요. 기본값 -1은 꺼져 있어요.</Check>
 </Checkpoints>
 

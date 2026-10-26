@@ -1,0 +1,37 @@
+questions:
+  - id: calls-vs-mean
+    type: choice
+    prompt: 한 SQL의 DB 시간이 어제보다 10배 늘었어요. 계획이 바뀐 탓이라면 SQL별 통계는 어떻게 보일까요?
+    choices:
+      - 호출 수는 그대로인데 1회 평균 시간이 늘어요
+      - 호출 수가 10배로 늘고 1회 평균 시간은 그대로예요
+      - 호출 수와 1회 평균 시간이 모두 그대로예요
+      - SQL별 통계에서 그 SQL이 사라져요
+    answer: 0
+    explain: 호출 수가 늘었다면 앱 쪽 변화예요. 계획이 바뀌면 같은 횟수를 부르는데 한 번이 느려져요.
+  - id: estimate-vs-actual
+    type: ox
+    prompt: EXPLAIN ANALYZE에서 예상 행 수가 100건, 실제 행 수가 10만 건이라면, 잘못된 예상으로 계획을 골랐을 가능성이 크나요?
+    answer: true
+    explain: 계획은 예상 행 수로 길을 골라요. 예상이 크게 빗나가면 그 행 수에 맞지 않는 방법을 고르기 쉬워요.
+  - id: auto-analyze-threshold
+    type: choice
+    prompt: PostgreSQL 기본 설정에서 100만 행인 표의 자동 ANALYZE는 대략 몇 행이 바뀌어야 돌까요?
+    choices:
+      - 10만 50행
+      - 50행
+      - 1만 행
+      - 100만 행
+    answer: 0
+    explain: 기본은 표 행 수의 10%에 50을 더한 값이에요. 그래서 큰 적재 뒤에는 통계가 늦게 새로워질 수 있어요.
+  - id: generic-plan-rare-value
+    type: ox
+    prompt: 준비된 문장을 흔한 값으로 여러 번 실행한 뒤에는, 드문 값이 와도 늘 그 값에 맞는 새 계획을 세우나요?
+    answer: false
+    explain: PostgreSQL은 다섯 번 뒤 범용 계획이 크게 비싸지 않으면 그 계획을 다시 써요. 드문 값에는 맞지 않을 수 있어요.
+  - id: analyze-term
+    type: input
+    prompt: PostgreSQL에서 표의 행 수와 값 분포를 다시 모아 통계를 새로 고치는 명령은?
+    answer: [ANALYZE, analyze, VACUUM ANALYZE, 애널라이즈]
+    term: database/statistics
+    explain: 큰 적재나 삭제 뒤에 돌리면 낡은 통계 때문에 나빠진 계획이 돌아와요. MySQL은 ANALYZE TABLE이에요.

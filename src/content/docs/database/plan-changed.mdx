@@ -1,0 +1,122 @@
+---
+title: 실행 계획이 갑자기 바뀌었을 때
+summary: 같은 SQL이 갑자기 느려지면 계획이 바뀌었는지 보고, 통계와 바인드 값에서 이유를 찾아요.
+domain: database
+type: guide
+order: 95
+icon: database
+keywords: [실행 계획 변경, plan change, plan regression, 통계, ANALYZE, generic plan, 범용 계획, plan_cache_mode, PLAN_HASH_VALUE, SQL plan baseline]
+related: [database/execution-plans, database/query-processing, database/top-sql, database/slow-database]
+sources:
+  - title: PostgreSQL — PREPARE (custom plan, generic plan)
+    url: https://www.postgresql.org/docs/current/sql-prepare.html
+  - title: PostgreSQL — Query Planning (plan_cache_mode)
+    url: https://www.postgresql.org/docs/current/runtime-config-query.html
+  - title: PostgreSQL — Vacuuming (autovacuum_analyze_threshold, scale_factor)
+    url: https://www.postgresql.org/docs/current/runtime-config-vacuum.html
+  - title: PostgreSQL — The Cumulative Statistics System (pg_stat_user_tables)
+    url: https://www.postgresql.org/docs/current/monitoring-stats.html
+  - title: PostgreSQL — auto_explain
+    url: https://www.postgresql.org/docs/current/auto-explain.html
+  - title: PostgreSQL — Statistics Used by the Planner (Extended Statistics)
+    url: https://www.postgresql.org/docs/current/planner-stats.html
+  - title: PostgreSQL — CREATE STATISTICS
+    url: https://www.postgresql.org/docs/current/sql-createstatistics.html
+  - title: MySQL 8.4 — Configuring Persistent Optimizer Statistics
+    url: https://dev.mysql.com/doc/refman/8.4/en/innodb-persistent-stats.html
+  - title: Oracle 19c — V$SQL (PLAN_HASH_VALUE)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/V-SQL.html
+  - title: Oracle 19c — Overview of SQL Plan Management
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/overview-of-sql-plan-management.html
+updated: 2026-10-26
+---
+
+<Situation>
+  주문 조회 API가 오늘 아침부터 느려졌어요. 어제까지 몇 ms 걸리던 SQL이 한 번에 0.2초 넘게 걸려요. SQL과 코드는 바뀌지 않았어요.
+
+  DB는 SQL마다 실행 계획을 세우는데, 같은 SQL이라도 계획이 바뀔 수 있어요. 계획이 바뀌었는지 먼저 확인하고, 왜 바뀌었는지를 찾아요. 예시는 PostgreSQL 기준이에요.
+</Situation>
+
+<FirstLook>
+  <Item title="한 번이 느려졌나">호출 수가 아니라 1회 실행 시간이 늘었는지 봐요.</Item>
+  <Item title="예상과 실제 행 수">계획의 예상 행 수가 실제와 크게 다른지 봐요.</Item>
+  <Item title="통계와 바인드 값">통계가 낡았는지, 값마다 계획이 다른지 봐요.</Item>
+</FirstLook>
+
+## 1. 한 번 실행이 느려졌는지 보세요
+
+전체 DB 시간이 늘었다면, 같은 SQL이 더 자주 불렸을 수도 있어요. 계획이 바뀐 거라면 호출 수는 그대로인데 1회 실행 시간이 뛰어요.
+
+**확인 방법**: SQL별 부하 순위에서 그 SQL의 호출 수와 1회 평균 시간을 견줘요. PostgreSQL이라면 `pg_stat_statements`의 `calls`와 `mean_exec_time`이에요. 순위를 읽는 법은 <Term slug="database/top-sql">SQL별 부하 순위</Term>에 있어요.
+
+Oracle은 계획마다 `PLAN_HASH_VALUE`라는 번호를 붙여요. 같은 SQL의 이 번호가 바뀐 시각이 곧 계획이 바뀐 시각이에요.
+
+## 2. 지금 계획에서 예상과 실제 행 수를 견주세요
+
+계획은 통계로 행 수를 예상해 고른 길이에요. 예상이 실제와 10배, 100배 다르면, 잘못된 예상으로 고른 계획일 가능성이 커요.
+
+**확인 방법**: `EXPLAIN (ANALYZE, BUFFERS)`로 그 SQL을 실행해요. 노드마다 `rows`(예상)와 `actual rows`(실제)를 견줘요. 읽는 법은 <Term slug="database/execution-plans">실행 계획 읽기</Term>에 있어요.
+
+느렸던 순간의 계획을 남겨 두려면 auto_explain 모듈을 켜요. `auto_explain.log_min_duration`보다 오래 걸린 SQL의 계획을 로그에 남겨 줘요.
+
+## 3. 통계가 낡았는지 보세요
+
+큰 적재나 삭제 뒤에 통계를 다시 모으지 않으면, DB는 옛 행 수와 분포로 계획을 세워요. PostgreSQL의 자동 ANALYZE는 표 행 수의 10%에 50을 더한 만큼 행이 바뀌어야 돌아요. 그래서 큰 표는 꽤 바뀐 뒤에야 통계가 새로워져요.
+
+**확인 방법**: 아래 질의로 마지막 ANALYZE 시각과, 그 뒤로 바뀐 행 수를 봐요. 바뀐 행 수가 살아 있는 행 수에 견줄 만큼 크다면 통계가 낡은 거예요.
+
+```text
+SELECT relname, n_live_tup,
+  n_mod_since_analyze,
+  last_analyze,
+  last_autoanalyze
+FROM pg_stat_user_tables
+ORDER BY n_mod_since_analyze
+  DESC
+LIMIT 10;
+```
+
+## 4. 값에 따라 계획이 달라지는지 보세요
+
+앱이 준비된 문장(prepared statement)으로 SQL을 부를 때의 이야기예요. PostgreSQL은 처음 다섯 번은 값마다 맞춤 계획(custom plan)을 세워요. 그다음부터는 값을 보지 않는 <Term term="database/generic-plan">범용 계획</Term>이 맞춤 계획보다 크게 비싸지 않으면 범용 계획을 다시 써요.
+
+값마다 행 수가 크게 다르면 여기서 문제가 생겨요. 아래는 PGlite(PostgreSQL 17.5)에서 재현한 예예요.
+
+<Figure caption="주문 20만 건 중 'pending'은 200건이에요. 처음에는 Nested Loop로 1.5ms였지만, 'done'으로 다섯 번 실행한 뒤에는 범용 계획(Hash Join)으로 바뀌어 같은 값이 234ms 걸렸어요.">
+  <StatTile label="맞춤 계획" value="1.5" unit="ms" note="Nested Loop" />
+  <StatTile label="범용 계획" value="234" unit="ms" tone="warn" note="Hash Join" />
+  <StatTile label="범용 계획의 예상" value="100,000" unit="건" tone="warn" note="실제 200건" />
+</Figure>
+
+범용 계획은 값을 모르니 '절반쯤 나오겠지'라고 예상했어요. 그래서 주문 상세 60만 행을 다 읽는 Hash Join을 골랐어요. 'pending'처럼 드문 값에는 맞지 않는 계획이에요.
+
+**확인 방법**: 같은 SQL을 드문 값과 흔한 값으로 각각 `EXPLAIN`해 계획이 다른지 봐요. 준비된 문장이라면 `plan_cache_mode`를 `force_custom_plan`으로 바꾼 세션에서 다시 재 봐요. 차이가 크면 범용 계획이 원인이에요.
+
+## 5. 다른 무엇이 바뀌었는지 보세요
+
+통계와 값이 아니라면 주변에서 바뀐 것을 찾아요.
+
+- **인덱스**: 누가 인덱스를 지웠거나 새로 만들었나요? 새 인덱스가 다른 계획을 부르기도 해요.
+- **버전과 설정**: DB를 올렸거나 `work_mem`, `random_page_cost` 같은 계획 설정을 바꿨나요?
+- **데이터 모양**: 한쪽 값만 크게 늘었나요? 행 수가 같아도 분포가 바뀌면 계획이 바뀌어요.
+
+## 계획을 되돌리고 막는 법
+
+급할 때는 그 표에 `ANALYZE`를 돌려 통계를 새로 모아요. 낡은 통계 때문이었다면 다음 실행부터 계획이 돌아와요. 큰 적재를 하는 작업이라면 끝에 `ANALYZE`를 넣어요.
+
+범용 계획이 원인이라면, 그 SQL을 쓰는 세션이나 사용자에만 `plan_cache_mode = force_custom_plan`을 걸 수 있어요. 대신 실행할 때마다 계획을 새로 세우는 시간이 들어요.
+
+두 열의 값이 함께 움직이면(예: 시와 구) 플래너는 따로 곱해 행 수를 너무 작게 예상해요. 이때는 `CREATE STATISTICS`로 두 열의 관계를 통계로 모아요.
+
+## 다른 DB에서는
+
+MySQL InnoDB는 기본으로 통계를 디스크에 두고, 표 행의 10%가 넘게 바뀌면 다시 모아요. 바로 모으려면 `ANALYZE TABLE`을 돌려요.
+
+Oracle은 SQL 계획 기준선(SQL plan baseline)으로 검증된 계획만 쓰게 묶을 수 있어요. 새 계획은 검증을 거친 뒤에야 쓰여서, 갑자기 나빠지는 일을 막아요.
+
+<Checkpoints>
+  <Check>SQL별 화면에서 계획이 바뀐 시점을 알 수 없다면, 계획 식별자도 함께 남기세요. Oracle이라면 `PLAN_HASH_VALUE`, PostgreSQL이라면 auto_explain 로그예요.</Check>
+  <Check>큰 적재 작업 뒤 바로 느려지는 SQL이 있다면, 적재 작업 끝에 ANALYZE가 있는지 보세요. 자동 ANALYZE는 꽤 바뀐 뒤에야 돌아요.</Check>
+  <Check>같은 SQL이 어떤 값에서만 느리다면 범용 계획을 의심하세요. 흔한 값으로 여러 번 실행된 뒤 드문 값이 오면 맞지 않는 계획을 써요.</Check>
+  <Check>통계를 다시 모아 빨라졌다고 끝내지 마세요. 왜 낡았는지, 다음 적재 때 같은 일이 생기지 않는지 확인하세요.</Check>
+</Checkpoints>

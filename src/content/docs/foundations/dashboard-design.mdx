@@ -1,0 +1,94 @@
+---
+title: 대시보드는 어떻게 짤까
+summary: 대시보드는 질문 하나에 답해야 해요. 위에는 사용자가 겪는 증상을, 아래로 갈수록 원인을 둬요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 105
+icon: chart-column
+keywords: [대시보드, dashboard, 패널, 레이아웃, golden signals, 템플릿 변수, drill-down, 누적 그래프, stacked, 새로고침]
+related: [foundations/red-and-use, foundations/slo-and-error-budget, foundations/percentiles, foundations/units-and-notation, foundations/no-data-vs-zero]
+sources:
+  - title: Grafana — Dashboard best practices
+    url: https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/best-practices/
+  - title: Google SRE Book — Monitoring Distributed Systems (four golden signals, dashboard)
+    url: https://sre.google/sre-book/monitoring-distributed-systems/
+updated: 2026-10-26
+---
+
+<OnDashboard title="결제 서비스 대시보드 · 위에서 아래로" caption="맨 위 한 줄만 봐도 '지금 괜찮은가'에 답해요. 아래로 내려갈수록 원인을 찾는 패널이에요.">
+  <Layers
+    ariaLabel="위에서부터 서비스 상태, 요청 흐름, 자원, 의존 서비스 순서로 쌓은 대시보드 구성"
+    layers={[
+      { label: '① 서비스 상태', note: 'SLO · 에러율 · p99 응답시간', tone: 'accent' },
+      { label: '② 요청 흐름', note: '서비스마다 요청 · 에러 · 지연 한 줄' },
+      { label: '③ 자원', note: 'CPU · 메모리 · 스레드 · 연결 풀' },
+      { label: '④ 의존 서비스', note: 'DB · 캐시 · 외부 API' },
+    ]}
+  />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="질문 하나에 답하게 짜요">
+    '결제가 지금 괜찮은가?'처럼 대시보드마다 답할 질문을 정해요. 질문이 없으면 패널만 늘어서, 새벽 2시에 장애를 볼 때 어디부터 봐야 할지 몰라요.
+  </Point>
+  <Point title="위에는 증상, 아래로 원인">
+    사람은 위에서 아래로 읽어요. 그래서 사용자가 겪는 증상(에러, 지연)을 맨 위에 두고, 원인 후보(CPU, 연결 풀, DB)를 그 아래에 둬요.
+
+    서비스가 여럿이면 서비스마다 한 줄씩, 요청이 흐르는 순서대로 쌓아요. 어느 줄부터 빨개졌는지가 곧 어디서 시작됐는지예요.
+  </Point>
+  <Point title="읽는 사람이 계산하지 않게 해요">
+    단위, 기준선, 임계값을 그래프에 함께 보여 줘서 한눈에 판단하게 해요. 머릿속으로 코어 수를 곱하거나 단위를 바꿔야 한다면 고칠 곳이에요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="자동차 계기판은 만든 회사가 정한 몇 개만 보여 주지만, 대시보드는 누구나 패널을 끝없이 더할 수 있어요. 그래서 일부러 덜어 내야 해요.">
+  대시보드는 자동차 계기판과 비슷해요. 운전 중에는 속도와 경고등만 크게 보이고, 엔진 세부는 정비소에서 따로 봐요.
+</Analogy>
+
+## 맨 위에 무엇을 둘까
+
+Google SRE Book은 사용자가 쓰는 시스템에서 네 가지만 잴 수 있다면 이 넷에 집중하라고 해요. 지연(latency), 트래픽(traffic), 에러(errors), 포화(saturation)예요.
+
+서비스라면 요청·에러·지연(RED)으로 줄여 보기도 해요. 두 틀은 <Term slug="foundations/red-and-use">RED와 USE</Term>에서 다뤘어요.
+
+목표를 정해 두었다면 맨 위에 <Term slug="foundations/slo-and-error-budget">SLO</Term>와 남은 에러 버짓을 둬요. '좋음, 나쁨'을 숫자 하나로 답해 줘요.
+
+응답시간은 평균만 두지 말고 p99 같은 <Term slug="foundations/percentiles">백분위수</Term>를 함께 둬요. 평균은 느린 요청을 숨겨요.
+
+## 한 패널에는 한 가지
+
+패널 하나는 질문 하나에 답해요. 선이 수십 개 겹치면 아무것도 읽히지 않아요. '어느 서버가 문제인가'를 묻는다면 모든 서버를 그리지 말고, 값이 큰 몇 개만(`topk`) 그려요.
+
+단위가 다른 값은 한 축에 그리지 않아요. 요청 수와 응답시간을 함께 보고 싶다면 패널을 나누거나 왼쪽·오른쪽 축을 따로 써요.
+
+값을 위로 쌓는 누적 그래프(stacked)는 조심해요. 선마다 높이가 아래 선 위에 얹혀서 각 값을 읽기 어렵고, 잘못 읽히기 쉬워요. Grafana 문서도 대부분은 끄라고 해요.
+
+## 숫자를 읽기 쉽게
+
+- **단위를 붙여요**: 바이트인지 비트인지, 초인지 밀리초인지 축에 적어요. 자세한 건 <Term slug="foundations/units-and-notation">단위와 숫자 표기</Term>에 있어요.
+- **비교할 수 있게 맞춰요**: CPU는 코어 수가 다른 서버끼리 견줄 수 있게 %로 그려요. 크기가 크게 다른 서비스는 한 패널에 넣지 않아요. 큰 값에 작은 값이 묻혀요.
+- **색에 뜻을 줘요**: 빨강은 나쁜 상태에만 써요. 임계값을 넘었을 때 색이 바뀌게 해요.
+- **빈 것과 0을 가려요**: 데이터가 없는 걸 0으로 그리면 '문제없음'으로 읽혀요. <Term slug="foundations/no-data-vs-zero">데이터 없음과 0은 달라요</Term>를 봐요.
+
+## 같은 대시보드를 여러 벌 만들지 않아요
+
+서버마다, 환경마다 대시보드를 복사하면 한 벌을 고쳐도 나머지는 그대로예요. 대신 서비스, 환경, 서버를 고르는 변수(템플릿 변수)를 둬서 한 벌로 바꿔 봐요.
+
+대시보드끼리는 링크로 이어요. 맨 위 서비스 상태에서 서비스를 누르면 그 서비스의 상세 대시보드로 내려가게 해요. 이걸 drill-down이라고 불러요.
+
+패널마다 무엇을 그렸는지 설명을 달아 두면, 처음 보는 사람도 헤매지 않아요.
+
+## 새로고침과 시간 범위
+
+자동 새로고침은 데이터가 바뀌는 속도에 맞춰요. 1분마다 모으는 지표를 5초마다 새로 고치면, 화면은 그대로인데 질의만 열두 배로 늘어요.
+
+시간 범위를 길게 잡으면 점을 줄여 그려서 짧은 급등이 사라져요. 원리는 <Term slug="foundations/aggregation-and-downsampling">집계 구간과 다운샘플링</Term>에 있어요.
+
+<Checkpoints>
+  <Check>패널이 수십 개인데 이 대시보드가 어떤 질문에 답하는지 한 문장으로 말할 수 없다면, 질문부터 정하고 패널을 덜어 내세요.</Check>
+  <Check>맨 위에 CPU, 메모리 같은 자원 패널이 있고 에러율과 응답시간은 아래에 있다면 순서를 바꾸세요. 사용자가 겪는 증상이 먼저예요.</Check>
+  <Check>응답시간 패널에 평균만 있다면 p99를 더하세요. 평균이 괜찮아도 느린 요청 1%는 보이지 않아요.</Check>
+  <Check>누적 그래프로 서버별 값을 그렸다면, 각 선의 값을 읽을 수 있는지 다시 보세요. 대부분은 쌓지 않은 선이 나아요.</Check>
+  <Check>서버나 환경마다 복사한 대시보드가 여럿이라면 변수 하나로 합치세요. 복사본은 고칠 때 빠지기 쉬워요.</Check>
+</Checkpoints>
