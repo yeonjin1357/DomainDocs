@@ -1,0 +1,131 @@
+---
+title: 알림 잠재우기와 점검 시간
+summary: 한 번은 사일런스, 되풀이는 점검 시간, 큰 장애는 억제로 줄여요. 알림 판정은 계속 돌아요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 125
+icon: clock
+keywords: [silence, 사일런스, 침묵, mute timing, 점검 시간, maintenance window, inhibition, 억제, Alertmanager, Watchdog]
+related: [foundations/alert-conditions, foundations/alert-fatigue, foundations/slo-and-error-budget, server/clock-drift]
+sources:
+  - title: Prometheus — Alertmanager (Inhibition, Silences)
+    url: https://prometheus.io/docs/alerting/latest/alertmanager/
+  - title: Prometheus — Alertmanager configuration (inhibit_rule, time_interval, mute_time_intervals)
+    url: https://prometheus.io/docs/alerting/latest/configuration/
+  - title: Alertmanager — README (amtool silence)
+    url: https://github.com/prometheus/alertmanager/blob/main/README.md
+  - title: Alertmanager — API v2 OpenAPI (silence의 필수 항목)
+    url: https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml
+  - title: Grafana — Configure silences
+    url: https://grafana.com/docs/grafana/latest/alerting/configure-notifications/create-silence/
+  - title: Grafana — Configure mute timings
+    url: https://grafana.com/docs/grafana/latest/alerting/configure-notifications/mute-timings/
+  - title: Prometheus Operator runbooks — Watchdog
+    url: https://runbooks.prometheus-operator.dev/runbooks/general/watchdog/
+updated: 2026-10-26
+---
+
+<OnDashboard title="DB 점검 · 일요일 02:00~04:00" caption="점검하는 2시간 동안 알림 48개가 울렸지만 사일런스로 보내지 않았어요. 점검이 끝난 뒤에도 하나가 풀리지 않아, 그건 사람이 봐야 해요.">
+  <StatTile label="울린 알림" value="48" unit="개" />
+  <StatTile label="보낸 알림" value="0" unit="개" note="사일런스로 막음" />
+  <StatTile label="점검 뒤 남은 알림" value="1" unit="개" tone="warn" note="진짜 문제예요" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="잠재워도 알림 판정은 계속 돌아요">
+    사일런스, 점검 시간, 억제는 모두 '보내기'만 막아요. 알림 규칙은 그대로 평가되고, 화면에는 울린 알림이 그대로 보여요.
+  </Point>
+  <Point title="한 번은 사일런스, 되풀이는 점검 시간">
+    이번 배포처럼 한 번뿐이면 시작과 끝을 정한 사일런스(silence)을 걸어요. 매주 일요일 새벽처럼 되풀이되면 점검 시간(mute timing)을 설정에 넣어요.
+  </Point>
+  <Point title="큰 장애가 작은 알림을 덮게 해요">
+    클러스터 전체에 닿지 않으면, 그 안 서버들의 알림 수백 개는 소음이에요. 억제(inhibition)로 원인 알림 하나만 보내요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="휴대폰 방해 금지는 내 휴대폰에만 걸리지만, 알림 사일런스는 팀 전체에 걸려요. 다른 사람이 받아야 할 알림까지 막을 수 있어요.">
+  회의 중에 켜는 휴대폰 방해 금지 모드와 비슷해요. 전화는 계속 오고 기록도 남지만, 벨만 울리지 않아요.
+</Analogy>
+
+## 사일런스: 이번 한 번만
+
+사일런스는 레이블 조건과 시작·끝 시각으로 걸어요. 조건에 맞는 알림은 그동안 보내지 않아요. Alertmanager에서는 만든 사람과 이유(comment)도 꼭 적어야 해요.
+
+```text
+amtool silence add \
+  alertname=DiskSlow cluster=b \
+  --duration=2h \
+  --author=oncall \
+  --comment="DB 점검"
+```
+
+이 사일런스는 `cluster="b"`의 `DiskSlow`만 2시간 동안 막아요. 점검이 일찍 끝나면 `amtool silence expire <ID>`로 바로 풀어요.
+
+조건은 좁게 잡아요. 서버 이름이나 클러스터처럼 점검하는 대상만 고르고, 알림 이름도 함께 적어요. 조건을 넓게 잡으면 점검과 상관없는 진짜 장애까지 조용해져요.
+
+## 점검 시간: 되풀이되는 시간
+
+매주 같은 시각에 하는 점검이나 배치 작업은 설정 파일에 시간 구간을 두고, 경로(route)에 붙여요. 그 시간 동안 그 경로로 가는 알림은 보내지 않아요.
+
+```yaml
+time_intervals:
+  - name: sunday-maint
+    time_intervals:
+      - weekdays: ['sunday']
+        times:
+          - start_time: '02:00'
+            end_time: '04:00'
+        location: 'Asia/Seoul'
+```
+
+경로에서는 `mute_time_intervals: [sunday-maint]`로 이 구간을 불러요. 시간대(`location`)를 적지 않으면 시각을 UTC로 읽어요. 그러면 한국 시간 새벽 2시가 아니라 오전 11시에 알림이 꺼져요.
+
+## 억제: 큰 알림이 작은 알림을 덮어요
+
+억제는 어떤 알림(원인)이 울리는 동안, 조건에 맞는 다른 알림(결과)을 보내지 않는 규칙이에요. 두 알림의 `equal`에 적은 레이블 값이 같아야 걸려요.
+
+```yaml
+inhibit_rules:
+  - source_matchers:
+      - alertname="ClusterDown"
+    target_matchers:
+      - severity="warning"
+    equal: [cluster]
+```
+
+이 규칙은 `ClusterDown`이 울리는 동안 같은 클러스터의 warning 알림을 막아요. 다른 클러스터의 warning은 그대로 보내요. 알림을 묶는 다른 방법은 <Term slug="foundations/alert-fatigue">알림이 너무 많이 울릴 때</Term>에 있어요.
+
+## 알림이 오지 않는 것도 알아야 해요
+
+알림이 조용한 건 문제가 없어서일 수도 있지만, 알림을 보내는 길이 끊겨서일 수도 있어요. 그래서 늘 울리는 알림 하나(Watchdog)를 두고, 이 알림이 바깥 시스템에 꾸준히 닿는지 봐요.
+
+Watchdog이 끊기면 알림 파이프라인이 멈춘 거예요. 이걸 알아채는 쪽은 감시 대상과 다른 곳에 둬야 해요. 같은 곳에 두면 함께 멈춰요.
+
+## 모니터링에서는
+
+Alertmanager는 사일런스나 억제에 걸린 알림의 상태를 `suppressed`로 보여 줘요. 그래서 알림 이력 화면에서 '울렸지만 보내지 않은 알림'을 따로 볼 수 있어요.
+
+점검이 끝난 직후가 중요해요. 점검 동안 막혀 있던 알림 가운데 끝난 뒤에도 풀리지 않은 것이 있다면, 점검 때문이 아니라 진짜 문제예요.
+
+<Checkpoints>
+  <Check>사일런스 조건이 `alertname=~".+"`처럼 넓다면 다시 보세요. 점검과 상관없는 장애까지 모두 조용해져요.</Check>
+  <Check>며칠이나 몇 주짜리 사일런스가 걸려 있다면, 누가 왜 걸었는지 보고 줄이세요. 되풀이되는 점검이라면 점검 시간 설정으로 옮기세요.</Check>
+  <Check>점검 시간을 `location` 없이 적었다면 UTC로 읽혀요. 한국 시간으로 적은 시각이라면 9시간 어긋나요.</Check>
+  <Check>억제 규칙에 `equal`이 없다면, 한 클러스터의 장애가 모든 클러스터의 알림을 막을 수 있어요. 같아야 할 레이블을 적으세요.</Check>
+  <Check>늘 울리는 Watchdog 알림이 없다면 하나 두세요. 알림이 오지 않는 게 평화인지, 알림 길이 끊긴 건지 가릴 수 없어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 점검 시간과 사일런스의 차이
+
+  Grafana 문서는 둘을 이렇게 나눠요. 점검 시간(mute timing)은 알림 정책에 붙이는 되풀이 구간이고, 사일런스는 레이블로 알림을 골라 정한 시간 동안만 막아요. 둘 다 알림 평가를 멈추지 않고, 화면에서 알림을 지우지도 않아요.
+
+  ### 반대로 쓰는 active_time_intervals
+
+  `active_time_intervals`는 거꾸로, 적은 시간에만 그 경로로 알림을 보내요. 업무 시간에만 채팅방으로 보내는 경로처럼 써요. 두 설정은 부모 경로에서 물려받지 않아서, 필요한 경로마다 적어요.
+
+  ### 억제가 자기 자신을 막지 않게
+
+  어떤 알림이 원인과 결과 조건에 모두 맞으면, Alertmanager는 그 알림끼리는 서로 막지 않아요. 문서는 처음부터 두 조건이 겹치지 않게 잡으라고 권해요.
+</Deeper>

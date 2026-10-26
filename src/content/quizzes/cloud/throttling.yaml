@@ -1,0 +1,37 @@
+questions:
+  - id: token-bucket-burst
+    type: choice
+    prompt: 바구니 크기 100개, 초당 20개씩 채워지는 API를 바구니가 가득 찬 상태에서 부르기 시작해요. 그 1초 동안 몇 번까지 성공할까요?
+    choices:
+      - '100'
+      - '20'
+      - '120'
+      - '5'
+    answer: 0
+    explain: 모아 둔 토큰만큼은 한꺼번에 쓸 수 있어요. 다만 계속 이어서 쓸 수 있는 건 채우는 속도인 초당 20번이에요.
+  - id: retry-immediately
+    type: ox
+    prompt: 스로틀링 오류를 받으면 기다리지 않고 바로 몇 번 더 보내는 게 가장 빨리 성공하는 방법인가요?
+    answer: false
+    explain: 바로 다시 보내면 한도가 풀릴 틈 없이 계속 거절돼요. 간격을 두 배씩 늘리고 무작위로 흩어 보내요.
+  - id: quota-vs-throttle
+    type: choice
+    prompt: 리전 안의 Lambda 함수가 동시에 1,000개 넘게 실행되려 해요. 기본 설정에서 넘치는 호출은 어떻게 될까요?
+    choices:
+      - 스로틀링되어 거절돼요
+      - 자동으로 다른 리전에서 실행돼요
+      - 다음 날로 미뤄져요
+      - 추가 요금을 내고 그대로 실행돼요
+    answer: 0
+    explain: 동시 실행 1,000개는 기본 할당량이에요. 늘리려면 Service Quotas에서 미리 요청해요.
+  - id: monitoring-throttled
+    type: ox
+    prompt: 모니터링 제품이 CloudWatch 지표를 가져올 때도 API 한도에 걸려 그 사이 지표가 빌 수 있나요?
+    answer: true
+    explain: 지표를 가져오는 GetMetricData도 계정과 리전마다 초당 한도가 있어요. 같은 계정의 여러 도구가 한도를 나눠 써요.
+  - id: throttling-term
+    type: input
+    prompt: 정해 둔 속도보다 요청이 많을 때 넘친 요청을 거절하는 일을 뭐라고 부를까요?
+    answer: [스로틀링, throttling, 쓰로틀링, rate limiting, 속도 제한]
+    term: cloud/throttling
+    explain: HTTP에서는 보통 429 Too Many Requests로 돌아와요. 고장이 아니라 천천히 보내라는 뜻이에요.

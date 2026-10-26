@@ -138,3 +138,16 @@ terms:
     aliases: [cost allocation tag, 태그, tag, 비용 태그]
     short: 자원에 붙인 이름표로 요금을 팀이나 서비스별로 나눠 보는 기능이에요.
     doc: cloud/costs
+  - id: throttling
+    name: 스로틀링
+    en: Throttling
+    aliases: [throttling, throttle, 쓰로틀링, rate limiting, 속도 제한, ThrottlingException, RequestLimitExceeded, "429"]
+    short: 정해 둔 속도보다 요청이 많으면 넘친 요청을 거절하는 일이에요.
+    analogy: 창구가 몰리면 잠시 뒤 다시 오라고 돌려보내는 것과 같아요.
+    doc: cloud/throttling
+  - id: service-quota
+    name: 할당량
+    en: Service quota
+    aliases: [quota, limit, 서비스 할당량, Service Quotas, 한도, 쿼터]
+    short: 계정과 리전마다 만들거나 부를 수 있는 양에 사업자가 정해 둔 상한이에요.
+    doc: cloud/throttling

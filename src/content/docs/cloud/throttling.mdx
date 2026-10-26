@@ -1,0 +1,119 @@
+---
+title: 요청 한도와 스로틀링
+summary: 클라우드 API는 초당 부를 수 있는 양에 한도가 있어요. 넘치면 거절되니, 간격을 벌려 다시 보내요.
+domain: cloud
+type: concept
+stage: basics
+order: 87
+icon: cloud
+keywords: [스로틀링, throttling, rate limit, '429', RequestLimitExceeded, ThrottlingException, 토큰 버킷, 지수 백오프, Service Quotas, 할당량]
+related: [cloud/cloud-metrics, cloud/cloud-metrics-missing, cloud/serverless, cloud/costs, apm/timeouts-and-retries]
+sources:
+  - title: AWS — Request throttling for the Amazon EC2 API (token bucket)
+    url: https://docs.aws.amazon.com/ec2/latest/devguide/ec2-api-throttling.html
+  - title: AWS SDKs and Tools — Retry behavior (standard mode, backoff)
+    url: https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html
+  - title: AWS — What is Service Quotas?
+    url: https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html
+  - title: AWS — CloudWatch service quotas (GetMetricData)
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html
+  - title: AWS — Lambda quotas (concurrent executions)
+    url: https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
+  - title: AWS — Lambda Invoke API (TooManyRequestsException, 429)
+    url: https://docs.aws.amazon.com/lambda/latest/api/API_Invoke.html
+  - title: AWS — CloudWatch usage metrics (AWS/Usage)
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Service-Quota-Integration.html
+  - title: RFC 6585 — Additional HTTP Status Codes (429 Too Many Requests)
+    url: https://www.rfc-editor.org/rfc/rfc6585
+updated: 2026-10-26
+---
+
+<KeyPoints>
+  <Point title="API는 초당 부를 수 있는 양이 정해져 있어요">
+    클라우드 API는 계정과 리전마다 초당 부를 수 있는 양에 한도가 있어요. 넘치면 거절하는데, 이걸 <Term term="cloud/throttling">스로틀링</Term>이라고 해요. 고장이 아니라 '잠깐 천천히'라는 뜻이에요.
+  </Point>
+  <Point title="만들 수 있는 양에도 상한이 있어요">
+    인스턴스 수, 함수의 동시 실행 수처럼 만들거나 쓸 수 있는 양에도 기본 상한(<Term term="cloud/service-quota">할당량</Term>)이 있어요. 늘리려면 미리 요청해요.
+  </Point>
+  <Point title="다시 보낼 땐 간격을 벌려요">
+    거절되자마자 다시 보내면 한도를 더 세게 두드려요. 기다리는 시간을 두 배씩 늘리고, 무작위로 흩어서 다시 보내요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="창구 번호표는 사람이 뽑지만, API 한도는 사업자가 계정마다 미리 정해 둬요. 같은 계정의 다른 프로그램이 한도를 다 쓰면 내 요청도 거절돼요.">
+  빌딩 관리 사무소 창구와 비슷해요. 한 번에 받을 수 있는 신청서 수가 정해져 있어서, 몰리면 '잠시 뒤 다시 오세요'라며 돌려보내요.
+</Analogy>
+
+## 바구니에 모아 둔 만큼 몰아 쓸 수 있어요
+
+<Figure caption="EC2 문서의 DescribeHosts 예시예요. 바구니에는 토큰이 100개까지 차고, 1초에 100번 부르면 비어요. 그 뒤 초당 20개씩 채워져 5초 뒤에 다시 가득 차요.">
+  <MiniLineChart
+    ariaLabel="남은 토큰이 100개에서 한 번의 몰림으로 0이 된 뒤, 초당 20개씩 늘어 5초 뒤 다시 100개가 되는 그래프"
+    yMax={100}
+    series={[{ label: '남은 토큰', values: [100, 100, 0, 20, 40, 60, 80, 100, 100], tone: 'accent', value: '최대 100개' }]}
+  />
+</Figure>
+
+AWS의 많은 API는 토큰 바구니(token bucket) 방식으로 한도를 걸어요. 요청 하나가 토큰 하나를 쓰고, 바구니는 정해진 속도로 다시 채워져요. 바구니가 비면 그 API의 요청은 거절돼요.
+
+그래서 짧게 몰아 쓰는 건 바구니 크기만큼 되지만, 오래 이어서 쓸 수 있는 건 채우는 속도만큼이에요. 그림에서는 초당 20번이에요.
+
+한도는 API마다 따로예요. 다른 API의 바구니는 영향을 받지 않아요.
+
+EC2 문서는 필터와 페이지 나누기 없이 전부를 읽는 `DescribeInstances` 같은 호출에 더 작은 바구니를 줘요. 50개를 초당 10개씩 채워요.
+
+## 거절은 이렇게 보여요
+
+| 서비스 | 거절 응답 |
+| --- | --- |
+| HTTP 일반 | `429 Too Many Requests` |
+| EC2 API | `RequestLimitExceeded` |
+| 여러 AWS API | `ThrottlingException` 등 |
+| Lambda | `429`(TooManyRequestsException) |
+
+HTTP 표준(RFC 6585)은 429에 `Retry-After` 헤더를 붙여 얼마나 기다릴지 알려 줄 수 있다고 해요. 이 헤더가 있다면 그 시간을 따라요.
+
+## 다시 보내는 법
+
+AWS SDK는 기본으로 거절된 요청을 다시 보내요.
+
+표준 모드는 처음 요청을 포함해 3번까지 시도해요. 기다리는 시간은 두 배씩 늘리는데, 이걸 지수 백오프라고 해요. 실제로는 0부터 그 값 사이에서 무작위로 고르고, 이걸 지터라고 불러요.
+
+스로틀링으로 거절됐을 때는 기다리는 시간의 상한을 1초, 2초, 4초처럼 늘리고, 20초를 넘기지 않아요. 여러 프로그램이 같은 순간 다시 보내 또 몰리는 일을 무작위가 막아 줘요.
+
+직접 다시 보내는 코드를 쓴다면 같은 규칙을 따라요. 기다리지 않고 바로 몇 번씩 다시 보내면, 한도가 풀릴 틈 없이 계속 거절돼요. 재시도가 장애를 키우는 이야기는 <Term slug="apm/timeouts-and-retries">타임아웃과 재시도</Term>에 있어요.
+
+## 할당량
+
+할당량은 계정과 리전마다 정해진 상한이에요. 예를 들어 Lambda 함수는 리전마다 동시에 1,000개까지 실행돼요.
+
+넘치는 호출은 스로틀링돼요. 동시 실행은 <Term slug="cloud/serverless">서버리스 함수</Term>에서 다뤘어요.
+
+많은 할당량은 Service Quotas 화면에서 늘려 달라고 요청할 수 있어요. 바로 늘지 않을 수 있어서, 행사처럼 몰릴 일이 있으면 미리 요청해요. 일부 서비스는 지금 쓰는 양을 CloudWatch의 `AWS/Usage` 지표로 보여 줘서, 상한에 가까워질 때 알림을 걸 수 있어요.
+
+## 모니터링에서는
+
+모니터링 제품도 클라우드 API를 부르는 프로그램이에요. 지표는 CloudWatch의 GetMetricData로, 자원 목록은 Describe 계열 API로 가져와요. 이 호출도 같은 한도를 받아요.
+
+CloudWatch의 GetMetricData는 계정과 리전마다 초당 500번까지예요. 같은 계정에서 여러 도구가 지표를 가져가면 한도를 나눠 써요. 한도에 걸리면 그 사이의 지표가 비어서, 화면에는 <Term slug="cloud/cloud-metrics-missing">클라우드 지표가 비어 있을 때</Term>처럼 보여요.
+
+<Checkpoints>
+  <Check>클라우드 지표 그래프가 정해진 시각마다 비거나, 계정이 늘어난 뒤로 자주 빈다면 수집기 로그에서 스로틀링 오류를 찾으세요. 수집 간격이나 한 번에 묻는 지표 수를 조정해요.</Check>
+  <Check>스로틀링 오류를 받자마자 바로 다시 보내는 코드라면 다시 보세요. 간격을 두 배씩 늘리고 무작위로 흩어 보내세요.</Check>
+  <Check>자원 목록을 필터나 페이지 나누기 없이 통째로 자주 읽는다면, 더 작은 한도를 받을 수 있어요. 필요한 것만, 나눠서 읽으세요.</Check>
+  <Check>행사나 이전처럼 사용량이 크게 늘 일이 있다면, 할당량을 미리 확인하고 늘려 두세요. 요청이 처리되기까지 시간이 걸릴 수 있어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 재시도에도 바구니가 있어요
+
+  AWS SDK의 표준 모드에는 재시도용 바구니(retry quota)도 있어요. 재시도마다 토큰을 쓰고, 요청이 성공하면 다시 채워요. 실패가 계속되면 이 바구니가 비어서 SDK가 재시도를 멈춰요.
+
+  ### 기다리는 시간 계산
+
+  SDK 문서의 식은 '무작위(0~1) × min(20초, 기준 지연 × 2^재시도 번호)'예요. 기준 지연은 스로틀링이면 1초, 잠깐의 네트워크 오류 같은 일시적 오류면 50ms예요.
+
+  ### DynamoDB는 조금 달라요
+
+  DynamoDB와 DynamoDB Streams 클라이언트는 기본 시도 횟수가 4번이에요. 이 서비스들은 더 짧은 기준 지연을 써요.
+</Deeper>
