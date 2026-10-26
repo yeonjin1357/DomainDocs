@@ -132,7 +132,7 @@ terms:
     en: Synthetic monitoring
     aliases: [synthetic monitoring, URL 모니터링, 랩 데이터, lab data, 신세틱 모니터링]
     short: 정해 둔 곳에서 주기적으로 주소를 열어 보며 속도와 정상 여부를 재는 감시예요.
-    doc: apm/page-load
+    doc: apm/synthetic-monitoring
   - id: cache
     name: 캐시
     en: Cache

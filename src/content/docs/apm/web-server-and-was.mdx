@@ -92,7 +92,7 @@ APM 에이전트는 보통 WAS 안에서 요청이 들어오고 나가는 지점
 
 <Checkpoints>
   <Check>APM 응답시간은 빠른데 사용자는 느리다고 한다면 웹 서버의 시간도 함께 보세요. WAS 앞에서 줄을 서거나 네트워크에서 쓴 시간은 APM에 안 보여요.</Check>
-  <Check>504가 늘었다면 WAS가 느려져 웹 서버의 시간 제한(nginx 기본 60초)을 넘긴 거예요. WAS의 느린 트랜잭션을 찾아보세요.</Check>
+  <Check>504가 늘었다면 WAS가 느려져 웹 서버의 시간 제한(nginx 기본 60초)을 넘긴 거예요. WAS의 느린 트랜잭션을 찾아보세요. 순서는 <Term slug="apm/gateway-errors">502·504가 날 때</Term>에 있어요.</Check>
   <Check>WAS의 최대 스레드 수를 크게만 늘리자는 제안이라면 다시 보세요. 스레드가 늘면 DB 연결과 메모리도 더 쓰고, 느린 곳이 DB라면 줄만 옮겨 가요.</Check>
 </Checkpoints>
 

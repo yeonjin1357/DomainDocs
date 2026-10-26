@@ -1,0 +1,124 @@
+---
+title: URL 모니터링(외부 감시)
+summary: 정해 둔 곳에서 주기적으로 주소를 열어 봐요. 사용자가 없어도 장애를 알지만, 한 곳의 실패는 믿지 않아요.
+domain: apm
+type: concept
+stage: monitoring
+order: 65
+icon: activity
+keywords: [URL 모니터링, synthetic monitoring, 외부 감시, blackbox exporter, probe_success, 가용성, uptime, 점검 위치, 응답 본문 검사, probe]
+related: [apm/page-load, apm/http-basics, network/tls-certificates, network/dns, foundations/alert-conditions]
+sources:
+  - title: blackbox_exporter — README (probe_success, 타임아웃)
+    url: https://github.com/prometheus/blackbox_exporter/blob/master/README.md
+  - title: blackbox_exporter — CONFIGURATION (valid_status_codes, 본문 검사, IP 선택)
+    url: https://github.com/prometheus/blackbox_exporter/blob/master/CONFIGURATION.md
+  - title: blackbox_exporter 소스 — prober/http.go (구간 resolve·connect·tls·processing·transfer, User-Agent)
+    url: https://github.com/prometheus/blackbox_exporter/blob/master/prober/http.go
+  - title: Grafana Cloud — Synthetic Monitoring
+    url: https://grafana.com/docs/grafana-cloud/testing/synthetic-monitoring/
+  - title: Grafana Cloud — Configure per-check alerts
+    url: https://grafana.com/docs/grafana-cloud/testing/synthetic-monitoring/configure-alerts/configure-per-check-alerts/
+  - title: Grafana Cloud — Configure legacy alerts (성공률 기준)
+    url: https://grafana.com/docs/grafana-cloud/testing/synthetic-monitoring/configure-alerts/synthetic-monitoring-alerting/
+updated: 2026-10-26
+---
+
+<OnDashboard title="주문 페이지 점검 · 세 위치 · 1분마다" caption="싱가포르만 시간 초과예요. 다른 두 곳은 정상이라, 서비스보다 그 위치의 네트워크 문제일 수 있어요.">
+  <StatTile label="서울" value="0.42" unit="초" note="성공" />
+  <StatTile label="도쿄" value="0.61" unit="초" note="성공" />
+  <StatTile label="싱가포르" value="실패" tone="warn" note="10초 시간 초과" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="사용자가 없어도 먼저 알아요">
+    정해 둔 위치에서 정해 둔 간격으로 주소를 열어, 성공했는지와 걸린 시간을 재요. 새벽처럼 사용자가 없을 때도 장애를 알아채요. 이걸 <Term term="apm/synthetic-monitoring">외부 감시</Term>(synthetic monitoring), 흔히 URL 모니터링이라고 해요.
+  </Point>
+  <Point title="구간을 나눠 재요">
+    한 번 열 때 걸린 시간을 주소 찾기(DNS), 연결, TLS, 서버 처리, 내려받기로 나눠요. 그래서 느려졌을 때 어느 구간이 늘었는지 바로 보여요.
+  </Point>
+  <Point title="한 번, 한 곳의 실패는 믿지 않아요">
+    감시하는 쪽의 네트워크가 잠깐 끊겨도 실패로 나와요. 그래서 여러 위치에서 재고, 여러 곳이 일정 시간 실패할 때 사람을 불러요.
+  </Point>
+</KeyPoints>
+
+## 한 번 열 때 무엇을 재나요
+
+<Figure caption="주문 페이지를 한 번 연 기록이에요. 서버 처리(첫 바이트를 받기까지)가 가장 길어요. blackbox_exporter는 이 구간을 resolve, connect, tls, processing, transfer로 나눠 내요.">
+  <Waterfall
+    ariaLabel="DNS 20ms, 연결 30ms, TLS 60ms, 서버 처리 250ms, 내려받기 40ms로 모두 400ms인 한 번의 점검"
+    unit="ms"
+    spans={[
+      { label: '점검 한 번', start: 0, duration: 400 },
+      { label: '주소 찾기(DNS)', start: 0, duration: 20, depth: 1 },
+      { label: '연결(TCP)', start: 20, duration: 30, depth: 1 },
+      { label: 'TLS', start: 50, duration: 60, depth: 1 },
+      { label: '서버 처리', start: 110, duration: 250, depth: 1, tone: 'accent' },
+      { label: '내려받기', start: 360, duration: 40, depth: 1 },
+    ]}
+  />
+</Figure>
+
+DNS가 늘었다면 이름 풀이, 연결이 늘었다면 네트워크나 서버의 연결 받기, 서버 처리가 늘었다면 앱이 느린 거예요. 브라우저가 페이지를 띄우는 순서와 같아서, <Term slug="apm/page-load">브라우저에서 페이지가 뜨기까지</Term>의 앞부분과 겹쳐요.
+
+## 무엇을 성공으로 볼까요
+
+blackbox_exporter의 HTTP 점검은 기본으로 2xx 응답이면 성공이에요. 리다이렉트는 기본으로 따라가서 마지막 응답으로 판정해요.
+
+그런데 앱이 오류 화면을 200으로 돌려주면 성공으로 나와요. 그래서 응답 본문에 꼭 있어야 하는 글자(예: '주문하기' 버튼)나 없어야 하는 글자('Error')를 함께 검사해요. blackbox_exporter의 `fail_if_body_not_matches_regexp`가 그 설정이에요.
+
+HTTPS 주소라면 같은 점검으로 인증서 만료일도 함께 받아요. 만료 감시는 <Term slug="network/tls-certificates">TLS 인증서와 만료</Term>에서 다뤘어요.
+
+## 어디서, 얼마나 자주
+
+점검 한 번은 한 위치에서 한 사용자가 연 것과 같아요. 그래서 사용자가 있는 지역마다 위치를 둬요. 회사 안에서만 열리는 주소는 안쪽에 둔 점검 위치(private probe)에서 재요.
+
+간격을 1분으로 하면 하루 1,440번 열어요. 짧을수록 빨리 알지만, 점검 요청이 그만큼 서버의 요청 수와 로그에 섞여요.
+
+한 번 점검이 기다리는 시간(타임아웃)도 정해요. blackbox_exporter는 Prometheus의 수집 타임아웃보다 조금 짧게 잡고, 둘 다 없으면 120초를 기다려요.
+
+## 실제 사용자 감시와 함께 봐요
+
+외부 감시는 같은 조건에서 되풀이해 재서 변화를 견주기 좋아요. 대신 정해 둔 위치와 주소만 재요. 느린 휴대폰, 먼 지역, 로그인한 뒤의 화면은 실제 사용자 감시(RUM)가 보여 줘요.
+
+둘을 함께 두면 서로를 메워요. 외부 감시는 사용자가 없을 때 장애를 먼저 알리고, RUM은 감시가 못 가는 곳의 느림을 알려요.
+
+## 모니터링에서는
+
+blackbox_exporter는 점검마다 성공 여부와 걸린 시간을 내요. `probe_success`는 성공 1, 실패 0이고, `probe_duration_seconds`는 걸린 시간이에요. 구간별 시간은 `probe_http_duration_seconds`의 `phase` 레이블로 나뉘어요.
+
+알림은 한 번의 실패가 아니라 여러 위치, 일정 시간으로 걸어요. 아래 식은 위치마다 5분 성공률을 구하고, 80%가 안 되는 위치가 두 곳 이상일 때 참이에요.
+
+```text
+count by (instance) (
+  avg_over_time(
+    probe_success[5m]
+  ) < 0.8
+) >= 2
+```
+
+세 위치의 성공률을 평균 내 90%와 견주는 식은 한 곳만 막혀도 66.7%가 되어 울려요. 위치를 따로 세는 쪽이 감시 쪽 문제를 더 잘 걸러요.
+
+<Checkpoints>
+  <Check>응답 코드만으로 성공을 판정한다면 다시 보세요. 오류 화면을 200으로 주는 앱은 장애 중에도 '정상'으로 나와요. 본문에 꼭 있어야 할 글자를 함께 검사하세요.</Check>
+  <Check>한 위치에서 한 번 실패할 때마다 사람을 부른다면, 감시 쪽 네트워크 문제에도 울려요. 여러 위치의 실패를 함께 보세요.</Check>
+  <Check>서버 여러 대가 한 이름(DNS 라운드 로빈)으로 묶였다면, blackbox_exporter는 그중 주소 하나만 골라 검사해요. 서버마다 따로 점검하세요.</Check>
+  <Check>점검 요청이 서비스의 요청 수와 에러율에 섞이지 않는지 보세요. blackbox_exporter는 기본으로 `Blackbox-Exporter/버전` User-Agent를 보내서, 이 값으로 걸러 낼 수 있어요.</Check>
+  <Check>로그인, 장바구니, 결제처럼 여러 단계가 이어지는 흐름은 주소 하나 열기로는 잴 수 없어요. 단계를 이어 실행하는 스크립트 점검을 따로 두세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### IPv6를 먼저 골라요
+
+  이름이 IPv4와 IPv6 주소를 모두 가지면, blackbox_exporter는 기본으로 IPv6를 골라요. `preferred_ip_protocol`의 기본값이 `ip6`이에요. 한쪽 주소만 있으면 그쪽으로 이어요.
+
+  점검 위치에서 IPv6가 막혀 있다면 `ip4`로 바꿔요.
+
+  ### 타임아웃의 비율
+
+  README는 `probe_duration_seconds / probe_timeout_seconds`로 타임아웃을 얼마나 썼는지 보라고 해요. 이 비율이 1에 가까워지면 곧 시간 초과로 실패하기 시작해요.
+
+  ### 다른 도구의 기본 규칙
+
+  Grafana Cloud 합성 모니터링의 예전 기본 알림은 세 규칙이었어요. 점검의 성공률이 5분 동안 95%, 90%, 75% 아래로 머물면 울려요. 지금은 점검마다 실패 횟수, 평균 지연, 인증서 만료 기준을 따로 정해요.
+</Deeper>
