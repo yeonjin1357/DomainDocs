@@ -82,9 +82,9 @@ LIMIT 10;
 
 값마다 행 수가 크게 다르면 여기서 문제가 생겨요. 아래는 PGlite(PostgreSQL 17.5)에서 재현한 예예요.
 
-<Figure caption="주문 20만 건 중 'pending'은 200건이에요. 처음에는 Nested Loop로 1.5ms였지만, 'done'으로 다섯 번 실행한 뒤에는 범용 계획(Hash Join)으로 바뀌어 같은 값이 234ms 걸렸어요.">
-  <StatTile label="맞춤 계획" value="1.5" unit="ms" note="Nested Loop" />
-  <StatTile label="범용 계획" value="234" unit="ms" tone="warn" note="Hash Join" />
+<Figure caption="주문 20만 건 중 'pending'은 200건이에요. 처음에는 Nested Loop로 1.3ms였지만, 'done'으로 다섯 번 실행한 뒤에는 범용 계획(Hash Join)으로 바뀌어 같은 값이 125ms 걸렸어요.">
+  <StatTile label="맞춤 계획" value="1.3" unit="ms" note="Nested Loop" />
+  <StatTile label="범용 계획" value="125" unit="ms" tone="warn" note="Hash Join" />
   <StatTile label="범용 계획의 예상" value="100,000" unit="건" tone="warn" note="실제 200건" />
 </Figure>
 

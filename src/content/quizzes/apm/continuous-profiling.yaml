@@ -1,0 +1,36 @@
+questions:
+  - id: flame-x-axis
+    type: ox
+    prompt: 불꽃 그래프에서 왼쪽에 있는 막대는 먼저 실행된 함수인가요?
+    answer: false
+    explain: 가로는 시간 흐름이 아니라 표본을 이름순으로 늘어놓은 거예요. 넓이가 그 함수가 쓴 몫이에요.
+  - id: cpu-profile-misses-wait
+    type: choice
+    prompt: 요청이 느린데 CPU 프로파일에는 눈에 띄는 함수가 없어요. 무엇을 의심할까요?
+    choices:
+      - DB 응답이나 잠금을 기다리느라 CPU를 쓰지 않는 시간
+      - 프로파일러가 고장 났어요
+      - CPU가 너무 빨라서요
+      - 불꽃 그래프를 거꾸로 봤어요
+    answer: 0
+    explain: 기다리는 동안은 CPU를 쓰지 않아 CPU 프로파일에 나오지 않아요. Off-CPU나 벽시계 시간 프로파일을 봐요.
+  - id: heap-vs-alloc
+    type: choice
+    prompt: 메모리가 새는지 보려면 어떤 프로파일이 더 맞을까요?
+    choices:
+      - 지금 남아 있는 메모리를 보여 주는 Heap
+      - 할당한 총량을 보여 주는 Allocations
+      - On-CPU
+      - 잠금 대기
+    answer: 0
+    explain: 많이 할당해도 곧 풀리면 새는 게 아니에요. 계속 남아 쌓이는 쪽이 Heap 프로파일에 보여요.
+  - id: sampling-overhead
+    type: ox
+    prompt: 표본 방식의 프로파일러는 모든 함수 호출의 시작과 끝을 재서, 운영 서버에서는 쓰기 어렵나요?
+    answer: false
+    explain: 정해진 간격마다 호출 줄만 적어서 부담이 작아요. 그래서 운영에서 늘 켜 두는 지속 프로파일링이 가능해요.
+  - id: profiling-signal
+    type: input
+    prompt: 로그, 메트릭, 트레이스에 이어 OpenTelemetry가 네 번째 신호로 다루기 시작한, 코드 수준의 자원 사용 기록은?
+    answer: [프로파일, profile, profiles, 프로파일링, profiling]
+    explain: OpenTelemetry의 프로파일 신호는 아직 Alpha라, 지금은 도구마다 형식이 달라요.

@@ -16,8 +16,9 @@
 | SQL plan baseline은 옵티마이저가 쓸 수 있는 승인된 계획의 모음, 검증된 계획만 쓰게 함 | https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/overview-of-sql-plan-management.html |
 
 - 재현: PGlite 0.3.16(PostgreSQL 17.5)에서 주문 20만 건('pending' 200건, 나머지 'done')과 주문 상세 60만 건으로 준비된 조인 질의를 만들었어요.
-  - 첫 실행의 'pending'은 Nested Loop, Execution Time 1.466ms였어요.
-  - 'done'으로 다섯 번 실행한 뒤의 'pending'은 범용 계획(`status = $1`)의 Hash Join, 예상 100,000행에 실제 200행, Execution Time 233.874ms였어요.
-  - 다섯 번 잰 가운데 값은 범용 계획 265.7ms, `force_custom_plan`은 5.8ms였어요.
+  - 첫 실행의 'pending'은 Nested Loop, Execution Time 1.262ms였어요.
+  - 'done'으로 다섯 번 실행한 뒤의 'pending'은 범용 계획(`status = $1`)의 Hash Join, 주문 상세 60만 행을 Seq Scan, 예상 100,000행에 실제 200행, Execution Time 125.259ms였어요.
+  - 다섯 번 잰 가운데 값은 범용 계획 95.3ms, `force_custom_plan`은 2.2ms였어요.
+- 고친 것(같은 날): PGlite 0.3.16은 기본으로 `enable_seqscan`이 off였어요. 처음 재현은 이 상태로 돌려서 범용 계획이 Seq Scan 대신 Index Scan으로 60만 행을 읽었고, 234ms가 나왔어요. `enable_seqscan = on`으로 실제 PostgreSQL 기본값에 맞춰 다시 재현하고, 그림을 1.3ms와 125ms로 고쳤어요. 계획이 Nested Loop에서 Hash Join으로 바뀌는 현상은 같았어요.
 - 질의 확인: 3단계의 `pg_stat_user_tables` 질의를 PGlite에서 돌려 열 이름을 확인했어요. PGlite는 통계를 모으지 않아 `n_mod_since_analyze`는 0으로 나왔어요. 설정 기본값(50, 0.1, auto)도 PGlite의 `pg_settings`와 같았어요.
 - 함께 한 것: 용어 `database/generic-plan`을 더했고, 퀴즈 5문제를 썼어요.

@@ -1,0 +1,114 @@
+---
+title: 지속 프로파일링
+summary: 프로파일은 어느 함수가 CPU와 메모리를 쓰는지 보여 줘요. 늘 켜 두면 배포 전후를 견줄 수 있어요.
+domain: apm
+type: concept
+stage: monitoring
+order: 135
+icon: activity
+keywords: [profiling, 프로파일링, continuous profiling, 지속 프로파일링, flame graph, 불꽃 그래프, pprof, Pyroscope, On-CPU, Off-CPU]
+related: [apm/slow-response, apm/gc-pause, apm/jvm-memory, apm/thread-dumps, foundations/logs-metrics-traces]
+sources:
+  - title: OpenTelemetry — Profiles (Alpha, profile types, 다른 신호와 잇기)
+    url: https://opentelemetry.io/docs/concepts/signals/profiles/
+  - title: Brendan Gregg — Flame Graphs
+    url: https://www.brendangregg.com/flamegraphs.html
+  - title: Go 소스 — runtime/pprof/pprof.go (CPU 프로파일 100Hz)
+    url: https://github.com/golang/go/blob/master/src/runtime/pprof/pprof.go
+  - title: Grafana Pyroscope — What is continuous profiling?
+    url: https://grafana.com/docs/pyroscope/latest/introduction/continuous-profiling/
+  - title: Grafana Pyroscope — Profiling types
+    url: https://grafana.com/docs/pyroscope/latest/introduction/profiling-types/
+updated: 2026-10-26
+---
+
+<OnDashboard title="결제 API · 배포 전후" caption="배포 뒤 CPU 사용률이 늘었어요. 같은 시간대의 프로파일을 견주니, JSON으로 바꾸는 함수가 쓰는 CPU 몫이 12%에서 45%로 늘었어요.">
+  <StatTile label="CPU 사용률" value="35 → 58" unit="%" tone="warn" />
+  <StatTile label="json.Marshal의 CPU 몫" value="12 → 45" unit="%" tone="warn" note="프로파일" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="어느 함수가 자원을 쓰는지 보여 줘요">
+    메트릭은 'CPU가 늘었다', 트레이스는 '이 구간이 느리다'까지 알려 줘요. 프로파일은 한 단계 더 들어가 '이 함수가 CPU를 쓴다'를 보여 줘요.
+  </Point>
+  <Point title="표본을 떠서 늘 켜 둘 수 있어요">
+    프로파일러는 정해진 간격마다 지금 실행 중인 함수의 호출 줄(스택)을 기록해요. 모든 호출을 재지 않아 부담이 작아서, 운영 서버에서도 늘 켜 둘 수 있어요. 이게 지속 프로파일링이에요.
+  </Point>
+  <Point title="불꽃 그래프는 넓이가 몫이에요">
+    프로파일은 보통 불꽃 그래프로 봐요. 가로 넓이가 그 함수가 쓴 몫이고, 가로 순서는 시간 흐름이 아니에요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="사진 몇 장은 짧게 들른 사람을 놓칠 수 있어요. 프로파일도 표본 사이에 끝난 아주 짧은 함수는 잘 잡히지 않아요.">
+  은행 창구를 1분마다 사진 찍는 것과 비슷해요. 하루치 사진을 모아 보면, 직원들이 어떤 업무에 시간을 많이 썼는지 알 수 있어요.
+</Analogy>
+
+## 무엇을 재나요
+
+| 종류 | 알려 주는 것 |
+| --- | --- |
+| On-CPU | 어느 함수가 CPU를 쓰고 있나 |
+| Off-CPU | 어디서 잠금이나 입출력을 기다리나 |
+| Heap | 지금 남아 있는 메모리를 어느 함수가 잡았나 |
+| Allocations | 어느 코드가 메모리를 가장 많이 할당했나 |
+
+OpenTelemetry 문서가 드는 흔한 종류예요. 쓸 수 있는 종류는 언어와 프로파일러마다 달라요. Pyroscope는 잠금(mutex)을 기다린 횟수와 시간 같은 종류도 받아요.
+
+CPU 프로파일만 보면 DB 응답이나 잠금을 기다린 시간은 보이지 않아요. 그 시간에는 CPU를 쓰지 않기 때문이에요. 요청이 느린 이유가 기다림이라면 Off-CPU나 벽시계 시간(wall time) 프로파일을 봐요.
+
+## 표본을 떠서 모아요
+
+표본 방식의 프로파일러는 정해진 간격마다 프로그램을 잠깐 멈추고 지금의 호출 줄을 적어요. Go의 CPU 프로파일러는 1초에 100번 표본을 떠요. 10초를 재면 바쁜 코어 하나에서 표본이 1,000개쯤 모여요.
+
+같은 호출 줄이 표본에 많이 나올수록 그 코드가 CPU를 많이 쓴 거예요. 모든 함수 호출의 시작과 끝을 재는 방식보다 부담이 훨씬 작아서 운영에서 쓸 수 있어요. 대신 통계라서, 짧게 잰 프로파일은 몫이 흔들려요.
+
+## 불꽃 그래프 읽기
+
+<Figure caption="결제 API의 1분 CPU 프로파일을 위에서 아래로 펼쳤어요. 막대 길이가 CPU 몫이고, 들여쓰기가 '누가 누구를 불렀나'예요. 가로 위치는 시간 순서가 아니에요.">
+  <Waterfall
+    ariaLabel="전체 100% 아래에 handleOrder 70%, GC 20%, 기타 10%. handleOrder 아래에 json.Marshal 45%, db.Query 15%, validate 10%인 프로파일"
+    unit="%"
+    spans={[
+      { label: '전체', start: 0, duration: 100 },
+      { label: 'handleOrder', start: 0, duration: 70, depth: 1 },
+      { label: 'json.Marshal', start: 0, duration: 45, depth: 2, tone: 'warn' },
+      { label: 'db.Query', start: 45, duration: 15, depth: 2 },
+      { label: 'validate', start: 60, duration: 10, depth: 2 },
+      { label: 'GC', start: 70, duration: 20, depth: 1 },
+      { label: '기타', start: 90, duration: 10, depth: 1 },
+    ]}
+  />
+</Figure>
+
+불꽃 그래프를 만든 Brendan Gregg의 설명으로는 가로가 표본의 모임을 이름순으로 늘어놓은 것이고, 시간 흐름이 아니에요. 세로는 호출 깊이예요. 막대가 넓을수록 그 함수가 표본에 자주 나온 거예요.
+
+원래 불꽃 그래프는 바닥에서 위로 쌓고, 맨 위 끝이 그 순간 CPU에서 돌던 함수예요. 위 그림처럼 위에서 아래로 펼친 모양(icicle)도 같은 내용이에요. 넓은데 자식이 거의 없는 막대가 CPU를 직접 쓴 곳이라, 먼저 고칠 곳이에요.
+
+## 늘 켜 두고 견줘요
+
+지속 프로파일링은 운영 서버에서 프로파일을 계속 모아 저장해 둬요. 그러면 문제가 생긴 뒤에 다시 재지 않아도, 그 시각의 프로파일을 꺼내 볼 수 있어요.
+
+가장 쓸모 있는 건 견주기예요. 배포 전후, 느린 시간대와 평소의 프로파일을 나란히 놓으면 무엇이 늘었는지 보여요. 맨 위 그림의 `json.Marshal`처럼 몫이 갑자기 커진 함수가 범인 후보예요.
+
+## 모니터링에서는
+
+OpenTelemetry는 프로파일을 로그, 메트릭, 트레이스에 이은 네 번째 신호로 다루기 시작했어요. 다만 아직 Alpha라서, 지금은 도구마다 모으는 방식과 형식이 달라요.
+
+프로파일은 다른 신호와 이어 볼 때 힘이 커요. CPU가 튄 그래프에서 그 시각의 프로파일로, 느린 span에서 그 요청의 프로파일로 넘어가요. 메모리 부족 로그에서는 Heap 프로파일로 어느 코드가 메모리를 잡았는지 찾아요.
+
+<Checkpoints>
+  <Check>느린 요청의 원인을 CPU 프로파일로만 찾고 있다면 다시 보세요. DB나 잠금을 기다린 시간은 CPU 프로파일에 나오지 않아요.</Check>
+  <Check>불꽃 그래프의 왼쪽을 '먼저 실행된 함수'로 읽었다면 다시 보세요. 가로 순서는 시간이 아니라 이름순이에요.</Check>
+  <Check>메모리가 샌다고 보고 Allocations 프로파일을 열었다면, Heap도 함께 보세요. 많이 할당해도 곧 풀리면 새는 게 아니에요. 지금 남아 있는 쪽이 Heap이에요.</Check>
+  <Check>몇 초만 잰 프로파일로 몫을 비교했다면, 표본 수를 보세요. 표본이 적으면 몫이 크게 흔들려요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 왜 100Hz일까
+
+  Go 소스의 주석은 CPU 프로파일 빈도를 100Hz로 정한 이유를 적어 둬요. 운영체제는 대략 500Hz보다 자주 신호를 주기 어렵고, 신호마다 스택을 읽는 일도 가볍지 않아요. 100Hz는 쓸 만큼 잦고, 시스템을 느리게 하지 않을 만큼 드물고, 표본 수를 초로 바꾸기 쉬운 수라고 해요.
+
+  ### 트레이스와 잇는 두 방법
+
+  OpenTelemetry 문서는 프로파일을 두 방향으로 이어요. 하나는 요청(트레이스·span)과 잇는 것이고, 다른 하나는 같은 서비스 인스턴스(resource)와 잇는 거예요. 앞은 한 요청이 느린 이유를, 뒤는 그 서버가 바쁜 이유를 찾을 때 써요.
+</Deeper>

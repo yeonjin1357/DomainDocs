@@ -1,0 +1,94 @@
+---
+title: 인덱스가 있는데도 안 쓰일 때
+summary: 인덱스를 만들었는데 계획에 Seq Scan이 나오면, 조건의 모양과 고르는 행 수에서 이유를 찾아요.
+domain: database
+type: guide
+order: 98
+icon: database
+keywords: [인덱스 안 탐, index not used, Seq Scan, 함수 인덱스, expression index, 형 변환, LIKE, 복합 인덱스, skip scan, pg_trgm]
+related: [database/indexes, database/execution-plans, database/plan-changed, database/slow-database]
+sources:
+  - title: PostgreSQL — Index Types (B-tree와 LIKE)
+    url: https://www.postgresql.org/docs/current/indexes-types.html
+  - title: PostgreSQL — Indexes on Expressions
+    url: https://www.postgresql.org/docs/current/indexes-expressional.html
+  - title: PostgreSQL — Operator Classes and Operator Families (text_pattern_ops)
+    url: https://www.postgresql.org/docs/current/indexes-opclass.html
+  - title: PostgreSQL — Multicolumn Indexes
+    url: https://www.postgresql.org/docs/current/indexes-multicolumn.html
+  - title: PostgreSQL 18 Release Notes (skip scan)
+    url: https://www.postgresql.org/docs/18/release-18.html
+  - title: PostgreSQL — pg_trgm
+    url: https://www.postgresql.org/docs/current/pgtrgm.html
+updated: 2026-10-26
+---
+
+<Situation>
+  회원 검색 API가 느려서 `email`에 인덱스를 만들었어요. 그런데 실행 계획에는 여전히 표 전체를 읽는 Seq Scan이 나와요.
+
+  인덱스는 만들었다고 늘 쓰이지 않아요. 조건이 인덱스의 모양과 맞아야 하고, 옵티마이저가 인덱스 쪽이 더 싸다고 봐야 써요. 예시는 PostgreSQL 기준이에요.
+</Situation>
+
+<FirstLook>
+  <Item title="정말 안 쓰나">계획에 Index Cond가 있는지, Filter만 있는지 봐요.</Item>
+  <Item title="조건의 모양">열에 함수나 형 변환이 씌워졌는지 봐요.</Item>
+  <Item title="고르는 행 수">표의 대부분을 고르는 조건인지 봐요.</Item>
+</FirstLook>
+
+## 1. 정말 안 쓰는지 계획으로 보세요
+
+`EXPLAIN`으로 그 SQL의 계획을 봐요. 인덱스로 찾았다면 `Index Scan`이나 `Bitmap Index Scan` 아래에 `Index Cond:`가 나와요. 조건이 `Filter:`에만 있다면 행을 다 읽어 가며 하나씩 걸렀다는 뜻이에요.
+
+**확인 방법**: 실제로 느렸던 SQL을 값까지 그대로 넣어 `EXPLAIN (ANALYZE)`로 봐요. 계획을 읽는 법은 <Term slug="database/execution-plans">실행 계획 읽기</Term>에 있어요.
+
+## 2. 열에 함수나 계산을 씌웠는지 보세요
+
+인덱스는 열의 값 그대로를 정렬해 둔 거라, 열을 바꾼 조건과는 모양이 달라요. 아래는 PGlite(PostgreSQL 17.5)에서 회원 20만 명으로 잰 계획이에요.
+
+| 조건 | 계획 |
+| --- | --- |
+| `email = 'a@x.com'` | Index Scan |
+| `lower(email) = 'a@x.com'` | Seq Scan |
+| `created_at`의 하루 범위(`>=`와 `<`) | Index Scan |
+| `date(created_at …) = '2026-03-01'` | Seq Scan |
+
+**확인 방법**: 조건에서 인덱스 열에 함수(`lower`, `date`, `substr`)나 계산(`+ 1`)이 씌워졌는지 봐요. 날짜는 범위 조건으로 바꾸고, 꼭 함수가 필요하면 그 식으로 인덱스를 만들어요. `lower(email)`로 인덱스를 만들자 위 조건도 Index Scan이 됐어요.
+
+## 3. 값의 형이 열과 같은지 보세요
+
+열과 값의 형이 다르면, 데이터베이스가 열 쪽을 값의 형으로 바꿔 견주기도 해요. 그러면 2단계처럼 열에 변환이 씌워진 셈이라 인덱스를 못 써요.
+
+같은 실험에서 `bigint`인 `id`를 `id = 42`로 찾으면 Index Scan이었어요. `id = 42.0`으로 찾으면 계획에 `(id)::numeric = 42.0`이 나오며 Seq Scan이 됐어요.
+
+**확인 방법**: 계획의 조건에 `::numeric`, `::text` 같은 변환이 열 쪽에 붙었는지 봐요. 앱이 값을 어떤 형으로 넘기는지도 확인해요. 같은 SQL이 앱에서만 느리다면 형이 다를 수 있어요.
+
+## 4. LIKE가 %로 시작하는지 보세요
+
+B-tree 인덱스는 앞부분이 정해진 패턴만 도와요. `email LIKE 'user42@%'`는 인덱스로 범위를 좁혔어요. `email LIKE '%42@example.com'`은 Seq Scan이었어요.
+
+**확인 방법**: 패턴이 `%`로 시작하는지 봐요. 중간이나 끝을 찾아야 한다면 `pg_trgm` 확장의 GIN 인덱스처럼 그런 검색을 돕는 인덱스를 따로 써요.
+
+데이터베이스가 C 로케일이 아니라면, 앞부분이 정해진 패턴도 보통 인덱스로는 안 돼요. 이때는 `text_pattern_ops`로 만든 인덱스가 필요해요.
+
+## 5. 복합 인덱스의 앞 열을 조건에 넣었는지 보세요
+
+`(city, district)` <Term term="database/composite-index">복합 인덱스</Term>는 `city`로 먼저 정렬돼 있어요. 둘 다 조건에 넣으면 인덱스의 좁은 범위만 읽어요. 같은 실험에서 계획의 인덱스 읽기 비용은 6쯤이었어요.
+
+`district`만으로 찾으면 인덱스를 처음부터 끝까지 읽으며 걸러서, 같은 부분의 비용이 2,228쯤으로 커졌어요. 인덱스를 쓰긴 해도 효과가 작아요.
+
+**확인 방법**: 자주 쓰는 조건의 열이 인덱스의 앞쪽에 있는지 봐요. PostgreSQL 18부터는 skip scan이 들어와, 앞 열 조건이 없어도 복합 인덱스를 더 잘 쓰는 경우가 늘었어요.
+
+## 6. 많은 행을 고르면 일부러 안 써요
+
+조건이 표의 대부분을 고른다면 인덱스를 거치는 것보다 처음부터 다 읽는 편이 싸요. 같은 실험에서 99%가 'done'인 `status`로 찾으면 Seq Scan, 1%인 'pending'으로 찾으면 Index Scan이었어요.
+
+이건 고장이 아니라 옳은 선택이에요. 다만 옵티마이저가 행 수를 잘못 어림해서 고른 거라면 다른 문제예요.
+
+**확인 방법**: `EXPLAIN ANALYZE`의 예상 행 수와 실제 행 수를 견줘요. 크게 다르면 통계가 낡았을 수 있어요. 순서는 <Term slug="database/plan-changed">실행 계획이 갑자기 바뀌었을 때</Term>에 있어요.
+
+<Checkpoints>
+  <Check>인덱스를 만들고 바로 '이제 빨라졌다'고 끝냈다면, 실제 SQL의 계획에 그 인덱스가 나오는지 보세요. 만들기만 하고 안 쓰이는 인덱스는 쓰기만 느리게 해요.</Check>
+  <Check>AI가 짠 SQL이 WHERE에서 날짜 열에 `date()`나 `to_char()`를 씌웠다면, 범위 조건으로 바꾸세요. 날짜 인덱스를 그대로 쓸 수 있어요.</Check>
+  <Check>콘솔에서 돌리면 빠른데 앱에서만 느리다면, 앱이 넘기는 값의 형을 보세요. 형이 달라 열에 변환이 붙으면 인덱스를 못 써요.</Check>
+  <Check>Seq Scan이 나왔다고 무조건 인덱스를 강제하지 마세요. 표의 대부분을 읽는 조건이라면 Seq Scan이 더 빨라요.</Check>
+</Checkpoints>

@@ -1,0 +1,119 @@
+---
+title: 알림을 누구에게 보낼까
+summary: 알림의 레이블로 받을 팀과 방법을 고르고, 아무도 확인하지 않으면 다음 사람에게 넘겨요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 127
+icon: list-checks
+keywords: [알림 라우팅, routing, route, receiver, 당직, on-call, 에스컬레이션, escalation, Alertmanager, 알림 정책]
+related: [foundations/alert-conditions, foundations/alert-fatigue, foundations/alert-silencing, foundations/slo-and-error-budget]
+sources:
+  - title: Prometheus — Alertmanager configuration (route, continue)
+    url: https://prometheus.io/docs/alerting/latest/configuration/
+  - title: Grafana — Notification policies
+    url: https://grafana.com/docs/grafana/latest/alerting/fundamentals/notifications/notification-policies/
+  - title: Google SRE Book — Being On-Call (응답 시간)
+    url: https://sre.google/sre-book/being-on-call/
+  - title: Google SRE Book — Monitoring Distributed Systems (Every page should be actionable)
+    url: https://sre.google/sre-book/monitoring-distributed-systems/
+  - title: PagerDuty — Escalation Policies
+    url: https://support.pagerduty.com/main/docs/escalation-policies
+  - title: Alertmanager 소스 — notify/metrics.go (알림 실패 지표)
+    url: https://github.com/prometheus/alertmanager/blob/main/notify/metrics.go
+updated: 2026-10-26
+---
+
+<OnDashboard title="알림 경로 나무" caption="team=payment인 알림은 결제 채팅방으로 가고, 그중 severity=critical만 결제 당직을 호출해요. 어디에도 맞지 않는 알림은 기본 경로의 운영 채팅방으로 가요.">
+  <Flow
+    ariaLabel="모든 알림이 기본 경로로 들어와, team이 payment면 결제 채팅방으로, 그중 severity가 critical이면 결제 당직 호출로 가고, 어디에도 맞지 않으면 기본 채팅방으로 가는 경로 나무"
+    nodes={[
+      { id: 'root', label: '기본 경로', col: 0, row: 0, note: '운영 채팅방' },
+      { id: 'pay', label: '결제 팀', col: 2, row: 0, note: '결제 채팅방' },
+      { id: 'crit', label: 'critical', col: 2, row: 1, note: '결제 당직 호출', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'root', to: 'pay' },
+      { from: 'pay', to: 'crit', tone: 'warn' },
+    ]}
+  />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="레이블이 받을 곳을 정해요">
+    알림에 붙은 `team`, `severity` 같은 레이블로 받을 팀과 방법을 골라요. 맞는 경로가 없으면 맨 위의 기본 경로가 받아서, 알림이 사라지지는 않아요.
+  </Point>
+  <Point title="처음 맞는 경로 하나로 가요">
+    Alertmanager는 자식 경로를 순서대로 보고, 처음 맞는 곳에서 멈춰요. 여러 곳에 함께 보내려면 그 경로에 `continue: true`를 적어요.
+  </Point>
+  <Point title="아무도 안 보면 다음 사람에게">
+    당직 도구는 정한 시간 안에 아무도 확인하지 않으면 다음 단계의 사람에게 알림을 넘겨요. 이걸 에스컬레이션이라고 해요.
+  </Point>
+</KeyPoints>
+
+## 경로 나무
+
+알림은 맨 위 경로로 들어와 자식 경로를 따라 내려가요. 맨 위 경로는 모든 알림을 받아야 해서 조건을 두지 않아요. 맞는 자식이 없으면 지금 있는 경로의 받는 곳으로 가요.
+
+```yaml
+route:
+  receiver: ops-chat
+  routes:
+    - matchers:
+        - team="payment"
+      receiver: pay-chat
+      routes:
+        - matchers:
+            - severity="critical"
+          receiver: pay-oncall
+```
+
+이 설정에서 `team="payment"`와 `severity="critical"`인 알림은 결제 당직(`pay-oncall`)으로 가요. 결제 팀의 warning은 결제 채팅방으로, 팀 레이블이 없는 알림은 기본 채팅방으로 가요.
+
+레이블 값은 글자 그대로 견줘요. `team="Payment"`처럼 대소문자만 달라도 결제 경로에 맞지 않고 기본 경로로 가요.
+
+## 심각도마다 방법을 달리해요
+
+모든 알림이 사람을 깨울 필요는 없어요. Google SRE Book은 '모든 호출은 사람이 행동할 수 있어야 한다'고 해요. 그래서 알림의 급한 정도에 따라 보내는 방법을 나눠요.
+
+| 급한 정도 | 보내는 방법 | 예 |
+| --- | --- | --- |
+| 지금 사람이 손써야 해요 | 당직자 호출(전화, 앱 알림) | 결제 실패율이 SLO를 태워요 |
+| 오늘 안에 보면 돼요 | 팀 채팅방 | 디스크가 일주일 뒤 차요 |
+| 언젠가 고쳐요 | 작업 티켓 | 인증서가 두 달 뒤 만료돼요 |
+
+무엇을 호출로 보낼지는 <Term slug="foundations/alert-conditions">알림 조건</Term>과 <Term slug="foundations/slo-and-error-budget">SLO</Term>에서 정해요. 호출이 너무 잦으면 <Term slug="foundations/alert-fatigue">알림이 너무 많이 울릴 때</Term>의 순서로 줄여요.
+
+## 당직과 에스컬레이션
+
+당직은 정해진 기간 동안 호출을 받는 사람이에요. Google SRE Book은 사용자에게 바로 보이는 서비스라면 5분, 덜 급한 시스템이라면 30분 안에 응답하는 것을 흔한 값으로 들어요.
+
+에스컬레이션은 단계로 정해요. PagerDuty에서는 첫 단계 사람에게 바로 알려요. 정한 시간(escalation timeout) 안에 확인이나 해결이 없으면 다음 단계로 넘겨요.
+
+누가 확인하면 그 뒤로는 넘기지 않아요. 그래서 확인(acknowledge)은 '내가 보고 있다'는 약속이에요. 확인만 하고 손을 놓으면, 다음 사람에게도 넘어가지 않아 장애가 그대로 남아요.
+
+## 모니터링에서는
+
+경로는 설정을 바꿀 때마다 시험해요. Alertmanager의 `amtool config routes test`에 레이블을 주면 어느 받는 곳으로 가는지 알려 줘요. 모니터링 제품의 알림 설정 화면도 이런 미리 보기가 있으면 실수를 줄여요.
+
+보내기가 실패해도 알림은 사람에게 닿지 않아요.
+
+Alertmanager는 받는 곳 종류마다 보내기 실패 수(`alertmanager_notifications_failed_total`)를 내요. 이 값과 늘 울리는 Watchdog 알림으로 알림 길 자체를 지켜봐요. Watchdog은 <Term slug="foundations/alert-silencing">알림 잠재우기와 점검 시간</Term>에서 다뤘어요.
+
+<Checkpoints>
+  <Check>알림 규칙에 `team` 같은 레이블이 빠져 있다면, 그 알림은 모두 기본 경로로 가요. 기본 경로의 채팅방에 다른 팀의 알림이 쌓이고 있지 않은지 보세요.</Check>
+  <Check>레이블 값이 경로 조건과 대소문자나 철자까지 같은지 보세요. `Payment`와 `payment`는 다른 값이에요.</Check>
+  <Check>한 알림을 채팅방과 당직 호출 양쪽에 보내려 했는데 한쪽만 온다면, 앞 경로에 `continue: true`가 있는지 보세요. 기본은 처음 맞는 경로에서 멈춰요.</Check>
+  <Check>warning까지 당직자를 호출하고 있다면 다시 보세요. 사람이 지금 할 일이 없는 알림은 채팅방이나 티켓으로 보내세요.</Check>
+  <Check>보내기 실패 지표에 알림이 없다면 거세요. 채팅방 토큰이 만료되면 알림은 조용히 사라져요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 물려받는 설정
+
+  자식 경로는 받는 곳, `group_by`, 기다리는 시간 같은 설정을 따로 적지 않으면 부모의 값을 물려받아요. 다만 점검 시간(`mute_time_intervals`, `active_time_intervals`)은 물려받지 않아서, 필요한 경로마다 적어요.
+
+  ### Grafana의 알림 정책
+
+  Grafana 알림에서는 경로를 알림 정책(notification policy)이라고 불러요. 기본 정책이 모든 알림을 받고, 처음 맞는 정책에서 멈추는 것도 같아요. 함께 보내려면 Continue matching siblings를 켜요.
+</Deeper>

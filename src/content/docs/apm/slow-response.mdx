@@ -78,7 +78,7 @@ sum(http_server_active_requests{job="order-api"})
 
 - **DB 구간이 길어졌다면**: <Term slug="database/slow-database">DB 쪽</Term>의 느린 질의, 잠금, 연결 수를 봐요.
 - **외부 API 구간이라면**: 상대 서비스의 응답시간과 에러율을 봐요.
-- **빈칸(앱 코드)이 길어졌다면**: 서버의 CPU·메모리 같은 자원을 <Term slug="foundations/red-and-use">USE</Term>로 봐요.
+- **빈칸(앱 코드)이 길어졌다면**: 서버의 CPU·메모리 같은 자원을 <Term slug="foundations/red-and-use">USE</Term>로 봐요. 어느 함수가 시간을 쓰는지는 <Term slug="apm/continuous-profiling">지속 프로파일링</Term>으로 찾아요.
 
 Google SRE Book은 함께 움직였다고 원인은 아니라고 경고해요. 그래서 원인으로 본 것을 고친 뒤 응답시간이 돌아오는지까지 확인해요.
 

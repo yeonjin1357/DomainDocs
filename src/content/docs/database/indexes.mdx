@@ -7,7 +7,7 @@ stage: basics
 order: 30
 icon: layers
 keywords: [index, 인덱스, B-tree, 비트리, 전체 스캔, full scan, seq scan, 복합 인덱스, clustered index, 클러스터형 인덱스]
-related: [database/query-processing, database/execution-plans, database/top-sql, database/memory-and-disk]
+related: [database/query-processing, database/execution-plans, database/top-sql, database/memory-and-disk, database/index-not-used]
 sources:
   - title: PostgreSQL — Indexes, Introduction
     url: https://www.postgresql.org/docs/current/indexes-intro.html
@@ -95,7 +95,7 @@ updated: 2026-10-21
 
 - 가져올 행이 많을 때예요. 테이블의 행 대부분을 가져온다면 처음부터 다 읽는 편이 더 싸요.
 - 열에 함수를 씌운 조건이에요. `WHERE lower(email) = …`은 `email` 순서로 정렬한 인덱스와 모양이 달라요. `lower(email)`로 만든 인덱스가 따로 있어야 써요.
-- 여러 열을 묶은 <Term term="database/composite-index">복합 인덱스</Term>에서 앞 열 조건이 없을 때예요. `(고객, 주문일)` 인덱스는 고객으로 먼저 정렬돼 있어서, 주문일만으로 찾으면 효율이 크게 떨어져요.
+- 여러 열을 묶은 <Term term="database/composite-index">복합 인덱스</Term>에서 앞 열 조건이 없을 때예요. `(고객, 주문일)` 인덱스는 고객으로 먼저 정렬돼 있어서, 주문일만으로 찾으면 효율이 크게 떨어져요. 계획으로 확인하고 고치는 순서는 <Term slug="database/index-not-used">인덱스가 있는데도 안 쓰일 때</Term>에 있어요.
 
 ## 모니터링에서는
 
