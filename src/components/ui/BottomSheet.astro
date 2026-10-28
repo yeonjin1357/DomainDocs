@@ -31,6 +31,12 @@ const { id, label, variant = 'sheet' } = Astro.props;
     justify-content: center;
   }
 
+  /* 브라우저 기본값은 모달 dialog가 스크롤을 허용한다. 패널이 아래에서 올라오거나
+     끌려 내려가는 동안 틀 밖으로 나가 스크롤바가 잠깐 생기지 않게 막는다. 패널은 안에서 스크롤한다. */
+  .sheet-sheet {
+    overflow: hidden;
+  }
+
   .sheet::backdrop {
     background: rgba(0, 0, 0, 0.4);
   }
