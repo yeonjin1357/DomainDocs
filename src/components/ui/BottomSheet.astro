@@ -31,10 +31,13 @@ const { id, label, variant = 'sheet' } = Astro.props;
     justify-content: center;
   }
 
-  /* 브라우저 기본값은 모달 dialog가 스크롤을 허용한다. 패널이 아래에서 올라오거나
-     끌려 내려가는 동안 틀 밖으로 나가 스크롤바가 잠깐 생기지 않게 막는다. 패널은 안에서 스크롤한다. */
+  /* 브라우저 기본값은 모달 dialog가 스크롤을 허용한다. 패널이 아래에서 올라오거나 끌려 내려가는
+     동안 틀 밖으로 나가면 스크롤바가 생기고, 열 때 첫 버튼에 포커스가 가며 틀이 스크롤돼
+     시트가 위로 떴다가 내려앉는다. clip은 틀을 스크롤할 수 없게 막는다(hidden은 스크롤바만 숨김).
+     clip을 모르는 브라우저는 hidden을 쓴다. 내용 스크롤은 패널이 맡는다. */
   .sheet-sheet {
     overflow: hidden;
+    overflow: clip;
   }
 
   .sheet::backdrop {

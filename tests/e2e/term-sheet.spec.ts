@@ -59,6 +59,8 @@ test.describe('개념 미리보기 시트', () => {
 
   test('손잡이를 아래로 끌어내리면 닫힌다', async ({ page }) => {
     await page.locator('a.term[data-term="foundations/beta"]').click();
+    // 시트가 다 올라온 뒤에 손잡이 위치를 잰다. 올라오는 중에 재면 위치가 어긋난다.
+    await page.locator('#term-sheet [data-sheet-panel]').evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
     const handle = page.locator('#term-sheet [data-sheet-handle]');
     const box = (await handle.boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
