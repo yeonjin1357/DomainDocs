@@ -1,0 +1,116 @@
+---
+title: HPA가 파드를 늘리지 않을 때
+summary: HPA가 지표를 읽는지, 최대 개수에 닿았는지, 늘린 파드가 실제로 떴는지 차례로 봐요.
+domain: kubernetes
+type: guide
+order: 170
+icon: container
+keywords: [HPA not scaling, unknown, FailedGetResourceMetric, missing request for cpu, ScalingActive, ScalingLimited, TooManyReplicas, maxReplicas, Metrics Server, 원인 찾기]
+related: [kubernetes/autoscaling, kubernetes/requests-and-limits, kubernetes/pod-pending, kubernetes/resource-quotas]
+sources:
+  - title: Kubernetes — Horizontal Pod Autoscaling
+    url: https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/
+  - title: Kubernetes — HorizontalPodAutoscaler Walkthrough (부록, HPA 조건)
+    url: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
+  - title: Kubernetes 소스 — HPA 컨트롤러 (이벤트 이유, 조건)
+    url: https://github.com/kubernetes/kubernetes/blob/master/pkg/controller/podautoscaler/horizontal.go
+  - title: Kubernetes 소스 — HPA replica calculator (missing request 메시지)
+    url: https://github.com/kubernetes/kubernetes/blob/master/pkg/controller/podautoscaler/replica_calculator.go
+  - title: Kubernetes 소스 — kubectl HPA 출력 (TARGETS 표시)
+    url: https://github.com/kubernetes/kubernetes/blob/master/pkg/printers/internalversion/printers.go
+updated: 2026-10-28
+---
+
+<Situation>
+  점심 트래픽이 두 배로 늘어 파드들의 CPU 사용률이 90%를 넘었어요. 그런데 HPA가 붙은 Deployment의 파드는 30분째 4개 그대로예요.
+
+  <Term slug="kubernetes/autoscaling">HPA</Term>는 15초마다 지표를 읽고, 원하는 파드 수를 계산해 워크로드에 적어요. 지표를 못 읽었는지, 계산은 했는데 막혔는지, 늘렸는데 파드가 못 떴는지를 가려요.
+</Situation>
+
+<FirstLook>
+  <Item title="TARGETS 칸">지금 값이 unknown인지 봐요.</Item>
+  <Item title="HPA의 조건">ScalingActive와 ScalingLimited를 봐요.</Item>
+  <Item title="새 파드">늘린 파드가 Pending인지 봐요.</Item>
+</FirstLook>
+
+## 1. 지표를 읽고 있는지 보세요
+
+`kubectl get hpa`의 TARGETS 칸은 '지금 값/목표 값'이에요. 지금 값 자리에 `<unknown>`이 있으면 HPA가 지표를 못 읽고 있는 거예요.
+
+```text
+NAME   TARGETS
+web    cpu: <unknown>/60%
+```
+
+이 칸은 API 서버가 만들어 줘요. 쿠버네티스 1.30부터는 앞에 `cpu:`처럼 자원 이름이 붙고, 그 전에는 `<unknown>/60%`만 보여요.
+
+지표를 못 읽는 흔한 이유는 두 가지예요.
+
+- **CPU 요청이 없어요**: 사용률은 요청 대비 퍼센트라, 파드의 컨테이너 하나라도 CPU 요청이 없으면 계산할 수 없어요. 이벤트에 `missing request for cpu`가 나와요.
+- **Metrics Server가 없어요**: CPU·메모리 사용량은 Metrics Server가 모아 줘요. 설치되지 않았거나 멈췄으면 사용량 자체가 없어요.
+
+**확인 방법**: `kubectl describe hpa HPA이름`의 Events에서 FailedGetResourceMetric을 찾아요. 메시지는 이런 꼴이에요.
+
+```text
+failed to get cpu utilization:
+missing request for cpu in
+container app of Pod web-7d9-x2k
+```
+
+원리는 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>와 <Term slug="kubernetes/metrics-sources">쿠버네티스 지표는 어디서 오나</Term>에 있어요.
+
+## 2. HPA의 조건을 읽으세요
+
+`kubectl describe hpa`의 Conditions에는 HPA가 스스로 적은 상태가 세 줄 있어요.
+
+| 조건 | 뜻 | 볼 때 |
+| --- | --- | --- |
+| AbleToScale | 워크로드의 파드 수를 읽고 바꿀 수 있어요 | False면 대상의 파드 수를 읽거나 바꾸지 못해요 |
+| ScalingActive | 지표로 원하는 파드 수를 계산하고 있어요 | False면 1단계 문제예요 |
+| ScalingLimited | 계산한 수가 범위에 막혔어요 | True면 3단계를 봐요 |
+
+조건마다 이유(Reason)가 붙어요. ScalingActive가 False이고 이유가 FailedGetResourceMetric이면, 1단계의 지표 문제예요.
+
+## 3. 최대 개수에 닿았는지 보세요
+
+ScalingLimited가 True이고 이유가 TooManyReplicas라면, 계산한 수가 `maxReplicas`를 넘어 멈춘 거예요. 메시지는 'the desired replica count is more than the maximum replica count'예요.
+
+<Figure caption="파드 4개의 평균 CPU 사용률이 90%, 목표가 60%라 계산한 파드 수는 4 × 90 ÷ 60 = 6개예요. 최대값이 4라서 4개에서 멈췄어요.">
+  <StatTile label="계산한 파드" value="6" unit="개" />
+  <StatTile label="maxReplicas" value="4" unit="개" tone="warn" />
+  <StatTile label="지금 파드" value="4" unit="개" note="TooManyReplicas" />
+</Figure>
+
+이유가 ScaleUpLimit이라면 한 번에 늘릴 수 있는 폭에 걸린 거예요. 기본 설정은 15초마다 4개와 지금 수의 100% 중 큰 쪽까지만 늘려요. 잠시 기다리면 다음 주기에 더 늘어요.
+
+## 4. 늘렸는데 파드가 안 떴는지 보세요
+
+HPA가 원하는 파드 수를 올렸는데 준비된 파드가 그대로라면, HPA는 할 일을 한 거예요. 새 파드가 뜨지 못하는 이유를 봐요.
+
+- 새 파드가 Pending이라면 노드에 자리가 없어요. <Term slug="kubernetes/pod-pending">파드가 Pending에 머물 때</Term>의 순서로 봐요.
+- 파드 자체가 안 생겼다면 네임스페이스 할당량에 막혔을 수 있어요. ReplicaSet 이벤트에서 exceeded quota를 찾아요. <Term slug="kubernetes/resource-quotas">네임스페이스 할당량</Term>에서 다뤄요.
+
+**확인 방법**: `kubectl get deployment`에서 원하는 파드 수와 준비된 파드 수를 견줘요.
+
+## 5. 계산이 맞는데도 안 늘린다면
+
+지표도 읽고 최대값에도 안 닿았는데 그대로라면, 계산 결과가 '바꿀 필요 없음'인 거예요.
+
+- **목표 근처예요**: 지금 값 ÷ 목표 값이 0.9~1.1 사이면 바꾸지 않아요. 기본 허용 범위가 0.1이에요.
+- **요청이 너무 커요**: 요청을 2코어로 잡고 0.8코어를 쓰면 사용률은 40%예요. 목표 60% 아래라 앱이 느려도 늘리지 않아요.
+- **병목이 CPU가 아니에요**: 스레드 풀이나 DB 연결이 모자라면 CPU는 한가한데 응답만 느려요. CPU 기준 HPA는 움직이지 않아요.
+- **막 뜬 파드는 0%로 쳐요**: 아직 준비되지 않은 파드는, CPU로 늘릴지 계산할 때 사용률을 0%로 보수적으로 봐요. 그래서 늘리는 폭이 작아질 수 있어요.
+
+## 줄어드는 게 늦다면
+
+부하가 끝나도 파드가 바로 줄지 않는 건 정상이에요. 기본 설정은 지난 5분 동안 계산한 값 중 가장 큰 값을 따라 줄여요.
+
+다만 배포할 때마다 파드 수가 원래대로 돌아간다면 매니페스트를 봐요. Deployment에 `replicas`가 적혀 있으면, `kubectl apply`할 때마다 파드 수가 그 값으로 바뀌어요. 쿠버네티스 문서는 HPA를 쓰면 이 값을 매니페스트에서 빼라고 권해요.
+
+<Checkpoints>
+  <Check>TARGETS에 unknown이 보인다면, 모든 컨테이너에 CPU 요청이 있는지와 Metrics Server가 도는지부터 보세요.</Check>
+  <Check>파드 수가 maxReplicas에 붙어 있는데 응답이 느리다면, ScalingLimited 조건이 TooManyReplicas인지 보세요.</Check>
+  <Check>HPA가 원하는 파드 수를 올렸는데 준비된 파드가 그대로라면, HPA가 아니라 새 파드가 못 뜨는 이유를 보세요.</Check>
+  <Check>앱은 느린데 CPU 사용률이 목표보다 낮다면, 요청을 너무 크게 잡았거나 병목이 CPU가 아닌 건 아닌지 보세요.</Check>
+  <Check>배포할 때마다 파드 수가 출렁인다면, Deployment 매니페스트에 replicas가 남아 있지 않은지 보세요.</Check>
+</Checkpoints>

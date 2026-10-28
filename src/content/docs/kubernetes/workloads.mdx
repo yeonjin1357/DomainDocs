@@ -7,7 +7,7 @@ stage: basics
 order: 30
 icon: container
 keywords: [workload, 워크로드, Deployment, ReplicaSet, StatefulSet, DaemonSet, Job, CronJob, rolling update, 롤링 업데이트]
-related: [kubernetes/overview, kubernetes/pods-and-nodes, kubernetes/requests-and-limits, kubernetes/pod-status]
+related: [kubernetes/overview, kubernetes/pods-and-nodes, kubernetes/requests-and-limits, kubernetes/pod-status, kubernetes/job-failed]
 sources:
   - title: Kubernetes — Workload Management
     url: https://kubernetes.io/docs/concepts/workloads/controllers/
@@ -117,6 +117,8 @@ StatefulSet의 파드는 `db-0`, `db-1`처럼 번호가 붙은 이름을 받아�
 <Term term="kubernetes/job">Job</Term>은 끝까지 돌고 멈추는 일을 맡아요. 정해 둔 개수의 파드가 성공할 때까지 파드를 다시 실행해요. 기본 설정에서는 6번까지 다시 시도한 뒤 실패로 봐요.
 
 CronJob은 정해진 일정마다 Job을 만들어요. 리눅스의 crontab 한 줄과 같아서, "매일 새벽 2시에 백업"처럼 적어요.
+
+Job이 실패하거나 CronJob이 제때 돌지 않을 때 보는 순서는 <Term slug="kubernetes/job-failed">Job·CronJob이 실패하거나 안 돌 때</Term>에 있어요.
 
 ## 모니터링에서는
 

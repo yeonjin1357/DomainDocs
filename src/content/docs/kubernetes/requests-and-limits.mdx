@@ -7,7 +7,7 @@ stage: basics
 order: 40
 icon: container
 keywords: [requests, limits, 요청, 한도, CPU throttling, 스로틀링, OOMKilled, QoS, BestEffort, millicpu]
-related: [kubernetes/containers, kubernetes/pods-and-nodes, kubernetes/pod-status, server/cpu-usage, server/memory]
+related: [kubernetes/pods-and-nodes, kubernetes/pod-status, kubernetes/resource-quotas, kubernetes/pod-evicted, server/memory]
 sources:
   - title: Kubernetes — Resource Management for Pods and Containers
     url: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
@@ -100,7 +100,9 @@ CPU 한도는 짧은 주기마다 쓸 수 있는 CPU 시간으로 걸어요. 리
 | Burstable | Guaranteed는 아니지만 요청이나 한도를 하나라도 적었어요 | 그다음이에요 |
 | BestEffort | 아무것도 안 적었어요 | 가장 먼저 쫓겨나요 |
 
-노드의 메모리가 모자라면 kubelet이 파드를 노드에서 쫓아내요. 이걸 축출(eviction)이라고 하고, BestEffort부터 Burstable, Guaranteed 순으로 쫓아내요. 이때는 요청보다 더 쓰고 있는 파드만 후보가 돼요.
+노드의 메모리가 모자라면 kubelet이 파드를 노드에서 쫓아내요. 이걸 <Term term="kubernetes/eviction">축출</Term>(eviction)이라고 해요. 요청보다 더 쓰고 있는 파드가 먼저 쫓겨나서, 대체로 BestEffort, Burstable, Guaranteed 순이 돼요.
+
+쫓겨난 파드를 읽는 법은 <Term slug="kubernetes/pod-evicted">파드가 Evicted로 끝날 때</Term>에서 다뤄요.
 
 ## 모니터링에서는
 

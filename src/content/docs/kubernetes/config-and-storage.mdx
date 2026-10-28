@@ -7,7 +7,7 @@ stage: basics
 order: 70
 icon: container
 keywords: [ConfigMap, Secret, 시크릿, volume, 볼륨, emptyDir, PersistentVolume, PVC, StorageClass, access mode]
-related: [kubernetes/containers, kubernetes/workloads, server/filesystem-and-capacity]
+related: [kubernetes/containers, kubernetes/workloads, kubernetes/volume-not-attaching, server/filesystem-and-capacity]
 sources:
   - title: Kubernetes — ConfigMaps
     url: https://kubernetes.io/docs/concepts/configuration/configmap/
@@ -116,6 +116,8 @@ StorageClass로 자동으로 만든 PV는 StorageClass의 정책을 따르고, �
 PVC의 용량은 노드 디스크와 따로 봐요. 노드 디스크가 한가해도 PVC가 가득 차면 그 앱은 더 쓰지 못해요. 디스크 용량 읽는 법은 서버·OS의 <Term slug="server/filesystem-and-capacity">파일 시스템과 용량</Term>과 같아요.
 
 설정이 바뀐 시점도 기록해 둬요. 배포 없이 ConfigMap만 바뀌어도 앱의 동작이 달라질 수 있어요.
+
+볼륨이 파드에 붙지 않아 파드가 멈췄다면 <Term slug="kubernetes/volume-not-attaching">볼륨이 붙지 않을 때</Term>의 순서로 봐요.
 
 <Checkpoints>
   <Check>ConfigMap을 고쳤는데 앱이 그대로라면, 환경 변수로 받는지 보세요. 환경 변수는 파드를 다시 시작해야 바뀌어요.</Check>

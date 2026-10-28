@@ -1,0 +1,41 @@
+questions:
+  - id: wait-for-first-consumer
+    type: ox
+    prompt: StorageClass가 WaitForFirstConsumer인데 PVC만 만들고 파드는 아직 없어요. PVC가 Pending인 건 장애인가요?
+    answer: false
+    explain: 이 모드는 파드가 놓일 노드가 정해진 뒤에 저장소를 만들어요. 쓰는 파드가 생기기 전까지 Pending이 정상이에요.
+  - id: zone-mismatch
+    type: choice
+    prompt: 디스크가 a 영역에 있는데 a 영역 노드가 모두 점검으로 빠졌어요. 그 디스크를 쓰는 StatefulSet 파드는 어떻게 될까요?
+    choices:
+      - 놓을 노드가 없어 Pending에 머물러요
+      - 디스크가 b 영역으로 저절로 옮겨져요
+      - 디스크 없이 시작해요
+      - 아무 노드에나 놓이고 원격으로 붙어요
+    answer: 0
+    explain: 클라우드 블록 디스크는 영역 하나에 속해 다른 영역 노드에 붙지 않아요. 스케줄러가 PV의 영역 조건에 맞는 노드를 못 찾아요.
+  - id: rwo-deployment
+    type: choice
+    prompt: ReadWriteOnce PVC 하나를 쓰는 Deployment를 파드 3개로 늘렸더니 일부가 FailedAttachVolume에 멈췄어요. 왜일까요?
+    choices:
+      - 한 노드에만 붙는 볼륨을 다른 노드의 파드가 붙이려 해서
+      - PVC 크기가 3배로 필요해서
+      - 서비스가 파드를 못 찾아서
+      - 이미지가 너무 커서
+    answer: 0
+    explain: ReadWriteOnce는 한 번에 노드 하나에만 붙어요. 파드마다 PVC를 받는 StatefulSet이나 여러 노드가 쓰는 저장소를 써요.
+  - id: shrink-pvc
+    type: ox
+    prompt: allowVolumeExpansion이 true인 StorageClass의 PVC는 크기를 줄일 수도 있나요?
+    answer: false
+    explain: 키우는 것만 돼요. 쿠버네티스는 PVC를 지금 크기보다 줄이는 걸 지원하지 않아요.
+  - id: volume-full-metric
+    type: choice
+    prompt: PVC가 가득 차는 걸 미리 알고 싶어요. 무엇으로 지켜볼까요?
+    choices:
+      - kubelet_volume_stats_available_bytes와 capacity_bytes의 비율
+      - 노드 디스크 사용률
+      - FailedMount 이벤트
+      - PVC의 STATUS 칸
+    answer: 0
+    explain: 가득 찬 볼륨은 이벤트 대신 앱 쓰기 오류로 드러나요. kubelet이 PVC마다 내는 남은 바이트와 전체 바이트를 견줘요.

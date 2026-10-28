@@ -7,7 +7,7 @@ stage: basics
 order: 60
 icon: container
 keywords: [Service, 서비스, ClusterIP, NodePort, LoadBalancer, Ingress, 인그레스, Gateway API, label selector, kube-proxy]
-related: [kubernetes/pods-and-nodes, kubernetes/pod-status, network/addresses, apm/web-server-and-was]
+related: [kubernetes/pods-and-nodes, kubernetes/pod-status, kubernetes/cluster-dns, network/addresses, apm/web-server-and-was]
 sources:
   - title: Kubernetes — Service
     url: https://kubernetes.io/docs/concepts/services-networking/service/
@@ -76,6 +76,8 @@ updated: 2026-10-21
 쿠버네티스는 서비스마다 <Term term="network/dns">DNS</Term> 이름을 만들어요. 이름은 `서비스.네임스페이스.svc.클러스터도메인` 꼴이고, 서비스의 IP로 풀려요.
 
 같은 네임스페이스 안에서는 서비스 이름만 써도 돼요. kubelet이 파드의 DNS 설정에 검색 도메인을 넣어 두기 때문이에요. 그래서 주문 파드는 그냥 `http://pay`로 결제 서비스를 불러요.
+
+이름을 찾는 과정은 <Term slug="kubernetes/cluster-dns">클러스터 안의 DNS</Term>에서 자세히 다뤄요.
 
 ## 서비스의 종류
 

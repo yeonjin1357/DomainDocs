@@ -7,7 +7,7 @@ stage: basics
 order: 80
 icon: container
 keywords: [HPA, HorizontalPodAutoscaler, autoscaling, 자동 확장, 오토스케일링, scale out, 수평 확장, 수직 확장, Metrics Server, minReplicas]
-related: [kubernetes/workloads, kubernetes/requests-and-limits, kubernetes/pod-status]
+related: [kubernetes/workloads, kubernetes/requests-and-limits, kubernetes/pod-status, kubernetes/hpa-not-scaling]
 sources:
   - title: Kubernetes — Horizontal Pod Autoscaling
     url: https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/
@@ -97,6 +97,8 @@ HPA는 파드만 늘려요. 새 파드를 놓을 노드에 자리가 없으면 �
 HPA 화면은 지금 지표와 목표, 지금 파드 수와 원하는 파드 수를 함께 보여 줘요. 원하는 파드 수가 최대값에 붙어 있다면, 더 늘릴 수 없는 상태예요.
 
 파드 수 그래프는 요청량, 응답시간 그래프와 같은 시간축에 놓고 봐요. 파드가 늘기 전에 응답시간이 먼저 튀었다면, 확장이 부하를 따라가지 못한 거예요.
+
+부하가 늘었는데 파드 수가 그대로라면 <Term slug="kubernetes/hpa-not-scaling">HPA가 파드를 늘리지 않을 때</Term>의 순서로 봐요.
 
 <Checkpoints>
   <Check>파드 수가 최대값에 붙어 있다면 다시 보세요. 부하가 더 늘어도 파드가 늘지 않아 응답이 느려질 수 있어요.</Check>

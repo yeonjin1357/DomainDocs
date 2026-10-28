@@ -1,0 +1,37 @@
+questions:
+  - id: short-name-other-namespace
+    type: ox
+    prompt: shop 네임스페이스의 파드가 짧은 이름 pay만으로 billing 네임스페이스의 pay 서비스를 찾을 수 있나요?
+    answer: false
+    explain: 짧은 이름에는 자기 네임스페이스 도메인부터 붙여서 pay.shop.svc.cluster.local을 찾아요. 다른 네임스페이스는 pay.billing처럼 적어요.
+  - id: first-query
+    type: choice
+    prompt: ndots:5인 shop 네임스페이스 파드가 api.example.com을 찾을 때, 가장 먼저 묻는 이름은?
+    choices:
+      - api.example.com.shop.svc.cluster.local
+      - api.example.com
+      - api.example.com.cluster.local
+      - shop.svc.cluster.local
+    answer: 0
+    explain: 점이 5개보다 적어서 검색 도메인부터 차례로 붙여 봐요. 원래 이름은 마지막에 물어요.
+  - id: nxdomain-ratio
+    type: choice
+    prompt: CoreDNS 응답의 70%가 NXDOMAIN이에요. 먼저 떠올릴 이유는?
+    choices:
+      - 검색 도메인을 붙여 본 질의가 없는 이름으로 끝난 거예요
+      - CoreDNS가 멈춘 거예요
+      - 서비스가 모두 지워진 거예요
+      - 노드의 디스크가 가득 찬 거예요
+    answer: 0
+    explain: 바깥 이름 하나를 찾을 때도 검색 도메인 질의 대부분이 NXDOMAIN이에요. 장애 신호로는 SERVFAIL과 처리 시간을 봐요.
+  - id: default-dns-policy
+    type: ox
+    prompt: 파드에 dnsPolicy를 적지 않으면 Default 정책이 쓰이나요?
+    answer: false
+    explain: 적지 않으면 ClusterFirst예요. Default는 이름과 달리 노드의 DNS 설정을 그대로 받는 정책이에요.
+  - id: ndots-name
+    type: input
+    prompt: 파드의 resolv.conf에서, 이름에 점이 몇 개보다 적으면 검색 도메인부터 붙여 볼지 정하는 옵션은?
+    answer: [ndots]
+    term: kubernetes/ndots
+    explain: 쿠버네티스 파드는 ndots:5를 받아요. 그래서 점이 4개 이하인 바깥 이름도 검색 도메인부터 붙여 봐요.

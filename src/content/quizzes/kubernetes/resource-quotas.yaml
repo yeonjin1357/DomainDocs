@@ -1,0 +1,37 @@
+questions:
+  - id: deployment-apply-succeeds
+    type: ox
+    prompt: CPU 요청 할당량이 꽉 찬 네임스페이스에 새 Deployment를 만들면, Deployment 만들기 명령 자체가 실패하나요?
+    answer: false
+    explain: Deployment 객체는 만들어지고, 그 뒤 ReplicaSet이 파드를 만들 때 거부돼요. 그래서 원하는 파드 수보다 적게 떠요.
+  - id: counts-requests-not-usage
+    type: choice
+    prompt: 할당량은 requests.cpu 4코어예요. 요청 1코어짜리 파드 3개가 실제로는 0.2코어씩 써요. 요청 1.5코어짜리 파드를 하나 더 만들면?
+    choices:
+      - 요청 합계가 4.5코어가 돼 거부돼요
+      - 실제 사용량이 0.6코어라 만들어져요
+      - 만들어지지만 Pending으로 기다려요
+      - 기존 파드 하나가 쫓겨나고 만들어져요
+    answer: 0
+    explain: 할당량은 실제 사용량이 아니라 적어 둔 요청의 합계를 세요. 3코어에 1.5코어를 더하면 4코어를 넘어요.
+  - id: where-to-look
+    type: choice
+    prompt: 배포 뒤 원하는 파드는 5개인데 준비된 파드가 3개예요. Pending 파드도 없어요. 먼저 볼 곳은?
+    choices:
+      - ReplicaSet의 이벤트
+      - 노드의 Allocated resources
+      - 떠 있는 파드의 로그
+      - 서비스의 엔드포인트
+    answer: 0
+    explain: 할당량에 막힌 파드는 아예 만들어지지 않아요. 흔적은 ReplicaSet의 FailedCreate 이벤트에 exceeded quota로 남아요.
+  - id: limitrange-existing-pods
+    type: ox
+    prompt: LimitRange를 새로 만들면, 이미 떠 있는 파드에도 기본 요청값이 채워지나요?
+    answer: false
+    explain: LimitRange는 파드를 만들 때만 검사하고 기본값을 넣어요. 이미 떠 있는 파드는 그대로예요.
+  - id: limitrange-name
+    type: input
+    prompt: 네임스페이스 안에서 요청·한도를 안 적은 컨테이너에 기본값을 넣어 주는 객체는?
+    answer: [LimitRange, 리밋 레인지]
+    term: kubernetes/limit-range
+    explain: LimitRange는 기본값을 채우고, 컨테이너 하나나 파드 하나가 정한 범위를 벗어나지 않게 막아요.
