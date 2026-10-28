@@ -6,7 +6,7 @@ type: guide
 order: 40
 icon: activity
 keywords: [slow database, DB 느려짐, DB 지연, 대기 이벤트, Top SQL, 잠금, blocking, pg_blocking_pids, idle in transaction, 원인 찾기]
-related: [database/active-sessions, database/top-sql, database/execution-plans, apm/connection-pool]
+related: [database/active-sessions, database/top-sql, database/execution-plans, database/stop-long-query, apm/connection-pool]
 sources:
   - title: PostgreSQL — The Cumulative Statistics System (pg_stat_activity)
     url: https://www.postgresql.org/docs/current/monitoring-stats.html
@@ -82,7 +82,7 @@ WHERE cardinality(pg_blocking_pids(pid)) > 0;
 
 **확인 방법**: 막고 있는 pid로 `pg_stat_activity`를 다시 조회해요. `state`, `xact_start`(트랜잭션 시작 시각), `query`를 봐요.
 
-급하면 `pg_terminate_backend(pid)`로 그 세션을 끝낼 수 있어요. 그 세션의 트랜잭션은 커밋되지 않고 사라지니, 앱 쪽 원인을 함께 고쳐요.
+급하면 `pg_terminate_backend(pid)`로 그 세션을 끝낼 수 있어요. 그 세션의 트랜잭션은 커밋되지 않고 사라지니, 앱 쪽 원인을 함께 고쳐요. 쿼리만 멈출지 세션째 끊을지는 <Term slug="database/stop-long-query">오래 도는 쿼리 멈추기</Term>에서 다뤄요.
 
 <Checkpoints>
   <Check>DB CPU 사용률만 보는 화면이라면 액티브 세션과 대기 종류를 함께 두세요. 잠금을 기다리는 세션은 CPU를 쓰지 않아서, DB가 막혀 있어도 CPU는 한가해 보여요.</Check>

@@ -219,7 +219,7 @@ terms:
     en: Deadlock
     aliases: [deadlock, 데드락, 교착 상태]
     short: 두 트랜잭션이 서로 상대가 쥔 잠금을 기다려 둘 다 못 나아가는 상태예요.
-    doc: database/locks-and-blocking
+    doc: database/deadlock
   - id: replication
     name: 복제
     en: Replication
@@ -258,3 +258,41 @@ terms:
     short: 바인드 값을 보지 않고 세워 두고 다시 쓰는 실행 계획이에요.
     analogy: 손님마다 묻지 않고 늘 같은 길로 가는 배달 경로와 같아요.
     doc: database/plan-changed
+  - id: tablespace
+    name: 테이블스페이스
+    en: Tablespace
+    aliases: [tablespace, 표 공간, TEMP, SYSAUX]
+    short: 표와 인덱스를 담는 논리적인 저장 공간이에요. 데이터 파일 하나 이상으로 이뤄져요.
+    analogy: 상품 창고, 반품 창고처럼 쓰임새별로 나눈 창고 하나와 같아요.
+    doc: database/tablespaces
+  - id: data-file
+    name: 데이터 파일
+    en: Data file
+    aliases: [datafile, data file, AUTOEXTEND, 자동 확장]
+    short: 테이블스페이스의 데이터가 실제로 저장되는 디스크 파일이에요.
+    doc: database/tablespaces
+  - id: partition
+    name: 파티션
+    en: Partition
+    aliases: [partition, partitioning, 파티셔닝, 테이블 분할]
+    short: 큰 표를 날짜 같은 기준 열로 나눠 담은 칸 하나예요.
+    analogy: 서류를 달마다 나눠 넣은 캐비닛 서랍 하나와 같아요.
+    doc: database/partitioning
+  - id: partition-pruning
+    name: 파티션 가지치기
+    en: Partition pruning
+    aliases: [partition pruning, pruning, Subplans Removed]
+    short: 조건에 맞지 않는 파티션을 읽지 않고 건너뛰는 일이에요.
+    doc: database/partitioning
+  - id: work-mem
+    name: work_mem
+    en: work_mem
+    aliases: [작업 메모리, work memory, hash_mem_multiplier]
+    short: PostgreSQL에서 정렬·해시 단계 하나가 디스크로 넘치기 전까지 쓰는 메모리 한도예요.
+    doc: database/temp-spill
+  - id: temp-file
+    name: 임시 파일
+    en: Temporary file
+    aliases: [temp file, temporary file, spill, 디스크로 넘침, external merge]
+    short: 정렬이나 해시가 메모리에 다 안 들어갈 때 디스크에 잠깐 쓰는 파일이에요.
+    doc: database/temp-spill

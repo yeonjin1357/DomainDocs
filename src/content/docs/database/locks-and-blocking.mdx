@@ -7,7 +7,7 @@ stage: monitoring
 order: 50
 icon: server
 keywords: [lock, 잠금, 락, blocking, 블로킹, deadlock, 교착, lock_timeout, ACCESS EXCLUSIVE, pg_locks]
-related: [database/active-sessions, database/slow-database, apm/timeouts-and-retries]
+related: [database/active-sessions, database/slow-database, database/deadlock, database/stop-long-query, apm/timeouts-and-retries]
 sources:
   - title: PostgreSQL — Explicit Locking (lock modes, deadlocks)
     url: https://www.postgresql.org/docs/current/explicit-locking.html
@@ -41,6 +41,8 @@ updated: 2026-10-15
   </Point>
   <Point title="교착은 DB가 하나를 끊어 풀어요">
     두 트랜잭션이 서로의 잠금을 기다리면 둘 다 끝나지 않아요. 이를 교착(deadlock)이라고 해요. PostgreSQL은 교착을 찾아내 한쪽 트랜잭션을 에러로 끝내고, 나머지를 진행시켜요.
+
+    로그로 두 트랜잭션을 찾는 법은 <Term slug="database/deadlock">교착이 났을 때</Term>에 있어요.
   </Point>
 </KeyPoints>
 

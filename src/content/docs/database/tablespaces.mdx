@@ -1,0 +1,121 @@
+---
+title: 테이블스페이스와 언두·임시 공간
+summary: 데이터 파일을 묶은 저장 공간이에요. 옛 값을 두는 언두와 넘친 작업을 받는 임시 공간도 있어요.
+domain: database
+type: concept
+stage: basics
+order: 45
+icon: database
+keywords: [tablespace, 테이블스페이스, datafile, 데이터 파일, undo, 언두, TEMP, ORA-01555, ORA-01652, AUTOEXTEND]
+related: [database/memory-and-disk, database/concurrency, database/storage-growing, database/temp-spill]
+sources:
+  - title: Oracle Database 23 — Logical Storage Structures (Tablespaces)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/logical-storage-structures.html
+  - title: Oracle Database 23 — Managing Tablespaces
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/admin/managing-tablespaces.html
+  - title: Oracle Database 23 — Managing Undo
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/admin/managing-undo.html
+  - title: Oracle Database 23 — UNDO_RETENTION
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/refrn/UNDO_RETENTION.html
+  - title: Oracle Database 23 — DBA_TABLESPACE_USAGE_METRICS
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/refrn/DBA_TABLESPACE_USAGE_METRICS.html
+  - title: Oracle — ORA-01555
+    url: https://docs.oracle.com/en/error-help/db/ora-01555/
+  - title: Oracle — ORA-01652
+    url: https://docs.oracle.com/en/error-help/db/ora-01652/
+  - title: Oracle — ORA-01653
+    url: https://docs.oracle.com/en/error-help/db/ora-01653/
+  - title: PostgreSQL 18 — Tablespaces
+    url: https://www.postgresql.org/docs/18/manage-ag-tablespaces.html
+updated: 2026-10-28
+---
+
+<KeyPoints>
+  <Point title="데이터 파일을 묶은 공간이에요">
+    테이블스페이스는 표와 인덱스를 담는 논리적인 공간이에요. 실제로는 디스크의 데이터 파일 하나 이상으로 이뤄져요.
+  </Point>
+  <Point title="언두는 옛 값을 두는 칸이에요">
+    Oracle은 바꾸기 전 값을 언두 테이블스페이스에 둬요. 되돌리기와, 바뀌기 전 모습으로 읽기에 써요.
+  </Point>
+  <Point title="임시 공간은 넘친 작업을 받아요">
+    메모리에 안 들어가는 정렬 중간 결과는 임시 테이블스페이스에 써요. 여기가 모자라면 그 SQL이 실패해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="창고 건물은 다 차면 바로 보이지만, 테이블스페이스는 자동으로 커지게 해 두면 디스크가 찰 때까지 문제가 안 보이기도 해요.">
+  물류 창고 단지와 같아요. 상품 창고(데이터), 반품 보관 창고(언두), 포장 작업장(임시)이 나뉘어 있고, 창고마다 실제 건물(데이터 파일)이 하나 이상 있어요.
+</Analogy>
+
+## 테이블스페이스와 데이터 파일
+
+<Figure caption="Oracle DB의 테이블스페이스 예시예요. 테이블스페이스마다 데이터 파일이나 임시 파일이 하나 이상 있고, 쓰임새가 나뉘어 있어요.">
+  <Layers
+    ariaLabel="Oracle DB 안에 SYSTEM, SYSAUX, 사용자 데이터, UNDO, TEMP 테이블스페이스가 있고 각각의 쓰임새를 적은 계층도"
+    layers={[
+      { label: 'SYSTEM', note: 'DB를 관리하는 정보' },
+      { label: 'SYSAUX', note: 'SYSTEM을 돕는 보조 정보' },
+      { label: '사용자 데이터', note: '앱의 표와 인덱스', tone: 'accent' },
+      { label: 'UNDO', note: '바꾸기 전 값' },
+      { label: 'TEMP', note: '정렬 중간 결과 같은 임시 데이터' },
+    ]}
+  />
+</Figure>
+
+Oracle 문서는 <Term term="database/tablespace">테이블스페이스</Term>를 '세그먼트를 담는 논리적인 그릇'이라고 해요. 세그먼트는 표나 인덱스 하나가 차지한 공간이에요. 물리적으로는 데이터 파일이나 임시 파일 하나 이상에 저장돼요.
+
+<Term term="database/data-file">데이터 파일</Term>은 자동 확장(`AUTOEXTEND`)을 켜 두면 차는 대로 커져요. 최대 크기(`MAXSIZE`)에 닿거나 디스크가 차면 더 커지지 못해요. 그러면 표에 행을 넣다가 ORA-01653처럼 '테이블스페이스를 늘릴 수 없다'는 오류가 나요.
+
+## 언두: 바꾸기 전 값
+
+Oracle은 행을 바꿀 때 바꾸기 전 값을 <Term term="database/undo">언두</Term> 테이블스페이스에 둬요. 쓰임새는 둘이에요.
+
+- 트랜잭션을 되돌릴 때 옛 값으로 돌려놔요.
+- 다른 세션이 바뀌는 중인 행을 읽으면, 언두로 바뀌기 전 모습을 만들어 보여 줘요.
+
+커밋한 뒤의 언두도 한동안 남겨 둬요. 자동 확장하는 언두라면 `UNDO_RETENTION`(기본 900초)을 최소 보관 시간으로 지키려 하고, 모자라면 먼저 파일을 늘려요. 최대 크기에 닿으면 보관 시간이 안 지난 언두도 덮어쓸 수 있어요.
+
+오래 도는 조회가 이미 덮어쓴 옛 값을 찾으면 ORA-01555(snapshot too old)가 나요. 문서는 일관된 읽기에 필요한 언두를 다른 쓰기가 덮어썼다는 뜻으로 설명해요. 그래서 긴 조회와 많은 쓰기가 겹칠 때 잘 나요.
+
+PostgreSQL에는 따로 언두가 없어요. 옛 값을 표 안에 그대로 두고, 나중에 VACUUM이 치워요. 이 차이는 <Term slug="database/concurrency">동시에 읽고 쓰기</Term>에서 다뤄요.
+
+## 임시 공간: 넘친 작업
+
+Oracle 문서는 임시 테이블스페이스에 정렬 중간 결과, 임시 표와 인덱스 같은 것을 둔다고 해요. 세션 동안에만 필요한 데이터예요.
+
+큰 정렬이 여러 개 겹쳐 임시 공간을 다 쓰면 ORA-01652가 나요. Oracle 23의 문구는 'unable to grow … in tablespace …'로, 임시 공간을 더 늘릴 수 없다는 뜻이에요. 넘치는 원리와 줄이는 법은 <Term slug="database/temp-spill">정렬·해시가 디스크로 넘칠 때</Term>에 있어요.
+
+## PostgreSQL의 테이블스페이스
+
+PostgreSQL에서 테이블스페이스는 데이터를 둘 디렉터리 위치일 뿐이에요. 따로 만들지 않으면 기본 `pg_default`와 공용 `pg_global` 둘만 있어요.
+
+그래서 PostgreSQL에서는 테이블스페이스가 차는 일보다, 그 디렉터리가 있는 디스크가 차는 일을 지켜봐요. 임시 파일도 기본으로 같은 디스크에 써요.
+
+## 모니터링에서는
+
+<Figure caption="Oracle 테이블스페이스 사용률 예시예요. 지금 파일 크기 대비로는 96%지만, 자동 확장할 수 있는 최대 크기 대비로는 48%예요.">
+  <StatTile label="지금 크기 대비" value="96" unit="%" tone="warn" note="곧 자동으로 커져요" />
+  <StatTile label="최대 크기 대비" value="48" unit="%" />
+</Figure>
+
+자동 확장이 켜진 테이블스페이스는 지금 크기만 보면 늘 가득 차 보여요. `DBA_TABLESPACE_USAGE_METRICS`의 `TABLESPACE_SIZE`는 자동 확장으로 커질 수 있는 최대 크기예요. 이 값 대비 사용률로 봐야 진짜 남은 공간이 보여요.
+
+다만 최대 크기까지 커질 디스크 공간이 실제로 있는지도 함께 봐요. 서버 디스크 보는 법은 <Term slug="server/disk-filling-up">디스크가 차오를 때</Term>와 같아요.
+
+언두와 임시 공간은 순간적으로 차요. 사용률 평균보다 ORA-01555, ORA-01652 같은 오류가 몇 번 났는지 함께 봐요.
+
+<Checkpoints>
+  <Check>테이블스페이스 사용률이 늘 95% 근처라 경고가 계속 울린다면, 지금 크기가 아니라 자동 확장 최대 크기 대비로 계산했는지 보세요.</Check>
+  <Check>자동 확장을 믿고 안심했다면, 최대 크기만큼 늘어날 디스크 공간이 실제로 남아 있는지 보세요.</Check>
+  <Check>긴 리포트 조회가 ORA-01555로 실패한다면, 같은 시간에 많은 쓰기가 겹치지 않는지와 언두 보관 시간을 보세요.</Check>
+  <Check>PostgreSQL 화면에 Oracle처럼 테이블스페이스 사용률 칸을 두었다면 다시 보세요. PostgreSQL은 디스크 사용량으로 봐야 해요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### MySQL InnoDB의 언두와 임시 공간
+
+  MySQL InnoDB도 바뀐 행의 옛 정보를 언두 테이블스페이스에 둬요. 정렬이나 그룹화에 쓰는 내부 임시 표가 메모리 한도를 넘으면 디스크로 옮겨요.
+
+  ### 고정 크기 언두의 보관 시간
+
+  고정 크기 언두에서는 `UNDO_RETENTION`을 쓰지 않아요. 대신 DB가 공간과 쓰기 양을 보고, 가장 오래 도는 조회보다 조금 길게 보관 시간을 스스로 맞춰요. 자동 확장 언두에서도 이 자동 조정은 함께 일어나요.
+</Deeper>

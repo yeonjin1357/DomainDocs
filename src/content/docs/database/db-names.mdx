@@ -1,0 +1,151 @@
+---
+title: DB마다 다른 이름
+summary: 세션·대기·잠금·SQL 통계·실행 계획을 네 DB에서 어디서 보는지 모았어요.
+domain: database
+type: concept
+stage: monitoring
+order: 8
+icon: database
+keywords: [pg_stat_activity, performance_schema, V$SESSION, sys.dm_exec_requests, wait event, pg_stat_statements, events_statements_summary_by_digest, V$SQL, sys.dm_exec_query_stats, DBMS_XPLAN]
+related: [database/active-sessions, database/top-sql, database/locks-and-blocking, database/stop-long-query]
+sources:
+  - title: PostgreSQL 18 — The Cumulative Statistics System (pg_stat_activity)
+    url: https://www.postgresql.org/docs/18/monitoring-stats.html
+  - title: PostgreSQL 18 — System Information Functions (pg_blocking_pids)
+    url: https://www.postgresql.org/docs/18/functions-info.html
+  - title: PostgreSQL 18 — pg_stat_statements
+    url: https://www.postgresql.org/docs/18/pgstatstatements.html
+  - title: MySQL 8.4 — The processlist Table
+    url: https://dev.mysql.com/doc/refman/8.4/en/performance-schema-processlist-table.html
+  - title: MySQL 8.4 — The events_waits_current Table
+    url: https://dev.mysql.com/doc/refman/8.4/en/performance-schema-events-waits-current-table.html
+  - title: MySQL 8.4 — The data_locks Table
+    url: https://dev.mysql.com/doc/refman/8.4/en/performance-schema-data-locks-table.html
+  - title: MySQL 8.4 — Statement Summary Tables
+    url: https://dev.mysql.com/doc/refman/8.4/en/performance-schema-statement-summary-tables.html
+  - title: MySQL 8.4 — EXPLAIN Statement (EXPLAIN ANALYZE)
+    url: https://dev.mysql.com/doc/refman/8.4/en/explain.html
+  - title: Oracle Database 23 — V$SESSION
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/refrn/V-SESSION.html
+  - title: Oracle Database 23 — V$SQL
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/refrn/V-SQL.html
+  - title: Oracle Database 23 — V$LOCK
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/refrn/V-LOCK.html
+  - title: Oracle Database 23 — DBMS_XPLAN
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/arpls/DBMS_XPLAN.html
+  - title: Oracle Database 23 — V$ACTIVE_SESSION_HISTORY
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/refrn/V-ACTIVE_SESSION_HISTORY.html
+  - title: Oracle Database 23 — Licensing Information (Diagnostics Pack)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/dblic/Licensing-Information.html
+  - title: MySQL 8.4 — MySQL sys Schema
+    url: https://dev.mysql.com/doc/refman/8.4/en/sys-schema.html
+  - title: SQL Server — sys.dm_exec_requests
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-requests-transact-sql
+  - title: SQL Server — sys.dm_os_wait_stats
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-os-wait-stats-transact-sql
+  - title: SQL Server — sys.dm_exec_query_stats
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-query-stats-transact-sql
+updated: 2026-10-28
+---
+
+<OnDashboard title="DB 목록 · 액티브 세션 칸" caption="같은 '액티브 세션' 칸이라도 DB 종류마다 다른 곳에서 값을 읽어 와요. 읽어 오는 곳이 다르면 단위와 범위도 달라질 수 있어요.">
+  <Flow
+    ariaLabel="PostgreSQL의 pg_stat_activity, MySQL의 processlist, Oracle의 V$SESSION, SQL Server의 dm_exec_requests가 모두 같은 액티브 세션 칸으로 모이는 구조도"
+    nodes={[
+      { id: 'pg', label: 'PostgreSQL', col: 0, row: 0, note: 'pg_stat_activity' },
+      { id: 'my', label: 'MySQL', col: 0, row: 1, note: 'processlist' },
+      { id: 'ora', label: 'Oracle', col: 0, row: 2, note: 'V$SESSION' },
+      { id: 'ms', label: 'SQL Server', col: 0, row: 3, note: 'dm_exec_requests' },
+      { id: 'tile', label: '액티브 세션', col: 2, row: 1, tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'pg', to: 'tile' },
+      { from: 'my', to: 'tile' },
+      { from: 'ora', to: 'tile' },
+      { from: 'ms', to: 'tile' },
+    ]}
+  />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="같은 개념, 다른 이름">
+    세션, 대기, 잠금, SQL 통계, 실행 계획은 네 DB 모두 있어요. 이름과 보는 곳만 달라요. 한 DB에서 익힌 개념은 다른 DB에서도 그대로 써요.
+  </Point>
+  <Point title="이름보다 단위와 범위를 맞춰요">
+    실행 시간이 초인지 밀리초인지, 지금 값인지 쌓인 값인지가 DB마다 달라요. 화면에서 나란히 놓기 전에 이걸 맞춰요.
+  </Point>
+  <Point title="세션을 가리키는 번호도 달라요">
+    PostgreSQL은 pid, Oracle은 SID와 SERIAL# 한 쌍, MySQL과 SQL Server는 세션 번호로 세션을 가리켜요.
+  </Point>
+</KeyPoints>
+
+## 지금 도는 세션
+
+세션마다 지금 무엇을 하는지 보는 곳이에요. 개념은 <Term slug="database/connections-and-sessions">연결과 세션</Term>과 <Term slug="database/active-sessions">액티브 세션</Term>에 있어요.
+
+- **PostgreSQL**: `pg_stat_activity`. `state`가 `active`면 쿼리를 돌리는 중이에요.
+- **MySQL**: `performance_schema.processlist`, 또는 `SHOW PROCESSLIST`예요. `TIME`은 지금 상태로 지낸 초예요.
+- **Oracle**: `V$SESSION`. `STATUS`가 `ACTIVE`면 SQL을 실행하는 중이고, `LAST_CALL_ET`는 그렇게 된 뒤 지난 초예요.
+- **SQL Server**: 세션은 `sys.dm_exec_sessions`, 지금 실행 중인 요청은 `sys.dm_exec_requests`예요. `total_elapsed_time`은 밀리초예요.
+
+## 무엇을 기다리나
+
+세션이 CPU를 쓰지 않고 무엇을 기다리는지 보는 곳이에요.
+
+- **PostgreSQL**: `pg_stat_activity`의 `wait_event_type`과 `wait_event`예요.
+- **MySQL**: `performance_schema.events_waits_current`예요.
+- **Oracle**: `V$SESSION`의 `EVENT`와 `WAIT_CLASS`예요.
+- **SQL Server**: 지금 기다리는 것은 `sys.dm_exec_requests`의 `wait_type`이에요. 서버 전체에 쌓인 대기는 `sys.dm_os_wait_stats`예요.
+
+## 누가 막고 있나
+
+잠금을 기다리는 세션과 막는 세션을 잇는 곳이에요. 읽는 법은 <Term slug="database/locks-and-blocking">잠금과 블로킹</Term>에 있어요.
+
+- **PostgreSQL**: `pg_blocking_pids(pid)`가 막는 쪽 pid 목록을 돌려줘요. 잠금 하나하나는 `pg_locks`에 있어요.
+- **MySQL**: `performance_schema.data_locks`와 `data_lock_waits`예요.
+- **Oracle**: 막는 세션은 `V$SESSION`의 `BLOCKING_SESSION`, 잠금은 `V$LOCK`이에요.
+- **SQL Server**: 막는 세션은 `sys.dm_exec_requests`의 `blocking_session_id`예요. 잠금은 `sys.dm_tran_locks`예요.
+
+## SQL별로 쌓인 통계
+
+SQL마다 호출 수와 걸린 시간을 쌓아 두는 곳이에요. <Term slug="database/top-sql">Top SQL</Term> 화면이 여기서 읽어요.
+
+- **PostgreSQL**: `pg_stat_statements`. 확장이라 따로 켜야 해요.
+- **MySQL**: `performance_schema.events_statements_summary_by_digest`. 값만 다른 SQL을 한 모양으로 묶어 세요.
+- **Oracle**: `V$SQL`이에요.
+- **SQL Server**: `sys.dm_exec_query_stats`나 쿼리 저장소(Query Store)예요.
+
+## 실행 계획
+
+DB가 SQL을 어떻게 실행하는지 보는 법이에요. 읽는 법은 <Term slug="database/execution-plans">실행 계획 읽기</Term>에 있어요.
+
+- **PostgreSQL**: `EXPLAIN`이고, 실제로 돌려 보려면 `EXPLAIN (ANALYZE)`예요.
+- **MySQL**: `EXPLAIN`이고, 실제로 돌려 보려면 `EXPLAIN ANALYZE`예요.
+- **Oracle**: `DBMS_XPLAN` 패키지예요. 이미 실행된 SQL의 계획은 `DISPLAY_CURSOR`로 봐요.
+- **SQL Server**: 실행 계획(Showplan)으로 봐요. 쿼리 저장소에도 계획이 남아요.
+
+## 모니터링에서는
+
+DB 종류마다 화면을 따로 만들기보다, 같은 개념을 같은 칸에 두고 읽어 오는 곳만 바꾸는 게 흔해요. 이때 두 가지가 어긋나기 쉬워요.
+
+- **단위**: MySQL `TIME`과 Oracle `LAST_CALL_ET`는 초예요. SQL Server `total_elapsed_time`은 밀리초예요. PostgreSQL은 시작 시각이라 지금 시각에서 빼야 해요.
+- **쌓인 값과 지금 값**: `sys.dm_os_wait_stats`나 `pg_stat_statements`는 계속 쌓이는 값이에요. 다시 시작하거나 지우면 0부터라, 구간마다 늘어난 양으로 봐요.
+
+세션을 끊을 때도 번호가 달라요. Oracle은 SID가 다시 쓰일 수 있어서 SID와 SERIAL#을 함께 넘겨야 해요. 끊는 명령은 <Term slug="database/stop-long-query">오래 도는 쿼리 멈추기</Term>에 모았어요.
+
+<Checkpoints>
+  <Check>여러 DB의 실행 시간을 한 그래프에 그렸다면, 초와 밀리초가 섞이지 않았는지 보세요.</Check>
+  <Check>sys.dm_os_wait_stats나 pg_stat_statements 값을 그대로 그렸다면 다시 보세요. 쌓인 값이라 구간마다 늘어난 양을 봐야 해요.</Check>
+  <Check>Oracle 세션을 SID만으로 가리키는 화면이라면, SERIAL#도 함께 들고 다니는지 보세요. 같은 SID가 다른 세션에 다시 쓰여요.</Check>
+  <Check>PostgreSQL에서 SQL별 통계가 비어 있다면, pg_stat_statements 확장이 켜져 있는지부터 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### MySQL의 sys 스키마
+
+  MySQL에는 performance_schema를 사람이 읽기 쉽게 다시 묶은 `sys` 스키마도 있어요. 화면을 만들 때는 원본 표와 이 묶음 중 어느 쪽을 읽는지 정해 둬요.
+
+  ### Oracle의 액티브 세션 기록
+
+  Oracle은 액티브 세션을 1초마다 찍어 둔 `V$ACTIVE_SESSION_HISTORY`도 있어요. 쓰려면 별도 라이선스(Diagnostics Pack)가 필요해서, 제품에서 쓰기 전에 고객 환경을 확인해요.
+</Deeper>

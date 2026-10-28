@@ -1,0 +1,123 @@
+---
+title: 오래 도는 쿼리 멈추기
+summary: 오래 도는 쿼리를 찾고, 쿼리만 멈출지 세션째 끊을지 정해요. 되돌리는 시간과 시간 한도도 챙겨요.
+domain: database
+type: guide
+order: 85
+icon: database
+keywords: [long running query, pg_cancel_backend, pg_terminate_backend, KILL QUERY, KILL SESSION, statement_timeout, lock_timeout, idle_in_transaction_session_timeout, max_execution_time, 쿼리 취소]
+related: [database/active-sessions, database/locks-and-blocking, database/slow-database, database/db-names]
+sources:
+  - title: PostgreSQL 18 — Server Signaling Functions (pg_cancel_backend, pg_terminate_backend)
+    url: https://www.postgresql.org/docs/18/functions-admin.html
+  - title: PostgreSQL 18 — Client Connection Defaults (statement_timeout, lock_timeout, idle_in_transaction_session_timeout)
+    url: https://www.postgresql.org/docs/18/runtime-config-client.html
+  - title: PostgreSQL 18 — The Cumulative Statistics System (pg_stat_activity)
+    url: https://www.postgresql.org/docs/18/monitoring-stats.html
+  - title: MySQL 8.4 — KILL Statement
+    url: https://dev.mysql.com/doc/refman/8.4/en/kill.html
+  - title: MySQL 8.4 — Optimizing InnoDB Transaction Management (큰 트랜잭션 되돌리기)
+    url: https://dev.mysql.com/doc/refman/8.4/en/optimizing-innodb-transaction-management.html
+  - title: MySQL 8.4 — Server System Variables (max_execution_time)
+    url: https://dev.mysql.com/doc/refman/8.4/en/server-system-variables.html
+  - title: Oracle Database 23 — Managing Processes (ALTER SYSTEM CANCEL SQL)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/admin/managing-processes.html
+  - title: Oracle Database 23 — ALTER SYSTEM (KILL SESSION)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/ALTER-SYSTEM.html
+  - title: SQL Server — KILL (Transact-SQL)
+    url: https://learn.microsoft.com/en-us/sql/t-sql/language-elements/kill-transact-sql
+updated: 2026-10-28
+---
+
+<Situation>
+  누군가 운영 DB에서 돌린 대량 UPDATE가 40분째 끝나지 않아요. 그 행들을 바꾸려는 주문 요청들이 잠금을 기다리며 줄줄이 밀려요.
+
+  멈추는 건 쉽지만, 무엇을 멈추느냐에 따라 결과가 달라요. 쿼리 하나만 멈출지, 연결째 끊을지 정하고, 멈춘 뒤 되돌리는 시간까지 생각해요.
+</Situation>
+
+<FirstLook>
+  <Item title="어느 세션인가">오래 돈 순서로 세션을 찾아요.</Item>
+  <Item title="쿼리만, 세션째">멈출 범위를 정해요.</Item>
+  <Item title="되돌리는 시간">멈춘 뒤 바로 끝나는지 봐요.</Item>
+</FirstLook>
+
+## 1. 오래 도는 쿼리를 찾으세요
+
+PostgreSQL은 `pg_stat_activity`에서 세션마다 지금 하는 일을 보여 줘요. 쉬는 세션을 빼고, 쿼리를 시작한 지 오래된 순서로 봐요.
+
+```sql
+select pid, state, wait_event,
+       now() - query_start
+         as running,
+       left(query, 40) as query
+  from pg_stat_activity
+ where state <> 'idle'
+ order by query_start;
+```
+
+`running`이 실행 시간이에요. `state`가 `idle in transaction`인 세션도 눈여겨봐요. 쿼리는 끝났는데 트랜잭션을 열어 둔 채 잠금을 쥐고 있을 수 있어요.
+
+다른 쿼리를 막고 있는 세션은 `pg_blocking_pids(pid)`로 찾아요. 기다리는 세션의 pid를 넣으면 막는 쪽 pid 목록이 나와요. 다른 DB에서 같은 정보를 보는 곳은 <Term slug="database/db-names">DB마다 다른 이름</Term>에 모았어요.
+
+## 2. 쿼리만 멈출지, 세션째 끊을지 정하세요
+
+<Figure caption="PostgreSQL 18로 재현한 결과예요. 쿼리만 멈추면 연결은 남지만, 트랜잭션 안이었다면 그 트랜잭션은 되돌려야만 다시 쓸 수 있어요. 세션째 끊으면 연결이 사라져요.">
+  <Compare
+    columns={['쿼리만 멈추기', '세션째 끊기']}
+    rows={[
+      { label: '그 쿼리가 받는 오류', values: ['canceling statement due to user request', 'terminating connection due to administrator command'] },
+      { label: '연결', values: ['그대로 써요', '끊겨요'] },
+    ]}
+  />
+</Figure>
+
+쿼리만 멈추면 앱의 연결은 살아 있어요. 다만 트랜잭션 안에서 멈췄다면, 다음 SQL은 `current transaction is aborted` 오류를 받아요. 앱이 `ROLLBACK`을 해야 다시 쓸 수 있어요.
+
+세션째 끊으면 그 연결로 들어오는 다음 요청도 실패해요. 커넥션 풀은 끊긴 연결을 버리고 새로 만들어야 해요. 그래서 먼저 쿼리만 멈춰 보고, 안 되면 세션을 끊어요.
+
+DB마다 이름은 이래요.
+
+- **PostgreSQL**: `pg_cancel_backend(pid)`, `pg_terminate_backend(pid)`
+- **MySQL**: `KILL QUERY id`, `KILL id`(`KILL CONNECTION`과 같아요)
+- **Oracle**: 쿼리만은 `ALTER SYSTEM CANCEL SQL 'sid, serial#'`예요. 세션째는 `ALTER SYSTEM KILL SESSION 'sid,serial#'`예요.
+- **SQL Server**: `KILL session_id`는 세션을 끝내요
+
+PostgreSQL의 두 함수가 `true`를 돌려줘도 '신호를 보냈다'는 뜻이에요. 실제로 멈췄는지는 `pg_stat_activity`에서 다시 봐요. 같은 역할의 세션이거나 `pg_signal_backend` 권한이 있어야 하고, 슈퍼유저 세션은 슈퍼유저만 멈출 수 있어요.
+
+## 3. 되돌리는 시간을 생각하세요
+
+멈춘 쿼리가 데이터를 바꾸던 중이었다면, 그때까지의 변경을 되돌려요. 이 시간은 DB마다 크게 달라요.
+
+<Figure caption="PostgreSQL 18에서 200만 행을 바꾸는 UPDATE를 한 트랜잭션으로 돌린 뒤 되돌린 시간이에요. 되돌리기는 거의 바로 끝났지만, 바뀌다 만 행 200만 개가 정리할 거리로 남았어요.">
+  <StatTile label="UPDATE 200만 행" value="5.6" unit="초" />
+  <StatTile label="ROLLBACK" value="1" unit="ms" />
+  <StatTile label="남은 정리 거리" value="200만" unit="행" tone="warn" note="n_dead_tup" />
+</Figure>
+
+PostgreSQL은 트랜잭션을 '취소됨'으로 표시만 하고 바꾼 행을 하나하나 되돌리지 않아서 빨라요. 대신 남은 옛 행은 VACUUM이 치워야 해요. 이 흐름은 <Term slug="database/concurrency">동시에 읽고 쓰기</Term>에서 다뤄요.
+
+MySQL InnoDB는 다르게 경고해요. 큰 트랜잭션을 되돌리면 원래 작업보다 몇 배 오래 걸릴 수 있다고 해요. DB 프로세스를 죽여도 소용없고, 다시 켜질 때 되돌리기가 처음부터 다시 시작돼요.
+
+Oracle의 `KILL SESSION`과 SQL Server의 `KILL`도 되돌릴 일이 많으면 끝나기까지 시간이 걸려요. SQL Server는 `KILL session_id WITH STATUSONLY`로 되돌리기가 얼마나 남았는지 볼 수 있어요.
+
+## 4. 시간 한도를 걸어 두세요
+
+멈추는 일이 반복되면, 처음부터 한도를 걸어 둬요. PostgreSQL에는 세 가지가 있고, 기본값은 모두 0(꺼짐)이에요.
+
+| 설정 | 넘으면 | 재현한 오류 |
+| --- | --- | --- |
+| `statement_timeout` | SQL 하나를 멈춰요 | canceling statement due to statement timeout |
+| `lock_timeout` | 잠금을 기다리던 SQL을 멈춰요 | canceling statement due to lock timeout |
+| `idle_in_transaction_session_timeout` | 트랜잭션을 연 채 쉬는 세션을 끊어요 | terminating connection due to idle-in-transaction timeout |
+
+문서는 `statement_timeout`을 서버 설정 파일에 넣지 말라고 해요. 모든 세션에 걸리기 때문이에요. 리포트 계정이나 앱 계정처럼 역할마다, 또는 세션에서 정해요.
+
+MySQL에는 `max_execution_time`(밀리초)이 있어요. 다만 읽기 전용 `SELECT`에만 걸려요.
+
+<Checkpoints>
+  <Check>오래 도는 쿼리를 바로 세션째 끊었다면 다시 보세요. 먼저 쿼리만 멈춰 보면 앱의 연결을 살릴 수 있어요.</Check>
+  <Check>pg_cancel_backend가 true를 돌려줬다고 멈춘 것으로 판단했다면, pg_stat_activity에서 그 세션을 다시 보세요. true는 신호를 보냈다는 뜻이에요.</Check>
+  <Check>MySQL에서 큰 UPDATE를 KILL한 뒤 DB를 재시작하면 빨라질 거라 생각했다면 다시 보세요. 되돌리기는 재시작 뒤에 처음부터 다시 해요.</Check>
+  <Check>쿼리는 없는데 잠금을 쥔 세션이 있다면, idle in transaction 상태인지 보세요. idle_in_transaction_session_timeout으로 막을 수 있어요.</Check>
+  <Check>statement_timeout을 서버 전체 기본값으로 걸었다면, 원래 오래 걸리는 백업이나 관리 작업까지 멈추지 않는지 보세요.</Check>
+</Checkpoints>

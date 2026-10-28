@@ -1,0 +1,36 @@
+questions:
+  - id: tablespace-files
+    type: ox
+    prompt: Oracle의 테이블스페이스 하나는 꼭 데이터 파일 하나로만 이뤄지나요?
+    answer: false
+    explain: 테이블스페이스는 논리적인 공간이고, 데이터 파일이나 임시 파일 하나 이상에 저장돼요.
+  - id: snapshot-too-old
+    type: choice
+    prompt: 긴 리포트 조회가 ORA-01555(snapshot too old)로 실패했어요. 무슨 일일까요?
+    choices:
+      - 조회에 필요한 옛 값이 담긴 언두를 다른 쓰기가 덮어썼어요
+      - 임시 공간이 모자라 정렬을 못 했어요
+      - 데이터 파일이 최대 크기에 닿았어요
+      - 두 트랜잭션이 서로를 기다렸어요
+    answer: 0
+    explain: Oracle은 바뀌는 중인 행을 언두로 옛 모습을 만들어 읽어요. 그 언두가 사라지면 일관되게 읽을 수 없어요.
+  - id: autoextend-usage
+    type: choice
+    prompt: 자동 확장이 켜진 테이블스페이스의 사용률을 알림 기준으로 쓸 때 알맞은 분모는?
+    choices:
+      - 자동 확장으로 커질 수 있는 최대 크기
+      - 지금 데이터 파일의 크기
+      - 서버 메모리 크기
+      - 언두 테이블스페이스 크기
+    answer: 0
+    explain: 지금 크기 대비로는 늘 가득 차 보여요. DBA_TABLESPACE_USAGE_METRICS도 최대 크기를 기준으로 보여 줘요.
+  - id: pg-no-undo
+    type: ox
+    prompt: PostgreSQL도 Oracle처럼 옛 값을 따로 담는 언두 공간을 두나요?
+    answer: false
+    explain: PostgreSQL은 옛 버전을 표 안에 그대로 두고 VACUUM이 나중에 치워요. 테이블스페이스도 디렉터리 위치일 뿐이에요.
+  - id: temp-tablespace
+    type: input
+    prompt: Oracle에서 메모리에 안 들어가는 정렬 중간 결과를 쓰는 공간을 무엇이라고 할까요?
+    answer: [임시 테이블스페이스, temporary tablespace, TEMP, 템프]
+    explain: 여기를 다 쓰면 ORA-01652가 나요. 큰 정렬이 여러 개 겹칠 때 잘 차요.

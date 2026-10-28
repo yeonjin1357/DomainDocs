@@ -1,0 +1,41 @@
+questions:
+  - id: oracle-session-view
+    type: choice
+    prompt: PostgreSQL의 pg_stat_activity처럼, Oracle에서 지금 세션마다 하는 일을 보는 뷰는?
+    choices:
+      - V$SESSION
+      - V$SQL
+      - V$LOCK
+      - DBA_TABLESPACE_USAGE_METRICS
+    answer: 0
+    explain: V$SESSION에 상태, 실행 중인 SQL_ID, 기다리는 이벤트, 막는 세션이 있어요. V$SQL은 SQL별로 쌓인 통계예요.
+  - id: sqlserver-blocking
+    type: choice
+    prompt: SQL Server에서 지금 요청을 막고 있는 세션 번호를 보는 곳은?
+    choices:
+      - sys.dm_exec_requests의 blocking_session_id
+      - sys.dm_os_wait_stats의 wait_type
+      - sys.dm_exec_query_stats
+      - Query Store
+    answer: 0
+    explain: dm_exec_requests는 지금 실행 중인 요청마다 막는 세션과 기다리는 종류를 보여 줘요.
+  - id: units
+    type: ox
+    prompt: MySQL processlist의 TIME과 SQL Server dm_exec_requests의 total_elapsed_time은 같은 단위인가요?
+    answer: false
+    explain: MySQL TIME은 초, SQL Server total_elapsed_time은 밀리초예요. 한 그래프에 그리기 전에 단위를 맞춰요.
+  - id: cumulative
+    type: choice
+    prompt: sys.dm_os_wait_stats 값을 그대로 그렸더니 계속 오르기만 해요. 왜일까요?
+    choices:
+      - 다시 시작하거나 지운 뒤로 쌓인 값이라서요
+      - 대기가 끝없이 늘고 있어서요
+      - 밀리초를 초로 바꾸지 않아서요
+      - 세션 수가 늘어서요
+    answer: 0
+    explain: 쌓이는 값은 구간마다 늘어난 양으로 봐야 해요. pg_stat_statements도 같아요.
+  - id: oracle-serial
+    type: input
+    prompt: Oracle에서 세션을 끊을 때 SID와 함께 넘겨야 하는 V$SESSION의 열 이름은?
+    answer: [SERIAL#, SERIAL, serial number]
+    explain: 같은 SID가 다른 세션에 다시 쓰일 수 있어서, SERIAL#까지 맞아야 엉뚱한 세션을 끊지 않아요.

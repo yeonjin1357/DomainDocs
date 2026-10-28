@@ -1,0 +1,130 @@
+---
+title: 정렬·해시가 디스크로 넘칠 때
+summary: 임시 파일과 계획으로 넘친 곳을 찾고, work_mem을 올리기 전에 정말 문제인지 따져요.
+domain: database
+type: guide
+order: 97
+icon: database
+keywords: [work_mem, temp file, 임시 파일, external merge, Sort Method, Batches, temp_file_limit, log_temp_files, hash_mem_multiplier, spill]
+related: [database/execution-plans, database/memory-and-disk, database/top-sql, database/tablespaces]
+sources:
+  - title: PostgreSQL 18 — Resource Consumption (work_mem, hash_mem_multiplier, temp_file_limit)
+    url: https://www.postgresql.org/docs/18/runtime-config-resource.html
+  - title: PostgreSQL 18 — Error Reporting and Logging (log_temp_files)
+    url: https://www.postgresql.org/docs/18/runtime-config-logging.html
+  - title: PostgreSQL 18 — The Cumulative Statistics System (temp_files, temp_bytes)
+    url: https://www.postgresql.org/docs/18/monitoring-stats.html
+  - title: PostgreSQL 18 — pg_stat_statements (temp_blks_written)
+    url: https://www.postgresql.org/docs/18/pgstatstatements.html
+  - title: MySQL 8.4 — Internal Temporary Table Use (tmp_table_size, Created_tmp_disk_tables)
+    url: https://dev.mysql.com/doc/refman/8.4/en/internal-temporary-tables.html
+  - title: Oracle Database 23 — Managing Tablespaces (Temporary Tablespaces)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/23/admin/managing-tablespaces.html
+  - title: SQL Server — tempdb database
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/databases/tempdb-database
+updated: 2026-10-28
+---
+
+<Situation>
+  월말 정산 리포트가 도는 동안 DB 서버의 디스크 쓰기가 치솟고, 여유 공간이 20GB쯤 줄었다가 끝나면 돌아와요.
+
+  정렬이나 해시 조인은 정해진 메모리 안에서 일하다가, 모자라면 디스크에 임시 파일을 써요. 이걸 '디스크로 넘친다(spill)'고 해요.
+
+  넘치는지, 어디서 넘치는지, 그게 정말 문제인지를 차례로 봐요. 예시는 PostgreSQL 기준이에요.
+</Situation>
+
+<FirstLook>
+  <Item title="임시 파일 통계">임시 파일이 얼마나 생기는지 봐요.</Item>
+  <Item title="계획의 Disk 표시">어느 단계가 넘쳤는지 찾아요.</Item>
+  <Item title="정말 느린지">넘친 것과 느린 것은 따로 봐요.</Item>
+</FirstLook>
+
+## 1. 임시 파일이 생기는지 보세요
+
+PostgreSQL에서 정렬·해시 한 단계가 쓸 수 있는 메모리는 <Term term="database/work-mem">work_mem</Term>이고, 기본값은 4MB예요. 이보다 많이 필요하면 <Term term="database/temp-file">임시 파일</Term>을 써요.
+
+- `pg_stat_database`의 `temp_files`, `temp_bytes`: 그 DB에서 만든 임시 파일 수와 쓴 양이에요. 계속 더해지는 값이라 구간마다 늘어난 양을 봐요.
+- `pg_stat_statements`의 `temp_blks_written`: SQL마다 임시 파일에 쓴 블록 수예요. 어느 SQL이 넘치는지 찾을 때 써요.
+- `log_temp_files`: 기본값 -1은 꺼짐이에요. 0으로 두면 임시 파일을 지울 때마다 이름과 크기를 로그에 남겨요.
+
+```text
+LOG:  temporary file: path
+  "base/pgsql_tmp/pgsql_tmp650.0",
+  size 16588800
+STATEMENT:  … order by memo
+```
+
+PostgreSQL 18로 재현한 로그예요. 크기는 바이트이고, 바로 아래 줄에 그 파일을 만든 SQL이 남아요.
+
+## 2. 계획에서 어느 단계가 넘쳤는지 보세요
+
+`EXPLAIN (ANALYZE)`로 그 SQL을 돌리면 단계마다 메모리를 썼는지 디스크를 썼는지 나와요. 계획 읽는 법은 <Term slug="database/execution-plans">실행 계획 읽기</Term>에 있어요.
+
+- **정렬(Sort)**: 메모리 안에서 끝나면 `quicksort Memory: …`, 넘치면 `external merge Disk: …`라고 나와요.
+- **해시 조인(Hash)**: `Batches: 1`이면 메모리 안이고, 2 이상이면 넘친 거예요.
+- **해시 집계(HashAggregate)**: `Batches`가 2 이상이고 `Disk Usage: …`가 붙으면 넘친 거예요.
+
+해시는 데이터를 묶음(batch) 여러 개로 나눠 하나씩 처리해요. 묶음이 둘 이상이면 나머지 묶음을 디스크에 써 둔 거예요.
+
+## 3. 넘쳤다고 꼭 느린 건 아니에요
+
+먼저 이 SQL이 실제로 느린지, 디스크를 바쁘게 하는지 봐요. 넘쳤다는 사실만으로 고칠 대상은 아니에요.
+
+<Figure caption="PostgreSQL 18에서 200만 행을 정렬하고 해시 조인한 시간이에요. 병렬 처리를 끄고 work_mem만 바꿔 5번씩 잰 중앙값이에요. 이 서버에서는 디스크로 넘친 쪽이 오히려 빨랐어요.">
+  <Compare
+    columns={['work_mem 4MB', 'work_mem 512MB']}
+    rows={[
+      { label: '정렬 방식', values: ['디스크 98MB로 넘침', '메모리 170MB'] },
+      { label: '정렬 시간', values: ['1.6초', '2.1초'] },
+      { label: '해시 조인', values: ['16묶음, 0.76초', '1묶음, 1.27초'] },
+    ]}
+  />
+</Figure>
+
+임시 파일은 디스크에 쓰지만, 운영체제가 최근 쓴 파일을 메모리 캐시에 두기도 해요. 그래서 디스크로 넘쳐도 시간이 크게 늘지 않을 수 있어요.
+
+넘침이 문제가 되는 때는 따로 있어요.
+
+- 디스크가 느리거나 다른 일로 바빠서, 임시 파일 읽기·쓰기가 줄을 서요.
+- 여러 SQL이 한꺼번에 넘쳐서 임시 파일이 디스크 공간을 크게 차지해요.
+- 넘친 SQL이 실제로 느려서 사용자가 기다려요.
+
+## 4. work_mem을 올리기 전에 곱해 보세요
+
+`work_mem`은 SQL 하나의 한도가 아니라 정렬·해시 단계 하나의 한도예요. 문서는 복잡한 SQL이 여러 단계를 동시에 돌리고, 여러 세션이 함께 돌 수 있다고 경고해요. 그래서 전체 메모리는 이 값의 몇 배가 될 수 있어요.
+
+예를 들어 `work_mem`을 64MB로 올리고, 정렬 2개가 든 SQL을 연결 100개가 함께 돌리면 12.8GB까지 쓸 수 있어요. 해시 단계는 여기에 `hash_mem_multiplier`(기본 2.0)를 곱한 만큼까지 써요.
+
+그래서 전체 기본값을 올리기보다 범위를 좁혀요.
+
+- 리포트용 계정만 올려요: `ALTER ROLE report SET work_mem = '256MB'`
+- 그 세션이나 트랜잭션에서만 올려요: `SET work_mem = '256MB'`
+- 다룰 행을 줄여요. 정렬 순서와 같은 인덱스를 두거나, 필요한 열만 고르거나, 행 수 추정이 크게 틀린 곳을 바로잡아요.
+
+## 5. 디스크를 지키는 한도를 걸어 두세요
+
+`temp_file_limit`은 한 프로세스가 동시에 쓸 수 있는 임시 파일 크기의 합계를 막아요. 기본값 -1은 제한 없음이라, SQL 하나가 디스크를 다 채울 수도 있어요.
+
+한도를 넘으면 그 SQL은 이렇게 실패해요. 1MB로 걸고 재현한 결과예요.
+
+```text
+ERROR:  temporary file size
+exceeds "temp_file_limit"
+(1024kB)
+```
+
+## 다른 DB에서는
+
+넘치는 곳의 이름만 다르고, 원리는 같아요.
+
+- **MySQL**: 내부 임시 테이블이 메모리 한도를 넘으면 디스크로 옮겨요. `tmp_table_size`(기본 16MB)가 한도이고, 상태 값 `Created_tmp_disk_tables`가 디스크에 만든 수를 세요.
+- **Oracle**: 정렬 중간 결과를 임시 테이블스페이스에 써요. 그 공간이 모자라면 오류가 나요. <Term slug="database/tablespaces">테이블스페이스와 언두·임시 공간</Term>에서 다뤄요.
+- **SQL Server**: 정렬과 해시의 작업 파일을 `tempdb`에 써요.
+
+<Checkpoints>
+  <Check>임시 파일이 생겼다는 이유만으로 work_mem을 올렸다면 다시 보세요. 넘친 SQL이 정말 느린지, 디스크가 바쁜지부터 확인해요.</Check>
+  <Check>work_mem을 서버 전체 기본값으로 크게 올렸다면, 단계 수와 연결 수를 곱한 최대 메모리를 계산해 보세요.</Check>
+  <Check>temp_bytes 그래프가 계속 오르기만 한다고 놀랐다면, 누적 값이라 그래요. 구간마다 늘어난 양으로 보세요.</Check>
+  <Check>temp_file_limit이 기본값 -1이라면, 쿼리 하나가 임시 파일로 디스크를 채울 수 있어요.</Check>
+  <Check>해시 조인에 `Batches: 16 (originally 1)`처럼 처음 계획과 다른 묶음 수가 보이면, 행 수 추정이 빗나간 거예요. 추정 행 수와 실제 행 수를 견줘 보세요.</Check>
+</Checkpoints>
