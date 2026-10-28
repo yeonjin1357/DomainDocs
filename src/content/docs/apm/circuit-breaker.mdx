@@ -1,0 +1,145 @@
+---
+title: 서킷 브레이커
+summary: 실패가 쌓이면 호출을 잠시 끊어 장애가 번지지 않게 막아요. 열리면 오류는 늘고 응답은 빨라져요.
+domain: apm
+type: concept
+stage: monitoring
+order: 145
+icon: layers
+keywords: [circuit breaker, 서킷 브레이커, 회로 차단기, Resilience4j, CallNotPermittedException, half-open, 반열림, fallback, failureRateThreshold, waitDurationInOpenState]
+related: [apm/timeouts-and-retries, apm/cascading-failure, apm/service-map, apm/errors-and-exceptions]
+sources:
+  - title: Resilience4j — CircuitBreaker
+    url: https://resilience4j.readme.io/docs/circuitbreaker
+  - title: Resilience4j — Micrometer (지표)
+    url: https://resilience4j.readme.io/docs/micrometer
+  - title: Resilience4j 소스 — CircuitBreakerMetricNames (지표 이름)
+    url: https://github.com/resilience4j/resilience4j/blob/master/resilience4j-micrometer/src/main/java/io/github/resilience4j/micrometer/tagged/CircuitBreakerMetricNames.java
+  - title: Martin Fowler — CircuitBreaker
+    url: https://martinfowler.com/bliki/CircuitBreaker.html
+  - title: Envoy — Circuit breaking
+    url: https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/circuit_breaking
+updated: 2026-10-28
+---
+
+<OnDashboard title="주문 서비스 → 결제 API · 최근 10분" caption="결제 API를 부르는 서킷 브레이커가 열렸어요. 주문 서비스의 오류는 늘었는데, 그 오류 응답은 3ms 만에 끝나요. 결제 API까지 가지 않고 바로 실패했기 때문이에요.">
+  <StatTile label="서킷 상태" value="열림" note="OPEN" tone="warn" />
+  <StatTile label="거절한 호출" value="1,240" unit="번/분" tone="warn" />
+  <StatTile label="오류 응답 p50" value="3" unit="ms" note="평소 응답 180ms" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="실패가 쌓이면 회로를 열어요">
+    <Term term="apm/circuit-breaker">서킷 브레이커</Term>는 바깥 호출의 최근 실패율을 세요. 기준을 넘으면 한동안 호출을 보내지 않고 바로 실패시켜요. 아픈 서비스를 더 두드리지 않고, 기다리느라 스레드가 묶이지도 않아요.
+  </Point>
+  <Point title="열리면 오류는 늘고 응답은 빨라져요">
+    열린 동안의 호출은 상대에게 가지 않고 바로 예외로 끝나요. 그래서 오류 수는 느는데 오류 응답시간은 아주 짧아져요. 상대 서비스 쪽 지표는 오히려 조용해져요.
+  </Point>
+  <Point title="잠시 뒤 몇 개만 보내 봐요">
+    정한 시간이 지나면 반열림 상태가 돼 시험 호출 몇 개만 보내요. 성공하면 닫히고, 실패하면 다시 열려요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="집의 차단기는 사람이 직접 올려야 하지만, 서킷 브레이커는 정해진 시간이 지나면 스스로 몇 번 시험해 보고 닫혀요.">
+  집의 누전 차단기와 같아요. 이상 전류가 흐르면 차단기가 내려가 전선이 타지 않게 막아요.
+</Analogy>
+
+## 세 가지 상태
+
+<Figure caption="닫힘에서는 호출을 보내며 실패율을 세요. 실패율이 기준을 넘으면 열림, 기다린 뒤 반열림이 되고, 시험 호출 결과에 따라 닫힘이나 열림으로 가요.">
+  <Flow
+    ariaLabel="닫힘에서 열림으로, 열림에서 반열림으로, 반열림에서 성공하면 닫힘으로, 실패하면 다시 열림으로 가는 상태도"
+    nodes={[
+      { id: 'closed', label: '닫힘', col: 0, row: 0, note: '호출을 보내요' },
+      { id: 'open', label: '열림', col: 2, row: 0, note: '바로 실패', tone: 'warn' },
+      { id: 'half', label: '반열림', col: 1, row: 1, note: '몇 개만 시험' },
+    ]}
+    edges={[
+      { from: 'closed', to: 'open', tone: 'warn' },
+      { from: 'open', to: 'half' },
+      { from: 'half', to: 'closed', tone: 'accent' },
+      { from: 'half', to: 'open', dashed: true },
+    ]}
+  />
+</Figure>
+
+| 상태 | 호출 | 다음 상태로 가는 때 |
+| --- | --- | --- |
+| 닫힘(CLOSED) | 그대로 보내고 결과를 세요 | 실패율이 기준 이상이면 열림 |
+| 열림(OPEN) | 보내지 않고 바로 실패시켜요 | 정한 시간이 지나면 반열림 |
+| 반열림(HALF_OPEN) | 정한 수만큼만 시험으로 보내요 | 시험 결과에 따라 닫힘이나 열림 |
+
+## 언제 열리나요
+
+자바에서 많이 쓰는 Resilience4j의 기본값으로 보면 이래요.
+
+| 설정 | 기본값 | 뜻 |
+| --- | --- | --- |
+| `slidingWindowSize` | 100 | 최근 호출 100번으로 실패율을 세요 |
+| `minimumNumberOfCalls` | 100 | 100번은 쌓여야 실패율을 계산해요 |
+| `failureRateThreshold` | 50 | 실패율 50% 이상이면 열려요 |
+| `slowCallDurationThreshold` | 60초 | 60초보다 오래 걸린 호출은 느린 호출로 세요 |
+| `slowCallRateThreshold` | 100 | 느린 호출이 100%면 열려요 |
+| `waitDurationInOpenState` | 60초 | 열린 뒤 60초를 기다려요 |
+| `permittedNumberOfCallsInHalfOpenState` | 10 | 반열림에서 시험 호출 10번을 보내요 |
+
+최소 호출 수가 중요해요. 문서의 예처럼 9번 모두 실패해도, 최소 10번으로 정했다면 열리지 않아요. 호출이 드문 API는 기본값 100번이 쌓이기까지 한참 걸려요.
+
+느린 호출의 비율로도 열 수 있어요. 다만 기본값은 60초보다 느린 호출이 100%일 때라, 느린 응답만으로는 거의 열리지 않아요. 응답이 느려지는 장애를 막으려면 두 값을 서비스에 맞게 낮춰요.
+
+열림에서 60초를 기다린 뒤에도 기본 설정에서는 저절로 반열림이 되지 않아요. 다음 호출이 들어올 때 반열림으로 바뀌어요.
+
+<Figure caption="Resilience4j 2.2로 직접 돌린 결과예요. 시험하기 쉽게 창 크기와 최소 호출 수를 10, 기다림을 1초로 줄였어요.">
+  <StatTile label="호출 10번 중 실패" value="7" unit="번" note="실패율 70%" />
+  <StatTile label="상태" value="열림" tone="warn" note="CLOSED → OPEN" />
+  <StatTile label="1초 뒤 시험 3번 성공" value="닫힘" tone="accent" note="HALF_OPEN → CLOSED" />
+</Figure>
+
+열려 있을 때 들어온 호출은 이런 예외로 끝나요.
+
+```text
+CallNotPermittedException:
+CircuitBreaker 'payment' is OPEN
+and does not permit further calls
+```
+
+## 대신 줄 응답(폴백)
+
+열린 동안 그냥 오류를 내지 않고, 미리 정한 대체 응답을 주기도 해요. 이걸 폴백(fallback)이라고 해요. 추천 상품이 안 오면 인기 상품 목록을 보여 주는 식이에요.
+
+폴백은 사용자를 지켜 주지만, 오류를 가리기도 해요. 앱의 오류 지표에는 성공으로 남을 수 있어요. 그래서 서킷 브레이커의 상태와 거절 수를 따로 지켜봐요.
+
+## 모니터링에서는
+
+Resilience4j를 Micrometer로 내보내면 Prometheus에서 이런 이름으로 보여요.
+
+- `resilience4j_circuitbreaker_state`: 상태별로 1이나 0이에요. `state="open"`이 1이면 열린 거예요.
+- `resilience4j_circuitbreaker_not_permitted_calls_total`: 열려서 거절한 호출 수예요.
+- `resilience4j_circuitbreaker_failure_rate`: 지금 실패율이에요. 최소 호출 수가 안 쌓였으면 -1이에요.
+- `resilience4j_circuitbreaker_calls_seconds`: 호출 시간이에요. `kind` 레이블로 성공과 실패를 나눠요.
+
+<Term slug="apm/service-map">서비스 맵</Term>을 볼 때 조심해요. 열린 동안에는 호출이 상대에게 가지 않아서, 부르는 쪽은 빨간데 상대 서비스는 조용해 보여요. 상대 쪽 요청 수가 갑자기 줄었다면 서킷이 열렸는지부터 봐요.
+
+실패율 지표의 -1을 0%로 그리면 안 돼요. -1은 '아직 계산할 만큼 호출이 없음'이라는 표시예요.
+
+<Checkpoints>
+  <Check>오류는 급증했는데 오류 응답시간이 몇 ms로 짧다면, 상대가 아니라 서킷 브레이커가 바로 거절하고 있는지 보세요.</Check>
+  <Check>호출이 하루 수십 번인 API에 기본 설정을 그대로 썼다면 다시 보세요. 최소 호출 수 100번이 쌓이기 전에는 열리지 않아요.</Check>
+  <Check>느린 응답 장애를 서킷 브레이커가 막아 줄 거라 기대했다면, 느린 호출 기준이 기본값 60초·100%로 남아 있지 않은지 보세요.</Check>
+  <Check>폴백을 쓰는 호출이라면, 앱 오류율이 아니라 서킷 상태와 거절 수로 알림을 거세요.</Check>
+  <Check>실패율 그래프에 -1이 그대로 그려진다면, 계산 전 상태를 0%와 구분해서 보여 주세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 시간 기준 창
+
+  기본 창(COUNT_BASED)은 '최근 호출 몇 번'으로 세요. '최근 몇 초 동안의 호출'로 세는 시간 기준 창(TIME_BASED)도 고를 수 있어요.
+
+  ### Envoy의 circuit breaking은 뜻이 달라요
+
+  Envoy나 그 위의 Istio가 말하는 circuit breaking은 열림·닫힘 상태가 아니라 동시 연결·대기 요청 수의 한도예요. 한도를 넘는 요청은 바로 실패시키고 넘친 횟수를 세요. Envoy 문서는 기본으로 클러스터마다 연결 1,024개 같은 한도가 켜져 있다고 해요.
+
+  ### 재시도와 함께 쓸 때
+
+  재시도는 실패한 호출을 다시 보내서, 서킷이 볼 실패를 늘리거나 줄일 수 있어요. 어느 쪽이 먼저 감싸는지에 따라 동작이 달라지니, 함께 쓸 때는 순서를 확인해요. 재시도는 <Term slug="apm/timeouts-and-retries">타임아웃과 재시도</Term>에서 다뤄요.
+</Deeper>

@@ -120,7 +120,7 @@ terms:
     en: Real User Monitoring
     aliases: [실제 사용자 모니터링, 필드 데이터, field data]
     short: 실제 사용자의 브라우저에서 페이지 속도와 오류를 재서 모으는 모니터링이에요.
-    doc: apm/page-load
+    doc: apm/rum
   - id: core-web-vitals
     name: Core Web Vitals
     en: Core Web Vitals
@@ -158,3 +158,56 @@ terms:
     aliases: [eviction, evict, 쫓아내기, 퇴출, LRU]
     short: 캐시 메모리가 차면 덜 쓰는 값을 골라 지우는 일이에요.
     doc: apm/cache
+  - id: memory-leak
+    name: 메모리 누수
+    en: Memory leak
+    aliases: [memory leak, 누수, leak]
+    short: 더는 쓰지 않는 객체를 계속 붙잡고 있어 메모리가 줄지 않고 쌓이는 일이에요.
+    analogy: 다 본 서류를 버리지 않고 책상에 계속 쌓아 두는 것과 같아요.
+    doc: apm/memory-growing
+  - id: heap-dump
+    name: 힙 덤프
+    en: Heap dump
+    aliases: [heap dump, hprof, GC.heap_dump, HeapDumpOnOutOfMemoryError]
+    short: 그 순간 힙에 있던 객체를 모두 파일로 쏟아 낸 거예요. 누수를 찾는 핵심 자료예요.
+    doc: apm/memory-growing
+  - id: connection-leak
+    name: 커넥션 누수
+    en: Connection leak
+    aliases: [connection leak, leakDetectionThreshold, 커넥션 반납 누락]
+    short: 빌린 DB 커넥션을 닫지 않아 풀로 돌아오지 않는 일이에요.
+    analogy: 빌려 간 우산을 돌려주지 않아 우산꽂이가 비는 것과 같아요.
+    doc: apm/pool-exhausted
+  - id: source-map
+    name: 소스 맵
+    en: Source map
+    aliases: [source map, sourcemap, sourceMappingURL, .map]
+    short: 줄이고 합친 자바스크립트의 위치를 원래 파일과 줄로 되돌리는 대응표예요.
+    doc: apm/rum
+  - id: n-plus-one
+    name: N+1
+    en: N+1 query problem
+    aliases: [N+1 query, N+1 select, N+1 문제, 엔 플러스 원]
+    short: 목록을 한 번 가져온 뒤 항목마다 SQL을 하나씩 더 보내는 모양이에요.
+    analogy: 장보기 목록을 받고 물건 하나마다 마트를 따로 다녀오는 것과 같아요.
+    doc: apm/n-plus-one
+  - id: lazy-loading
+    name: 지연 로딩
+    en: Lazy loading
+    aliases: [lazy loading, LAZY, FetchType.LAZY, 지연 가져오기]
+    short: 연관 객체를 처음 읽는 순간에야 DB에서 가져오는 ORM의 방식이에요.
+    doc: apm/n-plus-one
+  - id: circuit-breaker
+    name: 서킷 브레이커
+    en: Circuit breaker
+    aliases: [circuit breaker, 회로 차단기, Resilience4j, CallNotPermittedException]
+    short: 바깥 호출의 실패가 쌓이면 한동안 호출을 끊고 바로 실패시키는 장치예요.
+    analogy: 이상 전류가 흐르면 내려가는 집의 누전 차단기와 같아요.
+    doc: apm/circuit-breaker
+  - id: canary
+    name: 카나리 배포
+    en: Canary release
+    aliases: [canary, canarying, 카나리, 카나리 릴리스]
+    short: 새 버전을 일부 트래픽에만 먼저 내보내 기존 버전과 견주는 배포 방식이에요.
+    analogy: 광부가 탄광에 카나리아를 먼저 들여보내 위험을 살피던 데서 온 말이에요.
+    doc: apm/slow-after-deploy

@@ -49,6 +49,7 @@ updated: 2026-10-14
   <Check>풀 최대치에 서버 수를 곱해 DB 연결 한도와 견줘 보세요. 풀 20개짜리 서버를 10대로 늘리면 연결이 200개까지 늘어요. PostgreSQL의 `max_connections` 기본값은 보통 100이에요.</Check>
   <Check>트랜잭션 안에서 외부 API를 부르는 코드는 다시 보세요. 응답을 기다리는 동안 커넥션을 쥐고 있어서 풀이 빨리 바닥나요.</Check>
   <Check>커넥션을 기다리는 동안 요청을 처리하는 스레드도 붙잡혀요. 30초씩 기다리는 스레드가 쌓여 스레드 풀이 바닥나면, DB를 쓰지 않는 요청까지 멈춰요.</Check>
+  <Check>풀이 바닥나 Connection is not available 예외가 난다면 <Term slug="apm/pool-exhausted">커넥션 풀이 바닥날 때</Term>의 순서로 원인을 가려 보세요.</Check>
 </Checkpoints>
 
 <Deeper>

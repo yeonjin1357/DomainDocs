@@ -1,0 +1,116 @@
+---
+title: 커넥션 풀이 바닥날 때
+summary: 예외 메시지로 풀이 찼는지 확인하고, 쥐는 시간·돌려주지 않는 커넥션·빌리는 횟수를 차례로 봐요.
+domain: apm
+type: guide
+order: 115
+icon: layers
+keywords: [connection pool exhausted, 커넥션 풀 고갈, Connection is not available, SQLTransientConnectionException, HikariCP, leakDetectionThreshold, 커넥션 누수, connection leak, hikaricp_connections_pending, 원인 찾기]
+related: [apm/connection-pool, database/too-many-connections, database/locks-and-blocking, apm/n-plus-one]
+sources:
+  - title: HikariCP — Configuration (leakDetectionThreshold, connectionTimeout)
+    url: https://github.com/brettwooldridge/HikariCP#gear-configuration-knobs-baby
+  - title: HikariCP — About Pool Sizing
+    url: https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing
+  - title: HikariCP 소스 — HikariPool (타임아웃 예외 메시지)
+    url: https://github.com/brettwooldridge/HikariCP/blob/dev/src/main/java/com/zaxxer/hikari/pool/HikariPool.java
+  - title: HikariCP 소스 — ProxyLeakTask (누수 경고)
+    url: https://github.com/brettwooldridge/HikariCP/blob/dev/src/main/java/com/zaxxer/hikari/pool/ProxyLeakTask.java
+  - title: HikariCP — MicrometerMetricsTracker (지표 이름)
+    url: https://github.com/brettwooldridge/HikariCP/blob/dev/src/main/java/com/zaxxer/hikari/metrics/micrometer/MicrometerMetricsTracker.java
+updated: 2026-10-28
+---
+
+<Situation>
+  결제 API가 30초씩 멈췄다가 `SQLTransientConnectionException`으로 끝나요. 그런데 DB 화면을 보면 CPU도 한가하고 느린 SQL도 없어요.
+
+  이 예외는 DB가 아니라 앱 안의 <Term slug="apm/connection-pool">커넥션 풀</Term>에서 커넥션을 못 빌렸다는 뜻이에요. 풀이 왜 비었는지를 가려요. 예시는 자바에서 흔히 쓰는 HikariCP 기준이에요.
+</Situation>
+
+<FirstLook>
+  <Item title="예외 메시지">사용 중·쉬는·기다리는 수가 적혀 있어요.</Item>
+  <Item title="쥐는 시간">한 번 빌려 돌려주기까지가 늘었나 봐요.</Item>
+  <Item title="한가할 때 사용 중 수">요청이 없어도 꽉 차 있으면 누수예요.</Item>
+</FirstLook>
+
+## 1. 예외 메시지로 풀 상태를 읽으세요
+
+HikariCP는 `connectionTimeout`(기본 30초) 안에 커넥션을 못 빌리면 예외를 던져요. 메시지 끝에 그 순간의 풀 상태가 붙어요. 아래는 풀 크기 2, 기다림 1초로 재현한 메시지예요.
+
+```text
+orders - Connection is not
+available, request timed out
+after 1000ms (total=2,
+active=2, idle=0, waiting=0)
+```
+
+| 값 | 뜻 |
+| --- | --- |
+| `total` | 풀에 있는 커넥션 수 |
+| `active` | 빌려 간 커넥션 수 |
+| `idle` | 쉬고 있는 커넥션 수 |
+| `waiting` | 이 요청 말고 더 기다리는 스레드 수 |
+
+`active`가 최대 크기와 같고 `idle`이 0이면, 풀이 바닥난 거예요. 이제 커넥션이 왜 안 돌아오는지를 봐요.
+
+**확인 방법**: Micrometer 지표로는 `hikaricp_connections_active`가 최대값에 붙었는지 봐요. 기다리는 스레드 수인 `hikaricp_connections_pending`이 느는지도 봐요. 못 빌리고 끝난 횟수는 `hikaricp_connections_timeout_total`이에요.
+
+## 2. 쥐는 시간이 늘었는지 보세요
+
+필요한 커넥션 수는 '빌리는 횟수 × 한 번 쥐는 시간'이에요. 쥐는 시간이 두 배가 되면, 같은 트래픽에도 커넥션이 두 배 필요해요. 이 셈은 <Term slug="apm/connection-pool">DB 커넥션 풀</Term>에서 자세히 다뤄요.
+
+쥐는 시간이 느는 흔한 이유는 이래요.
+
+- **느린 SQL**: SQL 자체가 느려졌어요. <Term slug="database/slow-database">DB가 느려졌을 때</Term>의 순서로 봐요.
+- **잠금 대기**: SQL은 빠른데 다른 트랜잭션의 잠금을 기다려요. <Term slug="database/locks-and-blocking">잠금과 블로킹</Term>에서 다뤄요.
+- **트랜잭션 안의 바깥 호출**: 트랜잭션을 연 채로 외부 API를 불러요. 응답을 기다리는 동안에도 커넥션을 쥐고 있어요.
+
+DB 화면이 한가한데 쥐는 시간만 길다면 마지막 경우를 의심해요. 커넥션을 쥔 채 DB가 아닌 곳에서 시간을 쓰고 있는 거예요.
+
+**확인 방법**: 쥐는 시간은 `hikaricp_connections_usage_seconds`예요. 트레이스에서는 트랜잭션이 시작된 뒤 DB가 아닌 구간이 끼어 있는지 봐요.
+
+## 3. 돌려주지 않는 커넥션이 있는지 보세요
+
+빌린 커넥션을 닫지 않으면 풀로 돌아오지 않아요. 이걸 <Term term="apm/connection-leak">커넥션 누수</Term>라고 해요. 예외가 났을 때 닫는 코드를 건너뛰는 경우가 흔해요.
+
+<Figure caption="새벽 3시의 예시예요. 요청이 초당 2건뿐인데 사용 중 커넥션이 최대 10개에 붙어 있어요. 일이 없는데 커넥션이 안 돌아오면 누수예요.">
+  <StatTile label="초당 요청" value="2" unit="건" note="낮에는 120건" />
+  <StatTile label="사용 중 커넥션" value="10" unit="/ 10개" tone="warn" note="쉬는 커넥션 0개" />
+</Figure>
+
+HikariCP는 `leakDetectionThreshold`를 켜면, 커넥션이 그 시간보다 오래 풀 밖에 있을 때 경고를 남겨요. 기본값 0은 꺼짐이고, 켤 때 가장 작은 값은 2초예요.
+
+```text
+WARN ProxyLeakTask - Connection
+leak detection triggered for
+conn0 ... on thread main,
+stack trace follows
+java.lang.Exception: Apparent
+connection leak detected
+  at …getConnection(…)
+  at Pool.main(Pool.java:19)
+```
+
+경고에 붙은 스택 트레이스는 그 커넥션을 빌린 코드 줄을 가리켜요. 재현에서도 커넥션을 빌린 19번째 줄이 그대로 찍혔어요. 그 줄에서 커넥션을 닫는 길이 빠짐없이 있는지 봐요.
+
+기준을 너무 짧게 잡으면, 원래 오래 걸리는 배치 작업도 누수로 찍혀요. 정상적으로 가장 오래 쥐는 시간보다 길게 잡아요.
+
+## 4. 빌리는 횟수가 늘었는지 보세요
+
+쥐는 시간이 그대로라면 빌리는 횟수가 는 거예요. 트래픽이 늘었는지, 재시도가 몰렸는지 봐요.
+
+한 요청이 같은 SQL을 수백 번 부르는 <Term slug="apm/n-plus-one">N+1</Term>도 의심해요. 요청 수는 그대로여도 DB를 오가는 횟수와 시간이 함께 늘어요.
+
+## 5. 풀을 키우기 전에 DB 한도를 보세요
+
+풀 크기를 키우면 바로 풀리는 것처럼 보여요. 하지만 원인이 쥐는 시간이라면 더 많은 커넥션이 같은 곳에서 기다릴 뿐이에요.
+
+키운다면 서버 수를 곱한 합계가 DB의 연결 한도 안에 드는지 봐요. 풀 20개짜리 서버 10대면 200개예요. DB 쪽에서 보는 법은 <Term slug="database/too-many-connections">DB 연결이 한도에 닿았을 때</Term>에 있어요.
+
+<Checkpoints>
+  <Check>Connection is not available 예외를 DB 장애로 판단했다면 다시 보세요. 앱의 풀이 비었다는 뜻이고, DB는 한가할 수 있어요.</Check>
+  <Check>DB는 한가한데 커넥션을 쥐는 시간이 길다면, 트랜잭션 안에서 외부 API를 부르는 코드가 없는지 보세요.</Check>
+  <Check>요청이 거의 없는 시간에도 사용 중 커넥션이 최대값에 붙어 있다면 누수예요. leakDetectionThreshold를 켜서 빌린 곳을 찾으세요.</Check>
+  <Check>누수 경고를 2초처럼 짧게 켰다면, 원래 오래 걸리는 작업이 경고로 쏟아지지 않는지 보세요.</Check>
+  <Check>풀 크기를 늘려 해결하려 한다면, 서버 수를 곱한 합계와 DB 연결 한도를 먼저 견주세요.</Check>
+</Checkpoints>

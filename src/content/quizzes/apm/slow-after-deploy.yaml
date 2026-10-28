@@ -1,0 +1,41 @@
+questions:
+  - id: warmup
+    type: choice
+    prompt: 자바 앱을 배포한 직후 5분 동안만 느렸다가 원래대로 돌아왔어요. 가장 그럴듯한 이유는?
+    choices:
+      - JIT 컴파일과 빈 캐시 때문에 막 뜬 서버가 데워지는 중이었어요
+      - 새 코드에 N+1이 생겼어요
+      - DB 인덱스가 사라졌어요
+      - 커넥션 풀이 누수됐어요
+    answer: 0
+    explain: 코드 문제라면 계속 느려요. 몇 분 안에 스스로 돌아오면 웜업이에요.
+  - id: by-version
+    type: choice
+    prompt: 배포 도중 응답시간이 올랐어요. 새 버전 탓인지 가리려면?
+    choices:
+      - 같은 시간대의 응답시간을 버전별로 나눠 봐요
+      - 전체 평균 응답시간을 봐요
+      - 에러율만 봐요
+      - 배포가 끝날 때까지 기다려요
+    answer: 0
+    explain: 롤링 업데이트 중에는 두 버전이 섞여 있어요. 새 버전 인스턴스만 느리면 새 버전 탓이에요.
+  - id: service-version
+    type: input
+    prompt: OpenTelemetry에서 서비스의 배포 버전을 담는 리소스 속성 이름은?
+    answer: [service.version]
+    explain: 배포 도구가 이 값을 채우게 해 두면, 지표와 트레이스를 버전으로 나눠 볼 수 있어요.
+  - id: canary-impact
+    type: choice
+    prompt: 요청의 20%를 실패시키는 새 버전을 트래픽 5%에만 내보냈어요. 전체 실패율은 대략 얼마가 늘까요?
+    choices:
+      - 1%
+      - 5%
+      - 20%
+      - 25%
+    answer: 0
+    explain: 5%의 트래픽에서 20%가 실패하니 전체의 1%예요. 카나리는 나쁜 버전의 영향을 이만큼 줄여 줘요.
+  - id: rollback-first
+    type: ox
+    prompt: 새 버전 탓에 사용자 영향이 크다면, 원인을 다 찾기 전에 먼저 되돌려도 되나요?
+    answer: true
+    explain: 옛 버전으로 돌아온 뒤에 원인을 찾아도 돼요. 얼마나 나쁘면 되돌릴지는 SLO와 에러 예산으로 미리 정해 둬요.

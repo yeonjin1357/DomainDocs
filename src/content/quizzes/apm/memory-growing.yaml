@@ -1,0 +1,42 @@
+questions:
+  - id: oomkilled-no-log
+    type: ox
+    prompt: 자바 앱 파드가 OOMKilled로 끝났다면, 앱 로그에서 OutOfMemoryError를 찾을 수 있나요?
+    answer: false
+    explain: OOMKilled는 프로세스가 컨테이너 한도를 넘어 커널이 죽인 거예요. JVM이 오류를 남길 틈이 없어서 앱 로그에는 흔적이 없어요.
+  - id: floor-rising
+    type: choice
+    prompt: 힙 사용량 그래프에서 누수를 의심할 모양은?
+    choices:
+      - GC 직후에 남는 양이 계속 올라가요
+      - GC 직전 사용량이 90%까지 올라가요
+      - 톱니처럼 오르고 내려요
+      - GC가 하루에 한 번만 돌아요
+    answer: 0
+    explain: GC 직전에 높은 건 정상이에요. 치운 뒤에도 남는 바닥이 계속 오르면 치울 수 없는 객체가 쌓이는 거예요.
+  - id: off-heap
+    type: choice
+    prompt: 힙의 GC 직후 바닥은 평평한데 컨테이너 메모리만 계속 올라요. 먼저 쓸 도구는?
+    choices:
+      - Native Memory Tracking으로 힙 밖의 칸을 나눠 봐요
+      - 힙 덤프를 떠서 큰 객체를 찾아요
+      - -Xmx를 두 배로 늘려요
+      - GC 종류를 바꿔요
+    answer: 0
+    explain: 힙이 아니라 힙 밖이 느는 거예요. 메타스페이스, 다이렉트 버퍼, 스레드 스택 중 어느 칸인지 NMT로 나눠 봐요.
+  - id: default-heap
+    type: choice
+    prompt: -Xmx 없이 메모리 한도 2Gi인 리눅스 컨테이너에서 띄운 자바 17의 최대 힙은 대략 얼마일까요?
+    choices:
+      - 512Mi 안팎
+      - 2Gi
+      - 1Gi
+      - 제한이 없어요
+    answer: 0
+    explain: 기본 MaxRAMPercentage가 25%이고, 컨테이너 한도를 기준으로 계산해요. 2Gi의 25%예요.
+  - id: heap-dump-name
+    type: input
+    prompt: 그 순간 힙에 있던 객체를 모두 파일로 쏟아 낸 것으로, 메모리 누수를 찾는 데 가장 중요한 자료는?
+    answer: [힙 덤프, heap dump, heapdump]
+    term: apm/heap-dump
+    explain: jcmd의 GC.heap_dump나 -XX:+HeapDumpOnOutOfMemoryError로 떠요. 메모리에 있던 데이터가 그대로 담기니 다루는 곳을 정해요.

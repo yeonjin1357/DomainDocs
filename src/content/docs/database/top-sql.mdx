@@ -7,7 +7,7 @@ stage: monitoring
 order: 20
 icon: chart-column
 keywords: [Top SQL, 상위 SQL, pg_stat_statements, total_exec_time, mean_exec_time, calls, 호출 수, queryid, 정규화, 느린 쿼리]
-related: [database/active-sessions, foundations/counters-and-rate, apm/trace-waterfall]
+related: [database/active-sessions, foundations/counters-and-rate, apm/trace-waterfall, apm/n-plus-one]
 sources:
   - title: PostgreSQL — pg_stat_statements
     url: https://www.postgresql.org/docs/current/pgstatstatements.html
@@ -39,7 +39,7 @@ updated: 2026-10-15
   <Check>평균 시간 순으로만 줄 세운 화면은 다시 보세요. 하루 한 번 도는 배치가 맨 위에 오고, 1초에 수백 번 도는 SQL이 묻혀요. 총 시간과 호출 수를 함께 두세요.</Check>
   <Check>누적값을 그대로 그린 그래프는 다시 보세요. 시간이 갈수록 오르기만 해서, 지금 무엇이 무거운지 보이지 않아요. 초기화되면 값이 갑자기 0으로 떨어지기도 해요.</Check>
   <Check>항목 수가 상한(`pg_stat_statements.max`, 기본 5,000)에 닿으면 적게 불린 SQL부터 버려져요. 버린 횟수가 `pg_stat_statements_info`에서 늘고 있다면 상한을 올리세요.</Check>
-  <Check>SQL 평균은 빠른데 앱의 DB 구간이 길다면 호출 수를 보세요. <Term slug="apm/trace-waterfall">N+1 질의</Term>처럼 같은 SQL을 요청마다 여러 번 부르면, 한 번은 빨라도 합이 커요.</Check>
+  <Check>SQL 평균은 빠른데 앱의 DB 구간이 길다면 호출 수를 보세요. <Term slug="apm/n-plus-one">N+1 질의</Term>처럼 같은 SQL을 요청마다 여러 번 부르면, 한 번은 빨라도 합이 커요.</Check>
 </Checkpoints>
 
 <Deeper>

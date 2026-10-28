@@ -1,0 +1,151 @@
+---
+title: 실제 사용자 모니터링(RUM)
+summary: 페이지에 심은 스크립트가 사용자 브라우저의 속도와 오류를 모아, 페이지를 떠날 때 보내요.
+domain: apm
+type: concept
+stage: monitoring
+order: 63
+icon: layers
+keywords: [RUM, real user monitoring, 실사용자 모니터링, sendBeacon, visibilitychange, Script error, crossorigin, source map, 소스 맵, unhandledrejection]
+related: [apm/page-load, apm/synthetic-monitoring, apm/errors-and-exceptions, apm/sampling]
+sources:
+  - title: MDN — Navigator.sendBeacon()
+    url: https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
+  - title: MDN — Document visibilitychange event
+    url: https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event
+  - title: MDN — Window error event
+    url: https://developer.mozilla.org/en-US/docs/Web/API/Window/error_event
+  - title: MDN — Window unhandledrejection event
+    url: https://developer.mozilla.org/en-US/docs/Web/API/Window/unhandledrejection_event
+  - title: MDN — script 요소 (crossorigin)
+    url: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script
+  - title: MDN — PerformanceLongTaskTiming (50ms 이상 긴 작업)
+    url: https://developer.mozilla.org/en-US/docs/Web/API/PerformanceLongTaskTiming
+  - title: GoogleChrome — web-vitals (보고 시점, soft navigation)
+    url: https://github.com/GoogleChrome/web-vitals
+  - title: ECMA-426 — Source map format specification
+    url: https://tc39.es/ecma426/
+  - title: Sentry — Troubleshooting (Dealing with Ad-Blockers)
+    url: https://docs.sentry.io/platforms/javascript/troubleshooting/
+updated: 2026-10-28
+---
+
+<OnDashboard title="상품 페이지 · RUM 오류 · 최근 1시간" caption="페이지 보기의 2.1%에서 자바스크립트 오류가 났어요. 그런데 그중 64%는 'Script error.'뿐이라, 어느 파일 몇째 줄인지 알 수 없어요.">
+  <StatTile label="페이지 보기" value="12,400" unit="번" />
+  <StatTile label="오류가 난 페이지 보기" value="2.1" unit="%" tone="warn" />
+  <StatTile label="그중 Script error." value="64" unit="%" tone="warn" note="출처 정보 없음" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="브라우저 안의 스크립트가 재요">
+    <Term term="apm/rum">RUM</Term>은 페이지에 심은 스크립트(SDK)가 사용자 브라우저에서 속도와 오류를 모아요. 서버 APM이 못 보는 네트워크, 화면 그리기, 자바스크립트 오류까지 담겨요.
+  </Point>
+  <Point title="떠날 때 보내요">
+    많은 값이 사용자가 페이지를 떠나거나 탭을 숨길 때 확정돼요. 그래서 그 순간에 보내는데, 그 순간을 놓치면 값이 빠져요.
+  </Point>
+  <Point title="다른 출처 스크립트 오류는 가려져요">
+    다른 도메인에서 받은 스크립트의 오류는, 설정이 없으면 'Script error.'라는 한 줄만 남아요. 파일과 줄 번호가 사라져요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="설문 카드는 손님이 직접 적지만, RUM은 브라우저가 이미 기록해 둔 숫자를 스크립트가 알아서 담아요. 대신 카드를 우체통에 넣기 전에 손님이 사라지면 그 기록은 영영 없어요.">
+  매장 손님마다 설문 카드를 쥐여 주고, 나갈 때 우체통에 넣게 하는 것과 같아요. 매장 직원이 보지 못한 손님 쪽의 경험이 모여요.
+</Analogy>
+
+## 무엇을 모으나요
+
+<Figure caption="RUM 스크립트는 브라우저가 기록해 둔 시각과 오류를 모았다가, 페이지가 숨겨질 때 수집 서버로 보내요.">
+  <Sequence
+    ariaLabel="브라우저가 시각과 오류를 기록하면 RUM 스크립트가 모으고, 페이지가 숨겨질 때 수집 서버로 보내는 순서"
+    participants={['브라우저', 'RUM 스크립트', '수집 서버']}
+    messages={[
+      { from: '브라우저', to: 'RUM 스크립트', label: '시각·지표 기록' },
+      { from: '브라우저', to: 'RUM 스크립트', label: '오류 이벤트' },
+      { from: 'RUM 스크립트', to: '수집 서버', label: '숨겨질 때 전송', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+| 종류 | 브라우저에서 읽는 곳 |
+| --- | --- |
+| 페이지 로딩 구간 | 브라우저가 남긴 탐색·자원 기록이에요. <Term slug="apm/page-load">브라우저에서 페이지가 뜨기까지</Term>에서 다뤄요 |
+| Core Web Vitals | 화면 그리기, 입력 반응, 화면 밀림을 지켜보는 기록이에요 |
+| 긴 작업 | 화면을 맡은 스레드를 50ms 이상 붙잡은 작업이에요 |
+| 자바스크립트 오류 | `error`, `unhandledrejection` 이벤트예요 |
+| 사용자 동작 | 누른 버튼, 바뀐 화면 주소 같은 흐름이에요 |
+
+이 기록에 브라우저 종류, 기기, 나라, 화면 주소를 붙여 보내요. 그래서 '모바일 사파리에서만 느리다'처럼 나눠 볼 수 있어요.
+
+## 언제 보내나요
+
+값 중에는 페이지를 떠날 때 확정되는 것이 많아요. 화면 밀림(CLS)과 입력 반응(INP)은 사용자가 머무는 동안 계속 바뀌어서, 페이지가 숨겨질 때 다시 보고해요.
+
+MDN은 페이지가 숨겨지는 순간(`visibilitychange`의 `hidden`)을 페이지가 믿고 받을 수 있는 마지막 이벤트로 설명해요. 탭을 바꾸거나 닫거나, 모바일에서 다른 앱으로 넘어갈 때 일어나요. 그래서 RUM 스크립트는 이때 보내요.
+
+보낼 때는 `navigator.sendBeacon()`을 써요. 페이지가 닫혀도 브라우저가 대신 보내 주는 작은 POST 요청이에요. 한 번에 보낼 수 있는 양은 64KiB 안팎이에요.
+
+## 자바스크립트 오류
+
+오류는 두 갈래로 잡아요.
+
+- `error` 이벤트: 실행 중에 바로 던진 오류예요.
+- `unhandledrejection` 이벤트: 처리하지 않은 Promise 거부예요. `async` 함수 안에서 잡지 않은 오류도 여기로 와요.
+
+### 'Script error.'만 남을 때
+
+CDN처럼 다른 도메인에서 받은 스크립트는, 오류가 나도 페이지에 내용을 다 알려 주지 않아요. 브라우저가 다른 출처의 정보를 보호하기 때문이에요.
+
+| 설정 | 오류 이벤트에 남는 것 |
+| --- | --- |
+| 아무것도 없음 | Script error. 한 줄뿐, 파일과 줄 번호 없음 |
+| crossorigin 속성과 CORS 헤더 | 실제 오류 문구, 파일 주소, 줄 번호 |
+
+브라우저로 직접 재현한 결과예요. 다른 출처 스크립트에는 `crossorigin="anonymous"`를 붙여요. 그 스크립트를 주는 서버는 `Access-Control-Allow-Origin` 헤더를 보내야 해요.
+
+### 소스 맵으로 원래 코드 찾기
+
+배포한 자바스크립트는 보통 줄이고 합친 코드라, 오류 위치가 `app.min.js:1:48213`처럼 나와요. <Term term="apm/source-map">소스 맵</Term>은 이 위치를 원래 파일과 줄로 되돌리는 대응표예요.
+
+줄인 코드 끝의 `//# sourceMappingURL=` 주석이 소스 맵 파일을 가리켜요. 소스 맵에는 원래 코드가 담길 수 있어서, 공개 서버에 두지 않고 RUM 도구에만 올리기도 해요.
+
+## 모니터링에서는
+
+<Figure caption="RUM에 담기지 않는 사용자가 있어요. 그래서 RUM의 숫자는 실제 사용자 전체가 아니라, 스크립트가 돌고 전송이 닿은 사용자의 숫자예요.">
+  <Layers
+    ariaLabel="실제 사용자에서 광고 차단, 전송 전 종료, 샘플링으로 빠진 뒤 남은 RUM 데이터를 위에서 아래로 줄어드는 층으로 그린 그림"
+    layers={[
+      { label: '실제 사용자 전체' },
+      { label: '스크립트가 막히지 않은 사용자', note: '광고·추적 차단에서 빠져요' },
+      { label: '전송이 닿은 페이지 보기', note: '보내기 전에 꺼지면 빠져요' },
+      { label: 'RUM 화면의 데이터', note: '샘플링하면 더 줄어요', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+광고나 추적을 막는 확장 프로그램은 RUM 스크립트나 전송 주소를 막을 수 있어요. Sentry 문서도 이 경우 오류와 성능 데이터가 전달되지 않는다고 해요. 그래서 RUM의 사용자 수를 서버 접속 수와 견주면 보통 적어요.
+
+RUM 화면은 서버 APM과 같은 요청을 다른 쪽에서 봐요. 서버 응답은 빠른데 RUM이 느리다면 네트워크나 브라우저 쪽이에요. 서버 응답부터 느리다면 서버 APM으로 넘어가요.
+
+Script error로만 남는 오류가 많다면 오류 수보다 먼저 설정을 고쳐요. 원인을 알 수 없는 오류는 아무리 많이 모아도 고칠 수 없어요.
+
+<Checkpoints>
+  <Check>RUM의 사용자 수가 서버 로그보다 적다고 버그로 판단했다면 다시 보세요. 차단, 전송 전 종료, 샘플링으로 빠지는 사용자가 있어요.</Check>
+  <Check>오류 대부분이 Script error.로만 보인다면, CDN 스크립트에 crossorigin 속성과 CORS 헤더가 있는지 보세요.</Check>
+  <Check>오류 위치가 줄인 파일의 1번째 줄로만 나온다면, 그 배포 버전의 소스 맵이 RUM 도구에 올라가 있는지 보세요.</Check>
+  <Check>RUM 전송을 페이지를 떠날 때의 unload 이벤트에 걸었다면 다시 보세요. MDN은 visibilitychange의 hidden에 보내라고 권해요.</Check>
+  <Check>Promise 오류가 하나도 안 잡힌다면, unhandledrejection 이벤트도 함께 듣고 있는지 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 한 페이지 앱의 화면 전환
+
+  한 페이지 앱(SPA)은 화면이 바뀌어도 문서를 새로 불러오지 않아요. 그래서 Core Web Vitals는 원래 처음 불러온 페이지에만 재요. web-vitals 문서에 따르면 크롬 151부터 이런 화면 전환(soft navigation)도 따로 재는 기능이 생겼어요.
+
+  ### 세션
+
+  RUM은 같은 사용자의 페이지 보기를 세션으로 묶어요. 얼마나 쉬면 세션을 끊는지는 제품마다 달라서, 제품 문서를 확인해요.
+
+  ### 보내기 전에 붙이는 정보
+
+  배포 버전을 함께 보내야, 어느 버전에서 오류가 늘었는지 나눠 볼 수 있어요. 소스 맵도 버전별로 올려야 위치가 맞게 되돌아가요.
+</Deeper>
