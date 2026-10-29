@@ -47,6 +47,26 @@ updated: 2026-10-14
   </Point>
 </KeyPoints>
 
+<Figure caption="위 그림의 숫자가 나온 길이에요. 지표는 나누기 전 10,000건으로 세서 에러율 0.5%예요. 에러는 모두, 정상은 10%만 남기면 남은 트레이스의 에러율은 4.8%로 부풀어요.">
+  <Flow
+    ariaLabel="요청 10,000건으로 먼저 지표를 세어 에러율 0.5%를 얻고, 에러 50건은 모두 남기고 정상 9,950건은 10%인 995건만 남겨, 남은 1,045건으로 센 에러율이 4.8%가 되는 구조도"
+    nodes={[
+      { id: 'metric', label: '지표', col: 0, row: 0, note: '에러율 0.5%', tone: 'accent' },
+      { id: 'all', label: '요청', col: 1, row: 0, note: '10,000건' },
+      { id: 'err', label: '에러', col: 0, row: 1, note: '50건' },
+      { id: 'ok', label: '정상', col: 2, row: 1, note: '9,950건' },
+      { id: 'kept', label: '남은 트레이스', col: 1, row: 3, note: '1,045건 · 4.8%', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'all', to: 'metric', tone: 'accent' },
+      { from: 'all', to: 'err' },
+      { from: 'all', to: 'ok' },
+      { from: 'err', to: 'kept', label: '모두 50건' },
+      { from: 'ok', to: 'kept', label: '10%만 995건' },
+    ]}
+  />
+</Figure>
+
 <Checkpoints>
   <Check>트레이스 검색 결과의 개수로 처리량이나 에러율을 그린 화면은 다시 보세요. head 샘플링이면 비율만큼 줄고, tail 샘플링이면 에러 쪽으로 쏠려요.</Check>
   <Check>Collector에서 span으로 지표를 만든다면(spanmetrics), 그 단계가 샘플링보다 앞에 있는지 보세요. Datadog 문서도 span 지표 connector를 `tail_sampling` 같은 샘플링 프로세서 앞에 두라고 해요.</Check>

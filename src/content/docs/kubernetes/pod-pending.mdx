@@ -33,6 +33,29 @@ updated: 2026-10-21
   <Item title="놓을 수 있는 노드">taint와 nodeSelector가 노드를 막는지 봐요.</Item>
 </FirstLook>
 
+<Figure caption="FailedScheduling 메시지의 이유가 갈래를 정해요. 자리가 모자라면 요청 합계를, 조건이 안 맞으면 taint와 레이블을, 저장소를 기다리면 PVC를 봐요.">
+  <Flow
+    ariaLabel="Pending 파드의 이벤트 메시지가 자리 부족이면 2단계 요청 합계로, 조건 불일치면 3단계 taint와 레이블로, PVC 대기면 4단계 PVC와 PV로 가는 흐름도"
+    nodes={[
+      { id: 'p', label: 'Pending 파드', col: 1, row: 0, note: '이벤트 메시지', tone: 'warn' },
+      { id: 'cap', label: '자리 부족', col: 0, row: 1, note: 'insufficient' },
+      { id: 'match', label: '조건 불일치', col: 1, row: 1, note: 'taint·selector' },
+      { id: 'pvc', label: 'PVC 대기', col: 2, row: 1, note: 'unbound' },
+      { id: 's2', label: '요청 합계', col: 0, row: 2, note: '2단계', tone: 'accent' },
+      { id: 's3', label: 'taint·레이블', col: 1, row: 2, note: '3단계', tone: 'accent' },
+      { id: 's4', label: 'PVC·PV', col: 2, row: 2, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'p', to: 'cap' },
+      { from: 'p', to: 'match' },
+      { from: 'p', to: 'pvc' },
+      { from: 'cap', to: 's2' },
+      { from: 'match', to: 's3' },
+      { from: 'pvc', to: 's4' },
+    ]}
+  />
+</Figure>
+
 ## 1. 스케줄러가 남긴 이유를 읽으세요
 
 스케줄러는 파드를 놓을 노드를 찾지 못할 때마다 FailedScheduling 이벤트를 남겨요. 메시지에 노드 몇 개 중 몇 개가 왜 안 되는지 적혀 있어요.
@@ -54,6 +77,21 @@ Message: 0/42 nodes available:
 메시지가 insufficient cpu나 insufficient memory라면, 노드마다 요청 합계에 남은 자리가 없는 거예요. 스케줄러는 실제 사용량이 아니라 요청으로 자리를 따져요. 그래서 노드가 한가해 보여도 파드가 못 들어가요.
 
 원리는 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>에 있어요.
+
+<Figure caption="CPU 4코어 노드를 0.5코어 칸으로 나눴어요. 요청 합계는 3.5코어라 0.5코어만 남아서, 1코어를 요청한 새 파드는 못 들어가요. 실제 사용량이 1.2코어(30%)여도 그래요.">
+  <Strip
+    ariaLabel="CPU 4코어 노드에서 파드 A가 1.5코어, B와 C가 1코어씩 요청해 0.5코어만 남았고, 실제 사용량은 1.2코어인 칸 띠"
+    rows={[
+      {
+        label: '요청 합계 3.5코어(스케줄러가 보는 것)',
+        cells: [{ label: 'A', tone: 'accent' }, { label: 'A', tone: 'accent' }, { label: 'A', tone: 'accent' }, { label: 'B', tone: 'accent' }, { label: 'B', tone: 'accent' }, { label: 'C', tone: 'accent' }, { label: 'C', tone: 'accent' }, { label: '빈', tone: 'sub' }],
+      },
+      { label: '실제 사용량 1.2코어(대시보드가 보는 것)', cells: ['', '', '', '', '', '', '', ''] },
+    ]}
+    marks={[{ row: 0, at: 7, label: '0.5코어 남음', tone: 'warn' }]}
+    ranges={[{ row: 1, from: 0, to: 2, label: '30% 남짓' }]}
+  />
+</Figure>
 
 쿠버네티스 문서가 권하는 길은 세 가지예요.
 

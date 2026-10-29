@@ -33,6 +33,25 @@ updated: 2026-10-21
 
 AWS Application Load Balancer는 두 수를 따로 세요. 대상이 만든 5xx는 HTTPCode_Target_5XX_Count, 로드 밸런서가 만든 5xx는 HTTPCode_ELB_5XX_Count예요. 지표 읽는 법은 <Term slug="cloud/load-balancers">로드 밸런서</Term>에 있어요.
 
+<Figure caption="5xx가 생기는 두 자리예요. 앱이 직접 돌려준 5xx는 Target 5XX로, 로드 밸런서가 대신 만든 5xx는 ELB 5XX로 세요. 뒤의 것은 앱 로그에 남지 않아요.">
+  <Flow
+    ariaLabel="사용자의 요청이 로드 밸런서를 거쳐 대상으로 가고, 대상이 돌려준 5xx는 Target 5XX, 로드 밸런서가 만든 502, 503, 504는 ELB 5XX로 세는 구조도"
+    nodes={[
+      { id: 'user', label: '사용자', col: 0, row: 0 },
+      { id: 'lb', label: '로드 밸런서', col: 1, row: 0, tone: 'accent' },
+      { id: 'app', label: '대상(앱)', col: 2, row: 0 },
+      { id: 'elb', label: 'ELB 5XX', col: 1, row: 1, note: 'LB가 만듦', tone: 'warn' },
+      { id: 'tgt', label: 'Target 5XX', col: 2, row: 1, note: '앱이 만듦' },
+    ]}
+    edges={[
+      { from: 'user', to: 'lb', tone: 'accent' },
+      { from: 'lb', to: 'app', tone: 'accent' },
+      { from: 'lb', to: 'elb', tone: 'warn' },
+      { from: 'app', to: 'tgt' },
+    ]}
+  />
+</Figure>
+
 <Figure caption="같은 10분 동안의 예시예요. 대상이 만든 5xx는 평소 수준인데, 로드 밸런서가 만든 504가 크게 늘었어요. 앱 로그에는 이 오류가 남지 않아요.">
   <StatTile label="대상이 만든 5xx" value="12" unit="건" />
   <StatTile label="LB가 만든 504" value="1,840" unit="건" tone="warn" />
@@ -41,6 +60,29 @@ AWS Application Load Balancer는 두 수를 따로 세요. 대상이 만든 5xx�
 
 - **대상이 만든 5xx가 늘었다면**: 앱 안의 오류예요. 앱 쪽 오류 분석으로 가요. <Term slug="apm/error-spike">에러가 늘었을 때 어디부터 볼까</Term>를 봐요.
 - **로드 밸런서가 만든 5xx가 늘었다면**: 대상까지 가지 못했거나 대상이 제대로 답하지 못했어요. 아래 단계에서 코드별로 봐요.
+
+<Figure caption="로드 밸런서가 만든 5xx는 코드마다 볼 곳이 달라요. 502는 연결이 끊긴 이유를, 503은 받을 대상이 있는지를, 504는 어디서 시간이 넘었는지를 봐요.">
+  <Flow
+    ariaLabel="ELB 5XX가 502면 연결 끊김으로 keep-alive와 RST를, 503이면 대상 없음으로 정상 대상 수를, 504면 시간 초과로 연결 10초와 응답시간을 보는 흐름도"
+    nodes={[
+      { id: 'elb', label: 'ELB 5XX', col: 1, row: 0, tone: 'warn' },
+      { id: 'c502', label: '502', col: 0, row: 1, note: '연결이 끊김' },
+      { id: 'c503', label: '503', col: 1, row: 1, note: '대상이 없음' },
+      { id: 'c504', label: '504', col: 2, row: 1, note: '시간 초과' },
+      { id: 'k', label: 'keep-alive', col: 0, row: 2, note: 'RST·포트', tone: 'accent' },
+      { id: 'h', label: '정상 대상 수', col: 1, row: 2, note: 'HealthyHost', tone: 'accent' },
+      { id: 't', label: '응답시간', col: 2, row: 2, note: '연결 10초·유휴', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'elb', to: 'c502' },
+      { from: 'elb', to: 'c503' },
+      { from: 'elb', to: 'c504' },
+      { from: 'c502', to: 'k' },
+      { from: 'c503', to: 'h' },
+      { from: 'c504', to: 't' },
+    ]}
+  />
+</Figure>
 
 ## 2. 502라면 연결이 끊긴 이유를 보세요
 
@@ -51,6 +93,22 @@ AWS Application Load Balancer는 두 수를 따로 세요. 대상이 만든 5xx�
 - 대상의 응답이 깨졌거나, 응답 헤더 전체가 32K를 넘었어요.
 
 keep-alive 문제라면 대상(웹 서버, WAS)의 keep-alive 시간을 로드 밸런서의 유휴 시간 제한보다 길게 잡아요.
+
+<Figure caption="대상의 keep-alive가 로드 밸런서의 유휴 시간 제한보다 짧을 때 생기는 502예요. 로드 밸런서가 쉬던 연결로 다음 요청을 보내는 순간, 대상은 그 연결을 닫고 있어요.">
+  <Sequence
+    ariaLabel="첫 요청은 정상으로 오가고, 연결이 쉬는 동안 대상이 keep-alive 시간이 끝나 연결을 닫는 순간 로드 밸런서가 같은 연결로 둘째 요청을 보내, 사용자에게 502가 돌아가는 순서"
+    participants={['사용자', '로드 밸런서', '대상']}
+    messages={[
+      { from: '사용자', to: '로드 밸런서', label: '요청 1' },
+      { from: '로드 밸런서', to: '대상', label: '요청 1' },
+      { from: '대상', to: '로드 밸런서', label: '응답', dashed: true },
+      { from: '사용자', to: '로드 밸런서', label: '요청 2' },
+      { from: '로드 밸런서', to: '대상', label: '쉬던 연결로 보냄', tone: 'warn' },
+      { from: '대상', to: '로드 밸런서', label: '그 순간 연결 닫음', tone: 'warn' },
+      { from: '로드 밸런서', to: '사용자', label: '502', tone: 'warn', dashed: true },
+    ]}
+  />
+</Figure>
 
 ## 3. 503이라면 받을 대상이 있는지 보세요
 

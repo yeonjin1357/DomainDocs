@@ -29,6 +29,19 @@ updated: 2026-10-21
   <Item title="시간대 문제는 아닌가">시계가 아니라 표시하는 시간대가 다를 수 있어요.</Item>
 </FirstLook>
 
+<Figure caption="로그에 적힌 시각대로 놓으면, DB가 받은 일이 앱이 보낸 일보다 3초 앞서요. DB 서버 시계가 2.9초 늦어서예요. 실제로는 보낸 직후(점선)에 받았어요.">
+  <Timeline
+    ariaLabel="앱 서버 로그는 10시 00분 05초에 보냈다고 적고, DB 서버 로그는 10시 00분 02초에 받았다고 적어 순서가 뒤집혀 보이지만, 실제로 받은 때는 보낸 직후인 시간 띠"
+    end={6}
+    lanes={[
+      { label: '앱 로그', segments: [{ start: 4.2, end: 5, label: '보냄', tone: 'accent' }] },
+      { label: 'DB 로그', segments: [{ start: 1.7, end: 2.5, label: '받음', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 5.05, label: '실제로 받은 때', tone: 'accent' }]}
+    ticks={[{ at: 0, label: '10:00:00' }, { at: 2, label: ':02' }, { at: 4, label: ':04' }, { at: 6, label: ':06' }]}
+  />
+</Figure>
+
 ## 1. 시간 동기화가 도는지 보세요
 
 서버의 시계는 조금씩 빨라지거나 느려져요. 그래서 보통은 NTP로 시간 서버와 주기적으로 맞춰요. 리눅스에서는 chrony나 systemd-timesyncd가 이 일을 해요.

@@ -66,6 +66,30 @@ updated: 2026-10-14
   </Point>
 </KeyPoints>
 
+<Figure caption="결제 요청 하나가 세 신호를 남겨요. 메트릭은 숫자로 합쳐지고, 트레이스와 로그는 요청마다 남아요. 트레이스와 로그는 같은 trace id로 이어져요(점선).">
+  <Flow
+    ariaLabel="결제 요청 하나가 메트릭, 트레이스, 로그를 남기고, 메트릭은 얼마나, 트레이스는 어디서, 로그는 왜를 알려 주며, 트레이스와 로그는 trace id로 이어지는 구조도"
+    nodes={[
+      { id: 'req', label: '결제 요청', col: 1, row: 0, note: '하나가 남긴 것', tone: 'accent' },
+      { id: 'metric', label: '메트릭', col: 0, row: 1, note: '에러 수 +1' },
+      { id: 'trace', label: '트레이스', col: 1, row: 1, note: 'span 묶음' },
+      { id: 'log', label: '로그', col: 2, row: 1, note: 'trace id 포함' },
+      { id: 'how', label: '얼마나', col: 0, row: 2, note: '에러율 4.8%' },
+      { id: 'where', label: '어디서', col: 1, row: 2, note: 'DB 조회 2.1초' },
+      { id: 'why', label: '왜', col: 2, row: 2, note: '시간 초과' },
+    ]}
+    edges={[
+      { from: 'req', to: 'metric' },
+      { from: 'req', to: 'trace' },
+      { from: 'req', to: 'log' },
+      { from: 'trace', to: 'log', both: true, dashed: true },
+      { from: 'metric', to: 'how', tone: 'accent' },
+      { from: 'trace', to: 'where', tone: 'accent' },
+      { from: 'log', to: 'why', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
 <Checkpoints>
   <Check>메트릭 <Term slug="foundations/time-series-and-labels">레이블</Term>에 사용자 ID나 요청 ID를 넣은 코드는 다시 보세요. 값이 새로 나올 때마다 시계열이 생겨서 메모리와 디스크를 계속 써요. 이런 값은 트레이스나 로그에 남겨요.</Check>
   <Check>로그 줄 수를 세는 일은 장애를 조사할 때만 하고, 늘 띄워 두는 패널과 알림은 <Term slug="foundations/counters-and-rate">카운터</Term> 메트릭으로 옮기세요. 로그는 사건 뒤 검색되기까지 시간이 걸려 알림이 늦어요. Google SRE Workbook도 사건마다 카운터를 올리고, 그 값으로 알림을 걸라고 권해요.</Check>

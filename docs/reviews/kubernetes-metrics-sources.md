@@ -19,3 +19,7 @@
   - 거르지 않고 더하면 810MB로 두 배 가까이 나왔어요.
 - 메모: 이 PC의 kubectl 설정이 외부 클러스터를 가리켜 실제 클러스터로는 확인하지 않았어요. 맨 위 그림의 숫자는 예시예요.
 - 함께 한 것: 퀴즈 5문제를 썼어요.
+
+## 2026-10-29 그림 보강
+
+- 메모: working set은 usage에서 비울 수 있는(inactive) 파일 캐시를 뺀 값이라, 자주 쓰는 파일 캐시는 working set에 남아요. 그림의 숫자(앱 600Mi, 캐시 300Mi 중 200Mi가 inactive)는 설명용이에요. (https://github.com/google/cadvisor/blob/master/container/libcontainer/handler.go 의 workingSet 계산)

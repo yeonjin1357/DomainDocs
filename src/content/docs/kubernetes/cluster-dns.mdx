@@ -75,6 +75,25 @@ updated: 2026-10-28
 3. `api.example.com.cluster.local`: 없다는 답이 와요.
 4. `api.example.com`: 그제야 주소가 와요.
 
+<Figure caption="shop 네임스페이스의 파드가 이름을 찾는 차례예요. 짧은 이름 pay는 첫 검색 도메인에서 바로 찾아요. 바깥 이름은 검색 도메인 셋에서 모두 없다는 답을 받은 뒤에야 원래 이름을 물어요.">
+  <Strip
+    ariaLabel="pay는 첫째 시도인 pay.shop.svc.cluster.local에서 바로 찾고, api.example.com은 shop.svc, svc, cluster 검색 도메인을 붙인 세 번이 모두 없음이고 넷째로 원래 이름을 물어 주소를 받는 칸 띠"
+    rows={[
+      { label: 'pay를 찾을 때', heads: ['1번'], cells: [{ label: '+shop.svc…', tone: 'accent' }] },
+      {
+        label: 'api.example.com을 찾을 때',
+        heads: ['1번', '2번', '3번', '4번'],
+        cells: [{ label: '+shop.svc…', tone: 'warn' }, { label: '+svc…', tone: 'warn' }, { label: '+cluster…', tone: 'warn' }, { label: '원래 이름', tone: 'accent' }],
+      },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 0, label: '바로 찾음', tone: 'accent' },
+      { row: 1, from: 0, to: 2, label: '없음(NXDOMAIN)', tone: 'warn' },
+      { row: 1, from: 3, to: 3, label: '주소', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
 앱은 보통 IPv4(A)와 IPv6(AAAA) 주소를 함께 찾아요. 그래서 위의 4번이 종류마다 한 번씩, 모두 8번 나가요.
 
 <Figure caption="파드와 같은 DNS 설정으로 이름을 찾고, DNS 서버가 받은 질의를 센 결과예요. 앱은 보통 IPv4(A)와 IPv6(AAAA) 주소를 함께 찾아서 이름 하나에 질의가 2개씩 나가요. 바깥 이름의 8번 중 6번은 '없음'이었어요.">

@@ -39,11 +39,41 @@ updated: 2026-10-15
 
 DB가 잰 SQL 실행 시간이 그대로라면 문제는 DB 밖에 있어요. DB가 잰 시간까지 늘었다면 다음 단계로 가요.
 
+<Figure caption="앱이 잰 DB 구간 2초를 나눠 봤어요. 1.5초는 커넥션을 기다린 시간이고, DB가 잰 SQL 실행은 0.4초예요. 이렇다면 DB보다 앱 쪽 풀이 먼저예요.">
+  <Timeline
+    ariaLabel="앱이 잰 DB 구간 2초 가운데 처음 1.5초는 커넥션 풀 대기, 끝의 0.4초만 DB가 잰 SQL 실행인 시간 띠"
+    end={2000}
+    lanes={[
+      { label: '앱이 잰 것', segments: [{ start: 0, end: 2000, label: 'DB 구간 2초' }] },
+      { label: '풀 대기', segments: [{ start: 0, end: 1500, label: '커넥션 기다림', tone: 'warn' }] },
+      { label: 'DB가 잰 것', segments: [{ start: 1560, end: 1960, label: '0.4초', tone: 'accent' }] },
+    ]}
+    ticks={[{ at: 0, label: '0초' }, { at: 1000, label: '1초' }, { at: 2000, label: '2초' }]}
+  />
+</Figure>
+
 **확인 방법**: 같은 시각의 커넥션 대기 시간과, `pg_stat_statements`의 그 SQL 평균 실행 시간을 견줘요.
 
 ## 2. 액티브 세션을 대기 종류로 나눠 보세요
 
 <Term slug="database/active-sessions">액티브 세션</Term>이 평소보다 늘었는지, 늘어난 몫이 무엇을 기다리는지 봐요. 대기 종류가 다음 단계를 정해요.
+
+<Figure caption="늘어난 액티브 세션이 무엇을 기다리는지가 다음 단계를 정해요.">
+  <Flow
+    ariaLabel="액티브 세션의 늘어난 몫이 Lock이면 막는 세션을 찾는 4단계로, IO나 CPU면 늘어난 SQL을 찾는 3단계로, 늘어난 게 없으면 DB 밖을 보는 1단계로 가는 흐름도"
+    nodes={[
+      { id: 'ash', label: '액티브 세션', col: 1, row: 0, note: '대기 종류로 나눔', tone: 'accent' },
+      { id: 'lock', label: 'Lock', col: 0, row: 1, note: '4단계: 막는 쪽' },
+      { id: 'work', label: 'IO·CPU', col: 1, row: 1, note: '3단계: SQL' },
+      { id: 'none', label: '그대로', col: 2, row: 1, note: '1단계: DB 밖' },
+    ]}
+    edges={[
+      { from: 'ash', to: 'lock', tone: 'warn' },
+      { from: 'ash', to: 'work' },
+      { from: 'ash', to: 'none' },
+    ]}
+  />
+</Figure>
 
 - **Lock이 늘었다면**: 서로의 잠금을 기다려요. 4단계로 가요.
 - **IO나 CPU가 늘었다면**: 일 자체가 늘었거나 무거워졌어요. 3단계로 가요.
@@ -79,6 +109,23 @@ WHERE cardinality(pg_blocking_pids(pid)) > 0;
 ```
 
 막고 있는 세션의 `state`가 `idle in transaction`이라면, 앱이 트랜잭션을 연 채 다른 일을 하고 있어요. 잠금은 보통 트랜잭션이 끝날 때까지 남아서, 그동안 뒤의 세션이 모두 줄을 서요.
+
+<Figure caption="세션 101이 트랜잭션을 연 채 쉬고 있어요. 같은 행을 바꾸려는 세션 셋이 그 뒤에 줄을 서요. 세 세션의 pg_blocking_pids는 모두 101을 가리켜요.">
+  <Flow
+    ariaLabel="트랜잭션을 연 채 쉬는 세션 101을 세션 205, 206, 207이 Lock 대기로 기다리는 구조도"
+    nodes={[
+      { id: 'b', label: '세션 101', col: 1, row: 0, note: '트랜잭션 연 채 쉼', tone: 'warn' },
+      { id: 'w1', label: '세션 205', col: 0, row: 1, note: 'Lock 대기' },
+      { id: 'w2', label: '세션 206', col: 1, row: 1, note: 'Lock 대기' },
+      { id: 'w3', label: '세션 207', col: 2, row: 1, note: 'Lock 대기' },
+    ]}
+    edges={[
+      { from: 'w1', to: 'b', tone: 'warn' },
+      { from: 'w2', to: 'b', tone: 'warn' },
+      { from: 'w3', to: 'b', tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: 막고 있는 pid로 `pg_stat_activity`를 다시 조회해요. `state`, `xact_start`(트랜잭션 시작 시각), `query`를 봐요.
 

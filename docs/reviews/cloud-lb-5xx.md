@@ -11,3 +11,7 @@
 | HTTPCode_ELB_5XX_Count(LB가 만든 것)와 HTTPCode_Target_5XX_Count(대상이 만든 것) | https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html |
 
 - 메모: 배포 중 503이 튀는 경우는 일반 설명이에요. 예시 숫자는 설명용이에요.
+
+## 2026-10-29 그림 보강
+
+- 메모: 502 순서 그림은 본문의 AWS 문서 근거(대상이 요청 처리 중 연결을 닫음, keep-alive가 유휴 시간 제한보다 짧을 때)를 그대로 그린 거예요. 새 주장은 없어요.

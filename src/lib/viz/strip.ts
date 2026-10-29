@@ -9,6 +9,8 @@ export interface StripRow {
   /** 줄 위에 쓸 이름(예: 파티션 0) */
   label?: string;
   cells: (string | StripCell)[];
+  /** 칸마다 위에 붙일 작은 글자(예: 버킷 경계). 빈 글자는 비워 둔다 */
+  heads?: string[];
 }
 
 /** 칸 하나를 위에서 가리키는 표시(예: 커밋 위치) */
@@ -36,6 +38,7 @@ export interface StripLayout {
   rows: {
     label?: string;
     cells: { label: string; tone?: FigureTone }[];
+    heads?: string[];
     marks: { column: number; label: string; tone: FigureTone }[];
     ranges: { column: number; span: number; label: string; tone: FigureTone }[];
   }[];
@@ -67,12 +70,16 @@ export function layoutStrip(
     return at + 1;
   };
 
-  const out: StripLayout['rows'] = rows.map((r) => ({
-    label: r.label,
-    cells: r.cells.map((c) => (typeof c === 'string' ? { label: c } : c)),
-    marks: [],
-    ranges: [],
-  }));
+  const out: StripLayout['rows'] = rows.map((r, i) => {
+    if (r.heads && r.heads.length !== r.cells.length) throw new Error(`Strip: 줄 ${i}의 머리글(${r.heads.length}개)과 칸(${r.cells.length}개) 수가 달라요`);
+    return {
+      label: r.label,
+      cells: r.cells.map((c) => (typeof c === 'string' ? { label: c } : c)),
+      heads: r.heads,
+      marks: [],
+      ranges: [],
+    };
+  });
   for (const m of marks) {
     const r = rowOf(m.row, `표시 '${m.label}'`);
     out[r].marks.push({ column: cellOf(r, m.at, `표시 '${m.label}'`), label: m.label, tone: m.tone ?? 'accent' });

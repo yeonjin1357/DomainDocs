@@ -29,6 +29,30 @@ updated: 2026-10-14
   <Item title="언제부터인지">느려진 시각에 배포나 설정 변경이 있었는지 봐요.</Item>
 </FirstLook>
 
+<Figure caption="이 글의 순서를 한 장으로 그렸어요. 처리량과 함께 보고 갈래를 정한 뒤, 느린 트레이스에서 길어진 구간을 찾아 그쪽 지표로 확인해요.">
+  <Flow
+    ariaLabel="p95가 오르면 처리량이 함께 늘었는지로 포화와 변경을 가르고, 느린 트레이스에서 길어진 구간을 찾아, DB 구간이면 DB 지표, 외부 API면 상대 지표, 빈칸이면 CPU와 프로파일을 보는 흐름도"
+    nodes={[
+      { id: 'start', label: 'p95 상승', col: 1, row: 0, note: '엔드포인트별로', tone: 'warn' },
+      { id: 'sat', label: '요청도 늘었음', col: 0, row: 1, note: '포화 쪽' },
+      { id: 'chg', label: '요청 그대로', col: 2, row: 1, note: '변경·의존 서비스' },
+      { id: 'trace', label: '느린 트레이스', col: 1, row: 2, note: '길어진 구간 찾기', tone: 'accent' },
+      { id: 'db', label: 'DB 구간', col: 0, row: 3, note: 'DB 쪽 지표' },
+      { id: 'api', label: '외부 API', col: 1, row: 3, note: '상대 응답·에러' },
+      { id: 'code', label: '빈칸', col: 2, row: 3, note: 'CPU·프로파일' },
+    ]}
+    edges={[
+      { from: 'start', to: 'sat' },
+      { from: 'start', to: 'chg' },
+      { from: 'sat', to: 'trace' },
+      { from: 'chg', to: 'trace' },
+      { from: 'trace', to: 'db' },
+      { from: 'trace', to: 'api' },
+      { from: 'trace', to: 'code' },
+    ]}
+  />
+</Figure>
+
 ## 1. 느린 범위부터 좁히세요
 
 엔드포인트(<Term slug="apm/transactions-and-response-time">트랜잭션</Term> 이름)마다 <Term slug="foundations/percentiles">p95</Term>를 나눠 보면 찾을 범위가 좁혀져요. 모든 엔드포인트가 함께 느려졌다면 함께 쓰는 DB, 네트워크, 서버 자원을 의심해요. 한 엔드포인트만 느리다면 그 기능의 코드와 그 기능이 부르는 서비스를 봐요.
@@ -71,6 +95,18 @@ sum(http_server_active_requests{job="order-api"})
 느려진 엔드포인트에서 느린 트레이스를 여러 개 열어, <Term slug="apm/trace-waterfall">워터폴</Term>에서 시간을 가장 많이 쓴 구간을 찾아요. 긴 막대 하나, 줄지어 반복된 막대, 막대 없는 빈칸이 후보예요.
 
 평소 속도의 트레이스도 하나 열어 견줘요. 두 트레이스에서 길이가 달라진 구간이 원인 구간 후보예요.
+
+<Figure caption="평소 요청과 느린 요청을 같은 시간축에 놓았어요. 다른 구간은 그대로인데 DB 조회만 150ms에서 1,300ms로 길어졌어요. 이 구간이 원인 후보예요.">
+  <Waterfall
+    ariaLabel="평소 요청 300ms 중 DB 조회 150ms, 느린 요청 1,500ms 중 DB 조회 1,300ms를 같은 시간축에 놓은 워터폴"
+    spans={[
+      { label: '평소 요청 GET /orders', start: 0, duration: 300, tone: 'accent' },
+      { label: 'DB 조회', start: 60, duration: 150, depth: 1 },
+      { label: '느린 요청 GET /orders', start: 0, duration: 1500, tone: 'warn' },
+      { label: 'DB 조회', start: 60, duration: 1300, depth: 1, tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: 트레이스 목록을 응답시간 순으로 정렬하거나 <Term slug="apm/response-time-distribution">분포도</Term>의 위쪽 점을 끌어서, p95보다 느린 것을 골라요. 그래프의 <Term slug="foundations/logs-metrics-traces">exemplar</Term>를 눌러 그 시각의 트레이스로 바로 건너갈 수도 있어요. 고른 트레이스 여러 개에서 같은 구간이 느리면 그 구간으로 좁혀요.
 

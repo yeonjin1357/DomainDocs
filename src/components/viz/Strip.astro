@@ -31,6 +31,13 @@ const alignOf = (column: number) => (column === 1 ? 'start' : column === layout.
             ))}
           </div>
         )}
+        {r.heads && (
+          <div class="strip-grid">
+            {r.heads.map((h) => (
+              <span class="strip-head">{h}</span>
+            ))}
+          </div>
+        )}
         <div class="strip-grid">
           {r.cells.map((c) => (
             <span class={`strip-cell tone-${c.tone ?? 'plain'}`}>{c.label}</span>
@@ -74,6 +81,17 @@ const alignOf = (column: number) => (column === 1 ? 'start' : column === layout.
     display: grid;
     grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     gap: 4px;
+  }
+
+  /* 칸보다 긴 머리글은 양옆으로 넘치게 가운데에 둔다 */
+  .strip-head {
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+    font-size: 11px;
+    color: var(--color-text-weak);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .strip-cell {

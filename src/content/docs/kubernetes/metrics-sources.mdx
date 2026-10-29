@@ -66,6 +66,33 @@ cAdvisor는 메모리를 여러 이름으로 내요. `container_memory_usage_byt
 
 쿠버네티스 문서는 자원 지표의 메모리를 working set으로 보고한다고 해요. `kubectl top`과 자동 확장이 이 값을 써요. 그래서 메모리 화면과 알림도 working set으로 맞춰야 서로 같은 숫자를 봐요.
 
+<Figure caption="메모리 한도 1Gi인 컨테이너를 100Mi 칸으로 나눴어요. usage는 비울 수 있는 파일 캐시까지 세서 900Mi, working set은 그 캐시를 뺀 700Mi예요.">
+  <Strip
+    ariaLabel="한도 1Gi 컨테이너에서 앱 메모리 600Mi와 자주 쓰는 파일 캐시 100Mi가 working set 700Mi이고, 비울 수 있는 파일 캐시 200Mi를 더하면 usage 900Mi인 칸 띠"
+    rows={[
+      {
+        label: '메모리 한도 1Gi(칸 하나가 100Mi)',
+        cells: [
+          { label: '앱', tone: 'accent' },
+          { label: '앱', tone: 'accent' },
+          { label: '앱', tone: 'accent' },
+          { label: '앱', tone: 'accent' },
+          { label: '앱', tone: 'accent' },
+          { label: '앱', tone: 'accent' },
+          { label: '캐시', tone: 'accent' },
+          { label: '캐시', tone: 'sub' },
+          { label: '캐시', tone: 'sub' },
+          '',
+        ],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 6, label: 'working set 700Mi', tone: 'accent' },
+      { from: 0, to: 8, label: 'usage 900Mi' },
+    ]}
+  />
+</Figure>
+
 CPU는 `container_cpu_usage_seconds_total`이 쓴 CPU 시간의 누적(초)이에요. 초당 증가량을 구하면 쓰는 코어 수가 돼요. 0.5면 코어 반 개를 쓰고 있다는 뜻이에요.
 
 ## 사용량과 요청을 함께 보기

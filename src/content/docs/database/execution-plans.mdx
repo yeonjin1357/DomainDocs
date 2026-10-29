@@ -45,6 +45,32 @@ updated: 2026-10-15
   </Point>
 </KeyPoints>
 
+<Figure caption="낡은 통계로 고른 계획이에요. 아래 노드가 위 노드로 행을 올려 줘요. 바깥 Seq Scan은 8행을 예상했지만 12,000행을 올렸고, 안쪽 Index Scan은 그 행마다 한 번씩 12,000번 돌았어요.">
+  <Flow
+    ariaLabel="맨 위 Nested Loop 아래에 바깥 Seq Scan과 안쪽 Index Scan이 있고, 바깥은 8행 예상에 12,000행을 올리며, 안쪽은 12,000번 반복하는 실행 계획 나무"
+    nodes={[
+      { id: 'nl', label: 'Nested Loop', col: 1, row: 0, tone: 'warn' },
+      { id: 'outer', label: 'Seq Scan', col: 0, row: 1, note: 'VIP 고객 · 예상 8' },
+      { id: 'inner', label: 'Index Scan', col: 2, row: 1, note: '주문' },
+    ]}
+    edges={[
+      { from: 'outer', to: 'nl', label: '실제 12,000행', tone: 'warn' },
+      { from: 'inner', to: 'nl', label: 'loops 12,000', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+<Figure caption="같은 SQL을 통계를 다시 모으기 전과 뒤에 견줬어요. 예상 행 수가 실제와 맞자 DB가 다른 방법을 골랐어요.">
+  <Compare
+    columns={['ANALYZE 전', 'ANALYZE 뒤']}
+    rows={[
+      { label: '바깥 표 예상', values: ['8행', '11,978행'] },
+      { label: '고른 방법', values: ['Nested Loop', 'Hash Join'] },
+      { label: '주문 표 읽기', values: ['VIP마다 인덱스로 12,000번', '한 번 훑어 해시로 맞춰요'] },
+    ]}
+  />
+</Figure>
+
 <Checkpoints>
   <Check>`UPDATE`나 `DELETE`를 `EXPLAIN ANALYZE`로 볼 때는 조심하세요. 실제로 실행되어 데이터가 바뀌어요. `BEGIN`과 `ROLLBACK` 사이에서 실행해요.</Check>
   <Check>`cost` 값을 밀리초로 읽는 화면이나 설명은 고치세요. `cost`는 디스크 페이지 하나를 차례로 읽는 비용을 1로 둔 임의 단위예요.</Check>

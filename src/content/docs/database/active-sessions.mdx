@@ -40,6 +40,21 @@ updated: 2026-10-15
   </Point>
 </KeyPoints>
 
+<Figure caption="세션 넷의 10초예요. 칠한 구간이 액티브(실행 중이거나 기다림)이고, 빈 곳은 쉬는 중이에요. 칠한 구간을 모두 더한 DB time 20초를 10초로 나누면 평균 액티브 세션은 2예요.">
+  <Timeline
+    ariaLabel="세션 1은 CPU로 0~3초와 6~8초, 세션 2는 2~9초 잠금 대기, 세션 3은 1~2초 IO 대기 뒤 2~4초 CPU, 세션 4는 4~9초 잠금 대기이고, 5초 순간의 표본에는 잠금 대기 세션 2개가 잡히는 시간 띠"
+    end={10}
+    lanes={[
+      { label: '세션 1', segments: [{ start: 0, end: 3, label: 'CPU', tone: 'accent' }, { start: 6, end: 8, label: 'CPU', tone: 'accent' }] },
+      { label: '세션 2', segments: [{ start: 2, end: 9, label: 'Lock 대기', tone: 'warn' }] },
+      { label: '세션 3', segments: [{ start: 1, end: 2, label: 'IO' }, { start: 2, end: 4, label: 'CPU', tone: 'accent' }] },
+      { label: '세션 4', segments: [{ start: 4, end: 9, label: 'Lock 대기', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 5, label: '5초 표본: 2개' }]}
+    ticks={[{ at: 0, label: '0초' }, { at: 5, label: '5초' }, { at: 10, label: '10초' }]}
+  />
+</Figure>
+
 <Checkpoints>
   <Check>액티브 세션을 1분에 한 번 찍은 표본으로 그린다면, 그 사이에 끝난 짧은 쿼리는 빠져요. `pg_stat_activity`는 지금 순간만 보여 줘서, <Term slug="foundations/collection-interval">자주 표본을 떠야</Term> 해요. Oracle ASH는 1초마다 떠요.</Check>
   <Check>`idle in transaction` 세션이 오래 남아 있다면 보세요. 잡은 잠금은 보통 트랜잭션이 끝날 때까지 놓지 않아서, 다른 세션이 Lock 대기로 줄을 서요.</Check>

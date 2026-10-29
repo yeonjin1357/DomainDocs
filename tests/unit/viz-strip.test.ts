@@ -31,6 +31,11 @@ describe('layoutStrip', () => {
     expect(() => layoutStrip([])).toThrow(/줄이 하나도/);
   });
 
+  it('머리글은 칸 수와 같아야 한다', () => {
+    expect(layoutStrip([{ cells: ['700', '200'], heads: ['~0.1', '~0.25'] }]).rows[0].heads).toEqual(['~0.1', '~0.25']);
+    expect(() => layoutStrip([{ cells: ['700', '200'], heads: ['~0.1'] }])).toThrow(/머리글\(1개\)과 칸\(2개\)/);
+  });
+
   it('칸이 12개를 넘으면 빌드를 멈춘다', () => {
     expect(() => layoutStrip([{ cells: Array.from({ length: 13 }, (_, i) => String(i)) }])).toThrow(/12개까지만/);
   });

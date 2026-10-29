@@ -9,3 +9,9 @@
 | dot3StatsFCSErrors = FCS 검사를 통과하지 못한 프레임, dot3StatsLateCollisions = 늦은 충돌, dot3StatsDuplexStatus = 현재 이중 통신 모드 | https://www.rfc-editor.org/rfc/rfc3635 |
 
 - 메모: duplex 불일치 때 한쪽은 FCS 오류, 다른 쪽은 늦은 충돌이 는다는 건 널리 알려진 현상이라 일반 설명으로 적었어요(RFC에는 카운터 정의만 있어요). 물리 원인 목록도 일반 점검 목록이에요. 예시 숫자는 설명용이에요.
+
+## 2026-10-29 그림 보강
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 이중 통신이 어긋나면 full 쪽은 잘린 프레임을 FCS 오류·짧은 프레임(runt)으로, half 쪽은 늦은 충돌로 센다 | https://en.wikipedia.org/wiki/Duplex_mismatch |

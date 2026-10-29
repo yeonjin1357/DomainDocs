@@ -35,6 +35,40 @@ updated: 2026-10-21
 
 **확인 방법**: 몇 분 간격으로 ifOperStatus와 ifLastChange를 읽어 기록해요. 폴링 간격보다 짧게 끊겼다 붙으면 상태는 매번 up으로 보이지만, ifLastChange는 바뀌어 있어요.
 
+<Figure caption="10분 동안 링크가 여섯 번 끊겼다 붙은 예시를 줄여 그렸어요. 2분마다 읽는 폴링은 4분과 8분에만 down을 봐요. 나머지는 폴링 사이에 끊겼다 돌아와서 up으로 보여요.">
+  <Timeline
+    ariaLabel="10분 동안 실제 링크가 여섯 번 짧게 끊기고, 2분마다 읽는 폴링은 4분과 8분에만 down을 보고 나머지 때는 up을 보는 시간 띠"
+    end={10}
+    lanes={[
+      {
+        label: '실제 링크',
+        segments: [
+          { start: 0, end: 0.9 },
+          { start: 0.9, end: 1.1, tone: 'warn' },
+          { start: 1.1, end: 2.6 },
+          { start: 2.6, end: 2.8, tone: 'warn' },
+          { start: 2.8, end: 3.9 },
+          { start: 3.9, end: 4.1, tone: 'warn' },
+          { start: 4.1, end: 6.1 },
+          { start: 6.1, end: 6.3, tone: 'warn' },
+          { start: 6.3, end: 7.9 },
+          { start: 7.9, end: 8.1, tone: 'warn' },
+          { start: 8.1, end: 9.3 },
+          { start: 9.3, end: 9.5, tone: 'warn' },
+          { start: 9.5, end: 10 },
+        ],
+      },
+    ]}
+    marks={[
+      { at: 2, label: 'up' },
+      { at: 4, label: 'down', tone: 'warn' },
+      { at: 6, label: 'up' },
+      { at: 8, label: 'down', tone: 'warn' },
+    ]}
+    ticks={[{ at: 0, label: '0분' }, { at: 2, label: '2' }, { at: 4, label: '4' }, { at: 6, label: '6' }, { at: 8, label: '8' }, { at: 10, label: '10분' }]}
+  />
+</Figure>
+
 ## 2. Trap과 Syslog로 횟수와 시각을 모으세요
 
 장비는 인터페이스가 down으로 바뀌려 할 때 linkDown, up이 되면 linkUp Trap을 보낼 수 있어요. 대부분의 장비는 같은 내용을 Syslog로도 남겨요.
