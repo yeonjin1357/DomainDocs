@@ -1,0 +1,34 @@
+questions:
+  - id: sampled
+    type: ox
+    prompt: CloudWatch Live Tail 화면에 보이지 않은 줄은 저장소에도 없다고 봐도 되나요?
+    answer: false
+    explain: 필터에 맞는 로그가 초당 500건을 넘으면 일부만 보여 줘요. 화면에 보인 비율을 함께 봐요.
+  - id: session-limit
+    type: choice
+    prompt: CloudWatch Live Tail 세션 하나는 최대 얼마나 열어 둘 수 있을까요?
+    choices: [3시간, 30분, 24시간, 제한 없음]
+    answer: 0
+    explain: 세션은 최대 3시간이고, 연 시간만큼 비용이 들어요. 오래 지켜볼 일은 키워드 알림으로 해요.
+  - id: kubectl-vs-central
+    type: choice
+    prompt: 중앙 저장소의 라이브 테일에는 아무것도 안 보이는데 kubectl logs -f에는 로그가 흘러요. 어디가 막혔을까요?
+    choices:
+      - 수집 에이전트에서 저장소까지의 길
+      - 앱이 로그를 쓰는 부분
+      - 파드의 컨테이너 런타임
+      - kubectl의 권한
+    answer: 0
+    explain: kubectl logs는 노드의 kubelet에서 바로 읽어서 수집 길을 거치지 않아요. 앱은 쓰고 있고, 수집 길이 막힌 거예요.
+  - id: selector-pods
+    type: choice
+    prompt: kubectl logs -f -l app=order-api로 파드 20개의 로그를 보려 해요. 기본으로 동시에 따라 읽는 파드 수는?
+    choices: ['5개', '20개', '1개', '10개']
+    answer: 0
+    explain: 레이블로 고르면 --max-log-requests 기본값 5개까지만 동시에 따라 읽어요.
+  - id: live-tail-name
+    type: input
+    prompt: 새로 들어오는 로그를 실시간으로 흘려 보여 주는 기능은?
+    answer: [라이브 테일, live tail, Live Tail, 실시간 로그]
+    term: logs/live-tail
+    explain: tail -f처럼 지금 들어오는 줄을 보여 줘요. 지난 범위를 찾는 검색과는 달라요.

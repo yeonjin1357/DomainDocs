@@ -1,6 +1,6 @@
 import type { IconName } from './icons';
 
-export const DOMAIN_IDS = ['foundations', 'network', 'server', 'kubernetes', 'cloud', 'apm', 'database', 'messaging'] as const;
+export const DOMAIN_IDS = ['foundations', 'network', 'server', 'kubernetes', 'cloud', 'apm', 'database', 'messaging', 'logs'] as const;
 export type DomainId = (typeof DOMAIN_IDS)[number];
 
 export interface Domain {
@@ -19,6 +19,7 @@ export const DOMAINS: readonly Domain[] = [
   { id: 'apm', name: '애플리케이션', description: 'WAS, 트랜잭션, 응답시간, 트레이스로 앱이 요청을 처리하는 방식이에요.', icon: 'activity' },
   { id: 'database', name: '데이터베이스', description: '트랜잭션, 인덱스, 잠금, 세션으로 DB가 데이터를 다루는 방식이에요.', icon: 'database' },
   { id: 'messaging', name: '메시지 큐', description: 'Kafka의 토픽, 파티션, 컨슈머 그룹으로 메시지가 오가는 방식이에요.', icon: 'messages-square' },
+  { id: 'logs', name: '로그', description: '레벨, 파싱, 색인, 키워드 알림처럼 로그가 모이고 검색되는 방식이에요.', icon: 'scroll-text' },
 ];
 
 export function getDomain(id: string): Domain | undefined {

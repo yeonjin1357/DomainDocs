@@ -1,0 +1,31 @@
+questions:
+  - id: other-logs-lost
+    type: choice
+    prompt: 한 서비스의 로그가 폭증한 뒤 다른 서비스의 로그 일부도 검색되지 않아요. Loki에서 먼저 볼 것은?
+    choices:
+      - 수집 한도에 걸려 요청이 429로 거절됐는지
+      - 다른 서비스의 로그 레벨
+      - 검색 화면의 시간대
+      - 대시보드의 새로 고침 간격
+    answer: 0
+    explain: Loki는 수집 한도를 넘는 요청을 통째로 거절해요. 같은 요청에 섞인 다른 로그도 함께 빠져요.
+  - id: debug-left-on
+    type: choice
+    prompt: 늘어난 줄이 대부분 DEBUG예요. 가장 그럴듯한 원인은?
+    choices:
+      - 누군가 로그 레벨을 낮춘 채 두었어요
+      - 사용자가 갑자기 늘었어요
+      - 디스크가 가득 찼어요
+      - 네트워크가 느려졌어요
+    answer: 0
+    explain: 오류가 아니라 설정 문제일 가능성이 커요. 레벨을 되돌리고, 레벨 변경에 기한을 두는 절차를 만들어요.
+  - id: throttle-drops
+    type: ox
+    prompt: Fluent Bit의 throttle 필터는 한도를 넘는 줄을 쌓아 두었다가 나중에 보내나요?
+    answer: false
+    explain: 한도를 넘는 줄은 버려요. 버려도 되는 줄에만 걸고, 버린 양을 세어 둬요.
+  - id: storm-symptom
+    type: ox
+    prompt: 같은 오류 줄이 재시도마다 찍혀 로그가 폭증했다면, 로그를 줄이는 것만으로 문제가 해결되나요?
+    answer: false
+    explain: 로그 폭주는 증상이에요. 줄이는 건 급한 불끄기이고, 원인인 오류를 고쳐야 해요.

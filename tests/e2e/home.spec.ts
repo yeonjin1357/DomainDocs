@@ -3,15 +3,15 @@ import { expect, test } from '@playwright/test';
 const cardWithTitle = (page: import('@playwright/test').Page, title: string) =>
   page.locator('[data-card]').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
 
-test('홈에 영역 8개가 있고, 글이 없는 영역은 준비 중이다', async ({ page }) => {
+test('홈에 영역 9개가 있고, 글이 없는 영역은 준비 중이다', async ({ page }) => {
   await page.goto('./');
   const rows = cardWithTitle(page, '영역').locator('[data-row]');
-  await expect(rows).toHaveCount(8);
+  await expect(rows).toHaveCount(9);
   await expect(rows.nth(0)).toHaveAttribute('href', '/DomainDocs/foundations/');
   await expect(rows.nth(0)).toContainText('모니터링 기초');
   await expect(rows.nth(0)).toContainText('6편');
   await expect(rows.nth(1)).toContainText('네트워크');
-  for (const i of [1, 2, 3, 4, 5, 6, 7]) {
+  for (const i of [1, 2, 3, 4, 5, 6, 7, 8]) {
     await expect(rows.nth(i)).toContainText('준비 중');
     await expect(rows.nth(i)).not.toHaveAttribute('href');
   }

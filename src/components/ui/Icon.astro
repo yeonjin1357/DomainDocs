@@ -1,5 +1,5 @@
 ---
-import { Activity, BookOpen, ChartColumn, ChartLine, Clock, Cloud, Container, Database, Gauge, Hash, Layers, ListChecks, MessagesSquare, Network, Server, Sigma, Timer, TrendingUp } from '@lucide/astro';
+import { Activity, BookOpen, ChartColumn, ChartLine, Clock, Cloud, Container, Database, Gauge, Hash, Layers, ListChecks, MessagesSquare, Network, ScrollText, Server, Sigma, Timer, TrendingUp } from '@lucide/astro';
 import type { IconName } from '../../data/icons';
 
 interface Props {
@@ -26,6 +26,7 @@ const ICONS = {
   'messages-square': MessagesSquare,
   'book-open': BookOpen,
   'list-checks': ListChecks,
+  'scroll-text': ScrollText,
 } satisfies Record<IconName, unknown>;
 
 const { name, size = 22 } = Astro.props;

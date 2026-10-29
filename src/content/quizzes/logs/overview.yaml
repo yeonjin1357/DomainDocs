@@ -1,0 +1,32 @@
+questions:
+  - id: pipeline-order
+    type: choice
+    prompt: 앱이 쓴 로그 한 줄이 검색 화면에 뜨기까지 지나는 순서로 알맞은 것은?
+    choices:
+      - 수집 → 파싱 → 저장·색인 → 검색
+      - 검색 → 저장·색인 → 파싱 → 수집
+      - 파싱 → 검색 → 수집 → 저장·색인
+      - 저장·색인 → 수집 → 검색 → 파싱
+    answer: 0
+    explain: 에이전트가 모으고, 필드로 나누고, 저장소가 색인해 둬야 검색과 알림에 쓸 수 있어요.
+  - id: two-timestamps
+    type: choice
+    prompt: 로그의 Timestamp와 ObservedTimestamp가 크게 벌어져 있어요. 무엇을 뜻할까요?
+    choices:
+      - 로그가 수집 쪽에 늦게 도착했어요
+      - 로그 레벨이 잘못 적혔어요
+      - 로그가 두 번 저장됐어요
+      - 로그 본문이 잘렸어요
+    answer: 0
+    explain: 하나는 일이 일어난 시각, 다른 하나는 수집 쪽이 그 로그를 본 시각이에요. 차이가 곧 늦게 도착한 정도예요.
+  - id: blocked-step
+    type: ox
+    prompt: 수집 단계가 막혀도, 이미 만든 키워드 알림은 그 시각의 로그를 계속 셀 수 있나요?
+    answer: false
+    explain: 알림과 검색은 저장소에 들어온 로그만 봐요. 앞 단계가 막히면 그 뒤의 화면이 모두 비어요.
+  - id: parsing-name
+    type: input
+    prompt: 글자로 된 로그 한 줄을 시각, 레벨, 값 같은 필드로 나누는 일을 무엇이라고 할까요?
+    answer: [파싱, parsing, 필드 추출]
+    term: logs/log-parsing
+    explain: 필드로 나눠야 "ERROR 줄만", "응답시간 3초 넘는 줄만"처럼 값으로 찾고 셀 수 있어요.

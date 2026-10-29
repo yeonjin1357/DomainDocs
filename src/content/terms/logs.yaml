@@ -1,0 +1,64 @@
+terms:
+  - id: log-parsing
+    name: 파싱
+    en: Log parsing
+    aliases: [parsing, 파서, parser, 필드 추출, field extraction]
+    short: 글자로 된 로그 한 줄을 시각, 레벨, 값 같은 필드로 나누는 일이에요.
+    analogy: 손으로 쓴 주문서를 표의 칸마다 옮겨 적는 일과 같아요.
+    doc: logs/parsing
+  - id: log-index
+    name: 색인
+    en: Index
+    aliases: [index, 인덱스, 로그 색인]
+    short: 로그를 빨리 찾도록 저장소가 미리 만들어 두는 찾아보기예요.
+    doc: logs/storage-and-indexing
+  - id: inverted-index
+    name: 역색인
+    en: Inverted index
+    aliases: [inverted index, 전문 색인, full-text index]
+    short: 단어마다 그 단어가 든 줄이나 문서를 적어 둔 표예요.
+    analogy: 책 뒤의 찾아보기와 같아요.
+    doc: logs/storage-and-indexing
+  - id: log-label
+    name: 라벨
+    en: Label
+    aliases: [Loki label, 로그 라벨, stream label]
+    short: Loki가 로그 스트림을 고르려고 색인하는 키와 값의 쌍이에요.
+    doc: logs/storage-and-indexing
+  - id: log-stream
+    name: 로그 스트림
+    en: Log stream
+    aliases: [stream, 스트림]
+    short: 같은 라벨 묶음을 가진 로그의 흐름이에요.
+    doc: logs/storage-and-indexing
+  - id: log-level
+    name: 로그 레벨
+    en: Log level
+    aliases: [level, severity, 심각도, ERROR, WARN, INFO, DEBUG]
+    short: 그 로그가 얼마나 중요한지 나타내는 표시예요.
+    analogy: 우편물에 찍는 '긴급' 도장과 같아요.
+    doc: logs/levels-and-structured
+  - id: structured-log
+    name: 구조화 로그
+    en: Structured logging
+    aliases: [structured logging, JSON 로그, logfmt]
+    short: 값을 JSON이나 key=value처럼 필드로 나눠 쓴 로그예요.
+    doc: logs/levels-and-structured
+  - id: log-retention
+    name: 보관 기간
+    en: Retention
+    aliases: [retention, 로그 보관, 보존 기간, retention_period]
+    short: 로그를 지우지 않고 남겨 두는 기간이에요.
+    doc: logs/retention-and-cost
+  - id: metric-filter
+    name: 지표 필터
+    en: Metric filter
+    aliases: [metric filter, 메트릭 필터, CloudWatch metric filter]
+    short: CloudWatch Logs에서 맞는 로그를 세어 지표로 바꾸는 설정이에요.
+    doc: logs/log-metrics
+  - id: live-tail
+    name: 라이브 테일
+    en: Live tail
+    aliases: [Live Tail, tail -f, 실시간 로그, kubectl logs -f]
+    short: 새로 들어오는 로그를 실시간으로 흘려 보여 주는 기능이에요.
+    doc: logs/live-tail

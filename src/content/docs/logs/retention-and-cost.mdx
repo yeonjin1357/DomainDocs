@@ -1,0 +1,108 @@
+---
+title: 보관 기간과 비용
+summary: 로그 비용은 하루에 쌓이는 양과 보관 기간으로 정해지고, 오래된 로그는 싼 곳으로 옮기거나 지워요.
+domain: logs
+type: concept
+stage: basics
+order: 40
+icon: scroll-text
+keywords: [retention, 보관 기간, 로그 비용, hot warm cold, ILM, 수명 주기, CloudWatch Logs, Loki retention, 용량 계산, Never expire]
+related: [logs/storage-and-indexing, logs/volume-spike, logs/levels-and-structured, cloud/costs]
+sources:
+  - title: Amazon CloudWatch Logs — Working with log groups and log streams (retention)
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html
+  - title: Grafana Loki — Log retention
+    url: https://grafana.com/docs/loki/latest/operations/storage/retention/
+  - title: Elastic — Index lifecycle (phases)
+    url: https://www.elastic.co/docs/manage-data/lifecycle/index-lifecycle-management/index-lifecycle
+updated: 2026-10-29
+---
+
+<KeyPoints>
+  <Point title="하루 양 × 보관 일수가 저장량이에요">
+    초당 줄 수, 줄 크기, 보관 일수를 곱하면 쌓이는 양이 나와요. 비용은 대부분 이 양에 비례해요.
+  </Point>
+  <Point title="기본값이 '지우지 않음'인 곳이 있어요">
+    CloudWatch Logs와 Loki는 따로 정하지 않으면 로그를 지우지 않아요. 계속 쌓이기만 해요.
+  </Point>
+  <Point title="자주 보는 기간만 비싼 곳에 둬요">
+    최근 로그는 빠른 저장소에 두고, 오래된 로그는 싼 저장소로 옮기거나 지워요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="창고의 상자는 크기가 일정하지만, 로그는 DEBUG 하나만 켜도 하루 양이 몇 배로 뛰어요.">
+  창고를 빌리는 것과 같아요. 매일 들어오는 상자 수와 보관 일수가 임대료를 정해요. 자주 꺼내는 상자는 입구 가까이에, 오래된 상자는 싼 외곽 창고에 둬요.
+</Analogy>
+
+## 하루에 얼마나 쌓이나
+
+초당 2,000줄을 쓰는 서비스를 예로 계산해 봤어요. 줄 크기는 <Term slug="logs/levels-and-structured">로그 레벨과 구조화 로그</Term>에서 잰 같은 사건의 텍스트(142바이트)와 JSON(193바이트)이에요.
+
+<Figure caption="초당 2,000줄을 30일 보관할 때의 압축 전 양이에요. 같은 사건도 JSON으로 쓰면 한 달에 270GB쯤 더 쌓여요.">
+  <StatTile label="텍스트, 하루" value="24.5" unit="GB" />
+  <StatTile label="JSON, 하루" value="33.4" unit="GB" />
+  <StatTile label="JSON, 30일" value="1,002" unit="GB" tone="warn" />
+</Figure>
+
+계산은 줄 크기 × 초당 줄 수 × 86,400초예요. 저장소가 압축하면 실제로 차지하는 공간은 이보다 작아요. 그래도 들어오는 양에 따라 값을 매기는 서비스도 있어서, 압축 전 양을 아는 게 출발점이에요.
+
+## 기본값부터 확인해요
+
+<Term term="logs/log-retention">보관 기간</Term>을 정하지 않으면 어떻게 되는지는 저장소마다 달라요.
+
+| 저장소 | 기본값 | 정하는 곳 |
+| --- | --- | --- |
+| CloudWatch Logs | 무기한 보관 | 로그 그룹마다 보관 기간 |
+| Loki | 지우지 않음(보관 기능이 꺼져 있음) | compactor의 보관 기능을 켜고 `retention_period` |
+| Elasticsearch | 인덱스 수명 주기 정책이 정한 대로 | ILM 정책의 단계별 조건 |
+
+Loki는 보관 기능을 켠 뒤, 라벨 선택자로 스트림마다 기간을 따로 줄 수도 있어요. 설정 이름은 `retention_stream`이고, 기간은 24시간 이상이어야 해요. 디버그 로그는 짧게, 감사 로그는 길게 두는 식이에요.
+
+CloudWatch Logs는 보관 기간이 지나도 바로 지우지 않아요. 문서에 따르면 보통 최대 72시간 뒤에 지워요.
+
+## 단계별로 옮겨요
+
+<Figure caption="Elasticsearch의 인덱스 수명 주기 단계예요. 아래로 갈수록 덜 보고, 더 싼 곳에 둬요.">
+  <Layers
+    ariaLabel="위에서부터 hot, warm, cold, frozen, delete 단계가 쌓인 계층도"
+    layers={[
+      { label: 'hot', note: '계속 쓰고 자주 찾아요', tone: 'accent' },
+      { label: 'warm', note: '거의 안 쓰지만 아직 찾아요' },
+      { label: 'cold', note: '거의 안 쓰고 가끔 찾아요' },
+      { label: 'frozen', note: '쓰지 않고 아주 드물게 찾아요' },
+      { label: 'delete', note: '필요 없어 지워요' },
+    ]}
+  />
+</Figure>
+
+최근 하루 이틀 로그는 장애를 볼 때 가장 많이 찾아요. 그래서 빠른 저장소(hot)에 둬요. 몇 주 지난 로그는 감사나 사후 분석 때만 찾으니, 싼 저장소로 옮기거나 지워요.
+
+## 줄이는 방법
+
+- **레벨**: 운영에서 DEBUG를 꺼요. 필요할 때만 잠깐 켜요.
+- **되풀이**: 같은 오류가 초당 수백 번 나면, 몇 줄만 남기고 수를 세어 둬요.
+- **큰 본문**: 요청과 응답 본문을 통째로 남기지 않아요.
+- **나눠 보관**: 오래 둘 로그와 짧게 둘 로그를 다른 그룹이나 스트림으로 나눠요.
+
+## 모니터링에서는
+
+하루 수집량의 추세와 서비스별 비중을 봐요. 어제보다 갑자기 늘었다면 비용도 그만큼 늘어요. 원인 찾기는 <Term slug="logs/volume-spike">로그가 갑자기 많아질 때</Term>에서 다뤄요.
+
+CloudWatch 로그 그룹에는 태그를 붙일 수 있고, 비용 보고서를 태그별로 나눠 볼 수 있어요. 팀이나 서비스 태그를 붙여 두면 어느 쪽 로그가 비싼지 보여요.
+
+<Checkpoints>
+  <Check>CloudWatch 로그 그룹의 보관 기간이 Never expire라면 다시 보세요. 기본값이라 지우지 않고 쌓기만 해요.</Check>
+  <Check>Loki에 `retention_period`만 적고 compactor의 보관 기능을 켜지 않았다면 다시 보세요. 기본으로 로그가 영원히 남아요.</Check>
+  <Check>보관 기간을 줄였는데 저장량이 바로 줄지 않는다면, 지우기까지 걸리는 시간을 확인하세요. CloudWatch는 보통 최대 72시간이에요.</Check>
+  <Check>감사나 법 때문에 오래 남겨야 하는 로그가 일반 로그와 같은 기간으로 묶였다면 나눠 두세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 옛 로그는 다시 넣기 어려워요
+
+  CloudWatch Logs는 PutLogEvents로 넣는 로그 중 14일보다 오래됐거나 2시간보다 미래인 시각의 로그를 거절해요. 그래서 지워진 로그를 나중에 다시 채워 넣기 어려워요.
+
+  ### 지우기 직전의 로그
+
+  CloudWatch에서 보관 기간이 지난 로그는 지우기로 표시된 순간부터 보관 비용에 들지 않아요. 실제로 지워지기 전이라도 그래요.
+</Deeper>

@@ -1,0 +1,38 @@
+questions:
+  - id: count-vs-rate
+    type: choice
+    prompt: Loki에서 구간 안의 줄 수를 세는 함수는?
+    choices: [count_over_time, rate, unwrap, json]
+    answer: 0
+    explain: count_over_time은 구간 안의 줄 수를, rate는 초당 줄 수를 내요. unwrap은 필드 값을 숫자로 쓰게 해요.
+  - id: by-user-id
+    type: ox
+    prompt: 로그 지표를 사용자 ID로 나눠(by user_id) 대시보드에 그리는 것은 권할 만한가요?
+    answer: false
+    explain: 값마다 시계열이 생겨 질의가 무거워지고 화면이 읽히지 않아요. 서비스, 레벨처럼 값이 몇 가지인 필드로 나눠요.
+  - id: log-p99
+    type: choice
+    prompt: 로그에 적힌 응답시간으로 구한 p99가 APM의 p99와 달라요. 가장 그럴듯한 이유는?
+    choices:
+      - 버리거나 샘플링한 로그만큼 빠진 값으로 계산했어요
+      - 로그의 응답시간은 늘 두 배로 적혀요
+      - APM은 평균을 p99라고 불러요
+      - unwrap은 p99를 계산할 수 없어요
+    answer: 0
+    explain: 로그 지표는 남은 줄로만 계산해요. 버리거나 샘플링한 줄이 있으면 그만큼 달라요.
+  - id: level-change
+    type: choice
+    prompt: 배포 뒤 앱 동작은 그대로인데 로그로 센 ERROR 수가 반으로 줄었어요. 먼저 볼 것은?
+    choices:
+      - 배포가 로그 레벨이나 문구를 바꿨는지
+      - 오류가 진짜로 반으로 줄었는지 축하하기
+      - 디스크 사용률
+      - 네트워크 지연
+    answer: 0
+    explain: 로그 지표는 로그를 남기는 방식에 따라 바뀌어요. 핵심 지표는 앱이 직접 내는 지표로 보고, 로그 지표는 보완으로 써요.
+  - id: metric-filter-name
+    type: input
+    prompt: CloudWatch Logs에서 맞는 로그를 세어 지표로 바꾸는 설정은?
+    answer: [지표 필터, metric filter, 메트릭 필터]
+    term: logs/metric-filter
+    explain: 맞는 줄마다 1을 더하거나 줄에서 찾은 숫자를 더해 지표를 만들어요. 만든 뒤에 들어온 로그만 세요.

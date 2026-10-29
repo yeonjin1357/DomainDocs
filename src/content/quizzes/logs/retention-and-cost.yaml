@@ -1,0 +1,34 @@
+questions:
+  - id: volume-calc
+    type: choice
+    prompt: 한 줄 200바이트 로그를 초당 1,000줄 쓰면, 압축 전 하루에 얼마나 쌓일까요?
+    choices: [약 17.3GB, 약 1.7GB, 약 173GB, 약 0.2GB]
+    answer: 0
+    explain: 200바이트 × 1,000줄 × 86,400초는 17.28GB예요. 보관 일수를 곱하면 저장량이 나와요.
+  - id: cw-default
+    type: ox
+    prompt: CloudWatch Logs의 로그 그룹은 따로 정하지 않아도 30일이 지나면 로그를 지우나요?
+    answer: false
+    explain: 기본은 무기한 보관(Never expire)이에요. 로그 그룹마다 보관 기간을 정해야 지워요.
+  - id: loki-retention-flag
+    type: choice
+    prompt: Loki에 retention_period를 7일로 적었는데 로그가 계속 남아요. 먼저 볼 것은?
+    choices:
+      - compactor의 보관 기능이 켜져 있는지
+      - 라벨 수가 너무 적은지
+      - 로그 레벨이 DEBUG인지
+      - 검색 시간 범위가 넓은지
+    answer: 0
+    explain: Loki의 보관은 compactor가 해요. 그 기능이 기본으로 꺼져 있어서, 켜지 않으면 로그가 영원히 남아요.
+  - id: hot-tier
+    type: choice
+    prompt: 장애를 볼 때 가장 자주 찾는 최근 하루 이틀 로그는 어느 단계에 두는 게 알맞을까요?
+    choices: [hot, cold, frozen, delete]
+    answer: 0
+    explain: hot은 계속 쓰고 자주 찾는 단계라 빠른 저장소에 둬요. 오래된 로그는 더 싼 단계로 옮겨요.
+  - id: retention-name
+    type: input
+    prompt: 로그를 지우지 않고 남겨 두는 기간을 무엇이라고 할까요?
+    answer: [보관 기간, retention, 보존 기간, 리텐션]
+    term: logs/log-retention
+    explain: 하루 쌓이는 양과 보관 기간을 곱한 값이 저장 비용을 정해요.

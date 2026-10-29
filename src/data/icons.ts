@@ -18,6 +18,7 @@ export const ICON_NAMES = [
   'messages-square',
   'book-open',
   'list-checks',
+  'scroll-text',
 ] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];

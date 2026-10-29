@@ -1,0 +1,93 @@
+---
+title: 라이브 테일
+summary: 새로 들어오는 로그를 실시간으로 흘려 보는 기능이에요. 너무 많으면 일부만 보여 줘요.
+domain: logs
+type: concept
+stage: monitoring
+order: 70
+icon: scroll-text
+keywords: [live tail, 라이브 테일, tail -f, kubectl logs -f, 실시간 로그, streaming, Live Tail, sampling, 표본, StartLiveTail]
+related: [logs/keyword-alerts, logs/overview, foundations/log-collection, kubernetes/pod-restarting]
+sources:
+  - title: Amazon CloudWatch Logs — Troubleshoot with Live Tail
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatchLogs_LiveTail.html
+  - title: Kubernetes — kubectl logs
+    url: https://kubernetes.io/docs/reference/kubectl/generated/kubectl_logs/
+updated: 2026-10-29
+---
+
+<OnDashboard title="라이브 테일 · 주문 API · 필터 ERROR" caption="필터에 맞는 로그가 초당 1,240건이라, 화면은 그중 40%만 흘려 보여 줘요. 화면에 안 보였다고 없던 로그가 아니에요.">
+  <StatTile label="필터에 맞는 로그" value="1,240" unit="건/초" />
+  <StatTile label="화면에 보인 비율" value="40" unit="%" tone="warn" note="나머지는 건너뜀" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="들어오는 줄을 바로 흘려 봐요">
+    `tail -f`처럼 지금 들어오는 로그를 화면에 흘려 보여 줘요. 배포 직후나 장애 중에 무엇이 찍히는지 바로 볼 때 써요.
+  </Point>
+  <Point title="너무 많으면 일부만 보여 줘요">
+    CloudWatch Live Tail은 필터에 맞는 로그가 초당 500건을 넘으면 표본만 보여 줘요. 사람이 읽을 수 있는 속도로 맞추려는 거예요. 그래서 라이브 테일은 "무엇이 찍히나"를 보는 데 쓰고, 개수는 세지 않아요.
+  </Point>
+  <Point title="저장소에 들어온 뒤의 로그예요">
+    중앙 저장소의 라이브 테일은 수집 길을 지나 들어온 로그만 보여 줘요. 수집 에이전트가 막히면 라이브 테일도 함께 멈춰요.
+  </Point>
+</KeyPoints>
+
+## 무엇을 흘려 보여 주나
+
+<Figure caption="중앙 저장소의 라이브 테일은 저장소에 들어오는 로그를 화면으로 흘려 보내요. 수집 길이 늦으면 화면도 그만큼 늦어요.">
+  <Sequence
+    ariaLabel="앱이 로그를 쓰면 수집 에이전트가 저장소로 보내고, 저장소가 라이브 테일 화면으로 새 로그를 흘려 보내는 순서"
+    participants={['앱', '수집 에이전트', '저장소', '라이브 테일']}
+    messages={[
+      { from: '앱', to: '수집 에이전트', label: '로그 한 줄' },
+      { from: '수집 에이전트', to: '저장소', label: '묶어서 보냄' },
+      { from: '저장소', to: '라이브 테일', label: '새 로그 흘려 보냄', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+<Term term="logs/live-tail">라이브 테일</Term>은 검색과 달라요. 검색은 지난 범위를 한 번에 찾아 주고, 라이브 테일은 지금부터 들어오는 줄을 계속 보여 줘요. 필터를 걸어 원하는 줄만 흘려 볼 수도 있어요.
+
+## CloudWatch Live Tail의 한도
+
+| 항목 | 내용 |
+| --- | --- |
+| 세션 길이 | 최대 3시간 |
+| 고를 수 있는 로그 그룹 | 콘솔에서 최대 10개 |
+| 표본 | 필터에 맞는 로그가 초당 500건을 넘으면 일부만 보여요 |
+| 필터 | 대소문자를 구분해요 |
+| 비용 | 세션을 연 시간(분)만큼 들어요 |
+
+표본으로 보여 주는 동안 화면에 보인 비율이 함께 나와요. 위 화면의 40%는 초당 1,240건 중 500건 안팎만 보였다는 뜻이에요.
+
+## kubectl logs -f와의 차이
+
+쿠버네티스에서는 `kubectl logs -f`로 파드 로그를 흘려 볼 수 있어요. 이 명령은 중앙 저장소를 거치지 않고, API 서버를 통해 그 파드가 도는 노드의 kubelet에서 읽어요.
+
+| | 중앙 저장소의 라이브 테일 | `kubectl logs -f` |
+| --- | --- | --- |
+| 범위 | 여러 서비스, 여러 서버 | 고른 파드 |
+| 수집 길 | 지나요(막히면 멈춰요) | 거치지 않아요 |
+| 필터 | 저장소의 필터 | 따로 없어 grep 등을 붙여요 |
+
+`-l app=order-api`처럼 레이블로 여러 파드를 고르면, 기본으로 5개까지만 동시에 따라 읽어요(`--max-log-requests`). 레이블로 고르면 처음 보여 주는 줄도 기본 10줄이에요.
+
+중앙 저장소의 라이브 테일에 아무것도 안 보이는데 `kubectl logs -f`에는 보인다면, 앱은 쓰고 있고 수집 길이 막힌 거예요. 그 순서는 <Term slug="foundations/logs-missing">로그가 안 들어올 때</Term>에 있어요.
+
+<Checkpoints>
+  <Check>라이브 테일에 안 보였다고 그 로그가 없다고 판단했다면, 화면에 보인 비율이 100%였는지 보세요. 많으면 일부만 보여요.</Check>
+  <Check>라이브 테일 화면을 띄워 두고 감시 용도로 쓰고 있다면 다시 보세요. CloudWatch는 세션 시간만큼 비용이 들고 3시간이면 끝나요. 감시는 키워드 알림으로 해요.</Check>
+  <Check>필터를 소문자로만 넣었다면 대소문자를 확인하세요. CloudWatch Live Tail의 필터는 대소문자를 구분해요.</Check>
+  <Check>파드가 많은 서비스를 `kubectl logs -f -l`로 보고 있다면, 기본 5개 파드만 따라 읽는지 확인하세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 콘솔과 명령줄
+
+  CloudWatch Live Tail은 콘솔 말고도 명령줄과 API로 열 수 있어요. 명령은 `aws logs start-live-tail`, API는 StartLiveTail이에요. 명령줄에서는 1초마다 새 줄을 아래에 붙여, `tail -f`와 비슷하게 보여 줘요.
+
+  ### 웹소켓
+
+  콘솔의 Live Tail은 웹소켓으로 로그를 받아요. 회사 보안 정책이 웹소켓을 막으면 콘솔에서는 쓸 수 없고, 명령줄이나 API로 써야 해요.
+</Deeper>

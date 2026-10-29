@@ -1,0 +1,42 @@
+questions:
+  - id: loki-indexes
+    type: choice
+    prompt: Loki가 색인하는 것은?
+    choices:
+      - 로그 스트림에 붙은 라벨
+      - 로그 본문의 모든 단어
+      - 로그 줄의 모든 필드
+      - 로그 파일의 이름만
+    answer: 0
+    explain: Loki는 라벨만 색인하고 본문은 압축 덩어리로 둬요. 그래서 색인이 작고 싸지만, 본문은 훑어서 찾아요.
+  - id: user-id-label
+    type: choice
+    prompt: Loki에서 user_id를 라벨로 추가했더니 생긴 일로 알맞은 것은?
+    choices:
+      - 사용자마다 스트림이 생겨 스트림 수가 폭증해요
+      - 사용자 검색이 공짜로 빨라져요
+      - 로그 본문이 더 잘 압축돼요
+      - 아무 변화도 없어요
+    answer: 0
+    explain: 라벨 값의 조합마다 스트림이 생겨요. 색인은 커지고 덩어리는 잘게 쪼개져요. 이런 값은 필터로 찾아요.
+  - id: rare-word
+    type: choice
+    prompt: 수억 줄 가운데 드문 주문 번호 하나가 든 줄을 가장 빨리 찾는 저장 방식은?
+    choices:
+      - 모든 단어를 색인하는 방식
+      - 라벨만 색인하는 방식
+      - 열로 모아 저장하는 방식
+      - 색인 없이 파일로만 두는 방식
+    answer: 0
+    explain: 역색인은 단어마다 든 줄을 적어 둬서 드문 단어를 바로 찾아요. 대신 색인을 만들고 두는 비용이 커요.
+  - id: keyword-field
+    type: ox
+    prompt: Elasticsearch에서 상태 코드로 정확히 일치를 찾고 집계하려면 text 필드가 keyword 필드보다 알맞나요?
+    answer: false
+    explain: text는 단어로 쪼개 전문 검색에 쓰고, 정확한 값의 일치·정렬·집계에는 keyword를 써요.
+  - id: inverted-name
+    type: input
+    prompt: 단어마다 그 단어가 든 줄이나 문서를 적어 둔 표를 무엇이라고 할까요?
+    answer: [역색인, inverted index, 역 인덱스]
+    term: logs/inverted-index
+    explain: 책 뒤의 찾아보기처럼 단어로 바로 위치를 찾게 해 줘요.

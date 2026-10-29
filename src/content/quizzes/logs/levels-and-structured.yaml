@@ -1,0 +1,38 @@
+questions:
+  - id: severity-order
+    type: choice
+    prompt: OpenTelemetry의 SeverityNumber가 18인 로그의 레벨은?
+    choices: [ERROR, WARN, INFO, FATAL]
+    answer: 0
+    explain: 17~20이 ERROR예요. WARN은 13~16, FATAL은 21~24예요.
+  - id: message-with-id
+    type: choice
+    prompt: 같은 결제 실패를 세려고 해요. 어떤 로그 설계가 세기 쉬울까요?
+    choices:
+      - 메시지는 "payment failed"로 두고 주문 번호는 필드로 빼기
+      - 메시지에 "주문 A1042 결제 실패"처럼 번호를 넣기
+      - 주문마다 다른 레벨을 쓰기
+      - 주문 번호를 서비스 이름에 붙이기
+    answer: 0
+    explain: 바뀌는 값을 문구에 넣으면 같은 사건이 주문마다 다른 문구가 돼요. 고정 문구와 필드로 나눠야 한 묶음으로 세요.
+  - id: json-size
+    type: ox
+    prompt: 같은 사건을 JSON으로 쓰면 보통 텍스트 한 줄보다 크기가 작아지나요?
+    answer: false
+    explain: 필드 이름이 줄마다 되풀이돼 커져요. 실험에서는 텍스트 142바이트, JSON 193바이트였어요.
+  - id: level-split
+    type: choice
+    prompt: 레벨별 그래프에서 ERROR가 반으로 줄었는데, error라는 줄이 따로 생겼어요. 원인은?
+    choices:
+      - 서비스마다 레벨 이름의 대소문자가 달라요
+      - 오류가 실제로 반으로 줄었어요
+      - 로그 보관 기간이 짧아졌어요
+      - 수집 에이전트가 줄을 두 번 보냈어요
+    answer: 0
+    explain: 레벨 이름이 다르면 그래프가 갈라져요. 한 이름이나 SeverityNumber로 맞춰야 해요.
+  - id: structured-name
+    type: input
+    prompt: 값을 JSON이나 key=value처럼 필드로 나눠 쓴 로그를 무엇이라고 할까요?
+    answer: [구조화 로그, structured log, structured logging, 구조화된 로그]
+    term: logs/structured-log
+    explain: 필드로 나눠 쓰면 글자 검색 대신 값으로 정확히 찾고 셀 수 있어요.

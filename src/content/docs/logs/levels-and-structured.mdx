@@ -1,0 +1,116 @@
+---
+title: 로그 레벨과 구조화 로그
+summary: 레벨은 로그의 무게를, 구조화는 값을 필드로 나눠 담아 찾고 세기 쉽게 하는 방식이에요.
+domain: logs
+type: concept
+stage: basics
+order: 10
+icon: scroll-text
+keywords: [log level, 로그 레벨, severity, ERROR, WARN, DEBUG, structured logging, 구조화 로그, JSON, logfmt]
+related: [logs/overview, logs/parsing, foundations/log-collection, network/traps-and-syslog]
+sources:
+  - title: OpenTelemetry — Logs Data Model (SeverityNumber)
+    url: https://opentelemetry.io/docs/specs/otel/logs/data-model/
+  - title: Grafana Loki — Log queries (json, logfmt parsers)
+    url: https://grafana.com/docs/loki/latest/query/log_queries/
+updated: 2026-10-29
+---
+
+<KeyPoints>
+  <Point title="레벨은 그 줄의 무게예요">
+    ERROR, WARN, INFO, DEBUG처럼 그 일이 얼마나 중요한지 표시해요. 레벨로 남길 줄과 버릴 줄을 정해요.
+  </Point>
+  <Point title="구조화하면 값을 필드로 찾아요">
+    값을 JSON이나 key=value로 나눠 쓰면, 글자 검색 대신 필드로 정확히 찾고 셀 수 있어요.
+  </Point>
+  <Point title="구조화는 크기를 늘려요">
+    필드 이름이 줄마다 되풀이돼요. 같은 사건이 텍스트로 142바이트, JSON으로 193바이트였어요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="서류 양식은 칸 이름이 정해져 있지만, 로그 필드는 서비스마다 코드가 정해서 같은 뜻도 level, lvl, severity처럼 이름이 갈려요.">
+  자유롭게 쓴 메모와 칸이 나뉜 서류 양식의 차이예요. 메모는 쓰기 쉽지만, 양식은 "금액" 칸만 모아 더하기 쉬워요. 레벨은 서류에 찍는 '긴급' 도장과 같아요.
+</Analogy>
+
+## 레벨: 얼마나 중요한가
+
+<Term term="logs/log-level">로그 레벨</Term>은 그 줄이 얼마나 중요한지 나타내요. 라이브러리마다 이름이 조금씩 달라서, OpenTelemetry는 레벨을 1~24의 번호로 맞춰 다뤄요.
+
+| 번호 | 이름 | 뜻 |
+| --- | --- | --- |
+| 1~4 | TRACE | 아주 자세한 디버깅용, 보통 꺼 둬요 |
+| 5~8 | DEBUG | 디버깅용 |
+| 9~12 | INFO | 무슨 일이 있었다는 기록 |
+| 13~16 | WARN | 오류는 아니지만 INFO보다 중요해요 |
+| 17~20 | ERROR | 무언가 잘못됐어요 |
+| 21~24 | FATAL | 앱이나 시스템이 멈췄어요 |
+
+번호가 클수록 무거워요. 그래서 WARN과 WARNING처럼 이름이 달라도 번호로 맞추면 같은 레벨로 셀 수 있어요.
+
+레벨은 남길 양도 정해요. 운영에서 DEBUG를 켜면 줄 수가 몇 배로 늘 수 있어요. 갑자기 늘어난 로그는 <Term slug="logs/volume-spike">로그가 갑자기 많아질 때</Term>에서 다뤄요.
+
+네트워크 장비의 Syslog는 0~7의 심각도를 따로 써요. <Term slug="network/traps-and-syslog">SNMP Trap과 Syslog</Term>에서 다뤄요.
+
+## 구조화 로그: 값을 필드로
+
+같은 사건을 두 가지로 써 봤어요.
+
+```text
+2026-10-29T08:22:19.512Z ERROR order-api payment failed order_id=A1042 user_id=88231 latency_ms=3021 trace_id=4bf92f35…
+```
+
+```json
+{"ts":"2026-10-29T08:22:19.512Z","level":"ERROR","service":"order-api","msg":"payment failed","order_id":"A1042","user_id":88231,"latency_ms":3021,"trace_id":"4bf92f35…"}
+```
+
+위 줄은 사람이 읽기 쉬워요. 하지만 응답시간만 꺼내려면 줄을 나누는 규칙이 따로 있어야 해요. 그 규칙은 <Term slug="logs/parsing">파싱과 필드 추출</Term>에서 다뤄요.
+
+아래 줄이 <Term term="logs/structured-log">구조화 로그</Term>예요. 기계가 바로 필드로 읽어서, "latency_ms가 3000 넘는 줄"처럼 값으로 찾을 수 있어요. Loki의 `| json`은 JSON의 필드를 꺼내 레이블로 써요.
+
+key=value를 공백으로 이어 쓰는 logfmt도 흔해요. Loki에는 이 형식을 읽는 `| logfmt`가 따로 있어요.
+
+## 무엇을 필드로 남길까
+
+메시지는 고정 문구로 쓰고, 바뀌는 값은 필드로 빼요. "주문 A1042 결제 실패"처럼 번호를 문구에 넣으면, 같은 사건이 주문마다 다른 문구가 돼요.
+
+| 필드 | 이유 |
+| --- | --- |
+| 시각(시간대 포함) | 정렬과 범위 검색의 기준이에요 |
+| 레벨 | 알림과 줄 수 세기의 기준이에요 |
+| 서비스, 호스트 | 어디서 났는지 가려요 |
+| 메시지(고정 문구) | 같은 사건끼리 묶여요 |
+| trace id, 요청 ID | 한 요청의 로그와 트레이스를 이어요 |
+
+비밀번호, 토큰, 카드 번호 같은 값은 필드로든 문구로든 남기지 않아요. 로그는 많은 사람이 오래 보는 곳이에요.
+
+## 모니터링에서는
+
+<Figure caption="같은 사건을 텍스트와 JSON으로 쓴 크기예요. 필드 이름이 줄마다 되풀이돼 JSON이 36% 더 커요.">
+  <StatTile label="텍스트 한 줄" value="142" unit="B" />
+  <StatTile label="JSON 한 줄" value="193" unit="B" tone="warn" note="+36%" />
+</Figure>
+
+초당 2,000줄이면 압축 전 기준으로 하루에 텍스트는 24.5GB, JSON은 33.4GB예요. 구조화는 찾기 쉬운 대신 그만큼 저장량이 늘어요.
+
+레벨별 줄 수는 그 자체로 좋은 지표예요. 레벨 이름이 서비스마다 다르면 그래프가 ERROR와 error로 갈라져서, 한쪽만 보면 오류가 줄어 보여요.
+
+<Checkpoints>
+  <Check>레벨 이름이 서비스마다 다르다면(WARN, warning, W) 한 이름이나 번호로 맞추세요. 레벨별 그래프가 갈라져요.</Check>
+  <Check>메시지 문구에 주문 번호 같은 바뀌는 값을 넣었다면 필드로 빼세요. 같은 사건이 문구마다 따로 세어져요.</Check>
+  <Check>시각을 시간대 없이 남기고 있다면 다시 보세요. 읽는 쪽 설정에 따라 9시간 어긋날 수 있어요.</Check>
+  <Check>요청 본문이나 토큰이 로그에 그대로 남는지 보세요. 지우기 전까지 많은 사람이 봐요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 같은 레벨 안의 세부 번호
+
+  OpenTelemetry는 레벨마다 번호를 넷씩 둬요. ERROR는 17~20이라, 원래 라이브러리가 ERROR를 더 잘게 나눴다면 그 차이도 담을 수 있어요. 번호 0은 레벨을 정하지 않았다는 뜻으로 쓸 수 있어요.
+
+  ### 레벨 글자와 번호
+
+  SeverityText는 원래 쓴 레벨 글자를 그대로 담아요. 글자가 없으면 SeverityNumber의 짧은 이름(INFO 등)으로 대신할 수 있어요.
+
+  ### 재현 조건
+
+  크기는 Node로 위의 두 줄을 만들어 UTF-8 바이트 수로 쟀어요. 하루 양은 줄 크기 × 초당 2,000줄 × 86,400초예요.
+</Deeper>

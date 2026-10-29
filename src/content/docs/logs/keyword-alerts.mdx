@@ -1,0 +1,101 @@
+---
+title: 키워드로 알림 만들기
+summary: 로그에 특정 단어나 필드 값이 정한 구간에 몇 번 넘게 나오면 알리는 방식이에요.
+domain: logs
+type: concept
+stage: monitoring
+order: 50
+icon: scroll-text
+keywords: [keyword alert, 키워드 알림, log alert, 로그 알림, LogQL, count_over_time, metric filter, 지표 필터, case-sensitive, 대소문자]
+related: [logs/log-metrics, foundations/alert-conditions, foundations/no-data-vs-zero, logs/parsing]
+sources:
+  - title: Grafana Loki — Log queries (line filters)
+    url: https://grafana.com/docs/loki/latest/query/log_queries/
+  - title: Grafana Loki — Metric queries (count_over_time)
+    url: https://grafana.com/docs/loki/latest/query/metric_queries/
+  - title: Amazon CloudWatch Logs — Creating metrics from log events using filters
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html
+updated: 2026-10-29
+---
+
+<OnDashboard title="주문 API · 키워드 알림 · 최근 1시간" caption="5분 동안 ERROR가 든 줄이 37줄이라 기준 20줄을 넘었어요. 그런데 이 중 몇 줄이 진짜 오류인지는 일치 조건을 봐야 알아요.">
+  <StatTile label="ERROR가 든 줄(5분)" value="37" unit="줄" tone="warn" />
+  <StatTile label="알림 기준" value="20" unit="줄" note="5분 동안" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="줄을 세서 기준과 견줘요">
+    키워드 알림은 정한 구간(예: 5분) 동안 조건에 맞는 줄 수를 세고, 기준을 넘으면 울려요. 로그를 세어 숫자로 바꾼 뒤에는 보통의 지표 알림과 같아요.
+  </Point>
+  <Point title="글자 일치는 넓기도 좁기도 해요">
+    LogQL의 `|=`는 대소문자를 구분해서, "error"로 걸면 "ERROR"를 놓쳐요. 반대로 "ERROR"는 "NO_ERROR" 같은 엉뚱한 줄에도 맞아요. 글자 일치는 '이 글자가 들어 있다'까지만 확인해요.
+  </Point>
+  <Point title="가능하면 필드로 걸어요">
+    레벨 필드가 ERROR인 줄처럼 필드 값으로 조건을 걸면, 엉뚱한 일치가 크게 줄어요. 그러려면 로그가 구조화돼 있거나 파싱돼 있어야 해요.
+  </Point>
+</KeyPoints>
+
+## 세는 질의
+
+Loki에서는 `count_over_time`으로 구간 안의 줄 수를 세요. 아래 질의는 order-api의 최근 5분 로그 중 "ERROR"가 든 줄을 세고, 20을 넘는지 봐요.
+
+```text
+sum(count_over_time(
+  {app="order-api"} |= "ERROR" [5m]
+)) > 20
+```
+
+`{app="order-api"}`로 스트림을 고르고, `|= "ERROR"`로 줄을 거른 뒤, `[5m]` 동안의 줄 수를 세요. 스트림이 여럿이면 `sum`으로 합쳐요.
+
+CloudWatch Logs에서는 <Term term="logs/metric-filter">지표 필터</Term>를 만들어요. 맞는 줄이 들어올 때마다 지표 값을 1씩 올리고, 그 지표에 알람을 걸어요.
+
+## 글자 일치의 함정
+
+| 조건 | 맞는 줄 | 놓치거나 잘못 맞는 줄 |
+| --- | --- | --- |
+| `\|= "error"` | `payment error` | `ERROR payment failed`를 놓쳐요 |
+| `\|~ "(?i)error"` | error, Error, ERROR 모두 | `retry_errors=0`에도 맞아요 |
+| `\|= "ERROR"` | `ERROR payment failed` | `NO_ERROR`, `ERROR_COUNT=0`에도 맞아요 |
+| 필드 `level="ERROR"` | 레벨이 ERROR인 줄 | 레벨을 잘못 적은 줄만 놓쳐요 |
+
+Loki 문서에 따르면 `|=`는 대소문자를 구분해요. 정규식 `|~`도 기본은 구분하고, 앞에 `(?i)`를 붙이면 구분하지 않아요.
+
+필드로 걸려면 질의 안에서 파싱하거나, 처음부터 구조화된 로그를 써요.
+
+```text
+sum(count_over_time(
+  {app="order-api"} | json | level="ERROR" [5m]
+)) > 20
+```
+
+## 결과가 비면
+
+조건에 맞는 줄이 하나도 없으면 결과가 0이 아니라 비어 있을 수 있어요. 그러면 알림 화면은 "0건이라 정상"과 "로그가 아예 안 들어옴"을 가리지 못해요. 이 차이는 <Term slug="foundations/no-data-vs-zero">데이터 없음과 0은 달라요</Term>에서 다뤄요.
+
+CloudWatch 지표 필터에는 기본값(default value)이 있어요. 로그는 들어왔는데 맞는 줄이 없으면 이 값을 보내요. 0으로 정해 두면 매분 값이 이어져요.
+
+로그가 아예 안 들어온 분에는 기본값도 보내지 않아요.
+
+## 늦게 도착하는 로그
+
+로그는 수집 길을 지나느라 몇 초에서 몇 분 늦게 저장소에 들어와요. 최근 5분을 세는 순간에 아직 도착하지 않은 줄은 빠져요.
+
+그래서 구간을 수집 지연보다 넉넉히 잡고, 기준은 그만큼의 줄 수로 정해요. 지연이 큰 날에는 알림이 늦게 울리거나, 아예 기준을 못 넘을 수 있어요.
+
+<Checkpoints>
+  <Check>키워드를 소문자로만 걸었다면 다시 보세요. LogQL의 `|=`는 대소문자를 구분해서 ERROR를 놓쳐요.</Check>
+  <Check>"ERROR" 같은 짧은 단어로 걸었다면, NO_ERROR나 ERROR_COUNT=0처럼 엉뚱하게 맞는 줄이 없는지 지난 로그로 확인하세요.</Check>
+  <Check>맞는 줄이 없을 때 결과가 비는지, 0이 나오는지 확인하세요. 로그가 끊긴 것과 오류가 없는 것을 가려야 해요.</Check>
+  <Check>CloudWatch 지표 필터를 만든 뒤 지난 로그로 숫자가 안 채워진다고 고장으로 봤다면 다시 보세요. 필터는 만든 뒤에 들어온 로그만 세요.</Check>
+  <Check>평가 구간이 수집 지연보다 짧다면 늘리세요. 아직 도착하지 않은 줄은 세지 못해요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 지표 필터의 차원
+
+  CloudWatch 지표 필터에 차원(dimension)을 붙이면, 로그에서 새 값이 나올 때마다 지표가 하나씩 새로 생겨요. 차원을 붙인 지표에는 기본값을 정할 수 없어요.
+
+  ### 두 번 셀 수 있어요
+
+  CloudWatch 문서는 지표 필터가 로그를 적어도 한 번 지표에 반영하고, 가끔 두 번 반영할 수 있다고 해요. 기준에 딱 걸치는 알림은 이 차이로 울렸다 말았다 할 수 있어요.
+</Deeper>

@@ -1,0 +1,73 @@
+---
+title: 로그 검색이 느릴 때
+summary: 시간 범위, 라벨·색인으로 좁히기, 검색어 모양, 결과 크기 순서로 느린 이유를 가려요.
+domain: logs
+type: guide
+order: 80
+icon: scroll-text
+sources:
+  - title: Grafana Loki — Query best practices
+    url: https://grafana.com/docs/loki/latest/query/bp-query/
+  - title: Grafana Loki — Label best practices
+    url: https://grafana.com/docs/loki/latest/get-started/labels/bp-labels/
+  - title: Elasticsearch — Text field type
+    url: https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/text
+updated: 2026-10-29
+---
+
+<Situation>
+  장애 중에 주문 번호 A1042의 로그를 찾으려는데, 검색이 1분 넘게 돌다가 시간 초과로 끝나요. 어제는 같은 검색이 몇 초 만에 끝났어요.
+
+  로그 검색은 범위를 좁히고, 좁힌 데이터를 훑고, 결과를 모아 돌려줘요. 어느 단계가 커졌는지 앞에서부터 가려요.
+</Situation>
+
+<FirstLook>
+  <Item title="시간 범위">검색 범위가 몇 시간인지, 며칠인지 봐요.</Item>
+  <Item title="먼저 좁히는 조건">라벨이나 색인된 필드로 먼저 좁혔는지 봐요.</Item>
+  <Item title="결과 크기">돌려받는 줄 수와 묶는 기준의 수를 봐요.</Item>
+</FirstLook>
+
+## 1. 시간 범위를 좁히세요
+
+훑는 데이터는 시간 범위에 비례해요. 장애 시각을 알면 그 앞뒤 몇 분으로 줄여요. 검색 화면의 기본 범위가 7일로 잡혀 있지 않은지도 봐요.
+
+Loki는 하루마다 색인 파일을 하나씩 만들어요. 그래서 여러 날에 걸친 검색은 색인 파일도 그만큼 더 읽어요.
+
+**확인 방법**: 같은 검색을 범위만 15분으로 줄여 돌려 봐요. 바로 끝난다면 범위가 원인이에요.
+
+## 2. 라벨이나 색인된 필드로 먼저 좁히세요
+
+라벨만 색인하는 저장소(Loki)에서는 라벨로 스트림을 좁혀야 훑을 양이 줄어요. `{namespace=~".+"}`처럼 넓게 고르면 모든 스트림을 훑어요. 가장 구체적인 라벨부터 써요.
+
+모든 단어를 색인하는 저장소(Elasticsearch)에서는 색인된 필드로 찾아야 빨라요. 주문 번호처럼 정확히 찾을 값이 keyword 필드로 있으면 그 필드로 찾아요.
+
+**확인 방법**: 질의 앞부분의 라벨 선택자나 필드 조건이 몇 개의 스트림, 몇 개의 문서를 고르는지 봐요. 저장 방식은 <Term slug="logs/storage-and-indexing">로그 저장과 색인</Term>에서 다뤄요.
+
+## 3. 검색어 모양을 보세요
+
+Loki 문서는 정규식(`|~`)보다 단순 포함(`|=`)을 먼저 쓰라고 해요. 단순 포함이 정규식보다 빨리 평가돼요. 정규식은 마지막 수단으로 써요.
+
+파서도 비싸요. `| json` 같은 파서를 줄 필터보다 앞에 두면, 모든 줄을 나눈 뒤에야 걸러요. 줄 필터를 먼저 두면 맞는 줄만 나눠요.
+
+```text
+# 느린 순서
+{app="order-api"} | json | order_id="A1042"
+
+# 빠른 순서
+{app="order-api"} |= "A1042" | json | order_id="A1042"
+```
+
+## 4. 결과와 묶는 기준의 크기를 보세요
+
+검색이 수백만 줄을 돌려주면, 찾는 데보다 보내고 그리는 데 시간이 더 들어요. 줄 수 제한을 두고, 필요한 필드만 봐요.
+
+집계 질의라면 `by`로 묶는 기준을 봐요. 사용자 ID처럼 값이 많은 필드로 묶으면 결과가 그만큼 많아져요.
+
+같은 무거운 질의를 대시보드가 계속 되풀이한다면, Loki 문서는 recording rule로 결과를 미리 계산해 두라고 해요.
+
+<Checkpoints>
+  <Check>검색 화면의 기본 시간 범위가 길게 잡혀 있다면 짧게 바꾸세요. 장애를 볼 때는 최근 몇 시간부터 좁혀 보세요.</Check>
+  <Check>Loki 질의가 넓은 라벨 선택자로 시작한다면, 앱이나 네임스페이스 같은 구체적인 라벨로 바꾸세요.</Check>
+  <Check>정규식을 단순 포함으로 바꿀 수 있다면 바꾸세요. 파서는 줄 필터 뒤에 두세요.</Check>
+  <Check>자주 찾는 값(주문 번호 등)을 찾을 때마다 본문에서 훑고 있다면, 필드로 빼 두는 걸 고려하세요.</Check>
+</Checkpoints>

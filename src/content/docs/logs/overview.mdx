@@ -1,0 +1,81 @@
+---
+title: 로그 한 줄이 화면에 뜨기까지
+summary: 앱이 쓴 한 줄이 수집, 파싱, 저장·색인을 거쳐 검색과 알림이 되기까지의 길이에요.
+domain: logs
+type: overview
+order: 0
+icon: scroll-text
+keywords: [log, 로그, log pipeline, 로그 파이프라인, 수집, 파싱, 색인, 검색, 키워드 알림, 라이브 테일]
+related: [foundations/log-collection, foundations/logs-metrics-traces, logs/levels-and-structured, logs/storage-and-indexing]
+sources:
+  - title: OpenTelemetry — Logs Data Model
+    url: https://opentelemetry.io/docs/specs/otel/logs/data-model/
+  - title: Grafana Loki — Overview
+    url: https://grafana.com/docs/loki/latest/get-started/overview/
+  - title: Elasticsearch — Text field type
+    url: https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/text
+updated: 2026-10-29
+---
+
+<Analogy limit="작업 일지는 하루에 몇 쪽이지만, 로그는 서버 한 대에서도 초당 수천 줄이 쏟아져요. 그래서 무엇을 남기고 얼마나 오래 둘지가 곧 비용이에요.">
+  로그는 공장 곳곳의 작업 일지와 같아요. 일지를 걷어 오고, 날짜와 항목별로 옮겨 적고, 찾기 쉽게 색인을 붙여 보관해요. 그래서 필요할 때 찾아보고, 특정 단어가 나오면 바로 알려 줄 수 있어요.
+</Analogy>
+
+## 로그 한 줄이 지나는 길
+
+<Figure caption="앱이 쓴 로그는 수집, 파싱, 저장·색인을 거쳐야 검색과 알림에 쓰여요. 어느 칸에서 막히면 그 뒤의 화면이 모두 비어요.">
+  <Flow
+    ariaLabel="앱이 로그를 쓰고, 수집 에이전트가 모으고, 파싱으로 필드를 나누고, 저장소에 색인해 두면, 검색과 알림이 저장소를 보는 구조도"
+    nodes={[
+      { id: 'app', label: '앱', col: 0, row: 0, note: '한 줄을 써요' },
+      { id: 'agent', label: '수집', col: 1, row: 0, note: '에이전트' },
+      { id: 'parse', label: '파싱', col: 2, row: 0, note: '필드로 나눠요' },
+      { id: 'store', label: '저장·색인', col: 2, row: 1, tone: 'accent' },
+      { id: 'search', label: '검색', col: 1, row: 1 },
+      { id: 'alert', label: '알림·지표', col: 0, row: 1 },
+    ]}
+    edges={[
+      { from: 'app', to: 'agent' },
+      { from: 'agent', to: 'parse' },
+      { from: 'parse', to: 'store' },
+      { from: 'store', to: 'search' },
+      { from: 'search', to: 'alert' },
+    ]}
+  />
+</Figure>
+
+앱은 무슨 일이 있었는지 글 한 줄로 남겨요. 수집 에이전트가 그 줄을 모아 저장소로 보내요. 이 구간은 <Term slug="foundations/log-collection">로그가 모이는 길</Term>에서 다뤄요.
+
+모은 줄은 시각, 레벨, 서비스 같은 필드로 나눠야 찾고 셀 수 있어요. 이 일을 <Term term="logs/log-parsing">파싱</Term>이라고 해요.
+
+저장소는 나중에 빨리 찾도록 <Term term="logs/log-index">색인</Term>을 만들어 둬요. 색인을 얼마나 만드느냐에 따라 검색 속도와 저장 비용이 크게 달라져요.
+
+## 로그 한 줄에 담기는 것
+
+OpenTelemetry는 로그 한 건을 아래 칸으로 나눠 다뤄요. 도구마다 이름은 달라도 담는 것은 비슷해요.
+
+| 칸 | 담는 것 |
+| --- | --- |
+| Timestamp | 일이 일어난 시각 |
+| ObservedTimestamp | 수집 쪽이 그 로그를 본 시각 |
+| SeverityText, SeverityNumber | 레벨(ERROR, INFO 등)과 그 번호 |
+| Body | 로그 본문 |
+| Attributes | 이번 일에 딸린 값(주문 번호, 응답시간 등) |
+| Resource | 로그를 낸 곳(서비스, 호스트, 파드) |
+| TraceId, SpanId | 이 로그를 남긴 요청의 트레이스 |
+
+시각이 두 개라는 점을 기억해 둬요. 두 시각의 차이가 곧 로그가 늦게 도착한 정도예요. 늦게 도착하는 로그는 알림과 검색 결과를 흔들어요.
+
+TraceId로 트레이스와 로그를 잇는 법은 <Term slug="foundations/logs-metrics-traces">로그, 메트릭, 트레이스</Term>에서 다뤄요.
+
+## 단계를 하나씩 확대해 봐요
+
+- 레벨과 필드로 나눠 쓰는 로그는 <Term slug="logs/levels-and-structured">로그 레벨과 구조화 로그</Term>에서 다뤄요.
+- 글자 한 줄을 필드로 나누는 법은 <Term slug="logs/parsing">파싱과 필드 추출</Term>에서 다뤄요.
+- 찾기 쉽게 저장하는 세 가지 방식은 <Term slug="logs/storage-and-indexing">로그 저장과 색인</Term>에서 다뤄요.
+- 얼마나 쌓이고 얼마나 둘지는 <Term slug="logs/retention-and-cost">보관 기간과 비용</Term>에서 다뤄요.
+- 특정 단어가 나오면 알리는 법은 <Term slug="logs/keyword-alerts">키워드로 알림 만들기</Term>에서 다뤄요.
+- 로그를 세어 그래프로 만드는 법은 <Term slug="logs/log-metrics">로그에서 지표 만들기</Term>에서 다뤄요.
+- 들어오는 로그를 바로 흘려 보는 법은 <Term slug="logs/live-tail">라이브 테일</Term>에서 다뤄요.
+
+로그가 아예 안 보일 때는 <Term slug="foundations/logs-missing">로그가 안 들어올 때</Term>에서 순서대로 가려요.

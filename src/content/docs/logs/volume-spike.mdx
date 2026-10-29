@@ -1,0 +1,75 @@
+---
+title: 로그가 갑자기 많아질 때
+summary: 늘어난 서비스와 레벨, 되풀이되는 문구, 최근 바뀐 것 순서로 원인을 찾고 줄여요.
+domain: logs
+type: guide
+order: 90
+icon: scroll-text
+sources:
+  - title: Grafana Loki — Request validation and rate limits
+    url: https://grafana.com/docs/loki/latest/operations/request-validation-rate-limits/
+  - title: Fluent Bit — Throttle filter
+    url: https://docs.fluentbit.io/manual/data-pipeline/filters/throttle
+  - title: Grafana Loki — Metric queries
+    url: https://grafana.com/docs/loki/latest/query/metric_queries/
+  - title: Google SRE Book — Effective Troubleshooting
+    url: https://sre.google/sre-book/effective-troubleshooting/
+updated: 2026-10-29
+---
+
+<Situation>
+  오후 3시부터 로그 수집량이 평소의 4배가 됐어요. 같은 시각부터 다른 서비스의 로그 일부가 검색되지 않아요.
+
+  양이 늘면 비용만 느는 게 아니에요. 저장소가 받아들이는 한도를 넘으면, 늘어난 서비스와 상관없는 로그까지 버려질 수 있어요.
+</Situation>
+
+<FirstLook>
+  <Item title="어디서 늘었나">서비스별, 레벨별 줄 수를 봐요.</Item>
+  <Item title="같은 줄이 되풀이되나">늘어난 줄의 문구가 한두 가지인지 봐요.</Item>
+  <Item title="무엇이 바뀌었나">그 시각의 배포와 설정 변경을 봐요.</Item>
+</FirstLook>
+
+## 1. 어느 서비스와 레벨이 늘었는지 보세요
+
+서비스별, 레벨별로 분당 줄 수를 그려요. 방법은 <Term slug="logs/log-metrics">로그에서 지표 만들기</Term>에 있어요.
+
+```text
+sum by (app, level) (
+  count_over_time({env="prod"} | json [1m])
+)
+```
+
+한두 서비스의 한 레벨이 늘어난 양을 거의 다 차지한다면, 그 서비스와 레벨로 범위를 좁혀요.
+
+## 2. 같은 문구가 되풀이되는지 보세요
+
+늘어난 줄을 몇 개 열어 봐요. 같은 오류가 재시도마다, 요청마다 찍히고 있다면 오류 폭주예요. 로그는 결과이고, 원인은 그 오류 쪽에 있어요.
+
+DEBUG나 TRACE 줄이 대부분이라면 오류가 아니라 설정이에요. 누군가 레벨을 낮춘 채 두었을 수 있어요.
+
+## 3. 그 시각에 바뀐 것을 보세요
+
+SRE 책은 잘 돌던 시스템이 갑자기 달라지면, 마지막에 무엇이 손댔는지부터 보라고 해요. 그 시각의 배포, 로그 레벨 변경, 트래픽 변화를 봐요.
+
+새 버전이 요청마다 큰 객체를 통째로 찍게 바뀌었을 수도 있어요. 줄 수는 그대로인데 바이트만 늘었다면 줄 크기를 봐요.
+
+## 4. 급한 불을 끄고, 원인을 고치세요
+
+저장소의 한도를 넘었는지 먼저 봐요. Loki는 수집 속도 한도를 넘는 요청을 HTTP 429로 거절해요. 이때 요청 전체가 저장되지 않아서, 같은 요청에 섞인 다른 로그도 함께 빠져요.
+
+| 확인할 것 | Loki에서 |
+| --- | --- |
+| 거절된 양 | `loki_discarded_samples_total`, `loki_discarded_bytes_total` |
+| 거절 이유 | reason 레이블의 `rate_limited` 등 |
+| 스트림 하나의 한도 | 기본 3MB(`per_stream_rate_limit`), 버스트 15MB |
+
+급하면 수집 단계에서 그 서비스의 로그를 줄여요. Fluent Bit의 throttle 필터는 정한 속도를 넘는 줄을 버려요. 쌓아 두지 않고 버리니, 버려도 되는 줄에만 걸어요.
+
+그다음 원인을 고쳐요. 오류 폭주라면 오류를, 레벨 변경이라면 레벨을 되돌려요. 되풀이 줄은 몇 줄만 남기고 수를 세는 방식으로 바꿔요.
+
+<Checkpoints>
+  <Check>로그 양이 늘었을 때 다른 서비스의 로그가 함께 빠졌다면, 저장소의 수집 한도에 걸려 요청째 거절됐는지 보세요.</Check>
+  <Check>DEBUG 레벨을 켠 채로 배포했다면 되돌리고, 레벨 변경에 기한을 두는 절차를 만드세요.</Check>
+  <Check>같은 오류 줄이 재시도마다 찍힌다면, 로그를 줄이기 전에 그 오류부터 보세요. 로그 폭주는 증상이에요.</Check>
+  <Check>throttle 같은 버리는 필터를 걸었다면, 버린 양을 세고 화면에 밝히세요. 버린 줄은 검색에 안 나와요.</Check>
+</Checkpoints>

@@ -1,0 +1,32 @@
+questions:
+  - id: first-check
+    type: choice
+    prompt: 로그 검색이 시간 초과로 끝나요. 가장 먼저 줄여 볼 것은?
+    choices: [시간 범위, 보관 기간, 로그 레벨, 수집 주기]
+    answer: 0
+    explain: 훑는 데이터는 시간 범위에 비례해요. 장애 시각 앞뒤 몇 분으로 줄여 봐요.
+  - id: broad-selector
+    type: ox
+    prompt: Loki에서 '{namespace=~".+"}'처럼 넓은 라벨 선택자로 시작해도, 줄 필터만 있으면 훑는 양은 같나요?
+    answer: false
+    explain: 라벨로 스트림을 좁혀야 훑을 덩어리가 줄어요. 넓게 고르면 모든 스트림을 훑어요.
+  - id: regex-vs-contains
+    type: choice
+    prompt: Loki 문서가 먼저 쓰라고 권하는 줄 필터는?
+    choices:
+      - 단순 포함(|=)
+      - 정규식(|~)
+      - 정규식 부정(!~)
+      - 파서 뒤의 레이블 필터
+    answer: 0
+    explain: 단순 포함과 단순 제외가 정규식보다 빨리 평가돼요. 정규식은 마지막 수단으로 써요.
+  - id: parser-order
+    type: choice
+    prompt: 같은 결과를 내는 두 질의 중 더 빠른 것은?
+    choices:
+      - '{app="order-api"} |= "A1042" | json'
+      - '{app="order-api"} | json |= "A1042"'
+      - 둘의 속도는 언제나 같아요
+      - 파서가 있으면 줄 필터는 무시돼요
+    answer: 0
+    explain: 줄 필터를 먼저 두면 맞는 줄만 파서로 나눠요. 파서가 줄 필터보다 비싸요.

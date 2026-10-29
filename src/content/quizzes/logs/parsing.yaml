@@ -1,0 +1,41 @@
+questions:
+  - id: tz-shift
+    type: choice
+    prompt: 시간대 없이 '2026-10-29 17:22:19'로 적힌 로그를 서울 시간대 서버가 지역 시간으로 읽었어요. UTC로 저장된 시각은?
+    choices:
+      - '2026-10-29T08:22:19Z'
+      - '2026-10-29T17:22:19Z'
+      - '2026-10-30T02:22:19Z'
+      - '2026-10-29T17:22:19+09:00'
+    answer: 0
+    explain: 서울은 UTC보다 9시간 빨라서, 지역 시간 17시는 UTC 8시예요. 같은 줄을 UTC 서버가 읽으면 17시로 저장돼요.
+  - id: format-change
+    type: choice
+    prompt: 날짜 형식을 바꾼 배포 뒤, 레벨 필드로 건 ERROR 알림이 갑자기 조용해졌어요. 먼저 볼 것은?
+    choices:
+      - 파서가 새 형식의 줄을 읽고 있는지
+      - 오류가 정말 사라졌는지 축하하기
+      - 알림 수신자 목록
+      - 저장소의 디스크 사용률
+    answer: 0
+    explain: 파싱에 실패하면 레벨 필드가 비어 ERROR가 0으로 세어져요. 오류가 사라진 게 아니라 못 세는 거예요.
+  - id: filter-before-parser
+    type: ox
+    prompt: Loki 질의에서 '| json' 파서를 줄 필터 '|=' 앞에 두는 편이 더 빠른가요?
+    answer: false
+    explain: 파서가 줄 필터보다 비싸요. 줄 필터로 먼저 줄인 뒤 남은 줄만 나눠야 빨라요.
+  - id: parse-when
+    type: choice
+    prompt: 파싱 규칙을 자주 바꿔야 하는 로그라면 어느 쪽이 유리할까요?
+    choices:
+      - 찾을 때 질의 안에서 나누기
+      - 넣을 때 수집 단계에서 나누기
+      - 파싱하지 않고 레벨만 남기기
+      - 저장 기간을 줄이기
+    answer: 0
+    explain: 찾을 때 나누면 원래 줄이 남아 있어서 규칙을 바꿔도 지난 로그에 바로 적용돼요. 대신 찾을 때마다 비용이 들어요.
+  - id: regex-syntax
+    type: input
+    prompt: Loki의 regexp 파서에서 이름 붙은 묶음은 '(?P<name>…)'로 써요. 이 정규식 문법의 이름은?
+    answer: [RE2, re2]
+    explain: Loki는 RE2를, Fluent Bit은 Ruby 정규식을 써요. 그래서 이름 붙은 묶음을 쓰는 법이 달라요.
