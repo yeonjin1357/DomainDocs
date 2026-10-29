@@ -5,7 +5,7 @@ import react from '@astrojs/react';
 import { unified } from '@astrojs/markdown-remark';
 import remarkGfm from 'remark-gfm';
 
-// 배포 시 GitHub Actions가 SITE_URL·BASE_PATH를 넣는다. 커스텀 도메인이면 BASE_PATH가 빈 문자열이다.
+// 배포는 Vercel이 하고, 프로젝트 환경 변수로 SITE_URL·BASE_PATH를 넣는다. 도메인 루트에 두므로 BASE_PATH는 `/`이다.
 const basePath = process.env.BASE_PATH;
 
 export default defineConfig({
