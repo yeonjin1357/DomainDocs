@@ -7,7 +7,7 @@ stage: monitoring
 order: 60
 icon: trending-up
 keywords: [replication lag, 복제 지연, standby, 복제본, replay_lag, pg_stat_replication, WAL, read replica, 읽기 전용 복제본, replication slot]
-related: [foundations/no-data-vs-zero, database/locks-and-blocking, database/active-sessions]
+related: [database/replication, foundations/no-data-vs-zero, database/locks-and-blocking, database/active-sessions]
 sources:
   - title: PostgreSQL — The Cumulative Statistics System (pg_stat_replication)
     url: https://www.postgresql.org/docs/current/monitoring-stats.html
@@ -35,7 +35,7 @@ updated: 2026-10-15
   <Point title="복제본에서 읽으면 방금 쓴 값이 안 보일 수 있어요">
     PostgreSQL 스트리밍 복제는 기본이 비동기라, 원본 커밋과 복제본 반영 사이에 짧은 틈이 있어요. 그래서 원본에 쓰고 곧바로 복제본에서 읽으면 옛 값이 보일 수 있어요.
 
-    지연이 커지면 이 틈도 커져요. 원본이 죽어 복제본으로 넘길 때 잃는 데이터의 양도 그 순간의 지연만큼이에요.
+    지연이 커지면 이 틈도 커져요. 원본이 죽어 복제본으로 넘기면, 잃는 데이터도 그 순간의 지연에 비례해요. 정확히는 복제본이 아직 받지 못한 WAL이고, 받아 둔 WAL은 승격할 때 마저 재생해요.
   </Point>
   <Point title="쓰기가 없으면 시간 지연이 부풀어요">
     복제본에서 흔히 쓰는 `now() - pg_last_xact_replay_timestamp()`는 마지막으로 재생한 트랜잭션 뒤로 흐른 시간이에요. 원본에 쓰기가 없으면 재생할 트랜잭션도 없어서, 다 따라잡았어도 이 값은 계속 늘어요.

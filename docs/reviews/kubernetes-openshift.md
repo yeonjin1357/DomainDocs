@@ -19,3 +19,11 @@ docs.redhat.com이 503을 돌려줘서, 같은 문서의 원본 저장소(opensh
 - 문서에서 기본 SCC가 restricted-v2라는 문장과 restricted-v3가 새 설치의 기본이 된다는 문장이 함께 있어서, 글에는 "버전에 따라 v2나 v3"로 썼어요.
 - 처음에는 "4.11부터 restricted-v2"라고 썼다가, 2차 자료로만 확인돼서 고쳤어요.
 - 함께 한 것: 용어 openshift, openshift-route, openshift-project, scc를 올리고, 쿠버네티스 개요에 이 글을 이었어요. 퀴즈 5문제를 썼어요.
+
+## 2026-10-29 보강
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 라우터는 서비스의 엔드포인트(파드 IP)로 바로 보내고 서비스 IP를 거치지 않음 | https://docs.openshift.com/container-platform/3.4/architecture/core_concepts/routes.html |
+
+- 메모: 그림이 라우터 → 서비스 → 파드로 그려져 있던 것을, 라우터가 서비스에서 주소만 얻고 파드로 바로 보내도록 고쳤어요.

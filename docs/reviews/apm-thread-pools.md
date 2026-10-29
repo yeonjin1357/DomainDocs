@@ -11,3 +11,11 @@
 | 계산 | 100 × 0.5 = 50, 100 × 3 = 300 |
 
 - 메모: 동시 처리 수 = 처리량 × 응답시간은 apm-throughput-and-concurrency 검토에서 확인한 관계예요.
+
+## 2026-10-29 보강
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 톰캣은 스레드가 max보다 적으면 대기열에 넣지 않고 새 스레드를 만든다(TaskQueue.offer가 false를 돌려줌) | https://github.com/apache/tomcat/blob/main/java/org/apache/tomcat/util/threads/TaskQueue.java |
+
+- 메모: 그림을 ThreadPoolExecutor 순서(core → 대기열 → max → 거부)에 맞췄어요.

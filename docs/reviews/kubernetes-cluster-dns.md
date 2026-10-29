@@ -20,3 +20,7 @@
   - `api.example.com`: `…shop.svc.cluster.local`, `…svc.cluster.local`, `…cluster.local`, `api.example.com` 순서로 A·AAAA 8번. 6번이 NXDOMAIN.
   - `api.example.com.`(끝에 점): `api.example.com` A·AAAA 2번.
 - 함께 한 것: 「서비스와 인그레스」에 이 글로 가는 줄을 더하고, 용어 coredns, ndots를 올리고 퀴즈 5문제를 썼어요.
+
+## 2026-10-29 보강
+
+- 메모: 핵심 블록의 "질의 8번"이 본문 목록(4번)과 어긋나 보여서, A와 AAAA를 함께 찾으면 4번이 두 배가 된다는 설명을 핵심 블록과 목록 바로 아래에 함께 적었어요. 숫자는 기존 실측(8번 중 6번 NXDOMAIN)과 같아요.

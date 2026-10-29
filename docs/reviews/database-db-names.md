@@ -17,3 +17,7 @@
 
 - 재현: PostgreSQL 18.4에서 잠금 대기 세션과 `pg_blocking_pids`를 확인했어요(「오래 도는 쿼리 멈추기」 검토 기록과 같은 실험).
 - 함께 한 것: DB 개요 글의 모니터링 목록에 이 글을 더하고, 퀴즈 5문제를 썼어요.
+
+## 2026-10-29 보강
+
+- 메모: MySQL의 세션 번호를 PROCESSLIST_ID로 밝히고 performance_schema의 THREAD_ID와 다르다고 적었어요. SQL Server는 session_id로 적었어요. (https://dev.mysql.com/doc/refman/8.4/en/performance-schema-threads-table.html)

@@ -55,10 +55,9 @@ updated: 2026-10-28
       { id: 'half', label: '반열림', col: 1, row: 1, note: '몇 개만 시험' },
     ]}
     edges={[
-      { from: 'closed', to: 'open', tone: 'warn' },
-      { from: 'open', to: 'half' },
-      { from: 'half', to: 'closed', tone: 'accent' },
-      { from: 'half', to: 'open', dashed: true },
+      { from: 'closed', to: 'open', label: '실패율 초과', tone: 'warn' },
+      { from: 'open', to: 'half', label: '기다림 · 실패', both: true },
+      { from: 'half', to: 'closed', label: '시험 성공', tone: 'accent' },
     ]}
   />
 </Figure>

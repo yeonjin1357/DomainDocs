@@ -62,7 +62,9 @@ updated: 2026-10-21
 
 자바 코드는 객체를 직접 지우지 않아요. 더는 아무도 가리키지 않는 객체는 <Term term="apm/gc">GC</Term>(가비지 컬렉터)가 찾아 치워요.
 
-요즘 기본 GC인 G1은 힙을 young과 old 두 세대로 나눠요. 새 객체는 young에 담기고, young을 치울 때 살아남은 객체는 old로 옮겨요. G1은 힙을 같은 크기의 영역(region) 여러 개로 나눠 관리해요.
+서버에서 흔히 도는 G1은 힙을 young과 old 두 세대로 나눠요. 새 객체는 young에 담기고, young을 치울 때 살아남은 객체는 old로 옮겨요. G1은 힙을 같은 크기의 영역(region) 여러 개로 나눠 관리해요.
+
+G1이 늘 기본은 아니에요. JVM은 CPU 2개 이상, 메모리 1792MB 이상일 때만 G1을 고르고, 그보다 작으면 Serial GC를 골라요. 작은 파드에서 무엇이 도는지는 <Term slug="apm/gc-logs">GC 로그 읽기</Term>에서 확인해요.
 
 GC는 치우는 동안 앱 스레드를 잠깐 멈추는 구간(stop-the-world)이 있어요. 이 멈춤이 응답시간에 주는 영향은 <Term slug="apm/gc-pause">GC 멈춤</Term>에서 다뤄요.
 

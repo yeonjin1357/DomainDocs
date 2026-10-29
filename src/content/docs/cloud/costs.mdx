@@ -64,15 +64,17 @@ updated: 2026-10-23
 
 <Figure caption="AWS us-east-1 기준이에요. 들어오는 건 무료, 인터넷으로 나가는 건 GB당 0.09달러부터, AZ 사이는 방향마다 GB당 0.01달러예요.">
   <Flow
-    ariaLabel="인터넷에서 VPC로 들어오는 전송은 무료, VPC에서 인터넷으로 나가는 전송과 AZ 사이 전송은 유료인 구조도"
+    ariaLabel="인터넷에서 AZ A의 서버로 들어오는 전송은 무료, 서버에서 인터넷으로 나가는 전송과 AZ A와 AZ B 사이의 양방향 전송은 유료인 구조도"
     nodes={[
-      { id: 'net', label: '인터넷', col: 0, row: 0 },
+      { id: 'in', label: '인터넷', col: 0, row: 0, note: '요청·업로드' },
       { id: 'a', label: 'AZ A의 서버', col: 2, row: 0, tone: 'accent' },
+      { id: 'out', label: '인터넷', col: 0, row: 1, note: '응답·다운로드' },
       { id: 'b', label: 'AZ B의 DB', col: 2, row: 1 },
     ]}
     edges={[
-      { from: 'net', to: 'a', label: '들어옴 무료', both: false },
-      { from: 'a', to: 'b', both: true, tone: 'warn' },
+      { from: 'in', to: 'a', label: '들어옴 무료' },
+      { from: 'a', to: 'out', label: '나감 유료', tone: 'warn' },
+      { from: 'a', to: 'b', label: '오갈 때마다', both: true, tone: 'warn' },
     ]}
   />
 </Figure>

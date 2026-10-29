@@ -31,5 +31,7 @@ export const LINT_CONFIG = {
     'Sequence',
     'Layers',
     'Compare',
+    'Timeline',
+    'Strip',
   ],
 } as const;

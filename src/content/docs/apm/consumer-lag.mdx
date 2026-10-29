@@ -44,6 +44,21 @@ updated: 2026-10-14
   </Point>
 </KeyPoints>
 
+<Figure caption="Kafka 문서의 예를 칸으로 그렸어요. 컨슈머가 기록한 위치는 2, 로그 끝은 4예요. 그 사이의 2건이 아직 처리하지 못한 lag이에요.">
+  <Strip
+    ariaLabel="오프셋 0과 1은 처리했고, 컨슈머가 기록한 위치 2부터 로그 끝 4 앞까지 오프셋 2와 3이 lag 2건이며, 4는 다음 메시지가 붙을 자리인 칸 띠"
+    rows={[{ label: '파티션 0', cells: ['0', '1', { label: '2', tone: 'warn' }, { label: '3', tone: 'warn' }, { label: '4', tone: 'sub' }] }]}
+    marks={[
+      { at: 2, label: '기록한 위치 2' },
+      { at: 4, label: '로그 끝 4', tone: 'sub' },
+    ]}
+    ranges={[
+      { from: 0, to: 1, label: '처리함' },
+      { from: 2, to: 3, label: 'lag 2건', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 <Checkpoints>
   <Check>lag 하나에 고정 임계값으로 알림을 걸었다면 다시 보세요. 바쁜 시간엔 정상이어도 울리고, 한가한 토픽은 컨슈머가 멈춰도 lag이 작아 늦게 울려요.</Check>
   <Check>컨슈머가 offset을 기록하는데 값이 그대로이고 lag이 남아 있다면 멈춘 거예요. Burrow는 이 상태를 STALLED라고 불러요. 같은 메시지를 계속 실패하며 다시 처리하는지 보세요.</Check>

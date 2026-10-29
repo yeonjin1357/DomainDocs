@@ -23,30 +23,30 @@ updated: 2026-10-29
 
 ## 로그 한 줄이 지나는 길
 
-<Figure caption="앱이 쓴 로그는 수집, 파싱, 저장·색인을 거쳐야 검색과 알림에 쓰여요. 어느 칸에서 막히면 그 뒤의 화면이 모두 비어요.">
+<Figure caption="앱이 쓴 로그는 수집, 파싱, 저장·색인을 거쳐요. 검색과 알림은 저장소를 따로따로 봐요. 앞 칸에서 막히면 뒤의 화면이 모두 비어요.">
   <Flow
-    ariaLabel="앱이 로그를 쓰고, 수집 에이전트가 모으고, 파싱으로 필드를 나누고, 저장소에 색인해 두면, 검색과 알림이 저장소를 보는 구조도"
+    ariaLabel="앱이 로그를 쓰고, 수집 에이전트가 모으고, 파싱으로 필드를 나누고, 저장소에 색인해 두면, 검색과 알림이 각각 저장소를 보는 구조도"
     nodes={[
       { id: 'app', label: '앱', col: 0, row: 0, note: '한 줄을 써요' },
       { id: 'agent', label: '수집', col: 1, row: 0, note: '에이전트' },
       { id: 'parse', label: '파싱', col: 2, row: 0, note: '필드로 나눠요' },
       { id: 'store', label: '저장·색인', col: 2, row: 1, tone: 'accent' },
-      { id: 'search', label: '검색', col: 1, row: 1 },
-      { id: 'alert', label: '알림·지표', col: 0, row: 1 },
+      { id: 'search', label: '검색', col: 1, row: 1, note: '사람이 찾아봐요' },
+      { id: 'alert', label: '알림·지표', col: 2, row: 2, note: '규칙이 지켜봐요' },
     ]}
     edges={[
       { from: 'app', to: 'agent' },
       { from: 'agent', to: 'parse' },
       { from: 'parse', to: 'store' },
       { from: 'store', to: 'search' },
-      { from: 'search', to: 'alert' },
+      { from: 'store', to: 'alert' },
     ]}
   />
 </Figure>
 
 앱은 무슨 일이 있었는지 글 한 줄로 남겨요. 수집 에이전트가 그 줄을 모아 저장소로 보내요. 이 구간은 <Term slug="foundations/log-collection">로그가 모이는 길</Term>에서 다뤄요.
 
-모은 줄은 시각, 레벨, 서비스 같은 필드로 나눠야 찾고 셀 수 있어요. 이 일을 <Term term="logs/log-parsing">파싱</Term>이라고 해요.
+모은 줄은 시각, 레벨, 서비스 같은 필드로 나눠야 찾고 셀 수 있어요. 이 일을 <Term term="logs/log-parsing">파싱</Term>이라고 해요. 그림은 저장 전에 나누는 경우이고, 검색할 때 나누는 도구도 있어요.
 
 저장소는 나중에 빨리 찾도록 <Term term="logs/log-index">색인</Term>을 만들어 둬요. 색인을 얼마나 만드느냐에 따라 검색 속도와 저장 비용이 크게 달라져요.
 

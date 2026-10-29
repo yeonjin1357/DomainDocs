@@ -24,7 +24,7 @@ sources:
 updated: 2026-10-26
 ---
 
-<OnDashboard title="알림 경로 나무" caption="team=payment인 알림은 결제 채팅방으로 가고, 그중 severity=critical만 결제 당직을 호출해요. 어디에도 맞지 않는 알림은 기본 경로의 운영 채팅방으로 가요.">
+<Figure caption="team=payment인 알림은 결제 채팅방으로 가고, 그중 severity=critical만 결제 당직을 호출해요. 어디에도 맞지 않는 알림은 기본 경로의 운영 채팅방으로 가요.">
   <Flow
     ariaLabel="모든 알림이 기본 경로로 들어와, team이 payment면 결제 채팅방으로, 그중 severity가 critical이면 결제 당직 호출로 가고, 어디에도 맞지 않으면 기본 채팅방으로 가는 경로 나무"
     nodes={[
@@ -33,11 +33,11 @@ updated: 2026-10-26
       { id: 'crit', label: 'critical', col: 2, row: 1, note: '결제 당직 호출', tone: 'warn' },
     ]}
     edges={[
-      { from: 'root', to: 'pay' },
-      { from: 'pay', to: 'crit', tone: 'warn' },
+      { from: 'root', to: 'pay', label: 'team=payment' },
+      { from: 'pay', to: 'crit', label: 'severity=critical', tone: 'warn' },
     ]}
   />
-</OnDashboard>
+</Figure>
 
 <KeyPoints>
   <Point title="레이블이 받을 곳을 정해요">

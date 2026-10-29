@@ -75,7 +75,7 @@ updated: 2026-10-28
     실행 시간이 초인지 밀리초인지, 지금 값인지 쌓인 값인지가 DB마다 달라요. 화면에서 나란히 놓기 전에 이걸 맞춰요.
   </Point>
   <Point title="세션을 가리키는 번호도 달라요">
-    PostgreSQL은 pid, Oracle은 SID와 SERIAL# 한 쌍, MySQL과 SQL Server는 세션 번호로 세션을 가리켜요.
+    PostgreSQL은 pid, Oracle은 SID와 SERIAL# 한 쌍, SQL Server는 session_id로 세션을 가리켜요. MySQL은 연결 번호(PROCESSLIST_ID)를 쓰는데, performance_schema의 THREAD_ID와는 다른 번호예요.
   </Point>
 </KeyPoints>
 

@@ -37,7 +37,7 @@ updated: 2026-10-14
     멈춤이 풀리면 기다리던 요청이 비슷한 때에 끝나요. 그래서 <Term slug="apm/response-time-distribution">분포도</Term>에 세로줄이 생기고, 줄의 꼭대기는 멈춘 시간에 평소 처리 시간을 더한 만큼이에요.
   </Point>
   <Point title="멈춤 길이는 GC 종류마다 달라요">
-    대부분의 서버에서 기본으로 쓰는 G1은 멈춤 목표를 200ms로 둬요. 목표일 뿐이라, 한 번 한 번의 멈춤을 보장하지는 않아요. OpenJDK 문서는 G1의 멈춤이 밀리초에서 초 단위까지 간다고 해요.
+    CPU 2개, 메모리 1792MB 이상이면 기본으로 쓰는 G1은 멈춤 목표를 200ms로 둬요. 목표일 뿐이라, 한 번 한 번의 멈춤을 보장하지는 않아요. OpenJDK 문서는 G1의 멈춤이 밀리초에서 초 단위까지 간다고 해요.
 
     ZGC는 대부분의 일을 앱과 함께 돌려서, 멈춤이 마이크로초 단위예요. 어느 GC를 쓰는지에 따라 같은 힙에서도 멈춤 길이가 크게 달라요.
   </Point>
@@ -45,6 +45,29 @@ updated: 2026-10-14
     GC에는 앱을 세우는 시간과, 앱과 함께 도는 시간이 있어요. 응답시간을 늘리는 건 앞의 것이에요. Micrometer는 둘을 `jvm.gc.pause`(멈춤)와 `jvm.gc.concurrent.phase.time`(함께 돈 시간)으로 나눠요.
   </Point>
 </KeyPoints>
+
+<Figure caption="GC가 앱을 1.2초 멈춘 예시예요. 멈춤 전후로 들어온 요청 A, B, C가 모두 멈춤이 풀린 직후에 함께 끝나요. 그래서 분포도에 세로줄이 생겨요.">
+  <Timeline
+    ariaLabel="앱 스레드가 0.6초부터 1.8초까지 GC로 멈추고, 그 사이에 걸친 요청 A, B, C가 모두 1.8초 직후에 끝나며, 멈춤 뒤에 온 요청 D는 0.1초 만에 끝나는 시간 띠"
+    end={2000}
+    lanes={[
+      { label: '앱 스레드', segments: [{ start: 0, end: 600, label: '일함', tone: 'accent' }, { start: 600, end: 1800, label: 'GC 멈춤 1.2초', tone: 'warn' }, { start: 1800, end: 2000, tone: 'accent' }] },
+      { label: '요청 A', segments: [{ start: 450, end: 1850, label: '1.4초' }] },
+      { label: '요청 B', segments: [{ start: 550, end: 1880, label: '1.3초' }] },
+      { label: '요청 C', segments: [{ start: 900, end: 1900, label: '1.0초' }] },
+      { label: '요청 D', segments: [{ start: 1850, end: 1950, tone: 'accent' }] },
+    ]}
+    marks={[
+      { at: 600, label: '멈춤', tone: 'warn' },
+      { at: 1800, label: '풀림' },
+    ]}
+    ticks={[
+      { at: 0, label: '0초' },
+      { at: 1000, label: '1초' },
+      { at: 2000, label: '2초' },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>응답시간이 몇 분마다 한꺼번에 튄다면, 같은 시각의 GC 멈춤을 보세요. 여러 서버 중 한 대만 튄다면 그 서버의 GC부터 봐요.</Check>

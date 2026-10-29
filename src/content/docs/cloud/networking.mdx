@@ -61,25 +61,28 @@ VPC를 만들 때는 `10.0.0.0/16`처럼 쓸 IP 주소 범위를 정해요. 그 
 
 비공개 서브넷의 서버가 밖으로 나가야 할 때는 NAT 게이트웨이를 거쳐요. 보안 패치를 받으러 나가는 경우가 대표적이에요. NAT 게이트웨이를 쓰면 안에서 밖으로는 연결을 맺을 수 있지만, 밖에서 안으로는 연결을 시작할 수 없어요.
 
-<Figure caption="공개 서브넷의 로드 밸런서만 인터넷에서 닿아요. 앱 서버와 DB는 비공개 서브넷에 두고, 밖으로 나갈 때만 NAT 게이트웨이를 거쳐요.">
+<Figure caption="인터넷 게이트웨이를 지나 공개 서브넷의 로드 밸런서로 들어와요. 비공개 서브넷의 앱 서버는 밖으로 나갈 때만 NAT 게이트웨이를 거쳐요.">
   <Flow
-    ariaLabel="인터넷에서 인터넷 게이트웨이를 지나 공개 서브넷의 로드 밸런서로 들어오고, 로드 밸런서가 비공개 서브넷의 앱 서버로, 앱 서버가 DB로 이어지며, 앱 서버는 공개 서브넷의 NAT 게이트웨이를 거쳐 밖으로 나가는 구조도"
+    ariaLabel="인터넷에서 인터넷 게이트웨이를 지나 공개 서브넷의 로드 밸런서로 들어오고, 로드 밸런서가 비공개 서브넷의 앱 서버로, 앱 서버가 DB로 이어지며, 앱 서버는 공개 서브넷의 NAT 게이트웨이와 인터넷 게이트웨이를 거쳐 밖으로 나가는 구조도"
     nodes={[
-      { id: 'net', label: '인터넷', col: 0, row: 0 },
-      { id: 'lb', label: '로드 밸런서', col: 1, row: 0, tone: 'accent' },
-      { id: 'nat', label: 'NAT', col: 2, row: 0, note: '게이트웨이' },
-      { id: 'app', label: '앱 서버', col: 1, row: 1 },
-      { id: 'db', label: 'DB', col: 1, row: 2 },
+      { id: 'net', label: '인터넷', col: 1, row: 0 },
+      { id: 'igw', label: '인터넷', col: 1, row: 1, note: '게이트웨이' },
+      { id: 'lb', label: '로드 밸런서', col: 0, row: 2, tone: 'accent' },
+      { id: 'nat', label: 'NAT', col: 2, row: 2, note: '게이트웨이' },
+      { id: 'app', label: '앱 서버', col: 1, row: 3 },
+      { id: 'db', label: 'DB', col: 2, row: 3 },
     ]}
     edges={[
-      { from: 'net', to: 'lb', tone: 'accent' },
+      { from: 'net', to: 'igw', both: true },
+      { from: 'igw', to: 'lb', tone: 'accent' },
       { from: 'lb', to: 'app', tone: 'accent' },
       { from: 'app', to: 'db' },
       { from: 'app', to: 'nat', dashed: true },
+      { from: 'nat', to: 'igw' },
     ]}
     groups={[
-      { label: '공개 서브넷', cols: [1, 2], rows: [0, 0] },
-      { label: '비공개 서브넷', cols: [0, 2], rows: [1, 2] },
+      { label: '공개 서브넷', cols: [0, 2], rows: [2, 2] },
+      { label: '비공개 서브넷', cols: [0, 2], rows: [3, 3] },
     ]}
   />
 </Figure>

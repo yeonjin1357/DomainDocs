@@ -48,16 +48,18 @@ updated: 2026-10-28
 
 ## 테이블스페이스와 데이터 파일
 
-<Figure caption="Oracle DB의 테이블스페이스 예시예요. 테이블스페이스마다 데이터 파일이나 임시 파일이 하나 이상 있고, 쓰임새가 나뉘어 있어요.">
-  <Layers
-    ariaLabel="Oracle DB 안에 SYSTEM, SYSAUX, 사용자 데이터, UNDO, TEMP 테이블스페이스가 있고 각각의 쓰임새를 적은 계층도"
-    layers={[
-      { label: 'SYSTEM', note: 'DB를 관리하는 정보' },
-      { label: 'SYSAUX', note: 'SYSTEM을 돕는 보조 정보' },
-      { label: '사용자 데이터', note: '앱의 표와 인덱스', tone: 'accent' },
-      { label: 'UNDO', note: '바꾸기 전 값' },
-      { label: 'TEMP', note: '정렬 중간 결과 같은 임시 데이터' },
+<Figure caption="Oracle DB의 테이블스페이스 예시예요. 위아래 층이 아니라 나란히 있는 그릇이에요. 그릇마다 데이터 파일이나 임시 파일이 하나 이상 있어요.">
+  <Flow
+    ariaLabel="Oracle DB 안에 SYSTEM, SYSAUX, 사용자 표, UNDO, TEMP 테이블스페이스가 나란히 있고, 각각 관리 정보, 보조 정보, 앱 데이터, 바꾸기 전 값, 정렬 중간값을 담는 그림"
+    nodes={[
+      { id: 'system', label: 'SYSTEM', col: 0, row: 0, note: '관리 정보' },
+      { id: 'sysaux', label: 'SYSAUX', col: 1, row: 0, note: '보조 정보' },
+      { id: 'users', label: '사용자 표', col: 2, row: 0, note: '앱 데이터', tone: 'accent' },
+      { id: 'undo', label: 'UNDO', col: 0, row: 1, note: '바꾸기 전 값' },
+      { id: 'temp', label: 'TEMP', col: 1, row: 1, note: '정렬 중간값' },
     ]}
+    edges={[]}
+    groups={[{ label: 'Oracle DB', cols: [0, 2], rows: [0, 1] }]}
   />
 </Figure>
 

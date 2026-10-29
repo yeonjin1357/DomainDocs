@@ -10,3 +10,10 @@
 | --event-ttl 기본 1h0m0s | https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/ |
 
 - 메모: 이유별 다음 글 표는 이 사이트의 다른 글로 잇는 안내예요. 워터폴 시각은 설명용이에요.
+
+## 2026-10-29 보강
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 이미지 받기를 미룰 때도 이유는 BackOff, 메시지는 Back-off pulling image | https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/events/event.go (BackOffPullImage = "BackOff") |
+| 재시작을 미룰 때 메시지는 Back-off restarting failed container | https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/kuberuntime/kuberuntime_manager.go |

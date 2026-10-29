@@ -1,0 +1,200 @@
+---
+import { layoutTimeline, type TimelineLane, type TimelineMark, type TimelineTick } from '../../lib/viz/timeline';
+
+interface Props {
+  /** 위에서부터 그릴 줄. 줄마다 이름과 구간들 */
+  lanes: TimelineLane[];
+  ariaLabel: string;
+  /** 띠 왼쪽 끝의 시간. 기본 0 */
+  start?: number;
+  /** 띠 오른쪽 끝의 시간. 없으면 가장 늦게 끝나는 구간 */
+  end?: number;
+  /** 모든 줄을 가로지르는 세로선(예: 배포 시각) */
+  marks?: TimelineMark[];
+  /** 아래 시간축 눈금 */
+  ticks?: TimelineTick[];
+}
+
+const { lanes, ariaLabel, start, end, marks, ticks } = Astro.props;
+const layout = layoutTimeline(lanes, { start, end, marks, ticks });
+// 선 이름 줄이 없으면 첫 줄을 비워 두지 않는다. 빈 줄에도 줄 간격이 붙는다.
+const head = layout.marks.length > 0 ? 1 : 0;
+const laneRow = (i: number) => i + 1 + head;
+---
+<div class="timeline" role="img" aria-label={ariaLabel} data-timeline>
+  {
+    head > 0 && (
+      <div class="tl-head" style="grid-row:1">
+        {layout.marks.map((m) => (
+          <span class={`tl-mark-label tone-${m.tone} align-${m.align}`} style={`left:${m.left}%`}>
+            {m.label}
+          </span>
+        ))}
+      </div>
+    )
+  }
+  {
+    layout.lanes.map((lane, i) => (
+      <>
+        <span class="tl-lane-label" style={`grid-row:${laneRow(i)}`}>{lane.label}</span>
+        <span class="tl-track" style={`grid-row:${laneRow(i)}`}>
+          {lane.segments.map((s) => (
+            <span class={`tl-seg tone-${s.tone}`} style={`left:${s.left}%;width:${s.width}%`}>
+              {s.label && <span class="tl-seg-label">{s.label}</span>}
+            </span>
+          ))}
+        </span>
+      </>
+    ))
+  }
+  {
+    head > 0 && (
+      <span class="tl-lines" style={`grid-row:${laneRow(0)} / span ${layout.lanes.length}`}>
+        {layout.marks.map((m) => (
+          <span class={`tl-line tone-${m.tone}`} style={`left:${m.left}%`} />
+        ))}
+      </span>
+    )
+  }
+  {
+    layout.ticks.length > 0 && (
+      <div class="tl-axis" style={`grid-row:${laneRow(layout.lanes.length)}`}>
+        {layout.ticks.map((t) => (
+          <span class={`tl-tick align-${t.align}`} style={`left:${t.left}%`}>
+            {t.label}
+          </span>
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  /* 왼쪽에 줄 이름, 오른쪽에 띠를 둔다. 세로선은 띠 칸 전체에 겹쳐 그려 모든 줄을 가로지른다. */
+  .timeline {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 10px;
+    row-gap: 8px;
+    align-items: center;
+  }
+
+  .tl-head,
+  .tl-track,
+  .tl-lines,
+  .tl-axis {
+    grid-column: 2;
+    position: relative;
+  }
+
+  .tl-head {
+    height: 16px;
+  }
+
+  .tl-lane-label {
+    grid-column: 1;
+    font-size: 13px;
+    color: var(--color-text-sub);
+    white-space: nowrap;
+  }
+
+  .tl-track {
+    height: 26px;
+    border-radius: 6px;
+    background: var(--color-card);
+  }
+
+  .tl-seg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 6px;
+  }
+
+  .tl-seg.tone-sub {
+    background: var(--color-line);
+  }
+
+  .tl-seg.tone-accent {
+    background: var(--color-accent-weak);
+    box-shadow: inset 0 0 0 1.5px var(--color-accent);
+  }
+
+  .tl-seg.tone-warn {
+    background: var(--color-warn-weak);
+    box-shadow: inset 0 0 0 1.5px var(--color-warn);
+  }
+
+  .tl-seg-label {
+    padding: 0 4px;
+    overflow: hidden;
+    font-size: 11px;
+    color: var(--color-text);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .tl-lines {
+    align-self: stretch;
+    pointer-events: none;
+  }
+
+  .tl-line {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    border-left: 1.5px dashed var(--color-text-weak);
+  }
+
+  .tl-line.tone-accent {
+    border-left-color: var(--color-accent);
+  }
+
+  .tl-line.tone-warn {
+    border-left-color: var(--color-warn);
+  }
+
+  .tl-mark-label,
+  .tl-tick {
+    position: absolute;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .tl-mark-label {
+    bottom: 0;
+    color: var(--color-text-sub);
+  }
+
+  .tl-mark-label.tone-accent {
+    color: var(--color-accent);
+  }
+
+  .tl-mark-label.tone-warn {
+    color: var(--color-warn);
+  }
+
+  .tl-axis {
+    height: 18px;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .tl-tick {
+    top: 3px;
+    color: var(--color-text-weak);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 양 끝의 글자는 띠 밖으로 나가지 않게 안쪽으로 붙인다 */
+  .align-center {
+    transform: translateX(-50%);
+  }
+
+  .align-end {
+    transform: translateX(-100%);
+  }
+</style>

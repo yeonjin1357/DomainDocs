@@ -14,3 +14,9 @@
 - SVI는 Cisco가 쓰는 이름이라 "Cisco는 이렇게 불러요"로만 썼어요.
 - 「모니터링에서는」의 인터페이스 이름(Gi1/0/1, Vlan10)은 예시예요.
 - 함께 한 것: 용어 vlan, vlan-tag, access-port, trunk-port, native-vlan, svi를 올리고, 네트워크 개요와 「스위치와 라우터」에 이 글을 이었어요. 퀴즈 5문제를 썼어요.
+
+## 2026-10-29 보강
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 802.1Q 태그의 1비트는 DEI(Drop eligible indicator), 예전 이름 CFI | https://en.wikipedia.org/wiki/IEEE_802.1Q |

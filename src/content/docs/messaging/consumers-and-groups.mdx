@@ -79,24 +79,33 @@ updated: 2026-10-21
 
 같은 `group.id`를 쓴 컨슈머들은 하나의 <Term term="messaging/consumer-group">컨슈머 그룹</Term>이 돼요. 그룹은 토픽의 파티션을 구성원에게 나눠 주고, 파티션 하나는 그룹 안의 컨슈머 하나에게만 가요.
 
-<Figure caption="파티션 4개를 컨슈머 2개가 둘씩 나눠 맡아요. 다른 그룹은 같은 파티션을 자기 위치에서 따로 읽어요.">
+<Figure caption="파티션 4개를 그룹마다 컨슈머 2개가 둘씩 나눠 맡아요. 그룹 A와 그룹 B는 같은 파티션을 자기 위치에서 따로 읽어요.">
   <Flow
-    ariaLabel="파티션 0과 1은 그룹 A의 컨슈머 1이, 파티션 2와 3은 그룹 A의 컨슈머 2가 맡는 구조도"
+    ariaLabel="가운데 파티션 0부터 3이 있고, 오른쪽 그룹 A의 컨슈머 1이 파티션 0과 1을, 컨슈머 2가 파티션 2와 3을 맡으며, 왼쪽 그룹 B도 같은 방식으로 같은 파티션을 따로 읽는 구조도"
     nodes={[
-      { id: 'p0', label: '파티션 0', col: 0, row: 0 },
-      { id: 'p1', label: '파티션 1', col: 0, row: 1 },
-      { id: 'p2', label: '파티션 2', col: 0, row: 2 },
-      { id: 'p3', label: '파티션 3', col: 0, row: 3 },
-      { id: 'c1', label: '컨슈머 1', col: 2, row: 0, tone: 'accent' },
-      { id: 'c2', label: '컨슈머 2', col: 2, row: 3, tone: 'accent' },
+      { id: 'p0', label: '파티션 0', col: 1, row: 0 },
+      { id: 'p1', label: '파티션 1', col: 1, row: 1 },
+      { id: 'p2', label: '파티션 2', col: 1, row: 2 },
+      { id: 'p3', label: '파티션 3', col: 1, row: 3 },
+      { id: 'a1', label: '컨슈머 1', col: 2, row: 0, tone: 'accent', note: '주문 처리' },
+      { id: 'a2', label: '컨슈머 2', col: 2, row: 3, tone: 'accent', note: '주문 처리' },
+      { id: 'b1', label: '컨슈머 1', col: 0, row: 0, note: '통계 집계' },
+      { id: 'b2', label: '컨슈머 2', col: 0, row: 3, note: '통계 집계' },
     ]}
     edges={[
-      { from: 'p0', to: 'c1' },
-      { from: 'p1', to: 'c1' },
-      { from: 'p2', to: 'c2' },
-      { from: 'p3', to: 'c2' },
+      { from: 'p0', to: 'a1', tone: 'accent' },
+      { from: 'p1', to: 'a1', tone: 'accent' },
+      { from: 'p2', to: 'a2', tone: 'accent' },
+      { from: 'p3', to: 'a2', tone: 'accent' },
+      { from: 'p0', to: 'b1' },
+      { from: 'p1', to: 'b1' },
+      { from: 'p2', to: 'b2' },
+      { from: 'p3', to: 'b2' },
     ]}
-    groups={[{ label: '그룹 A', cols: [2, 2], rows: [0, 3] }]}
+    groups={[
+      { label: '그룹 A', cols: [2, 2], rows: [0, 3] },
+      { label: '그룹 B', cols: [0, 0], rows: [0, 3] },
+    ]}
   />
 </Figure>
 

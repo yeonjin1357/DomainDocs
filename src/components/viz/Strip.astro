@@ -1,0 +1,180 @@
+---
+import { layoutStrip, type StripMark, type StripRange, type StripRow } from '../../lib/viz/strip';
+
+interface Props {
+  /** 위에서부터 그릴 줄. 줄마다 칸 글자들(예: 오프셋 0, 1, 2) */
+  rows: StripRow[];
+  ariaLabel: string;
+  /** 칸 하나를 위에서 가리키는 표시 */
+  marks?: StripMark[];
+  /** 여러 칸을 아래에서 묶는 괄호 */
+  ranges?: StripRange[];
+}
+
+const { rows, ariaLabel, marks, ranges } = Astro.props;
+const layout = layoutStrip(rows, marks, ranges);
+// 첫 칸과 끝 칸의 표시 글자는 그림 밖으로 나가지 않게 안쪽으로 붙인다.
+const alignOf = (column: number) => (column === 1 ? 'start' : column === layout.columns ? 'end' : 'center');
+---
+<div class="strip" role="img" aria-label={ariaLabel} data-strip style={`--cols:${layout.columns}`}>
+  {
+    layout.rows.map((r) => (
+      <div class="strip-row">
+        {r.label && <span class="strip-row-label">{r.label}</span>}
+        {r.marks.length > 0 && (
+          <div class="strip-grid">
+            {r.marks.map((m) => (
+              <span class={`strip-mark tone-${m.tone} align-${alignOf(m.column)}`} style={`grid-column:${m.column}`}>
+                <span class="strip-mark-text">{m.label}</span>
+                <span class="strip-mark-arrow" />
+              </span>
+            ))}
+          </div>
+        )}
+        <div class="strip-grid">
+          {r.cells.map((c) => (
+            <span class={`strip-cell tone-${c.tone ?? 'plain'}`}>{c.label}</span>
+          ))}
+        </div>
+        {r.ranges.length > 0 && (
+          <div class="strip-grid">
+            {r.ranges.map((g) => (
+              <span class={`strip-range tone-${g.tone}`} style={`grid-column:${g.column} / span ${g.span}`}>
+                <span class="strip-range-bracket" />
+                <span class="strip-range-text">{g.label}</span>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .strip {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .strip-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .strip-row-label {
+    font-size: 13px;
+    color: var(--color-text-sub);
+  }
+
+  /* 줄마다 같은 칸 수로 나눠서, 줄이 달라도 같은 번호의 칸이 위아래로 맞는다 */
+  .strip-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .strip-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    overflow: hidden;
+    border: 1.5px solid var(--color-line);
+    border-radius: 6px;
+    background: var(--color-card);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .strip-cell.tone-accent {
+    border-color: var(--color-accent);
+    background: var(--color-accent-weak);
+  }
+
+  .strip-cell.tone-warn {
+    border-color: var(--color-warn);
+    background: var(--color-warn-weak);
+  }
+
+  /* 지나간 칸, 지워질 칸처럼 흐리게 보일 칸 */
+  .strip-cell.tone-sub {
+    border-style: dashed;
+    background: transparent;
+    color: var(--color-text-weak);
+  }
+
+  .strip-mark {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    color: var(--color-text-sub);
+  }
+
+  .strip-mark.tone-accent {
+    color: var(--color-accent);
+  }
+
+  .strip-mark.tone-warn {
+    color: var(--color-warn);
+  }
+
+  /* 칸보다 긴 글자는 양옆으로 넘치게 둔다. 화살촉만 칸 가운데에 맞춘다. */
+  .strip-mark-text {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .strip-mark.align-start .strip-mark-text {
+    justify-content: flex-start;
+  }
+
+  .strip-mark.align-end .strip-mark-text {
+    justify-content: flex-end;
+  }
+
+  .strip-mark-arrow {
+    margin-top: 2px;
+    border: 5px solid transparent;
+    border-bottom: 0;
+    border-top-color: currentColor;
+  }
+
+  .strip-range {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    color: var(--color-text-sub);
+  }
+
+  .strip-range.tone-accent {
+    color: var(--color-accent);
+  }
+
+  .strip-range.tone-warn {
+    color: var(--color-warn);
+  }
+
+  .strip-range-bracket {
+    align-self: stretch;
+    height: 7px;
+    border: 1.5px solid currentColor;
+    border-top: 0;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .strip-range-text {
+    margin-top: 2px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+</style>

@@ -67,14 +67,18 @@ RDS의 다중 AZ 배포는 다른 가용 영역에 대기 서버를 자동으로
     nodes={[
       { id: 'app', label: '앱', col: 1, row: 0, tone: 'accent' },
       { id: 'pri', label: '주 DB', col: 0, row: 1, note: '읽기·쓰기' },
-      { id: 'stb', label: '대기 DB', col: 0, row: 2, note: '동기, 읽기 불가' },
-      { id: 'rep', label: '읽기 복제본', col: 2, row: 1, note: '비동기' },
+      { id: 'stb', label: '대기 DB', col: 0, row: 2, note: '동기 복제' },
+      { id: 'rep', label: '읽기 복제본', col: 2, row: 1, note: '비동기 복제' },
     ]}
     edges={[
       { from: 'app', to: 'pri', tone: 'accent' },
       { from: 'app', to: 'rep' },
       { from: 'pri', to: 'stb', dashed: true },
       { from: 'pri', to: 'rep', dashed: true },
+    ]}
+    groups={[
+      { label: '가용 영역 a', cols: [0, 0], rows: [1, 1] },
+      { label: '가용 영역 b', cols: [0, 0], rows: [2, 2] },
     ]}
   />
 </Figure>

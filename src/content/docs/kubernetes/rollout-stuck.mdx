@@ -6,7 +6,7 @@ type: guide
 order: 130
 icon: container
 keywords: [rollout stuck, 배포 멈춤, ProgressDeadlineExceeded, progressDeadlineSeconds, kubectl rollout status, rollout undo, 롤백, readiness, ImagePullBackOff, 롤링 업데이트]
-related: [kubernetes/workloads, kubernetes/pod-restarting, kubernetes/pod-pending, kubernetes/pod-status]
+related: [kubernetes/workloads, kubernetes/pod-restarting, kubernetes/pod-pending, kubernetes/pod-status, kubernetes/resource-quotas]
 sources:
   - title: Kubernetes — Deployments
     url: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
@@ -16,7 +16,7 @@ updated: 2026-10-21
 ---
 
 <Situation>
-  새 버전을 배포했는데 20분째 끝나지 않아요. 파드 4개 중 새 버전은 1개뿐이고, 그마저 준비되지 않았어요. 옛 버전 파드 3개가 아직 요청을 받고 있어요.
+  새 버전을 배포했는데 20분째 끝나지 않아요. 원하는 파드는 3개인데 새 버전은 1개만 떴고, 그마저 준비되지 않았어요. 옛 버전 파드 3개가 아직 요청을 받고 있어요.
 
   롤링 업데이트는 새 파드가 준비돼야 다음으로 넘어가요. 그래서 새 파드가 준비되지 못하면 배포가 그 자리에 멈춰요. 서비스는 아직 옛 버전으로 버티고 있어요.
 </Situation>
@@ -41,7 +41,8 @@ Deployment는 정해 둔 시간(`progressDeadlineSeconds`, 기본 600초) 동안
 
 | 새 파드 상태 | 흔한 이유 | 다음에 볼 곳 |
 | --- | --- | --- |
-| Pending | 자원·할당량이 모자라요 | <Term slug="kubernetes/pod-pending">파드가 Pending에 머물 때</Term> |
+| Pending | 노드에 자리가 모자라요 | <Term slug="kubernetes/pod-pending">파드가 Pending에 머물 때</Term> |
+| 새 파드가 아예 없음 | 할당량을 넘어 파드를 만들지 못해요 | <Term slug="kubernetes/resource-quotas">네임스페이스 할당량</Term> |
 | ImagePullBackOff | 이미지를 받지 못해요 | 이미지 이름·태그, 저장소 인증 |
 | CrashLoopBackOff | 새 버전이 시작하자마자 죽어요 | <Term slug="kubernetes/pod-restarting">파드가 계속 재시작될 때</Term> |
 | Running인데 준비 안 됨 | readiness 프로브가 실패해요 | 4단계 |
@@ -64,11 +65,13 @@ Deployment는 정해 둔 시간(`progressDeadlineSeconds`, 기본 600초) 동안
 
 **확인 방법**: `kubectl describe pod 새파드`의 Events에서 Unhealthy 기록과 프로브 실패 메시지를 봐요.
 
-<Figure caption="멈춘 배포의 예시예요. 원하는 파드 4개 중 새 버전 1개는 준비되지 못했고, 옛 버전 3개가 요청을 받고 있어요.">
-  <StatTile label="원하는 파드" value="4" unit="개" />
+<Figure caption="멈춘 배포의 예시예요. 원하는 파드는 3개예요. 새 버전 1개는 준비되지 못했고, 옛 버전 3개가 그대로 요청을 받고 있어요.">
+  <StatTile label="원하는 파드" value="3" unit="개" />
   <StatTile label="새 버전 준비됨" value="0" unit="/ 1개" tone="warn" />
   <StatTile label="옛 버전 준비됨" value="3" unit="개" />
 </Figure>
+
+원하는 수는 3개인데 파드가 4개인 건 롤링 업데이트의 기본값 때문이에요. maxSurge 25%는 올림해 1개를 더 띄우게 하고, maxUnavailable 25%는 내림해 0개라 옛 파드를 먼저 줄이지 않아요.
 
 <Checkpoints>
   <Check>배포 명령이 성공으로 끝났다고 배포가 끝났다고 판단했다면 다시 보세요. 명령은 원하는 상태를 적었을 뿐이에요. `kubectl rollout status`로 끝까지 확인해요.</Check>

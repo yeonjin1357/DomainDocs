@@ -32,6 +32,37 @@ test('계층도와 비교는 글자를 순서대로 보여 준다', async ({ pag
   await expect(page.locator('[data-compare] [data-compare-row]')).toHaveCount(2);
 });
 
+test('시간 띠는 줄마다 구간을 시간에 비례해 놓고, 세로선이 모든 줄을 가로지른다', async ({ page }) => {
+  const tl = page.getByRole('img', { name: '앱이 400ms부터 300ms 멈추고 요청이 그동안 기다리는 시간 띠' });
+  await expect(tl.locator('.tl-lane-label')).toHaveText(['앱', '요청']);
+  await expect(tl.locator('.tl-seg')).toHaveCount(4);
+  await expect(tl.locator('.tl-tick')).toHaveText(['0ms', '500ms', '1초']);
+  const track = await tl.locator('.tl-track').first().boundingBox();
+  const pause = await tl.locator('.tl-seg.tone-warn').boundingBox();
+  expect(Math.abs(pause!.x - (track!.x + track!.width * 0.4))).toBeLessThan(2);
+  expect(Math.abs(pause!.width - track!.width * 0.3)).toBeLessThan(2);
+  const line = await tl.locator('.tl-line').boundingBox();
+  const lastTrack = await tl.locator('.tl-track').nth(1).boundingBox();
+  expect(Math.abs(line!.x - pause!.x)).toBeLessThan(2);
+  expect(line!.y).toBeLessThanOrEqual(track!.y);
+  expect(line!.y + line!.height).toBeGreaterThanOrEqual(lastTrack!.y + lastTrack!.height);
+});
+
+test('칸 띠는 칸을 같은 폭으로 놓고, 표시와 괄호를 가리킨 칸에 맞춘다', async ({ page }) => {
+  const strip = page.getByRole('img', { name: '오프셋 0부터 5까지 중 커밋 위치는 3이고 3부터 5까지 3건이 지연인 칸 띠' });
+  await expect(strip.locator('.strip-row-label')).toHaveText('파티션 0');
+  await expect(strip.locator('.strip-cell')).toHaveText(['0', '1', '2', '3', '4', '5']);
+  await expect(strip.locator('.strip-cell.tone-warn')).toHaveCount(3);
+  const cell = await strip.locator('.strip-cell').nth(3).boundingBox();
+  const arrow = await strip.locator('.strip-mark-arrow').boundingBox();
+  expect(Math.abs(arrow!.x + arrow!.width / 2 - (cell!.x + cell!.width / 2))).toBeLessThan(2);
+  const last = await strip.locator('.strip-cell').nth(5).boundingBox();
+  const range = await strip.locator('.strip-range-bracket').boundingBox();
+  expect(Math.abs(range!.x - cell!.x)).toBeLessThan(2);
+  expect(Math.abs(range!.x + range!.width - (last!.x + last!.width))).toBeLessThan(2);
+  await expect(strip.locator('.strip-range-text')).toHaveText('지연 3건');
+});
+
 test('SVG 그림은 이름 붙은 그림이다', async ({ page }) => {
   await expect(page.getByRole('img', { name: '테스트용 SVG 그림' })).toBeVisible();
 });

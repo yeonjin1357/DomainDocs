@@ -57,26 +57,26 @@ updated: 2026-10-29
 
 ## Route: 바깥 요청을 서비스로
 
-<Figure caption="Route는 호스트 이름과 대상 서비스를 적어 둔 객체예요. 라우터가 Route를 읽어 바깥 요청을 서비스의 파드로 넘겨요.">
+<Figure caption="Route는 호스트 이름과 대상 서비스를 적어 둔 객체예요. 라우터는 서비스에서 파드 주소 목록만 얻고, 요청은 파드로 바로 넘겨요.">
   <Flow
-    ariaLabel="사용자의 요청이 라우터를 거쳐 서비스로 가고, 서비스가 파드 두 개로 넘기는 구조도"
+    ariaLabel="사용자의 요청이 라우터로 가고, 라우터가 서비스에서 파드 주소 목록을 얻어, 서비스를 거치지 않고 파드 두 개로 바로 넘기는 구조도"
     nodes={[
       { id: 'user', label: '사용자', col: 0, row: 0 },
       { id: 'router', label: '라우터', col: 1, row: 0, note: 'HAProxy', tone: 'accent' },
-      { id: 'svc', label: '서비스', col: 2, row: 0 },
-      { id: 'p1', label: '파드 1', col: 1, row: 1 },
+      { id: 'svc', label: '서비스', col: 1, row: 1, note: '파드 주소 목록' },
+      { id: 'p1', label: '파드 1', col: 2, row: 0 },
       { id: 'p2', label: '파드 2', col: 2, row: 1 },
     ]}
     edges={[
-      { from: 'user', to: 'router' },
-      { from: 'router', to: 'svc' },
-      { from: 'svc', to: 'p1' },
-      { from: 'svc', to: 'p2' },
+      { from: 'user', to: 'router', tone: 'accent' },
+      { from: 'svc', to: 'router', label: '주소', dashed: true },
+      { from: 'router', to: 'p1', tone: 'accent' },
+      { from: 'router', to: 'p2', tone: 'accent' },
     ]}
   />
 </Figure>
 
-<Term term="kubernetes/openshift-route">Route</Term>에는 바깥에서 부를 호스트 이름과 대상 서비스를 적어요. 클러스터의 라우터가 Route를 읽어 요청을 그 서비스의 파드로 넘겨요. OpenShift 라우터의 기준 구현은 HAProxy예요.
+<Term term="kubernetes/openshift-route">Route</Term>에는 바깥에서 부를 호스트 이름과 대상 서비스를 적어요. 라우터는 그 서비스에 딸린 파드 주소(엔드포인트)를 읽어, 서비스 IP를 거치지 않고 파드로 바로 넘겨요. OpenShift 라우터의 기준 구현은 HAProxy예요.
 
 TLS를 어디서 풀지도 Route에 정해요.
 

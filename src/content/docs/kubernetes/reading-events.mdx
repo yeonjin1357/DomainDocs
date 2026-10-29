@@ -57,10 +57,12 @@ updated: 2026-10-21
 | 이유 | 뜻 | 다음에 볼 곳 |
 | --- | --- | --- |
 | FailedScheduling | 파드를 놓을 노드를 못 찾았어요 | <Term slug="kubernetes/pod-pending">파드가 Pending에 머물 때</Term> |
-| BackOff | 컨테이너가 죽어 다시 띄우기를 미루고 있어요 | <Term slug="kubernetes/pod-restarting">파드가 계속 재시작될 때</Term> |
+| BackOff(재시작) | 컨테이너가 죽어 다시 띄우기를 미루고 있어요 | <Term slug="kubernetes/pod-restarting">파드가 계속 재시작될 때</Term> |
 | Unhealthy | 프로브가 실패했어요 | <Term slug="kubernetes/pod-status">파드 상태와 재시작</Term> |
 | FailedMount | 볼륨을 붙이지 못했어요 | <Term slug="kubernetes/config-and-storage">설정과 저장소</Term> |
-| Failed(이미지) | 이미지를 받지 못했어요 | 이미지 이름·태그와 인증 정보 |
+| Failed, BackOff(이미지) | 이미지를 받지 못해 다시 받기를 미뤄요 | 이미지 이름·태그와 인증 정보 |
+
+BackOff라는 이유는 두 곳에서 함께 써요. 메시지에 `restarting failed container`가 있으면 재시작, `pulling image`가 있으면 이미지 받기예요.
 
 같은 시각에 여러 객체에서 같은 이유가 쏟아진다면, 파드 하나보다 공통 원인을 먼저 봐요. 예를 들어 여러 노드의 파드가 동시에 Unhealthy라면 그 파드들이 함께 기대는 DB나 네트워크를 봐요.
 

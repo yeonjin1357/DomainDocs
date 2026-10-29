@@ -34,19 +34,21 @@ updated: 2026-10-21
 
 ## 스레드 풀은 이렇게 움직여요
 
-<Figure caption="요청은 빈 스레드가 있으면 바로 처리되고, 없으면 대기열에서 기다려요. 대기열이 가득 차면 거부돼요.">
+<Figure caption="자바 표준 스레드 풀의 순서예요. 기본 스레드가 다 바쁘면 대기열에 넣고, 대기열이 차야 max까지 스레드를 늘려요. 그래도 넘치면 거부해요.">
   <Flow
-    ariaLabel="요청이 스레드 풀로 가고, 스레드가 다 바쁘면 대기열로, 대기열이 가득 차면 거부로 이어지는 구조도"
+    ariaLabel="요청이 기본 스레드로 가고, 기본 스레드가 다 바쁘면 대기열로, 대기열이 가득 차면 스레드를 최대 수까지 늘리고, 그것도 넘으면 거부로 이어지는 구조도"
     nodes={[
       { id: 'req', label: '요청', col: 0, row: 0 },
-      { id: 'pool', label: '스레드 풀', col: 1, row: 0, note: '빈 스레드가 맡음', tone: 'accent' },
+      { id: 'core', label: '기본 스레드', col: 1, row: 0, note: 'core 수만큼', tone: 'accent' },
       { id: 'queue', label: '대기열', col: 1, row: 1, note: '차례를 기다림' },
-      { id: 'reject', label: '거부', col: 1, row: 2, tone: 'warn' },
+      { id: 'extra', label: '추가 스레드', col: 1, row: 2, note: 'max까지' },
+      { id: 'reject', label: '거부', col: 1, row: 3, tone: 'warn' },
     ]}
     edges={[
-      { from: 'req', to: 'pool', tone: 'accent' },
-      { from: 'pool', to: 'queue', label: '다 바쁘면' },
-      { from: 'queue', to: 'reject', label: '가득 차면', tone: 'warn' },
+      { from: 'req', to: 'core', tone: 'accent' },
+      { from: 'core', to: 'queue', label: '다 바쁘면' },
+      { from: 'queue', to: 'extra', label: '가득 차면' },
+      { from: 'extra', to: 'reject', label: 'max도 차면', tone: 'warn' },
     ]}
   />
 </Figure>
@@ -56,6 +58,8 @@ updated: 2026-10-21
 자바의 표준 스레드 풀(`ThreadPoolExecutor`)은 이 순서로 움직여요. 기본 스레드 수(core)보다 적게 돌고 있으면 새 스레드를 만들어요. 기본 수만큼 돌고 있으면 새 일을 <Term term="apm/request-queue">대기열</Term>에 넣어요.
 
 대기열에도 못 넣으면 최대 수(max)까지 스레드를 늘리고, 그것도 넘으면 거부해요.
+
+톰캣의 요청 처리 스레드 풀은 순서가 달라요. 대기열에 넣기 전에 스레드부터 maxThreads까지 늘려요. 스레드가 다 찬 뒤에야 줄을 세워요.
 
 ## 동시에 몇 개가 필요할까요
 

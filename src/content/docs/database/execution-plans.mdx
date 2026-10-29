@@ -33,7 +33,7 @@ updated: 2026-10-15
   <Point title="실행 계획은 노드를 쌓은 나무예요">
     `EXPLAIN`은 DB가 SQL을 실행하려고 고른 방법을 노드 나무로 보여 줘요. 맨 아래 노드는 표에서 행을 읽어요. 전체를 훑는 Seq Scan, 인덱스로 찾는 Index Scan이 그 예예요.
 
-    그 위 노드는 아래에서 올라온 행을 합치거나(Join) 정렬해요. 줄마다 붙는 `cost`는 시간이 아니라 플래너가 쓰는 임의 단위예요.
+    그 위 노드는 아래에서 올라온 행을 합치거나(Join) 정렬해요. 줄마다 붙는 `cost`는 시간이 아니라 플래너가 쓰는 임의 단위예요. 계획이 SQL 실행의 어디쯤에서 정해지는지는 <Term slug="database/query-processing">SQL이 실행되는 과정</Term>에서 다뤄요.
   </Point>
   <Point title="예상과 실제 행 수가 다른 곳을 찾아요">
     `EXPLAIN ANALYZE`는 SQL을 실제로 실행해, 노드마다 걸린 시간과 실제 행 수를 함께 보여 줘요. PostgreSQL 문서는 예상 행 수가 실제와 가까운지가 보통 가장 중요하다고 해요.

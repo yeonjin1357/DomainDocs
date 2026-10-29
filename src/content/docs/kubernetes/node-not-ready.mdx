@@ -47,7 +47,7 @@ Unknown이라면 노드 쪽 kubelet이 컨트롤 플레인과 연락이 끊긴 �
 
 ## 2. 압박 조건이 켜졌는지 보세요
 
-Ready 말고도 노드는 자원 압박을 조건으로 알려요.
+Ready 말고도 노드는 자원 압박을 따로 조건으로 알려요. 압박만으로는 NotReady가 되지 않아서, Ready가 True인 채 이 조건만 켜져 있기도 해요. 대신 새 파드가 오지 않도록 노드에 taint가 붙어요.
 
 | 조건 | True일 때 |
 | --- | --- |
@@ -63,14 +63,23 @@ Ready 말고도 노드는 자원 압박을 조건으로 알려요.
 
 노드가 NotReady나 연락 끊김이 되면, 쿠버네티스는 그 노드에 taint를 붙여요. 그리고 파드마다 이 taint를 5분(300초) 동안 견디는 toleration을 자동으로 붙여 둬요.
 
-<Figure caption="노드 연락이 끊긴 뒤의 흐름이에요. 50초 동안 소식이 없으면 Unknown이 되고, 5분을 더 견딘 뒤 파드가 쫓겨나 다른 노드에 새로 떠요.">
-  <Waterfall
-    ariaLabel="노드 연락이 끊긴 뒤 50초 동안 기다려 Unknown이 되고, 그 뒤 300초 동안 파드가 노드에 남아 있다가, 쫓겨난 뒤 다른 노드에 새 파드가 뜨는 타임라인"
-    unit="초"
-    spans={[
-      { label: '연락 끊김 → Unknown', start: 0, duration: 50, tone: 'warn' },
-      { label: '파드가 노드에 남아 있음', start: 50, duration: 300 },
-      { label: '쫓겨나고 다른 노드에 새로 뜸', start: 350, duration: 40, tone: 'accent' },
+<Figure caption="노드 연락이 끊긴 뒤의 흐름이에요. 처음 50초는 마지막 값(Ready)으로 보이다가 Unknown이 돼요. 5분을 더 견딘 뒤 파드가 쫓겨나고, 다른 노드에 새로 떠요.">
+  <Timeline
+    ariaLabel="0초에 노드 연락이 끊기고, 50초에 노드가 Unknown이 되며 taint가 붙고, 옛 파드는 350초까지 Running으로 보이다 쫓겨나고, 그 직후 다른 노드에 새 파드가 뜨는 시간 띠"
+    end={460}
+    lanes={[
+      { label: '노드', segments: [{ start: 0, end: 50 }, { start: 50, end: 460, label: 'Unknown', tone: 'warn' }] },
+      { label: '옛 파드', segments: [{ start: 0, end: 350, label: 'Running으로 보임' }, { start: 350, end: 460, label: '쫓겨남', tone: 'warn' }] },
+      { label: '새 파드', segments: [{ start: 355, end: 460, label: '새로 뜸', tone: 'accent' }] },
+    ]}
+    marks={[
+      { at: 50, label: 'taint', tone: 'warn' },
+      { at: 350, label: '5분 뒤', tone: 'warn' },
+    ]}
+    ticks={[
+      { at: 0, label: '끊김' },
+      { at: 50, label: '50초' },
+      { at: 350, label: '350초' },
     ]}
   />
 </Figure>

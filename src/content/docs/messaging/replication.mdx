@@ -44,7 +44,7 @@ Kafka는 토픽의 파티션마다 복제본을 여러 브로커에 둬요. 복�
 
 <Figure caption="복제 계수 3인 파티션이에요. 리더는 브로커 1에, 팔로워는 브로커 2와 3에 있어요. 팔로워들이 리더에게서 이벤트를 가져가요.">
   <Flow
-    ariaLabel="프로듀서가 브로커 1의 리더에 쓰고, 브로커 2와 브로커 3의 팔로워가 리더에게서 이벤트를 가져가는 구조도"
+    ariaLabel="프로듀서가 브로커 1의 리더에 쓰고, 브로커 2와 브로커 3의 팔로워가 리더에게서 이벤트를 가져가 복사본을 만드는 구조도"
     nodes={[
       { id: 'prod', label: '프로듀서', col: 0, row: 1 },
       { id: 'lead', label: '리더', col: 1, row: 1, tone: 'accent', note: '브로커 1' },
@@ -53,8 +53,8 @@ Kafka는 토픽의 파티션마다 복제본을 여러 브로커에 둬요. 복�
     ]}
     edges={[
       { from: 'prod', to: 'lead', tone: 'accent' },
-      { from: 'f1', to: 'lead', dashed: true },
-      { from: 'f2', to: 'lead', dashed: true },
+      { from: 'lead', to: 'f1', label: '가져감', dashed: true },
+      { from: 'lead', to: 'f2', label: '가져감', dashed: true },
     ]}
   />
 </Figure>

@@ -28,7 +28,7 @@ updated: 2026-10-15
   <Point title="액티브 세션은 일하거나 기다리는 세션이에요">
     DB에 붙은 세션 대부분은 다음 명령을 기다리며 쉬어요. 액티브 세션은 그중 쿼리를 실행하고 있는 세션이에요. PostgreSQL에서는 `pg_stat_activity`의 `state`가 `active`인 세션이에요.
 
-    액티브 세션 수는 DB가 동시에 처리하는 일의 양이에요. Oracle은 이 수의 평균을 평균 액티브 세션(AAS)이라 부르고, 세션들이 쓴 시간의 합(DB time)을 경과 시간으로 나눠 구해요.
+    액티브 세션 수는 DB가 동시에 처리하는 일의 양이에요. Oracle은 이 수의 평균을 평균 액티브 세션(AAS)이라 부르고, 세션들이 쓴 시간의 합(DB time)을 경과 시간으로 나눠 구해요. 세션 자체는 <Term slug="database/connections-and-sessions">연결과 세션</Term>에서 다뤄요.
   </Point>
   <Point title="대기 이벤트가 무엇을 기다리는지 알려 줘요">
     액티브 세션은 CPU에서 실행 중이거나, 무언가를 기다려요. PostgreSQL은 기다리는 대상을 `wait_event_type`으로 나눠요. 잠금은 Lock, 디스크 읽기·쓰기는 IO, 공유 메모리 구조는 LWLock이에요.

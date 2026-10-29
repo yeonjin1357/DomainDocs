@@ -166,7 +166,7 @@ updated: 2026-10-21
 
 ## 어떻게 동작하나요
 
-순서가 있으면 `Sequence`로, 층이 있으면 `Layers`로 그려요.
+순서가 있으면 `Sequence`로, 층이 있으면 `Layers`로 그려요. 시간이 흐르며 상태가 바뀌면 `Timeline`으로, 번호 붙은 칸의 위치(오프셋, 버킷)를 짚으면 `Strip`으로 그려요.
 
 ## 모니터링에서는
 
@@ -300,8 +300,10 @@ updated: 2026-10-13
 | `ServiceMap` | `nodes`, `edges`, `ariaLabel`, `height?` | 서비스 맵. `nodes`는 `{ id, label, x, y, note?, tone?, virtual? }`(x·y는 %), `edges`는 `{ from, to, label?, tone? }` 배열이에요. 화살표가 없어서 부르는 쪽을 왼쪽에 두고 `caption`에 밝혀요. `virtual`은 점선으로 그려요 |
 | `Flow` | `nodes`, `edges`, `ariaLabel`, `groups?` | 구조도(화살표 있는 상자). `nodes`는 `{ id, label, col, row, note?, tone? }`(칸 위치), `edges`는 `{ from, to, label?, tone?, both?, dashed? }`, `groups`는 `{ label, cols: [시작, 끝], rows: [시작, 끝] }` 배열이에요. 한 줄에 3칸까지가 360px에서 읽혀요. 상자 이름은 8자 안팎으로 써요. 글자를 붙인 가로 화살표는 상자 사이에 빈 칸을 하나 둬요. 묶음(groups) 테두리를 지나는 화살표에는 글자를 붙이지 않아요. 테두리 위의 묶음 이름과 겹쳐요 |
 | `Sequence` | `participants`, `messages`, `ariaLabel` | 주고받기 순서. 참여자 2~4명, `messages`는 `{ from, to, label, tone?, dashed? }` 배열이고 위에서 아래로 시간 순이에요. 돌아오는 응답은 `dashed`로 그려요 |
-| `Layers` | `layers`, `ariaLabel` | 계층도. `layers`는 위층부터 `{ label, note?, tone? }` 배열이에요 |
+| `Layers` | `layers`, `ariaLabel` | 계층도. `layers`는 위층부터 `{ label, note?, tone? }` 배열이에요. 위아래로 기대는 층에만 써요. 나란히 있는 것은 `Flow`로 그려요 |
 | `Compare` | `columns`, `rows` | 두 가지 비교. `columns`는 두 열 이름, `rows`는 `{ label, values: [왼쪽, 오른쪽] }` 배열이에요 |
+| `Timeline` | `lanes`, `ariaLabel`, `start?`, `end?`, `marks?`, `ticks?` | 시간 띠. `lanes`는 `{ label, segments: [{ start, end, label?, tone? }] }` 배열이고, 줄마다 시간에 비례한 구간을 그려요. `marks`(`{ at, label, tone? }`)는 모든 줄을 가로지르는 세로선, `ticks`(`{ at, label }`)는 아래 시간축 눈금이에요. 줄 이름은 6자 안팎, 구간 글자는 띠 안에 들어갈 만큼 짧게 써요. 같은 줄 이름이나 눈금 글자가 360px에서 겹치지 않는지 확인해요 |
+| `Strip` | `rows`, `ariaLabel`, `marks?`, `ranges?` | 칸 띠. `rows`는 `{ label?, cells }` 배열이고, `cells`는 글자나 `{ label, tone? }`예요. 칸은 12개까지예요. `marks`(`{ row?, at, label, tone? }`)는 칸 하나를 위에서 가리키고, `ranges`(`{ row?, from, to, label, tone? }`)는 여러 칸을 아래에서 묶어요. 번호는 모두 0부터예요. 칸 `tone: 'sub'`는 지나간 칸이나 빈자리처럼 흐리게 그려요 |
 | SVG 그림 | `aria-label` | 위 그림으로 안 되는 그림은 `src/assets/figures/{domain}/{name}.svg`에 그려 default import해요. `Figure` 안에 두고 `aria-label`을 꼭 붙여요. 색은 `currentColor`나 `var(--color-…)`만 써야 다크 모드에서도 보여요 |
 | `PercentileDemo`, `DownsamplingDemo` | 없음 | 직접 만져 보는 데모. default import 후 `client:visible`로 써요 |
 
