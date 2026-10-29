@@ -23,7 +23,7 @@ sources:
     url: https://opentelemetry.io/docs/specs/otel/metrics/sdk/
   - title: OpenTelemetry Collector — Tail Sampling Processor
     url: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/tailsamplingprocessor/README.md
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <OnDashboard title="주문 API · 최근 5분 · 요청 10,000건" caption="에러 트레이스는 모두 남기고 나머지는 10%만 남겼어요. 남은 트레이스로 센 에러율이 실제의 열 배 가까이 부풀었어요.">
@@ -33,21 +33,62 @@ updated: 2026-10-14
 
 <KeyPoints>
   <Point title="트레이스로 센 수는 샘플링만큼 줄어요">
-    요청을 시작할 때 남길지 정하는 <Term slug="foundations/logs-metrics-traces">head 샘플링</Term>으로 10%만 남기면, 저장된 트레이스는 요청의 10%예요. 그래서 트레이스 개수로 센 처리량은 실제의 1/10이에요.
-
-    Elastic은 head 샘플 비율의 역수를 곱해 전체를 어림해요. 비율이 5%면 트레이스 하나를 20건으로 세요. OpenTelemetry는 이 값을 adjusted count(보정 개수)라 부르고, 1/확률로 정해요.
+    head 샘플링으로 10%만 남기면, 트레이스로 센 처리량도 실제의 1/10이에요. 비율의 역수를 곱하면 전체를 어림해요.
   </Point>
   <Point title="tail 샘플링은 비율을 비틀어요">
-    span을 다 모은 뒤 정하는 tail 샘플링은 에러와 느린 트레이스를 더 남기게 짤 수 있어요. 그러면 남은 트레이스로 센 에러율과 p99는 실제보다 나빠 보여요. 그림에서는 0.5%가 4.8%가 됐어요.
-
-    이렇게 고른 트레이스는 비율을 곱해도 바로잡을 수 없어요. 에러라서 남긴 것처럼 확률로 고르지 않은 span에는 보정 개수가 정의되지 않아요.
+    에러와 느린 트레이스를 더 남기면, 남은 트레이스가 실제보다 나빠 보여요. 비율을 곱해도 바로잡을 수 없어요.
   </Point>
   <Point title="APM 지표는 샘플링 전에 세요">
-    그래서 요청 수, 에러 수, 응답시간 지표는 샘플링하기 전의 모든 요청으로 세요. Datadog은 이 지표를 샘플링 설정과 상관없이 모든 트래픽으로 계산해요. Elastic도 tail 샘플링이면 남길지와 상관없이 모든 이벤트로 지표를 계산해요.
+    요청 수, 에러 수, 응답시간 지표는 샘플링하기 전의 모든 요청으로 세요.
   </Point>
 </KeyPoints>
 
-<Figure caption="위 그림의 숫자가 나온 길이에요. 지표는 나누기 전 10,000건으로 세서 에러율 0.5%예요. 에러는 모두, 정상은 10%만 남기면 남은 트레이스의 에러율은 4.8%로 부풀어요.">
+## 트레이스로 센 수는 샘플링만큼 줄어요
+
+요청을 시작할 때 남길지 정하는 <Term slug="foundations/logs-metrics-traces">head 샘플링</Term>으로 10%만 남기면, 저장된 트레이스는 요청의 10%예요. 그래서 트레이스 개수로 센 처리량은 실제의 1/10이에요.
+
+<Figure caption="head 샘플링 10%의 예시예요. 요청 10건 중 1건만 트레이스로 남아요. 남은 1건에 10을 곱하면 요청 10건을 어림해요.">
+  <Strip
+    ariaLabel="요청 10건 중 첫 번째만 트레이스로 남기고 나머지 9건은 버리며, 남은 1건에 10을 곱해 요청 10건으로 어림하는 칸 띠"
+    rows={[
+      {
+        label: '요청 10건(head 10%)',
+        cells: [{ label: '1', tone: 'accent' }, { label: '2', tone: 'sub' }, { label: '3', tone: 'sub' }, { label: '4', tone: 'sub' }, { label: '5', tone: 'sub' }, { label: '6', tone: 'sub' }, { label: '7', tone: 'sub' }, { label: '8', tone: 'sub' }, { label: '9', tone: 'sub' }, { label: '10', tone: 'sub' }],
+      },
+    ]}
+    marks={[{ at: 0, label: '남김' }]}
+    ranges={[
+      { from: 1, to: 9, label: '버린 9건' },
+      { from: 0, to: 9, label: '남은 1건 × 10 = 10건', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+Elastic은 head 샘플 비율의 역수를 곱해 전체를 어림해요. 비율이 5%면 트레이스 하나를 20건으로 세요. OpenTelemetry는 이 값을 adjusted count(보정 개수)라 부르고, 1/확률로 정해요.
+
+## tail 샘플링은 비율을 비틀어요
+
+span을 다 모은 뒤 정하는 tail 샘플링은 에러와 느린 트레이스를 더 남기게 짤 수 있어요. 그러면 남은 트레이스로 센 에러율과 p99는 실제보다 나빠 보여요. 맨 위 대시보드에서는 0.5%가 4.8%가 됐어요.
+
+이렇게 고른 트레이스는 비율을 곱해도 바로잡을 수 없어요. 에러라서 남긴 것처럼 확률로 고르지 않은 span에는 보정 개수가 정의되지 않아요.
+
+<Figure caption="두 샘플링을 견줬어요. head는 확률로 고르니 비율을 곱해 되돌릴 수 있지만, 정책으로 고른 tail은 되돌릴 수 없어요.">
+  <Compare
+    columns={['head 샘플링', 'tail 샘플링']}
+    rows={[
+      { label: '정하는 때', values: ['요청을 시작할 때', 'span을 다 모은 뒤'] },
+      { label: '고르는 법', values: ['확률로 골라요', '정책으로 골라요(예: 에러는 모두)'] },
+      { label: '트레이스로 센 수', values: ['비율만큼 줄어요', '에러 쪽으로 쏠려요'] },
+      { label: '비율을 곱한 보정', values: ['돼요(보정 개수 = 1/확률)', '안 돼요'] },
+    ]}
+  />
+</Figure>
+
+## APM 지표는 샘플링 전에 세요
+
+그래서 요청 수, 에러 수, 응답시간 지표는 샘플링하기 전의 모든 요청으로 세요. Datadog은 이 지표를 샘플링 설정과 상관없이 모든 트래픽으로 계산해요. Elastic도 tail 샘플링이면 남길지와 상관없이 모든 이벤트로 지표를 계산해요.
+
+<Figure caption="맨 위 대시보드의 숫자가 나온 길이에요. 지표는 나누기 전 10,000건으로 세서 에러율 0.5%예요. 에러는 모두, 정상은 10%만 남기면 남은 트레이스의 에러율은 4.8%로 부풀어요.">
   <Flow
     ariaLabel="요청 10,000건으로 먼저 지표를 세어 에러율 0.5%를 얻고, 에러 50건은 모두 남기고 정상 9,950건은 10%인 995건만 남겨, 남은 1,045건으로 센 에러율이 4.8%가 되는 구조도"
     nodes={[

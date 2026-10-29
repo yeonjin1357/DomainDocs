@@ -39,7 +39,7 @@ sources:
     url: https://sre.google/sre-book/monitoring-distributed-systems/
   - title: Google SRE Workbook — Alerting on SLOs (burn rate, 지속 시간의 단점)
     url: https://sre.google/workbook/alerting-on-slos/
-updated: 2026-10-13
+updated: 2026-10-29
 ---
 
 <OnDashboard title="에러율 · 1분마다 평가 · 임계값 2%" caption="지속 시간이 없으면 2분·4분의 한 번짜리 스파이크까지 세 번 울려요. 지속 시간을 3분(for: 3m)으로 두면 7분부터 이어진 문제에만, 3분 늦은 10분에 한 번 울려요.">
@@ -54,30 +54,92 @@ updated: 2026-10-13
 
 <KeyPoints>
   <Point title="알림 조건은 질의·임계값·지속 시간이에요">
-    알림 규칙(alerting rule)은 질의 결과가 임계값을 넘는 상태가 정한 시간(지속 시간)만큼 이어지면 울려요. 조건이 처음 맞으면 pending(대기)이 되고, 정해진 간격(평가 간격)마다 다시 봐서 그 시간을 채우면 firing(울림)이에요. 그 전에 한 번이라도 조건이 깨지면 pending은 사라지고, 다음엔 처음부터 다시 세요.
-
-    ```yaml
-    - alert: HighErrorRate
-      expr: |
-        sum by (job) (rate(http_requests_total{status=~"5.."}[1m]))
-          / sum by (job) (rate(http_requests_total[1m]))
-          > 0.02
-      for: 3m
-    ```
-
-    Prometheus에선 `expr`에 질의와 임계값(0.02, 곧 2%)을, `for`에 지속 시간을 적어요. 이 질의는 15초마다 수집한 요청 <Term slug="foundations/counters-and-rate">카운터의 rate</Term>로 서비스(`job`)마다 구한 1분 에러율이에요. `by (job)`이 없으면 한 서비스의 에러가 다른 서비스 요청에 묻혀요.
+    질의 결과가 임계값을 넘는 상태가 지속 시간만큼 이어지면 울려요. 그 전에 조건이 깨지면 처음부터 다시 세요.
   </Point>
   <Point title="지속 시간은 흔들림과 늦음을 맞바꿔요">
-    지속 시간이 없으면 그림의 2분·4분처럼 한 번 튄 값(스파이크)에도 울리고, 1분 뒤 해제돼요. 울림과 해제를 되풀이하는 이런 알림을 flapping(흔들림)이라 해요. 너무 자주 울리면 사람들이 알림을 훑어보다가 진짜 문제도 놓쳐요.
-
-    `for: 3m`이면 스파이크는 거르고, 7분부터 이어진 문제에만 10분에 울려요. 대신 문제가 시작되고 3분 늦어요. `for: 5m`이면 5분 만에 끝난 이 문제엔 아예 울리지 않아요.
+    지속 시간이 없으면 스파이크에도 울리고, 길면 늦게 울리거나 아예 울리지 않아요.
   </Point>
   <Point title="원인보다 증상에 알림을 걸어요">
-    증상은 사용자가 겪는 일(에러, 느린 응답)이고, 원인은 그 이유(CPU 과부하, DB 연결 거부)예요. CPU 90% 알림은 사용자가 멀쩡해도 울릴 수 있고, CPU가 낮은 채 DB가 연결을 거부하면 조용해요.
-
-    그래서 Google SRE Book은 사람을 부르는 알림은 증상에 걸고, 원인은 문제를 찾을 때 보라고 해요. CPU 같은 <Term slug="foundations/red-and-use">원인 지표</Term>는 대시보드에 두고, 아주 분명하고 임박한 원인에만 알림을 걸어요. 증상 알림의 임계값은 <Term slug="foundations/slo-and-error-budget">SLO</Term>에서 정하면 근거가 생겨요.
+    사람을 부르는 알림은 사용자가 겪는 에러와 느린 응답에 걸어요. CPU 같은 원인은 대시보드에서 봐요.
   </Point>
 </KeyPoints>
+
+## 알림 조건은 질의·임계값·지속 시간이에요
+
+알림 규칙(alerting rule)은 질의 결과가 임계값을 넘는 상태가 정한 시간(지속 시간)만큼 이어지면 울려요. 조건이 처음 맞으면 pending(대기)이 되고, 정해진 간격(평가 간격)마다 다시 봐서 그 시간을 채우면 firing(울림)이에요. 그 전에 한 번이라도 조건이 깨지면 pending은 사라지고, 다음엔 처음부터 다시 세요.
+
+<Figure caption="지속 시간 3분 규칙을 1분마다 평가하는 예시예요. 2분에 조건이 한 번 깨지자 pending이 사라지고, 3분부터 다시 세서 6분에야 울려요.">
+  <Timeline
+    ariaLabel="지속 시간 3분 규칙에서 0분부터 조건이 맞아 pending이 되지만 2분에 한 번 깨져 사라지고, 3분부터 다시 맞아 3분을 채운 6분에 울리는 시간 띠"
+    end={8}
+    lanes={[
+      { label: '조건', segments: [{ start: 0, end: 2, label: '넘음', tone: 'accent' }, { start: 3, end: 8, label: '넘음', tone: 'accent' }] },
+      { label: '상태', segments: [{ start: 0, end: 2, label: 'pending' }, { start: 3, end: 6, label: 'pending' }, { start: 6, end: 8, label: '울림', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 3, label: '처음부터 다시 셈' }]}
+    ticks={[
+      { at: 0, label: '0분' },
+      { at: 2, label: '2분' },
+      { at: 3, label: '3분' },
+      { at: 6, label: '6분' },
+      { at: 8, label: '8분' },
+    ]}
+  />
+</Figure>
+
+```yaml
+- alert: HighErrorRate
+  expr: |
+    sum by (job) (rate(http_requests_total{status=~"5.."}[1m]))
+      / sum by (job) (rate(http_requests_total[1m]))
+      > 0.02
+  for: 3m
+```
+
+Prometheus에선 `expr`에 질의와 임계값(0.02, 곧 2%)을, `for`에 지속 시간을 적어요. 이 질의는 15초마다 수집한 요청 <Term slug="foundations/counters-and-rate">카운터의 rate</Term>로 서비스(`job`)마다 구한 1분 에러율이에요. `by (job)`이 없으면 한 서비스의 에러가 다른 서비스 요청에 묻혀요.
+
+## 지속 시간은 흔들림과 늦음을 맞바꿔요
+
+지속 시간이 없으면 맨 위 그래프의 2분·4분처럼 한 번 튄 값(스파이크)에도 울리고, 1분 뒤 해제돼요. 울림과 해제를 되풀이하는 이런 알림을 flapping(흔들림)이라 해요. 너무 자주 울리면 사람들이 알림을 훑어보다가 진짜 문제도 놓쳐요.
+
+`for: 3m`이면 스파이크는 거르고, 7분부터 이어진 문제에만 10분에 울려요. 대신 문제가 시작되고 3분 늦어요. `for: 5m`이면 5분 만에 끝난 이 문제엔 아예 울리지 않아요.
+
+<Figure caption="맨 위 그래프의 에러율을 1분마다 평가한 상태예요. 회색은 pending, 빨간색은 울림이에요. 지속 시간이 길수록 스파이크는 걸러지지만, 늦게 울리거나 아예 울리지 않아요.">
+  <Timeline
+    ariaLabel="같은 에러율에서 지속 시간이 없으면 2분, 4분, 7분에 세 번 울리고, for 3m은 2분과 4분의 pending을 거른 뒤 10분에 울려 12분에 해제되며, for 5m은 7분부터 12분까지 pending만 되고 울리지 않는 시간 띠"
+    end={12}
+    lanes={[
+      { label: 'for 없음', segments: [{ start: 2, end: 3, tone: 'warn' }, { start: 4, end: 5, tone: 'warn' }, { start: 7, end: 12, label: '울림', tone: 'warn' }] },
+      { label: 'for 3m', segments: [{ start: 2, end: 3 }, { start: 4, end: 5 }, { start: 7, end: 10, label: 'pending' }, { start: 10, end: 12, label: '울림', tone: 'warn' }] },
+      { label: 'for 5m', segments: [{ start: 2, end: 3 }, { start: 4, end: 5 }, { start: 7, end: 12, label: 'pending' }] },
+    ]}
+    ticks={[
+      { at: 0, label: '0분' },
+      { at: 2, label: '2분' },
+      { at: 4, label: '4분' },
+      { at: 7, label: '7분' },
+      { at: 10, label: '10분' },
+      { at: 12, label: '12분' },
+    ]}
+  />
+</Figure>
+
+## 원인보다 증상에 알림을 걸어요
+
+증상은 사용자가 겪는 일(에러, 느린 응답)이고, 원인은 그 이유(CPU 과부하, DB 연결 거부)예요. CPU 90% 알림은 사용자가 멀쩡해도 울릴 수 있고, CPU가 낮은 채 DB가 연결을 거부하면 조용해요.
+
+그래서 Google SRE Book은 사람을 부르는 알림은 증상에 걸고, 원인은 문제를 찾을 때 보라고 해요. CPU 같은 <Term slug="foundations/red-and-use">원인 지표</Term>는 대시보드에 두고, 아주 분명하고 임박한 원인에만 알림을 걸어요. 증상 알림의 임계값은 <Term slug="foundations/slo-and-error-budget">SLO</Term>에서 정하면 근거가 생겨요.
+
+<Figure caption="증상과 원인을 나눠 둔 곳을 견줬어요. 원인 지표에는 아주 분명하고 임박한 것에만 알림을 걸어요.">
+  <Compare
+    columns={['증상', '원인']}
+    rows={[
+      { label: '뜻', values: ['사용자가 겪는 일', '그 일의 이유'] },
+      { label: '예', values: ['에러, 느린 응답', 'CPU 과부하, DB 연결 거부'] },
+      { label: '두는 곳', values: ['사람을 부르는 알림', '대시보드(문제를 찾을 때)'] },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>`[1m]`처럼 짧은 구간의 값에 `for`도 없는 규칙은, 그림처럼 튈 때마다 울리고 해제돼요. 평가가 수집보다 잦거나 rate 구간이 평가 간격보다 길면, 스파이크 하나가 여러 번 평가될 수 있어요. 15초마다 수집·평가하는 `[1m]` 질의라면 스파이크 하나가 세 번 걸리니, `for`는 수집 주기와 rate 구간보다 길게 잡으세요.</Check>

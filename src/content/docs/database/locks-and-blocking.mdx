@@ -21,7 +21,7 @@ sources:
     url: https://www.postgresql.org/docs/current/runtime-config-client.html
   - title: PostgreSQL — Error Reporting and Logging (log_lock_waits)
     url: https://www.postgresql.org/docs/current/runtime-config-logging.html
-updated: 2026-10-15
+updated: 2026-10-29
 ---
 
 <OnDashboard title="주문 DB · 블로킹 사슬 · orders 표" caption="왼쪽 세션이 오른쪽 세션을 막아요. 101이 트랜잭션을 연 채 쉬는 동안 ALTER TABLE(202)이 기다리고, 그 뒤에 온 평범한 SELECT까지 줄을 섰어요.">
@@ -30,21 +30,74 @@ updated: 2026-10-15
 
 <KeyPoints>
   <Point title="잠금은 동시에 바꾸는 것을 막아요">
-    행을 바꾸는 트랜잭션은 그 행에 잠금을 걸고, 보통 트랜잭션이 끝날 때까지 쥐어요. 같은 행을 바꾸려는 다른 트랜잭션은 그동안 기다려요.
-
-    PostgreSQL에서는 읽기와 쓰기가 서로 막지 않아요. 행의 여러 버전을 두는 방식(MVCC)이라, 평범한 SELECT는 쓰는 중인 행도 기다리지 않고 읽어요.
+    같은 행을 바꾸려는 트랜잭션은 앞 트랜잭션이 끝날 때까지 기다려요. PostgreSQL에서 평범한 SELECT는 기다리지 않아요.
   </Point>
   <Point title="기다리는 잠금도 뒤를 막아요">
-    `ALTER TABLE`의 여러 형태는 표 전체를 잠그는 ACCESS EXCLUSIVE 잠금을 써요. 이 잠금은 다른 모든 잠금과 충돌해서, 평범한 SELECT도 막아요.
-
-    그래서 앞 트랜잭션 때문에 `ALTER TABLE`이 기다리는 동안, 그 뒤에 온 SELECT도 `ALTER TABLE` 뒤에 줄을 서요. `pg_blocking_pids`는 이렇게 대기 줄에서 앞에 선 세션이 막는 것을 soft block이라 불러요.
+    `ALTER TABLE`이 잠금을 기다리는 동안, 뒤에 온 SELECT도 그 뒤에 줄을 서요.
   </Point>
   <Point title="교착은 DB가 하나를 끊어 풀어요">
-    두 트랜잭션이 서로의 잠금을 기다리면 둘 다 끝나지 않아요. 이를 교착(deadlock)이라고 해요. PostgreSQL은 교착을 찾아내 한쪽 트랜잭션을 에러로 끝내고, 나머지를 진행시켜요.
-
-    로그로 두 트랜잭션을 찾는 법은 <Term slug="database/deadlock">교착이 났을 때</Term>에 있어요.
+    서로의 잠금을 기다리는 두 트랜잭션 중 하나를 DB가 에러로 끝내요.
   </Point>
 </KeyPoints>
+
+## 잠금은 동시에 바꾸는 것을 막아요
+
+행을 바꾸는 트랜잭션은 그 행에 잠금을 걸고, 보통 트랜잭션이 끝날 때까지 쥐어요. 같은 행을 바꾸려는 다른 트랜잭션은 그동안 기다려요.
+
+PostgreSQL에서는 읽기와 쓰기가 서로 막지 않아요. 행의 여러 버전을 두는 방식(MVCC)이라, 평범한 SELECT는 쓰는 중인 행도 기다리지 않고 읽어요.
+
+<Figure caption="세 세션이 같은 행(주문 42)을 건드린 예시예요. B의 UPDATE는 A가 커밋할 때까지 기다리지만, C의 SELECT는 기다리지 않고 바로 읽어요.">
+  <Timeline
+    ariaLabel="세션 A가 0초부터 6초에 커밋할 때까지 주문 42의 잠금을 쥐고, 세션 B의 UPDATE는 1초부터 6초까지 기다린 뒤 실행되며, 세션 C의 SELECT는 2초에 기다리지 않고 바로 실행되는 시간 띠"
+    end={10}
+    lanes={[
+      { label: '세션 A', segments: [{ start: 0, end: 6, label: '주문 42 잠금 쥠', tone: 'accent' }] },
+      { label: '세션 B', segments: [{ start: 1, end: 6, label: 'UPDATE 대기', tone: 'warn' }, { start: 6, end: 8, label: '실행', tone: 'accent' }] },
+      { label: '세션 C', segments: [{ start: 2, end: 4, label: '읽음', tone: 'accent' }] },
+    ]}
+    marks={[{ at: 6, label: 'A 커밋' }]}
+  />
+</Figure>
+
+## 기다리는 잠금도 뒤를 막아요
+
+`ALTER TABLE`의 여러 형태는 표 전체를 잠그는 ACCESS EXCLUSIVE 잠금을 써요. 이 잠금은 다른 모든 잠금과 충돌해서, 평범한 SELECT도 막아요.
+
+그래서 앞 트랜잭션 때문에 `ALTER TABLE`이 기다리는 동안, 그 뒤에 온 SELECT도 `ALTER TABLE` 뒤에 줄을 서요. `pg_blocking_pids`는 이렇게 대기 줄에서 앞에 선 세션이 막는 것을 soft block이라 불러요.
+
+<Figure caption="맨 위 사슬을 시간 순으로 줄여 그린 예시예요. 202의 ALTER TABLE이 101을 기다리는 동안, 뒤에 온 SELECT도 202 뒤에 줄을 서요.">
+  <Timeline
+    ariaLabel="세션 101이 트랜잭션을 연 채 쉬는 동안 세션 202의 ALTER TABLE이 2초부터 기다리고, 그 뒤에 온 세션 303과 404의 SELECT도 4초와 6초부터 함께 기다리는 시간 띠"
+    end={10}
+    lanes={[
+      { label: '세션 101', segments: [{ start: 0, end: 10, label: '트랜잭션 연 채 쉼' }] },
+      { label: '세션 202', segments: [{ start: 2, end: 10, label: 'ALTER TABLE 대기', tone: 'warn' }] },
+      { label: '세션 303', segments: [{ start: 4, end: 10, label: 'SELECT 대기', tone: 'warn' }] },
+      { label: '세션 404', segments: [{ start: 6, end: 10, label: 'SELECT 대기', tone: 'warn' }] },
+    ]}
+  />
+</Figure>
+
+## 교착은 DB가 하나를 끊어 풀어요
+
+두 트랜잭션이 서로의 잠금을 기다리면 둘 다 끝나지 않아요. 이를 교착(deadlock)이라고 해요. PostgreSQL은 교착을 찾아내 한쪽 트랜잭션을 에러로 끝내고, 나머지를 진행시켜요.
+
+<Figure caption="두 트랜잭션이 행 A와 B를 엇갈려 잠근 예시예요. 둘 다 상대가 쥔 행을 기다리면, DB가 한쪽을 에러로 끝내요. 어느 쪽이 끝날지는 예측할 수 없어요.">
+  <Sequence
+    ariaLabel="트랜잭션 1이 행 A를, 트랜잭션 2가 행 B를 잠근 뒤, 1은 행 B를, 2는 행 A를 기다려 교착이 되고, DB가 트랜잭션 2를 에러로 끝내 트랜잭션 1이 행 B를 얻어 진행하는 순서"
+    participants={['트랜잭션 1', 'DB', '트랜잭션 2']}
+    messages={[
+      { from: '트랜잭션 1', to: 'DB', label: '행 A 잠금' },
+      { from: '트랜잭션 2', to: 'DB', label: '행 B 잠금' },
+      { from: '트랜잭션 1', to: 'DB', label: '행 B 기다림', tone: 'warn' },
+      { from: '트랜잭션 2', to: 'DB', label: '행 A 기다림', tone: 'warn' },
+      { from: 'DB', to: '트랜잭션 2', label: '교착 에러로 끝냄', tone: 'warn', dashed: true },
+      { from: 'DB', to: '트랜잭션 1', label: '행 B 얻어 진행', tone: 'accent', dashed: true },
+    ]}
+  />
+</Figure>
+
+로그로 두 트랜잭션을 찾는 법은 <Term slug="database/deadlock">교착이 났을 때</Term>에 있어요.
 
 <Checkpoints>
   <Check>운영 중에 `ALTER TABLE` 같은 DDL을 돌린다면 `lock_timeout`을 짧게 두세요. 정한 시간 안에 잠금을 얻지 못하면 더 기다리지 않고 실패해서, 뒤의 쿼리를 오래 줄 세우지 않아요.</Check>

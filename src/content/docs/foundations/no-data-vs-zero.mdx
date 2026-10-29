@@ -61,7 +61,7 @@ sources:
     url: https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rule-evaluation/stale-alert-instances/
   - title: Grafana — Handle missing data in Grafana Alerting
     url: https://grafana.com/docs/grafana/latest/alerting/guides/missing-data/
-updated: 2026-10-13
+updated: 2026-10-29
 ---
 
 <OnDashboard title="에러율 · 수집이 멈추고 10분 뒤" caption="수집이 멈추고 10분 뒤, 지금 시각의 질의 결과는 비어 있어요. 빈 값을 0으로 바꾼 화면은 에러 0%를, 그대로 그린 화면은 데이터 없음을 보여 줘요.">
@@ -71,21 +71,85 @@ updated: 2026-10-13
 
 <KeyPoints>
   <Point title="0은 '없었다', 데이터 없음은 '모른다'예요">
-    0은 재 봤더니 값이 0이었다는 기록이에요. 에러율 0%라면 요청이 들어왔고, 그중 에러는 없었다는 뜻이죠.
-
-    데이터 없음은 기록 자체가 없다는 뜻이에요. <Term slug="foundations/collection-interval">수집</Term>이 멈췄거나 서버가 내려갔을 수도, 아직 한 번도 기록하지 않은 값일 수도 있어요. 그래서 에러 0%는 좋은 소식이지만, 데이터 없음은 가장 나쁜 상황일 수도 있어요.
+    0은 재 봤더니 값이 0이었다는 기록이에요. 데이터 없음은 기록 자체가 없어서, 무슨 일인지 몰라요.
   </Point>
   <Point title="한 번도 안 생긴 시계열은 0이 아니라 없어요">
-    Prometheus의 Go·Python 클라이언트(앱에서 지표를 만드는 라이브러리)는 레이블 값 조합을 처음 쓸 때 그 <Term slug="foundations/time-series-and-labels">시계열</Term>을 만들어요. 요청 수를 `route`와 `status` 레이블로 세면, 에러가 한 번도 안 난 경로엔 `status="500"` 시계열이 없어요. 그래서 이 경로의 에러율 질의는 0%가 아니라 빈 결과를 돌려줘요.
-
-    Prometheus 계측(코드에 지표를 심는 일) 문서는 생길 줄 아는 시계열을 미리 0 같은 기본값으로 내보내라고 권해요. 그러면 에러가 없을 때 진짜 0이 나와서, 빈 결과와 헷갈리지 않아요.
+    에러가 한 번도 안 난 경로엔 에러 시계열이 없어서, 에러율 질의가 빈 결과를 돌려줘요.
   </Point>
   <Point title="빈 값을 0으로 채우면 장애가 정상처럼 보여요">
-    화면 코드가 빈 결과를 0으로 바꾸면, 수집이 멈춘 장애가 '에러 0%'로 보여요. 장애 한가운데서 가장 건강한 숫자가 떠서, 확인하러 갈 이유가 사라져요.
-
-    빈 값은 그래프에선 선을 끊고, 숫자 칸에선 '데이터 없음'으로 보여 주세요. 다만 Grafana Stat 패널(숫자 하나를 보여 주는 패널)은 기본으로 범위의 마지막 값을 띄워, 멈추기 전 값이 장애를 가릴 수 있어요. 질의 Type을 Instant(범위 끝 시각만 계산)로 바꾸면, 지금 값이 없을 때 No data가 떠요.
+    수집이 멈춘 장애가 '에러 0%'로 보여요. 빈 값은 선을 끊고 '데이터 없음'으로 보여 주세요.
   </Point>
 </KeyPoints>
+
+## 0은 '없었다', 데이터 없음은 '모른다'예요
+
+0은 재 봤더니 값이 0이었다는 기록이에요. 에러율 0%라면 요청이 들어왔고, 그중 에러는 없었다는 뜻이죠.
+
+데이터 없음은 기록 자체가 없다는 뜻이에요. <Term slug="foundations/collection-interval">수집</Term>이 멈췄거나 서버가 내려갔을 수도, 아직 한 번도 기록하지 않은 값일 수도 있어요.
+
+<Figure caption="0은 재 본 값이 0일 때만 생겨요. 데이터 없음은 서로 다른 세 원인이 모두 같은 모습으로 보여서, 화면만으론 어느 쪽인지 몰라요.">
+  <Flow
+    ariaLabel="재 봤더니 0인 경우만 에러율 0%로 이어지고, 수집 멈춤, 서버 내려감, 아직 기록 전이라는 세 경우는 모두 같은 데이터 없음으로 이어지는 구조도"
+    nodes={[
+      { id: 'measured', label: '재 봤더니 0', col: 0, row: 0, note: '에러 없었음' },
+      { id: 'zero', label: '에러율 0%', col: 2, row: 0, note: '좋은 소식', tone: 'accent' },
+      { id: 'stop', label: '수집 멈춤', col: 0, row: 1 },
+      { id: 'down', label: '서버 내려감', col: 0, row: 2 },
+      { id: 'never', label: '아직 기록 전', col: 0, row: 3 },
+      { id: 'none', label: '데이터 없음', col: 2, row: 2, note: '원인을 모름', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'measured', to: 'zero', tone: 'accent' },
+      { from: 'stop', to: 'none', tone: 'warn' },
+      { from: 'down', to: 'none', tone: 'warn' },
+      { from: 'never', to: 'none', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+그래서 에러 0%는 좋은 소식이지만, 데이터 없음은 가장 나쁜 상황일 수도 있어요.
+
+## 한 번도 안 생긴 시계열은 0이 아니라 없어요
+
+Prometheus의 Go·Python 클라이언트(앱에서 지표를 만드는 라이브러리)는 레이블 값 조합을 처음 쓸 때 그 <Term slug="foundations/time-series-and-labels">시계열</Term>을 만들어요. 요청 수를 `route`와 `status` 레이블로 세면, 에러가 한 번도 안 난 경로엔 `status="500"` 시계열이 없어요. 그래서 이 경로의 에러율 질의는 0%가 아니라 빈 결과를 돌려줘요.
+
+Prometheus 계측(코드에 지표를 심는 일) 문서는 생길 줄 아는 시계열을 미리 0 같은 기본값으로 내보내라고 권해요. 그러면 에러가 없을 때 진짜 0이 나와서, 빈 결과와 헷갈리지 않아요.
+
+<Figure caption="에러가 한 번도 안 난 경로의 예시예요. 그냥 두면 500 시계열이 없어 빈 결과가 나오고, 미리 0으로 내보내면 진짜 0%가 나와요.">
+  <Compare
+    columns={['그냥 둘 때', '미리 0으로 내보낼 때']}
+    rows={[
+      { label: 'status="200" 시계열', values: ['있어요', '있어요'] },
+      { label: 'status="500" 시계열', values: ['없어요(에러가 안 나서)', '값 0으로 있어요'] },
+      { label: '에러율 질의', values: ['빈 결과', '0%'] },
+    ]}
+  />
+</Figure>
+
+## 빈 값을 0으로 채우면 장애가 정상처럼 보여요
+
+화면 코드가 빈 결과를 0으로 바꾸면, 수집이 멈춘 장애가 '에러 0%'로 보여요. 장애 한가운데서 가장 건강한 숫자가 떠서, 확인하러 갈 이유가 사라져요.
+
+빈 값은 그래프에선 선을 끊고, 숫자 칸에선 '데이터 없음'으로 보여 주세요.
+
+다만 Grafana Stat 패널(숫자 하나를 보여 주는 패널)은 기본으로 범위의 마지막 값을 띄워, 멈추기 전 값이 장애를 가릴 수 있어요. 질의 Type을 Instant(범위 끝 시각만 계산)로 바꾸면, 지금 값이 없을 때 No data가 떠요.
+
+<Figure caption="시간 범위 끝에서 수집이 멈춘 예시예요. 기본 설정은 값이 있는 마지막 칸 0.4를 띄워 장애를 가려요. Instant는 범위 끝 칸만 계산해서, 그 칸이 비면 No data가 떠요.">
+  <Strip
+    ariaLabel="점 간격마다 계산한 에러율이 0.4, 0.5, 0.4로 이어지다 뒤 세 칸은 수집이 멈춰 비어 있고, Stat 패널 기본 설정은 마지막 값 0.4를, Instant는 범위 끝의 빈 칸이라 No data를 보여 주는 칸 띠"
+    rows={[
+      {
+        label: '점 간격마다 계산한 에러율(%)',
+        cells: ['0.4', '0.5', { label: '0.4', tone: 'accent' }, { label: '없음', tone: 'sub' }, { label: '없음', tone: 'sub' }, { label: '없음', tone: 'sub' }],
+      },
+    ]}
+    marks={[
+      { at: 2, label: '기본: 마지막 값', tone: 'accent' },
+      { at: 5, label: 'Instant: No data', tone: 'warn' },
+    ]}
+    ranges={[{ from: 3, to: 5, label: '수집 멈춤', tone: 'warn' }]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>빈 응답에 `?? 0`이나 `|| 0`을 붙여 0을 넣는 코드가 있다면 다시 보세요. Prometheus HTTP API는 결과가 없으면 `result`가 빈 배열이라, `result[0]?.value[1]`은 undefined예요. 두 식 모두 이걸 0으로 바꾸니, 빈 값(undefined·null)은 숫자로 바꾸기 전에 걸러 '데이터 없음'으로 그리세요.</Check>

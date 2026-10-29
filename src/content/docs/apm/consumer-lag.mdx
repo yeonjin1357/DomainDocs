@@ -19,7 +19,7 @@ sources:
     url: https://github.com/linkedin/Burrow/wiki/Consumer-Lag-Evaluation-Rules
   - title: OpenTelemetry — Semantic conventions for messaging spans
     url: https://opentelemetry.io/docs/specs/semconv/messaging/messaging-spans/
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <OnDashboard title="주문 알림 컨슈머 · 최근 10분" caption="들어오는 메시지(초당 500건)보다 처리(초당 400건)가 느려서, lag이 1분에 6,000건씩 늘어 60,000건이 됐어요.">
@@ -30,19 +30,19 @@ updated: 2026-10-14
 
 <KeyPoints>
   <Point title="lag은 아직 못 읽은 메시지 수예요">
-    Kafka는 파티션마다 메시지에 번호(offset)를 붙여 쌓아요. lag은 파티션의 마지막 offset에서 컨슈머가 처리했다고 기록한 offset을 뺀 값이에요. 곧 큐에 들어왔지만 아직 처리하지 못한 메시지 수예요.
-
-    그래서 컨슈머의 처리 시간이 멀쩡해도, 사용자는 결과를 늦게 받을 수 있어요. 그림이라면 주문 알림이 점점 늦게 가요.
+    큐에 들어왔지만 컨슈머가 아직 처리하지 못한 메시지 수예요. 처리 시간이 멀쩡해도 결과는 늦게 갈 수 있어요.
   </Point>
   <Point title="lag의 크기보다 줄어드는지를 봐요">
-    바쁜 토픽은 잘 돌 때도 lag이 0이 아닐 때가 많아요. 그래서 LinkedIn의 Burrow는 lag에 고정 임계값을 두지 않아요. 최근 구간에서 lag이 0이 된 적이 있는지, offset이 앞으로 가는지, lag이 줄곧 늘기만 하는지로 판단해요.
+    바쁜 토픽은 잘 돌 때도 lag이 0이 아닐 때가 많아요. 그래서 고정 임계값보다 줄어드는지로 판단해요.
   </Point>
   <Point title="시간으로 바꾸면 얼마나 늦는지 보여요">
-    lag을 처리 속도로 나누면, 지금 쌓인 몫을 처리하는 데 걸릴 시간이에요. 그림이라면 60,000건 ÷ 초당 400건 = 150초라, 방금 들어온 메시지는 2분 넘게 기다려요.
-
-    들어오는 속도가 처리 속도보다 빠르면 lag은 줄지 않고 계속 늘어요. 이때는 컨슈머를 늘리거나 한 건의 처리 시간을 줄여야 해요.
+    lag을 처리 속도로 나누면, 쌓인 몫을 처리하는 데 걸릴 시간이에요.
   </Point>
 </KeyPoints>
+
+## lag은 아직 못 읽은 메시지 수예요
+
+Kafka는 파티션마다 메시지에 번호(offset)를 붙여 쌓아요. lag은 파티션의 마지막 offset에서 컨슈머가 처리했다고 기록한 offset을 뺀 값이에요. 곧 큐에 들어왔지만 아직 처리하지 못한 메시지 수예요.
 
 <Figure caption="Kafka 문서의 예를 칸으로 그렸어요. 컨슈머가 기록한 위치는 2, 로그 끝은 4예요. 그 사이의 2건이 아직 처리하지 못한 lag이에요.">
   <Strip
@@ -55,6 +55,37 @@ updated: 2026-10-14
     ranges={[
       { from: 0, to: 1, label: '처리함' },
       { from: 2, to: 3, label: 'lag 2건', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+그래서 컨슈머의 처리 시간이 멀쩡해도, 사용자는 결과를 늦게 받을 수 있어요. 맨 위 대시보드라면 주문 알림이 점점 늦게 가요.
+
+## lag의 크기보다 줄어드는지를 봐요
+
+바쁜 토픽은 잘 돌 때도 lag이 0이 아닐 때가 많아요. 그래서 LinkedIn의 Burrow는 lag에 고정 임계값을 두지 않아요. 최근 구간에서 lag이 0이 된 적이 있는지, offset이 앞으로 가는지, lag이 줄곧 늘기만 하는지로 판단해요.
+
+<Figure caption="lag 두 줄을 견준 예시예요. 바쁜 토픽은 lag이 커도 0으로 돌아와서 잘 도는 중이에요. 한가한 토픽은 lag이 작아도 줄곧 늘어서 뒤처지는 중이에요.">
+  <MiniLineChart ariaLabel="바쁜 토픽의 lag은 0건에서 1,800건 사이를 오르내리며 두 번 0으로 돌아오고, 한가한 토픽의 lag은 100건에서 640건으로 한 번도 줄지 않고 느는 그래프" series={[{ label: '바쁜 토픽', values: [800, 1500, 600, 0, 1200, 1800, 900, 0, 1400, 700], tone: 'accent' }, { label: '한가한 토픽', values: [100, 160, 220, 280, 340, 400, 460, 520, 580, 640], tone: 'warn' }]} />
+</Figure>
+
+## 시간으로 바꾸면 얼마나 늦는지 보여요
+
+lag을 처리 속도로 나누면, 지금 쌓인 몫을 처리하는 데 걸릴 시간이에요. 맨 위 대시보드라면 60,000건 ÷ 초당 400건 = 150초라, 방금 들어온 메시지는 2분 넘게 기다려요.
+
+들어오는 속도가 처리 속도보다 빠르면 lag은 줄지 않고 계속 늘어요. 이때는 컨슈머를 늘리거나 한 건의 처리 시간을 줄여야 해요.
+
+<Figure caption="맨 위 대시보드의 숫자예요. 1초에 500건이 들어오는데 400건만 처리해서, 차이 100건이 1초마다 쌓여요. 쌓인 60,000건은 초당 400건으로 150초 걸려요.">
+  <Flow
+    ariaLabel="생산자가 초당 500건을 큐에 넣고 컨슈머가 초당 400건을 처리해서, 큐에 lag 60,000건이 쌓인 구조도"
+    nodes={[
+      { id: 'prod', label: '생산자', col: 0, row: 0 },
+      { id: 'queue', label: '큐', col: 0, row: 1, note: 'lag 6만 건', tone: 'warn' },
+      { id: 'cons', label: '컨슈머', col: 0, row: 2 },
+    ]}
+    edges={[
+      { from: 'prod', to: 'queue', label: '초당 500건' },
+      { from: 'queue', to: 'cons', label: '초당 400건', tone: 'warn' },
     ]}
   />
 </Figure>

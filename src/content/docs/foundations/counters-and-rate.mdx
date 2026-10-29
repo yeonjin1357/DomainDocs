@@ -21,7 +21,7 @@ sources:
     url: https://grafana.com/docs/grafana/latest/datasources/prometheus/template-variables/
   - title: Grafana Blog — $__rate_interval for Prometheus rate queries that just work
     url: https://grafana.com/blog/2020/09/28/new-in-grafana-7.2-__rate_interval-for-prometheus-rate-queries-that-just-work/
-updated: 2026-10-13
+updated: 2026-10-29
 ---
 
 <OnDashboard title="처리한 요청 수 · 10초마다 수집" caption="위는 카운터를 그대로 그린 선이에요. 아래는 이웃한 두 값 사이 증가량을 10초로 나눈 rate예요. 재시작한 순간에도 rate는 이어져요.">
@@ -38,15 +38,56 @@ updated: 2026-10-13
 
 <KeyPoints>
   <Point title="카운터는 쌓이기만 해요">
-    `http_requests_total` 같은 카운터(counter)는 프로세스가 시작된 뒤 처리한 요청 수를 계속 더한 값이에요. 그래서 1,000,000이라는 값만으로는 지금 바쁜지 알 수 없어요. 값이 줄어드는 건 재시작해서 0부터 다시 셀 때뿐이에요.
+    카운터는 프로세스가 시작된 뒤의 수를 계속 더한 값이라, 값만으로는 지금 바쁜지 알 수 없어요.
   </Point>
   <Point title="rate는 1초에 얼마나 늘었는지예요">
-    rate(초당 증가량)는 구간 동안 늘어난 양을 구간 길이(초)로 나눈 값이에요. 5분(300초) 동안 1,000,000에서 1,030,000이 됐다면 30,000 ÷ 300 = 초당 100건이에요. 대시보드에는 카운터가 아니라 이 값을 그려요.
+    구간 동안 늘어난 양을 구간 길이(초)로 나눈 값이에요. 대시보드에는 카운터가 아니라 이 값을 그려요.
   </Point>
   <Point title="rate는 재시작을 알아서 메워요">
-    Prometheus의 `rate`와 `increase`(구간 증가량)는 재시작을 알아서 처리해요. 값이 1,000 → 1,050 → (재시작) → 20일 때, 재시작 앞뒤 값을 그냥 빼면 20 − 1,050 = −1,030이에요. 두 함수는 값이 줄어든 순간을 재시작으로 보고, 재시작 전에 늘어난 50과 뒤의 20을 더해 70으로 세요.
+    값이 줄어든 순간을 재시작으로 보고, 재시작 앞뒤에 늘어난 양을 더해 세요.
   </Point>
 </KeyPoints>
+
+## 카운터는 쌓이기만 해요
+
+`http_requests_total` 같은 카운터(counter)는 프로세스가 시작된 뒤 처리한 요청 수를 계속 더한 값이에요. 그래서 1,000,000이라는 값만으로는 지금 바쁜지 알 수 없어요. 값이 줄어드는 건 재시작해서 0부터 다시 셀 때뿐이에요.
+
+## rate는 1초에 얼마나 늘었는지예요
+
+rate(초당 증가량)는 구간 동안 늘어난 양을 구간 길이(초)로 나눈 값이에요. 5분(300초) 동안 1,000,000에서 1,030,000이 됐다면 30,000 ÷ 300 = 초당 100건이에요. 대시보드에는 카운터가 아니라 이 값을 그려요.
+
+<Figure caption="5분 구간에서 rate를 구하는 모습이에요. 카운터가 늘어난 양 30,000을 구간 길이 300초로 나눠 초당 100건을 얻어요.">
+  <Flow
+    ariaLabel="5분 구간의 시작 값 1,000,000과 끝 값 1,030,000에서 늘어난 양 30,000을 구하고, 300초로 나눠 rate 초당 100건을 얻는 구조도"
+    nodes={[
+      { id: 'from', label: '구간 시작', col: 0, row: 0, note: '1,000,000' },
+      { id: 'to', label: '구간 끝', col: 2, row: 0, note: '1,030,000' },
+      { id: 'inc', label: '늘어난 양', col: 1, row: 1, note: '30,000' },
+      { id: 'rate', label: 'rate', col: 1, row: 2, note: '초당 100건', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'from', to: 'inc' },
+      { from: 'to', to: 'inc' },
+      { from: 'inc', to: 'rate', label: '÷ 300초', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+## rate는 재시작을 알아서 메워요
+
+Prometheus의 `rate`와 `increase`(구간 증가량)는 재시작을 알아서 처리해요. 값이 1,000 → 1,050 → (재시작) → 20일 때, 재시작 앞뒤 값을 그냥 빼면 20 − 1,050 = −1,030이에요. 두 함수는 값이 줄어든 순간을 재시작으로 보고, 재시작 전에 늘어난 50과 뒤의 20을 더해 70으로 세요.
+
+<Figure caption="재시작한 카운터는 0부터 다시 세요. 두 함수는 재시작 전의 +50과 0부터 센 +20을 더해 70으로 봐요. 흐린 칸은 수집되지 않은 0이에요.">
+  <Strip
+    ariaLabel="카운터 값이 1,000, 1,050 다음 재시작으로 0이 된 뒤 20이 되어, 재시작 전 50과 재시작 뒤 20을 더해 증가량 70으로 세는 칸 띠"
+    rows={[{ label: '수집한 카운터 값', cells: ['1,000', '1,050', { label: '0', tone: 'sub' }, '20'] }]}
+    marks={[{ at: 2, label: '재시작', tone: 'warn' }]}
+    ranges={[
+      { from: 0, to: 1, label: '+50' },
+      { from: 2, to: 3, label: '+20' },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>카운터 값을 그대로 그린 그래프는 지금 상태를 말해 주지 않아요. 선이 오르기만 하다가 재시작 때만 떨어진다면 이 경우예요. rate로 바꿨는지 확인하세요.</Check>

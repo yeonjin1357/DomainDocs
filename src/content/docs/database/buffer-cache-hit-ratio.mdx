@@ -19,7 +19,7 @@ sources:
     url: https://www.postgresql.org/docs/current/using-explain.html
   - title: Oracle — Tuning the Database Buffer Cache (Interpreting the Buffer Cache Hit Ratio)
     url: https://docs.oracle.com/en/database/oracle/oracle-database/19/tgdba/tuning-database-buffer-cache.html
-updated: 2026-10-15
+updated: 2026-10-29
 ---
 
 <OnDashboard title="VIP 고객 주문 조회 · EXPLAIN (ANALYZE, BUFFERS)" caption="통계가 낡은 계획은 캐시에서 블록을 84,253번 읽어 적중률이 99.9%였어요. 통계를 다시 모은 계획은 1,406번만 읽었어요.">
@@ -30,17 +30,88 @@ updated: 2026-10-15
 
 <KeyPoints>
   <Point title="적중률은 캐시에서 찾은 블록의 비율이에요">
-    DB는 데이터를 블록(PostgreSQL은 보통 8kB) 단위로 읽어요. 읽으려는 블록이 메모리의 버퍼 캐시에 있으면 적중이고, 없으면 디스크 쪽에서 가져와요. 적중률은 읽은 블록 중 캐시에서 찾은 블록의 비율이에요.
+    읽으려는 블록이 메모리의 버퍼 캐시에 있으면 적중이에요. 적중률은 읽은 블록 중 캐시에서 찾은 블록의 비율이에요.
   </Point>
   <Point title="같은 블록을 많이 읽을수록 비율이 올라가요">
-    나쁜 실행 계획은 같은 인덱스와 표 블록을 몇 번이고 다시 읽어요. 다시 읽는 블록은 대부분 캐시에 있어서, 일을 많이 할수록 적중률은 오히려 올라가요. 그림에서는 60배 많은 블록을 읽고도 적중률이 99.9%였어요.
-
-    Oracle 문서도 같은 표나 인덱스를 반복해 훑으면 적중률이 인위적으로 부풀 수 있다고 해요. 그래서 비율보다 SQL마다 읽은 블록 수를 봐요.
+    다시 읽는 블록은 대부분 캐시에 있어서, 일을 많이 할수록 적중률은 오히려 올라가요. 그래서 비율보다 SQL마다 읽은 블록 수를 봐요.
   </Point>
   <Point title="캐시 밖 읽기도 디스크 읽기가 아닐 수 있어요">
-    PostgreSQL의 적중은 자기 버퍼 캐시(`shared_buffers`)에서 찾은 것만 세요. 캐시에 없어 읽은 블록도 운영체제의 파일 캐시에서 나왔을 수 있어요. PostgreSQL은 운영체제 캐시에도 기대는 구조라서, 문서도 전용 서버의 `shared_buffers`를 메모리의 25%쯤에서 시작하라고 해요.
+    캐시에 없어 읽은 블록도 운영체제의 파일 캐시에서 나왔을 수 있어요.
   </Point>
 </KeyPoints>
+
+## 적중률은 캐시에서 찾은 블록의 비율이에요
+
+DB는 데이터를 블록(PostgreSQL은 보통 8kB) 단위로 읽어요. 읽으려는 블록이 메모리의 버퍼 캐시에 있으면 적중이고, 없으면 디스크 쪽에서 가져와요. 적중률은 읽은 블록 중 캐시에서 찾은 블록의 비율이에요.
+
+<Figure caption="블록 8개를 읽은 설명용 예시예요. 6개는 버퍼 캐시에서 찾고, 2개는 캐시에 없어 디스크 쪽에서 가져왔어요. 적중률은 6 ÷ 8 = 75%예요.">
+  <Strip
+    ariaLabel="블록 8개를 읽어 6개는 버퍼 캐시에서 찾고 2개는 캐시에 없어 디스크 쪽에서 가져와, 적중률이 75%인 칸 띠"
+    rows={[
+      {
+        label: '읽은 블록 8개',
+        cells: [
+          { label: '적중', tone: 'accent' },
+          { label: '적중', tone: 'accent' },
+          { label: '없음', tone: 'warn' },
+          { label: '적중', tone: 'accent' },
+          { label: '적중', tone: 'accent' },
+          { label: '적중', tone: 'accent' },
+          { label: '없음', tone: 'warn' },
+          { label: '적중', tone: 'accent' },
+        ],
+      },
+    ]}
+    ranges={[{ from: 0, to: 7, label: '적중 6 ÷ 읽음 8 = 75%' }]}
+  />
+</Figure>
+
+## 같은 블록을 많이 읽을수록 비율이 올라가요
+
+나쁜 실행 계획은 같은 인덱스와 표 블록을 몇 번이고 다시 읽어요. 다시 읽는 블록은 대부분 캐시에 있어서, 일을 많이 할수록 적중률은 오히려 올라가요. 맨 위 예에서는 60배 많은 블록을 읽고도 적중률이 99.9%였어요.
+
+<Figure caption="같은 블록을 다시 읽는 설명용 예시예요. 처음만 디스크 쪽에서 가져오고, 다시 읽을 때는 캐시에서 찾아요. 일을 4배 했는데 적중률은 50%에서 87.5%로 올라가요.">
+  <Strip
+    ariaLabel="같은 블록을 2번 읽으면 처음 한 번은 디스크 쪽, 다음 한 번은 캐시라 적중률 50%이고, 8번 읽으면 처음 한 번만 디스크 쪽이고 나머지 7번은 캐시라 적중률 87.5%인 칸 띠"
+    rows={[
+      { label: '같은 블록을 2번 읽기', cells: [{ label: '없음', tone: 'warn' }, { label: '적중', tone: 'accent' }] },
+      {
+        label: '같은 블록을 8번 읽기',
+        cells: [
+          { label: '없음', tone: 'warn' },
+          { label: '적중', tone: 'accent' },
+          { label: '적중', tone: 'accent' },
+          { label: '적중', tone: 'accent' },
+          { label: '적중', tone: 'accent' },
+          { label: '적중', tone: 'accent' },
+          { label: '적중', tone: 'accent' },
+          { label: '적중', tone: 'accent' },
+        ],
+      },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 1, label: '적중률 50%' },
+      { row: 1, from: 0, to: 7, label: '적중률 87.5%', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+Oracle 문서도 같은 표나 인덱스를 반복해 훑으면 적중률이 인위적으로 부풀 수 있다고 해요. 그래서 비율보다 SQL마다 읽은 블록 수를 봐요.
+
+## 캐시 밖 읽기도 디스크 읽기가 아닐 수 있어요
+
+PostgreSQL의 적중은 자기 버퍼 캐시(`shared_buffers`)에서 찾은 것만 세요. 캐시에 없어 읽은 블록도 운영체제의 파일 캐시에서 나왔을 수 있어요. PostgreSQL은 운영체제 캐시에도 기대는 구조라서, 문서도 전용 서버의 `shared_buffers`를 메모리의 25%쯤에서 시작하라고 해요.
+
+<Figure caption="PostgreSQL이 블록을 찾는 층이에요. 적중으로 세는 건 맨 위 버퍼 캐시뿐이에요. 캐시에 없어 읽은 블록은 운영체제 파일 캐시에서 나왔을 수도, 디스크에서 나왔을 수도 있어요.">
+  <Layers
+    ariaLabel="맨 위 PostgreSQL 버퍼 캐시에서 찾으면 적중으로 세고, 그 아래 운영체제 파일 캐시와 맨 아래 디스크에서 가져온 블록은 모두 캐시에 없어 읽은 블록으로 세는 층 그림"
+    layers={[
+      { label: 'PostgreSQL 버퍼 캐시', note: 'shared_buffers. 여기서 찾으면 적중(blks_hit)', tone: 'accent' },
+      { label: '운영체제 파일 캐시', note: '여기서 나와도 캐시에 없던 읽기(blks_read)' },
+      { label: '디스크', note: '여기까지 와야 실제 디스크 읽기' },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>적중률 하나로 DB 상태를 '좋음'이라고 보여 주는 화면은 다시 보세요. 비율은 일의 양을 지워요. SQL별로 읽은 블록 수와 실행 시간을 함께 두세요.</Check>

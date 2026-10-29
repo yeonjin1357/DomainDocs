@@ -11,7 +11,7 @@ related: [database/active-sessions, foundations/counters-and-rate, apm/trace-wat
 sources:
   - title: PostgreSQL — pg_stat_statements
     url: https://www.postgresql.org/docs/current/pgstatstatements.html
-updated: 2026-10-15
+updated: 2026-10-29
 ---
 
 <OnDashboard title="주문 DB · SQL별 실행 시간 합계 · 최근 1시간" caption="평균은 SQL B가 2,500배 느리지만, DB를 40배 더 쓴 건 SQL A예요. SQL A를 1ms 줄이면 1,000초가 줄어요.">
@@ -21,19 +21,75 @@ updated: 2026-10-15
 
 <KeyPoints>
   <Point title="순위는 총 시간으로 매겨요">
-    SQL 하나가 DB를 쓴 시간은 호출 수 × 평균 시간이에요. 평균 순으로 줄 세우면 드물게 도는 무거운 SQL이 위에 와요. 총 시간 순으로 줄 세우면 DB를 가장 많이 쓰는 SQL이 위에 와요.
-
-    DB 부하를 줄이려면 총 시간 위쪽부터 봐요. 그림의 SQL A는 2ms로 빠르지만, 100만 번 불려 DB 시간의 대부분을 써요.
+    SQL 하나가 DB를 쓴 시간은 호출 수 × 평균 시간이에요. DB 부하를 줄이려면 총 시간 위쪽부터 봐요.
   </Point>
   <Point title="값만 다른 SQL은 하나로 묶어요">
-    `WHERE id = 1`과 `WHERE id = 2`는 같은 SQL이에요. PostgreSQL의 `pg_stat_statements`는 상수 값만 다른 SQL을 한 항목으로 묶고, 상수 자리를 `$1`처럼 바꿔 보여 줘요.
-
-    묶지 않으면 같은 SQL이 값마다 흩어져, 순위에서 하나하나는 작아 보여요.
+    상수 값만 다른 SQL은 한 항목으로 묶어요. 묶지 않으면 순위에서 하나하나는 작아 보여요.
   </Point>
   <Point title="누적값이라 구간마다 차이를 봐요">
-    `pg_stat_statements`의 호출 수와 시간은 마지막 초기화 뒤로 쌓인 누적값이에요. 그래서 최근 1시간을 보려면, 1시간 전과 지금 값의 차이를 써요. <Term slug="foundations/counters-and-rate">카운터</Term>를 읽는 방법과 같아요.
+    최근 1시간을 보려면 1시간 전과 지금 값의 차이를 써요.
   </Point>
 </KeyPoints>
+
+## 순위는 총 시간으로 매겨요
+
+SQL 하나가 DB를 쓴 시간은 호출 수 × 평균 시간이에요. 평균 순으로 줄 세우면 드물게 도는 무거운 SQL이 위에 와요. 총 시간 순으로 줄 세우면 DB를 가장 많이 쓰는 SQL이 위에 와요.
+
+<Figure caption="맨 위 두 SQL을 견줬어요. 평균으로 줄 세우면 SQL B가 1위지만, 호출 수를 곱한 총 시간으로 줄 세우면 SQL A가 1위예요.">
+  <Compare
+    columns={['SQL A · 주문 조회', 'SQL B · 월 정산']}
+    rows={[
+      { label: '평균 시간', values: ['2ms', '5초'] },
+      { label: '호출 수', values: ['100만 번', '10번'] },
+      { label: '총 시간(호출 수 × 평균)', values: ['2,000초', '50초'] },
+      { label: '평균으로 줄 세우면', values: ['2위', '1위'] },
+      { label: '총 시간으로 줄 세우면', values: ['1위', '2위'] },
+    ]}
+  />
+</Figure>
+
+DB 부하를 줄이려면 총 시간 위쪽부터 봐요. 그림의 SQL A는 2ms로 빠르지만, 100만 번 불려 DB 시간의 대부분을 써요.
+
+## 값만 다른 SQL은 하나로 묶어요
+
+`WHERE id = 1`과 `WHERE id = 2`는 같은 SQL이에요. PostgreSQL의 `pg_stat_statements`는 상수 값만 다른 SQL을 한 항목으로 묶고, 상수 자리를 `$1`처럼 바꿔 보여 줘요.
+
+<Figure caption="WHERE 절의 상수만 다른 SQL 셋이 한 항목으로 묶인 예시예요. 상수 자리는 $1로 바뀌고, 셋의 호출 수와 시간이 이 항목에 모여요.">
+  <Flow
+    ariaLabel="WHERE id = 1, WHERE id = 2, WHERE id = 3인 SQL 셋이 모두 WHERE id = $1인 한 항목으로 묶이는 구조도"
+    nodes={[
+      { id: 'q1', label: 'id = 1', col: 0, row: 0 },
+      { id: 'q2', label: 'id = 2', col: 0, row: 1 },
+      { id: 'q3', label: 'id = 3', col: 0, row: 2 },
+      { id: 'norm', label: 'id = $1', col: 2, row: 1, note: '한 항목', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'q1', to: 'norm' },
+      { from: 'q2', to: 'norm' },
+      { from: 'q3', to: 'norm' },
+    ]}
+  />
+</Figure>
+
+묶지 않으면 같은 SQL이 값마다 흩어져, 순위에서 하나하나는 작아 보여요.
+
+## 누적값이라 구간마다 차이를 봐요
+
+`pg_stat_statements`의 호출 수와 시간은 마지막 초기화 뒤로 쌓인 누적값이에요. 그래서 최근 1시간을 보려면, 1시간 전과 지금 값의 차이를 써요. <Term slug="foundations/counters-and-rate">카운터</Term>를 읽는 방법과 같아요.
+
+<Figure caption="SQL A의 실행 시간 합을 한 시간마다 읽은 예시예요. 누적값은 오르기만 해서, 최근 1시간은 지금 값에서 1시간 전 값을 빼 2,000초로 구해요.">
+  <Strip
+    ariaLabel="SQL A의 누적 실행 시간 합이 3시간 전 1,500초, 2시간 전 3,000초, 1시간 전 5,000초, 지금 7,000초로 오르기만 하고, 마지막 두 값의 차이 2,000초가 최근 1시간인 칸 띠"
+    rows={[
+      {
+        label: 'SQL A의 실행 시간 합(누적)',
+        heads: ['3시간 전', '2시간 전', '1시간 전', '지금'],
+        cells: ['1,500초', '3,000초', '5,000초', { label: '7,000초', tone: 'accent' }],
+      },
+    ]}
+    ranges={[{ from: 2, to: 3, label: '7,000 − 5,000 = 2,000초', tone: 'warn' }]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>평균 시간 순으로만 줄 세운 화면은 다시 보세요. 하루 한 번 도는 배치가 맨 위에 오고, 1초에 수백 번 도는 SQL이 묻혀요. 총 시간과 호출 수를 함께 두세요.</Check>

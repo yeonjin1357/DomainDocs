@@ -17,7 +17,7 @@ sources:
     url: https://www.postgresql.org/docs/current/runtime-config-client.html
   - title: Oracle — Measuring Database Performance (DB time, ASH, Idle wait events)
     url: https://docs.oracle.com/en/database/oracle/oracle-database/19/tgdba/measuring-database-performance.html
-updated: 2026-10-15
+updated: 2026-10-29
 ---
 
 <OnDashboard title="주문 DB · 액티브 세션 · 14:00~14:10" caption="14:05부터 액티브 세션이 3개에서 12개로 늘었어요. 늘어난 9개는 모두 잠금(Lock)을 기다려요.">
@@ -26,19 +26,21 @@ updated: 2026-10-15
 
 <KeyPoints>
   <Point title="액티브 세션은 일하거나 기다리는 세션이에요">
-    DB에 붙은 세션 대부분은 다음 명령을 기다리며 쉬어요. 액티브 세션은 그중 쿼리를 실행하고 있는 세션이에요. PostgreSQL에서는 `pg_stat_activity`의 `state`가 `active`인 세션이에요.
-
-    액티브 세션 수는 DB가 동시에 처리하는 일의 양이에요. Oracle은 이 수의 평균을 평균 액티브 세션(AAS)이라 부르고, 세션들이 쓴 시간의 합(DB time)을 경과 시간으로 나눠 구해요. 세션 자체는 <Term slug="database/connections-and-sessions">연결과 세션</Term>에서 다뤄요.
+    액티브 세션은 쿼리를 실행하고 있는 세션이에요. 그 수가 DB가 동시에 처리하는 일의 양이에요.
   </Point>
   <Point title="대기 이벤트가 무엇을 기다리는지 알려 줘요">
-    액티브 세션은 CPU에서 실행 중이거나, 무언가를 기다려요. PostgreSQL은 기다리는 대상을 `wait_event_type`으로 나눠요. 잠금은 Lock, 디스크 읽기·쓰기는 IO, 공유 메모리 구조는 LWLock이에요.
-
-    대기 종류로 나누면 원인의 갈래가 보여요. 그림처럼 Lock 대기만 늘었다면, 쿼리가 무거워진 게 아니라 서로의 잠금을 기다리는 거예요.
+    대기 종류로 나누면 원인의 갈래가 보여요. Lock 대기만 늘었다면 서로의 잠금을 기다리는 거예요.
   </Point>
   <Point title="쉬는 대기는 빼고 봐요">
-    대기 이벤트에는 할 일이 없어 쉬는 대기도 있어요. PostgreSQL의 `ClientRead`는 앱이 다음 데이터를 보내길 기다리는 대기예요. Oracle도 Idle 종류의 대기는 성능 문제를 볼 때 빼라고 해요.
+    `ClientRead`처럼 할 일이 없어 쉬는 대기는 성능 문제를 볼 때 빼요.
   </Point>
 </KeyPoints>
+
+## 액티브 세션은 일하거나 기다리는 세션이에요
+
+DB에 붙은 세션 대부분은 다음 명령을 기다리며 쉬어요. 액티브 세션은 그중 쿼리를 실행하고 있는 세션이에요. PostgreSQL에서는 `pg_stat_activity`의 `state`가 `active`인 세션이에요.
+
+액티브 세션 수는 DB가 동시에 처리하는 일의 양이에요. Oracle은 이 수의 평균을 평균 액티브 세션(AAS)이라 부르고, 세션들이 쓴 시간의 합(DB time)을 경과 시간으로 나눠 구해요. 세션 자체는 <Term slug="database/connections-and-sessions">연결과 세션</Term>에서 다뤄요.
 
 <Figure caption="세션 넷의 10초예요. 칠한 구간이 액티브(실행 중이거나 기다림)이고, 빈 곳은 쉬는 중이에요. 칠한 구간을 모두 더한 DB time 20초를 10초로 나누면 평균 액티브 세션은 2예요.">
   <Timeline
@@ -51,6 +53,49 @@ updated: 2026-10-15
       { label: '세션 4', segments: [{ start: 4, end: 9, label: 'Lock 대기', tone: 'warn' }] },
     ]}
     marks={[{ at: 5, label: '5초 표본: 2개' }]}
+    ticks={[{ at: 0, label: '0초' }, { at: 5, label: '5초' }, { at: 10, label: '10초' }]}
+  />
+</Figure>
+
+## 대기 이벤트가 무엇을 기다리는지 알려 줘요
+
+액티브 세션은 CPU에서 실행 중이거나, 무언가를 기다려요. PostgreSQL은 기다리는 대상을 `wait_event_type`으로 나눠요. 잠금은 Lock, 디스크 읽기·쓰기는 IO, 공유 메모리 구조는 LWLock이에요.
+
+<Figure caption="액티브 세션은 실행 중이거나 기다리는 중이에요. 기다리는 쪽은 무엇을 기다리는지에 따라 다시 갈려요. 맨 위 그래프에서 늘어난 건 Lock 갈래예요.">
+  <Flow
+    ariaLabel="액티브 세션이 CPU에서 실행 중인 갈래와 무언가 기다리는 갈래로 나뉘고, 기다리는 갈래는 잠금을 기다리는 Lock, 디스크를 기다리는 IO, 공유 메모리 구조를 기다리는 LWLock으로 다시 나뉘는 구조도"
+    nodes={[
+      { id: 'act', label: '액티브 세션', col: 1, row: 0 },
+      { id: 'cpu', label: 'CPU에서 실행', col: 2, row: 0, tone: 'accent' },
+      { id: 'wait', label: '무언가 기다림', col: 1, row: 1 },
+      { id: 'lock', label: 'Lock', col: 0, row: 2, note: '잠금', tone: 'warn' },
+      { id: 'io', label: 'IO', col: 1, row: 2, note: '디스크' },
+      { id: 'lwlock', label: 'LWLock', col: 2, row: 2, note: '공유 메모리' },
+    ]}
+    edges={[
+      { from: 'act', to: 'cpu' },
+      { from: 'act', to: 'wait' },
+      { from: 'wait', to: 'lock', tone: 'warn' },
+      { from: 'wait', to: 'io' },
+      { from: 'wait', to: 'lwlock' },
+    ]}
+  />
+</Figure>
+
+대기 종류로 나누면 원인의 갈래가 보여요. 맨 위 그래프처럼 Lock 대기만 늘었다면, 쿼리가 무거워진 게 아니라 서로의 잠금을 기다리는 거예요.
+
+## 쉬는 대기는 빼고 봐요
+
+대기 이벤트에는 할 일이 없어 쉬는 대기도 있어요. PostgreSQL의 `ClientRead`는 앱이 다음 데이터를 보내길 기다리는 대기예요. Oracle도 Idle 종류의 대기는 성능 문제를 볼 때 빼라고 해요.
+
+<Figure caption="세션 둘의 10초를 그린 예시예요. 세션 A의 Lock 대기는 일하다 막힌 대기예요. 세션 B의 ClientRead는 앱이 다음 데이터를 보내길 기다리며 쉬는 대기라서, 성능 문제를 볼 때 빼요.">
+  <Timeline
+    ariaLabel="세션 A는 CPU로 일하다 3초부터 7초까지 잠금을 기다린 뒤 다시 CPU로 일하고, 세션 B는 2초까지 CPU로 일한 뒤 10초까지 앱의 다음 데이터를 기다리는 ClientRead로 쉬는 시간 띠"
+    end={10}
+    lanes={[
+      { label: '세션 A', segments: [{ start: 0, end: 3, label: 'CPU', tone: 'accent' }, { start: 3, end: 7, label: 'Lock 대기', tone: 'warn' }, { start: 7, end: 10, label: 'CPU', tone: 'accent' }] },
+      { label: '세션 B', segments: [{ start: 0, end: 2, label: 'CPU', tone: 'accent' }, { start: 2, end: 10, label: 'ClientRead (쉼)' }] },
+    ]}
     ticks={[{ at: 0, label: '0초' }, { at: 5, label: '5초' }, { at: 10, label: '10초' }]}
   />
 </Figure>

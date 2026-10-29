@@ -23,7 +23,7 @@ sources:
     url: https://github.com/micrometer-metrics/micrometer/blob/main/micrometer-core/src/main/java/io/micrometer/core/instrument/binder/jvm/JvmGcMetrics.java
   - title: OpenTelemetry — Semantic conventions for JVM metrics
     url: https://opentelemetry.io/docs/specs/semconv/runtime/jvm-metrics/
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <OnDashboard title="주문 API · 응답시간 분포도 · 14:00~14:10" caption="14:03과 14:07에 GC가 앱을 1.2초씩 멈췄어요. 그동안 처리 중이던 요청이 멈춤이 풀린 뒤 함께 끝나서 세로줄이 생겼어요.">
@@ -32,19 +32,19 @@ updated: 2026-10-14
 
 <KeyPoints>
   <Point title="GC가 멈추면 요청도 함께 멈춰요">
-    Java는 더 쓰지 않는 객체를 GC(가비지 컬렉션)로 치워요. GC의 몇몇 단계는 앱 스레드를 모두 세운 채(stop-the-world) 진행해서, 그동안 처리 중이던 요청도 함께 멈춰요.
-
-    멈춤이 풀리면 기다리던 요청이 비슷한 때에 끝나요. 그래서 <Term slug="apm/response-time-distribution">분포도</Term>에 세로줄이 생기고, 줄의 꼭대기는 멈춘 시간에 평소 처리 시간을 더한 만큼이에요.
+    GC의 몇몇 단계는 앱 스레드를 모두 세워요. 그동안 처리 중이던 요청은 멈춤이 풀린 뒤 한꺼번에 끝나요.
   </Point>
   <Point title="멈춤 길이는 GC 종류마다 달라요">
-    CPU 2개, 메모리 1792MB 이상이면 기본으로 쓰는 G1은 멈춤 목표를 200ms로 둬요. 목표일 뿐이라, 한 번 한 번의 멈춤을 보장하지는 않아요. OpenJDK 문서는 G1의 멈춤이 밀리초에서 초 단위까지 간다고 해요.
-
-    ZGC는 대부분의 일을 앱과 함께 돌려서, 멈춤이 마이크로초 단위예요. 어느 GC를 쓰는지에 따라 같은 힙에서도 멈춤 길이가 크게 달라요.
+    G1은 밀리초에서 초 단위까지, ZGC는 마이크로초 단위로 멈춰요.
   </Point>
   <Point title="멈춘 시간과 함께 돈 시간을 나눠 봐요">
-    GC에는 앱을 세우는 시간과, 앱과 함께 도는 시간이 있어요. 응답시간을 늘리는 건 앞의 것이에요. Micrometer는 둘을 `jvm.gc.pause`(멈춤)와 `jvm.gc.concurrent.phase.time`(함께 돈 시간)으로 나눠요.
+    응답시간을 늘리는 건 앱을 세운 시간뿐이에요. 지표도 둘을 따로 내요.
   </Point>
 </KeyPoints>
+
+## GC가 멈추는 동안 요청도 멈춰요
+
+Java는 더 쓰지 않는 객체를 GC(가비지 컬렉션)로 치워요. GC의 몇몇 단계는 앱 스레드를 모두 세운 채(stop-the-world) 진행해서, 그동안 처리 중이던 요청도 함께 멈춰요.
 
 <Figure caption="GC가 앱을 1.2초 멈춘 예시예요. 멈춤 전후로 들어온 요청 A, B, C가 모두 멈춤이 풀린 직후에 함께 끝나요. 그래서 분포도에 세로줄이 생겨요.">
   <Timeline
@@ -65,6 +65,40 @@ updated: 2026-10-14
       { at: 0, label: '0초' },
       { at: 1000, label: '1초' },
       { at: 2000, label: '2초' },
+    ]}
+  />
+</Figure>
+
+멈춤이 풀리면 기다리던 요청이 비슷한 때에 끝나요. 그래서 <Term slug="apm/response-time-distribution">분포도</Term>에 세로줄이 생기고, 줄의 꼭대기는 멈춘 시간에 평소 처리 시간을 더한 만큼이에요.
+
+## 멈춤 길이는 GC 종류마다 달라요
+
+CPU 2개, 메모리 1792MB 이상이면 기본으로 쓰는 G1은 멈춤 목표를 200ms로 둬요. 목표일 뿐이라, 한 번 한 번의 멈춤을 보장하지는 않아요. OpenJDK 문서는 G1의 멈춤이 밀리초에서 초 단위까지 간다고 해요.
+
+ZGC는 대부분의 일을 앱과 함께 돌려서, 멈춤이 마이크로초 단위예요. 어느 GC를 쓰는지에 따라 같은 힙에서도 멈춤 길이가 크게 달라요.
+
+<Figure caption="두 GC의 멈춤을 견줬어요. G1의 200ms는 목표일 뿐이고, 실제 멈춤은 초 단위까지 가기도 해요.">
+  <Compare
+    columns={['G1', 'ZGC']}
+    rows={[
+      { label: '쓰는 때', values: ['CPU 2개, 메모리 1792MB 이상이면 기본', '직접 골라서 써요'] },
+      { label: '멈춤 목표', values: ['200ms(보장은 아님)', '1ms 넘지 않기'] },
+      { label: '실제 멈춤', values: ['밀리초에서 초 단위', '마이크로초 단위'] },
+    ]}
+  />
+</Figure>
+
+## 멈춘 시간과 함께 돈 시간을 나눠 봐요
+
+GC에는 앱을 세우는 시간과, 앱과 함께 도는 시간이 있어요. 응답시간을 늘리는 건 앞의 것이에요. Micrometer는 둘을 `jvm.gc.pause`(멈춤)와 `jvm.gc.concurrent.phase.time`(함께 돈 시간)으로 나눠요.
+
+<Figure caption="GC 한 주기를 줄여 그린 예시예요. 빨간 칸은 앱을 세운 멈춤, 회색 칸은 앱과 함께 돈 일이에요. 앱 스레드가 비는 곳은 빨간 칸뿐이라, 응답시간에는 빨간 칸만 더해져요.">
+  <Timeline
+    ariaLabel="GC가 세 번 짧게 앱을 멈추고, 그 사이 긴 표시 작업은 앱과 함께 돌아서, 앱 스레드는 멈춤 동안에만 비는 시간 띠"
+    end={1000}
+    lanes={[
+      { label: 'GC', segments: [{ start: 100, end: 140, tone: 'warn' }, { start: 200, end: 760, label: '앱과 함께 표시' }, { start: 760, end: 800, tone: 'warn' }, { start: 860, end: 890, tone: 'warn' }] },
+      { label: '앱 스레드', segments: [{ start: 0, end: 100, tone: 'accent' }, { start: 140, end: 760, label: '일함', tone: 'accent' }, { start: 800, end: 860, tone: 'accent' }, { start: 890, end: 1000, tone: 'accent' }] },
     ]}
   />
 </Figure>

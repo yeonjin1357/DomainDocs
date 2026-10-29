@@ -19,7 +19,7 @@ sources:
     url: https://opentelemetry.io/docs/specs/semconv/db/database-metrics/
   - title: PostgreSQL — Connections and Authentication (max_connections)
     url: https://www.postgresql.org/docs/current/runtime-config-connection.html
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <OnDashboard title="주문 API · 커넥션 풀(최대 10개) · 최근 10분" caption="쿼리가 느려지자 사용 중 커넥션이 최대 10개에 붙고, 커넥션을 기다리는 스레드가 26개로 늘었어요. 쿼리는 50ms인데 커넥션을 얻기까지 1.8초를 기다려요.">
@@ -30,19 +30,79 @@ updated: 2026-10-14
 
 <KeyPoints>
   <Point title="풀이 바닥나면 쿼리 밖에서 기다려요">
-    커넥션 풀은 DB 연결을 미리 열어 두고 빌려 쓰는 곳이에요. HikariCP에서는 최대 개수(`maximumPoolSize`, 기본 10)를 다 빌려 가면 다음 요청은 기다려요. `connectionTimeout`(기본 30초)이 지나도 못 얻으면 예외를 던져요.
-
-    그래서 쿼리 시간은 그대로인데 응답시간만 늘어요. 커넥션을 얻는 단계가 계측되지 않았다면, <Term slug="apm/trace-waterfall">워터폴</Term>에서는 DB span 앞의 빈칸으로 보여요.
+    커넥션을 다 빌려 가면 다음 요청은 기다려요. 그래서 쿼리 시간은 그대로인데 응답시간만 늘어요.
   </Point>
   <Point title="필요한 개수는 빌리는 횟수 × 쥐는 시간이에요">
-    <Term slug="apm/throughput-and-concurrency">동시 처리 수</Term>와 같은 셈이에요. 초당 400번 빌리고 한 번에 20ms 쥐면, 평균 8개를 동시에 써요. 쥐는 시간이 50ms로 늘면 20개가 필요해서, 최대 10개를 넘는 몫은 기다려요.
-
-    쥐는 시간은 쿼리 시간이 아니라 빌려서 돌려줄 때까지예요. 트랜잭션 안에서 다른 일을 하면 그 시간도 들어가요.
+    초당 빌리는 횟수에 한 번 쥐는 시간을 곱하면 동시에 쓰는 개수예요. 이 값이 최대 개수를 넘는 몫은 기다려요.
   </Point>
   <Point title="풀을 키우기 전에 쥐는 시간을 줄여요">
-    HikariCP 문서는 작은 풀을 권해요. 풀 크기는 DB가 동시에 처리할 수 있는 쿼리 수에 맞추고, 나머지 스레드는 풀에서 기다리게 해요. DB의 CPU 코어보다 동시 쿼리가 훨씬 많으면, 번갈아 처리하느라 오히려 느려져요.
+    HikariCP 문서는 작은 풀을 권해요. DB 코어보다 동시 쿼리가 훨씬 많으면 오히려 느려져요.
   </Point>
 </KeyPoints>
+
+## 풀이 바닥나면 쿼리 밖에서 기다려요
+
+커넥션 풀은 DB 연결을 미리 열어 두고 빌려 쓰는 곳이에요. HikariCP에서는 최대 개수(`maximumPoolSize`, 기본 10)를 다 빌려 가면 다음 요청은 기다려요. `connectionTimeout`(기본 30초)이 지나도 못 얻으면 예외를 던져요.
+
+그래서 쿼리 시간은 그대로인데 응답시간만 늘어요. 커넥션을 얻는 단계가 계측되지 않았다면, <Term slug="apm/trace-waterfall">워터폴</Term>에서는 DB span 앞의 빈칸으로 보여요.
+
+<Figure caption="위 화면의 숫자로 그린 트레이스 예시예요. 쿼리는 50ms인데, 커넥션을 기다린 1.8초가 DB span 앞에 빈칸으로 남아요.">
+  <Waterfall
+    ariaLabel="주문 요청 1,850ms 중 앞의 1,800ms는 하위 구간 없는 빈칸이고, 마지막 50ms에만 DB 쿼리 span이 있는 워터폴"
+    unit="ms"
+    spans={[
+      { label: '주문 요청', start: 0, duration: 1850 },
+      { label: 'DB 쿼리', start: 1800, duration: 50, depth: 1, tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+## 필요한 개수는 빌리는 횟수 × 쥐는 시간이에요
+
+<Term slug="apm/throughput-and-concurrency">동시 처리 수</Term>와 같은 셈이에요. 초당 400번 빌리고 한 번에 20ms 쥐면, 평균 8개를 동시에 써요. 쥐는 시간이 50ms로 늘면 20개가 필요해서, 최대 10개를 넘는 몫은 기다려요.
+
+<Figure caption="초당 400번 빌리는 풀에서 쥐는 시간만 바꿔 견줬어요. 50ms면 20개가 필요해서, 최대 10개를 넘는 몫이 기다려요.">
+  <Compare
+    columns={['쥐는 시간 20ms', '쥐는 시간 50ms']}
+    rows={[
+      { label: '동시에 쓰는 개수', values: ['400 × 0.02초 = 8개', '400 × 0.05초 = 20개'] },
+      { label: '최대 10개 풀이면', values: ['안에 들어요', '넘는 10개 몫이 기다려요'] },
+    ]}
+  />
+</Figure>
+
+쥐는 시간은 쿼리 시간이 아니라 빌려서 돌려줄 때까지예요. 트랜잭션 안에서 다른 일을 하면 그 시간도 들어가요.
+
+<Figure caption="커넥션 하나를 쥐는 동안을 줄여 그린 예시예요. 쿼리는 합쳐 20ms인데, 사이에 다른 일을 30ms 해서 커넥션은 50ms 동안 묶여요.">
+  <Timeline
+    ariaLabel="커넥션을 0ms에 빌려 50ms에 돌려주는 동안, 쿼리는 처음 10ms와 마지막 10ms에만 돌고 가운데 30ms는 다른 일을 하는 시간 띠"
+    end={50}
+    lanes={[
+      { label: '커넥션', segments: [{ start: 0, end: 50, label: '쥔 시간 50ms', tone: 'warn' }] },
+      { label: '쿼리', segments: [{ start: 0, end: 10, label: '10ms', tone: 'accent' }, { start: 40, end: 50, label: '10ms', tone: 'accent' }] },
+      { label: '다른 일', segments: [{ start: 10, end: 40, label: '30ms' }] },
+    ]}
+    marks={[
+      { at: 0, label: '빌림' },
+      { at: 50, label: '돌려줌' },
+    ]}
+  />
+</Figure>
+
+## 풀을 키우기 전에 쥐는 시간을 줄여요
+
+HikariCP 문서는 작은 풀을 권해요. 풀 크기는 DB가 동시에 처리할 수 있는 쿼리 수에 맞추고, 나머지 스레드는 풀에서 기다리게 해요. DB의 CPU 코어보다 동시 쿼리가 훨씬 많으면, 번갈아 처리하느라 오히려 느려져요.
+
+<Figure caption="풀 크기에 따라 요청이 기다리는 곳이 달라져요. 작은 풀은 남는 스레드를 DB 안이 아니라 풀에서 기다리게 해요.">
+  <Compare
+    columns={['큰 풀', '작은 풀']}
+    rows={[
+      { label: 'DB에 들어간 동시 쿼리', values: ['DB 코어보다 훨씬 많아요', 'DB가 처리할 수 있는 만큼'] },
+      { label: '남는 일이 기다리는 곳', values: ['DB 안에서 번갈아', '풀에서 차례로'] },
+      { label: 'DB', values: ['번갈아 처리하느라 느려져요', '처리할 만큼만 받아요'] },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>응답시간은 늘었는데 쿼리 시간은 그대로라면, 커넥션 대기 시간과 대기 스레드 수를 보세요. Micrometer로 내보낸 HikariCP 지표라면 대기 시간은 `hikaricp_connections_acquire_seconds`예요. 대기 스레드 수는 `hikaricp_connections_pending`이에요.</Check>

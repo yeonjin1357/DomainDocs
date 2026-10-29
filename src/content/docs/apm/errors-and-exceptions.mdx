@@ -23,7 +23,7 @@ sources:
     url: https://docs.newrelic.com/docs/apm/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/
   - title: Sentry — Event grouping
     url: https://docs.sentry.io/concepts/data-management/event-grouping/
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <OnDashboard title="주문 API · 최근 5분 · 요청 10,000건" caption="같은 5분의 숫자예요. 에러율은 5xx로 실패한 요청만 세서 0.5%이고, 4xx 응답과 에러 로그는 따로 세요.">
@@ -34,21 +34,68 @@ updated: 2026-10-14
 
 <KeyPoints>
   <Point title="에러율은 실패한 요청의 비율이에요">
-    에러율은 실패한 요청 수를 전체 요청 수로 나눈 값이에요. OpenTelemetry(오픈소스 계측 도구)는 작업이 예외를 밖으로 던지거나 에러 코드로 끝나면 실패로 봐요. 그림이라면 50 ÷ 10,000 = 0.5%예요.
-
-    그래서 에러율은 요청 단위예요. 요청 하나가 실패하면, 그 안에서 예외가 몇 번 났든 한 건이에요.
+    실패한 요청 수를 전체 요청 수로 나눈 값이에요. 요청 안에서 예외가 몇 번 났든 실패는 한 건이에요.
   </Point>
   <Point title="서버는 5xx만 에러로 세요">
-    OpenTelemetry HTTP 규약은 서버 쪽 <Term slug="foundations/logs-metrics-traces">span</Term>에서 5xx 응답을 에러로 봐요. 4xx는 서버 span 상태를 비워 둬요. HTTP 명세(RFC 9110)도 4xx를 클라이언트가 잘못한 것으로 보이는 응답으로 정해요.
-
-    반대로 요청을 보낸 클라이언트 span에서는 4xx도 에러예요. 그래서 같은 404가 부른 쪽에선 에러이고, 받은 쪽에선 에러가 아니에요.
+    서버 span은 5xx만 에러로 봐요. 요청을 보낸 쪽 span에서는 4xx도 에러예요.
   </Point>
   <Point title="예외 수는 실패한 요청 수가 아니에요">
-    코드가 잡아서 처리한 예외는 요청을 실패시키지 않아요. 재시도해서 성공한 호출이 그 예예요. OpenTelemetry는 처리한 에러를 그 작업의 span과 지표에 남기지 말라고 해요.
-
-    하지만 앱 로그에는 처리한 예외도 남을 수 있어요. 요청 하나가 예외 로그를 여러 줄 남기기도 해서, 로그 줄 수로 낸 에러율은 부풀어요.
+    처리한 예외는 요청을 실패시키지 않아요. 그래서 로그 줄 수로 낸 에러율은 부풀어요.
   </Point>
 </KeyPoints>
+
+## 에러율은 실패한 요청의 비율이에요
+
+에러율은 실패한 요청 수를 전체 요청 수로 나눈 값이에요. OpenTelemetry(오픈소스 계측 도구)는 작업이 예외를 밖으로 던지거나 에러 코드로 끝나면 실패로 봐요. 위 화면이라면 50 ÷ 10,000 = 0.5%예요.
+
+그래서 에러율은 요청 단위예요. 요청 하나가 실패하면, 그 안에서 예외가 몇 번 났든 한 건이에요.
+
+<Figure caption="요청 5건의 예시예요. 예외는 모두 4번 났지만 실패한 요청은 1건이라, 에러율은 1 ÷ 5 = 20%예요.">
+  <Strip
+    ariaLabel="요청 5건 중 세 번째 요청만 실패했고, 그 요청에서 예외가 3번, 성공한 두 번째 요청에서 예외가 1번 나서, 예외는 4번이지만 에러는 1건인 칸 띠"
+    rows={[
+      { label: '요청 결과', cells: ['성공', '성공', { label: '실패', tone: 'warn' }, '성공', '성공'] },
+      { label: '그 요청에서 난 예외', cells: ['0번', '1번', { label: '3번', tone: 'warn' }, '0번', '0번'] },
+    ]}
+    ranges={[{ row: 0, from: 2, to: 2, label: '에러 1건', tone: 'warn' }]}
+  />
+</Figure>
+
+## 서버는 5xx만 에러로 세요
+
+OpenTelemetry HTTP 규약은 서버 쪽 <Term slug="foundations/logs-metrics-traces">span</Term>에서 5xx 응답을 에러로 봐요. 4xx는 서버 span 상태를 비워 둬요. HTTP 명세(RFC 9110)도 4xx를 클라이언트가 잘못한 것으로 보이는 응답으로 정해요.
+
+반대로 요청을 보낸 클라이언트 span에서는 4xx도 에러예요. 그래서 같은 404가 부른 쪽에선 에러이고, 받은 쪽에선 에러가 아니에요.
+
+<Figure caption="같은 HTTP 호출을 양쪽 span에서 본 모습이에요. 5xx는 양쪽 모두 에러지만, 4xx는 부른 쪽에서만 에러예요.">
+  <Compare
+    columns={['부른 쪽(클라이언트 span)', '받은 쪽(서버 span)']}
+    rows={[
+      { label: '5xx 응답', values: ['에러', '에러'] },
+      { label: '4xx 응답(예: 404)', values: ['에러', '에러 아님(상태를 비워 둬요)'] },
+    ]}
+  />
+</Figure>
+
+## 예외 수는 실패한 요청 수가 아니에요
+
+코드가 잡아서 처리한 예외는 요청을 실패시키지 않아요. 재시도해서 성공한 호출이 그 예예요. OpenTelemetry는 처리한 에러를 그 작업의 span과 지표에 남기지 말라고 해요.
+
+하지만 앱 로그에는 처리한 예외도 남을 수 있어요. 요청 하나가 예외 로그를 여러 줄 남기기도 해서, 로그 줄 수로 낸 에러율은 부풀어요.
+
+<Figure caption="재시도로 성공한 호출의 예시예요. 첫 호출의 예외가 로그에 한 줄 남지만, 요청은 성공 한 건이라 에러율에는 들어가지 않아요.">
+  <Sequence
+    ariaLabel="앱이 외부 API를 불렀다가 실패해 예외를 잡고 로그에 한 줄 남긴 뒤, 다시 불러 성공하는 순서"
+    participants={['로그', '앱', '외부 API']}
+    messages={[
+      { from: '앱', to: '외부 API', label: '호출' },
+      { from: '외부 API', to: '앱', label: '실패', dashed: true, tone: 'warn' },
+      { from: '앱', to: '로그', label: '예외 한 줄' },
+      { from: '앱', to: '외부 API', label: '다시 호출' },
+      { from: '외부 API', to: '앱', label: '성공', dashed: true, tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>4xx를 서버 에러율에 넣은 계산은 다시 보세요. 잘못된 요청이 몰리면 서버가 멀쩡해도 에러율이 올라요. 4xx가 갑자기 늘었다면(예: 배포 뒤 401) 따로 지켜보세요.</Check>

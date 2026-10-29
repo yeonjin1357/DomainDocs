@@ -27,7 +27,7 @@ sources:
     url: https://docs.cloud.google.com/architecture/framework/reliability/define-reliability-based-on-user-experience-goals
   - title: Prometheus — Histograms and summaries (300ms 안에 끝난 요청의 비율)
     url: https://prometheus.io/docs/practices/histograms/
-updated: 2026-10-13
+updated: 2026-10-29
 ---
 
 <OnDashboard title="결제 API · SLO 99.9% · 30일" caption="30일 동안 요청 100만 건 중 1,000건(0.1%)까지 실패할 수 있는데, 500건이 실패했어요. 그래서 성공률은 99.95%이고, 에러 버짓은 절반이 남았어요.">
@@ -44,21 +44,95 @@ updated: 2026-10-13
 
 <KeyPoints>
   <Point title="SLI는 좋은 요청의 비율로 두면 좋아요">
-    SLI(service level indicator, 서비스 수준 지표)는 사용자가 겪는 서비스 품질을 잰 숫자예요. Google SRE Workbook은 SLI를 '좋은 이벤트 수 ÷ 전체 이벤트 수'로 두라고 권해요. 예를 들면 '300ms 안에 성공한 요청 ÷ 전체 요청'이에요.
-
-    비율이라 값이 0~100% 사이에 들어서, 목표와 견주기 쉬워요. 서버 CPU 사용률 같은 내부 지표는 SLI로 두지 않아요. CPU 과부하는 느린 응답의 원인일 뿐, 사용자가 겪는 일은 아니에요.
+    SLI는 '300ms 안에 성공한 요청 ÷ 전체 요청'처럼 좋은 요청의 비율로 둬요. 값이 0~100% 사이라 목표와 견주기 쉬워요.
   </Point>
   <Point title="SLO는 목표와 기간을 함께 정해요">
-    SLO(service level objective, 서비스 수준 목표)는 SLI가 이뤄야 할 목표값이에요. '30일 동안 99.9%'처럼 기간이 함께 있어야 지켰는지 판정할 수 있어요. 요청이 고르게 들어올 때 모든 요청이 30분 동안 실패하면, 하루 기준으론 목표를 깨지만 30일 기준으론 허용 범위 안이에요.
-
-    SLA(service level agreement, 서비스 수준 협약)는 목표를 못 지켰을 때 환불 같은 대가를 정한 계약이에요. 그래서 SLA 목표는 보통 내부 SLO보다 느슨하게 둬요. SLA가 한 달 99.9%, 내부 SLO가 99.95%라면 내부 목표가 먼저 깨져서, 계약을 어기기 전에 손볼 수 있어요.
+    '30일 동안 99.9%'처럼 기간이 함께 있어야 지켰는지 판정할 수 있어요.
   </Point>
   <Point title="에러 버짓은 허용한 실패의 양이에요">
-    에러 버짓(error budget)은 100%에서 SLO를 뺀 만큼의 실패예요. 30일 99.9%라면 0.1%라서, 30일 요청이 100만 건이면 1,000건까지 실패해도 돼요. 정상이던 시간으로 재면 30일(43,200분)의 0.1%인 43.2분이에요.
-
-    99.99%로 9를 하나 더하면 버짓은 4.32분으로 10분의 1이 돼요. Google SRE Book은 신뢰성을 한 단계 올리는 비용이 앞 단계의 100배일 수도 있다고 해요. 같은 책의 예에선 버짓이 남으면 배포를 이어 가고, 다 쓰면 잠시 멈춰요.
+    100%에서 SLO를 뺀 만큼이에요. 30일 99.9%에 요청이 100만 건이면 1,000건까지 실패해도 돼요.
   </Point>
 </KeyPoints>
+
+## SLI는 좋은 요청의 비율로 두면 좋아요
+
+SLI(service level indicator, 서비스 수준 지표)는 사용자가 겪는 서비스 품질을 잰 숫자예요. Google SRE Workbook은 SLI를 '좋은 이벤트 수 ÷ 전체 이벤트 수'로 두라고 권해요. 예를 들면 '300ms 안에 성공한 요청 ÷ 전체 요청'이에요.
+
+<Figure caption="전체 요청을 좋은 요청과 나머지로 나눠요. SLI는 좋은 요청 수를 전체 요청 수로 나눈 비율이에요.">
+  <Flow
+    ariaLabel="전체 요청이 300ms 안에 성공한 좋은 요청과, 느리거나 실패한 나머지로 갈리고, 좋은 요청 수와 전체 요청 수로 SLI를 구하는 구조도"
+    nodes={[
+      { id: 'all', label: '전체 요청', col: 1, row: 0 },
+      { id: 'good', label: '좋은 요청', col: 0, row: 1, note: '300ms 안 성공', tone: 'accent' },
+      { id: 'rest', label: '나머지', col: 2, row: 1, note: '느리거나 실패' },
+      { id: 'sli', label: 'SLI', col: 1, row: 2, note: '좋은 ÷ 전체', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'all', to: 'good' },
+      { from: 'all', to: 'rest' },
+      { from: 'good', to: 'sli', tone: 'accent' },
+      { from: 'all', to: 'sli' },
+    ]}
+  />
+</Figure>
+
+비율이라 값이 0~100% 사이에 들어서, 목표와 견주기 쉬워요. 서버 CPU 사용률 같은 내부 지표는 SLI로 두지 않아요. CPU 과부하는 느린 응답의 원인일 뿐, 사용자가 겪는 일은 아니에요.
+
+## SLO는 목표와 기간을 함께 정해요
+
+SLO(service level objective, 서비스 수준 목표)는 SLI가 이뤄야 할 목표값이에요. '30일 동안 99.9%'처럼 기간이 함께 있어야 지켰는지 판정할 수 있어요. 요청이 고르게 들어올 때 모든 요청이 30분 동안 실패하면, 하루 기준으론 목표를 깨지만 30일 기준으론 허용 범위 안이에요.
+
+<Figure caption="같은 99.9%라도 기간이 길면 허용하는 실패도 길어요. 요청이 고르게 들어온다고 본 예예요.">
+  <Compare
+    columns={['하루 기준', '30일 기준']}
+    rows={[
+      { label: '99.9%가 허용하는 실패 시간', values: ['1.44분', '43.2분'] },
+      { label: '모든 요청이 30분 실패하면', values: ['목표를 깨요', '허용 범위 안이에요'] },
+    ]}
+  />
+</Figure>
+
+SLA(service level agreement, 서비스 수준 협약)는 목표를 못 지켰을 때 환불 같은 대가를 정한 계약이에요. 그래서 SLA 목표는 보통 내부 SLO보다 느슨하게 둬요. SLA가 한 달 99.9%, 내부 SLO가 99.95%라면 내부 목표가 먼저 깨져서, 계약을 어기기 전에 손볼 수 있어요.
+
+<Figure caption="SLI가 조금씩 떨어지는 예시예요. 내부 SLO 99.95%가 먼저 깨지고, SLA 99.9%는 그 뒤에 깨져요. 그 사이가 계약을 어기기 전에 손볼 때예요.">
+  <Strip
+    ariaLabel="SLI가 99.98, 99.97, 99.96, 99.94, 99.92, 99.88로 떨어지면서, 99.94에서 내부 SLO 99.95%가 먼저 깨지고 99.88에서 SLA 99.9%가 깨지며, 그 사이 두 칸이 손볼 때인 칸 띠"
+    rows={[
+      {
+        label: 'SLI가 떨어지는 예시(%)',
+        cells: ['99.98', '99.97', '99.96', { label: '99.94', tone: 'accent' }, { label: '99.92', tone: 'accent' }, { label: '99.88', tone: 'warn' }],
+      },
+    ]}
+    marks={[
+      { at: 3, label: 'SLO 깨짐', tone: 'accent' },
+      { at: 5, label: 'SLA 깨짐', tone: 'warn' },
+    ]}
+    ranges={[{ from: 3, to: 4, label: '계약 전에 손볼 때', tone: 'accent' }]}
+  />
+</Figure>
+
+## 에러 버짓은 허용한 실패의 양이에요
+
+에러 버짓(error budget)은 100%에서 SLO를 뺀 만큼의 실패예요. 30일 99.9%라면 0.1%라서, 30일 요청이 100만 건이면 1,000건까지 실패해도 돼요. 정상이던 시간으로 재면 30일(43,200분)의 0.1%인 43.2분이에요.
+
+<Figure caption="30일 99.9% SLO의 에러 버짓은 0.1%예요. 요청으로 세면 100만 건 중 1,000건, 시간으로 재면 43,200분 중 43.2분이에요.">
+  <Flow
+    ariaLabel="SLO 99.9%를 100%에서 빼면 에러 버짓 0.1%가 되고, 이것을 요청으로 세면 100만 건 중 1,000건, 시간으로 재면 43,200분 중 43.2분이 되는 구조도"
+    nodes={[
+      { id: 'slo', label: 'SLO 99.9%', col: 1, row: 0, note: '30일' },
+      { id: 'budget', label: '버짓 0.1%', col: 1, row: 1, note: '100% − SLO', tone: 'accent' },
+      { id: 'req', label: '1,000건', col: 0, row: 2, note: '100만 건 중' },
+      { id: 'min', label: '43.2분', col: 2, row: 2, note: '43,200분 중' },
+    ]}
+    edges={[
+      { from: 'slo', to: 'budget' },
+      { from: 'budget', to: 'req', tone: 'accent' },
+      { from: 'budget', to: 'min', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+99.99%로 9를 하나 더하면 버짓은 4.32분으로 10분의 1이 돼요. Google SRE Book은 신뢰성을 한 단계 올리는 비용이 앞 단계의 100배일 수도 있다고 해요. 같은 책의 예에선 버짓이 남으면 배포를 이어 가고, 다 쓰면 잠시 멈춰요.
 
 <Checkpoints>
   <Check>SLI를 '평균 응답시간 300ms 이하'로 정했다면 다시 보세요. <Term slug="foundations/percentiles">평균</Term>은 느린 요청을 숨기고, 나쁜 요청을 세지 않아 에러 버짓으로 바꾸기 어려워요. '300ms 안에 끝난 요청의 비율'처럼 임계값 안에 든 요청을 세세요.</Check>
@@ -96,7 +170,7 @@ updated: 2026-10-13
 
   burn rate(소진율)는 SLO에 견줘 에러 버짓을 쓰는 속도예요. 1이면 SLO 기간이 끝나는 순간 버짓이 정확히 0이 돼요. 99.9%·30일에서 에러율 0.1%가 이어지면 burn rate가 1이에요.
 
-  burn rate는 어떤 구간의 에러율을 (1 − SLO)로 나눈 값이에요. 99.9%에서 에러율이 1%면 10이라 3일 만에, 100%면 1,000이라 43.2분 만에 버짓을 다 써요. 그림의 결제 API는 30일 에러율이 0.05%라 burn rate가 0.5예요.
+  burn rate는 어떤 구간의 에러율을 (1 − SLO)로 나눈 값이에요. 99.9%에서 에러율이 1%면 10이라 3일 만에, 100%면 1,000이라 43.2분 만에 버짓을 다 써요. 맨 위 그림의 결제 API는 30일 에러율이 0.05%라 burn rate가 0.5예요.
 
   Google SRE Workbook은 30일 99.9% SLO의 알림 출발점으로 이런 값을 권해요. 1시간 burn rate 14.4(버짓 2%)나 6시간 burn rate 6(버짓 5%)이면 사람을 불러요. 3일 burn rate 1(버짓 10%)이면 티켓(나중에 처리할 작업)만 남겨요.
 

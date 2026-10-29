@@ -19,7 +19,7 @@ sources:
     url: https://www.postgresql.org/docs/current/routine-vacuuming.html
   - title: PostgreSQL — auto_explain
     url: https://www.postgresql.org/docs/current/auto-explain.html
-updated: 2026-10-15
+updated: 2026-10-29
 ---
 
 <OnDashboard title="VIP 고객 주문 조회 · EXPLAIN ANALYZE" caption="통계를 모은 뒤 VIP 고객이 10명에서 12,000명으로 늘었어요. DB는 낡은 통계로 8명을 예상해 Nested Loop를 골랐고, 안쪽 찾기가 12,000번 돌았어요.">
@@ -31,19 +31,21 @@ updated: 2026-10-15
 
 <KeyPoints>
   <Point title="실행 계획은 노드를 쌓은 나무예요">
-    `EXPLAIN`은 DB가 SQL을 실행하려고 고른 방법을 노드 나무로 보여 줘요. 맨 아래 노드는 표에서 행을 읽어요. 전체를 훑는 Seq Scan, 인덱스로 찾는 Index Scan이 그 예예요.
-
-    그 위 노드는 아래에서 올라온 행을 합치거나(Join) 정렬해요. 줄마다 붙는 `cost`는 시간이 아니라 플래너가 쓰는 임의 단위예요. 계획이 SQL 실행의 어디쯤에서 정해지는지는 <Term slug="database/query-processing">SQL이 실행되는 과정</Term>에서 다뤄요.
+    맨 아래 노드가 표에서 행을 읽고, 그 위 노드가 올라온 행을 합치거나 정렬해요.
   </Point>
   <Point title="예상과 실제 행 수가 다른 곳을 찾아요">
-    `EXPLAIN ANALYZE`는 SQL을 실제로 실행해, 노드마다 걸린 시간과 실제 행 수를 함께 보여 줘요. PostgreSQL 문서는 예상 행 수가 실제와 가까운지가 보통 가장 중요하다고 해요.
-
-    예상이 크게 빗나가면 그 자리에 맞지 않는 방법을 고르기 쉬워요. 그림처럼 8건을 예상하고 고른 Nested Loop는, 12,000건 앞에서 안쪽 찾기를 12,000번 돌려요. 통계를 다시 모으자 예상이 11,978건이 되고, DB는 Hash Join으로 바꿨어요.
+    예상이 크게 빗나가면 그 자리에 맞지 않는 방법을 고르기 쉬워요.
   </Point>
   <Point title="loops를 곱해야 그 노드의 전체 시간이에요">
-    노드가 여러 번 실행되면, 표시된 시간과 행 수는 한 번 실행의 평균이에요. `loops` 값을 곱해야 그 노드에서 쓴 전체 시간이에요. 안쪽 찾기가 한 번에 0.1ms라도, 그림처럼 12,000번이면 1,200ms예요.
+    표시된 시간은 한 번 실행의 평균이라, `loops` 값을 곱해야 그 노드에서 쓴 전체 시간이에요.
   </Point>
 </KeyPoints>
+
+## 실행 계획은 노드를 쌓은 나무예요
+
+`EXPLAIN`은 DB가 SQL을 실행하려고 고른 방법을 노드 나무로 보여 줘요. 맨 아래 노드는 표에서 행을 읽어요. 전체를 훑는 Seq Scan, 인덱스로 찾는 Index Scan이 그 예예요.
+
+그 위 노드는 아래에서 올라온 행을 합치거나(Join) 정렬해요.
 
 <Figure caption="낡은 통계로 고른 계획이에요. 아래 노드가 위 노드로 행을 올려 줘요. 바깥 Seq Scan은 8행을 예상했지만 12,000행을 올렸고, 안쪽 Index Scan은 그 행마다 한 번씩 12,000번 돌았어요.">
   <Flow
@@ -60,6 +62,14 @@ updated: 2026-10-15
   />
 </Figure>
 
+줄마다 붙는 `cost`는 시간이 아니라 플래너가 쓰는 임의 단위예요. 계획이 SQL 실행의 어디쯤에서 정해지는지는 <Term slug="database/query-processing">SQL이 실행되는 과정</Term>에서 다뤄요.
+
+## 예상과 실제 행 수가 다른 곳을 찾아요
+
+`EXPLAIN ANALYZE`는 SQL을 실제로 실행해, 노드마다 걸린 시간과 실제 행 수를 함께 보여 줘요. PostgreSQL 문서는 예상 행 수가 실제와 가까운지가 보통 가장 중요하다고 해요.
+
+예상이 크게 빗나가면 그 자리에 맞지 않는 방법을 고르기 쉬워요. 앞 그림처럼 8건을 예상하고 고른 Nested Loop는, 12,000건 앞에서 안쪽 찾기를 12,000번 돌려요. 통계를 다시 모으자 예상이 11,978건이 되고, DB는 Hash Join으로 바꿨어요.
+
 <Figure caption="같은 SQL을 통계를 다시 모으기 전과 뒤에 견줬어요. 예상 행 수가 실제와 맞자 DB가 다른 방법을 골랐어요.">
   <Compare
     columns={['ANALYZE 전', 'ANALYZE 뒤']}
@@ -68,6 +78,25 @@ updated: 2026-10-15
       { label: '고른 방법', values: ['Nested Loop', 'Hash Join'] },
       { label: '주문 표 읽기', values: ['VIP마다 인덱스로 12,000번', '한 번 훑어 해시로 맞춰요'] },
     ]}
+  />
+</Figure>
+
+## loops를 곱해야 그 노드의 전체 시간이에요
+
+노드가 여러 번 실행되면, 표시된 시간과 행 수는 한 번 실행의 평균이에요. `loops` 값을 곱해야 그 노드에서 쓴 전체 시간이에요. 안쪽 찾기가 한 번에 0.1ms라도, 그림처럼 12,000번이면 1,200ms예요.
+
+<Figure caption="안쪽 찾기 한 번이 0.1ms인 예시예요. 계획에 보이는 시간은 한 번 실행의 평균이라, loops 12,000을 곱해야 이 노드가 쓴 1,200ms가 나와요.">
+  <Strip
+    ariaLabel="안쪽 Index Scan이 1번째부터 12,000번째까지 한 번에 0.1ms씩 실행되고, 계획에는 한 번의 평균 0.1ms만 보이며, 모두 더하면 1,200ms인 칸 띠"
+    rows={[
+      {
+        label: '안쪽 Index Scan · loops 12,000',
+        heads: ['1번', '2번', '3번', '', '12,000번'],
+        cells: ['0.1ms', '0.1ms', '0.1ms', { label: '…', tone: 'sub' }, '0.1ms'],
+      },
+    ]}
+    marks={[{ at: 0, label: '계획에 보이는 값' }]}
+    ranges={[{ from: 0, to: 4, label: '0.1ms × 12,000 = 1,200ms', tone: 'warn' }]}
   />
 </Figure>
 

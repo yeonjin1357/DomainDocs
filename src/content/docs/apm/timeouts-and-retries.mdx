@@ -17,7 +17,7 @@ sources:
     url: https://sre.google/sre-book/handling-overload/
   - title: gRPC — Deadlines
     url: https://grpc.io/docs/guides/deadlines/
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <OnDashboard title="사용자 동작 한 번 · DB가 과부하로 실패할 때" caption="브라우저, 프런트 서버, 백엔드가 저마다 실패하면 3번씩 다시 시도해요. 사용자 동작 한 번이 DB에서는 64번이 돼요.">
@@ -29,19 +29,80 @@ updated: 2026-10-14
 
 <KeyPoints>
   <Point title="타임아웃은 우리 자원을 지키는 상한이에요">
-    타임아웃은 부르는 쪽이 응답을 기다리는 시간의 상한이에요. 상한이 없거나 길면, 느린 상대를 기다리는 동안 스레드와 커넥션을 붙잡아요. 그러면 상대의 문제가 우리 쪽 자원 고갈로 번져요.
-
-    Amazon은 받아들일 헛 타임아웃 비율(예: 0.1%)을 먼저 정해요. 그다음 상대 응답시간의 그 백분위수(p99.9)를 타임아웃의 출발점으로 삼아요.
+    상한이 없으면 느린 상대를 기다리는 동안 스레드와 커넥션이 묶여요. 상대의 문제가 우리 쪽 자원 고갈로 번져요.
   </Point>
   <Point title="재시도는 계층마다 곱해져요">
-    재시도는 잠깐의 실패를 덮어 주지만, 실패한 만큼 요청을 더 보내요. 계층마다 따로 재시도하면 그 수가 곱해져요. 그림처럼 세 계층이 3번씩 다시 시도하면(4번 시도) 4 × 4 × 4 = 64번이에요.
-
-    상대가 과부하로 실패하는 중이라면, 재시도가 부하를 더 키워 회복을 늦춰요. 그래서 Amazon은 재시도를 한 계층에서만 하라고 권해요.
+    세 계층이 3번씩 다시 시도하면 DB는 64번을 받아요. 그래서 재시도는 한 계층에서만 해요.
   </Point>
   <Point title="다시 보낼 땐 간격을 벌리고 흩뜨려요">
-    실패한 요청이 모두 같은 간격 뒤에 다시 오면, 또 한꺼번에 몰려 실패해요. 그래서 재시도 간격을 두 배씩처럼 점점 늘리고(지수 백오프), 무작위 값(jitter)을 더해 흩뜨려요.
+    같은 간격으로 다시 보내면 또 한꺼번에 몰려요. 간격을 점점 늘리고 무작위로 흩뜨려요.
   </Point>
 </KeyPoints>
+
+## 타임아웃은 우리 자원을 지키는 상한이에요
+
+타임아웃은 부르는 쪽이 응답을 기다리는 시간의 상한이에요. 상한이 없거나 길면, 느린 상대를 기다리는 동안 스레드와 커넥션을 붙잡아요. 그러면 상대의 문제가 우리 쪽 자원 고갈로 번져요.
+
+<Figure caption="상대가 10초 걸리는 예시예요. 상한이 없으면 스레드가 10초 내내 기다림에 묶여요. 1초 상한이면 1초에 끊고 스레드를 놓아줘요.">
+  <Timeline
+    ariaLabel="상대 응답이 10초 걸릴 때, 상한이 없으면 스레드가 0초부터 10초까지 기다림에 묶이고, 1초 상한이면 1초에 끊어 나머지 9초 동안 스레드를 다시 쓸 수 있는 시간 띠"
+    end={10}
+    lanes={[
+      { label: '상한 없음', segments: [{ start: 0, end: 10, label: '스레드가 기다림', tone: 'warn' }] },
+      { label: '1초 상한', segments: [{ start: 0, end: 1, tone: 'warn' }, { start: 1, end: 10, label: '스레드를 다시 쓸 수 있음', tone: 'accent' }] },
+    ]}
+    marks={[{ at: 1, label: '타임아웃' }]}
+    ticks={[{ at: 0, label: '0초' }, { at: 5, label: '5초' }, { at: 10, label: '10초' }]}
+  />
+</Figure>
+
+Amazon은 받아들일 헛 타임아웃 비율(예: 0.1%)을 먼저 정해요. 그다음 상대 응답시간의 그 백분위수(p99.9)를 타임아웃의 출발점으로 삼아요.
+
+## 재시도는 계층마다 곱해져요
+
+재시도는 잠깐의 실패를 덮어 주지만, 실패한 만큼 요청을 더 보내요. 계층마다 따로 재시도하면 그 수가 곱해져요. 그림처럼 세 계층이 3번씩 다시 시도하면(4번 시도) 4 × 4 × 4 = 64번이에요.
+
+<Figure caption="브라우저, 프런트 서버, 백엔드가 저마다 처음 1번에 다시 시도 3번, 모두 4번까지 보내요. 화살표를 하나 지날 때마다 4배가 돼서, 사용자 동작 한 번이 DB에서는 64번이에요.">
+  <Flow
+    ariaLabel="사용자 동작 1번이 브라우저에서 프런트 서버로 4번, 프런트 서버에서 백엔드로 16번, 백엔드에서 DB로 64번이 되어, 화살표마다 4배씩 늘어나는 구조도"
+    nodes={[
+      { id: 'browser', label: '브라우저', col: 0, row: 0, note: '동작 1번' },
+      { id: 'front', label: '프런트 서버', col: 2, row: 0, note: '4번 받음' },
+      { id: 'back', label: '백엔드', col: 2, row: 1, note: '16번 받음' },
+      { id: 'db', label: 'DB', col: 0, row: 1, note: '64번 받음', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'browser', to: 'front', label: '×4' },
+      { from: 'front', to: 'back', label: '×4' },
+      { from: 'back', to: 'db', label: '×4', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+상대가 과부하로 실패하는 중이라면, 재시도가 부하를 더 키워 회복을 늦춰요. 그래서 Amazon은 재시도를 한 계층에서만 하라고 권해요.
+
+## 다시 보낼 땐 간격을 벌리고 흩뜨려요
+
+실패한 요청이 모두 같은 간격 뒤에 다시 오면, 또 한꺼번에 몰려 실패해요. 그래서 재시도 간격을 두 배씩처럼 점점 늘리고(지수 백오프), 무작위 값(jitter)을 더해 흩뜨려요.
+
+<Figure caption="0초에 함께 실패한 두 클라이언트가 다시 보내는 때를 그린 예시예요. 위 두 줄은 간격을 1, 2, 4초로 늘려도 같은 때에 보내서 함께 몰려요. 아래 두 줄은 jitter를 더해 보내는 때가 흩어져요.">
+  <Timeline
+    ariaLabel="두 클라이언트가 0초에 함께 실패한 뒤, 백오프만 쓰면 둘 다 1초, 3초, 7초에 다시 보내 몰리고, jitter를 더하면 다시 보내는 때가 서로 다른 시각으로 흩어지는 시간 띠"
+    end={8}
+    lanes={[
+      { label: '백오프 A', segments: [{ start: 0, end: 0.25 }, { start: 1, end: 1.25, tone: 'warn' }, { start: 3, end: 3.25, tone: 'warn' }, { start: 7, end: 7.25, tone: 'warn' }] },
+      { label: '백오프 B', segments: [{ start: 0, end: 0.25 }, { start: 1, end: 1.25, tone: 'warn' }, { start: 3, end: 3.25, tone: 'warn' }, { start: 7, end: 7.25, tone: 'warn' }] },
+      { label: '+jitter A', segments: [{ start: 0, end: 0.25 }, { start: 0.6, end: 0.85, tone: 'accent' }, { start: 2.3, end: 2.55, tone: 'accent' }, { start: 5.8, end: 6.05, tone: 'accent' }] },
+      { label: '+jitter B', segments: [{ start: 0, end: 0.25 }, { start: 1.6, end: 1.85, tone: 'accent' }, { start: 3.7, end: 3.95, tone: 'accent' }, { start: 6.6, end: 6.85, tone: 'accent' }] },
+    ]}
+    marks={[
+      { at: 1.125, label: '몰림', tone: 'warn' },
+      { at: 3.125, label: '몰림', tone: 'warn' },
+      { at: 7.125, label: '몰림', tone: 'warn' },
+    ]}
+    ticks={[{ at: 0, label: '0초' }, { at: 4, label: '4초' }, { at: 8, label: '8초' }]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>타임아웃 없이 외부를 부르는 코드는 다시 보세요. 상대가 멈추면 스레드가 끝없이 기다려, 우리 서비스의 스레드 풀까지 바닥나요. gRPC도 기본으로는 마감 시각을 두지 않아서, 직접 정해야 해요.</Check>

@@ -37,7 +37,7 @@ sources:
     url: https://thanos.io/tip/components/query.md/
   - title: Thanos 소스 — pkg/query/querier.go (aggrsFromFunc)
     url: https://github.com/thanos-io/thanos/blob/v0.42.4/pkg/query/querier.go#L256-L275
-updated: 2026-10-13
+updated: 2026-10-29
 ---
 import DownsamplingDemo from '../../../components/demos/DownsamplingDemo.tsx';
 
@@ -56,21 +56,81 @@ import DownsamplingDemo from '../../../components/demos/DownsamplingDemo.tsx';
 
 <KeyPoints>
   <Point title="점 하나만 고르면 짧은 피크가 빠져요">
-    10초마다 수집하면 값이 1시간에 360개, 7일이면 60,480개예요. 7일 치는 그래프 폭의 픽셀 수보다 많아서, 점 사이 간격(Prometheus의 step, Grafana의 interval)을 벌려 그려요. 이렇게 점 수를 줄이는 일을 다운샘플링(downsampling)이라고 해요.
-
-    Prometheus에서 `[5m]` 같은 구간 없이 쓴 질의는 점마다 가장 최근 값 하나만 골라요. 그래서 짧은 피크는 점에 걸리면 그대로 보이고, 아니면 아예 빠져요.
+    `[5m]` 같은 구간 없이 쓴 Prometheus 질의는 점마다 최근 값 하나만 골라요. 짧은 피크는 점에 걸릴 때만 보여요.
   </Point>
   <Point title="평균으로 묶으면 짧은 피크가 묻혀요">
-    값을 묶을 때 점 하나가 맡는 시간을 집계 구간이라고 해요. 평소 40% 안팎인 서버가 30초 동안 95%였다고 해 봐요.
-
-    1분씩 평균을 내면 피크가 든 점은 67%로 보여요. 5분이면 45%, 15분이면 42%예요. 15분 구간에서 30초는 1/30뿐이기 때문이에요.
+    30초 동안 95%였던 피크가 5분 평균으로는 45%로 보여요.
   </Point>
   <Point title="최댓값으로 묶으면 피크는 남지만 길이가 부풀어요">
-    5분씩 묶을 때 평균 대신 최댓값을 쓰면 95%가 그대로 남아요. 대신 30초짜리 피크가 5분 내내 이어진 것처럼 보여요.
-
-    아래 데모는 값을 평균이나 최댓값으로 묶을 때를 보여 줘요. 한 점이 맡는 시간과 묶는 방법을 바꿔 보세요.
+    95%는 그대로 남지만, 30초 피크가 5분 내내 이어진 것처럼 보여요.
   </Point>
 </KeyPoints>
+
+## 점 하나만 고르면 짧은 피크가 빠져요
+
+10초마다 수집하면 값이 1시간에 360개, 7일이면 60,480개예요. 7일 치는 그래프 폭의 픽셀 수보다 많아서, 점 사이 간격(Prometheus의 step, Grafana의 interval)을 벌려 그려요. 이렇게 점 수를 줄이는 일을 다운샘플링(downsampling)이라고 해요.
+
+Prometheus에서 `[5m]` 같은 구간 없이 쓴 질의는 점마다 가장 최근 값 하나만 골라요. 그래서 짧은 피크는 점에 걸리면 그대로 보이고, 아니면 아예 빠져요.
+
+<Figure caption="칸 하나가 10초마다 수집한 CPU 사용률(%)이고, 점 간격은 예시로 1분이에요. 점은 제 시각의 가장 최근 값 하나만 골라요. 같은 30초 피크도 점에 걸리면 95%로 보이고, 아니면 사라져요.">
+  <Strip
+    ariaLabel="10초마다 수집한 값 12개를 1분 간격 점으로 그리는 두 줄의 칸 띠. 30초 피크가 점 사이에 들면 1분과 2분 점이 40%와 41%를 골라 피크가 빠지고, 피크가 1분 점에 걸리면 그 점이 95%를 고름"
+    rows={[
+      {
+        label: '피크가 점 사이에 들 때',
+        heads: ['', '', '', '', '', '1분', '', '', '', '', '', '2분'],
+        cells: ['40', '41', { label: '95', tone: 'warn' }, { label: '95', tone: 'warn' }, { label: '95', tone: 'warn' }, { label: '40', tone: 'accent' }, '39', '41', '40', '42', '40', { label: '41', tone: 'accent' }],
+      },
+      {
+        label: '피크가 점에 걸릴 때',
+        heads: ['', '', '', '', '', '1분', '', '', '', '', '', '2분'],
+        cells: ['40', '41', '40', '42', { label: '95', tone: 'warn' }, { label: '95', tone: 'warn' }, { label: '95', tone: 'warn' }, '40', '39', '41', '40', { label: '41', tone: 'accent' }],
+      },
+    ]}
+    marks={[
+      { row: 0, at: 5, label: '점 40%', tone: 'accent' },
+      { row: 0, at: 11, label: '점 41%', tone: 'accent' },
+      { row: 1, at: 5, label: '점 95%', tone: 'warn' },
+      { row: 1, at: 11, label: '점 41%', tone: 'accent' },
+    ]}
+    ranges={[
+      { row: 0, from: 2, to: 4, label: '30초 피크', tone: 'warn' },
+      { row: 1, from: 4, to: 6, label: '30초 피크', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+## 평균으로 묶으면 짧은 피크가 묻혀요
+
+값을 묶을 때 점 하나가 맡는 시간을 집계 구간이라고 해요. 평소 40% 안팎인 서버가 30초 동안 95%였다고 해 봐요.
+
+1분씩 평균을 내면 피크가 든 점은 67%로 보여요. 5분이면 45%, 15분이면 42%예요. 15분 구간에서 30초는 1/30뿐이기 때문이에요.
+
+<Figure caption="띠 하나가 30초 피크를 품은 점 하나가 맡는 시간이고, 줄 이름 옆 숫자가 그 점의 평균이에요. 맡는 시간이 길수록 같은 30초의 몫이 작아져서 피크가 묻혀요.">
+  <Timeline
+    ariaLabel="15분 동안 30초 이어진 95% 피크를, 그 피크를 품은 점이 1분이면 67%, 5분이면 45%, 15분이면 42%로 보여 주는 시간 띠. 점이 맡는 시간이 길수록 피크의 몫이 작아짐"
+    end={900}
+    lanes={[
+      { label: '원본 95%', segments: [{ start: 420, end: 450, tone: 'warn' }] },
+      { label: '1분 67%', segments: [{ start: 420, end: 480, tone: 'accent' }] },
+      { label: '5분 45%', segments: [{ start: 300, end: 600, tone: 'accent' }] },
+      { label: '15분 42%', segments: [{ start: 0, end: 900, tone: 'accent' }] },
+    ]}
+    marks={[{ at: 435, label: '30초 피크', tone: 'warn' }]}
+    ticks={[
+      { at: 0, label: '0분' },
+      { at: 300, label: '5분' },
+      { at: 600, label: '10분' },
+      { at: 900, label: '15분' },
+    ]}
+  />
+</Figure>
+
+## 최댓값으로 묶으면 피크는 남지만 길이가 부풀어요
+
+5분씩 묶을 때 평균 대신 최댓값을 쓰면 95%가 그대로 남아요. 대신 30초짜리 피크가 5분 내내 이어진 것처럼 보여요.
+
+아래 데모는 값을 평균이나 최댓값으로 묶을 때를 보여 줘요. 한 점이 맡는 시간과 묶는 방법을 바꿔 보세요.
 
 <DownsamplingDemo client:visible />
 

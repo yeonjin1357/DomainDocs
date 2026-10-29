@@ -35,7 +35,7 @@ sources:
     url: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#cardinality-limits
   - title: OpenTelemetry — Prometheus and OpenMetrics compatibility (Metric Attributes)
     url: https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/#metric-attributes
-updated: 2026-10-13
+updated: 2026-10-29
 ---
 
 <OnDashboard title="활성 시계열 수 · 배포 전후" caption="레이블에 사용자 ID를 넣어 배포한 뒤로, 새 사용자가 요청할 때마다 시계열이 늘어요.">
@@ -49,21 +49,79 @@ updated: 2026-10-13
 
 <KeyPoints>
   <Point title="레이블 조합 하나가 시계열 하나예요">
-    시계열(time series)은 값을 시각 순서로 늘어놓은 줄이에요. Prometheus는 지표 이름과 레이블(label, 키와 값의 쌍) 조합으로 줄을 구별해요. 레이블 값이 하나만 달라도 다른 시계열이에요.
-
-    요청 수를 세는 <Term slug="foundations/counters-and-rate">카운터</Term> `http_requests_total`로 보면 이래요. `{method="GET", status="200"}`과 `{method="POST", status="200"}`은 서로 다른 시계열이에요. 대시보드에 그리면 선도 두 개예요.
+    레이블 값이 하나만 달라도 다른 시계열이에요. 대시보드에 그리면 선도 따로 생겨요.
   </Point>
   <Point title="시계열 수는 최대 레이블 값 수의 곱이에요">
-    레이블 값 조합의 수, 곧 시계열 개수를 카디널리티(cardinality)라고 해요. method 5개 × status 10개 × route(`/users/:id` 같은 경로 틀) 200개면 서버 한 대에 최대 10,000개예요. 값을 기록했거나 미리 만들어 둔 조합만 시계열이 돼서, 곱은 최대치예요.
-
-    Prometheus는 수집할 때 수집 대상마다 `instance` 레이블을 붙여요. 서버마다 값이 달라서, 서버 50대면 최대 500,000개예요. 여기에 값이 10개인 레이블을 하나 더하면 5,000,000개까지 늘어요.
+    method 5개 × status 10개 × route 200개면 서버 한 대에 최대 10,000개예요.
   </Point>
   <Point title="끝없이 늘어나는 값은 레이블에 넣지 마세요">
-    사용자 ID, 요청 ID, 이메일, 원본 URL은 값이 계속 새로 나와요. 레이블에 넣으면 새 값마다 시계열이 생기고, 시계열마다 메모리와 디스크를 써요. Prometheus 문서도 사용자 ID나 이메일처럼 끝없는 값은 레이블로 쓰지 말라고 해요.
-
-    사용자별·요청별로 봐야 한다면 로그 본문이나 트레이스(요청 전체의 기록)에 남겨요. 지표 레이블에는 응답 상태 코드처럼 값이 몇 개로 정해진 것만 둬요.
+    새 값마다 시계열이 생기고, 시계열마다 메모리와 디스크를 써요. 사용자별로 볼 건 로그나 트레이스에 남겨요.
   </Point>
 </KeyPoints>
+
+## 레이블 조합 하나가 시계열 하나예요
+
+시계열(time series)은 값을 시각 순서로 늘어놓은 줄이에요. Prometheus는 지표 이름과 레이블(label, 키와 값의 쌍) 조합으로 줄을 구별해요. 레이블 값이 하나만 달라도 다른 시계열이에요.
+
+요청 수를 세는 <Term slug="foundations/counters-and-rate">카운터</Term> `http_requests_total`로 보면 이래요. `{method="GET", status="200"}`과 `{method="POST", status="200"}`은 서로 다른 시계열이에요. 대시보드에 그리면 선도 두 개예요.
+
+<Figure caption="같은 지표 http_requests_total을 15초마다 모은 예시예요. 레이블 조합마다 줄이 따로 생기고, 줄마다 값이 시각 순서로 쌓여요.">
+  <Strip
+    ariaLabel="http_requests_total 지표에서 method가 GET인 줄과 POST인 줄이 따로 있고, 줄마다 0초부터 60초까지 15초마다 모은 값이 시각 순서로 쌓인 칸 띠"
+    rows={[
+      {
+        label: 'method="GET", status="200"',
+        heads: ['0초', '15초', '30초', '45초', '60초'],
+        cells: ['100', '104', '109', '113', '118'],
+      },
+      {
+        label: 'method="POST", status="200"',
+        cells: ['20', '21', '21', '23', '24'],
+      },
+    ]}
+  />
+</Figure>
+
+## 시계열 수는 최대 레이블 값 수의 곱이에요
+
+레이블 값 조합의 수, 곧 시계열 개수를 카디널리티(cardinality)라고 해요. method 5개 × status 10개 × route(`/users/:id` 같은 경로 틀) 200개면 서버 한 대에 최대 10,000개예요. 값을 기록했거나 미리 만들어 둔 조합만 시계열이 돼서, 곱은 최대치예요.
+
+Prometheus는 수집할 때 수집 대상마다 `instance` 레이블을 붙여요. 서버마다 값이 달라서, 서버 50대면 최대 500,000개예요. 여기에 값이 10개인 레이블을 하나 더하면 5,000,000개까지 늘어요.
+
+<Figure caption="레이블마다 값의 수를 곱하면 시계열 수의 최대치예요. 레이블을 하나 더할 때마다 그 값의 수만큼 곱이 커져요.">
+  <Strip
+    ariaLabel="method 5개, status 10개, route 200개를 곱하면 서버 한 대에 최대 10,000개, instance 50개를 더 곱하면 최대 500,000개, 값이 10개인 레이블을 하나 더하면 최대 5,000,000개가 되는 칸 띠"
+    rows={[
+      {
+        label: '레이블마다 값의 수',
+        heads: ['method', 'status', 'route', 'instance', '하나 더'],
+        cells: ['5개', '10개', '200개', '50개', { label: '10개', tone: 'warn' }],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 2, label: '서버 한 대: 최대 10,000개', tone: 'accent' },
+      { from: 0, to: 3, label: '서버 50대: 최대 500,000개' },
+      { from: 0, to: 4, label: '하나 더하면: 최대 5,000,000개', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+## 끝없이 늘어나는 값은 레이블에 넣지 마세요
+
+사용자 ID, 요청 ID, 이메일, 원본 URL은 값이 계속 새로 나와요. 레이블에 넣으면 새 값마다 시계열이 생기고, 시계열마다 메모리와 디스크를 써요. Prometheus 문서도 사용자 ID나 이메일처럼 끝없는 값은 레이블로 쓰지 말라고 해요.
+
+사용자별·요청별로 봐야 한다면 로그 본문이나 트레이스(요청 전체의 기록)에 남겨요. 지표 레이블에는 응답 상태 코드처럼 값이 몇 개로 정해진 것만 둬요.
+
+<Figure caption="레이블에는 값이 몇 개로 정해진 것만 둬요. 끝없이 늘어나는 값은 새 값마다 시계열을 만들어서, 로그나 트레이스에 남겨요.">
+  <Compare
+    columns={['값이 정해진 것', '끝없이 늘어나는 것']}
+    rows={[
+      { label: '예', values: ['응답 상태 코드', '사용자 ID, 요청 ID, 이메일, 원본 URL'] },
+      { label: '시계열 수', values: ['값이 몇 개로 정해져서 늘지 않아요', '새 값마다 늘어요'] },
+      { label: '남길 곳', values: ['지표 레이블', '로그 본문이나 트레이스'] },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>레이블에 사용자 ID, 요청 ID, 타임스탬프, 원본 URL이 들어간다면 다시 보세요. 값이 계속 새로 나와서 시계열도 계속 늘어요.</Check>

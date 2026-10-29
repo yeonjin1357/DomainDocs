@@ -21,7 +21,7 @@ sources:
     url: https://grafana.com/docs/grafana/latest/visualizations/panels-visualizations/visualizations/heatmap/
   - title: Brendan Gregg — Latency Heat Maps
     url: https://www.brendangregg.com/HeatMaps/latency.html
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <OnDashboard title="주문 API · 응답시간 분포도 · 14:00~14:10" caption="14:04의 세로줄은 잠금이 풀리며 함께 끝난 요청이에요. 14:06부터 5초 높이에 생긴 가로줄은 타임아웃 에러예요.">
@@ -30,19 +30,107 @@ updated: 2026-10-14
 
 <KeyPoints>
   <Point title="점 하나가 끝난 요청 하나예요">
-    응답시간 분포도는 요청이 끝날 때마다 점을 하나 찍어요. 가로축은 끝난 시각, 세로축은 그 요청의 응답시간이에요. 평균선과 달리 느린 요청이 하나하나 보이고, 영역을 끌어 고르면 그 요청들의 트레이스를 열 수 있어요.
-
-    점은 요청이 끝나야 찍혀요. 그래서 끝나지 않고 멈춰 있는 요청은 보이지 않아요.
+    가로축은 끝난 시각, 세로축은 응답시간이에요. 끝나지 않고 멈춰 있는 요청은 보이지 않아요.
   </Point>
   <Point title="줄이 보이면 병목이 있어요">
-    세로줄은 여러 요청이 같은 순간에 함께 끝난 자리예요. 잠금(lock)이나 <Term slug="apm/gc-pause">GC 멈춤</Term>처럼 잠깐 막혔던 것이 풀리면, 기다리던 요청이 한꺼번에 끝나서 생겨요.
-
-    가로줄은 끝난 시각은 달라도 응답시간이 같은 요청들이에요. 자원이 모자라 타임아웃 값만큼 기다리다 에러로 끝나면 생겨서, 그 높이가 곧 타임아웃 값이에요.
+    세로줄은 막혔던 것이 풀리며 함께 끝난 요청이에요. 가로줄은 타임아웃 값만큼 기다리다 끝난 요청이에요.
   </Point>
   <Point title="요청이 많으면 히트맵으로 봐요">
-    요청이 많으면 점이 겹쳐서, 어디에 얼마나 몰렸는지 보이지 않아요. 히트맵(heatmap)은 시각과 응답시간으로 나눈 칸마다 요청 수를 세어 색 진하기로 보여 줘요. 대신 요청 하나하나는 칸을 눌러 들어가야 보여요.
+    히트맵은 칸마다 요청 수를 세어 색 진하기로 보여 줘요. 점이 겹쳐도 어디에 몰렸는지 보여요.
   </Point>
 </KeyPoints>
+
+## 점 하나가 끝난 요청 하나예요
+
+응답시간 분포도는 요청이 끝날 때마다 점을 하나 찍어요. 가로축은 끝난 시각, 세로축은 그 요청의 응답시간이에요. 평균선과 달리 느린 요청이 하나하나 보이고, 영역을 끌어 고르면 그 요청들의 트레이스를 열 수 있어요.
+
+점은 요청이 끝나야 찍혀요. 그래서 끝나지 않고 멈춰 있는 요청은 보이지 않아요.
+
+<Figure caption="요청 셋의 예시예요. A와 C는 끝난 시각에 점이 찍히고, 점의 높이는 걸린 시간이에요. 아직 끝나지 않은 B는 점이 없어요.">
+  <Timeline
+    ariaLabel="요청 A는 1초에 시작해 3초에 끝나 점이 찍히고, 요청 C는 6초에 시작해 7초에 끝나 점이 찍히며, 요청 B는 2초에 시작해 지금인 10초까지 끝나지 않아 점이 없는 시간 띠"
+    end={10}
+    lanes={[
+      { label: '요청 A', segments: [{ start: 1, end: 3, label: '2초', tone: 'accent' }] },
+      { label: '요청 B', segments: [{ start: 2, end: 10, label: '아직 안 끝남', tone: 'warn' }] },
+      { label: '요청 C', segments: [{ start: 6, end: 7, tone: 'accent' }] },
+    ]}
+    marks={[
+      { at: 3, label: 'A 점' },
+      { at: 7, label: 'C 점' },
+      { at: 10, label: '지금', tone: 'warn' },
+    ]}
+    ticks={[
+      { at: 0, label: '0초' },
+      { at: 5, label: '5초' },
+      { at: 10, label: '10초' },
+    ]}
+  />
+</Figure>
+
+## 줄이 보이면 병목이 있어요
+
+세로줄은 여러 요청이 같은 순간에 함께 끝난 자리예요. 잠금(lock)이나 <Term slug="apm/gc-pause">GC 멈춤</Term>처럼 잠깐 막혔던 것이 풀리면, 기다리던 요청이 한꺼번에 끝나서 생겨요.
+
+<Figure caption="잠금이 4초 이어진 예시예요. 그 사이 들어온 요청 A, B, C는 응답시간이 제각각이지만, 잠금이 풀리는 순간 함께 끝나서 점이 세로로 서요.">
+  <Timeline
+    ariaLabel="잠금이 1초부터 5초까지 이어지고, 그 사이 1.5초, 2.5초, 4초에 들어온 요청 A, B, C가 모두 5초에 함께 끝나는 시간 띠"
+    end={6}
+    lanes={[
+      { label: '잠금', segments: [{ start: 1, end: 5, label: '잠금 4초', tone: 'warn' }] },
+      { label: '요청 A', segments: [{ start: 1.5, end: 5, label: '3.5초' }] },
+      { label: '요청 B', segments: [{ start: 2.5, end: 5, label: '2.5초' }] },
+      { label: '요청 C', segments: [{ start: 4, end: 5 }] },
+    ]}
+    marks={[{ at: 5, label: '풀림' }]}
+    ticks={[
+      { at: 0, label: '0초' },
+      { at: 3, label: '3초' },
+      { at: 6, label: '6초' },
+    ]}
+  />
+</Figure>
+
+가로줄은 끝난 시각은 달라도 응답시간이 같은 요청들이에요. 자원이 모자라 타임아웃 값만큼 기다리다 에러로 끝나면 생겨서, 그 높이가 곧 타임아웃 값이에요.
+
+<Figure caption="타임아웃이 5초인 예시예요. 요청 D, E, F는 끝난 시각이 달라도 모두 5초를 기다리다 끝나서, 점이 5초 높이에 가로로 누워요.">
+  <Timeline
+    ariaLabel="요청 D, E, F가 각각 0초, 2초, 4초에 들어와 모두 5초씩 기다리다 5초, 7초, 9초에 타임아웃 에러로 끝나는 시간 띠"
+    end={10}
+    lanes={[
+      { label: '요청 D', segments: [{ start: 0, end: 5, label: '5초', tone: 'warn' }] },
+      { label: '요청 E', segments: [{ start: 2, end: 7, label: '5초', tone: 'warn' }] },
+      { label: '요청 F', segments: [{ start: 4, end: 9, label: '5초', tone: 'warn' }] },
+    ]}
+    ticks={[
+      { at: 0, label: '0초' },
+      { at: 5, label: '5초' },
+      { at: 10, label: '10초' },
+    ]}
+  />
+</Figure>
+
+## 요청이 많으면 히트맵으로 봐요
+
+요청이 많으면 점이 겹쳐서, 어디에 얼마나 몰렸는지 보이지 않아요. 히트맵(heatmap)은 시각과 응답시간으로 나눈 칸마다 요청 수를 세어 색 진하기로 보여 줘요. 대신 요청 하나하나는 칸을 눌러 들어가야 보여요.
+
+<Figure caption="1분 단위와 응답시간 세 구간으로 칸을 나눈 히트맵 예시예요. 칸마다 요청 수를 세어, 많을수록 진하게 칠해요. 14:04에는 요청이 1초 넘는 칸으로 몰렸어요.">
+  <Strip
+    ariaLabel="14:00부터 14:05까지 1분마다 세 응답시간 구간의 요청 수를 센 히트맵. 평소에는 0.5초 아래 칸이 120건 안팎으로 진하고 1초 넘는 칸은 0~2건으로 흐리지만, 14:04에는 1초 넘는 칸이 110건으로 진해지고 0.5초 아래 칸은 30건으로 옅어진 칸 띠"
+    rows={[
+      {
+        label: '1초 넘음',
+        heads: ['14:00', '14:01', '14:02', '14:03', '14:04', '14:05'],
+        cells: [{ label: '0', tone: 'sub' }, { label: '1', tone: 'sub' }, { label: '0', tone: 'sub' }, { label: '2', tone: 'sub' }, { label: '110', tone: 'accent' }, { label: '1', tone: 'sub' }],
+      },
+      { label: '0.5~1초', cells: ['8', '10', '7', '9', '12', '8'] },
+      {
+        label: '0.5초 아래',
+        cells: [{ label: '120', tone: 'accent' }, { label: '125', tone: 'accent' }, { label: '118', tone: 'accent' }, { label: '122', tone: 'accent' }, '30', { label: '121', tone: 'accent' }],
+      },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>분포도에 점이 끊긴 시간이 있다면, 요청이 없었는지 끝나지 않았는지 가려 보세요. 멈춘 요청은 끝나야 찍혀요. 그 시간에 <Term slug="apm/throughput-and-concurrency">활성 트랜잭션</Term>이 늘었는지 함께 봐요.</Check>
