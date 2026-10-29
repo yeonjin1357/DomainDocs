@@ -3,7 +3,7 @@ questions:
     type: ox
     prompt: Syslog 심각도는 숫자가 클수록 더 심각한가요?
     answer: false
-    explain: 0(Emergency)이 가장 심각하고 7(Debug)이 가장 가벼워요. 오류 이상만 보려면 3 이하를 걸러요.
+    explain: 0(Emergency)이 가장 심각하고 7(Debug)이 가장 가벼워요. 에러 이상만 보려면 3 이하를 걸러요.
   - id: trap-only-risk
     type: choice
     prompt: 인터페이스 장애를 linkDown Trap만으로 알아채고 있어요. 무엇이 문제일까요?

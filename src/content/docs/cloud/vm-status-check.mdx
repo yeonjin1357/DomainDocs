@@ -14,7 +14,7 @@ sources:
     url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html
   - title: AWS — Amazon EC2 instance state changes
     url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -28,6 +28,32 @@ updated: 2026-10-21
   <Item title="서버 안에서 무슨 일이">메모리·디스크·부팅 문제를 의심해요.</Item>
   <Item title="옮겨 띄울 수 있나">멈췄다 켜면 다른 호스트로 옮겨져요.</Item>
 </FirstLook>
+
+<Figure caption="1단계에서 어느 검사가 실패했는지가 갈래를 정해요. 시스템 검사면 옮겨 띄우고, 인스턴스 검사면 서버 안을 봐요. 어느 쪽이든 4단계에서 되풀이를 막아요.">
+  <Flow
+    ariaLabel="1단계에서 실패한 검사가 시스템 검사면 2단계 옮겨 띄우기로, 인스턴스 검사면 3단계 서버 안 보기로, 붙은 EBS 검사면 디스크 교체나 멈췄다 켜기로 가고, 2단계와 3단계 뒤에는 4단계 되풀이 막기로 가는 흐름도"
+    nodes={[
+      { id: 's1', label: '상태 검사', col: 1, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'sys', label: '시스템 검사', col: 0, row: 1, note: 'AWS 쪽' },
+      { id: 'ins', label: '인스턴스 검사', col: 1, row: 1, note: '내 쪽' },
+      { id: 'ebs', label: 'EBS 검사', col: 2, row: 1, note: '붙은 디스크' },
+      { id: 's2', label: '옮겨 띄우기', col: 0, row: 2, note: '2단계', tone: 'accent' },
+      { id: 's3', label: '서버 안 보기', col: 1, row: 2, note: '3단계', tone: 'accent' },
+      { id: 'disk', label: '디스크 교체', col: 2, row: 2, note: '멈췄다 켜기' },
+      { id: 's4', label: '되풀이 막기', col: 1, row: 3, note: '4단계' },
+    ]}
+    edges={[
+      { from: 's1', to: 'sys' },
+      { from: 's1', to: 'ins' },
+      { from: 's1', to: 'ebs' },
+      { from: 'sys', to: 's2' },
+      { from: 'ins', to: 's3' },
+      { from: 'ebs', to: 'disk' },
+      { from: 's2', to: 's4' },
+      { from: 's3', to: 's4' },
+    ]}
+  />
+</Figure>
 
 ## 1. 어느 검사가 실패했는지 보세요
 
@@ -47,6 +73,21 @@ EC2는 인스턴스마다 매분 상태 검사를 해요. 모두 통과하면 OK
 
 AWS가 고칠 때까지 기다릴 수도 있고, 직접 옮길 수도 있어요. EBS로 부팅하는 인스턴스는 멈췄다 다시 켜면 대개 새 호스트로 옮겨져요. 이때 인스턴스 스토어의 데이터는 지워져요.
 
+<Figure caption="시스템 검사가 실패한 인스턴스를 옮기는 그림이에요. 재부팅은 같은 호스트에 머물 수 있고, 멈췄다 켜면 대개 새 호스트로 옮겨져요. 이때 인스턴스 스토어의 데이터는 지워져요.">
+  <Flow
+    ariaLabel="문제가 생긴 호스트 A의 인스턴스를 재부팅하면 호스트 A에 머물 수 있고, 멈췄다 켜면 대개 새 호스트 B로 옮겨지는 구조도"
+    nodes={[
+      { id: 'a', label: '호스트 A', col: 0, row: 0, note: '문제 생김', tone: 'warn' },
+      { id: 'b', label: '호스트 B', col: 2, row: 0, note: '새 호스트', tone: 'accent' },
+      { id: 'a2', label: '호스트 A', col: 0, row: 1, note: '머물 수 있음', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'a', to: 'b', label: '멈췄다 켜기', tone: 'accent' },
+      { from: 'a', to: 'a2', label: '재부팅' },
+    ]}
+  />
+</Figure>
+
 인스턴스 상태는 <Term slug="cloud/virtual-machines">가상 머신</Term>에서 다뤄요.
 
 ## 3. 인스턴스 검사 실패라면 서버 안을 보세요
@@ -65,9 +106,20 @@ AWS가 고칠 때까지 기다릴 수도 있고, 직접 옮길 수도 있어요.
   <StatTile label="인스턴스 검사" value="실패" tone="warn" />
 </Figure>
 
-들어갈 수 없다면 콘솔에서 시스템 로그(부팅 기록)나 화면 캡처를 봐요. 커널 오류나 디스크 오류가 남아 있을 수 있어요. 메모리는 <Term slug="server/low-memory">메모리가 모자라 보일 때</Term>, 디스크는 <Term slug="server/disk-filling-up">디스크가 차오를 때</Term>의 순서로 봐요.
+들어갈 수 없다면 콘솔에서 시스템 로그(부팅 기록)나 화면 캡처를 봐요. 커널 에러나 디스크 에러가 남아 있을 수 있어요. 메모리는 <Term slug="server/low-memory">메모리가 모자라 보일 때</Term>, 디스크는 <Term slug="server/disk-filling-up">디스크가 차오를 때</Term>의 순서로 봐요.
 
 재부팅하는 동안에도 인스턴스 검사는 잠깐 실패로 보여요. 재부팅 직후의 짧은 실패는 정상이에요.
+
+<Figure caption="재부팅하는 동안의 예시예요. 인스턴스 검사가 잠깐 실패로 보였다가 재부팅이 끝나면 다시 통과해요. 이런 짧은 실패는 정상이에요.">
+  <Timeline
+    ariaLabel="인스턴스가 재부팅하는 동안 인스턴스 검사가 잠깐 실패로 보이고, 재부팅이 끝난 뒤 다시 통과하는 시간 띠"
+    end={100}
+    lanes={[
+      { label: '인스턴스', segments: [{ start: 0, end: 40, label: '실행 중' }, { start: 40, end: 60, label: '재부팅', tone: 'warn' }, { start: 60, end: 100, label: '실행 중' }] },
+      { label: '검사', segments: [{ start: 0, end: 40, label: '통과', tone: 'accent' }, { start: 40, end: 62, label: '실패', tone: 'warn' }, { start: 62, end: 100, label: '통과', tone: 'accent' }] },
+    ]}
+  />
+</Figure>
 
 ## 4. 같은 일이 되풀이되지 않게 하세요
 

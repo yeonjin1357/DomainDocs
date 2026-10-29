@@ -100,13 +100,13 @@ AWS Application Load Balancer의 기본값으로 계산해 보면 이래요.
 
 ## 모니터링에서는
 
-<Figure caption="같은 5분 동안의 오류 예시예요. 대상이 만든 5xx는 없는데, 로드 밸런서가 만든 5xx가 쌓였어요. 앱 로그에는 이 오류가 남지 않아요.">
+<Figure caption="같은 5분 동안의 에러 예시예요. 대상이 만든 5xx는 없는데, 로드 밸런서가 만든 5xx가 쌓였어요. 앱 로그에는 이 에러가 남지 않아요.">
   <StatTile label="LB가 만든 5xx" value="184" unit="건" tone="warn" />
   <StatTile label="대상이 만든 5xx" value="0" unit="건" />
   <StatTile label="정상 대상" value="0" unit="/ 3대" tone="warn" />
 </Figure>
 
-로드 밸런서 지표는 오류를 누가 만들었는지 나눠 줘요. AWS Application Load Balancer에서는 이렇게 봐요.
+로드 밸런서 지표는 에러를 누가 만들었는지 나눠 줘요. AWS Application Load Balancer에서는 이렇게 봐요.
 
 | 지표 | 뜻 |
 | --- | --- |
@@ -116,10 +116,10 @@ AWS Application Load Balancer의 기본값으로 계산해 보면 이래요.
 | HTTPCode_Target_5XX_Count | 대상이 만든 5xx 수 |
 | HealthyHostCount | 정상으로 판단한 대상 수 |
 
-로드 밸런서가 만든 5xx는 대상까지 가지 못했거나 대상이 제대로 답하지 못했을 때 생겨요. 이런 오류는 앱 로그에 남지 않아서, 로드 밸런서 지표로만 보여요. 상태 코드의 뜻은 <Term slug="apm/http-basics">HTTP 요청과 응답</Term>에서 다뤄요.
+로드 밸런서가 만든 5xx는 대상까지 가지 못했거나 대상이 제대로 답하지 못했을 때 생겨요. 이런 에러는 앱 로그에 남지 않아서, 로드 밸런서 지표로만 보여요. 상태 코드의 뜻은 <Term slug="apm/http-basics">HTTP 요청과 응답</Term>에서 다뤄요.
 
 <Checkpoints>
-  <Check>사용자는 오류를 겪는데 앱 로그가 깨끗하다면, 로드 밸런서가 만든 5xx를 보세요. 대상까지 가지 못한 오류는 앱에 남지 않아요.</Check>
+  <Check>사용자는 에러를 겪는데 앱 로그가 깨끗하다면, 로드 밸런서가 만든 5xx를 보세요. 대상까지 가지 못한 에러는 앱에 남지 않아요.</Check>
   <Check>정상 대상 수가 0인데 요청이 계속 대상에 간다고 놀랐다면 다시 보세요. 모든 대상이 실패하면 fail open으로 모두에게 보내요.</Check>
   <Check>상태 확인 주소가 DB까지 확인하는 무거운 주소라면 다시 보세요. DB가 잠깐 느려지면 멀쩡한 대상이 한꺼번에 빠질 수 있어요.</Check>
   <Check>TargetResponseTime을 사용자 응답시간으로 본다면 다시 보세요. 로드 밸런서와 사용자 사이의 네트워크 시간은 들어 있지 않아요.</Check>

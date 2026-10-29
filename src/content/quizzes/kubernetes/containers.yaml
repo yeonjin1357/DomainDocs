@@ -37,6 +37,6 @@ questions:
       - latest
       - stable
       - 가장 먼저 만든 태그
-      - 태그가 없으니 오류를 내요
+      - 태그가 없으니 에러를 내요
     answer: 0
     explain: 태그를 빼면 latest로 알아들어요. 그래서 운영에서는 버전을 적거나 다이제스트로 가리켜요.

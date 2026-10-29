@@ -1,14 +1,14 @@
 questions:
   - id: owner-edge
     type: choice
-    prompt: 토폴로지 화면에서 레플리카셋과 파드를 잇는 선의 근거가 되는 필드는?
+    prompt: 토폴로지 화면에서 ReplicaSet과 파드를 잇는 선의 근거가 되는 필드는?
     choices:
       - 파드의 ownerReferences
       - 서비스의 셀렉터
       - 파드의 nodeName
       - 인그레스의 규칙
     answer: 0
-    explain: 레플리카셋이 파드를 만들면 쿠버네티스가 파드의 ownerReferences에 주인을 적어요. 셀렉터는 서비스와 파드 사이의 근거예요.
+    explain: ReplicaSet이 파드를 만들면 쿠버네티스가 파드의 ownerReferences에 주인을 적어요. 셀렉터는 서비스와 파드 사이의 근거예요.
   - id: not-ready-edge
     type: ox
     prompt: 셀렉터에 맞는 파드라면 준비(Ready)되지 않았어도 서비스 요청을 받나요?
@@ -26,14 +26,14 @@ questions:
     explain: 셀렉터에 오타가 있으면 고르는 파드가 없어요. 요청은 서비스까지 와도 넘길 파드가 없어요.
   - id: two-replicasets
     type: choice
-    prompt: 배포 중에 디플로이먼트 하나 아래 레플리카셋이 두 개 보여요. 왜일까요?
+    prompt: 배포 중에 Deployment 하나 아래 ReplicaSet이 두 개 보여요. 왜일까요?
     choices:
       - 롤링 업데이트 중이라 옛 버전과 새 버전이 함께 있어요
-      - 레플리카셋이 잘못 두 번 만들어졌어요
+      - ReplicaSet이 잘못 두 번 만들어졌어요
       - 노드가 두 개라서 그래요
       - 서비스가 두 개라서 그래요
     answer: 0
-    explain: 롤링 업데이트는 새 레플리카셋을 늘리면서 옛 것을 줄여요. 배포가 끝나면 옛 레플리카셋의 파드 수는 0이 돼요.
+    explain: 롤링 업데이트는 새 ReplicaSet을 늘리면서 옛 것을 줄여요. 배포가 끝나면 옛 ReplicaSet의 파드 수는 0이 돼요.
   - id: endpointslice-name
     type: input
     prompt: 서비스가 고른 파드의 주소와 준비 상태를 적어 두는 객체는?

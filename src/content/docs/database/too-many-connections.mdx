@@ -1,6 +1,6 @@
 ---
 title: DB 연결이 한도에 닿았을 때 어디부터 볼까
-summary: 연결을 누가 쥐었는지 세고, 쉬는 연결과 앱 풀 설정을 본 뒤, 한도를 올릴지 연결 풀러를 둘지 정해요.
+summary: 연결을 누가 쥐었는지 세고, 쉬는 연결과 앱 풀 설정을 본 뒤, 한도를 올릴지 커넥션 풀러를 둘지 정해요.
 domain: database
 type: guide
 order: 80
@@ -20,7 +20,7 @@ sources:
     url: https://www.pgbouncer.org/features.html
   - title: PgBouncer — Configuration (pool_mode)
     url: https://www.pgbouncer.org/config.html
-updated: 2026-10-15
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -34,6 +34,27 @@ updated: 2026-10-15
   <Item title="연결이 일하는지 쉬는지">`active`와 `idle`, `idle in transaction`의 몫을 봐요.</Item>
   <Item title="앱 풀 설정이 바뀌었는지">배포로 풀 크기나 서버 수가 늘었는지 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 쉬는 연결이 대부분이고 액티브가 적다면 연결 수를 줄이고, 줄이기 어려울 때 커넥션 풀러로 가요. idle in transaction이 많다면 잠금까지 쥔 다른 문제예요.">
+  <Flow
+    ariaLabel="1단계 연결을 쥔 곳을 세고, 2단계 연결 상태가 idle in transaction이 많으면 잠금도 쥔 다른 문제로, idle이 대부분이면 3단계 한도를 따져요. 액티브가 적으면 연결 수를 줄이고, 줄이기 어려우면 4단계 커넥션 풀러를 보는 흐름도"
+    nodes={[
+      { id: 's1', label: '연결 쥔 곳', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 's2', label: '연결 상태', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '잠금도 쥠', col: 2, row: 1, note: '트랜잭션 연 채' },
+      { id: 's3', label: '한도 따지기', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '연결 줄이기', col: 2, row: 2, note: '풀 크기 낮춤' },
+      { id: 's4', label: '커넥션 풀러', col: 0, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 'e2', label: 'idle in tx' },
+      { from: 's2', to: 's3', label: 'idle 대부분' },
+      { from: 's3', to: 'e3', label: '액티브 적음' },
+      { from: 's3', to: 's4', label: '줄이기 어려움' },
+    ]}
+  />
+</Figure>
 
 ## 1. 누가 연결을 쥐었는지 세세요
 
@@ -56,6 +77,18 @@ ORDER BY count(*) DESC;
 
 HikariCP는 `minimumIdle`을 따로 정하지 않으면 `maximumPoolSize`와 같아서, 일이 없어도 최대치만큼 연결을 열어 둬요. 그래서 앱 서버를 늘리는 배포만으로도 한도에 닿을 수 있어요.
 
+<Figure caption="숫자는 설명용 예시예요. 서버마다 풀이 연결 20개를 열어 둔다면, 앱 서버를 4대에서 6대로 늘리기만 해도 120개가 돼 한도 100을 넘어요.">
+  <Compare
+    columns={['배포 전', '배포 뒤']}
+    rows={[
+      { label: '앱 서버', values: ['4대', '6대'] },
+      { label: '서버마다 열어 둔 연결', values: ['20개', '20개'] },
+      { label: '합계', values: ['80개', '120개'] },
+      { label: 'max_connections 100', values: ['들어가요', '넘쳐요'] },
+    ]}
+  />
+</Figure>
+
 `idle in transaction`이 많다면 다른 문제예요. 앱이 트랜잭션을 연 채 쉬고 있어서, 연결과 함께 <Term slug="database/locks-and-blocking">잠금</Term>도 쥐고 있을 수 있어요.
 
 **확인 방법**: 1단계 결과에서 `state`별 합을 보고, 앱마다 풀 설정(<Term slug="apm/connection-pool">최대 크기와 최소 유지 수</Term>)과 서버 수를 곱해 봐요.
@@ -68,9 +101,22 @@ HikariCP는 `minimumIdle`을 따로 정하지 않으면 `maximumPoolSize`와 같
 
 **확인 방법**: 같은 시각의 액티브 세션 수와 연결 수를 견줘요. 연결 100개 중 액티브가 5개 안팎이라면 연결 대부분이 쉬고 있어요.
 
-## 4. 연결 풀러를 검토하세요
+## 4. 커넥션 풀러를 검토하세요
 
-앱 서버가 많아 연결을 줄이기 어렵다면, 앱과 DB 사이에 연결 풀러를 둬요. PgBouncer의 transaction 모드는 트랜잭션 동안에만 DB 연결을 내줘서, 많은 앱 연결이 적은 DB 연결을 나눠 써요.
+앱 서버가 많아 연결을 줄이기 어렵다면, 앱과 DB 사이에 커넥션 풀러를 둬요. PgBouncer의 transaction 모드는 트랜잭션 동안에만 DB 연결을 내줘서, 많은 앱 연결이 적은 DB 연결을 나눠 써요.
+
+<Figure caption="transaction 모드를 그린 예시예요. 앱 연결 셋이 트랜잭션을 할 때만 DB 연결 하나를 차례로 빌려 써요. session 모드라면 앱 연결마다 끊을 때까지 DB 연결을 쥐어요.">
+  <Timeline
+    ariaLabel="PgBouncer transaction 모드에서 앱 연결 1, 2, 3이 서로 다른 때에 트랜잭션을 하고, DB 연결 하나가 그때마다 1번, 2번, 3번에게 차례로 쓰이는 시간 띠"
+    end={100}
+    lanes={[
+      { label: '앱 연결 1', segments: [{ start: 0, end: 25, label: '트랜잭션', tone: 'accent' }] },
+      { label: '앱 연결 2', segments: [{ start: 35, end: 60, label: '트랜잭션', tone: 'accent' }] },
+      { label: '앱 연결 3', segments: [{ start: 70, end: 95, label: '트랜잭션', tone: 'accent' }] },
+      { label: 'DB 연결', segments: [{ start: 0, end: 25, label: '1번에게' }, { start: 35, end: 60, label: '2번에게' }, { start: 70, end: 95, label: '3번에게' }] },
+    ]}
+  />
+</Figure>
 
 대신 transaction 모드는 세션 단위 기능 몇 가지를 깨요. PgBouncer 문서는 앱이 그런 기능을 쓰지 않을 때만 쓰라고 해요. 기본값인 session 모드는 모든 기능을 지원하지만, 연결을 끊을 때까지 DB 연결을 쥐어요.
 
@@ -78,6 +124,6 @@ HikariCP는 `minimumIdle`을 따로 정하지 않으면 `maximumPoolSize`와 같
 
 <Checkpoints>
   <Check>앱 서버를 늘리는 배포 전에, 풀 최대치 × 서버 수가 `max_connections`보다 충분히 작은지 계산하세요. 관리자 몫과 다른 앱의 연결도 빼 두세요.</Check>
-  <Check>`idle_session_timeout`으로 쉬는 연결을 끊는다면 조심하세요. PostgreSQL 문서는 연결 풀을 거친 연결에 걸면, 풀이 갑자기 끊긴 연결을 잘 다루지 못할 수 있다고 해요.</Check>
+  <Check>`idle_session_timeout`으로 쉬는 연결을 끊는다면 조심하세요. PostgreSQL 문서는 커넥션 풀을 거친 연결에 걸면, 풀이 갑자기 끊긴 연결을 잘 다루지 못할 수 있다고 해요.</Check>
   <Check>DB 연결 수 그래프만 보는 화면이라면 상태별로 나눠 주세요. 같은 100개라도 대부분 쉬는지, 대부분 일하는지에 따라 할 일이 정반대예요.</Check>
 </Checkpoints>

@@ -18,7 +18,7 @@ questions:
     type: choice
     prompt: Redis가 maxmemory에 닿았는데 maxmemory-policy를 기본값으로 두었어요. 어떻게 될까요?
     choices:
-      - 아무것도 지우지 않고 새 값을 넣는 명령에 오류를 돌려줘요
+      - 아무것도 지우지 않고 새 값을 넣는 명령에 에러를 돌려줘요
       - 가장 오래 쓰지 않은 키부터 지워요
       - 무작위로 키를 지워요
       - 만료가 가장 가까운 키부터 지워요

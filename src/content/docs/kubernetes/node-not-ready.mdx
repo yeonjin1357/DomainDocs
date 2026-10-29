@@ -16,7 +16,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/
   - title: Kubernetes — Taints and Tolerations
     url: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -30,6 +30,27 @@ updated: 2026-10-21
   <Item title="압박 조건">메모리·디스크·프로세스 수 압박이 켜졌는지 봐요.</Item>
   <Item title="파드의 운명">5분 뒤 파드가 쫓겨나는지 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. Ready가 Unknown이면 노드를 서버로 보고 점검하고, 디스크 압박이면 쌓인 로그와 이미지를 봐요.">
+  <Flow
+    ariaLabel="1단계 Ready 값이 Unknown이면 노드를 서버로 보고 점검하고, 2단계 압박 조건에서 디스크 압박이면 로그와 이미지를 보며, 3단계 그 위 파드의 운명을 알아 두고, 4단계 노드 안의 kubelet을 보는 흐름도"
+    nodes={[
+      { id: 's1', label: 'Ready 값', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '서버로 보기', col: 2, row: 0, note: '꺼짐·네트워크' },
+      { id: 's2', label: '압박 조건', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '로그·이미지', col: 2, row: 1, note: '쌓였나' },
+      { id: 's3', label: '파드의 운명', col: 0, row: 2, note: '3단계' },
+      { id: 's4', label: 'kubelet', col: 0, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: 'Unknown' },
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 'e2', label: '디스크' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 's4' },
+    ]}
+  />
+</Figure>
 
 ## 1. Ready 조건의 값을 보세요
 
@@ -56,6 +77,21 @@ Ready 말고도 노드는 자원 압박을 따로 조건으로 알려요. 압박
 | PIDPressure | 노드에 프로세스가 너무 많아요 |
 
 압박 조건이 켜지면 kubelet은 노드를 지키려고 파드를 쫓아내기 시작해요. 이걸 노드 압박 축출(node-pressure eviction)이라고 해요. 기본 기준은 리눅스 노드에서 쓸 수 있는 메모리 100Mi 미만, 노드 파일 시스템 여유 10% 미만 같은 값이에요.
+
+<Figure caption="압박 조건이 켜지면 두 가지가 함께 일어나요. 새 파드가 오지 않게 taint가 붙고, kubelet이 있던 파드를 쫓아내요. Ready는 True 그대로일 수 있어요.">
+  <Flow
+    ariaLabel="노드의 압박 조건이 켜지면 새 파드를 막는 taint가 붙고, kubelet이 있던 파드를 쫓아내는 구조도"
+    nodes={[
+      { id: 'p', label: '압박 조건', col: 1, row: 0, note: 'True로 켜짐', tone: 'warn' },
+      { id: 't', label: 'taint', col: 0, row: 1, note: '새 파드 막음' },
+      { id: 'e', label: '축출', col: 2, row: 1, note: '파드 내보냄', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'p', to: 't' },
+      { from: 'p', to: 'e', tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 디스크 압박이라면 노드의 로그와 컨테이너 이미지가 쌓이지 않았는지 봐요. 서버 디스크를 보는 순서는 <Term slug="server/disk-filling-up">디스크가 차오를 때</Term>와 같아요.
 

@@ -34,13 +34,13 @@ updated: 2026-10-26
 
 <KeyPoints>
   <Point title="출처 셋이 각자 다른 걸 줘요">
-    kubelet은 컨테이너가 실제로 쓴 CPU와 메모리를, kube-state-metrics는 파드·디플로이먼트 같은 객체의 상태를 줘요. metrics-server는 자동 확장과 `kubectl top`에 쓸 최근 사용량만 들고 있어요.
+    kubelet은 컨테이너가 실제로 쓴 CPU와 메모리를, kube-state-metrics는 파드·Deployment 같은 객체의 상태를 줘요. Metrics Server는 자동 확장과 `kubectl top`에 쓸 최근 사용량만 들고 있어요.
   </Point>
   <Point title="메모리는 working set으로 봐요">
     `container_memory_usage_bytes`는 비울 수 있는 캐시까지 넣어 세서 크게 나와요. `kubectl top`과 자동 확장이 보는 값은 working set이에요.
   </Point>
-  <Point title="metrics-server는 저장용이 아니에요">
-    metrics-server는 자동 확장을 위해 만든 거라, 파드마다 가장 최근 값만 메모리에 들고 있어요. 모니터링 화면은 kubelet과 kube-state-metrics에서 직접 모아요.
+  <Point title="Metrics Server는 저장용이 아니에요">
+    Metrics Server는 자동 확장을 위해 만든 거라, 파드마다 가장 최근 값만 메모리에 들고 있어요. 모니터링 화면은 kubelet과 kube-state-metrics에서 직접 모아요.
   </Point>
 </KeyPoints>
 
@@ -54,7 +54,7 @@ updated: 2026-10-26
 | --- | --- | --- |
 | kubelet(cAdvisor) | 컨테이너가 쓴 CPU·메모리·네트워크 | `container_cpu_usage_seconds_total` |
 | kube-state-metrics | API 서버에 적힌 객체의 상태 | `kube_pod_status_phase` |
-| metrics-server | 자동 확장용 최근 사용량 | `kubectl top`, HPA |
+| Metrics Server | 자동 확장용 최근 사용량 | `kubectl top`, HPA |
 
 사용량을 재는 곳은 노드마다 있는 kubelet이에요. kubelet 안의 cAdvisor가 리눅스 cgroup에서 컨테이너별 값을 읽어요. kubelet은 이 값을 `/metrics/cadvisor`와 `/metrics/resource`로 내보내요.
 
@@ -123,7 +123,7 @@ container_memory_working_set_bytes
 <Checkpoints>
   <Check>메모리 화면이나 알림이 `container_memory_usage_bytes`로 되어 있다면 다시 보세요. 캐시까지 들어가 늘 높게 나와요. working set으로 바꾸세요.</Check>
   <Check>cAdvisor 메모리를 파드 단위로 더할 때 `image!=""` 같은 거르기가 없다면 다시 보세요. 파드 전체 줄이 함께 더해져 두 배 가까이 나올 수 있어요.</Check>
-  <Check>metrics-server에서 값을 가져와 그래프로 쌓고 있다면 다시 보세요. metrics-server README는 모니터링 용도로 쓰지 말고 kubelet의 `/metrics/resource`에서 직접 모으라고 해요.</Check>
+  <Check>Metrics Server에서 값을 가져와 그래프로 쌓고 있다면 다시 보세요. Metrics Server README는 모니터링 용도로 쓰지 말고 kubelet의 `/metrics/resource`에서 직접 모으라고 해요.</Check>
   <Check>재시작 수(`kube_pod_container_status_restarts_total`)를 그대로 그렸다면, 계속 커지는 카운터예요. 최근 1시간에 몇 번인지는 `increase`로 구하세요.</Check>
 </Checkpoints>
 

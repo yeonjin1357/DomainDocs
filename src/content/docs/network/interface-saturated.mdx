@@ -10,7 +10,7 @@ related: [network/interfaces-and-traffic, network/network-performance, foundatio
 sources:
   - title: RFC 2863 — The Interfaces Group MIB
     url: https://www.rfc-editor.org/rfc/rfc2863
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -25,11 +25,45 @@ updated: 2026-10-21
   <Item title="누가 쓰나">어떤 주소와 서비스가 많이 보내는지 찾아요.</Item>
 </FirstLook>
 
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 3단계에서 버린 패킷이 늘었다면 4단계에서 누가 쓰는지 찾아요. 사용률은 낮은데 버린 패킷이 늘었다면 2단계로 돌아가 짧은 간격으로 봐요.">
+  <Flow
+    ariaLabel="1단계에서 장비의 속도가 실제 회선과 다르면 회선 속도로 사용률을 다시 계산하고, 2단계에서 짧은 간격의 사용률을 본 뒤, 3단계에서 버린 패킷이 늘었다면 4단계 누가 쓰는지로 가요. 버림이 없으면 잘 쓰는 중이고, 사용률은 낮은데 버림이 늘면 순간 폭주를 의심해 2단계로 돌아가는 흐름도"
+    nodes={[
+      { id: 's1', label: '방향·속도', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '사용률 재계산', col: 2, row: 0, note: '회선 속도로' },
+      { id: 's2', label: '짧은 간격', col: 0, row: 1, note: '2단계' },
+      { id: 's3', label: '버린 패킷', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '잘 쓰는 중', col: 2, row: 2, note: '당장 괜찮음' },
+      { id: 's4', label: '누가 쓰나', col: 0, row: 3, note: '4단계', tone: 'accent' },
+      { id: 'back', label: '순간 폭주', col: 2, row: 3, note: '2단계로 다시' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '속도 다름' },
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '버림 없음' },
+      { from: 's3', to: 's4', label: '버림 늘음' },
+      { from: 's3', to: 'back' },
+    ]}
+  />
+</Figure>
+
 ## 1. 방향과 속도를 확인하세요
 
 인터페이스는 받는 쪽(in)과 보내는 쪽(out)을 따로 세요. 회선은 보통 두 방향이 따로 같은 속도를 내서, 한쪽만 꽉 차는 경우가 많아요.
 
 사용률은 bps를 인터페이스 속도로 나눈 값이에요. 그런데 장비에 적힌 속도가 실제 계약 속도와 다를 수 있어요. 1Gbps 포트에 100Mbps 회선을 물렸다면, 화면의 10%가 사실은 꽉 찬 거예요.
+
+<Figure caption="1Gbps 포트에 100Mbps 회선을 물린 경우예요. 같은 100Mbps를 어느 속도로 나누느냐에 따라 사용률이 10%도, 100%도 돼요.">
+  <Compare
+    columns={['장비에 적힌 속도로', '실제 회선 속도로']}
+    rows={[
+      { label: '나누는 속도', values: ['1Gbps(포트)', '100Mbps(회선)'] },
+      { label: '흐르는 양', values: ['100Mbps', '100Mbps'] },
+      { label: '사용률', values: ['10%', '100%, 꽉 참'] },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: 사용률 계산에 쓰인 속도(ifHighSpeed)와 실제 회선 속도를 견줘요. 계산 방법은 <Term slug="network/interfaces-and-traffic">인터페이스와 트래픽</Term>에 있어요.
 
@@ -52,7 +86,7 @@ updated: 2026-10-21
 
 ## 3. 버린 패킷이 늘었는지 보세요
 
-정말 넘치고 있다면 보내는 쪽의 버린 패킷 수(ifOutDiscards)가 함께 늘어요. 오류는 없었지만 내보낼 자리가 없어 버린 패킷이에요.
+정말 넘치고 있다면 보내는 쪽의 버린 패킷 수(ifOutDiscards)가 함께 늘어요. 에러는 없었지만 내보낼 자리가 없어 버린 패킷이에요.
 
 - **사용률이 높고 버린 패킷도 늘었다면**: 정말 넘치고 있어요. 4단계로 가서 줄일 트래픽을 찾거나 회선을 늘려요.
 - **사용률은 높은데 버린 패킷이 없다면**: 꽉 차게 잘 쓰고 있는 거예요. 당장 문제는 아니에요.

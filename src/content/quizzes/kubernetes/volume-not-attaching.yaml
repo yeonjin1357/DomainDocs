@@ -38,4 +38,4 @@ questions:
       - FailedMount 이벤트
       - PVC의 STATUS 칸
     answer: 0
-    explain: 가득 찬 볼륨은 이벤트 대신 앱 쓰기 오류로 드러나요. kubelet이 PVC마다 내는 남은 바이트와 전체 바이트를 견줘요.
+    explain: 가득 찬 볼륨은 이벤트 대신 앱 쓰기 에러로 드러나요. kubelet이 PVC마다 내는 남은 바이트와 전체 바이트를 견줘요.

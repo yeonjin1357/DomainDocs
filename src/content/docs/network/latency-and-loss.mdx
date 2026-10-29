@@ -14,7 +14,7 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc792
   - title: RFC 1812 — Requirements for IP Version 4 Routers (ICMP rate limiting)
     url: https://www.rfc-editor.org/rfc/rfc1812
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -28,6 +28,31 @@ updated: 2026-10-21
   <Item title="어느 구간부터인가">경로를 따라 나빠지기 시작한 곳을 찾아요.</Item>
   <Item title="그 구간이 넘치나">그 구간 인터페이스의 사용률과 버림을 봐요.</Item>
 </FirstLook>
+
+<Figure caption="가운데 줄을 위에서 아래로 따라가요. 3단계에서 중간 장비 하나만 나쁘다면 그 장비가 답을 아끼는 거예요. 4단계에서는 그 구간 인터페이스의 상태로 갈래를 골라요.">
+  <Flow
+    ariaLabel="1단계에서 범위를 정하고 2단계 traceroute로 나빠진 구간을 찾아요. 3단계에서 중간 장비 하나만 나쁘면 답을 아끼는 것이고, 끝까지 이어지면 4단계 그 구간 인터페이스를 봐요. 사용률과 버림이 높으면 꽉 찼을 때, 받은 에러면 에러가 늘 때 가이드로 가고, 통신사 구간이면 통신사에 문의하는 흐름도"
+    nodes={[
+      { id: 's1', label: '범위', col: 1, row: 0, note: '1단계', tone: 'warn' },
+      { id: 's2', label: 'traceroute', col: 1, row: 1, note: '2단계' },
+      { id: 's3', label: '중간 손실', col: 1, row: 2, note: '3단계' },
+      { id: 'quiet', label: '답을 아낌', col: 2, row: 2, note: '중간 하나만' },
+      { id: 's4', label: '인터페이스', col: 1, row: 3, note: '4단계', tone: 'accent' },
+      { id: 'full', label: '꽉 찼을 때', col: 0, row: 4, note: '사용률·버림' },
+      { id: 'err', label: '에러가 늘 때', col: 1, row: 4, note: '받은 에러' },
+      { id: 'isp', label: '통신사 문의', col: 2, row: 4, note: '통신사 구간' },
+    ]}
+    edges={[
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'quiet' },
+      { from: 's3', to: 's4', label: '끝까지 이어짐' },
+      { from: 's4', to: 'full' },
+      { from: 's4', to: 'err' },
+      { from: 's4', to: 'isp' },
+    ]}
+  />
+</Figure>
 
 ## 1. 범위부터 정하세요
 
@@ -63,16 +88,34 @@ traceroute는 TTL을 1부터 하나씩 늘린 패킷을 보내서, 길 위 라�
 
 traceroute에서 중간 장비 하나만 손실이 크거나 느리고, 그 뒤 구간은 멀쩡할 때가 있어요. 이건 보통 진짜 손실이 아니에요.
 
-라우터는 지나가는 패킷을 넘기는 일과, 자기에게 온 ping·traceroute에 답하는 일을 다르게 다뤄요. 라우터 요구 사항 문서(RFC 1812)도 라우터가 ICMP 오류 메시지의 양을 제한할 수 있어야 한다고 해요. 그래서 바쁜 라우터는 traceroute에 늦게 답하거나 답을 건너뛰어요.
+라우터는 지나가는 패킷을 넘기는 일과, 자기에게 온 ping·traceroute에 답하는 일을 다르게 다뤄요. 라우터 요구 사항 문서(RFC 1812)도 라우터가 ICMP 에러 메시지의 양을 제한할 수 있어야 한다고 해요. 그래서 바쁜 라우터는 traceroute에 늦게 답하거나 답을 건너뛰어요.
 
 진짜 손실은 그 구간부터 끝까지 이어져요. 중간 하나만 나쁘고 끝(목적지)은 멀쩡하다면, 그 장비가 답을 아끼고 있을 뿐이에요.
+
+<Figure caption="traceroute의 구간별 손실 예시예요. 위 줄은 3번째 구간부터 끝까지 손실이 이어져서 진짜 손실이에요. 아래 줄은 3번째 장비만 나쁘고 끝은 멀쩡해서, 그 장비가 답을 아끼는 거예요.">
+  <Strip
+    ariaLabel="위 줄은 1, 2번째 구간 손실이 0%이고 3번째부터 5번째 목적지까지 3%가 이어지며, 아래 줄은 3번째 구간만 40%이고 4, 5번째는 0%인 칸 띠"
+    rows={[
+      {
+        label: '진짜 손실',
+        heads: ['1번째', '2번째', '3번째', '4번째', '5번째'],
+        cells: ['0%', '0%', { label: '3%', tone: 'warn' }, { label: '3%', tone: 'warn' }, { label: '3%', tone: 'warn' }],
+      },
+      { label: '답을 아끼는 장비', cells: ['0%', '0%', { label: '40%', tone: 'warn' }, '0%', '0%'] },
+    ]}
+    ranges={[
+      { row: 0, from: 2, to: 4, label: '끝까지 이어짐', tone: 'warn' },
+      { row: 1, from: 2, to: 2, label: '여기만', tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 ## 4. 그 구간의 인터페이스를 보세요
 
 지연이 늘어난 구간을 찾았다면, 그 구간을 잇는 인터페이스의 사용률과 버린 패킷을 봐요. 회선이 넘치면 장비 버퍼에 패킷이 줄을 서서 지연이 늘고, 버퍼가 넘치면 버려져 손실이 돼요.
 
 - 사용률이 높고 버림이 늘었다면 <Term slug="network/interface-saturated">인터페이스가 꽉 찼을 때</Term>로 가요.
-- 받은 오류가 늘었다면 <Term slug="network/errors-and-discards">오류·버린 패킷이 늘 때</Term>로 가요.
+- 받은 에러가 늘었다면 <Term slug="network/errors-and-discards">에러·버린 패킷이 늘 때</Term>로 가요.
 - 장비 쪽은 멀쩡한데 통신사 구간이라면, 시각과 traceroute 결과를 모아 통신사에 문의해요.
 
 <Checkpoints>

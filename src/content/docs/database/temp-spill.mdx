@@ -22,7 +22,7 @@ sources:
     url: https://docs.oracle.com/en/database/oracle/oracle-database/23/admin/managing-tablespaces.html
   - title: SQL Server — tempdb database
     url: https://learn.microsoft.com/en-us/sql/relational-databases/databases/tempdb-database
-updated: 2026-10-28
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -38,6 +38,29 @@ updated: 2026-10-28
   <Item title="계획의 Disk 표시">어느 단계가 넘쳤는지 찾아요.</Item>
   <Item title="정말 느린지">넘친 것과 느린 것은 따로 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 3단계에서 넘침이 문제가 안 된다면 고칠 일이 아니에요. 문제라면 work_mem을 좁은 범위에서 올리고, 디스크 한도도 걸어요.">
+  <Flow
+    ariaLabel="1단계 임시 파일이 생기면 2단계 계획에서 넘친 단계를 찾고, 3단계 정말 느린지 봐서 문제가 없으면 고칠 일이 아니에요. 문제라면 4단계 work_mem을 전체 대신 계정이나 세션 범위로 올리고, 5단계 디스크 한도를 거는 흐름도"
+    nodes={[
+      { id: 's1', label: '임시 파일', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 's2', label: '넘친 단계', col: 0, row: 1, note: '2단계' },
+      { id: 's3', label: '정말 느린지', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '고칠 일 아님', col: 2, row: 2, note: '넘침만으론' },
+      { id: 's4', label: 'work_mem', col: 0, row: 3, note: '4단계' },
+      { id: 'e4', label: '범위 좁히기', col: 2, row: 3, note: '계정·세션' },
+      { id: 's5', label: '디스크 한도', col: 0, row: 4, note: '5단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 's2', label: '생김' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '문제 없음' },
+      { from: 's3', to: 's4', label: '문제 됨' },
+      { from: 's4', to: 'e4', label: '전체 대신' },
+      { from: 's4', to: 's5' },
+    ]}
+  />
+</Figure>
 
 ## 1. 임시 파일이 생기는지 보세요
 
@@ -65,6 +88,26 @@ PostgreSQL 18로 재현한 로그예요. 크기는 바이트이고, 바로 아�
 - **해시 집계(HashAggregate)**: `Batches`가 2 이상이고 `Disk Usage: …`가 붙으면 넘친 거예요.
 
 해시는 데이터를 묶음(batch) 여러 개로 나눠 하나씩 처리해요. 묶음이 둘 이상이면 나머지 묶음을 디스크에 써 둔 거예요.
+
+<Figure caption="Batches: 4인 해시 조인을 그린 예시예요. 한 묶음은 메모리에서 처리하고, 나머지 셋은 디스크에 써 뒀다가 하나씩 처리해요. Batches: 1이라면 칸이 하나뿐이라 디스크를 쓰지 않아요.">
+  <Strip
+    ariaLabel="Batches가 4인 해시 조인에서 묶음 1은 메모리에서 먼저 처리하고, 묶음 2부터 4는 디스크에 써 둔 칸 띠"
+    rows={[
+      {
+        label: '해시 조인 · Batches: 4',
+        heads: ['묶음 1', '묶음 2', '묶음 3', '묶음 4'],
+        cells: [
+          { label: '메모리', tone: 'accent' },
+          { label: '디스크', tone: 'warn' },
+          { label: '디스크', tone: 'warn' },
+          { label: '디스크', tone: 'warn' },
+        ],
+      },
+    ]}
+    marks={[{ at: 0, label: '먼저 처리' }]}
+    ranges={[{ from: 1, to: 3, label: '디스크에 써 둔 묶음', tone: 'warn' }]}
+  />
+</Figure>
 
 ## 3. 넘쳤다고 꼭 느린 건 아니에요
 
@@ -95,6 +138,12 @@ PostgreSQL 18로 재현한 로그예요. 크기는 바이트이고, 바로 아�
 
 예를 들어 `work_mem`을 64MB로 올리고, 정렬 2개가 든 SQL을 연결 100개가 함께 돌리면 12.8GB까지 쓸 수 있어요. 해시 단계는 여기에 `hash_mem_multiplier`(기본 2.0)를 곱한 만큼까지 써요.
 
+<Figure caption="앞 문단의 예를 곱셈으로 따라가요. 한도는 정렬 단계 하나에 걸려서, 정렬 2개가 든 SQL 하나는 128MB를 써요. 그 SQL을 연결 100개가 함께 돌리면 12.8GB예요.">
+  <StatTile label="정렬 단계 하나" value="64" unit="MB" note="work_mem" />
+  <StatTile label="SQL 하나" value="128" unit="MB" note="정렬 2개" />
+  <StatTile label="연결 100개" value="12.8" unit="GB" tone="warn" note="128MB × 100" />
+</Figure>
+
 그래서 전체 기본값을 올리기보다 범위를 좁혀요.
 
 - 리포트용 계정만 올려요: `ALTER ROLE report SET work_mem = '256MB'`
@@ -118,7 +167,7 @@ exceeds "temp_file_limit"
 넘치는 곳의 이름만 다르고, 원리는 같아요.
 
 - **MySQL**: 내부 임시 테이블이 메모리 한도를 넘으면 디스크로 옮겨요. `tmp_table_size`(기본 16MB)가 한도이고, 상태 값 `Created_tmp_disk_tables`가 디스크에 만든 수를 세요.
-- **Oracle**: 정렬 중간 결과를 임시 테이블스페이스에 써요. 그 공간이 모자라면 오류가 나요. <Term slug="database/tablespaces">테이블스페이스와 언두·임시 공간</Term>에서 다뤄요.
+- **Oracle**: 정렬 중간 결과를 임시 테이블스페이스에 써요. 그 공간이 모자라면 에러가 나요. <Term slug="database/tablespaces">테이블스페이스와 언두·임시 공간</Term>에서 다뤄요.
 - **SQL Server**: 정렬과 해시의 작업 파일을 `tempdb`에 써요.
 
 <Checkpoints>

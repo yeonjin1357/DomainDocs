@@ -79,7 +79,7 @@ updated: 2026-10-23
 
 다른 하나는 메모리가 차서 쫓겨나는 <Term term="apm/eviction">축출</Term>이에요. 보통은 가장 오래 쓰지 않은 값(LRU)부터 지워요. 축출이 잦으면 다시 쓸 값까지 지워져 적중률이 떨어져요.
 
-Redis는 메모리 한도(`maxmemory`)에 닿았을 때 어떻게 할지 `maxmemory-policy`로 정해요. 기본값은 `noeviction`이라, 아무것도 지우지 않고 새 값을 넣는 명령에 오류를 돌려줘요. 캐시로 쓴다면 `allkeys-lru` 같은 축출 정책을 골라요.
+Redis는 메모리 한도(`maxmemory`)에 닿았을 때 어떻게 할지 `maxmemory-policy`로 정해요. 기본값은 `noeviction`이라, 아무것도 지우지 않고 새 값을 넣는 명령에 에러를 돌려줘요. 캐시로 쓴다면 `allkeys-lru` 같은 축출 정책을 골라요.
 
 ## 한꺼번에 비면 DB로 몰려요
 
@@ -102,7 +102,7 @@ Redis는 `INFO` 명령으로 상태를 보여 줘요. `keyspace_hits`와 `keyspa
 <Checkpoints>
   <Check>적중률을 Redis 시작 이후의 누적값으로 보고 있다면 다시 보세요. 몇 달 돈 서버라면 오늘 떨어진 적중률이 누적값에 묻혀요. 구간마다 늘어난 hits와 misses로 계산하세요.</Check>
   <Check>`evicted_keys`가 꾸준히 늘고 있다면 메모리가 모자라 쓸 값까지 쫓겨나는 거예요. 적중률과 함께 보세요.</Check>
-  <Check>캐시용 Redis의 `maxmemory-policy`가 `noeviction`이라면, 메모리가 찼을 때 저장 명령이 오류를 내요. 앱이 이 오류를 어떻게 다루는지 보세요.</Check>
+  <Check>캐시용 Redis의 `maxmemory-policy`가 `noeviction`이라면, 메모리가 찼을 때 저장 명령이 에러를 내요. 앱이 이 에러를 어떻게 다루는지 보세요.</Check>
   <Check>모든 키에 같은 TTL을 준 코드라면, 한꺼번에 만료돼 DB로 몰릴 수 있어요. 만료 시각을 흩어 두세요.</Check>
 </Checkpoints>
 

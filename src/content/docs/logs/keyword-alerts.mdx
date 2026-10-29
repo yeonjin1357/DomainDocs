@@ -18,7 +18,7 @@ sources:
 updated: 2026-10-29
 ---
 
-<OnDashboard title="주문 API · 키워드 알림 · 최근 1시간" caption="5분 동안 ERROR가 든 줄이 37줄이라 기준 20줄을 넘었어요. 그런데 이 중 몇 줄이 진짜 오류인지는 일치 조건을 봐야 알아요.">
+<OnDashboard title="주문 API · 키워드 알림 · 최근 1시간" caption="5분 동안 ERROR가 든 줄이 37줄이라 기준 20줄을 넘었어요. 그런데 이 중 몇 줄이 진짜 에러인지는 일치 조건을 봐야 알아요.">
   <StatTile label="ERROR가 든 줄(5분)" value="37" unit="줄" tone="warn" />
   <StatTile label="알림 기준" value="20" unit="줄" note="5분 동안" />
 </OnDashboard>
@@ -85,7 +85,7 @@ CloudWatch 지표 필터에는 기본값(default value)이 있어요. 로그는 
 <Checkpoints>
   <Check>키워드를 소문자로만 걸었다면 다시 보세요. LogQL의 `|=`는 대소문자를 구분해서 ERROR를 놓쳐요.</Check>
   <Check>"ERROR" 같은 짧은 단어로 걸었다면, NO_ERROR나 ERROR_COUNT=0처럼 엉뚱하게 맞는 줄이 없는지 지난 로그로 확인하세요.</Check>
-  <Check>맞는 줄이 없을 때 결과가 비는지, 0이 나오는지 확인하세요. 로그가 끊긴 것과 오류가 없는 것을 가려야 해요.</Check>
+  <Check>맞는 줄이 없을 때 결과가 비는지, 0이 나오는지 확인하세요. 로그가 끊긴 것과 에러가 없는 것을 가려야 해요.</Check>
   <Check>CloudWatch 지표 필터를 만든 뒤 지난 로그로 숫자가 안 채워진다고 고장으로 봤다면 다시 보세요. 필터는 만든 뒤에 들어온 로그만 세요.</Check>
   <Check>평가 구간이 수집 지연보다 짧다면 늘리세요. 아직 도착하지 않은 줄은 세지 못해요.</Check>
 </Checkpoints>

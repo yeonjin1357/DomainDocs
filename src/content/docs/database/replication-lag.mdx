@@ -1,6 +1,6 @@
 ---
 title: 복제 지연
-summary: 복제 지연은 원본의 변경이 복제본에 닿기까지의 시간이에요. 쓰기가 없을 때 재는 방법이 틀리기 쉬워요.
+summary: 주 서버의 변경이 복제 서버에 닿기까지의 시간이에요. 쓰기가 없을 때 재는 법이 틀리기 쉬워요.
 domain: database
 type: concept
 stage: monitoring
@@ -22,31 +22,31 @@ sources:
 updated: 2026-10-29
 ---
 
-<OnDashboard title="주문 DB 복제본 · 새벽 2시~3시" caption="새벽에 쓰기가 멈추자 '마지막 재생 뒤 흐른 시간'이 1시간까지 늘었어요. 실제로 밀린 WAL은 0바이트라, 복제는 다 따라잡은 상태였어요.">
+<OnDashboard title="주문 DB 복제 서버 · 새벽 2시~3시" caption="새벽에 쓰기가 멈추자 '마지막 재생 뒤 흐른 시간'이 1시간까지 늘었어요. 실제로 밀린 WAL은 0바이트라, 복제는 다 따라잡은 상태였어요.">
   <MiniLineChart ariaLabel="마지막 재생 뒤 흐른 시간은 0분에서 60분까지 꾸준히 늘고, 밀린 WAL 바이트는 줄곧 0인 그래프" series={[{ label: '마지막 재생 뒤 흐른 시간(분)', values: [0, 6, 12, 18, 24, 30, 36, 42, 48, 54, 60], tone: 'warn', value: '60분' }, { label: '밀린 WAL(바이트)', values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], tone: 'accent', value: '0' }]} />
 </OnDashboard>
 
 <KeyPoints>
-  <Point title="복제본은 원본의 WAL을 받아 다시 실행해요">
-    복제 지연은 WAL을 받아 쓰고, 확정하고, 다시 실행하는 단계가 원본보다 얼마나 늦는지예요.
+  <Point title="복제 서버는 주 서버의 WAL을 받아 다시 실행해요">
+    복제 지연은 WAL을 받아 쓰고, 확정하고, 다시 실행하는 단계가 주 서버보다 얼마나 늦는지예요.
   </Point>
-  <Point title="복제본에서 읽으면 방금 쓴 값이 안 보일 수 있어요">
-    기본인 비동기 복제에서는 원본에 쓰고 곧바로 복제본에서 읽으면 옛 값이 보일 수 있어요.
+  <Point title="복제 서버에서 읽으면 방금 쓴 값이 안 보일 수 있어요">
+    기본인 비동기 복제에서는 주 서버에 쓰고 곧바로 복제 서버에서 읽으면 옛 값이 보일 수 있어요.
   </Point>
   <Point title="쓰기가 없으면 시간 지연이 부풀어요">
     마지막 재생 뒤 흐른 시간은 쓰기가 없으면 계속 늘어요. 밀린 양은 WAL 바이트 차이로 함께 봐요.
   </Point>
 </KeyPoints>
 
-## 복제본은 원본의 WAL을 받아 다시 실행해요
+## 복제 서버는 주 서버의 WAL을 받아 다시 실행해요
 
-PostgreSQL 복제본은 원본이 남긴 변경 기록(WAL)을 받아 쓰고, 디스크에 확정하고, 다시 실행(replay)해요. 복제 지연은 이 단계들이 원본보다 얼마나 늦는지예요.
+PostgreSQL 복제 서버는 주 서버가 남긴 변경 기록(WAL)을 받아 쓰고, 디스크에 확정하고, 다시 실행(replay)해요. 복제 지연은 이 단계들이 주 서버보다 얼마나 늦는지예요.
 
-<Figure caption="복제본은 WAL을 받아 쓰고, 디스크에 확정하고, 다시 실행해요. 단계마다 원본보다 늦은 만큼이 write_lag, flush_lag, replay_lag예요. 다시 실행까지 마쳐야 복제본 조회에 보여요.">
+<Figure caption="복제 서버는 WAL을 받아 쓰고, 디스크에 확정하고, 다시 실행해요. 단계마다 주 서버보다 늦은 만큼이 write_lag, flush_lag, replay_lag예요. 다시 실행까지 마쳐야 복제 서버 조회에 보여요.">
   <Flow
-    ariaLabel="원본이 남긴 WAL을 복제본이 받아 쓰고, 디스크에 확정하고, 다시 실행한 뒤에야 조회에 보이며, 세 단계의 늦음이 각각 write_lag, flush_lag, replay_lag인 구조도"
+    ariaLabel="주 서버가 남긴 WAL을 복제 서버가 받아 쓰고, 디스크에 확정하고, 다시 실행한 뒤에야 조회에 보이며, 세 단계의 늦음이 각각 write_lag, flush_lag, replay_lag인 구조도"
     nodes={[
-      { id: 'primary', label: '원본', col: 0, row: 0, note: 'WAL 남김' },
+      { id: 'primary', label: '주 서버', col: 0, row: 0, note: 'WAL 남김' },
       { id: 'write', label: '받아 씀', col: 2, row: 0, note: 'write_lag' },
       { id: 'flush', label: '디스크 확정', col: 2, row: 1, note: 'flush_lag' },
       { id: 'replay', label: '다시 실행', col: 2, row: 2, note: 'replay_lag', tone: 'accent' },
@@ -58,38 +58,38 @@ PostgreSQL 복제본은 원본이 남긴 변경 기록(WAL)을 받아 쓰고, �
       { from: 'flush', to: 'replay' },
       { from: 'replay', to: 'read', tone: 'accent' },
     ]}
-    groups={[{ label: '복제본', cols: [2, 2], rows: [0, 2] }]}
+    groups={[{ label: '복제 서버', cols: [2, 2], rows: [0, 2] }]}
   />
 </Figure>
 
-`pg_stat_replication`은 단계마다 지연을 `write_lag`, `flush_lag`, `replay_lag`로 보여 줘요. 비동기 복제라면 `replay_lag`가 방금 커밋한 변경이 복제본 조회에 보이기까지의 시간에 가까워요.
+`pg_stat_replication`은 단계마다 지연을 `write_lag`, `flush_lag`, `replay_lag`로 보여 줘요. 비동기 복제라면 `replay_lag`가 방금 커밋한 변경이 복제 서버 조회에 보이기까지의 시간에 가까워요.
 
-## 복제본에서 읽으면 방금 쓴 값이 안 보일 수 있어요
+## 복제 서버에서 읽으면 방금 쓴 값이 안 보일 수 있어요
 
-PostgreSQL 스트리밍 복제는 기본이 비동기라, 원본 커밋과 복제본 반영 사이에 짧은 틈이 있어요. 그래서 원본에 쓰고 곧바로 복제본에서 읽으면 옛 값이 보일 수 있어요.
+PostgreSQL 스트리밍 복제는 기본이 비동기라, 주 서버 커밋과 복제 서버 반영 사이에 짧은 틈이 있어요. 그래서 주 서버에 쓰고 곧바로 복제 서버에서 읽으면 옛 값이 보일 수 있어요.
 
-<Figure caption="비동기 복제에서 원본에 쓰고 곧바로 복제본에서 읽은 예시예요. 변경이 복제본에 닿아 재생되기 전이라 옛 값이 보여요.">
+<Figure caption="비동기 복제에서 주 서버에 쓰고 곧바로 복제 서버에서 읽은 예시예요. 변경이 복제 서버에 닿아 재생되기 전이라 옛 값이 보여요.">
   <Sequence
-    ariaLabel="앱이 원본에 주문을 저장하고 커밋 완료를 받은 뒤 곧바로 복제본에서 조회하자 옛 값이 돌아오고, 그 뒤에야 원본의 WAL이 복제본에 닿아 재생되는 순서"
-    participants={['앱', '원본', '복제본']}
+    ariaLabel="앱이 주 서버에 주문을 저장하고 커밋 완료를 받은 뒤 곧바로 복제 서버에서 조회하자 옛 값이 돌아오고, 그 뒤에야 주 서버의 WAL이 복제 서버에 닿아 재생되는 순서"
+    participants={['앱', '주 서버', '복제 서버']}
     messages={[
-      { from: '앱', to: '원본', label: '주문 저장' },
-      { from: '원본', to: '앱', label: '커밋 완료', dashed: true },
-      { from: '앱', to: '복제본', label: '곧바로 조회' },
-      { from: '복제본', to: '앱', label: '옛 값', tone: 'warn', dashed: true },
-      { from: '원본', to: '복제본', label: 'WAL 도착 · 재생', tone: 'accent' },
+      { from: '앱', to: '주 서버', label: '주문 저장' },
+      { from: '주 서버', to: '앱', label: '커밋 완료', dashed: true },
+      { from: '앱', to: '복제 서버', label: '곧바로 조회' },
+      { from: '복제 서버', to: '앱', label: '옛 값', tone: 'warn', dashed: true },
+      { from: '주 서버', to: '복제 서버', label: 'WAL 도착 · 재생', tone: 'accent' },
     ]}
   />
 </Figure>
 
-지연이 커지면 이 틈도 커져요. 원본이 죽어 복제본으로 넘기면, 잃는 데이터도 그 순간의 지연에 비례해요. 정확히는 복제본이 아직 받지 못한 WAL이고, 받아 둔 WAL은 승격할 때 마저 재생해요.
+지연이 커지면 이 틈도 커져요. 주 서버가 죽어 복제 서버로 넘기면, 잃는 데이터도 그 순간의 지연에 비례해요. 정확히는 복제 서버가 아직 받지 못한 WAL이고, 받아 둔 WAL은 승격할 때 마저 재생해요.
 
-<Figure caption="원본이 죽은 순간의 설명용 예시예요. 복제본이 받아 둔 5~6은 승격할 때 마저 재생해요. 아직 받지 못한 7~8만 잃어요.">
+<Figure caption="주 서버가 죽은 순간의 설명용 예시예요. 복제 서버가 받아 둔 5~6은 승격할 때 마저 재생해요. 아직 받지 못한 7~8만 잃어요.">
   <Strip
-    ariaLabel="원본의 WAL 1부터 8 가운데 복제본은 4까지 재생하고 6까지 받아 두었으며, 받아 둔 5와 6은 승격 때 재생하고, 받지 못한 7과 8은 잃는 칸 띠"
+    ariaLabel="주 서버의 WAL 1부터 8 가운데 복제 서버는 4까지 재생하고 6까지 받아 두었으며, 받아 둔 5와 6은 승격 때 재생하고, 받지 못한 7과 8은 잃는 칸 띠"
     rows={[
       {
-        label: '원본의 WAL(왼쪽이 먼저)',
+        label: '주 서버의 WAL(왼쪽이 먼저)',
         cells: [
           { label: '1', tone: 'accent' },
           { label: '2', tone: 'accent' },
@@ -116,16 +116,16 @@ PostgreSQL 스트리밍 복제는 기본이 비동기라, 원본 커밋과 복�
 
 ## 쓰기가 없으면 시간 지연이 부풀어요
 
-복제본에서 흔히 쓰는 `now() - pg_last_xact_replay_timestamp()`는 마지막으로 재생한 트랜잭션 뒤로 흐른 시간이에요. 원본에 쓰기가 없으면 재생할 트랜잭션도 없어서, 다 따라잡았어도 이 값은 계속 늘어요.
+복제 서버에서 흔히 쓰는 `now() - pg_last_xact_replay_timestamp()`는 마지막 재생 뒤로 흐른 시간이에요. 주 서버에 쓰기가 없으면 재생할 트랜잭션도 없어서, 다 따라잡았어도 이 값은 계속 늘어요.
 
-<Figure caption="맨 위 그래프의 새벽을 줄여 그린 예시예요. 02:00에 쓰기가 멈추자 복제본도 다 따라잡았어요. 그 뒤로 재생할 트랜잭션이 없어서, 마지막 재생 뒤 흐른 시간만 계속 늘어요.">
+<Figure caption="맨 위 그래프의 새벽을 줄여 그린 예시예요. 02:00에 쓰기가 멈추자 복제 서버도 다 따라잡았어요. 그 뒤로 재생할 트랜잭션이 없어서, 마지막 재생 뒤 흐른 시간만 계속 늘어요.">
   <Timeline
-    ariaLabel="원본 쓰기와 복제본 재생이 02:00에 함께 멈추고, 그 뒤 03:00까지 밀린 것은 없는데 마지막 재생 뒤 흐른 시간만 0분에서 60분으로 늘어나는 시간 띠"
+    ariaLabel="주 서버 쓰기와 복제 서버 재생이 02:00에 함께 멈추고, 그 뒤 03:00까지 밀린 것은 없는데 마지막 재생 뒤 흐른 시간만 0분에서 60분으로 늘어나는 시간 띠"
     start={-15}
     end={60}
     lanes={[
-      { label: '원본 쓰기', segments: [{ start: -15, end: 0, label: '쓰기', tone: 'accent' }] },
-      { label: '복제본 재생', segments: [{ start: -14, end: 0, label: '재생', tone: 'accent' }] },
+      { label: '주 서버 쓰기', segments: [{ start: -15, end: 0, label: '쓰기', tone: 'accent' }] },
+      { label: '복제 서버 재생', segments: [{ start: -14, end: 0, label: '재생', tone: 'accent' }] },
       { label: '흐른 시간', segments: [{ start: 0, end: 60, label: '0분 → 60분', tone: 'warn' }] },
     ]}
     marks={[{ at: 0, label: '마지막 재생' }]}
@@ -138,17 +138,17 @@ PostgreSQL 스트리밍 복제는 기본이 비동기라, 원본 커밋과 복�
 <Checkpoints>
   <Check>복제 지연 알림을 마지막 재생 뒤 흐른 시간 하나에 걸었다면, 쓰기가 없는 새벽마다 거짓 알림이 울려요. WAL 바이트 차이나 `replay_lag`와 함께 판단하세요.</Check>
   <Check>`replay_lag`가 NULL이라면 0이 아니라 '최근에 잰 값이 없음'이에요. 다 따라잡고 WAL 활동이 없으면, 마지막 값을 잠시 보여 준 뒤 <Term slug="foundations/no-data-vs-zero">NULL이 돼요</Term>.</Check>
-  <Check>복제본에서 오래 도는 조회가 있다면 보세요. 재생할 변경과 그 조회가 충돌하면, 복제본은 재생을 미뤄요. `max_standby_streaming_delay`(기본 30초)까지 기다린 뒤 조회를 취소하고, 그동안 지연이 늘어요.</Check>
-  <Check>원본의 WAL 디스크가 차오른다면 복제 슬롯(replication slot)을 보세요. 슬롯은 복제본이 받기 전까지 WAL을 지우지 못하게 잡아 둬서, 멈춘 복제본의 슬롯이 디스크를 채울 수 있어요.</Check>
+  <Check>복제 서버에서 오래 도는 조회가 있다면 보세요. 재생할 변경과 그 조회가 충돌하면, 복제 서버는 재생을 미뤄요. `max_standby_streaming_delay`(기본 30초)까지 기다린 뒤 조회를 취소하고, 그동안 지연이 늘어요.</Check>
+  <Check>주 서버의 WAL 디스크가 차오른다면 복제 슬롯(replication slot)을 보세요. 슬롯은 복제 서버가 받기 전까지 WAL을 지우지 못하게 잡아 둬서, 멈춘 복제 서버의 슬롯이 디스크를 채울 수 있어요.</Check>
 </Checkpoints>
 
 <Deeper>
-  ### 원본에서 재기
+  ### 주 서버에서 재기
 
-  원본의 `pg_stat_replication`에는 복제본마다 한 줄이 있어요. `pg_wal_lsn_diff`로 원본의 현재 WAL 위치와 복제본이 재생한 위치의 바이트 차이를 구해요.
+  주 서버의 `pg_stat_replication`에는 복제 서버마다 한 줄이 있어요. `pg_wal_lsn_diff`로 주 서버의 현재 WAL 위치와 복제 서버가 재생한 위치의 바이트 차이를 구해요.
 
   ```text
-  -- 원본에서: 복제본별 밀린 양
+  -- 주 서버에서: 복제 서버별 밀린 양
   SELECT application_name,
          pg_wal_lsn_diff(pg_current_wal_lsn(), replay_lsn)
            AS replay_bytes,
@@ -156,15 +156,15 @@ PostgreSQL 스트리밍 복제는 기본이 비동기라, 원본 커밋과 복�
   FROM pg_stat_replication;
   ```
 
-  세 지연 값은 원본이 WAL을 자기 디스크에 확정한 뒤, 복제본이 각 단계를 마쳤다는 알림을 받기까지의 시간이에요. 동기 복제였다면 커밋이 그만큼 기다렸을 거라는 뜻이기도 해요.
+  세 지연 값은 주 서버가 WAL을 자기 디스크에 확정한 뒤, 복제 서버가 각 단계를 마쳤다는 알림을 받기까지의 시간이에요. 동기 복제였다면 커밋이 그만큼 기다렸을 거라는 뜻이기도 해요.
 
-  ### 복제본에서 재기
+  ### 복제 서버에서 재기
 
-  `pg_last_xact_replay_timestamp()`는 마지막으로 재생한 트랜잭션이 원본에서 커밋되거나 취소된 시각이에요. 재생한 트랜잭션이 없으면 NULL이에요.
+  `pg_last_xact_replay_timestamp()`는 마지막으로 재생한 트랜잭션이 주 서버에서 커밋되거나 취소된 시각이에요. 재생한 트랜잭션이 없으면 NULL이에요.
 
   ### 지연의 크기
 
-  PostgreSQL 문서는 스트리밍 복제의 지연이 복제본이 충분히 빠르면 보통 1초 아래라고 해요. 원본에서 표 전체를 잠그는 DDL(ACCESS EXCLUSIVE)은 복제본의 조회와도 충돌해요.
+  PostgreSQL 문서는 스트리밍 복제의 지연이 복제 서버가 충분히 빠르면 보통 1초 아래라고 해요. 주 서버에서 표 전체를 잠그는 DDL(ACCESS EXCLUSIVE)은 복제 서버의 조회와도 충돌해요.
 
   복제 슬롯이 잡아 둘 수 있는 WAL의 양은 `max_slot_wal_keep_size`로 묶을 수 있어요.
 </Deeper>

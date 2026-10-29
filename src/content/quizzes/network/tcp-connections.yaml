@@ -26,14 +26,14 @@ questions:
     explain: 거부는 서버 프로그램 쪽부터, 답이 오지 않는 시간 초과는 경로나 방화벽 쪽부터 봐요.
   - id: retransmit-spikes
     type: choice
-    prompt: 네트워크 오류 카운터는 그대로인데, 앱 응답시간이 가끔 1초, 3초씩 튀어요. 먼저 의심할 것은?
+    prompt: 네트워크 에러 카운터는 그대로인데, 앱 응답시간이 가끔 1초, 3초씩 튀어요. 먼저 의심할 것은?
     choices:
       - 사라진 패킷을 TCP가 기다렸다가 다시 보내느라 늦어짐
       - 서버 CPU의 부하
       - DNS 레코드의 TTL
       - 스위치의 플러딩
     answer: 0
-    explain: TCP는 답이 없으면 정한 시간만큼 기다렸다 다시 보내고, 그 시간은 매번 두 배로 늘어요. 오류로는 안 보이고 느려짐으로만 보여요.
+    explain: TCP는 답이 없으면 정한 시간만큼 기다렸다 다시 보내고, 그 시간은 매번 두 배로 늘어요. 에러로는 안 보이고 느려짐으로만 보여요.
   - id: handshake-name
     type: input
     prompt: TCP 연결을 맺을 때 SYN, SYN·ACK, ACK를 주고받는 과정을 무엇이라고 하나요?

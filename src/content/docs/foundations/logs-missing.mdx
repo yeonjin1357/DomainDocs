@@ -16,7 +16,7 @@ sources:
     url: https://docs.fluentbit.io/manual/administration/monitoring
   - title: Fluent Bit — Scheduling and retries
     url: https://docs.fluentbit.io/manual/administration/scheduling-and-retries
-updated: 2026-10-23
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -31,11 +31,53 @@ updated: 2026-10-23
   <Item title="앱이 쓰고 있나">로그 파일이 지금도 커지는지 봐요.</Item>
 </FirstLook>
 
+<Figure caption="검색 범위부터 봐요. 다른 시각에도 없으면 2단계 에이전트 지표로 갈래를 정해요. 보내기가 막혔으면 저장소를, 읽기가 멈췄으면 파일과 앱을 거슬러 봐요.">
+  <Flow
+    ariaLabel="1단계 검색 범위를 넓혀 다른 시각에 있으면 파서의 시간대 설정을 보고, 어디에도 없으면 2단계 에이전트 지표를 봐요. 보내기가 막혔으면 3단계 저장소로, 읽기가 멈췄으면 4단계 파일 읽기로 가고, 파일이 커지지 않으면 5단계 앱으로 가는 흐름도"
+    nodes={[
+      { id: 's1', label: '검색 범위', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'parser', label: '파서 설정', col: 2, row: 0, note: '시간대' },
+      { id: 's2', label: '에이전트', col: 0, row: 1, note: '2단계' },
+      { id: 's4', label: '파일 읽기', col: 2, row: 1, note: '4단계' },
+      { id: 's3', label: '저장소', col: 0, row: 2, note: '3단계', tone: 'accent' },
+      { id: 's5', label: '앱', col: 2, row: 2, note: '5단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'parser', label: '다른 시각' },
+      { from: 's1', to: 's2', label: '어디에도 없음' },
+      { from: 's2', to: 's4', label: '읽기 멈춤' },
+      { from: 's2', to: 's3', label: '보내기 막힘' },
+      { from: 's4', to: 's5', label: '파일 안 커짐' },
+    ]}
+  />
+</Figure>
+
 ## 1. 다른 시각에 들어가 있는지 보세요
 
 검색 화면은 보통 로그 줄에 적힌 시각으로 찾아요. 그런데 시각이 잘못 읽히면, 로그는 들어왔는데 엉뚱한 시각에 저장돼요.
 
 흔한 원인은 시간대예요. 앱이 시간대 없이 한국 시간으로 적었는데 에이전트가 UTC로 읽으면, 9시간 어긋난 자리에 저장돼요. Fluent Bit 파서에는 시간대가 없는 시각에 쓸 시간대를 정하는 설정(`time_zone`, `time_system_timezone`)이 있어요.
+
+<Figure caption="앱이 한국 시간 10시에 시간대 없이 쓴 로그를 에이전트가 UTC로 읽은 예시예요. 한국 시간 화면에선 9시간 뒤인 19시에 놓여서, 10시 근처를 찾으면 비어 있어요.">
+  <Timeline
+    ariaLabel="한국 시간 8시부터 20시까지의 띠에서, 10시에 쓴 로그가 9시간 뒤인 19시 자리에 저장되어, 9시부터 12시까지 찾는 범위는 비어 있는 시간 띠"
+    start={8}
+    end={20}
+    lanes={[
+      { label: '찾는 범위', segments: [{ start: 9, end: 12, label: '비어 있음', tone: 'accent' }] },
+      { label: '저장된 곳', segments: [{ start: 19, end: 20, tone: 'warn' }] },
+    ]}
+    marks={[
+      { at: 10, label: '쓴 시각 10시' },
+      { at: 19, label: '저장 19시', tone: 'warn' },
+    ]}
+    ticks={[
+      { at: 8, label: '8시' },
+      { at: 14, label: '14시' },
+      { at: 20, label: '20시' },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: 검색 범위를 앞뒤로 하루씩 넓혀, 그 서버의 로그가 다른 시각에 있는지 봐요. 있다면 로그의 시각 형식과 에이전트의 파서 설정을 견줘요.
 
@@ -48,11 +90,24 @@ updated: 2026-10-23
 - **보낸 로그 수가 늘지 않고, 버린 수나 재시도 실패가 늘었다면**: 저장소로 가는 길이 막혔어요. 3단계로 가요.
 - **읽은 바이트부터 늘지 않는다면**: 파일 쪽에서 멈췄어요. 4단계로 가요.
 
-**확인 방법**: Fluent Bit이라면 보낸 로그 수인 `fluentbit_output_proc_records_total`을 봐요. 재시도 한도를 넘겨 버린 묶음 수는 `fluentbit_output_retries_failed_total`이에요. 에이전트 로그의 경고와 오류도 함께 봐요.
+**확인 방법**: Fluent Bit이라면 보낸 로그 수인 `fluentbit_output_proc_records_total`을 봐요. 재시도 한도를 넘겨 버린 묶음 수는 `fluentbit_output_retries_failed_total`이에요. 에이전트 로그의 경고와 에러도 함께 봐요.
 
 ## 3. 저장소가 받아 주는지 보세요
 
 저장소가 멈췄거나 느리면 에이전트는 로그를 쌓아 두고 다시 보내요. Fluent Bit은 재시도 한도(`Retry_Limit`)를 넘기면 그 묶음을 버리고, 기본 한도는 1이에요. 그래서 저장소가 몇 분만 멈춰도 그 사이 로그는 돌아오지 않아요.
+
+<Figure caption="재시도 한도가 기본값 1일 때의 순서예요. 처음 보낸 것과 다시 보낸 한 번이 모두 실패하면, 에이전트는 그 묶음을 버려요. 저장소가 나중에 살아나도 버린 묶음은 돌아오지 않아요.">
+  <Sequence
+    ariaLabel="에이전트가 로그 묶음을 저장소에 보냈다가 실패하고, 한 번 다시 보냈다가 또 실패해 재시도 한도 1을 넘기면 그 묶음을 버리는 순서도"
+    participants={['에이전트', '저장소']}
+    messages={[
+      { from: '에이전트', to: '저장소', label: '로그 묶음 보내기' },
+      { from: '저장소', to: '에이전트', label: '실패', dashed: true, tone: 'warn' },
+      { from: '에이전트', to: '저장소', label: '다시 보내기(1번)' },
+      { from: '저장소', to: '에이전트', label: '또 실패', dashed: true, tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 메모리 버퍼 한도에 닿으면 Fluent Bit은 그 입력의 읽기를 멈춰요. 이때 에이전트 로그에 `paused (mem buf overlimit)` 같은 경고가 남아요. 저장소가 다시 받기 시작하면 이어서 읽어요.
 
@@ -81,6 +136,6 @@ updated: 2026-10-23
 
 <Checkpoints>
   <Check>로그 검색 범위를 좁게만 잡고 '로그가 없다'고 판단했다면, 범위를 넓혀 시각이 어긋나지 않았는지 보세요.</Check>
-  <Check>에이전트의 버린 수와 재시도 실패 지표에 알림이 없다면 거세요. 버려진 로그는 오류 없이 조용히 사라져요.</Check>
+  <Check>에이전트의 버린 수와 재시도 실패 지표에 알림이 없다면 거세요. 버려진 로그는 에러 없이 조용히 사라져요.</Check>
   <Check>로그 줄 수 그래프가 갑자기 0이 되었다면, 에러가 없다는 뜻이 아니라 수집이 멈췄다는 뜻일 수 있어요. <Term slug="foundations/no-data-vs-zero">데이터 없음과 0은 달라요</Term>.</Check>
 </Checkpoints>

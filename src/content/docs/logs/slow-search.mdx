@@ -1,6 +1,6 @@
 ---
 title: 로그 검색이 느릴 때
-summary: 시간 범위, 라벨·색인으로 좁히기, 검색어 모양, 결과 크기 순서로 느린 이유를 가려요.
+summary: 시간 범위, 레이블·색인으로 좁히기, 검색어 모양, 결과 크기 순서로 느린 이유를 가려요.
 domain: logs
 type: guide
 order: 80
@@ -23,9 +23,34 @@ updated: 2026-10-29
 
 <FirstLook>
   <Item title="시간 범위">검색 범위가 몇 시간인지, 며칠인지 봐요.</Item>
-  <Item title="먼저 좁히는 조건">라벨이나 색인된 필드로 먼저 좁혔는지 봐요.</Item>
+  <Item title="먼저 좁히는 조건">레이블이나 색인된 필드로 먼저 좁혔는지 봐요.</Item>
   <Item title="결과 크기">돌려받는 줄 수와 묶는 기준의 수를 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 고쳐요. 범위만 15분으로 줄여 바로 끝난다면 1단계에서 원인을 찾은 거예요.">
+  <Flow
+    ariaLabel="1단계 시간 범위에서 15분으로 줄여 빨라지면 범위를 좁히고, 2단계 레이블과 필드에서 넓게 골랐다면 구체적인 레이블이나 keyword 필드로 바꾸고, 3단계 검색어 모양에서 정규식이나 파서가 앞에 있다면 줄 필터를 먼저 두고, 4단계 결과 크기에서 수백만 줄을 돌려준다면 줄 수를 제한하는 흐름도"
+    nodes={[
+      { id: 's1', label: '시간 범위', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '범위 좁히기', col: 2, row: 0, note: '앞뒤 몇 분' },
+      { id: 's2', label: '레이블·필드', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '구체적 레이블', col: 2, row: 1, note: 'keyword 필드' },
+      { id: 's3', label: '검색어 모양', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '줄 필터 먼저', col: 2, row: 2, note: '파서는 뒤로' },
+      { id: 's4', label: '결과 크기', col: 0, row: 3, note: '4단계', tone: 'accent' },
+      { id: 'e4', label: '줄 수 제한', col: 2, row: 3, note: '필요한 필드만' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '15분은 빠름' },
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 'e2', label: '넓게 고름' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '정규식·파서' },
+      { from: 's3', to: 's4' },
+      { from: 's4', to: 'e4', label: '수백만 줄' },
+    ]}
+  />
+</Figure>
 
 ## 1. 시간 범위를 좁히세요
 
@@ -33,15 +58,55 @@ updated: 2026-10-29
 
 Loki는 하루마다 색인 파일을 하나씩 만들어요. 그래서 여러 날에 걸친 검색은 색인 파일도 그만큼 더 읽어요.
 
+<Figure caption="하루치마다 색인 파일이 하나씩 있는 예시예요. 범위가 7일이면 일곱 개를 다 읽고, 마지막 날의 15분이면 그날 파일 하나만 읽어요.">
+  <Strip
+    ariaLabel="하루에 하나씩 있는 색인 파일 일곱 개 중, 검색 범위가 7일이면 일곱 개를 모두 읽고, 마지막 날의 15분이면 7일째 파일 하나만 읽는 칸 띠"
+    rows={[
+      {
+        label: '검색 범위 7일',
+        cells: [{ label: '1일', tone: 'warn' }, { label: '2일', tone: 'warn' }, { label: '3일', tone: 'warn' }, { label: '4일', tone: 'warn' }, { label: '5일', tone: 'warn' }, { label: '6일', tone: 'warn' }, { label: '7일', tone: 'warn' }],
+      },
+      {
+        label: '검색 범위 15분',
+        cells: [{ label: '1일', tone: 'sub' }, { label: '2일', tone: 'sub' }, { label: '3일', tone: 'sub' }, { label: '4일', tone: 'sub' }, { label: '5일', tone: 'sub' }, { label: '6일', tone: 'sub' }, { label: '7일', tone: 'accent' }],
+      },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 6, label: '색인 파일 7개를 읽어요', tone: 'warn' },
+      { row: 1, from: 6, to: 6, label: '1개', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
 **확인 방법**: 같은 검색을 범위만 15분으로 줄여 돌려 봐요. 바로 끝난다면 범위가 원인이에요.
 
-## 2. 라벨이나 색인된 필드로 먼저 좁히세요
+## 2. 레이블이나 색인된 필드로 먼저 좁히세요
 
-라벨만 색인하는 저장소(Loki)에서는 라벨로 스트림을 좁혀야 훑을 양이 줄어요. `{namespace=~".+"}`처럼 넓게 고르면 모든 스트림을 훑어요. 가장 구체적인 라벨부터 써요.
+레이블만 색인하는 저장소(Loki)에서는 레이블로 스트림을 좁혀야 훑을 양이 줄어요. `{namespace=~".+"}`처럼 넓게 고르면 모든 스트림을 훑어요. 가장 구체적인 레이블부터 써요.
+
+<Figure caption="스트림 네 개가 있는 Loki의 예시예요. 넓은 선택자는 모든 스트림을 훑고, 구체적인 레이블은 맞는 스트림 하나만 훑어요.">
+  <Strip
+    ariaLabel="스트림 네 개 중, namespace를 아무 값이나 고르는 넓은 선택자는 네 개를 모두 훑고, app이 order-api인 선택자는 order-api 스트림 하나만 훑고 나머지 셋은 건너뛰는 칸 띠"
+    rows={[
+      {
+        label: '{namespace=~".+"}',
+        cells: [{ label: 'order-api', tone: 'warn' }, { label: 'pay-api', tone: 'warn' }, { label: 'user-api', tone: 'warn' }, { label: 'mail-api', tone: 'warn' }],
+      },
+      {
+        label: '{app="order-api"}',
+        cells: [{ label: 'order-api', tone: 'accent' }, { label: 'pay-api', tone: 'sub' }, { label: 'user-api', tone: 'sub' }, { label: 'mail-api', tone: 'sub' }],
+      },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 3, label: '모두 훑어요', tone: 'warn' },
+      { row: 1, from: 0, to: 0, label: '하나만', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 모든 단어를 색인하는 저장소(Elasticsearch)에서는 색인된 필드로 찾아야 빨라요. 주문 번호처럼 정확히 찾을 값이 keyword 필드로 있으면 그 필드로 찾아요.
 
-**확인 방법**: 질의 앞부분의 라벨 선택자나 필드 조건이 몇 개의 스트림, 몇 개의 문서를 고르는지 봐요. 저장 방식은 <Term slug="logs/storage-and-indexing">로그 저장과 색인</Term>에서 다뤄요.
+**확인 방법**: 질의 앞부분의 레이블 선택자나 필드 조건이 몇 개의 스트림, 몇 개의 문서를 고르는지 봐요. 저장 방식은 <Term slug="logs/storage-and-indexing">로그 저장과 색인</Term>에서 다뤄요.
 
 ## 3. 검색어 모양을 보세요
 
@@ -67,7 +132,7 @@ Loki 문서는 정규식(`|~`)보다 단순 포함(`|=`)을 먼저 쓰라고 해
 
 <Checkpoints>
   <Check>검색 화면의 기본 시간 범위가 길게 잡혀 있다면 짧게 바꾸세요. 장애를 볼 때는 최근 몇 시간부터 좁혀 보세요.</Check>
-  <Check>Loki 질의가 넓은 라벨 선택자로 시작한다면, 앱이나 네임스페이스 같은 구체적인 라벨로 바꾸세요.</Check>
+  <Check>Loki 질의가 넓은 레이블 선택자로 시작한다면, 앱이나 네임스페이스 같은 구체적인 레이블로 바꾸세요.</Check>
   <Check>정규식을 단순 포함으로 바꿀 수 있다면 바꾸세요. 파서는 줄 필터 뒤에 두세요.</Check>
   <Check>자주 찾는 값(주문 번호 등)을 찾을 때마다 본문에서 훑고 있다면, 필드로 빼 두는 걸 고려하세요.</Check>
 </Checkpoints>

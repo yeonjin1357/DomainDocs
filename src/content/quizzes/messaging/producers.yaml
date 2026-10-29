@@ -13,7 +13,7 @@ questions:
     type: ox
     prompt: acks=all인데 min.insync.replicas가 1이면, 복제본이 리더 하나로 줄어도 쓰기가 성공하나요?
     answer: true
-    explain: 동기화된 복제본이 리더 하나뿐이어도 '모두'가 돼요. 그 리더가 죽으면 잃으니, 복제본 3개에 최소 2개를 흔히 함께 걸어요.
+    explain: ISR이 리더 하나뿐이어도 '모두'가 돼요. 그 리더가 죽으면 잃으니, 복제본 3개에 최소 2개를 흔히 함께 걸어요.
   - id: linger-tradeoff
     type: choice
     prompt: 프로듀서의 linger.ms를 늘리면 어떻게 될까요?
@@ -26,14 +26,14 @@ questions:
     explain: linger.ms는 묶음을 채우려고 기다리는 최대 시간이에요. 오래 기다릴수록 크게 모이지만 그만큼 늦게 보내요.
   - id: retry-rate-rising
     type: choice
-    prompt: 프로듀서의 오류율은 0인데 record-retry-rate가 계속 올라요. 먼저 볼 곳은?
+    prompt: 프로듀서의 에러율은 0인데 record-retry-rate가 계속 올라요. 먼저 볼 곳은?
     choices:
       - 브로커와 네트워크
       - 컨슈머의 지연
       - 토픽 이름
       - 파티션 키
     answer: 0
-    explain: 재시도가 문제를 잠시 가리고 있을 수 있어요. 오류로 바뀌기 전에 브로커 상태부터 봐요.
+    explain: 재시도가 문제를 잠시 가리고 있을 수 있어요. 에러로 바뀌기 전에 브로커 상태부터 봐요.
   - id: idempotent-name
     type: input
     prompt: 프로듀서가 다시 보내다 같은 이벤트를 두 번 쓰는 일을, 브로커가 순번으로 걸러 막는 기능은?

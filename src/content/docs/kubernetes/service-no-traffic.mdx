@@ -14,7 +14,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/services-networking/service/
   - title: Kubernetes — DNS for Services and Pods
     url: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -28,6 +28,29 @@ updated: 2026-10-21
   <Item title="대상 파드가 잡혔나">EndpointSlice에 파드 IP가 있는지 봐요.</Item>
   <Item title="포트가 맞나">서비스의 targetPort와 파드의 포트를 견줘요.</Item>
 </FirstLook>
+
+<Figure caption="바깥에서 안쪽으로, 왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 먼저 봐요.">
+  <Flow
+    ariaLabel="1단계 이름이 안 풀리면 DNS 쪽을, 풀리면 2단계 대상 파드로 가서 목록이 비어 있으면 셀렉터와 준비 상태를 보고, 3단계 포트가 맞으면 4단계 막는 규칙으로 가서 파드로 직접은 되면 kube-proxy를 보는 흐름도"
+    nodes={[
+      { id: 's1', label: '이름 풀이', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: 'DNS 쪽', col: 2, row: 0, note: '클러스터 DNS' },
+      { id: 's2', label: '대상 파드', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '셀렉터·준비', col: 2, row: 1, note: '오타·readiness' },
+      { id: 's3', label: '포트', col: 0, row: 2, note: '3단계' },
+      { id: 's4', label: '막는 규칙', col: 0, row: 3, note: '4단계', tone: 'accent' },
+      { id: 'e4', label: 'kube-proxy', col: 2, row: 3, note: '서비스 규칙' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '안 풀림' },
+      { from: 's1', to: 's2', label: '풀림' },
+      { from: 's2', to: 'e2', label: '비어 있음' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 's4', label: '맞음' },
+      { from: 's4', to: 'e4', label: '직접은 됨' },
+    ]}
+  />
+</Figure>
 
 ## 1. 서비스가 있고 이름이 풀리는지 보세요
 
@@ -67,6 +90,21 @@ kubectl get endpointslices \
 
 서비스의 port는 서비스가 받는 포트이고, targetPort는 파드로 넘길 때 쓰는 포트예요. targetPort가 파드에서 앱이 실제로 듣는 포트와 다르면, 요청이 파드에 닿아도 받을 곳이 없어요.
 
+<Figure caption="포트 번호는 예시예요. 서비스는 port 80으로 받아 targetPort 8080으로 넘기는데, 앱은 8000에서 듣고 있어요. 요청이 파드에 닿아도 받을 곳이 없어요.">
+  <Flow
+    ariaLabel="주문 파드가 서비스 pay의 port 80으로 보내고, 서비스는 targetPort 8080으로 결제 파드에 넘기지만, 결제 파드의 앱은 8000에서 듣고 있어 받을 곳이 없는 구조도"
+    nodes={[
+      { id: 'caller', label: '주문 파드', col: 0, row: 0, note: '부르는 쪽' },
+      { id: 'svc', label: '서비스 pay', col: 2, row: 0, note: '받아서 넘김' },
+      { id: 'pod', label: '결제 파드', col: 2, row: 1, note: '앱은 8000', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'caller', to: 'svc', label: 'port 80' },
+      { from: 'svc', to: 'pod', label: 'targetPort 8080', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 **확인 방법**: `kubectl get service pay -o yaml`에서 port와 targetPort를 봐요. 이 값을 파드의 containerPort, 앱 설정의 포트와 견줘요. 이름 붙은 포트를 쓴다면 파드에도 같은 이름의 포트가 있는지 봐요.
 
 ## 4. 그래도 안 되면 길을 막는 규칙을 보세요
@@ -77,6 +115,22 @@ kubectl get endpointslices \
 - 노드마다 서비스 규칙을 까는 kube-proxy가 멈췄을 수 있어요.
 
 **확인 방법**: 대상 파드 IP와 포트로 직접 요청해 봐요. 직접은 되고 서비스 IP로는 안 된다면, 서비스 규칙(kube-proxy) 쪽이에요.
+
+<Figure caption="위쪽 곧은 화살표는 파드 IP로 직접 보낸 요청이고, 아래로 돌아가는 길은 서비스 IP를 거쳐요. 직접은 되는데 서비스로는 안 된다면, 그 사이의 서비스 규칙(kube-proxy)을 봐요.">
+  <Flow
+    ariaLabel="주문 파드가 결제 파드 IP로 직접 보내면 닿고, 서비스 IP를 거쳐 보내는 길은 kube-proxy가 까는 서비스 규칙을 지나는 두 길을 견준 구조도"
+    nodes={[
+      { id: 'caller', label: '주문 파드', col: 0, row: 0, note: '부르는 쪽' },
+      { id: 'pod', label: '결제 파드', col: 2, row: 0, note: '파드 IP' },
+      { id: 'svc', label: '서비스 IP', col: 1, row: 1, note: 'kube-proxy', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'caller', to: 'pod', label: '직접: 됨', tone: 'accent' },
+      { from: 'caller', to: 'svc' },
+      { from: 'svc', to: 'pod', tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>파드가 모두 Running이라 서비스도 될 거라 여겼다면 다시 보세요. Running이어도 Ready가 아니면 서비스 대상에서 빠져요.</Check>

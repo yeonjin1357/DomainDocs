@@ -23,12 +23,12 @@ questions:
     type: choice
     prompt: 모니터링 화면에서 파드 정보는 보이는데 노드 정보만 비어 있어요. 에이전트 로그에 무엇이 있을지 먼저 찾을까요?
     choices:
-      - nodes에 대한 forbidden 오류
+      - nodes에 대한 forbidden 에러
       - OOMKilled
       - CrashLoopBackOff
       - ImagePullBackOff
     answer: 0
-    explain: 권한이 빠진 자원은 오류 화면 없이 그 부분만 비어요. 로그의 forbidden 줄에 어느 계정이 무엇을 못 했는지 남아요.
+    explain: 권한이 빠진 자원은 에러 화면 없이 그 부분만 비어요. 로그의 forbidden 줄에 어느 계정이 무엇을 못 했는지 남아요.
   - id: sa-term
     type: input
     prompt: 사람이 아니라 파드 안의 프로그램이 API 서버를 부를 때 쓰는 계정을 뭐라고 부를까요?

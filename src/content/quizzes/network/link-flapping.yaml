@@ -16,7 +16,7 @@ questions:
     explain: ifLastChange는 지금 상태로 들어간 때의 장비 가동 시간 값이에요. 읽을 때마다 바뀐다면 그사이 상태가 또 바뀐 거예요.
   - id: physical-first
     type: choice
-    prompt: 링크가 끊겼다 붙기를 되풀이하고, 받은 오류(ifInErrors)도 함께 늘어요. 먼저 의심할 것은?
+    prompt: 링크가 끊겼다 붙기를 되풀이하고, 받은 에러(ifInErrors)도 함께 늘어요. 먼저 의심할 것은?
     choices:
       - 케이블이나 광 모듈 같은 물리 문제
       - 서버의 DNS 설정

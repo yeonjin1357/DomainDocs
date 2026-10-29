@@ -18,7 +18,7 @@ sources:
     url: https://docs.oracle.com/en/java/javase/21/vm/native-memory-tracking.html
   - title: Kubernetes — Resource Management for Pods and Containers (메모리 한도)
     url: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-updated: 2026-10-28
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -28,10 +28,29 @@ updated: 2026-10-28
 </Situation>
 
 <FirstLook>
-  <Item title="끝난 방식">자바 오류인지, 컨테이너가 죽인 건지 봐요.</Item>
+  <Item title="끝난 방식">자바 에러인지, 컨테이너가 죽인 건지 봐요.</Item>
   <Item title="어느 메모리">힙인지 힙 밖인지 가려요.</Item>
   <Item title="GC 직후 바닥">치운 뒤에도 남는 양이 오르는지 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 2단계에서 힙 바닥이 함께 오르면 3·4단계로 내려가고, 힙 바닥은 평평한데 프로세스 메모리(RSS)만 오르면 오른쪽 5단계로 가요.">
+  <Flow
+    ariaLabel="1단계에서 끝난 방식을 보고, 2단계에서 어느 메모리가 느는지 가려, 힙의 GC 직후 바닥이 오르면 3단계 GC 직후 바닥과 4단계 힙 덤프로, RSS만 오르면 5단계 힙 밖 칸 나누기로 가는 흐름도"
+    nodes={[
+      { id: 's1', label: '끝난 방식', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 's2', label: '어느 메모리', col: 0, row: 1, note: '2단계' },
+      { id: 's5', label: '힙 밖 칸', col: 2, row: 1, note: '5단계', tone: 'accent' },
+      { id: 's3', label: 'GC 직후 바닥', col: 0, row: 2, note: '3단계', tone: 'accent' },
+      { id: 's4', label: '힙 덤프', col: 0, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 's5', label: 'RSS만 오름' },
+      { from: 's2', to: 's3', label: '힙 바닥 오름' },
+      { from: 's3', to: 's4' },
+    ]}
+  />
+</Figure>
 
 ## 1. 어떻게 끝났는지 보세요
 
@@ -39,10 +58,10 @@ updated: 2026-10-28
 
 | 끝난 방식 | 누가 | 흔적 |
 | --- | --- | --- |
-| `OutOfMemoryError` | JVM | 앱 로그에 오류와 스택 트레이스가 남아요 |
+| `OutOfMemoryError` | JVM | 앱 로그에 에러와 스택 트레이스가 남아요 |
 | OOMKilled | 리눅스 커널 | 앱 로그에는 없고, 파드의 종료 이유와 종료 코드 137에 남아요 |
 
-<Term term="apm/out-of-memory-error">OutOfMemoryError</Term>는 JVM 안의 어느 메모리 칸이 모자랐다는 뜻이에요. 오류 뒤의 문구가 그 칸을 알려 줘요.
+<Term term="apm/out-of-memory-error">OutOfMemoryError</Term>는 JVM 안의 어느 메모리 칸이 모자랐다는 뜻이에요. 에러 뒤의 문구가 그 칸을 알려 줘요.
 
 OOMKilled는 프로세스 전체가 컨테이너 메모리 한도를 넘어 커널이 죽인 거예요. 힙은 여유가 있어도, 힙 밖 메모리까지 더한 크기가 한도를 넘으면 이렇게 끝나요. 파드 쪽에서 보는 법은 <Term slug="kubernetes/pod-restarting">파드가 계속 재시작될 때</Term>에 있어요.
 
@@ -53,7 +72,30 @@ JVM이 내는 힙 사용량과, 서버가 보는 프로세스 메모리(RSS)를 
 - 힙의 GC 직후 바닥이 함께 오르면 힙 안에 쌓이는 거예요. 3·4단계로 가요.
 - 힙 바닥은 평평한데 프로세스 메모리만 오르면 힙 밖이에요. 5단계로 가요.
 
+<Figure caption="힙 밖에서 느는 경우의 예시예요. 힙의 GC 직후 바닥은 평평한데, 서버가 보는 프로세스 메모리(RSS)만 계속 올라요.">
+  <MiniLineChart
+    ariaLabel="힙의 GC 직후 바닥은 150MB 안팎에서 평평하고, 프로세스 메모리 RSS는 700MB에서 1,200MB로 계속 오르는 그래프"
+    series={[
+      { label: 'RSS', values: [700, 760, 830, 900, 980, 1050, 1120, 1200], tone: 'warn', value: '700 → 1,200MB' },
+      { label: '힙 GC 직후', values: [150, 155, 150, 160, 150, 155, 160, 150], tone: 'sub', value: '150MB 안팎' },
+    ]}
+  />
+</Figure>
+
 `-Xmx`를 적지 않으면 최대 힙은 JVM이 정해요. 기본값은 쓸 수 있는 메모리의 25%(`MaxRAMPercentage`)예요. 리눅스 컨테이너에서는 컨테이너 메모리 한도를 기준으로 계산해서, 한도가 2Gi면 최대 힙은 512Mi 안팎이에요.
+
+<Figure caption="-Xmx 없이 컨테이너 한도 2Gi로 띄운 예시예요. 최대 힙은 한도의 25%인 512Mi 안팎이에요. 힙 밖 메모리까지 더한 크기가 2Gi를 넘으면 OOMKilled로 끝나요.">
+  <Strip
+    ariaLabel="컨테이너 메모리 한도 2Gi를 512Mi씩 네 칸으로 나눠, 첫 칸은 최대 힙으로 한도의 25%이고 나머지 세 칸에는 힙 밖 메모리가 들어가며, 둘을 더해 2Gi를 넘으면 OOMKilled인 칸 띠"
+    rows={[
+      { label: '컨테이너 메모리 한도 2Gi', cells: [{ label: '512Mi', tone: 'accent' }, '512Mi', '512Mi', '512Mi'] },
+    ]}
+    ranges={[
+      { from: 0, to: 0, label: '최대 힙 25%', tone: 'accent' },
+      { from: 1, to: 3, label: '힙 밖 메모리도 이 안에' },
+    ]}
+  />
+</Figure>
 
 ## 3. 힙이라면 GC 직후 바닥을 보세요
 
@@ -101,7 +143,7 @@ JVM이 내는 힙 사용량과, 서버가 보는 프로세스 메모리(RSS)를 
 - **다이렉트 버퍼**: 네트워크·파일 입출력용으로 힙 밖에 잡는 메모리예요. 최대 크기를 정하지 않으면 JVM이 정해요.
 - **스레드 스택**: 스레드마다 하나씩이라, 스레드 수가 늘면 같이 늘어요.
 
-다이렉트 버퍼가 바닥나면 오류 문구가 이렇게 달라요. 자바 17에서 한도 32MB로 재현한 결과예요.
+다이렉트 버퍼가 바닥나면 에러 문구가 이렇게 달라요. 자바 17에서 한도 32MB로 재현한 결과예요.
 
 ```text
 OutOfMemoryError: Cannot reserve

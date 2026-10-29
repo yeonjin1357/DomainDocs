@@ -14,7 +14,7 @@ sources:
     url: https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html
   - title: Apache Kafka 4.3 — Topic Configs (retention.ms)
     url: https://kafka.apache.org/43/configuration/topic-configs/
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -28,6 +28,33 @@ updated: 2026-10-21
   <Item title="어느 파티션이 밀리나">파티션별 지연과 맡은 컨슈머를 봐요.</Item>
   <Item title="멈춘 컨슈머가 있나">위치가 움직이지 않는 컨슈머를 찾아요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 먼저 봐요. 들어오는 양 자체가 늘었다면 4단계에서 처리 능력을 늘려요.">
+  <Flow
+    ariaLabel="1단계에서 처리 속도가 줄었다면 DB와 바깥 API를, 2단계 파티션별 지연에서 한 파티션만 밀리면 키 쏠림을, 3단계 멈춘 컨슈머에서 리밸런스가 잦으면 리밸런스 가이드를, 4단계 처리 능력에서 컨슈머가 이미 파티션 수만큼이면 파티션 늘리기를 보고, 5단계에서 따라잡는 시간을 계산하는 흐름도"
+    nodes={[
+      { id: 's1', label: '들어옴·처리', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: 'DB·바깥 API', col: 2, row: 0, note: '느려졌나' },
+      { id: 's2', label: '파티션별 지연', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '키 쏠림', col: 2, row: 1, note: '키 설명 보기' },
+      { id: 's3', label: '멈춘 컨슈머', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '리밸런스 반복', col: 2, row: 2, note: '별도 가이드' },
+      { id: 's4', label: '처리 능력', col: 0, row: 3, note: '4단계' },
+      { id: 'e4', label: '파티션 늘리기', col: 2, row: 3, note: '처리 시간 단축' },
+      { id: 's5', label: '따라잡는 시간', col: 0, row: 4, note: '5단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '처리 줄음' },
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 'e2', label: '한 파티션만' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '리밸런스 잦음' },
+      { from: 's3', to: 's4' },
+      { from: 's4', to: 'e4', label: '파티션 수만큼' },
+      { from: 's4', to: 's5' },
+    ]}
+  />
+</Figure>
 
 ## 1. 들어오는 양과 처리 속도를 견주세요
 
@@ -50,6 +77,17 @@ updated: 2026-10-21
 ## 2. 파티션별로 어디가 밀리는지 보세요
 
 지연을 그룹 전체 합으로만 보면 어디가 문제인지 안 보여요. 파티션 하나는 그룹 안의 컨슈머 하나만 맡아서, 컨슈머 하나가 느리면 그 컨슈머의 파티션만 밀려요.
+
+<Figure caption="파티션 6개(P0~P5)를 컨슈머 A, B, C가 둘씩 맡은 예시예요. 컨슈머 B가 맡은 P2와 P3에만 지연이 쌓였어요. 그룹 합 50만 건만 보면 이 쏠림이 안 보여요.">
+  <Strip
+    ariaLabel="파티션 P0부터 P5까지를 컨슈머 A, B, C가 둘씩 맡고, 컨슈머 B가 맡은 P2와 P3의 지연만 25만 건씩이며 나머지 파티션은 100건 안팎인 칸 띠"
+    rows={[
+      { label: '맡은 컨슈머', heads: ['P0', 'P1', 'P2', 'P3', 'P4', 'P5'], cells: ['A', 'A', { label: 'B', tone: 'warn' }, { label: 'B', tone: 'warn' }, 'C', 'C'] },
+      { label: '지연(건)', cells: ['120', '90', { label: '25만', tone: 'warn' }, { label: '25만', tone: 'warn' }, '80', '110'] },
+    ]}
+    ranges={[{ row: 1, from: 2, to: 3, label: '컨슈머 B의 파티션만 밀림', tone: 'warn' }]}
+  />
+</Figure>
 
 **확인 방법**: 아래 명령으로 파티션마다 처리 위치와 지연을 봐요.
 
@@ -76,6 +114,21 @@ CURRENT-OFFSET은 처리 위치, LOG-END-OFFSET은 끝, LAG는 그 차이예요.
 
 - 컨슈머를 늘려요. 다만 그룹 안에서 일하는 컨슈머 수는 파티션 수를 넘지 못해요. 파티션이 8개면 컨슈머 9번째부터는 놀아요.
 - 컨슈머가 이미 파티션 수만큼이라면, 파티션을 늘리거나 이벤트 하나의 처리 시간을 줄여요. 파티션을 늘리면 키와 파티션의 짝이 바뀌는 점은 미리 살펴요.
+
+<Figure caption="파티션 8개인 토픽을 컨슈머 9개가 읽는 경우예요. 칸은 컨슈머이고, 위 글자는 그 컨슈머가 맡은 파티션이에요. 9번째 컨슈머는 맡을 파티션이 없어 놀아요.">
+  <Strip
+    ariaLabel="컨슈머 1부터 8까지가 파티션 P0부터 P7을 하나씩 맡고, 9번째 컨슈머는 맡은 파티션이 없어 노는 칸 띠"
+    rows={[
+      {
+        label: '컨슈머 9개',
+        heads: ['P0', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', ''],
+        cells: ['1', '2', '3', '4', '5', '6', '7', '8', { label: '9', tone: 'sub' }],
+      },
+    ]}
+    marks={[{ at: 8, label: '놀아요', tone: 'warn' }]}
+    ranges={[{ from: 0, to: 7, label: '파티션 하나에 컨슈머 하나', tone: 'accent' }]}
+  />
+</Figure>
 
 ## 5. 보관 기간 안에 따라잡는지 보세요
 

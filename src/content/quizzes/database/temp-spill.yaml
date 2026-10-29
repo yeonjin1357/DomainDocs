@@ -33,7 +33,7 @@ questions:
       - work_mem
       - statement_timeout
     answer: 0
-    explain: 기본값 -1은 제한 없음이에요. 걸어 두면 넘는 순간 그 SQL이 temporary file size exceeds 오류로 끝나요.
+    explain: 기본값 -1은 제한 없음이에요. 걸어 두면 넘는 순간 그 SQL이 temporary file size exceeds 에러로 끝나요.
   - id: work-mem-name
     type: input
     prompt: PostgreSQL에서 정렬·해시 단계 하나가 디스크로 넘치기 전까지 쓸 수 있는 메모리 설정 이름은?

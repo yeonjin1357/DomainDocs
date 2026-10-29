@@ -20,7 +20,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
   - title: Kubernetes 소스 — kubelet eviction helpers (축출 메시지)
     url: https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/eviction/helpers.go
-updated: 2026-10-28
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -34,6 +34,33 @@ updated: 2026-10-28
   <Item title="노드 압박 조건">MemoryPressure, DiskPressure를 봐요.</Item>
   <Item title="요청 대비 사용량">요청보다 더 쓴 파드가 먼저예요.</Item>
 </FirstLook>
+
+<Figure caption="1단계 메시지가 갈래를 정해요. 노드 메모리가 모자라면 3단계로, 노드 디스크가 모자라거나 파드가 자기 한도를 넘었으면 4단계로 가요. OOMKilled와 헷갈리면 2단계를 봐요.">
+  <Flow
+    ariaLabel="축출 메시지가 노드 메모리 부족이면 3단계 기준과 순서로, 노드 디스크 부족이나 파드 자기 한도 초과면 4단계 무엇이 찼나로 가고, 둘 다 5단계 파드 정리로 이어지며, OOMKilled와 헷갈리면 2단계로 가는 흐름도"
+    nodes={[
+      { id: 's1', label: '축출 메시지', col: 1, row: 0, note: '1단계', tone: 'warn' },
+      { id: 's2', label: 'OOMKilled', col: 2, row: 0, note: '2단계' },
+      { id: 'mem', label: '메모리 부족', col: 0, row: 1, note: '노드 전체' },
+      { id: 'disk', label: '디스크 부족', col: 1, row: 1, note: '노드 전체' },
+      { id: 'lim', label: '한도 넘음', col: 2, row: 1, note: '파드 자기 한도' },
+      { id: 's3', label: '기준·순서', col: 0, row: 2, note: '3단계', tone: 'accent' },
+      { id: 's4', label: '무엇이 찼나', col: 1, row: 2, note: '4단계', tone: 'accent' },
+      { id: 's5', label: '파드 정리', col: 1, row: 3, note: '5단계' },
+    ]}
+    edges={[
+      { from: 's1', to: 's2', dashed: true },
+      { from: 's1', to: 'mem' },
+      { from: 's1', to: 'disk' },
+      { from: 's1', to: 'lim' },
+      { from: 'mem', to: 's3' },
+      { from: 'disk', to: 's4' },
+      { from: 'lim', to: 's4' },
+      { from: 's3', to: 's5' },
+      { from: 's4', to: 's5' },
+    ]}
+  />
+</Figure>
 
 ## 1. 축출 메시지를 읽으세요
 
@@ -96,6 +123,22 @@ nodefs는 kubelet과 파드 로그, emptyDir가 쓰는 노드의 주 파일 시�
 
 요청을 하나도 안 적은 BestEffort 파드는 조금만 써도 요청을 넘은 셈이라 앞쪽에 서요. 메모리 요청을 실제보다 낮게 적은 파드도 마찬가지예요. 원리는 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>에 있어요.
 
+<Figure caption="메모리가 모자랄 때 쫓겨나는 차례의 예시예요. 왼쪽부터 쫓겨나요. 같은 무리 안에서는 우선순위가 낮은 파드가 먼저예요.">
+  <Strip
+    ariaLabel="메모리가 모자랄 때 요청이 없는 BestEffort 파드와 요청보다 더 쓰는 파드가 먼저, 요청 안에서 쓰는 파드 둘이 마지막에 쫓겨나는 차례를 보여 주는 칸 띠"
+    rows={[
+      {
+        label: '쫓겨나는 차례(왼쪽부터)',
+        cells: [{ label: 'BestEffort', tone: 'warn' }, { label: '요청 초과', tone: 'warn' }, '요청 안', '요청 안'],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 1, label: '먼저: 요청보다 더 씀', tone: 'warn' },
+      { from: 2, to: 3, label: '마지막: 요청 안에서 씀' },
+    ]}
+  />
+</Figure>
+
 **확인 방법**: `kubectl describe node 노드이름`의 Conditions에서 압박 조건이 켜졌던 시각을 봐요. 압박 조건은 <Term slug="kubernetes/node-not-ready">노드가 NotReady일 때</Term>에서도 다뤄요.
 
 ## 4. 디스크 압박이라면 무엇이 찼는지 보세요
@@ -104,13 +147,31 @@ nodefs는 kubelet과 파드 로그, emptyDir가 쓰는 노드의 주 파일 시�
 
 파드가 노드 디스크를 쓰는 곳은 세 군데예요.
 
-- 컨테이너 안에 쓴 파일이에요. 컨테이너의 쓰기 층에 쌓여요.
+- 컨테이너 안에 쓴 파일이에요. 컨테이너의 쓰기 레이어에 쌓여요.
 - emptyDir 볼륨이에요.
 - 컨테이너 로그예요.
 
 앱이 로그나 임시 파일을 컨테이너 안에 계속 쌓으면, 그 파일이 모두 노드 디스크를 차지해요. 노드 디스크를 보는 순서는 <Term slug="server/disk-filling-up">디스크가 차오를 때</Term>와 같아요.
 
 이런 쓰기는 <Term term="kubernetes/ephemeral-storage">임시 저장 공간</Term>(ephemeral-storage)으로 요청·한도를 정할 수 있어요. 한도를 넘은 파드는 노드 압박을 기다리지 않고 바로 내보내져요. 1단계의 뒤쪽 두 메시지가 이 경우예요.
+
+<Figure caption="파드가 노드 디스크를 쓰는 세 곳이에요. 셋 다 노드 디스크에 쌓이고, 묶음 이름처럼 ephemeral-storage로 요청·한도를 정할 수 있어요.">
+  <Flow
+    ariaLabel="컨테이너 쓰기 레이어, emptyDir 볼륨, 컨테이너 로그 세 곳이 ephemeral-storage로 묶이고, 모두 노드 디스크에 쌓이는 구조도"
+    nodes={[
+      { id: 'w', label: '쓰기 레이어', col: 0, row: 0, note: '컨테이너 안' },
+      { id: 'ed', label: 'emptyDir', col: 1, row: 0, note: '볼륨' },
+      { id: 'log', label: '로그', col: 2, row: 0, note: '컨테이너 로그' },
+      { id: 'disk', label: '노드 디스크', col: 1, row: 1, note: '모두 여기에', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'w', to: 'disk' },
+      { from: 'ed', to: 'disk' },
+      { from: 'log', to: 'disk' },
+    ]}
+    groups={[{ label: 'ephemeral-storage', cols: [0, 2], rows: [0, 0] }]}
+  />
+</Figure>
 
 ## 5. 쫓겨난 파드를 정리하세요
 
@@ -122,7 +183,7 @@ Evicted 파드는 누가 지울 때까지 목록에 남아요. 컨트롤 플레�
 
 ## 하드 기준은 기다려 주지 않아요
 
-위 표의 기본 기준은 하드 기준이에요. 하드 기준에 닿으면 kubelet은 파드에 끝낼 시간을 주지 않고 바로 멈춰요. 그래서 처리 중이던 요청이 끊기고, 그 순간 오류가 튈 수 있어요.
+위 표의 기본 기준은 하드 기준이에요. 하드 기준에 닿으면 kubelet은 파드에 끝낼 시간을 주지 않고 바로 멈춰요. 그래서 처리 중이던 요청이 끊기고, 그 순간 에러가 튈 수 있어요.
 
 관리자가 소프트 기준을 따로 두면, 그 상태가 정한 시간 동안 이어질 때만 내보내요. 이때는 끝낼 시간을 줄 수 있어요.
 
@@ -131,5 +192,5 @@ Evicted 파드는 누가 지울 때까지 목록에 남아요. 컨트롤 플레�
   <Check>OOMKilled와 Evicted를 같은 원인으로 묶었다면 다시 보세요. 앞은 컨테이너 메모리 한도, 뒤는 노드 압박이나 임시 저장 한도예요.</Check>
   <Check>메모리 요청을 실제 사용량보다 한참 낮게 적었다면, 노드 메모리가 모자랄 때 그 파드부터 쫓겨나요.</Check>
   <Check>앱이 로그나 임시 파일을 컨테이너 안에 쌓는다면, 그 파일도 노드 디스크를 차지해 디스크 압박의 원인이 돼요.</Check>
-  <Check>축출 시각에 오류가 튀었다면, 하드 기준이라 끝낼 시간 없이 멈춘 건 아닌지 보세요.</Check>
+  <Check>축출 시각에 에러가 튀었다면, 하드 기준이라 끝낼 시간 없이 멈춘 건 아닌지 보세요.</Check>
 </Checkpoints>

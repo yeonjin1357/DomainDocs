@@ -13,7 +13,7 @@ questions:
     type: ox
     prompt: 트랜잭션 안에서 쿼리를 취소당한 연결은, 다음 SQL을 바로 정상적으로 실행할 수 있나요?
     answer: false
-    explain: 그 트랜잭션은 실패 상태라 current transaction is aborted 오류가 나요. ROLLBACK을 해야 다시 쓸 수 있어요.
+    explain: 그 트랜잭션은 실패 상태라 current transaction is aborted 에러가 나요. ROLLBACK을 해야 다시 쓸 수 있어요.
   - id: mysql-rollback
     type: ox
     prompt: MySQL에서 큰 UPDATE를 KILL한 뒤 되돌리기가 오래 걸리면, DB를 재시작해서 빨리 끝낼 수 있나요?

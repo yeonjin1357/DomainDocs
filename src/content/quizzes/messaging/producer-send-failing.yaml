@@ -1,7 +1,7 @@
 questions:
   - id: not-enough-replicas
     type: choice
-    prompt: 프로듀서가 NotEnoughReplicas 오류를 받아요. 어디를 고쳐야 할까요?
+    prompt: 프로듀서가 NotEnoughReplicas 에러를 받아요. 어디를 고쳐야 할까요?
     choices:
       - 클러스터의 복제 부족(브로커와 팔로워)
       - 프로듀서의 acks를 1로 낮추기
@@ -11,9 +11,9 @@ questions:
     explain: ISR이 최소 수보다 적어 브로커가 일부러 막은 거예요. acks를 낮추면 이벤트를 잃을 수 있어요.
   - id: error-after-retries
     type: ox
-    prompt: 앱 로그에 프로듀서의 보내기 오류가 보였다면, 프로듀서가 이미 다시 보내기까지 해 보고 실패한 뒤인가요?
+    prompt: 앱 로그에 프로듀서의 보내기 에러가 보였다면, 프로듀서가 이미 다시 보내기까지 해 보고 실패한 뒤인가요?
     answer: true
-    explain: 프로듀서는 실패하면 알아서 다시 보내요. 그래서 오류 전에 늘어난 재시도 수를 함께 봐요.
+    explain: 프로듀서는 실패하면 알아서 다시 보내요. 그래서 에러 전에 늘어난 재시도 수를 함께 봐요.
   - id: record-too-large
     type: choice
     prompt: RecordTooLargeException이 나요. 먼저 고려할 방법은?

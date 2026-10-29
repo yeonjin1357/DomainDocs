@@ -1,7 +1,7 @@
 questions:
   - id: cronjob-ok-job-failed
     type: ox
-    prompt: CronJob에 오류 표시가 없으면, 그 일정의 일도 성공했다고 봐도 되나요?
+    prompt: CronJob에 에러 표시가 없으면, 그 일정의 일도 성공했다고 봐도 되나요?
     answer: false
     explain: CronJob은 일정마다 Job을 만들 뿐이에요. 일이 성공했는지는 그 시각에 만들어진 Job의 조건을 봐야 해요.
   - id: deadline-vs-backoff

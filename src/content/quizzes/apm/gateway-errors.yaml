@@ -3,10 +3,10 @@ questions:
     type: ox
     prompt: nginx 뒤의 WAS가 응답을 늦게 줘 nginx가 504를 돌려줬다면, WAS의 에러 로그에도 504가 남나요?
     answer: false
-    explain: 504는 기다리다 그만둔 nginx가 만든 응답이라 WAS는 몰라요. 웹 서버의 접근 로그와 오류 로그에서 세요.
+    explain: 504는 기다리다 그만둔 nginx가 만든 응답이라 WAS는 몰라요. 웹 서버의 접근 로그와 에러 로그에서 세요.
   - id: log-to-code
     type: choice
-    prompt: nginx 오류 로그에 connect() failed (111 Connection refused)가 가득해요. 무슨 일일까요?
+    prompt: nginx 에러 로그에 connect() failed (111 Connection refused)가 가득해요. 무슨 일일까요?
     choices:
       - WAS 포트에 받는 프로그램이 없어 502가 나요
       - WAS가 60초 안에 답하지 않아 504가 나요

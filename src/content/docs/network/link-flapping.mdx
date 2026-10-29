@@ -12,20 +12,41 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc2863
   - title: RFC 3418 — MIB for SNMP (sysUpTime)
     url: https://www.rfc-editor.org/rfc/rfc3418
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
-  서버와 스위치를 잇는 포트에서 linkDown과 linkUp 알림이 10분 동안 30번 왔어요. 그 서버의 앱은 간간이 연결 오류를 내요.
+  서버와 스위치를 잇는 포트에서 linkDown과 linkUp 알림이 10분 동안 30번 왔어요. 그 서버의 앱은 간간이 연결 에러를 내요.
 
   링크가 끊겼다 붙었다 하는 걸 플래핑(flapping)이라고 해요. 언제 몇 번 바뀌었는지 모으고, 원인을 물리 쪽부터 좁혀요.
 </Situation>
 
 <FirstLook>
   <Item title="정말 바뀌었나">폴링한 상태와 마지막 변경 시각을 봐요.</Item>
-  <Item title="오류가 함께 늘었나">받은 오류 수가 늘었는지 봐요.</Item>
+  <Item title="에러가 함께 늘었나">받은 에러 수가 늘었는지 봐요.</Item>
   <Item title="양쪽 끝 기록">스위치와 서버의 기록을 함께 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 관리자가 끈 포트라면 장애가 아니에요. 받은 에러도 함께 늘었다면 물리 쪽일 가능성이 더 커서, 케이블과 광 모듈부터 봐요.">
+  <Flow
+    ariaLabel="1단계에서 관리자가 끈 포트면 장애가 아니고, 상태가 정말 바뀌었다면 2단계 Trap과 Syslog로 횟수와 시각을 모은 뒤, 3단계 물리 문제에서 받은 에러도 늘었다면 케이블과 광 모듈을 바꿔 보고, 4단계에서 알림을 묶는 흐름도"
+    nodes={[
+      { id: 's1', label: '상태 변화', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '장애 아님', col: 2, row: 0, note: '의도한 상태' },
+      { id: 's2', label: 'Trap·Syslog', col: 0, row: 1, note: '2단계' },
+      { id: 's3', label: '물리 문제', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '케이블·SFP', col: 2, row: 2, note: '바꿔 보기' },
+      { id: 's4', label: '알림 묶기', col: 0, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '관리자가 끔' },
+      { from: 's1', to: 's2', label: '정말 바뀜' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '에러도 늘음' },
+      { from: 's3', to: 's4' },
+    ]}
+  />
+</Figure>
 
 ## 1. 상태가 정말 바뀌었는지 확인하세요
 
@@ -83,14 +104,14 @@ Trap은 UDP라 중간에 사라져도 알 수 없어요. 그래서 Trap 수만 �
 
 ## 3. 물리 문제부터 의심하세요
 
-링크가 자꾸 끊겼다 붙으면 대부분 물리 쪽 문제예요. 받은 오류(ifInErrors)가 함께 늘었다면 더 그래요.
+링크가 자꾸 끊겼다 붙으면 대부분 물리 쪽 문제예요. 받은 에러(ifInErrors)가 함께 늘었다면 더 그래요.
 
 - 케이블이 헐겁거나 손상됐어요. 커넥터를 다시 꽂거나 케이블을 바꿔 봐요.
 - 광 모듈(SFP)이 낡았거나 받는 빛이 약해요.
 - 양쪽 끝의 속도나 이중 통신(duplex) 설정이 서로 맞지 않아요.
 - 연결된 서버의 네트워크 카드나 드라이버가 문제예요.
 
-양쪽 끝의 기록을 함께 봐요. 스위치 쪽 포트와 서버 쪽 네트워크 카드가 같은 시각에 끊겼다고 남겼는지 맞춰 봐요. 오류 카운터는 <Term slug="network/interfaces-and-traffic">인터페이스와 트래픽</Term>에서 다뤄요.
+양쪽 끝의 기록을 함께 봐요. 스위치 쪽 포트와 서버 쪽 네트워크 카드가 같은 시각에 끊겼다고 남겼는지 맞춰 봐요. 에러 카운터는 <Term slug="network/interfaces-and-traffic">인터페이스와 트래픽</Term>에서 다뤄요.
 
 ## 4. 알림이 쏟아지지 않게 묶으세요
 

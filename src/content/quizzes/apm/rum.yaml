@@ -1,14 +1,14 @@
 questions:
   - id: script-error
     type: choice
-    prompt: CDN에서 받은 스크립트의 오류가 RUM에 Script error.로만 보여요. 무엇을 고칠까요?
+    prompt: CDN에서 받은 스크립트의 에러가 RUM에 Script error.로만 보여요. 무엇을 고칠까요?
     choices:
       - script 태그에 crossorigin 속성을 붙이고 CDN이 CORS 헤더를 보내게 해요
       - 소스 맵을 올려요
       - 샘플링 비율을 올려요
       - unhandledrejection 이벤트를 들어요
     answer: 0
-    explain: 다른 출처 스크립트는 CORS 확인을 통과해야 오류 내용과 위치를 알려 줘요. 소스 맵은 위치를 되돌릴 뿐이에요.
+    explain: 다른 출처 스크립트는 CORS 확인을 통과해야 에러 내용과 위치를 알려 줘요. 소스 맵은 위치를 되돌릴 뿐이에요.
   - id: send-timing
     type: choice
     prompt: RUM 데이터를 보낼 때로 MDN이 권하는 순간은?
@@ -26,12 +26,12 @@ questions:
     explain: 광고·추적 차단, 보내기 전에 꺼진 페이지, 샘플링으로 빠지는 사용자가 있어요. RUM은 전송이 닿은 사용자의 숫자예요.
   - id: promise-error
     type: ox
-    prompt: async 함수 안에서 잡지 않은 오류도 window의 error 이벤트로 잡히나요?
+    prompt: async 함수 안에서 잡지 않은 에러도 window의 error 이벤트로 잡히나요?
     answer: false
     explain: 처리하지 않은 Promise 거부는 unhandledrejection 이벤트로 와요. 두 이벤트를 함께 들어야 해요.
   - id: source-map-name
     type: input
-    prompt: 줄이고 합친 자바스크립트의 오류 위치를 원래 파일과 줄로 되돌리는 대응표는?
+    prompt: 줄이고 합친 자바스크립트의 에러 위치를 원래 파일과 줄로 되돌리는 대응표는?
     answer: [소스 맵, source map, sourcemap]
     term: apm/source-map
     explain: 코드 끝의 sourceMappingURL 주석이 이 파일을 가리켜요. 배포 버전마다 RUM 도구에 올려 둬요.

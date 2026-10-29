@@ -8,7 +8,7 @@ questions:
       - 앞단 게이트웨이
       - DB
     answer: 0
-    explain: 4xx는 요청한 쪽이 잘못한 것 같다는 뜻이에요. 서버 오류율과는 나눠서 봐요.
+    explain: 4xx는 요청한 쪽이 잘못한 것 같다는 뜻이에요. 서버 에러율과는 나눠서 봐요.
   - id: post-retry
     type: ox
     prompt: 주문을 만드는 POST 요청이 시간 초과로 끝났어요. 자동으로 다시 보내도 안전한가요?
@@ -26,7 +26,7 @@ questions:
     explain: 표준은 GET 같은 안전한 메서드와 PUT, DELETE를 멱등으로 정해요. POST는 보낼 때마다 새로 처리될 수 있어요.
   - id: 504-from-gateway
     type: choice
-    prompt: 504 응답이 늘었는데 WAS 로그에는 오류가 없어요. 가장 그럴듯한 이유는?
+    prompt: 504 응답이 늘었는데 WAS 로그에는 에러가 없어요. 가장 그럴듯한 이유는?
     choices:
       - 앞단 장비가 WAS의 응답을 제때 받지 못해 직접 만든 응답이에요
       - 브라우저가 요청을 잘못 보냈어요

@@ -1,7 +1,7 @@
 questions:
   - id: error-page-200
     type: ox
-    prompt: 앱이 장애 중에 오류 안내 화면을 200 응답으로 돌려준다면, 응답 코드만 보는 URL 점검은 실패로 판정하나요?
+    prompt: 앱이 장애 중에 에러 안내 화면을 200 응답으로 돌려준다면, 응답 코드만 보는 URL 점검은 실패로 판정하나요?
     answer: false
     explain: 기본 판정은 2xx면 성공이라 '정상'으로 나와요. 본문에 꼭 있어야 할 글자를 함께 검사해요.
   - id: one-location-fails

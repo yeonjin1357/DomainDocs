@@ -18,7 +18,7 @@ sources:
     url: https://man7.org/linux/man-pages/man1/dmesg.1.html
   - title: Linux kernel source — mm/oom_kill.c
     url: https://github.com/torvalds/linux/blob/master/mm/oom_kill.c
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -32,6 +32,29 @@ updated: 2026-10-21
   <Item title="스왑이 오가는가">스왑 사용량이 아니라 오가는 양을 봐요.</Item>
   <Item title="누가 늘었나">RSS가 계속 오르는 프로세스를 찾아요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 봐요. available이 넉넉하면 메모리보다 알림 기준을 먼저 고쳐요.">
+  <Flow
+    ariaLabel="1단계 available이 넉넉하면 알림 기준을 고치고, 바닥에 가까우면 2단계 스왑이 오가는 양을 봐요. 3단계 RSS 추세에서 힙은 여유로우면 힙 밖 메모리를 보고, 프로세스가 사라졌다면 4단계 OOM 기록을, 컨테이너라면 컨테이너 한도를 보는 흐름도"
+    nodes={[
+      { id: 's1', label: 'available', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '알림 기준', col: 2, row: 0, note: 'free로 계산?' },
+      { id: 's2', label: '스왑 오가는 양', col: 0, row: 1, note: '2단계' },
+      { id: 's3', label: 'RSS 추세', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '힙 밖 메모리', col: 2, row: 2, note: '자바 앱' },
+      { id: 's4', label: 'OOM 기록', col: 0, row: 3, note: '4단계', tone: 'accent' },
+      { id: 'e4', label: '컨테이너 한도', col: 2, row: 3, note: 'OOMKilled' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '넉넉함' },
+      { from: 's1', to: 's2', label: '바닥 가까움' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '힙은 여유' },
+      { from: 's3', to: 's4', label: '사라졌다면' },
+      { from: 's4', to: 'e4', label: '컨테이너' },
+    ]}
+  />
+</Figure>
 
 ## 1. 진짜 여유부터 확인하세요
 
@@ -51,6 +74,17 @@ available이 넉넉하다면 지금 메모리 부족은 아니에요. 알림 기
 available이 바닥에 가까워지면 커널은 덜 쓰는 메모리를 스왑으로 내보내기 시작해요. 이때 서버가 눈에 띄게 느려져요. 디스크는 메모리보다 훨씬 느리기 때문이에요.
 
 봐야 할 건 스왑 사용량이 아니라 지금 오가는 양이에요. 한 번 내보낸 메모리는 다시 쓰이기 전까지 스왑에 남아 있어서, 사용량만 높고 조용할 수 있어요.
+
+<Figure caption="스왑 사용량이 높아도 두 경우가 있어요. 왼쪽은 예전에 내보낸 것이 남아 있을 뿐이고, 오른쪽은 지금 디스크와 오가며 서버를 느리게 해요.">
+  <Compare
+    columns={['사용량만 높을 때', '지금 오갈 때']}
+    rows={[
+      { label: '지금 오가는 양', values: ['0에 가까워요', '0보다 커요'] },
+      { label: '스왑에 든 것', values: ['예전에 내보낸 메모리', '지금 내보내고 들여오는 메모리'] },
+      { label: '서버', values: ['스왑 때문에 느려지지 않아요', '눈에 띄게 느려져요'] },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: `vmstat 5`의 si(스왑에서 들여온 양)와 so(스왑으로 내보낸 양)를 봐요. 둘 다 0에 가깝다면 지금 스왑 때문에 느려지고 있지는 않아요. 첫 줄은 부팅 뒤 평균이라 건너뛰어요.
 
@@ -72,7 +106,7 @@ available이 바닥에 가까워지면 커널은 덜 쓰는 메모리를 스왑�
 
 ## 4. 프로세스가 사라졌다면 OOM을 확인하세요
 
-메모리가 끝내 모자라면 커널의 <Term term="server/oom-killer">OOM killer</Term>가 프로세스 하나를 골라 끝내요. 앱은 오류 로그를 남길 틈도 없이 사라져요.
+메모리가 끝내 모자라면 커널의 <Term term="server/oom-killer">OOM killer</Term>가 프로세스 하나를 골라 끝내요. 앱은 에러 로그를 남길 틈도 없이 사라져요.
 
 이때 커널 로그에는 `Killed process 1234 (java)`처럼 끝낸 프로세스의 번호와 이름이 남아요. 프로세스가 사라진 시각과 이 기록의 시각을 맞춰 봐요.
 

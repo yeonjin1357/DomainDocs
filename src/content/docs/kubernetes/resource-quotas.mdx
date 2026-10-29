@@ -91,7 +91,7 @@ used: requests.memory=7Gi,
 limited: requests.memory=8Gi
 ```
 
-파드를 직접 만들 때는 이 오류가 바로 보여요. 하지만 보통은 Deployment를 만들고, 파드는 컨트롤러가 대신 만들어요.
+파드를 직접 만들 때는 이 에러가 바로 보여요. 하지만 보통은 Deployment를 만들고, 파드는 컨트롤러가 대신 만들어요.
 
 <Figure caption="Deployment 만들기는 성공해요. 파드를 만드는 건 ReplicaSet 컨트롤러라서, 할당량 거부는 사용자에게 오지 않고 ReplicaSet의 이벤트로 남아요.">
   <Sequence
@@ -147,7 +147,7 @@ spec:
 
 LimitRange도 파드를 만들 때만 검사해요. 새로 만들거나 고쳐도, 이미 떠 있는 파드는 그대로예요.
 
-기본값끼리 맞는지는 검사하지 않아요. 위 설정에서 CPU 요청만 `1500m`으로 적으면, 기본 한도 `1`이 붙어 요청이 한도보다 커져요. 이 파드는 `must be less than or equal to cpu limit` 오류로 만들어지지 않아요.
+기본값끼리 맞는지는 검사하지 않아요. 위 설정에서 CPU 요청만 `1500m`으로 적으면, 기본 한도 `1`이 붙어 요청이 한도보다 커져요. 이 파드는 `must be less than or equal to cpu limit` 에러로 만들어지지 않아요.
 
 ## 모니터링에서는
 

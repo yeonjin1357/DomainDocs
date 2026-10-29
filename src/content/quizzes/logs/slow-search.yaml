@@ -7,9 +7,9 @@ questions:
     explain: 훑는 데이터는 시간 범위에 비례해요. 장애 시각 앞뒤 몇 분으로 줄여 봐요.
   - id: broad-selector
     type: ox
-    prompt: Loki에서 '{namespace=~".+"}'처럼 넓은 라벨 선택자로 시작해도, 줄 필터만 있으면 훑는 양은 같나요?
+    prompt: Loki에서 '{namespace=~".+"}'처럼 넓은 레이블 선택자로 시작해도, 줄 필터만 있으면 훑는 양은 같나요?
     answer: false
-    explain: 라벨로 스트림을 좁혀야 훑을 덩어리가 줄어요. 넓게 고르면 모든 스트림을 훑어요.
+    explain: 레이블로 스트림을 좁혀야 훑을 덩어리가 줄어요. 넓게 고르면 모든 스트림을 훑어요.
   - id: regex-vs-contains
     type: choice
     prompt: Loki 문서가 먼저 쓰라고 권하는 줄 필터는?

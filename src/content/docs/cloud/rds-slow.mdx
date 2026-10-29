@@ -14,7 +14,7 @@ sources:
     url: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html
   - title: AWS — Monitoring OS metrics with Enhanced Monitoring
     url: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.html
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -24,16 +24,60 @@ updated: 2026-10-21
 </Situation>
 
 <FirstLook>
-  <Item title="CPU와 크레딧">CPU가 꽉 찼는지, 버스트형이라 묶였는지 봐요.</Item>
+  <Item title="CPU 사용률">평소보다 갑자기 올랐는지 봐요.</Item>
   <Item title="메모리와 읽기">자주 쓰는 데이터가 메모리에 다 안 들어가는지 봐요.</Item>
   <Item title="디스크 지연">읽기·쓰기 지연이 늘었는지 봐요.</Item>
 </FirstLook>
 
-## 1. CPU와 크레딧을 보세요
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가며 자원부터 봐요. 단계마다 오른쪽 조건에 맞으면 그 자원이 모자란 거예요. 자원이 모두 평소와 같으면 5단계에서 DB 안의 쿼리로 내려가요.">
+  <Flow
+    ariaLabel="1단계 CPU 사용률이 평소보다 갑자기 올랐으면 DB가 일을 많이 하는 것이고, 2단계 메모리와 읽기 IOPS에서 IOPS가 급증하면 작업 집합이 메모리를 넘친 것이고, 3단계 디스크 지연에서 IOPS가 한도에 붙으면 디스크가 모자라고, 4단계 연결 수가 크게 늘면 연결 한도 쪽을 보며, 자원이 모두 평소면 5단계 DB 안의 쿼리로 내려가는 흐름도"
+    nodes={[
+      { id: 's1', label: 'CPU 사용률', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '일이 많음', col: 2, row: 0, note: '평소와 견줘요' },
+      { id: 's2', label: '메모리·IOPS', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '작업 집합 넘침', col: 2, row: 1, note: '메모리 부족' },
+      { id: 's3', label: '디스크 지연', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '디스크 부족', col: 2, row: 2, note: 'IOPS·저장소' },
+      { id: 's4', label: '연결 수', col: 0, row: 3, note: '4단계' },
+      { id: 'e4', label: '연결 한도', col: 2, row: 3, note: '앱·느린 쿼리' },
+      { id: 's5', label: 'DB 안 쿼리', col: 0, row: 4, note: '5단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '갑자기 오름' },
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 'e2', label: 'IOPS 급증' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '한도에 붙음' },
+      { from: 's3', to: 's4' },
+      { from: 's4', to: 'e4', label: '크게 늘음' },
+      { from: 's4', to: 's5', label: '모두 평소' },
+    ]}
+  />
+</Figure>
+
+## 1. CPU가 갑자기 올랐는지 보세요
 
 CPUUtilization이 높다면 DB가 일을 많이 하고 있어요. 다만 AWS 문서는 높은 CPU가 목표한 처리량에 맞는 값이라면 괜찮을 수 있다고 해요. 평소와 견줘 갑자기 올랐는지가 중요해요.
 
-db.t 같은 버스트형 클래스라면 CPUCreditBalance를 함께 봐요. 크레딧이 바닥나면 CPU 사용률이 낮아 보여도 기준선에 묶여 느려져요. 원리는 <Term slug="cloud/virtual-machines">가상 머신</Term>의 크레딧과 같아요.
+db.t 같은 버스트형 클래스는 CPU 크레딧을 써요. 원리는 <Term slug="cloud/virtual-machines">가상 머신</Term>의 크레딧과 같아요. 다만 RDS의 db.t3·db.t4g는 Unlimited 모드로 설정돼 있어요.
+
+그래서 크레딧(CPUCreditBalance)이 바닥나도 CPU가 기준선에 묶이지 않아요. 기준선을 넘게 쓴 몫은 CPUSurplusCreditBalance에 쌓여요. 이 값이 24시간 동안 벌 수 있는 크레딧을 넘으면, 넘은 몫에 요금이 붙어요.
+
+그러니 크레딧은 느려짐보다 요금의 신호로 봐요. 요금이 붙은 몫은 CPUSurplusCreditsCharged로 보여요.
+
+<Figure caption="RDS 버스트형 클래스의 예시예요. Unlimited 모드라 크레딧이 바닥나도 CPU는 계속 필요한 만큼 써요. 대신 넘게 쓴 몫이 쌓이고, 너무 많이 쌓이면 요금이 더 붙어요.">
+  <Timeline
+    ariaLabel="크레딧이 바닥난 뒤에도 CPU는 계속 필요한 만큼 쓰고, 그때부터 기준선을 넘게 쓴 몫이 쌓이는 시간 띠"
+    end={100}
+    lanes={[
+      { label: '크레딧', segments: [{ start: 0, end: 60, label: '남아 있음', tone: 'accent' }, { start: 60, end: 100, label: '바닥', tone: 'warn' }] },
+      { label: 'CPU', segments: [{ start: 0, end: 100, label: '필요한 만큼 계속 씀' }] },
+      { label: '넘게 쓴 몫', segments: [{ start: 60, end: 100, label: '쌓여요', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 60, label: '크레딧 바닥', tone: 'warn' }]}
+  />
+</Figure>
 
 ## 2. 메모리와 읽기 IOPS를 보세요
 
@@ -68,7 +112,7 @@ DatabaseConnections가 평소보다 크게 늘었다면, 앱 쪽에서 연결을
 관리형 DB도 SQL로 DB 안을 들여다볼 수 있어요. PostgreSQL이라면 `pg_stat_activity`와 `pg_stat_statements`를 그대로 써요. OS 수준의 숫자가 필요하면 Enhanced Monitoring 같은 사업자 기능을 켜요.
 
 <Checkpoints>
-  <Check>RDS CPU 사용률이 낮다고 DB가 한가하다고 판단했다면, 버스트형 클래스의 크레딧 잔량을 보세요.</Check>
+  <Check>RDS 버스트형 클래스의 크레딧이 바닥나서 느려졌다고 판단했다면 다시 보세요. db.t3·db.t4g는 Unlimited 모드라 CPU가 기준선에 묶이지 않아요. 느린 원인은 다른 단계에서 찾고, 크레딧은 요금 쪽에서 봐요.</Check>
   <Check>읽기 IOPS가 갑자기 늘었다면 메모리 여유와 함께 보세요. 작업 집합이 메모리를 넘쳤을 수 있어요.</Check>
   <Check>DB를 큰 클래스로 올리기 전에, 늘어난 SQL이 있는지 먼저 보세요. 쿼리 하나가 원인이면 클래스를 올려도 다시 느려져요.</Check>
   <Check>관리형이라 OS를 못 봐서 원인을 못 찾는다고 여겼다면 다시 보세요. DB 안의 통계 뷰와 사업자의 OS 지표 기능은 그대로 쓸 수 있어요.</Check>

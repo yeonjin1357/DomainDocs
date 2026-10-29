@@ -18,7 +18,7 @@ sources:
     url: https://github.com/brettwooldridge/HikariCP/blob/dev/src/main/java/com/zaxxer/hikari/pool/ProxyLeakTask.java
   - title: HikariCP — MicrometerMetricsTracker (지표 이름)
     url: https://github.com/brettwooldridge/HikariCP/blob/dev/src/main/java/com/zaxxer/hikari/metrics/micrometer/MicrometerMetricsTracker.java
-updated: 2026-10-28
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -32,6 +32,29 @@ updated: 2026-10-28
   <Item title="쥐는 시간">한 번 빌려 돌려주기까지가 늘었나 봐요.</Item>
   <Item title="한가할 때 사용 중 수">요청이 없어도 꽉 차 있으면 누수예요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. DB는 한가한데 쥐는 시간만 길면 트랜잭션 안의 바깥 호출을, 요청 수는 그대로인데 빌리는 횟수가 늘면 N+1을 의심해요. 풀을 키운다면 DB 한도부터 봐요.">
+  <Flow
+    ariaLabel="1단계 예외 메시지에서 idle이 0인지 보고, 2단계 쥐는 시간에서 DB가 한가하면 트랜잭션 안의 바깥 호출을 보며, 3단계 커넥션 누수, 4단계 빌리는 횟수에서 요청 수가 그대로면 N+1을 본 뒤, 5단계에서 DB 연결 한도를 보는 흐름도"
+    nodes={[
+      { id: 's1', label: '예외 메시지', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 's2', label: '쥐는 시간', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '바깥 호출', col: 2, row: 1, note: '트랜잭션 안' },
+      { id: 's3', label: '커넥션 누수', col: 0, row: 2, note: '3단계' },
+      { id: 's4', label: '빌리는 횟수', col: 0, row: 3, note: '4단계' },
+      { id: 'e4', label: 'N+1', col: 2, row: 3, note: '요청당 SQL' },
+      { id: 's5', label: 'DB 한도', col: 0, row: 4, note: '5단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 's2', label: 'idle 0' },
+      { from: 's2', to: 'e2', label: 'DB는 한가' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 's4' },
+      { from: 's4', to: 'e4', label: '요청 수 그대로' },
+      { from: 's4', to: 's5' },
+    ]}
+  />
+</Figure>
 
 ## 1. 예외 메시지로 풀 상태를 읽으세요
 
@@ -53,6 +76,21 @@ active=2, idle=0, waiting=0)
 
 `active`가 최대 크기와 같고 `idle`이 0이면, 풀이 바닥난 거예요. 이제 커넥션이 왜 안 돌아오는지를 봐요.
 
+<Figure caption="최대 10개 풀의 예시예요. 평소엔 쉬는 커넥션이 남지만, 바닥나면 active가 최대 크기인 10과 같고 idle이 0이에요.">
+  <Strip
+    ariaLabel="최대 10개 풀에서 평소에는 커넥션 6개를 쓰고 4개가 쉬어 active 6, idle 4이고, 바닥났을 때는 10개를 모두 써서 active 10, idle 0인 칸 띠"
+    rows={[
+      { label: '평소', cells: ['사용', '사용', '사용', '사용', '사용', '사용', { label: '쉼', tone: 'sub' }, { label: '쉼', tone: 'sub' }, { label: '쉼', tone: 'sub' }, { label: '쉼', tone: 'sub' }] },
+      { label: '바닥났을 때', cells: [{ label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }] },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 5, label: 'active 6' },
+      { row: 0, from: 6, to: 9, label: 'idle 4' },
+      { row: 1, from: 0, to: 9, label: 'active 10 · idle 0', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 **확인 방법**: Micrometer 지표로는 `hikaricp_connections_active`가 최대값에 붙었는지 봐요. 기다리는 스레드 수인 `hikaricp_connections_pending`이 느는지도 봐요. 못 빌리고 끝난 횟수는 `hikaricp_connections_timeout_total`이에요.
 
 ## 2. 쥐는 시간이 늘었는지 보세요
@@ -66,6 +104,22 @@ active=2, idle=0, waiting=0)
 - **트랜잭션 안의 바깥 호출**: 트랜잭션을 연 채로 외부 API를 불러요. 응답을 기다리는 동안에도 커넥션을 쥐고 있어요.
 
 DB 화면이 한가한데 쥐는 시간만 길다면 마지막 경우를 의심해요. 커넥션을 쥔 채 DB가 아닌 곳에서 시간을 쓰고 있는 거예요.
+
+<Figure caption="트랜잭션 안에서 외부 API를 부르는 예시예요. SQL은 앞뒤로 잠깐씩만 도는데, 외부 API를 기다리는 동안에도 커넥션을 쥐고 있어요. 그래서 DB 화면은 한가해 보여요.">
+  <Timeline
+    ariaLabel="커넥션을 0초에 빌려 2초에 돌려주는 동안, SQL은 처음과 끝의 0.1초씩만 돌고 가운데 1.8초는 외부 API 응답을 기다리는 시간 띠"
+    end={2000}
+    lanes={[
+      { label: '커넥션', segments: [{ start: 0, end: 2000, label: '쥔 시간 2초', tone: 'warn' }] },
+      { label: 'SQL', segments: [{ start: 0, end: 100, tone: 'accent' }, { start: 1900, end: 2000, tone: 'accent' }] },
+      { label: '외부 API', segments: [{ start: 100, end: 1900, label: '응답 기다림 1.8초' }] },
+    ]}
+    marks={[
+      { at: 0, label: '빌림' },
+      { at: 2000, label: '돌려줌' },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: 쥐는 시간은 `hikaricp_connections_usage_seconds`예요. 트레이스에서는 트랜잭션이 시작된 뒤 DB가 아닌 구간이 끼어 있는지 봐요.
 

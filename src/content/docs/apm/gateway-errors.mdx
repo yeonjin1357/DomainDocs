@@ -1,6 +1,6 @@
 ---
 title: 502·504가 날 때
-summary: 502·504는 앞단 웹 서버가 만든 응답이에요. 오류 로그 문구로 원인을 가르고 WAS 쪽을 따라가요.
+summary: 502·504는 앞단 웹 서버가 만든 응답이에요. 에러 로그 문구로 원인을 가르고 WAS 쪽을 따라가요.
 domain: apm
 type: guide
 order: 85
@@ -14,26 +14,53 @@ sources:
     url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
   - title: nginx — ngx_http_upstream_module (keepalive_timeout, max_fails, fail_timeout, $upstream_status)
     url: https://nginx.org/en/docs/http/ngx_http_upstream_module.html
-  - title: nginx 소스 — src/http/ngx_http_upstream.c (오류 문구와 응답 코드)
+  - title: nginx 소스 — src/http/ngx_http_upstream.c (에러 문구와 응답 코드)
     url: https://github.com/nginx/nginx/blob/master/src/http/ngx_http_upstream.c
   - title: Node.js — server.keepAliveTimeout
     url: https://nodejs.org/api/http.html#serverkeepalivetimeout
-updated: 2026-10-26
+updated: 2026-10-29
 ---
 
 <Situation>
-  주문 API에서 502와 504가 섞여 늘었어요. 그런데 WAS 로그에는 그 시각의 오류가 거의 없어요.
+  주문 API에서 502와 504가 섞여 늘었어요. 그런데 WAS 로그에는 그 시각의 에러가 거의 없어요.
 
   502와 504는 앞단의 웹 서버(nginx 같은 리버스 프록시)가 만든 응답이에요. 그래서 WAS는 모를 수 있어요.
 
-  웹 서버의 오류 로그에서 원인을 가르고, 그 뒤 WAS 쪽을 따라가요. 예시는 nginx 기준이에요.
+  웹 서버의 에러 로그에서 원인을 가르고, 그 뒤 WAS 쪽을 따라가요. 예시는 nginx 기준이에요.
 </Situation>
 
 <FirstLook>
   <Item title="누가 만든 응답인가">웹 서버가 만들었는지, WAS가 돌려준 건지 봐요.</Item>
-  <Item title="오류 로그 문구">시간 초과인지, 연결 거부인지, 끊김인지 봐요.</Item>
+  <Item title="에러 로그 문구">시간 초과인지, 연결 거부인지, 끊김인지 봐요.</Item>
   <Item title="꾸준한가, 몰렸나">늘 조금씩인지, 한 시각에 몰렸는지 봐요.</Item>
 </FirstLook>
+
+<Figure caption="웹 서버가 만든 응답이라면 에러 로그 문구가 갈래를 정해요. 시간 초과면 느린 요청과 다시 보내기를, 도중 끊김이 꾸준하면 keep-alive를, 연결 거부가 대부분이면 WAS가 살아 있는지를 봐요.">
+  <Flow
+    ariaLabel="1단계에서 웹 서버가 만든 응답임을 가린 뒤 2단계 에러 로그 문구를 보고, 시간 초과로 난 504면 3단계 느린 요청과 4단계 다시 보내기로, 응답 도중 끊긴 502가 꾸준하면 5단계 keep-alive로, 연결 거부로 난 502가 대부분이면 6단계 WAS 생존 확인으로 가는 흐름도"
+    nodes={[
+      { id: 's1', label: '누가 만들었나', col: 1, row: 0, note: '1단계', tone: 'warn' },
+      { id: 's2', label: '에러 로그', col: 1, row: 1, note: '2단계' },
+      { id: 'timeout', label: '시간 초과', col: 0, row: 2, note: '504' },
+      { id: 'closed', label: '도중 끊김', col: 1, row: 2, note: '꾸준한 502' },
+      { id: 'refused', label: '연결 거부', col: 2, row: 2, note: '502 대부분' },
+      { id: 's3', label: '느린 요청', col: 0, row: 3, note: '3단계', tone: 'accent' },
+      { id: 's5', label: 'keep-alive', col: 1, row: 3, note: '5단계', tone: 'accent' },
+      { id: 's6', label: 'WAS 생존', col: 2, row: 3, note: '6단계', tone: 'accent' },
+      { id: 's4', label: '다시 보내기', col: 0, row: 4, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 's2', label: '웹 서버가 만듦' },
+      { from: 's2', to: 'timeout' },
+      { from: 's2', to: 'closed' },
+      { from: 's2', to: 'refused' },
+      { from: 'timeout', to: 's3' },
+      { from: 'closed', to: 's5' },
+      { from: 'refused', to: 's6' },
+      { from: 's3', to: 's4' },
+    ]}
+  />
+</Figure>
 
 ## 1. 누가 만든 응답인지 가르세요
 
@@ -41,20 +68,20 @@ WAS가 일부러 502나 504를 돌려줄 수도 있어요. 웹 서버가 WAS에�
 
 **확인 방법**: 웹 서버 접근 로그에 `$upstream_status`와 `$upstream_response_time`을 함께 남겨요. 앞은 WAS에서 받은 코드, 뒤는 WAS 응답을 받기까지 걸린 시간이에요.
 
-웹 서버가 시간 초과로 만든 504라면, 걸린 시간이 시간 제한(기본 60초) 근처이고 오류 로그에 시간 초과 문구가 남아요. WAS가 직접 돌려준 504라면 WAS 로그에도 남아요. 웹 서버가 보낼 WAS를 고르지도 못했다면 `$upstream_status`에는 502가 들어가요.
+웹 서버가 시간 초과로 만든 504라면, 걸린 시간이 시간 제한(기본 60초) 근처이고 에러 로그에 시간 초과 문구가 남아요. WAS가 직접 돌려준 504라면 WAS 로그에도 남아요. 웹 서버가 보낼 WAS를 고르지도 못했다면 `$upstream_status`에는 502가 들어가요.
 
-## 2. 오류 로그 문구로 갈래를 나누세요
+## 2. 에러 로그 문구로 갈래를 나누세요
 
-nginx는 502·504를 만들 때마다 오류 로그에 이유를 남겨요. 문구가 곧 원인의 갈래예요.
+nginx는 502·504를 만들 때마다 에러 로그에 이유를 남겨요. 문구가 곧 원인의 갈래예요.
 
-| 오류 로그 문구 | 응답 | 뜻 |
+| 에러 로그 문구 | 응답 | 뜻 |
 | --- | --- | --- |
 | `upstream timed out ... while reading response header` | 504 | WAS가 시간 안에 답하지 않았어요 |
 | `connect() failed (111: Connection refused)` | 502 | WAS 포트에 받는 프로그램이 없어요 |
 | `upstream prematurely closed connection` | 502 | WAS가 응답 도중 연결을 끊었어요 |
 | `no live upstreams` | 502 | 모든 WAS가 실패로 빠져 있어요 |
 
-**확인 방법**: 문제 시각의 오류 로그에서 위 문구별로 줄 수를 세요. 한 문구가 대부분이라면 아래 단계 중 그 갈래로 가요.
+**확인 방법**: 문제 시각의 에러 로그에서 위 문구별로 줄 수를 세요. 한 문구가 대부분이라면 아래 단계 중 그 갈래로 가요.
 
 ## 3. 504라면 느린 요청을 찾으세요
 
@@ -70,7 +97,24 @@ WAS의 제한이 웹 서버보다 길면, 사용자는 이미 504를 받았는�
 
 ## 4. 다음 서버로 다시 보내는지 보세요
 
-nginx는 기본으로 연결 오류나 시간 초과가 나면 같은 요청을 다음 WAS로 다시 보내요. 기본값이 `proxy_next_upstream error timeout`이에요. 그래서 느린 GET 요청 하나가 60초를 두 번 기다리고, WAS 두 대가 같은 일을 해요.
+nginx는 기본으로 연결 에러나 시간 초과가 나면 같은 요청을 다음 WAS로 다시 보내요. 기본값이 `proxy_next_upstream error timeout`이에요. 그래서 느린 GET 요청 하나가 60초를 두 번 기다리고, WAS 두 대가 같은 일을 해요.
+
+<Figure caption="느린 GET 요청 하나를 웹 서버가 기다린 시간이에요. WAS 1에서 60초가 지나면 같은 요청을 WAS 2로 다시 보내서, 모두 120초를 기다려요.">
+  <Timeline
+    ariaLabel="웹 서버가 느린 GET 요청을 WAS 1에 보내 60초를 기다리다 시간이 넘자, 같은 요청을 WAS 2로 다시 보내 또 60초를 기다려 모두 120초가 걸리는 시간 띠"
+    end={120}
+    lanes={[
+      { label: 'WAS 1', segments: [{ start: 0, end: 60, label: '60초 기다림', tone: 'warn' }] },
+      { label: 'WAS 2', segments: [{ start: 60, end: 120, label: '60초 기다림', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 60, label: '다시 보냄' }]}
+    ticks={[
+      { at: 0, label: '0초' },
+      { at: 60, label: '60초' },
+      { at: 120, label: '120초' },
+    ]}
+  />
+</Figure>
 
 POST처럼 멱등이 아닌 요청은 nginx 1.9.13부터 기본으로 다시 보내지 않아요. 응답을 사용자에게 보내기 시작한 뒤에도 다시 보내지 않아요.
 
@@ -80,7 +124,23 @@ POST처럼 멱등이 아닌 요청은 nginx 1.9.13부터 기본으로 다시 보
 
 웹 서버와 WAS 사이의 연결을 재사용하면, 쉬는 연결을 양쪽이 각자 정한 시간 뒤에 닫아요. nginx의 `upstream` 블록에서 `keepalive`를 켜면 쉬는 연결을 기본 60초 동안 들고 있어요. 그런데 Node.js 서버는 기본으로 5초 쉬면 연결을 닫아요.
 
-WAS가 막 닫은 연결에 웹 서버가 요청을 보내면, 그 요청은 502가 돼요. 오류 로그에는 `upstream prematurely closed connection` 같은 문구가 남아요. 트래픽에 상관없이 낮은 비율로 꾸준히 나는 게 특징이에요.
+WAS가 막 닫은 연결에 웹 서버가 요청을 보내면, 그 요청은 502가 돼요. 에러 로그에는 `upstream prematurely closed connection` 같은 문구가 남아요. 트래픽에 상관없이 낮은 비율로 꾸준히 나는 게 특징이에요.
+
+<Figure caption="WAS가 쉬는 연결을 웹 서버보다 먼저 닫을 때 생기는 502예요. 웹 서버가 쉬던 연결로 요청을 보내는 순간, WAS는 그 연결을 닫고 있어요.">
+  <Sequence
+    ariaLabel="첫 요청은 웹 서버와 WAS 사이를 정상으로 오가고, 연결이 쉬다가 WAS가 keep-alive 시간이 끝나 연결을 닫는 순간 웹 서버가 같은 연결로 둘째 요청을 보내, 사용자에게 502가 돌아가는 순서"
+    participants={['사용자', '웹 서버', 'WAS']}
+    messages={[
+      { from: '사용자', to: '웹 서버', label: '요청 1' },
+      { from: '웹 서버', to: 'WAS', label: '요청 1' },
+      { from: 'WAS', to: '웹 서버', label: '응답', dashed: true },
+      { from: '사용자', to: '웹 서버', label: '요청 2' },
+      { from: '웹 서버', to: 'WAS', label: '쉬던 연결로 보냄', tone: 'warn' },
+      { from: 'WAS', to: '웹 서버', label: '그 순간 연결 닫음', tone: 'warn' },
+      { from: '웹 서버', to: '사용자', label: '502', tone: 'warn', dashed: true },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: 웹 서버가 쉬는 연결을 들고 있는 시간과 WAS가 쉬는 연결을 닫는 시간을 견줘요. WAS 쪽을 더 길게 잡아요. 로드 밸런서 앞에서도 같은 일이 생기고, 그 경우는 <Term slug="cloud/lb-5xx">로드 밸런서에서 5xx가 늘 때</Term>에서 다뤘어요.
 
@@ -91,7 +151,7 @@ WAS가 막 닫은 연결에 웹 서버가 요청을 보내면, 그 요청은 502
 **확인 방법**: WAS 프로세스와 포트가 살아 있는지, 같은 시각에 배포나 재시작이 있었는지 봐요. 배포 중에만 잠깐 몰렸다면, 새 WAS가 준비된 뒤에 요청을 받게 하는 순서를 봐요.
 
 <Checkpoints>
-  <Check>앱의 에러율 화면에 502·504가 보이지 않는다면, 웹 서버 접근 로그에서 따로 세세요. WAS가 모르는 오류라 앱 지표에는 남지 않아요.</Check>
+  <Check>앱의 에러율 화면에 502·504가 보이지 않는다면, 웹 서버 접근 로그에서 따로 세세요. WAS가 모르는 에러라 앱 지표에는 남지 않아요.</Check>
   <Check>504가 정확히 60초 근처에서 끊긴다면, 웹 서버의 기본 시간 제한에 걸린 거예요. 시간을 늘리기 전에 그 요청이 왜 60초나 걸리는지 먼저 보세요.</Check>
   <Check>느린 GET 요청이 WAS 두 대에 모두 기록된다면, 웹 서버가 시간 초과 뒤 다음 서버로 다시 보낸 거예요. 부하가 두 배로 늘 수 있어요.</Check>
   <Check>502가 낮은 비율로 꾸준하다면, WAS의 keep-alive 시간이 웹 서버보다 짧은지 보세요. Node.js 기본값은 5초예요.</Check>

@@ -12,3 +12,11 @@
 | 지표 정의(CPUUtilization, DatabaseConnections·세션이 더 많을 수 있음, FreeableMemory = MemAvailable, FreeStorageSpace, ReadIOPS, ReadLatency, ReplicaLag, CPUCreditBalance) | https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html |
 | CloudWatch CPU는 하이퍼바이저, Enhanced Monitoring은 인스턴스 안 에이전트, 작은 인스턴스일수록 차이 큼 | https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.html |
 | Azure SQL Database = 완전 관리형, 고가용성·백업·유지 보수, SQL·OS 패치를 Microsoft가 처리 | https://learn.microsoft.com/en-us/azure/azure-sql/database/sql-database-paas-overview |
+
+## 다시 확인 (2026-10-29)
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| RDS의 db.t4g·db.t3는 Unlimited 모드로 설정돼, 크레딧이 바닥나도 기준선에 묶이지 않고 추가 요금을 냄 | https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.Types.html |
+
+- 고친 것: Check의 "크레딧이 바닥나면 가상 머신처럼 CPU가 기준선에 묶여요"를 Unlimited 모드 기준(요금이 붙을 수 있음)으로 고쳤어요.

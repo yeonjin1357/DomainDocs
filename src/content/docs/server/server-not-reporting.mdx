@@ -1,6 +1,6 @@
 ---
 title: 서버 수집이 끊겼을 때
-summary: 서버가 꺼졌는지, 네트워크가 끊겼는지, 수집기만 멈췄는지를 바깥에서 안쪽 순서로 가려요.
+summary: 서버가 꺼졌는지, 네트워크가 끊겼는지, 에이전트만 멈췄는지를 바깥에서 안쪽 순서로 가려요.
 domain: server
 type: guide
 order: 90
@@ -16,33 +16,58 @@ sources:
     url: https://man7.org/linux/man-pages/man1/journalctl.1.html
   - title: Linux man-pages — systemctl(1)
     url: https://man7.org/linux/man-pages/man1/systemctl.1.html
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
   서버 목록에서 웹 서버 한 대가 10분째 회색(수집 없음)으로 바뀌었어요. 그래프도 그 시각부터 비어 있어요.
 
-  "데이터 없음"은 서버가 죽었다는 뜻이 아니에요. 서버, 네트워크, 수집기 중 어디가 멈췄는지 바깥에서 안쪽 순서로 가려요.
+  "데이터 없음"은 서버가 죽었다는 뜻이 아니에요. 서버, 네트워크, 에이전트 중 어디가 멈췄는지 바깥에서 안쪽 순서로 가려요.
 </Situation>
 
 <FirstLook>
   <Item title="서버가 살아 있나">ping과 서비스 응답으로 바깥에서 확인해요.</Item>
   <Item title="재부팅했나">서버가 켜진 시각이 끊긴 시각과 맞는지 봐요.</Item>
-  <Item title="수집기만 멈췄나">수집 프로그램의 상태와 로그를 봐요.</Item>
+  <Item title="에이전트만 멈췄나">수집 프로그램의 상태와 로그를 봐요.</Item>
 </FirstLook>
+
+<Figure caption="1단계에서 ping과 서비스 응답으로 갈래를 나눠요. ping은 되는데 수집만 없을 때 2단계부터 차례로 내려가요. 에이전트 프로세스가 사라졌다면 OOM도 확인해요.">
+  <Flow
+    ariaLabel="1단계에서 ping과 서비스가 둘 다 안 되면 서버 꺼짐이나 네트워크를, ping만 안 되면 방화벽을 의심하고, ping은 되는데 수집만 없으면 2단계 재부팅, 재부팅이 없으면 3단계 에이전트를 봐요. 에이전트 프로세스가 사라졌다면 OOM을 확인하고, 4단계에서 빈 구간을 다루는 흐름도"
+    nodes={[
+      { id: 's1', label: 'ping·서비스', col: 1, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'down', label: '둘 다 안 됨', col: 0, row: 1, note: '꺼짐·네트워크' },
+      { id: 'up', label: 'ping은 됨', col: 1, row: 1, note: '수집만 없음' },
+      { id: 'fw', label: 'ping만 안 됨', col: 2, row: 1, note: '방화벽 의심' },
+      { id: 's2', label: '재부팅', col: 1, row: 2, note: '2단계' },
+      { id: 's3', label: '에이전트', col: 1, row: 3, note: '3단계' },
+      { id: 'oom', label: 'OOM 확인', col: 2, row: 3, note: '사라졌다면' },
+      { id: 's4', label: '빈 구간', col: 1, row: 4, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'down' },
+      { from: 's1', to: 'up' },
+      { from: 's1', to: 'fw' },
+      { from: 'up', to: 's2' },
+      { from: 's2', to: 's3', label: '재부팅 없음' },
+      { from: 's3', to: 'oom' },
+      { from: 's3', to: 's4' },
+    ]}
+  />
+</Figure>
 
 ## 1. 바깥에서 살아 있는지 보세요
 
 <Term slug="foundations/no-data-vs-zero">데이터 없음</Term>은 "모른다"는 뜻이에요. 먼저 서버가 정말 멈췄는지 바깥에서 확인해요.
 
-<Figure caption="수집이 끊긴 이유는 세 갈래예요. 바깥에서 닿는지, 서버가 켜져 있는지, 수집기가 도는지를 차례로 보면 갈래가 정해져요.">
+<Figure caption="수집이 끊긴 이유는 세 갈래예요. 바깥에서 닿는지, 서버가 켜져 있는지, 에이전트가 도는지를 차례로 보면 갈래가 정해져요.">
   <Flow
-    ariaLabel="수집 서버에서 네트워크를 지나 서버로 가고, 서버 안의 수집기가 지표를 보내는 경로에서 네트워크, 서버, 수집기 셋 중 하나가 멈출 수 있음을 보여 주는 구조도"
+    ariaLabel="모니터링 서버에서 네트워크를 지나 서버로 가고, 서버 안의 에이전트가 지표를 보내는 경로에서 네트워크, 서버, 에이전트 셋 중 하나가 멈출 수 있음을 보여 주는 구조도"
     nodes={[
       { id: 'mon', label: '모니터링 서버', col: 0, row: 0, tone: 'accent' },
       { id: 'net', label: '네트워크', col: 1, row: 0, note: '방화벽·경로' },
       { id: 'host', label: '서버', col: 2, row: 0, note: '전원·커널' },
-      { id: 'agent', label: '수집기', col: 2, row: 1, note: '프로세스' },
+      { id: 'agent', label: '에이전트', col: 2, row: 1, note: '프로세스' },
     ]}
     edges={[
       { from: 'agent', to: 'host', dashed: true },
@@ -62,20 +87,41 @@ updated: 2026-10-21
 
 서버가 다시 켜졌다면, 꺼져 있던 동안의 구간이 비어 있는 게 정상이에요. 켜진 시각을 수집이 끊긴 시각과 맞춰 봐요.
 
+<Figure caption="재부팅한 서버의 예시예요. 서버가 꺼져 있던 동안 수집도 비어 있고, 켜진 뒤로 다시 들어와요. 두 시각이 맞으면 빈 구간은 재부팅 때문이에요.">
+  <Timeline
+    ariaLabel="10시 09분에 서버가 꺼지면서 수집이 끊기고, 10시 20분에 서버가 다시 켜진 직후부터 수집이 다시 들어오는 시간 띠"
+    end={30}
+    lanes={[
+      { label: '서버', segments: [{ start: 0, end: 9, label: '켜짐', tone: 'accent' }, { start: 9, end: 20, label: '꺼짐', tone: 'warn' }, { start: 20, end: 30, label: '켜짐', tone: 'accent' }] },
+      { label: '수집', segments: [{ start: 0, end: 9, tone: 'accent' }, { start: 21, end: 30, tone: 'accent' }] },
+    ]}
+    marks={[
+      { at: 9, label: '끊긴 시각', tone: 'warn' },
+      { at: 20, label: '켜진 시각' },
+    ]}
+    ticks={[
+      { at: 0, label: '10:00' },
+      { at: 10, label: '10:10' },
+      { at: 20, label: '10:20' },
+      { at: 30, label: '10:30' },
+    ]}
+  />
+</Figure>
+
 **확인 방법**: `uptime -s`는 서버가 켜진 시각을 보여 줘요. `last reboot`는 지난 재부팅 기록을, `journalctl --list-boots`는 부팅마다 첫 기록과 마지막 기록의 시각을 보여 줘요.
 
-부팅 직전 기록이 갑자기 끊겼다면 정상 종료가 아니에요. 전원 문제나 커널 오류일 수 있어요. 그 직전 커널 로그를 봐요.
+부팅 직전 기록이 갑자기 끊겼다면 정상 종료가 아니에요. 전원 문제나 커널 에러일 수 있어요. 그 직전 커널 로그를 봐요.
 
-## 3. 수집기만 멈췄는지 보세요
+## 3. 에이전트만 멈췄는지 보세요
 
 서버는 살아 있고 재부팅도 없었다면, 지표를 보내는 수집 프로그램(에이전트)을 봐요. 흔한 경우는 이래요.
 
-- 수집기 프로세스가 죽었어요. 메모리가 모자라 OOM killer가 끝냈을 수도 있어요.
-- 수집기는 도는데 모니터링 서버로 보내는 길이 막혔어요. 방화벽 규칙이나 프록시 설정이 바뀐 경우예요.
-- 서버 디스크가 꽉 차서 수집기가 버퍼나 로그를 쓰지 못해요.
-- 수집기가 죽었다 살아나기를 되풀이해요. 상태는 active여도, 뜰 때마다 잠깐씩 지표가 비어요.
+- 에이전트 프로세스가 죽었어요. 메모리가 모자라 OOM killer가 끝냈을 수도 있어요.
+- 에이전트는 도는데 모니터링 서버로 보내는 길이 막혔어요. 방화벽 규칙이나 프록시 설정이 바뀐 경우예요.
+- 서버 디스크가 꽉 차서 에이전트가 버퍼나 로그를 쓰지 못해요.
+- 에이전트가 죽었다 살아나기를 되풀이해요. 상태는 active여도, 뜰 때마다 잠깐씩 지표가 비어요.
 
-**확인 방법**: 수집기가 systemd 서비스라면 `systemctl status 서비스이름`으로 상태와 최근 로그를 봐요. 읽는 법과 재시작 횟수 보는 법은 <Term slug="server/services-and-logs">서비스와 시스템 로그</Term>에 있어요. 프로세스가 사라졌다면 <Term slug="server/low-memory">메모리가 모자라 보일 때</Term>의 OOM 확인으로 가요.
+**확인 방법**: 에이전트가 systemd 서비스라면 `systemctl status 서비스이름`으로 상태와 최근 로그를 봐요. 읽는 법과 재시작 횟수 보는 법은 <Term slug="server/services-and-logs">서비스와 시스템 로그</Term>에 있어요. 프로세스가 사라졌다면 <Term slug="server/low-memory">메모리가 모자라 보일 때</Term>의 OOM 확인으로 가요.
 
 ## 4. 빈 구간을 어떻게 다룰지 정하세요
 
@@ -85,6 +131,6 @@ updated: 2026-10-21
 
 <Checkpoints>
   <Check>서버 여러 대가 같은 시각에 함께 끊겼다면 서버 하나하나를 보기 전에, 그 서버들이 함께 지나는 네트워크나 모니터링 서버를 먼저 보세요.</Check>
-  <Check>수집 끊김 알림과 서버 다운 알림을 같은 것으로 다룬다면 다시 보세요. 수집기만 멈춰도 같은 알림이 울려요.</Check>
+  <Check>수집 끊김 알림과 서버 다운 알림을 같은 것으로 다룬다면 다시 보세요. 에이전트만 멈춰도 같은 알림이 울려요.</Check>
   <Check>재부팅 뒤 지표가 이상하게 튄다면 카운터가 0부터 다시 센 건지 보세요. 누적값을 rate로 바꾸는 법은 <Term slug="foundations/counters-and-rate">카운터와 rate</Term>에 있어요.</Check>
 </Checkpoints>

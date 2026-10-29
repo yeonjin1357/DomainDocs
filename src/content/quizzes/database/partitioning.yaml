@@ -16,7 +16,7 @@ questions:
     explain: 칸을 지우거나 떼면 죽은 행이 남지 않아요. DELETE는 지운 행마다 VACUUM이 치울 거리가 남아요.
   - id: missing-partition
     type: choice
-    prompt: 1월 1일 0시부터 주문 저장이 no partition of relation found for row 오류로 실패해요. 원인은?
+    prompt: 1월 1일 0시부터 주문 저장이 no partition of relation found for row 에러로 실패해요. 원인은?
     choices:
       - 새 달의 파티션을 미리 만들어 두지 않았어요
       - 인덱스가 깨졌어요

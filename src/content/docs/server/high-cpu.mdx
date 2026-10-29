@@ -16,7 +16,7 @@ sources:
     url: https://man7.org/linux/man-pages/man1/pidstat.1.html
   - title: Linux man-pages — vmstat(8)
     url: https://man7.org/linux/man-pages/man8/vmstat.8.html
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -30,6 +30,31 @@ updated: 2026-10-21
   <Item title="어느 프로세스가 썼나">프로세스별 CPU 순위에서 평소와 달라진 것을 찾아요.</Item>
   <Item title="일이 밀렸나">부하(run queue)가 코어 수를 넘는지 봐요.</Item>
 </FirstLook>
+
+<Figure caption="1단계에서 늘어난 몫이 갈래를 정해요. us가 늘었다면 2~4단계를 차례로 내려가요. sy, st, wa는 상자 아래 글자가 가리키는 쪽을 봐요.">
+  <Flow
+    ariaLabel="1단계에서 CPU 시간을 종류별로 나눠, wa만 늘었으면 디스크 입출력을, sy가 늘었으면 잦은 커널 호출을, st가 늘었으면 호스트와 클라우드를 보고, us가 늘었으면 2단계 프로세스, 3단계 일 밀림, 4단계 언제부터를 차례로 보는 흐름도"
+    nodes={[
+      { id: 's1', label: 'CPU 시간 종류', col: 1, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'wa', label: 'wa만 늘음', col: 2, row: 0, note: '디스크 입출력' },
+      { id: 'us', label: 'us 늘음', col: 0, row: 1, note: '앱 코드' },
+      { id: 'sy', label: 'sy 늘음', col: 1, row: 1, note: '커널 자주 부름' },
+      { id: 'st', label: 'st 늘음', col: 2, row: 1, note: '호스트·클라우드' },
+      { id: 's2', label: '어느 프로세스', col: 0, row: 2, note: '2단계' },
+      { id: 's3', label: '일이 밀리나', col: 0, row: 3, note: '3단계' },
+      { id: 's4', label: '언제부터', col: 0, row: 4, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'wa' },
+      { from: 's1', to: 'us' },
+      { from: 's1', to: 'sy' },
+      { from: 's1', to: 'st' },
+      { from: 'us', to: 's2' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 's4' },
+    ]}
+  />
+</Figure>
 
 ## 1. CPU 시간을 종류별로 나눠 보세요
 
@@ -60,6 +85,20 @@ updated: 2026-10-21
 
 CPU가 95%여도 일이 밀리지 않으면 아직 감당하고 있는 거예요. 부하가 코어 수보다 커지면 차례를 기다리는 일이 생겨 응답이 느려져요.
 
+<Figure caption="코어 8개 서버에 실행 중이거나 차례를 기다리는 프로세스가 14개인 예시예요. 코어마다 하나씩 8개가 돌고, 남은 6개는 기다려요.">
+  <Strip
+    ariaLabel="코어 8개가 프로세스 8개를 하나씩 실행하고, 남은 프로세스 6개가 차례를 기다려 모두 14개가 되는 칸 띠"
+    rows={[
+      { label: '코어 8개에서 실행 중', cells: [{ label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }] },
+      { label: '차례를 기다림', cells: [{ label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }] },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 7, label: '8개' },
+      { row: 1, from: 0, to: 5, label: '6개', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 **확인 방법**: `vmstat 5`의 r은 실행 중이거나 차례를 기다리는 프로세스 수예요. r이 코어 수보다 계속 크면 CPU가 모자라요. `pidstat -u`의 %wait은 프로세스가 차례를 기다린 비율이에요.
 
 ## 4. 언제부터, 무엇과 함께 늘었는지 맞춰 보세요
@@ -69,6 +108,16 @@ CPU가 오른 시각을 다른 사건과 나란히 놓아요. 배포, 배치 작
 - 요청 수가 함께 늘었다면 부하가 는 거예요. 서버를 늘리거나 요청을 나눠요.
 - 요청 수는 그대로인데 CPU만 늘었다면, 요청 하나가 더 무거워졌어요. 배포된 코드나 데이터 변화를 봐요.
 - 일정한 시각마다 오른다면 정해진 작업(백업, 배치, cron)을 먼저 봐요.
+
+<Figure caption="CPU가 똑같이 올라도 요청 수에 따라 뜻이 달라요. 왼쪽은 일이 많아졌고, 오른쪽은 일 하나가 무거워졌어요.">
+  <Compare
+    columns={['요청 수도 늘었을 때', '요청 수는 그대로일 때']}
+    rows={[
+      { label: '뜻', values: ['부하가 늘었어요', '요청 하나가 무거워졌어요'] },
+      { label: '할 일', values: ['서버 늘리기, 요청 나누기', '배포된 코드, 데이터 변화 보기'] },
+    ]}
+  />
+</Figure>
 
 자바 서버에서 CPU와 함께 GC 시간이 늘었다면 <Term slug="apm/gc-pause">GC 멈춤</Term>을 함께 봐요. 힙이 모자라 GC가 쉬지 않고 돌면 CPU가 높아져요.
 

@@ -16,7 +16,7 @@ questions:
     explain: 오래된 자료는 1시간 단위로 묶여서 짧은 급등이 평평하게 지워져요.
   - id: sum-for-counts
     type: choice
-    prompt: 오류 수처럼 일어난 횟수를 세는 지표는 어떤 통계로 봐야 할까요?
+    prompt: 에러 수처럼 일어난 횟수를 세는 지표는 어떤 통계로 봐야 할까요?
     choices:
       - 합(Sum)
       - 평균(Average)

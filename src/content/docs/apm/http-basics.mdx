@@ -85,12 +85,12 @@ Content-Type: application/json
 
 APM은 요청을 메서드와 주소로 묶어 트랜잭션으로 보여 줘요. 이때 `/orders/42`처럼 ID가 든 주소는 `/orders/{id}`처럼 묶어야 같은 기능끼리 모여요.
 
-오류율은 보통 응답 상태 코드로 계산해요. 4xx와 5xx는 원인이 달라서 나눠 봐요. 예외까지 함께 보는 법은 <Term slug="apm/errors-and-exceptions">에러와 예외</Term>에서 다뤄요.
+에러율은 보통 응답 상태 코드로 계산해요. 4xx와 5xx는 원인이 달라서 나눠 봐요. 예외까지 함께 보는 법은 <Term slug="apm/errors-and-exceptions">에러와 예외</Term>에서 다뤄요.
 
 <Checkpoints>
-  <Check>4xx까지 서버 오류율에 섞어 알림을 보낸다면 다시 보세요. 404나 401은 대개 요청한 쪽 문제예요. 5xx와 나눠서 보세요.</Check>
+  <Check>4xx까지 서버 에러율에 섞어 알림을 보낸다면 다시 보세요. 404나 401은 대개 요청한 쪽 문제예요. 5xx와 나눠서 보세요.</Check>
   <Check>POST 요청을 자동으로 재시도하는 코드라면 다시 보세요. 같은 주문이나 결제가 두 번 처리될 수 있어요.</Check>
-  <Check>502나 504가 늘었는데 WAS 로그에는 오류가 없다면, 앞단 장비가 만든 응답일 수 있어요. <Term slug="apm/gateway-errors">502·504가 날 때</Term>의 순서로 웹 서버 쪽 기록을 보세요.</Check>
+  <Check>502나 504가 늘었는데 WAS 로그에는 에러가 없다면, 앞단 장비가 만든 응답일 수 있어요. <Term slug="apm/gateway-errors">502·504가 날 때</Term>의 순서로 웹 서버 쪽 기록을 보세요.</Check>
   <Check>트랜잭션 이름에 주문 번호 같은 ID가 그대로 들어간다면 다시 보세요. 주소마다 따로 묶여 이름이 끝없이 늘어나요. 이 문제는 <Term slug="foundations/cardinality-explosion">카디널리티 폭발</Term>에서 다뤄요.</Check>
 </Checkpoints>
 

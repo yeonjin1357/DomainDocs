@@ -62,7 +62,7 @@ updated: 2026-10-29
   />
 </Figure>
 
-줄마다 붙는 `cost`는 시간이 아니라 플래너가 쓰는 임의 단위예요. 계획이 SQL 실행의 어디쯤에서 정해지는지는 <Term slug="database/query-processing">SQL이 실행되는 과정</Term>에서 다뤄요.
+줄마다 붙는 `cost`는 시간이 아니라 옵티마이저가 쓰는 임의 단위예요. 계획이 SQL 실행의 어디쯤에서 정해지는지는 <Term slug="database/query-processing">SQL이 실행되는 과정</Term>에서 다뤄요.
 
 ## 예상과 실제 행 수가 다른 곳을 찾아요
 
@@ -103,7 +103,7 @@ updated: 2026-10-29
 <Checkpoints>
   <Check>`UPDATE`나 `DELETE`를 `EXPLAIN ANALYZE`로 볼 때는 조심하세요. 실제로 실행되어 데이터가 바뀌어요. `BEGIN`과 `ROLLBACK` 사이에서 실행해요.</Check>
   <Check>`cost` 값을 밀리초로 읽는 화면이나 설명은 고치세요. `cost`는 디스크 페이지 하나를 차례로 읽는 비용을 1로 둔 임의 단위예요.</Check>
-  <Check>SQL은 그대로인데 실행 시간이 갑자기 늘었다면, 큰 데이터 변경 뒤 통계를 다시 모았는지 보세요. 플래너는 `ANALYZE`가 모은 통계로 행 수를 예상해서, 통계가 낡으면 계획이 나빠질 수 있어요. 순서는 <Term slug="database/plan-changed">실행 계획이 갑자기 바뀌었을 때</Term>에 있어요.</Check>
+  <Check>SQL은 그대로인데 실행 시간이 갑자기 늘었다면, 큰 데이터 변경 뒤 통계를 다시 모았는지 보세요. 옵티마이저는 `ANALYZE`가 모은 통계로 행 수를 예상해서, 통계가 낡으면 계획이 나빠질 수 있어요. 순서는 <Term slug="database/plan-changed">실행 계획이 갑자기 바뀌었을 때</Term>에 있어요.</Check>
   <Check>운영 중 느렸던 실행의 계획을 보려면 `auto_explain`을 쓰세요. `auto_explain.log_min_duration`보다 오래 걸린 SQL의 계획을 로그에 남겨요. 기본값 -1은 꺼져 있어요.</Check>
 </Checkpoints>
 
@@ -124,7 +124,7 @@ updated: 2026-10-29
 
   ### cost 계산의 예
 
-  플래너는 관례로 차례 읽기 한 페이지(`seq_page_cost`)를 1.0, 행 하나 처리(`cpu_tuple_cost`)를 0.01로 둬요. 345페이지에 10,000행인 표를 전체 훑으면 (345 × 1.0) + (10,000 × 0.01) = 445예요.
+  옵티마이저는 관례로 차례 읽기 한 페이지(`seq_page_cost`)를 1.0, 행 하나 처리(`cpu_tuple_cost`)를 0.01로 둬요. 345페이지에 10,000행인 표를 전체 훑으면 (345 × 1.0) + (10,000 × 0.01) = 445예요.
 
   ### 실행 시간에 드는 것
 
@@ -132,5 +132,5 @@ updated: 2026-10-29
 
   ### 통계
 
-  플래너 통계는 `pg_statistic`에 담기고, `ANALYZE`나 `VACUUM ANALYZE`가 갱신해요. 막 갱신해도 근삿값이에요. 문서는 통계가 정확하지 않으면 나쁜 계획을 골라 성능이 떨어질 수 있다고 해요.
+  옵티마이저 통계는 `pg_statistic`에 담기고, `ANALYZE`나 `VACUUM ANALYZE`가 갱신해요. 막 갱신해도 근삿값이에요. 문서는 통계가 정확하지 않으면 나쁜 계획을 골라 성능이 떨어질 수 있다고 해요.
 </Deeper>

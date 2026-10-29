@@ -20,16 +20,16 @@ terms:
     analogy: 책 뒤의 찾아보기와 같아요.
     doc: logs/storage-and-indexing
   - id: log-label
-    name: 라벨
+    name: 레이블
     en: Label
-    aliases: [Loki label, 로그 라벨, stream label]
+    aliases: [Loki label, 라벨, 로그 라벨, 로그 레이블, stream label]
     short: Loki가 로그 스트림을 고르려고 색인하는 키와 값의 쌍이에요.
     doc: logs/storage-and-indexing
   - id: log-stream
     name: 로그 스트림
     en: Log stream
     aliases: [stream, 스트림]
-    short: 같은 라벨 묶음을 가진 로그의 흐름이에요.
+    short: 같은 레이블 묶음을 가진 로그의 흐름이에요.
     doc: logs/storage-and-indexing
   - id: log-level
     name: 로그 레벨

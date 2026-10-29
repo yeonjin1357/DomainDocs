@@ -3,7 +3,7 @@ questions:
     type: ox
     prompt: 로드 밸런서의 5xx 수 그래프가 대부분 비어 있어요. 수집이 고장 났다는 뜻인가요?
     answer: false
-    explain: 이 지표는 0이 아닌 값이 있을 때만 점을 찍어요. 오류가 없는 동안은 0이 아니라 비어 있어요.
+    explain: 이 지표는 0이 아닌 값이 있을 때만 점을 찍어요. 에러가 없는 동안은 0이 아니라 비어 있어요.
   - id: not-breaching
     type: choice
     prompt: 0일 때 점이 비는 지표에 건 경보가 INSUFFICIENT_DATA를 오가요. 어떻게 바꾸면 될까요?

@@ -1,7 +1,7 @@
 questions:
   - id: onerror-resource
     type: ox
-    prompt: window.onerror만 등록해 두면 이미지 404도 오류로 잡히나요?
+    prompt: window.onerror만 등록해 두면 이미지 404도 에러로 잡히나요?
     answer: false
     explain: 자원 불러오기 실패는 그 요소에서 일어나고 위로 퍼지지 않아요. window에 캡처 단계로 등록한 error 리스너에서 잡아요.
   - id: fetch-500
@@ -13,27 +13,27 @@ questions:
       - unhandledrejection 이벤트가 나요
       - window.onerror가 불려요
     answer: 0
-    explain: fetch는 요청 자체가 실패할 때만 거부돼요. 서버의 오류 응답은 ok나 status를 확인해야 오류로 남길 수 있어요.
+    explain: fetch는 요청 자체가 실패할 때만 거부돼요. 서버의 에러 응답은 ok나 status를 확인해야 에러로 남길 수 있어요.
   - id: group-by-stack
     type: choice
-    prompt: 같은 버그인데 브라우저마다 오류 문구가 달라요. 하나로 묶으려면 무엇을 기준으로 해야 할까요?
+    prompt: 같은 버그인데 브라우저마다 에러 문구가 달라요. 하나로 묶으려면 무엇을 기준으로 해야 할까요?
     choices:
       - 소스 맵으로 되살린 스택의 위치
-      - 오류 문구 전체
+      - 에러 문구 전체
       - 브라우저 이름
-      - 오류가 난 시각
+      - 에러가 난 시각
     answer: 0
     explain: 문구는 엔진과 버전마다 달라요. 스택의 위치로 묶어야 같은 버그가 한 묶음이 돼요.
   - id: fix-priority
     type: choice
-    prompt: 오류 묶음 A는 5만 번 났고 3명이 겪었어요. B는 2천 번 났고 1,500명이 겪었어요. 보통 무엇부터 고칠까요?
+    prompt: 에러 묶음 A는 5만 번 났고 3명이 겪었어요. B는 2천 번 났고 1,500명이 겪었어요. 보통 무엇부터 고칠까요?
     choices:
       - B를 먼저 봐요
       - A를 먼저 봐요
       - 둘을 합쳐 한 묶음으로 봐요
-      - 오류 수가 10만 번을 넘을 때까지 기다려요
+      - 에러 수가 10만 번을 넘을 때까지 기다려요
     answer: 0
-    explain: 오류 수는 한 사용자가 수백 번 낼 수 있어 부풀기 쉬워요. 고칠 순서는 겪은 사용자 수로 정해요.
+    explain: 에러 수는 한 사용자가 수백 번 낼 수 있어 부풀기 쉬워요. 고칠 순서는 겪은 사용자 수로 정해요.
   - id: string-reject
     type: ox
     prompt: Promise.reject('timeout')처럼 문자열로 거부하면 unhandledrejection에서 스택을 볼 수 있나요?

@@ -6,7 +6,7 @@ type: guide
 order: 90
 icon: cloud
 keywords: [ALB 5xx, "502", "503", "504", HTTPCode_ELB_5XX_Count, HTTPCode_Target_5XX_Count, idle timeout, keep-alive, 정상 대상, 원인 찾기]
-related: [cloud/load-balancers, apm/http-basics, apm/error-spike, apm/timeouts-and-retries]
+related: [cloud/load-balancers, apm/gateway-errors, apm/http-basics, apm/error-spike, apm/timeouts-and-retries]
 sources:
   - title: AWS — Troubleshoot your Application Load Balancers
     url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-troubleshooting.html
@@ -14,7 +14,7 @@ sources:
     url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html
   - title: AWS — Health checks for Application Load Balancer target groups
     url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -52,13 +52,13 @@ AWS Application Load Balancer는 두 수를 따로 세요. 대상이 만든 5xx�
   />
 </Figure>
 
-<Figure caption="같은 10분 동안의 예시예요. 대상이 만든 5xx는 평소 수준인데, 로드 밸런서가 만든 504가 크게 늘었어요. 앱 로그에는 이 오류가 남지 않아요.">
+<Figure caption="같은 10분 동안의 예시예요. 대상이 만든 5xx는 평소 수준인데, 로드 밸런서가 만든 504가 크게 늘었어요. 앱 로그에는 이 에러가 남지 않아요.">
   <StatTile label="대상이 만든 5xx" value="12" unit="건" />
   <StatTile label="LB가 만든 504" value="1,840" unit="건" tone="warn" />
   <StatTile label="LB가 만든 502" value="35" unit="건" />
 </Figure>
 
-- **대상이 만든 5xx가 늘었다면**: 앱 안의 오류예요. 앱 쪽 오류 분석으로 가요. <Term slug="apm/error-spike">에러가 늘었을 때 어디부터 볼까</Term>를 봐요.
+- **대상이 만든 5xx가 늘었다면**: 앱 안의 에러예요. 앱 쪽 에러 분석으로 가요. <Term slug="apm/error-spike">에러가 늘었을 때 어디부터 볼까</Term>를 봐요.
 - **로드 밸런서가 만든 5xx가 늘었다면**: 대상까지 가지 못했거나 대상이 제대로 답하지 못했어요. 아래 단계에서 코드별로 봐요.
 
 <Figure caption="로드 밸런서가 만든 5xx는 코드마다 볼 곳이 달라요. 502는 연결이 끊긴 이유를, 503은 받을 대상이 있는지를, 504는 어디서 시간이 넘었는지를 봐요.">
@@ -116,6 +116,18 @@ keep-alive 문제라면 대상(웹 서버, WAS)의 keep-alive 시간을 로드 �
 
 배포 중에 대상을 모두 빼고 새로 넣는 사이, 또는 대상 그룹을 잘못 바꿨을 때 흔해요.
 
+<Figure caption="배포 중의 예시예요. 옛 대상을 모두 뺀 뒤 새 대상이 정상으로 들어오기 전까지, 받을 대상이 없어 503이 나요.">
+  <Timeline
+    ariaLabel="옛 대상이 모두 빠진 뒤 새 대상이 아직 준비 중인 동안 정상 대상이 하나도 없어 응답이 503이고, 새 대상이 정상으로 들어오면 503이 멈추는 시간 띠"
+    end={100}
+    lanes={[
+      { label: '옛 대상', segments: [{ start: 0, end: 40, label: '정상' }] },
+      { label: '새 대상', segments: [{ start: 40, end: 65, label: '준비 중', tone: 'sub' }, { start: 65, end: 100, label: '정상', tone: 'accent' }] },
+      { label: '응답', segments: [{ start: 40, end: 65, label: '503', tone: 'warn' }] },
+    ]}
+  />
+</Figure>
+
 **확인 방법**: 대상 그룹의 등록 대상과 HealthyHostCount를 봐요. 모든 대상이 상태 확인에 실패한 경우는 4단계를 함께 봐요.
 
 ## 4. 504라면 어디서 시간이 넘었는지 보세요
@@ -127,8 +139,19 @@ keep-alive 문제라면 대상(웹 서버, WAS)의 keep-alive 시간을 로드 �
 
 두 번째라면 대상의 응답시간(TargetResponseTime)이 함께 늘었을 거예요. 앱이 느려진 이유는 <Term slug="apm/slow-response">응답이 느려졌을 때 어디부터 볼까</Term>의 순서로 찾아요. 네트워크 ACL이라면 대상에서 로드 밸런서로 돌아오는 임시 포트(1024~65535)가 열려 있는지 봐요.
 
+<Figure caption="504가 나는 두 자리를 견줬어요. 연결을 못 맺었는지, 맺은 뒤 답을 못 받았는지에 따라 볼 곳이 달라요.">
+  <Compare
+    columns={['연결을 못 맺음', '답이 늦음']}
+    rows={[
+      { label: '시간이 넘은 곳', values: ['연결 맺기(10초)', '답 기다리기(유휴 시간 제한)'] },
+      { label: '흔한 이유', values: ['대상이 바쁨, 보안 그룹·ACL', '앱 응답이 느려짐'] },
+      { label: '함께 볼 것', values: ['ACL의 임시 포트', 'TargetResponseTime'] },
+    ]}
+  />
+</Figure>
+
 <Checkpoints>
-  <Check>앱 로그에 5xx가 없다는 이유로 앱은 정상이라고 판단했다면, 로드 밸런서가 만든 5xx를 보세요. 대상까지 못 간 오류는 앱 로그에 남지 않아요.</Check>
+  <Check>앱 로그에 5xx가 없다는 이유로 앱은 정상이라고 판단했다면, 로드 밸런서가 만든 5xx를 보세요. 대상까지 못 간 에러는 앱 로그에 남지 않아요.</Check>
   <Check>502가 낮은 비율로 꾸준히 난다면, 대상의 keep-alive 시간이 로드 밸런서의 유휴 시간 제한보다 짧은지 보세요.</Check>
   <Check>배포할 때마다 503이 잠깐 튄다면, 새 대상이 정상으로 들어오기 전에 옛 대상이 빠지는지 보세요.</Check>
   <Check>504와 함께 대상 응답시간이 늘었다면, 로드 밸런서 설정보다 앱이 느려진 원인을 먼저 보세요.</Check>

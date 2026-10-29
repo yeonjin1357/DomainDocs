@@ -10,6 +10,8 @@ related: [apm/trace-waterfall, database/top-sql, apm/slow-response, apm/pool-exh
 sources:
   - title: Hibernate ORM 7.0 — An Introduction to Hibernate (N+1 selects, batch·join fetching)
     url: https://docs.hibernate.org/orm/7.0/introduction/html_single/Hibernate_Introduction.html
+  - title: Hibernate ORM 6.6 User Guide — Fetching (JPQL에서 EAGER 연관은 secondary select)
+    url: https://docs.hibernate.org/orm/6.6/userguide/html_single/Hibernate_User_Guide.html#fetching
   - title: Jakarta Persistence 3.2 — ManyToOne (fetch 기본값)
     url: https://jakarta.ee/specifications/persistence/3.2/apidocs/jakarta.persistence/jakarta/persistence/ManyToOne.html
   - title: Jakarta Persistence 3.2 — OneToMany (fetch 기본값)
@@ -20,7 +22,7 @@ sources:
     url: https://www.postgresql.org/docs/current/pgstatstatements.html
   - title: Sentry — N+1 Queries
     url: https://docs.sentry.io/product/issues/issue-details/performance-issues/n-one-queries/
-updated: 2026-10-28
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -35,11 +37,53 @@ updated: 2026-10-28
   <Item title="연관 객체 읽기">목록을 돌며 연관 객체를 읽는 코드를 찾아요.</Item>
 </FirstLook>
 
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 코드에 SQL이 안 보이면 지연 로딩을 찾고, 고칠 때는 조인을 먼저 쓰되 결과가 너무 커지면 묶어서 가져와요.">
+  <Flow
+    ariaLabel="1단계 트레이스의 반복 막대와 2단계 SQL 호출 수로 N+1을 확인하고, 3단계에서 부르는 코드를 찾되 코드에 SQL이 없으면 지연 로딩을 보며, 4단계에서 조인으로 고치되 결과가 너무 크면 묶어서 가져오고, 5단계에서 요청당 SQL 수로 지켜보는 흐름도"
+    nodes={[
+      { id: 's1', label: '반복 막대', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 's2', label: 'SQL 호출 수', col: 0, row: 1, note: '2단계' },
+      { id: 's3', label: '부르는 코드', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '지연 로딩', col: 2, row: 2, note: '반복문 속 읽기' },
+      { id: 's4', label: '조인', col: 0, row: 3, note: '4단계', tone: 'accent' },
+      { id: 'e4', label: '묶어서', col: 2, row: 3, note: 'IN·배치' },
+      { id: 's5', label: '요청당 SQL', col: 0, row: 4, note: '5단계' },
+    ]}
+    edges={[
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '코드에 SQL 없음' },
+      { from: 's3', to: 's4' },
+      { from: 's4', to: 'e4', label: '결과가 너무 큼' },
+      { from: 's4', to: 's5' },
+    ]}
+  />
+</Figure>
+
 ## 1. 트레이스에서 같은 막대를 세세요
 
 느린 요청의 <Term slug="apm/trace-waterfall">트레이스 워터폴</Term>을 열어요. N+1이라면 목록 SQL 하나 뒤에 같은 SQL 막대가 계단처럼 길게 이어져요.
 
 막대 하나는 짧아서 눈에 안 띄어요. 막대 수와 합계 시간을 봐요. 하나에 2ms여도 500번이면 1초예요.
+
+<Figure caption="N+1 트레이스의 예시예요. 주문 목록 SQL 하나 뒤에 같은 고객 조회 SQL이 계단처럼 이어져요. 막대 하나는 2ms로 짧지만, 주문 수만큼 줄이 길어져요.">
+  <Waterfall
+    ariaLabel="주문 목록 요청 32ms 아래 주문 목록 SQL 4ms가 먼저 돌고, 같은 고객 조회 SQL이 2ms씩 8번 계단처럼 이어지는 워터폴"
+    unit="ms"
+    spans={[
+      { label: 'GET /orders', start: 0, duration: 32 },
+      { label: '주문 목록 SQL', start: 1, duration: 4, depth: 1 },
+      { label: '고객 조회 SQL', start: 6, duration: 2, depth: 1, tone: 'warn' },
+      { label: '고객 조회 SQL', start: 9, duration: 2, depth: 1, tone: 'warn' },
+      { label: '고객 조회 SQL', start: 12, duration: 2, depth: 1, tone: 'warn' },
+      { label: '고객 조회 SQL', start: 15, duration: 2, depth: 1, tone: 'warn' },
+      { label: '고객 조회 SQL', start: 18, duration: 2, depth: 1, tone: 'warn' },
+      { label: '고객 조회 SQL', start: 21, duration: 2, depth: 1, tone: 'warn' },
+      { label: '고객 조회 SQL', start: 24, duration: 2, depth: 1, tone: 'warn' },
+      { label: '고객 조회 SQL', start: 27, duration: 2, depth: 1, tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: 트레이스에서 같은 SQL의 구간 수를 세어요. 구간 수에 상한을 두는 도구도 있어서 뒷부분이 잘려 보일 수 있어요. 예를 들어 Elastic APM 자바 에이전트는 트랜잭션 하나에 구간을 기본 500개까지만 남겨요.
 
@@ -55,6 +99,21 @@ N+1은 손으로 짠 코드에서도 생기지만, ORM에서 특히 잘 숨어�
 
 흔한 모양은 이래요. 주문 목록을 가져온 뒤 목록을 돌며 `order.getCustomer().getName()`을 읽어요. 고객 정보가 아직 안 불려 있으면, 읽는 순간마다 SQL이 하나씩 나가요.
 
+<Figure caption="목록을 돌며 고객 이름을 읽는 순서예요. 코드에는 SQL이 없지만, 고객 정보가 안 불려 있으면 읽을 때마다 ORM이 SQL을 하나씩 보내요.">
+  <Sequence
+    ariaLabel="반복문이 ORM에 주문 목록을 달라고 하면 목록 SQL이 한 번 나가고, 주문 1과 주문 2의 고객을 읽을 때마다 ORM이 DB에 고객 SQL을 하나씩 더 보내는 순서"
+    participants={['반복문', 'ORM', 'DB']}
+    messages={[
+      { from: '반복문', to: 'ORM', label: '주문 목록' },
+      { from: 'ORM', to: 'DB', label: '목록 SQL 1번' },
+      { from: '반복문', to: 'ORM', label: '주문 1 고객 읽기' },
+      { from: 'ORM', to: 'DB', label: '고객 SQL', tone: 'warn' },
+      { from: '반복문', to: 'ORM', label: '주문 2 고객 읽기' },
+      { from: 'ORM', to: 'DB', label: '고객 SQL', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 이렇게 필요할 때 가져오는 방식을 <Term term="apm/lazy-loading">지연 로딩</Term>(LAZY)이라고 해요. JPA 3.2의 기본값은 연관 종류마다 달라요.
 
 | 연관 | 기본 로딩 |
@@ -63,6 +122,10 @@ N+1은 손으로 짠 코드에서도 생기지만, ORM에서 특히 잘 숨어�
 | `@OneToMany`, `@ManyToMany` | 필요할 때 가져와요(LAZY) |
 
 그래서 코드에 SQL이 안 보여도, 목록을 도는 반복문 안에서 연관 객체를 읽는 곳이 범인이에요. 화면 템플릿이 목록을 그리며 연관 객체를 읽어도 같아요.
+
+`getCustomer()` 예시는 고객 연관을 LAZY로 바꿔 둔 경우예요. `@ManyToOne`을 기본값 EAGER로 두어도 N+1은 생겨요. Hibernate 문서는 JPQL 질의가 EAGER 연관을 함께 가져오지 않으면, 연관마다 SQL을 따로 보낸다고 해요.
+
+이때는 반복문이 아니라 목록을 가져오는 순간 SQL이 몰려요. 그래서 Hibernate 문서는 연관을 LAZY로 두고, 필요한 질의에서만 함께 가져오라고 권해요.
 
 ## 4. 한 번에 가져오게 고치세요
 

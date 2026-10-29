@@ -80,7 +80,7 @@ terms:
   - id: isr
     name: ISR
     en: In-sync replicas
-    aliases: [ISR, in-sync replicas, 동기화된 복제본, UnderReplicatedPartitions, min.insync.replicas]
+    aliases: [ISR, in-sync replicas, 따라잡은 복제본, 동기화된 복제본, UnderReplicatedPartitions, min.insync.replicas]
     short: 리더를 잘 따라잡고 있는 복제본 묶음이에요. 이 묶음 모두가 받아야 이벤트가 커밋돼요.
     doc: messaging/replication
   - id: retention

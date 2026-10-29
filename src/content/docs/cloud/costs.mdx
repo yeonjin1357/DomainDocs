@@ -27,7 +27,7 @@ sources:
     url: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html
   - title: AWS — Activating user-defined cost allocation tags
     url: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/activating-tags.html
-updated: 2026-10-23
+updated: 2026-10-29
 ---
 
 <KeyPoints>
@@ -35,7 +35,7 @@ updated: 2026-10-23
     서버는 켜 둔 시간만큼, 디스크는 잡아 둔 양만큼, 네트워크는 옮긴 데이터만큼 요금이 붙어요.
   </Point>
   <Point title="나가는 데이터에 요금이 붙어요">
-    인터넷에서 들어오는 데이터는 무료예요. 인터넷으로 나가거나 AZ와 리전 사이를 오가는 데이터에는 GB마다 요금이 붙어요.
+    인터넷에서 들어오는 데이터는 무료예요. 인터넷으로 나가거나 가용 영역(AZ)과 리전 사이를 오가는 데이터에는 GB마다 요금이 붙어요.
   </Point>
   <Point title="모니터링도 요금이 들어요">
     지표 수, 로그 양, 지표를 읽는 API 호출 수가 모두 요금이에요. 자주, 잘게 모을수록 비싸져요.
@@ -81,9 +81,9 @@ updated: 2026-10-23
 
 <Term term="cloud/data-transfer-cost">데이터 전송 요금</Term>은 방향과 목적지로 정해져요. 인터넷에서 들어오는 데이터는 모든 리전에서 무료예요. 인터넷으로 나가는 데이터는 리전마다 값이 다르고, us-east-1에서는 첫 10TB까지 GB당 0.09달러예요.
 
-같은 리전 안이라도 AZ를 건너면 요금이 붙어요. us-east-1에서 EC2, RDS 같은 서비스가 AZ 사이로 주고받는 데이터는 방향마다 GB당 0.01달러예요. 앱 서버와 DB가 다른 AZ에 있으면, 질의와 결과가 오갈 때마다 쌓여요.
+같은 리전 안이라도 <Term term="cloud/availability-zone">가용 영역</Term>(AZ)을 건너면 요금이 붙어요. us-east-1에서 EC2, RDS 같은 서비스가 AZ 사이로 주고받는 데이터는 방향마다 GB당 0.01달러예요. 앱 서버와 DB가 다른 AZ에 있으면, 질의와 결과가 오갈 때마다 쌓여요.
 
-NAT 게이트웨이(사설 서브넷의 서버가 인터넷에 나가는 출구)는 켜 둔 시간과 처리한 GB마다 요금을 받아요. 사설 서브넷의 서버가 내려받는 큰 파일도 이 출구를 지나면 GB마다 요금이 붙어요.
+NAT 게이트웨이(비공개 서브넷의 서버가 인터넷에 나가는 출구)는 켜 둔 시간과 처리한 GB마다 요금을 받아요. 비공개 서브넷의 서버가 내려받는 큰 파일도 이 출구를 지나면 GB마다 요금이 붙어요.
 
 ## 요금은 하루쯤 늦게 보여요
 

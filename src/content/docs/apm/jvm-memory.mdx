@@ -70,9 +70,9 @@ GC는 치우는 동안 앱 스레드를 잠깐 멈추는 구간(stop-the-world)�
 
 ## 힙이 모자라면
 
-GC가 치워도 새 객체를 담을 자리가 없으면 `OutOfMemoryError: Java heap space`가 나요. 자바 문서는 이 오류가 꼭 메모리 누수를 뜻하지는 않는다고 해요. 앱에 비해 힙 크기를 작게 잡은 설정 문제일 수도 있어요.
+GC가 치워도 새 객체를 담을 자리가 없으면 `OutOfMemoryError: Java heap space`가 나요. 자바 문서는 이 에러가 꼭 메모리 누수를 뜻하지는 않는다고 해요. 앱에 비해 힙 크기를 작게 잡은 설정 문제일 수도 있어요.
 
-메타스페이스가 바닥나면 `OutOfMemoryError: Metaspace`가 나요. 오류 뒤의 이름을 보면 어느 메모리가 모자랐는지 알 수 있어요.
+메타스페이스가 바닥나면 `OutOfMemoryError: Metaspace`가 나요. 에러 뒤의 이름을 보면 어느 메모리가 모자랐는지 알 수 있어요.
 
 ## 모니터링에서는
 

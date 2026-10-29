@@ -14,7 +14,7 @@ sources:
     url: https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
   - title: Grafana Tempo — Service graphs (metrics)
     url: https://grafana.com/docs/tempo/latest/metrics-from-traces/service_graphs/
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -28,6 +28,27 @@ updated: 2026-10-14
   <Item title="요청이 불어났는지">뒷단이 받는 요청이 앞단이 받는 것보다 더 늘었는지 봐요.</Item>
   <Item title="기다리는 자원이 바닥났는지">스레드 풀과 커넥션 풀이 상한에 붙었는지 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 부른 쪽 시간만 늘었다면 둘 사이를 보고, 뒷단 요청만 늘었다면 늘어난 몫은 재시도예요. 끝에는 부하를 크게 줄여 번짐을 멈춰요.">
+  <Flow
+    ariaLabel="1단계에서 출발점을 찾되 부른 쪽 시간만 늘었다면 둘 사이를 보고, 2단계에서 뒷단 요청만 늘었다면 늘어난 몫을 재시도로 보며, 3단계에서 기다리는 자원이 바닥났는지 본 뒤, 4단계에서 부하를 크게 줄이는 흐름도"
+    nodes={[
+      { id: 's1', label: '출발점 찾기', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '둘 사이', col: 2, row: 0, note: '받은 쪽 밖' },
+      { id: 's2', label: '재시도', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '재시도 몫', col: 2, row: 1, note: '늘어난 요청' },
+      { id: 's3', label: '자원 고갈', col: 0, row: 2, note: '3단계' },
+      { id: 's4', label: '부하 줄이기', col: 0, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '부른 쪽만 늘어남' },
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 'e2', label: '뒷단만 늘어남' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 's4' },
+    ]}
+  />
+</Figure>
 
 ## 1. 처음 나빠진 곳을 찾으세요
 
@@ -67,6 +88,20 @@ sum by (client, server) (
 
 SRE Book은 스레드가 모자라면 헬스 체크까지 실패할 수 있다고 해요. 그러면 서버가 빠지고, 그 몫이 남은 서버로 몰려 더 무너져요.
 
+<Figure caption="스레드 8개짜리 앞단의 예시예요. 결제 API가 느려지면 스레드가 모두 결제 응답을 기다려서, 결제를 부르지 않는 요청도 쓸 스레드가 없어요.">
+  <Strip
+    ariaLabel="평소에는 스레드 8개 중 3개가 일하고 5개가 비어 있지만, 결제 API가 느려지면 8개 모두 결제 응답을 기다려 빈 스레드가 0개가 되는 칸 띠"
+    rows={[
+      { label: '평소', cells: ['일함', '일함', '일함', { label: '빔', tone: 'sub' }, { label: '빔', tone: 'sub' }, { label: '빔', tone: 'sub' }, { label: '빔', tone: 'sub' }, { label: '빔', tone: 'sub' }] },
+      { label: '결제 API가 느릴 때', cells: [{ label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }] },
+    ]}
+    ranges={[
+      { row: 0, from: 3, to: 7, label: '빈 스레드 5개' },
+      { row: 1, from: 0, to: 7, label: '모두 결제 응답 대기 · 빈 스레드 0개', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 **확인 방법**: <Term slug="apm/throughput-and-concurrency">활성 트랜잭션</Term>이 스레드 상한에 붙어 평평한지, <Term slug="apm/connection-pool">커넥션 풀</Term>의 대기 스레드가 늘었는지 봐요.
 
 ## 4. 부하를 크게 줄여 번짐을 멈추세요
@@ -74,6 +109,17 @@ SRE Book은 스레드가 모자라면 헬스 체크까지 실패할 수 있다�
 과부하에서 벗어나려면 부하를 조금이 아니라 크게 줄여야 해요. SRE Book의 예에서는 초당 10,000건에서 멀쩡하던 서비스가 11,000건에서 무너졌어요. 이때 9,000건으로 줄여도 살아나지 않아요.
 
 무너지는 동안 건강한 서버가 10%만 남았다면, 받아 낼 수 있는 양도 그만큼 줄어서예요. 그 예에서는 초당 1,000건 정도로 줄여야 안정돼요.
+
+<Figure caption="SRE Book의 예를 견줬어요. 건강한 서버가 10%만 남으면 받아 낼 수 있는 양도 그만큼 줄어서, 9,000건으로는 모자라요.">
+  <Compare
+    columns={['멀쩡할 때', '무너지는 동안']}
+    rows={[
+      { label: '건강한 서버', values: ['모두', '10%만'] },
+      { label: '받아 낼 수 있는 양', values: ['초당 10,000건에서 멀쩡', '초당 1,000건 정도'] },
+      { label: '초당 9,000건으로 줄이면', values: ['버텨요', '살아나지 않아요'] },
+    ]}
+  />
+</Figure>
 
 부하를 줄이는 방법은 여럿이에요. 재시도를 끄거나 줄이고, 일부 요청을 일찍 거절하고(예: 503 응답), 기능을 덜어 가볍게 응답하고, 급하지 않은 배치 작업을 멈춰요.
 

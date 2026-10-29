@@ -21,7 +21,7 @@ sources:
     url: https://tomcat.apache.org/tomcat-10.1-doc/config/http.html
   - title: RFC 9110 — HTTP Semantics (502, 504)
     url: https://www.rfc-editor.org/rfc/rfc9110.html
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <KeyPoints>
@@ -103,7 +103,7 @@ APM 에이전트는 보통 WAS 안에서 요청이 들어오고 나가는 지점
 
   ### Tomcat의 연결 한도
 
-  Tomcat은 처리 중인 연결이 `maxConnections`(기본 8192)에 닿으면 하나만 더 받아요. 그 뒤 연결은 운영체제의 대기열(`acceptCount`, 기본 100)에 맡겨요. `maxThreads`(기본 200)는 동시에 요청을 처리하는 스레드 수예요.
+  Tomcat은 스레드(`maxThreads`, 기본 200)가 다 차면 연결(`maxConnections`, 기본 8,192)을 받아 둬요. 연결도 다 차면 운영체제 대기열(`acceptCount`, 기본 100)에 쌓여요. 차례로 차는 모습은 <Term slug="apm/thread-pools">스레드 풀과 요청 처리</Term>에 그림으로 있어요.
 
   ### 서버 묶음
 

@@ -26,7 +26,7 @@ sources:
     url: https://github.com/grafana/grafana-plugin-sdk-go/blob/5b3ec26fea665b17c2bd467fb425c69517bca601/backend/gtime/gtime.go#L226-L281
   - title: Grafana 소스 — calculateRateInterval
     url: https://github.com/grafana/grafana-prometheus-datasource/blob/cb5651b00a6b7769b10067f1a6baec07278f4c52/pkg/promlib/models/query.go#L421-L469
-updated: 2026-10-13
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -41,11 +41,56 @@ updated: 2026-10-13
   <Item title="합치는 순서">서버별 p99를 평균 냈는지, 요청을 모두 모아 p99를 다시 구했는지 봐요.</Item>
 </FirstLook>
 
+<Figure caption="왼쪽 줄을 위에서 아래로 맞춰 가요. 단계마다 두 화면이 다르면 오른쪽을 맞춰 보고, 셋 다 같은데도 숫자가 다르면 4단계로 가요.">
+  <Flow
+    ariaLabel="1단계 한 점이 맡는 시간이 다르면 기간과 step을 맞추고, 2단계 계산식이 다르면 함수와 rate 구간을 비교해요. 3단계에서 서버별 p99를 평균 냈다면 요청을 모아 다시 계산하고, 셋 다 같은데도 다르면 4단계 데이터로 가는 흐름도"
+    nodes={[
+      { id: 's1', label: '한 점의 시간', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '기간·step', col: 2, row: 0, note: '같게 맞춤' },
+      { id: 's2', label: '계산식', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: 'rate 구간', col: 2, row: 1, note: '함수도 비교' },
+      { id: 's3', label: '합치는 순서', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '다시 계산', col: 2, row: 2, note: '요청을 모아' },
+      { id: 's4', label: '데이터', col: 0, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '기간이 다름' },
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 'e2', label: '식이 다름' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: 'p99를 평균' },
+      { from: 's3', to: 's4', label: '셋 다 같음' },
+    ]}
+  />
+</Figure>
+
 ## 1. 한 점이 맡는 시간을 맞춰 보세요
 
 위젯은 7일, 상세 화면은 1시간을 그린다면 여기부터 봐요. 긴 기간은 점 수를 줄여 그리는데, 이를 <Term slug="foundations/aggregation-and-downsampling">다운샘플링</Term>이라고 해요. 폭 1,000픽셀 Grafana 패널이라면 7일은 10분마다, 1시간은 보통 수집 주기(예: 10초)마다 점을 찍어요.
 
 점 수를 줄이는 방법에 따라 짧은 피크가 빠지거나 묻혀요. Prometheus에서 `[5m]` 같은 구간 없이 쓴 질의는 점마다 가장 최근 값 하나만 골라, 피크가 점에 걸릴 때만 보여요. 평균으로 묶는 질의나 저장소에서는 피크가 낮아져요.
+
+<Figure caption="10초마다 모은 값 12개를 점 3개로 줄인 예시예요. 가장 최근 값만 고르면 세 점이 모두 10이라 피크 90이 사라져요. 평균으로 묶으면 피크가 든 구간이 30으로 낮아져요.">
+  <Strip
+    ariaLabel="10초마다 모은 값 12개 중 여섯째 값만 90이고 나머지는 10일 때, 4칸마다 마지막 값을 고른 점 세 개는 모두 10이고, 4칸씩 평균 내면 10, 30, 10이 되는 칸 띠"
+    rows={[
+      {
+        label: '10초마다 모은 값',
+        cells: ['10', '10', '10', { label: '10', tone: 'accent' }, '10', { label: '90', tone: 'warn' }, '10', { label: '10', tone: 'accent' }, '10', '10', '10', { label: '10', tone: 'accent' }],
+      },
+    ]}
+    marks={[
+      { at: 3, label: '점' },
+      { at: 7, label: '점' },
+      { at: 11, label: '점' },
+    ]}
+    ranges={[
+      { from: 0, to: 3, label: '평균 10' },
+      { from: 4, to: 7, label: '평균 30', tone: 'warn' },
+      { from: 8, to: 11, label: '평균 10' },
+    ]}
+  />
+</Figure>
 
 확인은 두 화면의 시간 범위를 같게 맞추는 데서 시작해요. Grafana 패널은 Relative time이나 Time shift로 대시보드와 다른 기간을 볼 수 있어요. 한쪽 패널에만 이 설정이 있는지 봐요.
 
@@ -56,6 +101,17 @@ updated: 2026-10-13
 화면의 이름이 같아도 계산식은 다를 수 있어요. 같은 "응답시간"이라도 평균은 느린 요청을 숨기고, p99는 드러내요. 질의가 `histogram_quantile(0.99, …)`인지, `_sum`의 <Term slug="foundations/counters-and-rate">rate</Term>를 `_count`의 rate로 나눈 평균인지 봐요.
 
 rate 구간이 길면 짧은 피크가 낮아지고, rate로 구한 p99에서도 잠깐 느려진 순간이 실제보다 낮게 나와요. 요청이 초당 100건이다가 1분 동안만 400건이 됐다면, 1분 rate는 가장 높을 때 초당 400건이에요. 5분 rate는 평소 4분이 섞여, 가장 높을 때도 초당 160건이에요.
+
+<Figure caption="위 예를 1분마다 찍은 그래프예요. 1분 rate는 400까지 솟지만, 5분 rate는 평소 4분이 섞여 160에 머물러요.">
+  <MiniLineChart
+    ariaLabel="1분마다 찍은 점 12개에서, 1분 rate는 초당 100건이다가 한 점만 400건으로 솟고, 5분 rate는 같은 시각부터 5분 동안 160건에 머문 뒤 100건으로 돌아오는 그래프"
+    yMax={500}
+    series={[
+      { label: '1분 rate', values: [100, 100, 100, 100, 100, 400, 100, 100, 100, 100, 100, 100], tone: 'warn', value: '최고 초당 400건' },
+      { label: '5분 rate', values: [100, 100, 100, 100, 100, 160, 160, 160, 160, 160, 100, 100], tone: 'accent', value: '최고 초당 160건' },
+    ]}
+  />
+</Figure>
 
 Grafana의 `$__rate_interval`을 쓰면 질의가 같아도 기간이 길수록 rate 구간이 길어져요. 폭 1,000픽셀, 수집 주기 설정(Scrape interval) 10초라면 1시간은 40초, 7일은 10분 10초 동안 p99를 구해요. Min step이나 Min interval을 정했다면 값이 달라질 수 있으니, 두 질의의 rate 구간을 비교해요.
 

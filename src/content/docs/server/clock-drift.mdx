@@ -14,7 +14,7 @@ sources:
     url: https://chrony-project.org/doc/4.6/chronyc.html
   - title: RFC 5905 — Network Time Protocol Version 4
     url: https://www.rfc-editor.org/rfc/rfc5905
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -39,6 +39,29 @@ updated: 2026-10-21
     ]}
     marks={[{ at: 5.05, label: '실제로 받은 때', tone: 'accent' }]}
     ticks={[{ at: 0, label: '10:00:00' }, { at: 2, label: ':02' }, { at: 4, label: ':04' }, { at: 6, label: ':06' }]}
+  />
+</Figure>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 먼저 봐요. 정확히 몇 시간씩 어긋난다면 시계가 아니라 시간대예요.">
+  <Flow
+    ariaLabel="1단계 시간 동기화가 꺼져 있으면 동기화를 켜고, 켜져 있으면 2단계 오프셋으로 가요. 오프셋이 안 맞으면 닿는 시간 서버를 보고, 3단계에서 몇 시간 단위로 어긋나면 시간대 설정을 보며, 4단계에서 크게 어긋난 시계를 조심해서 맞추는 흐름도"
+    nodes={[
+      { id: 's1', label: '시간 동기화', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '동기화 켜기', col: 2, row: 0, note: '바로 켜요' },
+      { id: 's2', label: '오프셋', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '시간 서버', col: 2, row: 1, note: '닿는지 봐요' },
+      { id: 's3', label: '어긋난 단위', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '시간대 설정', col: 2, row: 2, note: 'Time zone' },
+      { id: 's4', label: '조심해서 맞춤', col: 0, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '꺼짐' },
+      { from: 's1', to: 's2', label: '켜짐' },
+      { from: 's2', to: 'e2', label: '안 맞음' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '몇 시간 단위' },
+      { from: 's3', to: 's4' },
+    ]}
   />
 </Figure>
 
@@ -71,6 +94,16 @@ updated: 2026-10-21
 시간 동기화 프로그램은 보통 시계를 조금씩 빠르게 또는 느리게 돌려 서서히 맞춰요. 한 번에 훌쩍 건너뛰면 시간을 기준으로 동작하는 프로그램이 크게 흔들릴 수 있기 때문이에요.
 
 chrony에는 시계를 한 번에 맞추는 `makestep`이 있지만, 문서는 일부 소프트웨어가 이런 건너뜀에 심각한 영향을 받는다고 경고해요. 운영 중인 서버라면 영향을 받을 프로그램을 먼저 살펴요.
+
+<Figure caption="DB 서버 시계가 2.9초 늦은 상태에서 맞추는 예시예요. 보통은 늦은 정도가 조금씩 줄어요. makestep은 한 번에 0으로 건너뛰어요.">
+  <MiniLineChart
+    ariaLabel="2.9초 늦은 시계를 조금씩 맞추면 늦은 정도가 서서히 0까지 줄고, makestep으로 맞추면 한 번에 0으로 떨어지는 그래프"
+    series={[
+      { label: '조금씩 맞출 때', values: [2.9, 2.6, 2.3, 2.0, 1.7, 1.4, 1.2, 0.9, 0.6, 0.3, 0], tone: 'accent', value: '서서히' },
+      { label: 'makestep', values: [2.9, 2.9, 2.9, 0, 0, 0, 0, 0, 0, 0, 0], tone: 'warn', value: '한 번에' },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>트레이스에서 자식 구간이 부모보다 먼저 시작한다면, 두 서비스가 도는 서버의 시계 차이를 의심하세요. 구간 시각은 각 서버의 시계로 찍혀요.</Check>

@@ -5,7 +5,7 @@ questions:
     choices:
       - KEYS가 끝날 때까지 기다려요
       - 다른 스레드에서 바로 처리돼요
-      - 오류로 거절돼요
+      - 에러로 거절돼요
       - Redis가 KEYS를 SCAN으로 바꿔 실행해요
     answer: 0
     explain: 명령을 실행하는 스레드가 하나라서, 오래 걸리는 명령이 끝나야 다음 명령이 실행돼요.
@@ -13,7 +13,7 @@ questions:
     type: ox
     prompt: maxmemory에 닿으면 Redis는 기본으로 오래된 키를 지워 자리를 만드나요?
     answer: false
-    explain: 기본 정책 noeviction은 키를 지우지 않고 새 데이터를 넣는 명령을 OOM 오류로 거절해요. 읽기는 그대로 돼요.
+    explain: 기본 정책 noeviction은 키를 지우지 않고 새 데이터를 넣는 명령을 OOM 에러로 거절해요. 읽기는 그대로 돼요.
   - id: engine-cpu
     type: choice
     prompt: 4 vCPU ElastiCache 노드의 CPUUtilization이 25%인데 응답이 느려요. 먼저 볼 지표는?

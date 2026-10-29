@@ -3,7 +3,7 @@ questions:
     type: ox
     prompt: 자바 앱 파드가 OOMKilled로 끝났다면, 앱 로그에서 OutOfMemoryError를 찾을 수 있나요?
     answer: false
-    explain: OOMKilled는 프로세스가 컨테이너 한도를 넘어 커널이 죽인 거예요. JVM이 오류를 남길 틈이 없어서 앱 로그에는 흔적이 없어요.
+    explain: OOMKilled는 프로세스가 컨테이너 한도를 넘어 커널이 죽인 거예요. JVM이 에러를 남길 틈이 없어서 앱 로그에는 흔적이 없어요.
   - id: floor-rising
     type: choice
     prompt: 힙 사용량 그래프에서 누수를 의심할 모양은?

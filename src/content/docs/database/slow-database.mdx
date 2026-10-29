@@ -18,7 +18,7 @@ sources:
     url: https://www.postgresql.org/docs/current/functions-admin.html
   - title: PostgreSQL — Explicit Locking
     url: https://www.postgresql.org/docs/current/explicit-locking.html
-updated: 2026-10-15
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -32,6 +32,29 @@ updated: 2026-10-15
   <Item title="어느 SQL이 늘었는지">그 시각에 실행 시간 합이 늘어난 SQL을 봐요.</Item>
   <Item title="누가 잠금을 쥐고 있는지">Lock 대기라면 막고 있는 세션을 찾아요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. SQL 실행 시간이 그대로라면 DB 밖을, Lock 대기가 늘었다면 4단계를 먼저 봐요. 3단계에서는 호출 수와 평균 시간 중 무엇이 늘었는지로 다시 갈라요.">
+  <Flow
+    ariaLabel="1단계에서 DB가 잰 실행 시간이 그대로면 앱 커넥션 풀 같은 DB 밖으로, 늘었다면 2단계 대기 종류로 가요. Lock이면 4단계 막는 세션을, IO나 CPU면 3단계 늘어난 SQL을 보고, 호출 수가 늘었다면 앱 쪽 변화를, 평균 시간이 늘었다면 실행 계획을 보는 흐름도"
+    nodes={[
+      { id: 's1', label: 'DB 안인지', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'out', label: 'DB 밖', col: 2, row: 0, note: '앱 커넥션 풀' },
+      { id: 's2', label: '대기 종류', col: 0, row: 1, note: '2단계' },
+      { id: 's4', label: '막는 세션', col: 2, row: 1, note: '4단계' },
+      { id: 's3', label: '늘어난 SQL', col: 0, row: 2, note: '3단계' },
+      { id: 'app', label: '앱 쪽 변화', col: 2, row: 2, note: '배포·캐시' },
+      { id: 'plan', label: '실행 계획', col: 0, row: 3, note: 'EXPLAIN', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'out', label: '실행 그대로' },
+      { from: 's1', to: 's2', label: '실행도 늘음' },
+      { from: 's2', to: 's4', label: 'Lock' },
+      { from: 's2', to: 's3', label: 'IO·CPU' },
+      { from: 's3', to: 'app', label: '호출 늘음' },
+      { from: 's3', to: 'plan', label: '평균 늘음' },
+    ]}
+  />
+</Figure>
 
 ## 1. 정말 DB 안에서 느린지 보세요
 
@@ -96,6 +119,17 @@ GROUP BY 1;
 호출 수가 늘었다면 앱 쪽 변화부터 봐요. 배포로 같은 SQL을 더 자주 부르거나, 캐시가 만료돼 DB로 몰렸을 수 있어요. 평균 시간이 늘었다면 그 SQL을 <Term slug="database/execution-plans">EXPLAIN ANALYZE</Term>로 열어 예상과 실제 행 수를 견줘요.
 
 **확인 방법**: `pg_stat_statements`의 값은 누적값이에요. 장애 직전과 지금 두 번 떠서, SQL마다 `calls`와 `total_exec_time`의 차이를 구해요.
+
+<Figure caption="숫자는 설명용 예시예요. 누적값만 보면 평소에 오래 쌓인 SQL A가 위에 있어요. 두 시점의 차이로 보면 장애 구간에 늘어난 건 SQL B예요.">
+  <Compare
+    columns={['SQL A', 'SQL B']}
+    rows={[
+      { label: '장애 직전 누적', values: ['895초', '100초'] },
+      { label: '지금 누적', values: ['900초', '160초'] },
+      { label: '두 시점의 차이', values: ['+5초', '+60초'] },
+    ]}
+  />
+</Figure>
 
 ## 4. Lock 대기라면 막고 있는 세션을 찾으세요
 

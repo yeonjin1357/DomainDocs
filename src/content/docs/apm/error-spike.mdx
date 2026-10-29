@@ -16,7 +16,7 @@ sources:
     url: https://opentelemetry.io/docs/specs/semconv/http/http-spans/
   - title: OpenTelemetry — Recording errors (span status description)
     url: https://opentelemetry.io/docs/specs/semconv/general/recording-errors/
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -31,11 +31,46 @@ updated: 2026-10-14
   <Item title="한 곳에서만 나는지">엔드포인트와 서버별로 나눠 봐요.</Item>
 </FirstLook>
 
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 먼저 봐요. 에러율이 그대로면 요청이 왜 늘었는지가 먼저예요.">
+  <Flow
+    ariaLabel="1단계 에러율이 그대로면 요청 증가 원인으로, 올랐다면 2단계 에러 종류로 가요. 새 종류면 최근 변경을, 아니면 3단계 나는 곳으로 가요. 한 곳에 몰렸다면 그 서버나 기능을 보고, 4단계 에러 트레이스에서 처음 실패한 span을 찾는 흐름도"
+    nodes={[
+      { id: 's1', label: '에러율', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '요청 증가', col: 2, row: 0, note: '왜 늘었나' },
+      { id: 's2', label: '에러 종류', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '최근 변경', col: 2, row: 1, note: '배포·설정' },
+      { id: 's3', label: '나는 곳', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '그 서버·기능', col: 2, row: 2, note: '버전·코드' },
+      { id: 's4', label: '에러 트레이스', col: 0, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '그대로' },
+      { from: 's1', to: 's2', label: '올랐음' },
+      { from: 's2', to: 'e2', label: '새 종류' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '몰림' },
+      { from: 's3', to: 's4' },
+    ]}
+  />
+</Figure>
+
 ## 1. 에러 수보다 에러율을 보세요
 
 에러 수는 요청이 늘면 함께 늘어요. 요청이 분당 6,000건에서 60,000건으로 늘었다면, 에러가 30건에서 300건이 돼도 <Term slug="apm/errors-and-exceptions">에러율</Term>은 0.5% 그대로예요. 이때는 요청이 왜 늘었는지와, 늘어난 요청을 감당하는지를 봐요.
 
 요청은 그대로인데 에러만 늘었다면 에러율도 0.5%에서 5%로 올라요. 이때 아래 단계로 원인을 좁혀요.
+
+<Figure caption="같은 에러 300건이라도 요청 수에 따라 뜻이 달라요. 왼쪽은 요청이 함께 늘어 에러율이 그대로이고, 오른쪽은 에러율이 10배로 올랐어요.">
+  <Compare
+    columns={['요청도 늘었을 때', '에러만 늘었을 때']}
+    rows={[
+      { label: '요청(분당)', values: ['6,000 → 60,000건', '6,000건 그대로'] },
+      { label: '에러(분당)', values: ['30 → 300건', '30 → 300건'] },
+      { label: '에러율', values: ['0.5% 그대로', '0.5% → 5%'] },
+      { label: '다음에 볼 것', values: ['요청이 왜 늘었나', '2단계 에러 종류'] },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: 아래 질의로 에러율을 그려요.
 
@@ -85,6 +120,18 @@ sum by (http_route, instance) (
 ## 4. 에러 트레이스에서 처음 실패한 곳을 찾으세요
 
 좁힌 엔드포인트의 에러 트레이스를 열어, <Term slug="apm/trace-waterfall">워터폴</Term>에서 에러 표시가 된 span을 찾아요. 부모 span의 에러가 자식 span의 실패에서 왔다면 출발점은 자식이에요. 결제 API 호출 span이 실패해서 우리 서비스도 500을 냈다면, 결제 API부터 봐요.
+
+<Figure caption="에러 트레이스의 예시예요. 맨 위 요청 span도 에러지만, 그 아래 결제 API 호출 span이 먼저 실패했어요. 출발점은 처음 실패한 자식 span이에요.">
+  <Waterfall
+    ariaLabel="주문 요청 span 220ms가 에러로 표시되고, 그 아래 재고 확인 30ms는 성공, 결제 API 호출 160ms가 에러로 표시되어 결제 API 호출이 처음 실패한 곳인 워터폴"
+    unit="ms"
+    spans={[
+      { label: '주문 요청 · 500', start: 0, duration: 220, tone: 'warn' },
+      { label: '재고 확인', start: 10, duration: 30, depth: 1 },
+      { label: '결제 API 호출 · 실패', start: 50, duration: 160, depth: 1, tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 예외로 실패한 span에는 예외 메시지가 상태 설명(status description)으로 담겨요. 더 자세한 이유는 그 트레이스의 trace id로 <Term slug="foundations/logs-metrics-traces">로그</Term>를 찾아 봐요.
 

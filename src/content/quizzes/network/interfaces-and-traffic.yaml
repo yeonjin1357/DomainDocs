@@ -33,7 +33,7 @@ questions:
       - 카운터가 한 바퀴 돈 것
       - DNS 이름 찾기 실패
     answer: 0
-    explain: ifInErrors는 패킷에 오류가 있어 받지 못한 수예요. 오류 없이 버린 패킷은 ifInDiscards로 따로 세요.
+    explain: ifInErrors는 패킷에 에러가 있어 받지 못한 수예요. 에러 없이 버린 패킷은 ifInDiscards로 따로 세요.
   - id: utilization-per-direction
     type: ox
     prompt: 받은 양과 보낸 양을 더한 뒤 인터페이스 속도 하나로 나누면 맞는 사용률인가요?

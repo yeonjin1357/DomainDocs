@@ -20,7 +20,7 @@ sources:
     url: https://github.com/prometheus/prometheus/blob/v3.15.0/promql/quantile.go
   - title: Prometheus 소스 — promql/engine.go (le 레이블이 없을 때 경고)
     url: https://github.com/prometheus/prometheus/blob/v3.15.0/promql/engine.go
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -35,11 +35,47 @@ updated: 2026-10-14
   <Item title="그때 요청 수">p99가 튄 시각에 요청이 몇 건이었는지 봐요.</Item>
 </FirstLook>
 
+<Figure caption="그래프 모양이 첫 단계를 정해요. 2.5초에 붙었다면 1단계, 비었다면 2단계, 새벽에 튄다면 3단계예요. 경계를 더하는 배포 중이라면 1단계에서 4단계로 가요.">
+  <Flow
+    ariaLabel="p99가 이상할 때 2.5초에 붙었다면 1단계 버킷 경계로, 그래프가 비었다면 2단계 질의 순서로, 새벽에 튄다면 3단계 요청 수로 가요. 1단계에서 경계를 더하는 배포 중이라면 4단계 서버별 버킷으로 가는 흐름도"
+    nodes={[
+      { id: 'p', label: 'p99가 이상함', col: 1, row: 0, note: '그래프 모양', tone: 'warn' },
+      { id: 'stuck', label: '2.5초에 붙음', col: 0, row: 1 },
+      { id: 'empty', label: '그래프가 빔', col: 1, row: 1 },
+      { id: 'dawn', label: '새벽에 튐', col: 2, row: 1 },
+      { id: 's1', label: '버킷 경계', col: 0, row: 2, note: '1단계', tone: 'accent' },
+      { id: 's2', label: '질의 순서', col: 1, row: 2, note: '2단계', tone: 'accent' },
+      { id: 's3', label: '요청 수', col: 2, row: 2, note: '3단계', tone: 'accent' },
+      { id: 's4', label: '서버별 버킷', col: 0, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'p', to: 'stuck' },
+      { from: 'p', to: 'empty' },
+      { from: 'p', to: 'dawn' },
+      { from: 'stuck', to: 's1' },
+      { from: 'empty', to: 's2' },
+      { from: 'dawn', to: 's3' },
+      { from: 's1', to: 's4', label: '배포 중' },
+    ]}
+  />
+</Figure>
+
 ## 1. 값이 버킷 경계에 붙어 있는지 보세요
 
 p99가 `+Inf` 바로 앞 경계(가장 큰 유한 경계)에 붙어 움직이지 않으면, 실제 p99는 그보다 커요. 요청의 1% 넘게 그 경계를 넘으면, p99가 위 끝이 없는 `+Inf` 버킷에 들어요. 이때 `histogram_quantile`(버킷으로 p99를 구하는 함수)은 추정 없이 바로 앞 경계값을 돌려줘요.
 
 경계가 0.1, 0.25, 0.5, 1, 2.5초인 히스토그램이라고 해 봐요. 5분 동안 1,000건 중 20건(2%)이 2.5초를 넘으면, 그 20건이 3초든 30초든 p99는 2.5초예요. 느린 요청은 진짜 있지만, 얼마나 느린지는 이 버킷으로 알 수 없어요.
+
+<Figure caption="위 예의 1,000건을 2.5초 경계로 나눴어요. 99% 위치인 990번째 요청이 위 끝이 없는 칸에 들어서, 함수는 바로 앞 경계인 2.5초를 돌려줘요.">
+  <Strip
+    ariaLabel="5분 동안 1,000건 중 2.5초 이하가 980건, 그 위 +Inf 칸이 20건이라 990번째 요청이 +Inf 칸에 들고, 20건이 3초든 30초든 같은 칸이라 p99가 2.5초로 나오는 칸 띠"
+    rows={[
+      { label: '5분 동안 들어온 1,000건', heads: ['2.5초 이하', '그 위(+Inf)'], cells: ['980건', { label: '20건', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 1, label: '990번째', tone: 'warn' }]}
+    ranges={[{ from: 1, to: 1, label: '3초든 30초든 이 칸', tone: 'warn' }]}
+  />
+</Figure>
 
 **확인 방법**: `+Inf`를 뺀 가장 큰 `le`를 찾아요. 4단계의 `count by (le)` 질의로 경계 목록을 볼 수 있어요. 그 경계를 넘은 요청의 비율이 0.01(1%)을 넘으면, p99는 그 경계에 붙어 있어요.
 
@@ -98,6 +134,18 @@ sum(increase(http_server_request_duration_seconds_count{job="payment"}[5m]))
 1단계대로 5초·10초 경계를 더하는 배포가 반쯤 끝나, 새 서버 A와 옛 서버 B가 함께 떠 있다고 해 봐요. 둘 다 5분에 1,000건을 받고, 980건이 2.5초 안에, 995건이 5초 안에 끝나요. A만 보면 p99는 2.5~5초 사이(추정 4.2초)인데, 합치면 10초가 나와요.
 
 합친 5초 경계(`le="5.0"`)에는 A의 995건만 들어가, 2.5초 이하 1,960건(A+B)보다 적어요. 누적 개수가 거꾸로 줄자, `histogram_quantile`은 5초·10초 개수를 1,960건으로 올려요. 그래도 99% 위치인 1,980번째 요청이 그 안에 없어서, `+Inf` 바로 앞 경계인 10초가 나와요.
+
+<Figure caption="위 예의 누적 개수를 경계마다 적었어요(10초 경계는 뺐어요). 옛 서버 B엔 5초 경계가 없어서, 합친 5초 칸이 2.5초 칸보다 적어요.">
+  <Strip
+    ariaLabel="새 서버 A는 le 2.5에 980, le 5.0에 995, le +Inf에 1,000이고, 옛 서버 B는 le 2.5에 980, le 5.0은 없고, le +Inf에 1,000이라, 같은 le끼리 더하면 1,960, 995, 2,000으로 5초 칸이 앞 칸보다 적어지는 칸 띠"
+    rows={[
+      { label: '새 서버 A', heads: ['le 2.5', 'le 5.0', 'le +Inf'], cells: ['980', '995', '1,000'] },
+      { label: '옛 서버 B', cells: ['980', { label: '없음', tone: 'sub' }, '1,000'] },
+      { label: '같은 le끼리 더한 값', cells: ['1,960', { label: '995', tone: 'warn' }, '2,000'] },
+    ]}
+    marks={[{ row: 2, at: 1, label: '앞 칸보다 적어요', tone: 'warn' }]}
+  />
+</Figure>
 
 Prometheus 3은 이때 `needed to be fixed for monotonicity`라는 정보 주석을 붙여요. 누적 개수를 바로잡았다는 뜻으로, API 응답의 `infos`에 담겨서 화면 코드가 버리면 사라져요. 개수가 줄지 않으면 주석 없이도 틀릴 수 있으니, 주석이 없다고 안심하지 마세요.
 

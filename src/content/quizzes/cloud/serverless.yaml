@@ -16,12 +16,12 @@ questions:
     explain: 동시성은 초당 요청 수 × 평균 실행 시간이에요. 400 × 3 = 1,200이라, 리전 기본 한도 1,000을 넘어요.
   - id: throttles-not-errors
     type: ox
-    prompt: 동시성 한도에 걸려 스로틀된 요청은 Errors 지표에 들어가나요?
+    prompt: 동시성 한도에 걸려 스로틀링된 요청은 Errors 지표에 들어가나요?
     answer: false
-    explain: 스로틀된 요청은 Invocations에도 Errors에도 들어가지 않아요. Throttles를 따로 봐야 해요.
+    explain: 스로틀링된 요청은 Invocations에도 Errors에도 들어가지 않아요. Throttles를 따로 봐야 해요.
   - id: shared-region-limit
     type: choice
-    prompt: 함수 하나에 요청이 몰리자, 상관없는 다른 함수까지 스로틀돼요. 왜일까요?
+    prompt: 함수 하나에 요청이 몰리자, 상관없는 다른 함수까지 스로틀링돼요. 왜일까요?
     choices:
       - 리전 안의 모든 함수가 동시성 한도를 함께 써서
       - 함수끼리 같은 코드를 나눠 써서

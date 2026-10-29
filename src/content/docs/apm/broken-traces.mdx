@@ -26,7 +26,7 @@ sources:
     url: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/tailsamplingprocessor/README.md
   - title: OpenTelemetry Collector — Load Balancing Exporter
     url: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/loadbalancingexporter/README.md
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -41,6 +41,27 @@ updated: 2026-10-14
   <Item title="일부만 빠졌는지">같은 트레이스 안에서 몇몇 span만 없는지 봐요.</Item>
 </FirstLook>
 
+<Figure caption="1단계에서 본 끊긴 모양이 갈래를 정해요. 뒷단에 새 트레이스가 따로 있다면 헤더와 스레드를 보고, 뒷단 span이 어디에도 없다면 샘플링 결정을 봐요.">
+  <Flow
+    ariaLabel="1단계에서 끊긴 모양을 보고, 뒷단에 같은 시각의 새 트레이스가 있으면 2단계 헤더 전달과 3단계 스레드 넘김으로, 뒷단 span이 어느 트레이스에도 없으면 4단계 샘플링 결정으로 가는 흐름도"
+    nodes={[
+      { id: 's1', label: '끊긴 모양', col: 1, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'new', label: '새 트레이스', col: 0, row: 1, note: '뒷단에 따로' },
+      { id: 'none', label: 'span 없음', col: 2, row: 1, note: '뒷단 어디에도' },
+      { id: 's2', label: '헤더 전달', col: 0, row: 2, note: '2단계', tone: 'accent' },
+      { id: 's3', label: '스레드 넘김', col: 1, row: 2, note: '3단계', tone: 'accent' },
+      { id: 's4', label: '샘플링 결정', col: 2, row: 2, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'new' },
+      { from: 's1', to: 'none' },
+      { from: 'new', to: 's2' },
+      { from: 'new', to: 's3' },
+      { from: 'none', to: 's4' },
+    ]}
+  />
+</Figure>
+
 ## 1. 끊긴 모양부터 보세요
 
 뒷단 서비스에 같은 시각의 새 트레이스가 있다면, trace id가 넘어가지 않은 거예요. 뒷단은 부모를 모른 채 새 트레이스를 시작했어요. 이때는 2단계와 3단계를 봐요.
@@ -52,6 +73,21 @@ updated: 2026-10-14
 ## 2. 헤더가 넘어가는지 보세요
 
 trace id는 HTTP 헤더에 실려 다음 서비스로 넘어가요. OpenTelemetry는 기본으로 W3C 표준 `traceparent` 헤더를 써요. 사이에 있는 프록시, 게이트웨이, 직접 만든 HTTP 클라이언트가 이 헤더를 빼먹으면 트레이스가 끊겨요.
+
+<Figure caption="사이의 프록시가 헤더를 빼먹은 예시예요. 결제 API는 traceparent를 받지 못해, 부모를 모른 채 새 trace id로 트레이스를 시작해요.">
+  <Flow
+    ariaLabel="주문 API가 traceparent 헤더를 실어 프록시로 보냈는데, 프록시가 헤더를 빼고 결제 API로 넘겨서 결제 API가 새 trace id로 트레이스를 시작하는 흐름도"
+    nodes={[
+      { id: 'order', label: '주문 API', col: 0, row: 0, note: 'trace A' },
+      { id: 'proxy', label: '프록시', col: 2, row: 0, note: '헤더 빼먹음', tone: 'warn' },
+      { id: 'pay', label: '결제 API', col: 2, row: 1, note: '새 trace B', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'order', to: 'proxy', label: 'traceparent' },
+      { from: 'proxy', to: 'pay', label: '헤더 없음', tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 전파 형식도 맞아야 해요. SDK가 쓸 형식은 `OTEL_PROPAGATORS` 환경 변수로 정하고, 기본값은 `tracecontext,baggage`예요. 한쪽이 `b3`(Zipkin 형식)만 쓰면 다른 쪽은 헤더를 알아듣지 못해요.
 
@@ -68,6 +104,17 @@ traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01
 같은 서비스 안에서 끊긴다면, 작업을 다른 스레드로 넘긴 곳을 봐요. OpenTelemetry Java는 지금의 컨텍스트(trace id가 든 실행 정보)를 기본으로 스레드 로컬에 둬요. 그래서 스레드 풀이나 비동기로 넘긴 작업에는 컨텍스트가 따라가지 않을 수 있어요.
 
 이럴 땐 넘길 때 컨텍스트를 함께 넘겨요. Java라면 `Context.current().wrap(executorService)`처럼 스레드 풀을 감싸요. 메시지 큐를 거친다면 메시지에 컨텍스트를 실어 보내는지 봐요.
+
+<Figure caption="스레드 풀에 작업을 넘기는 두 방법을 견줬어요. 그냥 넘기면 컨텍스트가 요청 스레드에 남고, 감싸서 넘기면 작업과 함께 가요.">
+  <Compare
+    columns={['그냥 넘길 때', '감싸서 넘길 때']}
+    rows={[
+      { label: '넘기는 곳', values: ['executorService', 'Context.current().wrap(executorService)'] },
+      { label: '풀 스레드의 컨텍스트', values: ['따라가지 않을 수 있어요', '함께 넘어가요'] },
+      { label: '뒤쪽 span', values: ['트레이스가 끊길 수 있어요', '같은 트레이스에 이어져요'] },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: 끊긴 뒤쪽 span이 어느 스레드에서 시작했는지, 그 작업을 어디서 넘겼는지 코드를 따라가요.
 

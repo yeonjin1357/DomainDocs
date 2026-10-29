@@ -98,7 +98,7 @@ PVC가 아직 묶이지 않았다면 상태가 Pending이에요. 이벤트로 �
 
 옛 파드가 끝나 디스크가 떼어지면 저절로 풀려요. 계속 남는다면 옛 노드가 살아 있는지, 디스크를 떼는 데 실패하고 있지 않은지 봐요.
 
-이 오류는 설정 실수로도 자주 나요. ReadWriteOnce PVC 하나를 Deployment 파드 여럿이 쓰거나, 롤링 업데이트로 새 파드가 다른 노드에 먼저 뜬 경우예요. 이럴 땐 파드마다 PVC를 따로 받는 StatefulSet을 쓰거나, 옛 파드를 먼저 내리는 `Recreate` 배포 방식을 써요.
+이 에러는 설정 실수로도 자주 나요. ReadWriteOnce PVC 하나를 Deployment 파드 여럿이 쓰거나, 롤링 업데이트로 새 파드가 다른 노드에 먼저 뜬 경우예요. 이럴 땐 파드마다 PVC를 따로 받는 StatefulSet을 쓰거나, 옛 파드를 먼저 내리는 `Recreate` 배포 방식을 써요.
 
 ## 4. 연결 단계에서 멈췄는지 보세요
 
@@ -110,7 +110,7 @@ CSI(쿠버네티스가 저장소 드라이버를 붙이는 표준) 드라이버�
 
 ## 5. 가득 찼다면 늘리세요
 
-볼륨이 가득 차면 쿠버네티스 이벤트는 남지 않아요. 앱이 쓰기에 실패하고, 로그에 `No space left on device` 같은 오류가 남아요.
+볼륨이 가득 차면 쿠버네티스 이벤트는 남지 않아요. 앱이 쓰기에 실패하고, 로그에 `No space left on device` 같은 에러가 남아요.
 
 StorageClass의 `allowVolumeExpansion`이 true라면 PVC의 크기를 키울 수 있어요. 줄이는 건 안 돼요. 파일 시스템이 있는 볼륨은 XFS, Ext3, Ext4일 때 파일 시스템까지 함께 늘어나요.
 
@@ -123,5 +123,5 @@ StorageClass의 `allowVolumeExpansion`이 true라면 PVC의 크기를 키울 수
   <Check>노드 점검 뒤 StatefulSet 파드가 Pending이라면, 그 파드의 디스크가 있는 영역에 노드가 남아 있는지 보세요.</Check>
   <Check>ReadWriteOnce PVC 하나를 Deployment의 파드 여럿이 함께 쓰게 했다면 다시 보세요. 파드가 다른 노드에 놓이는 순간 붙지 못해요.</Check>
   <Check>이벤트 문구로 알림이나 검색을 만들었다면, 버전마다 바뀐 문구를 함께 잡는지 보세요. 이유(reason)인 FailedAttachVolume으로 잡는 게 안전해요.</Check>
-  <Check>볼륨이 가득 찰 때를 쿠버네티스 이벤트로 잡으려 했다면 다시 보세요. 가득 찬 볼륨은 이벤트 대신 앱 오류로 드러나서, 사용량 지표로 지켜봐요.</Check>
+  <Check>볼륨이 가득 찰 때를 쿠버네티스 이벤트로 잡으려 했다면 다시 보세요. 가득 찬 볼륨은 이벤트 대신 앱 에러로 드러나서, 사용량 지표로 지켜봐요.</Check>
 </Checkpoints>

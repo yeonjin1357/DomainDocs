@@ -6,7 +6,7 @@ questions:
       - GC 멈춤 기록
       - DNS 응답 시간
       - 디스크 용량
-      - 네트워크 카드의 오류 수
+      - 네트워크 카드의 에러 수
     answer: 0
     explain: GC가 앱 스레드를 멈추면 처리 중이던 요청이 함께 멈췄다가, 풀리는 순간 함께 끝나요. 그래서 세로줄이 생겨요.
   - id: g1-goal-not-guarantee

@@ -38,7 +38,7 @@ sources:
     url: https://grafana.com/docs/grafana/latest/alerting/configure-notifications/create-silence/
   - title: Grafana — No Data and Error states (DatasourceNoData, pending period)
     url: https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rule-evaluation/nodata-and-error-states/
-updated: 2026-10-13
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -52,6 +52,32 @@ updated: 2026-10-13
   <Item title="증상인지 원인인지">에러·지연처럼 사용자가 겪는 일에 걸었는지, CPU 같은 원인에 걸었는지 봐요.</Item>
   <Item title="같은 장애로 여러 알림이 울리는지">장애 하나에 알림이 몇 개 왔는지 세 봐요.</Item>
 </FirstLook>
+
+<Figure caption="위 세 줄은 지난 알림을 받은 사람이 한 일로 나눠요. 할 일이 없었다면 원인에 걸었는지, 에러·지연에 걸었는지로 2단계나 3단계를 골라요. 맨 아래 줄은 장애 하나에 알림이 여러 개 왔을 때 4단계로 가는 길이에요.">
+  <Flow
+    ariaLabel="1단계에서 지난 알림을 나눠, 할 일이 없던 원인 알림은 2단계 증상 알림으로 바꾸고, 할 일이 없던 에러·지연 알림은 3단계 지속 시간과 임계값으로, 조치했지만 미뤄도 됐거나 같은 손동작이던 알림은 티켓이나 자동화로 보내요. 지난 장애 하나에 알림이 여러 개 왔다면 4단계 알림 묶기로 가는 흐름도"
+    nodes={[
+      { id: 's1', label: '지난 알림', col: 1, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'cause', label: '원인 알림', col: 0, row: 1, note: '할 일 없음' },
+      { id: 'symptom', label: '에러·지연', col: 1, row: 1, note: '할 일 없음' },
+      { id: 'acted', label: '조치한 알림', col: 2, row: 1, note: '미룸·반복' },
+      { id: 's2', label: '증상 알림', col: 0, row: 2, note: '2단계', tone: 'accent' },
+      { id: 's3', label: '지속·임계값', col: 1, row: 2, note: '3단계', tone: 'accent' },
+      { id: 'ticket', label: '티켓·자동화', col: 2, row: 2, note: '부르지 않음' },
+      { id: 'incident', label: '지난 장애', col: 0, row: 3, note: '알림 세기', tone: 'warn' },
+      { id: 's4', label: '알림 묶기', col: 2, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'cause' },
+      { from: 's1', to: 'symptom' },
+      { from: 's1', to: 'acted' },
+      { from: 'cause', to: 's2' },
+      { from: 'symptom', to: 's3' },
+      { from: 'acted', to: 'ticket' },
+      { from: 'incident', to: 's4', label: '여러 개 옴' },
+    ]}
+  />
+</Figure>
 
 ## 1. 지난 알림을 조치 여부로 나눠 보세요
 
@@ -81,6 +107,23 @@ CPU 사용률 같은 원인 지표(USE, 사용률·포화·에러)는 대시보�
 ## 3. 지속 시간과 임계값을 다시 잡으세요
 
 한 번 튄 값(스파이크)에 울리는 알림엔 지속 시간을 두고, 임계값은 SLO에서 거꾸로 구해요. 지속 시간(Prometheus의 `for`, Grafana의 Pending period)이 없으면 한 번 튄 값에도 울렸다가 곧 해제돼요. 길수록 늦게 울리는 대가는 <Term slug="foundations/alert-conditions">알림 조건</Term> 글에서 다뤄요.
+
+<Figure caption="지속 시간을 5분으로 둔 예시예요. 2분 튄 값엔 지속 시간이 없을 때만 울렸다가 곧 풀려요. 25분 이어진 장애엔 둘 다 울리지만, 지속 시간을 두면 5분 늦게 울려요.">
+  <Timeline
+    ariaLabel="에러율이 8분부터 2분 동안 잠깐, 30분부터 25분 동안 길게 임계값을 넘을 때, 지속 시간이 없으면 두 번 다 울리고, 지속 시간이 5분이면 2분짜리엔 울리지 않고 긴 장애에만 35분부터 울리는 시간 띠"
+    end={60}
+    lanes={[
+      { label: '임계 넘음', segments: [{ start: 8, end: 10 }, { start: 30, end: 55, label: '25분' }] },
+      { label: 'for 없음', segments: [{ start: 8, end: 10, tone: 'warn' }, { start: 30, end: 55, label: '울림', tone: 'accent' }] },
+      { label: 'for 5분', segments: [{ start: 35, end: 55, label: '울림', tone: 'accent' }] },
+    ]}
+    ticks={[
+      { at: 0, label: '0분' },
+      { at: 30, label: '30분' },
+      { at: 60, label: '60분' },
+    ]}
+  />
+</Figure>
 
 Google SRE Workbook은 임계값을 SLO와 같게 잡아도 시끄럽다고 해요. 30일 99.9% SLO에서 10분 에러율 0.1% 이상에 울리면, 하루 최대 144번 울려요. 에러율이 0.1%에 머물면, 하나도 조치하지 않아도 SLO는 지켜져요.
 
@@ -122,6 +165,25 @@ sum by (alertname) (count_over_time(
 장애 하나는 알림 하나로 받게 묶어요. 서버마다 'DB에 닿지 않음' 알림을 걸면, 네트워크가 갈라질 때 닿지 못한 서버 수만큼 알림이 와요.
 
 Alertmanager는 Prometheus의 알림을 받아 사람에게 보내요. `group_by`에 적은 레이블(키와 값의 쌍)의 값이 같은 알림은 한 알림으로 묶어요. 문서의 예처럼 `[cluster, alertname]`으로 묶으면, 서버 수백 대의 같은 규칙 알림도 클러스터마다 한 알림으로 와요.
+
+<Figure caption="한 클러스터의 서버들이 같은 규칙으로 함께 울린 예시예요. cluster와 alertname 값이 같아서 Alertmanager가 한 묶음으로 모아, 사람에겐 알림 하나만 가요.">
+  <Flow
+    ariaLabel="같은 클러스터의 서버 1, 서버 2, 서버 N이 모두 DB에 닿지 않음 알림을 울리면, Alertmanager가 cluster와 alertname이 같은 알림을 한 묶음으로 모아 클러스터마다 알림 하나를 보내는 흐름도"
+    nodes={[
+      { id: 'a1', label: '서버 1', col: 0, row: 0, note: 'DB 안 닿음', tone: 'warn' },
+      { id: 'a2', label: '서버 2', col: 0, row: 1, note: 'DB 안 닿음', tone: 'warn' },
+      { id: 'a3', label: '서버 N', col: 0, row: 2, note: 'DB 안 닿음', tone: 'warn' },
+      { id: 'am', label: '알림 묶기', col: 1, row: 1, note: 'group_by' },
+      { id: 'out', label: '알림 1개', col: 2, row: 1, note: '클러스터마다', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'a1', to: 'am' },
+      { from: 'a2', to: 'am' },
+      { from: 'a3', to: 'am' },
+      { from: 'am', to: 'out' },
+    ]}
+  />
+</Figure>
 
 새 묶음은 처음 보내기 전 `group_wait`(기본 30초)를 기다려, 그사이 들어온 알림을 한 번에 모아요. Grafana 알림은 기본 알림 정책이 `alertname`과 `grafana_folder`(규칙이 든 폴더)로 묶어요. 그래서 규칙 하나의 알림이 한 묶음이 돼요.
 

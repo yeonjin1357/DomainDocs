@@ -87,7 +87,7 @@ updated: 2026-10-21
 | active (running) | 돌고 있어요 |
 | inactive | 멈춰 있어요. 멈추라고 했거나 아직 띄우지 않았어요 |
 | activating | 띄우는 중이에요 |
-| failed | 죽었거나, 오류 코드로 끝났거나, 정한 시간 안에 뜨지 못했어요 |
+| failed | 죽었거나, 에러 코드로 끝났거나, 정한 시간 안에 뜨지 못했어요 |
 
 Active 줄에는 언제부터 그 상태인지(since)도 나와요. 서비스를 다시 띄우면 이 시각도 새로 바뀌어요.
 
@@ -97,7 +97,7 @@ Loaded 줄에는 유닛 파일의 위치와 enabled 여부가 나와요. enabled
 
 서비스가 죽었을 때 다시 띄울지는 유닛 파일의 `Restart=`로 정해요. 기본값 `no`는 다시 띄우지 않아요. 문서는 오래 도는 서비스에 `on-failure`를 권해요.
 
-`on-failure`는 오류 코드로 끝나거나, 신호를 받아 죽거나, 정한 시간을 넘기면 다시 띄워요. 기본으로 100ms 쉬었다가 띄워요.
+`on-failure`는 에러 코드로 끝나거나, 신호를 받아 죽거나, 정한 시간을 넘기면 다시 띄워요. 기본으로 100ms 쉬었다가 띄워요.
 
 <Figure caption="같은 서비스가 계속 죽을 때의 두 모습이에요. 다시 띄우기를 켜면 상태만으로는 죽고 있다는 걸 알기 어려워요.">
   <Compare
@@ -114,7 +114,7 @@ Loaded 줄에는 유닛 파일의 위치와 enabled 여부가 나와요. enabled
 
 ## 로그는 journald에 모여요
 
-<Term term="server/journald">journald</Term>(systemd-journald)는 여러 곳의 로그를 받아 한곳에 저장해요. 서비스가 표준 출력과 표준 오류로 내보낸 글, syslog로 보낸 메시지, 커널 메시지가 모두 여기로 와요.
+<Term term="server/journald">journald</Term>(systemd-journald)는 여러 곳의 로그를 받아 한곳에 저장해요. 서비스가 표준 출력과 표준 에러로 내보낸 글, syslog로 보낸 메시지, 커널 메시지가 모두 여기로 와요.
 
 읽을 때는 `journalctl`을 써요.
 
@@ -141,7 +141,7 @@ Loaded 줄에는 유닛 파일의 위치와 enabled 여부가 나와요. enabled
 
 `dmesg`로 이 공간을 읽어요. journald도 커널 메시지를 받아 두어서, `journalctl -k`로도 볼 수 있어요.
 
-커널 로그에는 앱이 모르는 사건이 남아요. <Term term="server/oom-killer">OOM killer</Term>가 끝낸 프로세스, 디스크 입출력 오류, 네트워크 링크가 끊긴 일 같은 것들이에요.
+커널 로그에는 앱이 모르는 사건이 남아요. <Term term="server/oom-killer">OOM killer</Term>가 끝낸 프로세스, 디스크 입출력 에러, 네트워크 링크가 끊긴 일 같은 것들이에요.
 
 ## 모니터링에서는
 

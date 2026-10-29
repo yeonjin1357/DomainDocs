@@ -119,9 +119,7 @@ updated: 2026-10-29
 
   ### Tomcat에서 스레드가 다 차면
 
-  `maxThreads`는 동시에 처리할 수 있는 요청 수를 정하고, 기본값은 200이에요. `maxConnections`는 받아서 처리하는 연결 수의 상한으로, 기본값은 8,192예요. 스레드가 모두 바빠도 연결은 이 수까지 받아 두고, 스레드가 비면 처리해요.
-
-  연결이 `maxConnections`에 닿으면, 운영체제 대기열(`acceptCount`, 기본 100)에 연결이 쌓여요. 이 대기열도 차면 새 연결은 거절되거나 시간 초과로 끊길 수 있어요.
+  `maxThreads`(기본 200)가 다 차도 연결은 `maxConnections`(기본 8,192)까지 받아 두고, 스레드가 비면 처리해요. 그 뒤의 대기열과 거절은 <Term slug="apm/thread-pools">스레드 풀과 요청 처리</Term>에 그림으로 있어요.
 
   스레드를 기다린 시간은 <Term slug="apm/transactions-and-response-time">앱에 닿기 전 시간</Term>처럼 트랜잭션 시간 밖에 있을 수 있어요. 그래서 APM의 응답시간은 그대로 1.5초인데, 사용자가 기다린 시간은 더 길어질 수 있어요.
 </Deeper>

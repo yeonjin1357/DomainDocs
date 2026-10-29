@@ -18,7 +18,7 @@ sources:
     url: https://github.com/kubernetes/kubernetes/blob/master/pkg/controller/podautoscaler/replica_calculator.go
   - title: Kubernetes 소스 — kubectl HPA 출력 (TARGETS 표시)
     url: https://github.com/kubernetes/kubernetes/blob/master/pkg/printers/internalversion/printers.go
-updated: 2026-10-28
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -32,6 +32,31 @@ updated: 2026-10-28
   <Item title="HPA의 조건">ScalingActive와 ScalingLimited를 봐요.</Item>
   <Item title="새 파드">늘린 파드가 Pending인지 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 먼저 봐요. 2단계 조건은 1단계와 3단계 중 어디가 문제인지 알려 줘요.">
+  <Flow
+    ariaLabel="1단계 지표가 unknown이면 CPU 요청과 Metrics Server를 보고, 읽고 있으면 2단계 HPA 조건으로 가요. 3단계에서 TooManyReplicas면 maxReplicas에 막힌 것이고, 4단계 새 파드가 못 뜨면 노드 자리와 할당량을, 그래도 아니면 5단계 계산 결과를 보는 흐름도"
+    nodes={[
+      { id: 's1', label: '지표 읽기', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: 'CPU 요청', col: 2, row: 0, note: 'Metrics Server' },
+      { id: 's2', label: 'HPA 조건', col: 0, row: 1, note: '2단계' },
+      { id: 's3', label: '최대 개수', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: 'maxReplicas', col: 2, row: 2, note: '최대값에 막힘' },
+      { id: 's4', label: '새 파드', col: 0, row: 3, note: '4단계' },
+      { id: 'e4', label: '자리·할당량', col: 2, row: 3, note: 'Pending·quota' },
+      { id: 's5', label: '계산 결과', col: 0, row: 4, note: '5단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: 'unknown' },
+      { from: 's1', to: 's2', label: '읽음' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: 'TooManyReplicas' },
+      { from: 's3', to: 's4' },
+      { from: 's4', to: 'e4', label: '못 뜸' },
+      { from: 's4', to: 's5' },
+    ]}
+  />
+</Figure>
 
 ## 1. 지표를 읽고 있는지 보세요
 
@@ -48,6 +73,23 @@ web    cpu: <unknown>/60%
 
 - **CPU 요청이 없어요**: 사용률은 요청 대비 퍼센트라, 파드의 컨테이너 하나라도 CPU 요청이 없으면 계산할 수 없어요. 이벤트에 `missing request for cpu`가 나와요.
 - **Metrics Server가 없어요**: CPU·메모리 사용량은 Metrics Server가 모아 줘요. 설치되지 않았거나 멈췄으면 사용량 자체가 없어요.
+
+<Figure caption="사용률은 Metrics Server가 모은 사용량을 파드의 CPU 요청으로 나눈 값이에요. 위의 둘 중 하나라도 없으면 계산할 수 없어서 TARGETS에 unknown이 떠요.">
+  <Flow
+    ariaLabel="Metrics Server가 모은 CPU 사용량과 파드 명세의 CPU 요청이 함께 HPA로 들어가 사용률을 계산하고, 그 값이 TARGETS 칸의 지금 값으로 보이는 구조도"
+    nodes={[
+      { id: 'use', label: '사용량', col: 0, row: 0, note: 'Metrics Server' },
+      { id: 'req', label: 'CPU 요청', col: 2, row: 0, note: '파드 명세' },
+      { id: 'hpa', label: 'HPA', col: 1, row: 1, note: '사용률 계산', tone: 'accent' },
+      { id: 'tgt', label: 'TARGETS', col: 1, row: 2, note: '지금/목표' },
+    ]}
+    edges={[
+      { from: 'use', to: 'hpa' },
+      { from: 'req', to: 'hpa' },
+      { from: 'hpa', to: 'tgt' },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: `kubectl describe hpa HPA이름`의 Events에서 FailedGetResourceMetric을 찾아요. 메시지는 이런 꼴이에요.
 
@@ -100,6 +142,21 @@ HPA가 원하는 파드 수를 올렸는데 준비된 파드가 그대로라면,
 - **요청이 너무 커요**: 요청을 2코어로 잡고 0.8코어를 쓰면 사용률은 40%예요. 목표 60% 아래라 앱이 느려도 늘리지 않아요.
 - **병목이 CPU가 아니에요**: 스레드 풀이나 DB 연결이 모자라면 CPU는 한가한데 응답만 느려요. CPU 기준 HPA는 움직이지 않아요.
 - **막 뜬 파드는 0%로 쳐요**: 아직 준비되지 않은 파드는, CPU로 늘릴지 계산할 때 사용률을 0%로 보수적으로 봐요. 그래서 늘리는 폭이 작아질 수 있어요.
+
+<Figure caption="요청이 너무 큰 경우예요. 요청 2코어를 0.2코어씩 10칸으로 나누면, 0.8코어는 4칸이라 사용률 40%예요. 목표 60%에 닿지 않아서 앱이 느려도 HPA는 늘리지 않아요.">
+  <Strip
+    ariaLabel="CPU 요청 2코어를 10칸으로 나눈 띠에서 사용량 0.8코어가 4칸으로 사용률 40%이고, 목표 60%는 여섯째 칸 끝에 있어 아직 닿지 않은 칸 띠"
+    rows={[
+      {
+        label: '요청 2코어(한 칸 0.2코어)',
+        heads: ['', '', '', '40%', '', '60%', '', '', '', '100%'],
+        cells: [{ label: '', tone: 'accent' }, { label: '', tone: 'accent' }, { label: '', tone: 'accent' }, { label: '', tone: 'accent' }, '', '', '', '', '', ''],
+      },
+    ]}
+    marks={[{ at: 5, label: '목표', tone: 'warn' }]}
+    ranges={[{ from: 0, to: 3, label: '0.8코어 사용' }]}
+  />
+</Figure>
 
 ## 줄어드는 게 늦다면
 

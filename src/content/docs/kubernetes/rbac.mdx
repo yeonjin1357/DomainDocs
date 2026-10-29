@@ -108,7 +108,7 @@ rules:
   <StatTile label="노드 list" value="no" tone="warn" note="403 Forbidden" />
 </Figure>
 
-모니터링 에이전트는 파드, 노드, 이벤트 같은 정보를 API로 읽어요. 그래서 보통 클러스터 전체를 읽는 ClusterRole을 받아요. 권한이 빠진 자원은 오류 화면 없이 그 부분만 비어 보여요.
+모니터링 에이전트는 파드, 노드, 이벤트 같은 정보를 API로 읽어요. 그래서 보통 클러스터 전체를 읽는 ClusterRole을 받아요. 권한이 빠진 자원은 에러 화면 없이 그 부분만 비어 보여요.
 
 에이전트 로그에는 `forbidden`과 함께 어느 계정이 어떤 자원을 어떤 동작으로 못 했는지 남아요. 서비스 계정은 `system:serviceaccount:<네임스페이스>:<이름>` 꼴의 이름으로 나와요.
 

@@ -28,7 +28,7 @@ updated: 2026-10-29
 
 <KeyPoints>
   <Point title="쿠버네티스에 기능을 더한 배포판이에요">
-    파드, 디플로이먼트, 서비스는 그대로 있어요. 그 위에 Route, 프로젝트, SCC 같은 OpenShift만의 객체가 더해져요.
+    파드, Deployment, 서비스는 그대로 있어요. 그 위에 Route, 프로젝트, SCC 같은 OpenShift만의 객체가 더해져요.
   </Point>
   <Point title="바깥 요청은 Route로 들어와요">
     Route에 호스트 이름과 대상 서비스를 적으면, 라우터가 바깥 요청을 그 서비스로 넘겨요.
@@ -51,7 +51,7 @@ updated: 2026-10-29
 | 프로젝트 | 팀이나 용도별로 객체를 묶어요 | 주석이 더 붙은 네임스페이스예요 |
 | Route | 바깥 요청을 서비스로 넘겨요 | 인그레스를 만들면 Route가 함께 생겨요 |
 | SCC | 파드가 쓸 UID와 권한을 정해요 | 파드를 만들 때 검사해요 |
-| DeploymentConfig | 파드를 배포하고 갱신해요 | 4.14부터 deprecated라 디플로이먼트를 써요 |
+| DeploymentConfig | 파드를 배포하고 갱신해요 | 4.14부터 deprecated라 Deployment를 써요 |
 
 <Term term="kubernetes/openshift-project">프로젝트</Term>는 `oc new-project 이름`으로 만들어요. OpenShift 문서는 프로젝트를 "주석이 더 붙은 쿠버네티스 네임스페이스"라고 설명해요. 그래서 네임스페이스 단위로 보는 화면은 그대로 써요.
 
@@ -119,13 +119,13 @@ Route 같은 OpenShift 전용 객체의 지표는 openshift-state-metrics가 따
 
 OpenShift를 보는 화면이라면 Route도 서비스와 이어서 보여 줘야 해요. 바깥 요청이 어느 Route로 들어와 어느 서비스로 가는지가 경로의 첫 칸이에요.
 
-SCC에 걸리면 파드 자체가 만들어지지 않아요. 파드가 없으니 파드 화면은 비어 있고, 이유는 레플리카셋 같은 상위 객체의 <Term term="kubernetes/k8s-event">이벤트</Term>에 남아요.
+SCC에 걸리면 파드 자체가 만들어지지 않아요. 파드가 없으니 파드 화면은 비어 있고, 이유는 ReplicaSet 같은 상위 객체의 <Term term="kubernetes/k8s-event">이벤트</Term>에 남아요.
 
 <Checkpoints>
   <Check>OpenShift 화면에서 인그레스만 세고 있다면 다시 보세요. 바깥 접속은 Route로도 열고, 인그레스도 Route로 바뀌어요.</Check>
   <Check>이미지가 루트로 실행된다고 가정했다면 다시 보세요. 기본 SCC에서는 프로젝트마다 정한 UID로 실행돼요.</Check>
-  <Check>DeploymentConfig를 새로 쓰는 구현이라면 다시 보세요. 4.14부터 deprecated라 디플로이먼트를 써요.</Check>
-  <Check>파드가 하나도 안 보여 화면이 비었다면, 레플리카셋 이벤트에서 생성 실패 이유를 보세요. SCC에 걸리면 파드가 만들어지지 않아요.</Check>
+  <Check>DeploymentConfig를 새로 쓰는 구현이라면 다시 보세요. 4.14부터 deprecated라 Deployment를 써요.</Check>
+  <Check>파드가 하나도 안 보여 화면이 비었다면, ReplicaSet 이벤트에서 생성 실패 이유를 보세요. SCC에 걸리면 파드가 만들어지지 않아요.</Check>
 </Checkpoints>
 
 <Deeper>

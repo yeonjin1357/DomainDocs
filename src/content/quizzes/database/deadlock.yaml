@@ -16,7 +16,7 @@ questions:
     explain: 모든 트랜잭션이 같은 순서로 잠그면 같은 행에서 줄을 설 뿐 엇갈리지 않아요. PostgreSQL 문서가 꼽는 가장 좋은 방법이에요.
   - id: retry-whole
     type: choice
-    prompt: 앱이 교착 오류를 받았을 때 알맞은 처리는?
+    prompt: 앱이 교착 에러를 받았을 때 알맞은 처리는?
     choices:
       - 트랜잭션 전체를 처음부터 다시 시도해요
       - 실패한 SQL 하나만 다시 보내요
@@ -26,14 +26,14 @@ questions:
     explain: 실패한 쪽 트랜잭션은 이미 통째로 되돌려졌어요. 그래서 처음부터 다시 해요.
   - id: mysql-all-deadlocks
     type: choice
-    prompt: MySQL에서 SHOW ENGINE INNODB STATUS에는 마지막 교착만 보여요. 모든 교착을 오류 로그에 남기는 설정은?
+    prompt: MySQL에서 SHOW ENGINE INNODB STATUS에는 마지막 교착만 보여요. 모든 교착을 에러 로그에 남기는 설정은?
     choices:
       - innodb_print_all_deadlocks
       - innodb_lock_wait_timeout
       - max_execution_time
       - log_lock_waits
     answer: 0
-    explain: innodb_print_all_deadlocks를 켜면 교착마다 정보를 오류 로그에 써요. log_lock_waits는 PostgreSQL 설정이에요.
+    explain: innodb_print_all_deadlocks를 켜면 교착마다 정보를 에러 로그에 써요. log_lock_waits는 PostgreSQL 설정이에요.
   - id: pg-sqlstate
     type: input
     prompt: PostgreSQL에서 교착으로 실패한 쪽이 받는 SQLSTATE 코드는?

@@ -24,7 +24,7 @@ sources:
     url: https://www.postgresql.org/docs/current/runtime-config-replication.html
   - title: MySQL 8.4 — OPTIMIZE TABLE
     url: https://dev.mysql.com/doc/refman/8.4/en/optimize-table.html
-updated: 2026-10-23
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -40,6 +40,31 @@ updated: 2026-10-23
   <Item title="죽은 행이 쌓였나">지우거나 바꾼 행의 옛 버전이 남았는지 봐요.</Item>
   <Item title="정리를 막는 것">오래 열린 트랜잭션과 복제 슬롯을 봐요.</Item>
 </FirstLook>
+
+<Figure caption="1단계에서 무엇이 커졌는지가 갈래를 정해요. 표가 커졌다면 죽은 행과 정리를 막는 것을, 표 밖이라면 WAL을, 인덱스만 크다면 쓰지 않는 인덱스를 봐요.">
+  <Flow
+    ariaLabel="1단계에서 커진 곳을 나눠, 표가 커졌다면 2단계 죽은 행을 보고 정리가 안 됐다면 3단계 정리를 막는 것을 찾아요. 표 밖이라면 4단계 WAL과 복제 슬롯을, 인덱스만 크다면 5단계 쓰지 않는 인덱스를 보는 흐름도"
+    nodes={[
+      { id: 's1', label: '커진 곳', col: 1, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'tbl', label: '표가 커짐', col: 0, row: 1, note: '행 수 그대로' },
+      { id: 'wal', label: '표 밖', col: 1, row: 1, note: 'pg_wal' },
+      { id: 'idx', label: '인덱스만 큼', col: 2, row: 1 },
+      { id: 's2', label: '죽은 행', col: 0, row: 2, note: '2단계' },
+      { id: 's4', label: 'WAL·슬롯', col: 1, row: 2, note: '4단계', tone: 'accent' },
+      { id: 's5', label: '안 쓴 인덱스', col: 2, row: 2, note: '5단계', tone: 'accent' },
+      { id: 's3', label: '정리 막는 것', col: 0, row: 3, note: '3단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'tbl' },
+      { from: 's1', to: 'wal' },
+      { from: 's1', to: 'idx' },
+      { from: 'tbl', to: 's2' },
+      { from: 'wal', to: 's4' },
+      { from: 'idx', to: 's5' },
+      { from: 's2', to: 's3', label: '정리 안 됨' },
+    ]}
+  />
+</Figure>
 
 ## 1. 무엇이 커졌는지 나눠 보세요
 
@@ -90,7 +115,20 @@ LIMIT 10;
 
 VACUUM은 아직 누군가 볼 수 있는 옛 행을 지우지 못해요. 그래서 오래 열린 트랜잭션 하나가 DB 전체의 정리를 붙잡을 수 있어요. PostgreSQL 문서는 이런 트랜잭션을 `pg_stat_activity`에서 `age(backend_xmin)`이 큰 줄로 찾으라고 해요.
 
-복제 슬롯도 정리를 붙잡아요. 복제본이 오래 멈췄거나 이미 없어졌는데 슬롯이 남아 있으면, 그 슬롯이 옛 행과 로그를 계속 잡아 둬요.
+<Figure caption="오래 열린 트랜잭션이 정리를 붙잡는 예시예요. 그 트랜잭션이 열린 동안 VACUUM이 돌아도, 그 뒤에 생긴 죽은 행을 치우지 못해요. 트랜잭션이 끝난 뒤에야 치워요.">
+  <Timeline
+    ariaLabel="트랜잭션 하나가 오래 열린 동안 다른 세션이 행을 바꿔 죽은 행이 생기고, 그사이 돈 VACUUM은 죽은 행을 치우지 못하다가, 트랜잭션이 끝난 뒤에 돈 VACUUM이 치우는 시간 띠"
+    end={60}
+    lanes={[
+      { label: '트랜잭션', segments: [{ start: 0, end: 40, label: '오래 열림', tone: 'warn' }] },
+      { label: '다른 세션', segments: [{ start: 5, end: 55, label: '행을 바꿔 죽은 행이 생겨요' }] },
+      { label: 'VACUUM', segments: [{ start: 15, end: 30, label: '못 치움', tone: 'warn' }, { start: 43, end: 58, label: '치움', tone: 'accent' }] },
+    ]}
+    marks={[{ at: 40, label: '트랜잭션 끝' }]}
+  />
+</Figure>
+
+복제 슬롯도 정리를 붙잡아요. 복제 서버가 오래 멈췄거나 이미 없어졌는데 슬롯이 남아 있으면, 그 슬롯이 옛 행과 로그를 계속 잡아 둬요.
 
 **확인 방법**: 아래 두 질의를 돌려요. 첫째는 오래 열린 트랜잭션, 둘째는 쓰이지 않는(`active`가 false인) 복제 슬롯을 찾아요.
 
@@ -115,9 +153,35 @@ FROM pg_replication_slots;
 
 `pg_wal` 디렉터리가 커진다면, 아직 지우지 못하는 로그가 쌓인 거예요. 로그가 왜 남는지는 <Term slug="database/logs-and-recovery">로그와 복구</Term>에서 다뤄요.
 
-흔한 원인은 복제 슬롯이에요. 슬롯은 복제본이 받기 전까지 WAL을 지우지 못하게 잡아 둬요. `max_slot_wal_keep_size`의 기본값은 -1이라 한도가 없어서, 멈춘 슬롯 하나가 디스크를 채울 수 있어요.
+흔한 원인은 복제 슬롯이에요. 슬롯은 복제 서버가 받기 전까지 WAL을 지우지 못하게 잡아 둬요. `max_slot_wal_keep_size`의 기본값은 -1이라 한도가 없어서, 멈춘 슬롯 하나가 디스크를 채울 수 있어요.
 
-**확인 방법**: 3단계의 복제 슬롯 질의에서 `active`가 false인 슬롯을 찾아요. 그 슬롯을 쓰던 복제본이 아직 필요한지 확인한 뒤, 필요 없다면 슬롯을 지워요. 복제가 밀리는 경우는 <Term slug="database/replication-lag">복제 지연</Term>에 있어요.
+<Figure caption="예시예요. 슬롯은 복제 서버가 받아 간 곳에 멈춰 있고, 그 뒤의 WAL은 지우지 못해요. 복제 서버가 멈춘 채라면 새 WAL이 붙을수록 못 지우는 몫이 늘어요.">
+  <Strip
+    ariaLabel="pg_wal의 WAL 1부터 8 가운데 복제 서버가 3까지 받아 갔고, 슬롯이 4에 멈춰 있어 4부터 8까지는 지우지 못하는 칸 띠"
+    rows={[
+      {
+        label: 'pg_wal의 WAL(왼쪽이 먼저)',
+        cells: [
+          { label: '1', tone: 'sub' },
+          { label: '2', tone: 'sub' },
+          { label: '3', tone: 'sub' },
+          { label: '4', tone: 'warn' },
+          { label: '5', tone: 'warn' },
+          { label: '6', tone: 'warn' },
+          { label: '7', tone: 'warn' },
+          { label: '8', tone: 'warn' },
+        ],
+      },
+    ]}
+    marks={[{ at: 3, label: '슬롯이 멈춘 곳', tone: 'warn' }]}
+    ranges={[
+      { from: 0, to: 2, label: '복제 서버가 받아 감' },
+      { from: 3, to: 7, label: '받기 전이라 못 지움', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+**확인 방법**: 3단계의 복제 슬롯 질의에서 `active`가 false인 슬롯을 찾아요. 그 슬롯을 쓰던 복제 서버가 아직 필요한지 확인한 뒤, 필요 없다면 슬롯을 지워요. 복제가 밀리는 경우는 <Term slug="database/replication-lag">복제 지연</Term>에 있어요.
 
 ## 5. 쓰지 않는 인덱스를 보세요
 

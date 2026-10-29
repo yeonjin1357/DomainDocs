@@ -16,7 +16,7 @@ sources:
     url: https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
   - title: Kubernetes — Debug Pods
     url: https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -30,6 +30,27 @@ updated: 2026-10-21
   <Item title="이유(reason)로 갈래 정하기">이유 하나가 다음 단계를 정해요.</Item>
   <Item title="사라지기 전에 모으기">기본 1시간 뒤 지워져요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 일이 1시간보다 오래전이면 kubectl 대신 모아 둔 곳에서 찾아요. 여러 객체에 같은 이유가 쏟아지면 공통 원인을 먼저 봐요.">
+  <Flow
+    ariaLabel="1단계 이벤트의 칸을 알고, 2단계 Warning만 골라 보되 1시간이 지났다면 4단계 모아 둔 곳에서 찾고, 3단계 이유로 다음에 볼 곳을 정하되 여러 객체에서 같은 이유가 나오면 공통 원인을 보는 흐름도"
+    nodes={[
+      { id: 's1', label: '이벤트 칸', col: 0, row: 0, note: '1단계' },
+      { id: 's2', label: 'Warning만', col: 0, row: 1, note: '2단계', tone: 'warn' },
+      { id: 's4', label: '모아 둔 곳', col: 2, row: 1, note: '4단계' },
+      { id: 's3', label: '이유(reason)', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '공통 원인', col: 2, row: 2, note: 'DB·네트워크' },
+      { id: 'next', label: '다음 볼 곳', col: 0, row: 3, note: '표 오른쪽 칸', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 's4', label: '1시간 지남' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '여러 객체' },
+      { from: 's3', to: 'next' },
+    ]}
+  />
+</Figure>
 
 ## 1. 이벤트가 무엇을 담는지 알아 두세요
 
@@ -63,6 +84,17 @@ updated: 2026-10-21
 | Failed, BackOff(이미지) | 이미지를 받지 못해 다시 받기를 미뤄요 | 이미지 이름·태그와 인증 정보 |
 
 BackOff라는 이유는 두 곳에서 함께 써요. 메시지에 `restarting failed container`가 있으면 재시작, `pulling image`가 있으면 이미지 받기예요.
+
+<Figure caption="이유가 똑같이 BackOff여도 메시지로 갈라요. 재시작과 이미지 받기는 다음에 볼 곳이 달라요.">
+  <Compare
+    columns={['재시작 BackOff', '이미지 BackOff']}
+    rows={[
+      { label: '메시지에 든 말', values: ['restarting failed container', 'pulling image'] },
+      { label: '뜻', values: ['컨테이너가 죽어 다시 띄우기를 미뤄요', '이미지를 받지 못해 다시 받기를 미뤄요'] },
+      { label: '다음에 볼 곳', values: ['파드가 계속 재시작될 때', '이미지 이름·태그와 인증 정보'] },
+    ]}
+  />
+</Figure>
 
 같은 시각에 여러 객체에서 같은 이유가 쏟아진다면, 파드 하나보다 공통 원인을 먼저 봐요. 예를 들어 여러 노드의 파드가 동시에 Unhealthy라면 그 파드들이 함께 기대는 DB나 네트워크를 봐요.
 

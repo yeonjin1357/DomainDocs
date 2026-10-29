@@ -18,3 +18,11 @@
   - 조인: SQL 1번, 0.72ms.
 - 참고: Jakarta Persistence 4.0(마일스톤)에서는 to-one 연관의 기본값이 `FetchType.DEFAULT`(영속성 단위 설정을 따름)로 바뀌어서, 글에는 "JPA 3.2의 기본값"으로 버전을 밝혔어요.
 - 함께 한 것: 용어 n-plus-one, lazy-loading을 올리고 퀴즈 5문제를 썼어요. 「트레이스 워터폴 읽기」 본문과 「Top SQL」의 Check 링크를 이 글로 이었어요.
+
+## 다시 확인 (2026-10-29)
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| JPQL 질의가 EAGER 연관을 빼먹으면 Hibernate는 연관마다 secondary select를 보내 N+1이 될 수 있음, 그래서 LAZY로 두고 질의마다 함께 가져오는 편이 나음 | https://docs.hibernate.org/orm/6.6/userguide/html_single/Hibernate_User_Guide.html#fetching |
+
+- 고친 것: `getCustomer()` 예시는 LAZY일 때의 동작인데, 표는 `@ManyToOne` 기본값이 EAGER라고 해서 어긋났어요. EAGER에서도 목록을 가져오는 순간 N+1이 생긴다는 문단을 더했어요.

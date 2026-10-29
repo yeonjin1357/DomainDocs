@@ -1,6 +1,6 @@
 ---
 title: 교착이 났을 때
-summary: 교착 오류를 알아보고, 서버 로그에서 두 트랜잭션을 찾아 잠그는 순서를 맞추고 다시 시도하게 해요.
+summary: 교착 에러를 알아보고, 서버 로그에서 두 트랜잭션을 찾아 잠그는 순서를 맞추고 다시 시도하게 해요.
 domain: database
 type: guide
 order: 55
@@ -24,11 +24,11 @@ sources:
     url: https://docs.oracle.com/en/error-help/db/ora-00060/
   - title: SQL Server — Deadlocks guide
     url: https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-deadlocks-guide
-updated: 2026-10-28
+updated: 2026-10-29
 ---
 
 <Situation>
-  계좌 이체 API에서 하루 몇 번씩 `deadlock detected` 오류가 나요. 다시 누르면 대부분 성공해서, 사용자 문의는 가끔 들어와요.
+  계좌 이체 API에서 하루 몇 번씩 `deadlock detected` 에러가 나요. 다시 누르면 대부분 성공해서, 사용자 문의는 가끔 들어와요.
 
   <Term term="database/deadlock">교착</Term>(deadlock)은 두 트랜잭션이 서로 상대가 쥔 잠금을 기다려 둘 다 못 나가는 상태예요. DB가 한쪽을 실패시켜 풀어 주지만, 같은 코드라면 또 나요.
 
@@ -36,27 +36,50 @@ updated: 2026-10-28
 </Situation>
 
 <FirstLook>
-  <Item title="오류 번호">교착 오류가 맞는지 봐요.</Item>
+  <Item title="에러 번호">교착 에러가 맞는지 봐요.</Item>
   <Item title="서버 로그">엇갈린 두 SQL을 찾아요.</Item>
   <Item title="잠그는 순서">두 코드가 같은 순서로 잠그는지 봐요.</Item>
 </FirstLook>
 
-## 1. 교착 오류인지 확인하세요
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 오른쪽은 그 단계에서 조건에 맞을 때 볼 곳이에요. 배포 뒤 교착이 늘었다면 새 코드가 잠그는 순서를 봐요.">
+  <Flow
+    ariaLabel="1단계 에러 번호로 교착인지 확인하고, 2단계 서버 로그에서 두 SQL을 찾되 다른 DB라면 그 DB의 기록을 봐요. 3단계 잠금 순서를 맞추고, 4단계 다시 시도하게 한 뒤, 5단계 교착 횟수를 세고, 배포 뒤 늘었다면 새 코드의 잠금 순서를 보는 흐름도"
+    nodes={[
+      { id: 's1', label: '에러 번호', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 's2', label: '서버 로그', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: 'DB별 기록', col: 2, row: 1, note: 'MySQL 등' },
+      { id: 's3', label: '잠금 순서', col: 0, row: 2, note: '3단계' },
+      { id: 's4', label: '다시 시도', col: 0, row: 3, note: '4단계' },
+      { id: 's5', label: '교착 횟수', col: 0, row: 4, note: '5단계', tone: 'accent' },
+      { id: 'e5', label: '새 코드', col: 2, row: 4, note: '잠그는 순서' },
+    ]}
+    edges={[
+      { from: 's1', to: 's2', label: '교착 맞음' },
+      { from: 's2', to: 'e2', label: '다른 DB' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 's4' },
+      { from: 's4', to: 's5' },
+      { from: 's5', to: 'e5', label: '배포 뒤 늘음' },
+    ]}
+  />
+</Figure>
 
-DB는 교착을 스스로 찾아 한쪽 트랜잭션을 실패시키고 되돌려요. 남은 쪽은 잠금을 얻어 그대로 끝나요. 실패한 쪽이 받는 오류는 DB마다 달라요.
+## 1. 교착 에러인지 확인하세요
 
-| DB | 오류 |
+DB는 교착을 스스로 찾아 한쪽 트랜잭션을 실패시키고 되돌려요. 남은 쪽은 잠금을 얻어 그대로 끝나요. 실패한 쪽이 받는 에러는 DB마다 달라요.
+
+| DB | 에러 |
 | --- | --- |
 | PostgreSQL | `deadlock detected`, SQLSTATE 40P01 |
 | MySQL | 1213 `ER_LOCK_DEADLOCK`, SQLSTATE 40001 |
 | Oracle | ORA-00060 |
 | SQL Server | 1205 |
 
-PostgreSQL은 잠금을 `deadlock_timeout`(기본 1초)만큼 기다린 뒤에 교착인지 검사해요. 재현에서도 두 번째 트랜잭션이 엇갈린 지 1초 뒤에 한쪽이 오류를 받았어요.
+PostgreSQL은 잠금을 `deadlock_timeout`(기본 1초)만큼 기다린 뒤에 교착인지 검사해요. 재현에서도 두 번째 트랜잭션이 엇갈린 지 1초 뒤에 한쪽이 에러를 받았어요.
 
 ## 2. 서버 로그에서 두 SQL을 찾으세요
 
-앱이 받는 오류에는 어느 SQL끼리 엇갈렸는지가 다 나오지 않아요. PostgreSQL은 서버 로그에 두 프로세스와 각자의 SQL을 함께 남겨요.
+앱이 받는 에러에는 어느 SQL끼리 엇갈렸는지가 다 나오지 않아요. PostgreSQL은 서버 로그에 두 프로세스와 각자의 SQL을 함께 남겨요.
 
 ```text
 ERROR:  deadlock detected
@@ -78,7 +101,7 @@ PostgreSQL 18로 재현한 로그예요. 645번은 646번의 트랜잭션을, 64
 
 다른 DB에서 보는 곳은 이래요.
 
-- **MySQL**: `SHOW ENGINE INNODB STATUS`의 LATEST DETECTED DEADLOCK에 마지막 교착만 남아요. 모두 남기려면 `innodb_print_all_deadlocks`를 켜서 오류 로그에 써요.
+- **MySQL**: `SHOW ENGINE INNODB STATUS`의 LATEST DETECTED DEADLOCK에 마지막 교착만 남아요. 모두 남기려면 `innodb_print_all_deadlocks`를 켜서 에러 로그에 써요.
 - **Oracle**: 문서가 트레이스 파일에서 관련 트랜잭션과 자원을 보라고 해요.
 - **SQL Server**: 기본으로 켜진 `system_health` 세션이 교착 그래프(`xml_deadlock_report`)를 남겨요.
 
@@ -101,11 +124,25 @@ A가 1번에서 2번으로 이체하고, 같은 때 B가 2번에서 1번으로 �
 
 PostgreSQL 문서는 교착을 막는 가장 좋은 방법으로 일관된 잠금 순서를 들어요. 이체라면 보내는 쪽·받는 쪽과 상관없이 계좌 번호가 작은 행부터 바꿔요. 그러면 두 트랜잭션이 같은 행에서 줄을 서고, 엇갈리지 않아요.
 
+<Figure caption="순서를 맞춘 뒤의 모습이에요. B도 1번 계좌부터 잠그려 해서, A가 끝날 때까지 1번에서 줄을 서요. 그사이 A는 2번도 잠그고 끝까지 가요.">
+  <Sequence
+    ariaLabel="두 트랜잭션이 모두 1번 행부터 잠그면, B는 1번 행에서 줄을 서고, A가 2번 행까지 잠그고 끝난 뒤 B가 1번과 2번 행을 차례로 잠그는 순서"
+    participants={['트랜잭션 A', '1번 행', '2번 행', '트랜잭션 B']}
+    messages={[
+      { from: '트랜잭션 A', to: '1번 행', label: '잠금' },
+      { from: '트랜잭션 B', to: '1번 행', label: '잠그려다 줄 섬', tone: 'warn' },
+      { from: '트랜잭션 A', to: '2번 행', label: '잠금' },
+      { from: '트랜잭션 B', to: '1번 행', label: 'A가 끝난 뒤 잠금', tone: 'accent' },
+      { from: '트랜잭션 B', to: '2번 행', label: '잠금', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
 트랜잭션을 짧게 두는 것도 도와요. 잠금을 쥔 시간이 짧을수록 엇갈릴 틈이 줄어요.
 
 ## 4. 다시 시도하게 하세요
 
-순서를 맞춰도 교착을 모두 없애기는 어려워요. 그래서 앱은 교착 오류를 받으면 트랜잭션을 처음부터 다시 시도해야 해요. MySQL의 오류 문구도 'try restarting transaction'이에요.
+순서를 맞춰도 교착을 모두 없애기는 어려워요. 그래서 앱은 교착 에러를 받으면 트랜잭션을 처음부터 다시 시도해야 해요. MySQL의 에러 문구도 'try restarting transaction'이에요.
 
 다시 시도할 때는 실패한 SQL 하나가 아니라 트랜잭션 전체를 다시 해요. 실패한 쪽 트랜잭션은 이미 통째로 되돌려졌기 때문이에요. 몇 번까지 다시 할지와 사이 간격도 정해 둬요.
 
@@ -116,9 +153,9 @@ PostgreSQL은 `pg_stat_database`의 `deadlocks`에 DB마다 교착 횟수를 쌓
 배포 뒤 이 값이 갑자기 는다면, 새 코드가 잠그는 순서를 바꾸지 않았는지 봐요.
 
 <Checkpoints>
-  <Check>교착 오류를 받은 쪽 SQL만 고쳤다면 다시 보세요. 교착은 두 트랜잭션이 함께 만든 거라, 서버 로그에서 상대 SQL도 찾아야 해요.</Check>
+  <Check>교착 에러를 받은 쪽 SQL만 고쳤다면 다시 보세요. 교착은 두 트랜잭션이 함께 만든 거라, 서버 로그에서 상대 SQL도 찾아야 해요.</Check>
   <Check>같은 행들을 바꾸는 코드가 여러 곳이라면, 모두 같은 순서로 잠그는지 보세요. 한 곳만 반대여도 엇갈려요.</Check>
-  <Check>교착 오류를 받으면 실패한 SQL 하나만 다시 보내는 코드라면 다시 보세요. 트랜잭션 전체가 이미 되돌려졌어요.</Check>
+  <Check>교착 에러를 받으면 실패한 SQL 하나만 다시 보내는 코드라면 다시 보세요. 트랜잭션 전체가 이미 되돌려졌어요.</Check>
   <Check>MySQL에서 교착 원인을 찾는데 마지막 한 건만 보인다면, innodb_print_all_deadlocks를 켜서 모두 남기세요.</Check>
   <Check>교착 횟수를 그래프에 그렸는데 계속 오르기만 한다면, 쌓이는 값이라 그래요. 구간마다 늘어난 양으로 보세요.</Check>
 </Checkpoints>

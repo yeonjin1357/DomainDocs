@@ -14,7 +14,7 @@ sources:
     url: https://man7.org/linux/man-pages/man1/du.1.html
   - title: lsof(8)
     url: https://man7.org/linux/man-pages/man8/lsof.8.html
-updated: 2026-10-21
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -28,6 +28,29 @@ updated: 2026-10-21
   <Item title="무엇이 늘었나">어느 디렉터리가 커졌는지 찾아요.</Item>
   <Item title="지워도 남는 공간">열린 채 지워진 파일이 있는지 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 먼저 봐요. 지웠는데 사용량이 그대로일 때 3단계로 가요.">
+  <Flow
+    ariaLabel="1단계에서 inode만 찼다면 작은 파일이 많은 디렉터리를 찾고, 용량이 찼다면 2단계에서 늘어난 곳과 흔한 범인을 찾아요. 지워도 그대로면 3단계에서 열린 채 지워진 파일을 찾아 그 프로세스를 다시 시작하고, 4단계에서 남은 시간을 계산하는 흐름도"
+    nodes={[
+      { id: 's1', label: '용량·inode', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '작은 파일', col: 2, row: 0, note: '많은 디렉터리' },
+      { id: 's2', label: '늘어난 곳', col: 0, row: 1, note: '2단계' },
+      { id: 'e2', label: '흔한 범인', col: 2, row: 1, note: '로그·백업·DB' },
+      { id: 's3', label: '열린 파일', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '그 프로세스', col: 2, row: 2, note: '다시 시작' },
+      { id: 's4', label: '남은 시간', col: 0, row: 3, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: 'inode만 참' },
+      { from: 's1', to: 's2', label: '용량 참' },
+      { from: 's2', to: 'e2' },
+      { from: 's2', to: 's3', label: '지워도 그대로' },
+      { from: 's3', to: 'e3', label: '찾으면' },
+      { from: 's3', to: 's4' },
+    ]}
+  />
+</Figure>
 
 ## 1. 어느 파일 시스템의 무엇이 찼는지 보세요
 
@@ -69,6 +92,17 @@ updated: 2026-10-21
 사용률 숫자보다 "언제 다 차는가"가 더 쓸모 있어요. 지난 며칠 동안 늘어난 속도로, 남은 공간을 다 쓰는 데 걸리는 시간을 계산해요.
 
 예를 들어 남은 공간이 50GB이고 하루에 10GB씩 는다면 5일이 남아요. 같은 95%라도 하루에 0.1GB씩 느는 서버와는 급한 정도가 달라요. 알림에 이 남은 시간을 함께 보여 주면, 무엇부터 손볼지 정하기 쉬워요.
+
+<Figure caption="남은 공간이 똑같이 50GB인 두 서버를 5일 동안 본 예시예요. 하루 10GB씩 느는 서버는 5일 뒤 다 차고, 0.1GB씩 느는 서버는 거의 그대로예요.">
+  <MiniLineChart
+    ariaLabel="남은 공간 50GB에서 하루 10GB씩 줄어 5일 뒤 0이 되는 서버와, 하루 0.1GB씩 줄어 5일 뒤에도 49.5GB인 서버의 그래프"
+    yMax={60}
+    series={[
+      { label: '하루 10GB씩', values: [50, 40, 30, 20, 10, 0], tone: 'warn', value: '5일 뒤 0GB' },
+      { label: '하루 0.1GB씩', values: [50, 49.9, 49.8, 49.7, 49.6, 49.5], tone: 'accent', value: '49.5GB' },
+    ]}
+  />
+</Figure>
 
 <Checkpoints>
   <Check>로그를 지울 때 `rm` 대신, 열려 있는 파일이면 내용을 비우는(`: > 파일`) 방법을 고려하세요. 지운 파일을 프로세스가 붙잡고 있으면 공간이 돌아오지 않아요.</Check>

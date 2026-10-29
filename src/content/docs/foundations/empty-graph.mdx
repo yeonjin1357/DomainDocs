@@ -1,6 +1,6 @@
 ---
 title: 그래프가 비어 있을 때 무엇부터 볼까
-summary: 패널의 오류 표시부터 보고, 시간 범위·질의·수집·실제로 일이 없었는지 순서로 봐요.
+summary: 패널의 에러 표시부터 보고, 시간 범위·질의·수집·실제로 일이 없었는지 순서로 봐요.
 domain: foundations
 type: guide
 order: 80
@@ -11,7 +11,7 @@ sources:
     url: https://prometheus.io/docs/prometheus/latest/querying/basics/
   - title: Grafana 소스 — 질의가 실패해도 패널 본문엔 No data (PanelDataErrorView.tsx)
     url: https://github.com/grafana/grafana/blob/86037971957ea7c9c879e582643fbb0731f78b5b/public/app/features/panel/components/PanelDataErrorView.tsx#L158-L159
-  - title: Grafana Scenes 소스 — 질의 오류 메시지를 패널 머리에 띄움 (VizPanelRenderer.tsx)
+  - title: Grafana Scenes 소스 — 질의 에러 메시지를 패널 머리에 띄움 (VizPanelRenderer.tsx)
     url: https://github.com/grafana/scenes/blob/v8.21.1/packages/scenes/src/components/VizPanel/VizPanelRenderer.tsx#L483-L492
   - title: Prometheus — Storage (보관 기간 기본값 15d)
     url: https://prometheus.io/docs/prometheus/latest/storage/
@@ -47,13 +47,13 @@ sources:
     url: https://prometheus.io/docs/prometheus/latest/configuration/configuration/
   - title: Prometheus 소스 — scrape/scrape.go (추가에 실패하면 받은 값을 버리고 수집 실패로 침)
     url: https://github.com/prometheus/prometheus/blob/v3.15.0/scrape/scrape.go#L1611-L1635
-  - title: Prometheus 소스 — scrape/target.go (오류 문구 sample limit exceeded)
+  - title: Prometheus 소스 — scrape/target.go (에러 문구 sample limit exceeded)
     url: https://github.com/prometheus/prometheus/blob/v3.15.0/scrape/target.go#L363-L366
   - title: Prometheus 소스 — scrape/scrape.go (수집에 실패하면 up을 0으로 남김)
     url: https://github.com/prometheus/prometheus/blob/v3.15.0/scrape/scrape.go#L2297-L2310
   - title: Prometheus — Getting started (Status > Target health)
     url: https://prometheus.io/docs/prometheus/latest/getting_started/
-  - title: Prometheus 소스 — Target health 화면이 대상별 오류를 보여 줌 (ScrapePoolsList.tsx)
+  - title: Prometheus 소스 — Target health 화면이 대상별 에러를 보여 줌 (ScrapePoolsList.tsx)
     url: https://github.com/prometheus/prometheus/blob/v3.15.0/web/ui/mantine-ui/src/pages/targets/ScrapePoolsList.tsx#L320-L376
   - title: Prometheus — Using Prometheus as your OpenTelemetry backend (target_info)
     url: https://prometheus.io/docs/guides/opentelemetry/
@@ -67,13 +67,13 @@ sources:
     url: https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rule-evaluation/nodata-and-error-states/
   - title: Prometheus — Query functions (absent_over_time)
     url: https://prometheus.io/docs/prometheus/latest/querying/functions/
-updated: 2026-10-13
+updated: 2026-10-29
 ---
 
 <Situation>
   대시보드 패널에 No data가 떠요. 어제까지 이어지던 선이 중간에 끊기기도 해요. 서비스 장애일까요, 수집이 멈췄을까요, 질의가 틀렸을까요?
 
-  질의가 실패해도 본문엔 No data가 떠요. 이때는 패널 머리에 오류 표시가 뜨니, 그 메시지부터 봐요. 오류 표시 없이 비었다면 원인은 크게 네 갈래라, 아래 순서대로 좁혀요.
+  질의가 실패해도 본문엔 No data가 떠요. 이때는 패널 머리에 에러 표시가 뜨니, 그 메시지부터 봐요. 에러 표시 없이 비었다면 원인은 크게 네 갈래라, 아래 순서대로 좁혀요.
 </Situation>
 
 <FirstLook>
@@ -82,11 +82,55 @@ updated: 2026-10-13
   <Item title="수집이 살아 있는지">`up`(수집 상태 지표)이 1인지, 0인지, 아예 없는지 봐요.</Item>
 </FirstLook>
 
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 2단계에서 조건을 지웠을 때 이 조합만 없으면 4단계로, 다 지워도 비면 3단계로 가요. 4단계에서 다른 시계열도 비었다면 점선을 따라 3단계로 돌아가요.">
+  <Flow
+    ariaLabel="No data가 뜨면 패널 머리를 보고, 에러 표시가 있으면 에러 메시지부터 읽어요. 없으면 1단계 시간 범위를 보고, 7일 내내 비면 2단계 질의 조건으로 가요. 이 조합만 없으면 4단계 정말 일이 없었는지로, 다 지워도 비면 3단계 수집 상태로 가요. 4단계에서 다른 시계열이 늘면 일이 없었던 것이고, 다른 시계열도 비면 3단계로 돌아가는 흐름도"
+    nodes={[
+      { id: 'nd', label: 'No data', col: 0, row: 0, note: '패널 머리 보기', tone: 'warn' },
+      { id: 'err', label: '에러 메시지', col: 2, row: 0, note: '먼저 읽기' },
+      { id: 's1', label: '시간 범위', col: 0, row: 1, note: '1단계' },
+      { id: 's2', label: '질의 조건', col: 0, row: 2, note: '2단계' },
+      { id: 's4', label: '정말 없었나', col: 2, row: 2, note: '4단계' },
+      { id: 's3', label: '수집 상태', col: 0, row: 3, note: '3단계', tone: 'accent' },
+      { id: 'none', label: '일이 없었음', col: 2, row: 3, note: '수집은 정상', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'nd', to: 'err', label: '에러 표시' },
+      { from: 'nd', to: 's1', label: '표시 없음' },
+      { from: 's1', to: 's2', label: '7일 내내 빔' },
+      { from: 's2', to: 's4', label: '이 조합만 없음' },
+      { from: 's2', to: 's3', label: '다 지워도 빔' },
+      { from: 's4', to: 'none', label: '다른 것 늚' },
+      { from: 's4', to: 's3', dashed: true },
+    ]}
+  />
+</Figure>
+
 ## 1. 시간 범위와 시간대를 확인하세요
 
 화면이 보는 기간에 데이터가 남아 있는지부터 봐요. Prometheus는 보관 설정을 따로 하지 않으면 15일 치만 남겨서, 30일 전을 그리는 화면은 비어요.
 
 절대 시각으로 범위를 정했다면 시간대를 봐요. Grafana는 입력한 시각을 대시보드 시간대로 읽어요. UTC 대시보드에 KST로 생각한 14:00을 넣으면 KST 23:00을 봐서, 지금이 KST 16:00라면 아직 오지 않은 시간이라 비어요.
+
+<Figure caption="시각을 모두 KST로 놓은 예시예요. 14:00부터 1시간을 보려 했지만, UTC 대시보드는 23:00부터를 봐요. 지금은 16:00이라 그 시간엔 아직 데이터가 없어요.">
+  <Timeline
+    ariaLabel="KST 12시부터 24시까지의 띠에서 데이터는 지금인 16시까지만 있고, 생각한 14시부터 1시간이 아니라 아직 오지 않은 23시부터 1시간을 보는 시간 띠"
+    start={12}
+    end={24}
+    lanes={[
+      { label: '데이터', segments: [{ start: 12, end: 16, label: '지금까지', tone: 'accent' }] },
+      { label: '생각한 곳', segments: [{ start: 14, end: 15 }] },
+      { label: '실제로 봄', segments: [{ start: 23, end: 24, tone: 'warn' }] },
+    ]}
+    marks={[{ at: 16, label: '지금' }]}
+    ticks={[
+      { at: 12, label: '12시' },
+      { at: 14, label: '14시' },
+      { at: 16, label: '16시' },
+      { at: 23, label: '23시' },
+    ]}
+  />
+</Figure>
 
 한 패널만 비었다면 그 패널의 Query options에서 Relative time·Time shift를 봐요. 둘 다 패널만 다른 기간을 보게 하는 설정으로, <Term slug="foundations/why-numbers-differ">같은 지표가 화면마다 다르게 보이는 이유</Term>에도 나와요. 제목 옆의 시계 아이콘과 기간도 단서예요.
 
@@ -97,7 +141,7 @@ updated: 2026-10-13
 
 ## 2. 질의가 실제로 있는 시계열을 가리키는지 보세요
 
-Prometheus는 조건에 맞는 <Term slug="foundations/time-series-and-labels">시계열</Term>이 없으면 오류 없이 빈 결과를 돌려줘요. 그래서 레이블 조건 하나만 어긋나도 화면은 조용히 비어요. 이런 곳에서 어긋나요.
+Prometheus는 조건에 맞는 <Term slug="foundations/time-series-and-labels">시계열</Term>이 없으면 에러 없이 빈 결과를 돌려줘요. 그래서 레이블 조건 하나만 어긋나도 화면은 조용히 비어요. 이런 곳에서 어긋나요.
 
 - **오타와 대소문자**: `=`는 값이 글자 그대로 같아야 골라요. `status="Error"`로는 `status="error"`가 나오지 않아요.
 - **정규식**: `=~`도 값 전체가 맞아야 해요. `route=~"/api"`는 `/api/users`를 고르지 않으니, `"/api.*"`처럼 써요.
@@ -122,12 +166,24 @@ Prometheus는 조건에 맞는 <Term slug="foundations/time-series-and-labels">�
 **확인 방법**: Explore에서 `up{job="api"}`를 실행해요.
 
 - **앱이 OTLP(OpenTelemetry 전송 규약)로 직접 보낸다면**: 가져가는 대상이 아니라서 `up`이 없어요. 그 앱이 보내는 지표나 `target_info{job="api"}`(받은 앱의 정보를 담는 지표)가 계속 들어오는지 봐요.
-- **0이면**: Prometheus의 Status → Target health 화면에서 그 대상의 오류 메시지를 봐요.
+- **0이면**: Prometheus의 Status → Target health 화면에서 그 대상의 에러 메시지를 봐요.
 - **결과가 비면**: job 이름이 맞는지 보고, Target health 목록에 그 대상이 있는지 찾아요. 서비스 디스커버리(수집 대상을 자동으로 찾는 기능)에서 빠진 대상은 `up`이 0이 아니라 함께 사라져요. 그래서 `up == 0`만 찾으면 놓쳐요.
 
 ## 4. 정말 일이 없었는지 보세요
 
 앞의 셋이 모두 정상이라면 그 일이 정말 없었을 수 있어요. Prometheus Go·Python 클라이언트(앱에서 지표를 만드는 라이브러리)에선 레이블 조합을 처음 기록할 때 시계열이 생겨요. 그래서 500 응답이 한 번도 없던 경로엔 `status="500"` 시계열이 없고, 그 질의는 0이 아니라 빈 결과예요.
+
+<Figure caption="한 경로의 요청 카운터를 1분마다 본 예시예요. 500 시계열은 첫 500 응답을 기록할 때 생겨서, 그 전엔 0이 아니라 아예 없어요.">
+  <Strip
+    ariaLabel="1분부터 6분까지 status 200 시계열은 처음부터 값이 있고, status 500 시계열은 4분까지 없다가 5분에 첫 500 응답이 기록되며 1로 생기는 칸 띠"
+    rows={[
+      { label: 'status="200" 시계열', heads: ['1분', '2분', '3분', '4분', '5분', '6분'], cells: ['120', '240', '360', '480', '600', '720'] },
+      { label: 'status="500" 시계열', cells: [{ label: '없음', tone: 'sub' }, { label: '없음', tone: 'sub' }, { label: '없음', tone: 'sub' }, { label: '없음', tone: 'sub' }, { label: '1', tone: 'warn' }, '1'] },
+    ]}
+    marks={[{ row: 1, at: 4, label: '첫 500', tone: 'warn' }]}
+    ranges={[{ row: 1, from: 0, to: 3, label: '0이 아니라 빈 결과' }]}
+  />
+</Figure>
 
 빈 결과만으로는 500 응답이 없었는지, 수집이 멈췄는지 구별할 수 없어요. 그래서 <Term slug="foundations/no-data-vs-zero">데이터 없음</Term>을 0으로 읽으면 장애를 놓쳐요.
 

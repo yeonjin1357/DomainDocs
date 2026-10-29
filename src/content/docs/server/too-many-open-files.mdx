@@ -30,7 +30,7 @@ sources:
     url: https://prometheus.io/docs/instrumenting/writing_clientlibs/
   - title: node_exporter — filefd collector (node_filefd_allocated, node_filefd_maximum)
     url: https://github.com/prometheus/node_exporter/blob/master/collector/filefd_linux.go
-updated: 2026-10-23
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -38,7 +38,7 @@ updated: 2026-10-23
 
   리눅스에서 프로세스는 파일, 소켓, 파이프를 열 때마다 번호를 하나씩 받아요. 이 번호가 <Term term="server/file-descriptor">파일 디스크립터</Term>(fd)예요.
 
-  프로세스마다 열어 둘 수 있는 fd 수에 한도가 있고, 닿으면 이 오류가 나요. 한도가 낮은지, 닫지 않고 새는지를 가려요.
+  프로세스마다 열어 둘 수 있는 fd 수에 한도가 있고, 닿으면 이 에러가 나요. 한도가 낮은지, 닫지 않고 새는지를 가려요.
 </Situation>
 
 <FirstLook>
@@ -47,9 +47,34 @@ updated: 2026-10-23
   <Item title="계속 느는가">줄지 않고 늘기만 하면 새는 거예요.</Item>
 </FirstLook>
 
+<Figure caption="에러 메시지로 먼저 갈라요. in system이 붙은 ENFILE이면 5단계로 가요. EMFILE이면 왼쪽 줄을 따라 내려가며, 단계마다 오른쪽 조건에 맞으면 그쪽을 봐요.">
+  <Flow
+    ariaLabel="에러가 ENFILE이면 5단계 서버 전체 한도를, EMFILE이면 1단계 열린 수와 한도로 가요. 2단계에서 같은 파일을 여러 번 열었다면 닫지 않는 코드를, 소켓이면 3단계로 가요. 3단계에서 늘기만 하면 CLOSE-WAIT 연결을, 오르내리면 4단계 한도 올리기로 가는 흐름도"
+    nodes={[
+      { id: 'err', label: '에러 메시지', col: 0, row: 0, tone: 'warn' },
+      { id: 's5', label: '서버 전체', col: 2, row: 0, note: '5단계' },
+      { id: 's1', label: '열린 수·한도', col: 0, row: 1, note: '1단계' },
+      { id: 's2', label: '무엇을 열었나', col: 0, row: 2, note: '2단계' },
+      { id: 'e2', label: '닫지 않는 코드', col: 2, row: 2, note: '파일' },
+      { id: 's3', label: '계속 느나', col: 0, row: 3, note: '3단계' },
+      { id: 'e3', label: 'CLOSE-WAIT', col: 2, row: 3, note: '연결 닫는 곳' },
+      { id: 's4', label: '한도 올리기', col: 0, row: 4, note: '4단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'err', to: 's5', label: 'ENFILE' },
+      { from: 'err', to: 's1', label: 'EMFILE' },
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 'e2', label: '같은 파일' },
+      { from: 's2', to: 's3', label: '소켓' },
+      { from: 's3', to: 'e3', label: '늘기만 함' },
+      { from: 's3', to: 's4', label: '오르내림' },
+    ]}
+  />
+</Figure>
+
 ## 1. 열린 수와 한도를 견주세요
 
-한도는 두 개예요. 소프트 한도는 실제로 걸리는 값이고, 하드 한도는 소프트 한도를 올릴 수 있는 천장이에요. 열린 fd가 소프트 한도에 닿으면 파일 열기, 연결 받기가 `EMFILE`(Too many open files) 오류로 실패해요.
+한도는 두 개예요. 소프트 한도는 실제로 걸리는 값이고, 하드 한도는 소프트 한도를 올릴 수 있는 천장이에요. 열린 fd가 소프트 한도에 닿으면 파일 열기, 연결 받기가 `EMFILE`(Too many open files) 에러로 실패해요.
 
 **확인 방법**: 열린 수는 `ls /proc/<PID>/fd | wc -l`로 세요. 한도는 `grep 'Max open files' /proc/<PID>/limits`로 소프트와 하드를 함께 봐요. 셸에서 `ulimit -n`으로 본 값은 그 셸의 한도라, 서비스 프로세스와 다를 수 있어요.
 
@@ -63,14 +88,14 @@ updated: 2026-10-23
 
 `/proc/<PID>/fd` 안의 항목은 연 대상을 가리키는 링크예요. 파일은 파일 경로로, 소켓은 `socket:[번호]`로, 파이프는 `pipe:[번호]`로 보여요.
 
-<Figure caption="프로세스가 받은 fd 번호표예요. 0, 1, 2는 표준 입력·출력·오류로 처음부터 열려 있어요. 그 뒤로 파일이나 소켓을 열 때마다 다음 번호가 붙고, 소프트 한도에 닿으면 더 열지 못해요.">
+<Figure caption="프로세스가 받은 fd 번호표예요. 0, 1, 2는 표준 입력·출력·에러로 처음부터 열려 있어요. 그 뒤로 파일이나 소켓을 열 때마다 다음 번호가 붙고, 소프트 한도에 닿으면 더 열지 못해요.">
   <Strip
-    ariaLabel="fd 0은 표준 입력, 1은 표준 출력, 2는 표준 오류, 3은 로그 파일, 4부터 1,023까지는 대부분 소켓이고, 1,024개째에서 소프트 한도에 닿는 칸 띠"
+    ariaLabel="fd 0은 표준 입력, 1은 표준 출력, 2는 표준 에러, 3은 로그 파일, 4부터 1,023까지는 대부분 소켓이고, 1,024개째에서 소프트 한도에 닿는 칸 띠"
     rows={[
       {
         label: '결제 API의 fd',
         heads: ['0', '1', '2', '3', '4', '5', '6', '…', '1,023'],
-        cells: ['입력', '출력', '오류', '로그', { label: '소켓', tone: 'accent' }, { label: '소켓', tone: 'accent' }, { label: '소켓', tone: 'accent' }, { label: '…', tone: 'accent' }, { label: '소켓', tone: 'warn' }],
+        cells: ['입력', '출력', '에러', '로그', { label: '소켓', tone: 'accent' }, { label: '소켓', tone: 'accent' }, { label: '소켓', tone: 'accent' }, { label: '…', tone: 'accent' }, { label: '소켓', tone: 'warn' }],
       },
     ]}
     marks={[{ at: 8, label: '한도 1,024개째', tone: 'warn' }]}
@@ -97,7 +122,7 @@ ls -l /proc/<PID>/fd |
 
 ## 3. 계속 늘기만 하는지 보세요
 
-요청이 몰리면 fd가 늘었다가, 줄면 다시 내려와야 해요. 트래픽이 줄어도 fd 수가 계단처럼 올라가기만 한다면 어딘가에서 닫지 않는 거예요. 이때는 한도를 올려도 오류가 나는 날만 늦어져요.
+요청이 몰리면 fd가 늘었다가, 줄면 다시 내려와야 해요. 트래픽이 줄어도 fd 수가 계단처럼 올라가기만 한다면 어딘가에서 닫지 않는 거예요. 이때는 한도를 올려도 에러가 나는 날만 늦어져요.
 
 <Figure caption="열린 fd 수를 며칠 동안 본 예시예요. 정상이면 요청에 따라 오르내려요. 새는 프로세스는 계단처럼 오르기만 하다 한도 1,024에 닿아요.">
   <MiniLineChart
@@ -113,7 +138,7 @@ ls -l /proc/<PID>/fd |
 
 흔한 범인은 다 쓴 연결을 닫지 않는 코드예요. 상대가 연결을 끊었는데 앱이 소켓을 닫지 않으면, 연결이 CLOSE-WAIT 상태로 남아 fd를 계속 차지해요. 원리는 <Term slug="network/tcp-connections">TCP 연결</Term>에 있어요.
 
-**확인 방법**: `ss -tanp state close-wait`로 CLOSE-WAIT 연결과 그 연결을 가진 프로세스를 봐요. 이 수가 fd 수와 함께 늘고 있다면 앱 코드에서 연결을 닫는 곳을 찾아요. 연결 풀을 쓴다면 <Term slug="apm/connection-pool">연결 풀</Term>에서 빌린 연결을 돌려주는지도 봐요.
+**확인 방법**: `ss -tanp state close-wait`로 CLOSE-WAIT 연결과 그 연결을 가진 프로세스를 봐요. 이 수가 fd 수와 함께 늘고 있다면 앱 코드에서 연결을 닫는 곳을 찾아요. 커넥션 풀을 쓴다면 <Term slug="apm/connection-pool">커넥션 풀</Term>에서 빌린 연결을 돌려주는지도 봐요.
 
 ## 4. 한도가 낮다면 서비스 설정에서 올리세요
 
@@ -131,9 +156,20 @@ LimitNOFILE=65536
 
 `/etc/security/limits.conf`는 사용자가 로그인한 세션에 걸리는 설정이에요. 그래서 이 파일만 고치면 systemd가 띄운 서비스의 한도는 그대로예요.
 
+<Figure caption="한도를 정하는 곳이 둘로 나뉘어요. 서비스의 한도는 오른쪽 유닛 설정에서 정하고, 그 프로세스의 limits 파일로 확인해요.">
+  <Compare
+    columns={['로그인한 세션(셸)', 'systemd가 띄운 서비스']}
+    rows={[
+      { label: '한도를 정하는 곳', values: ['/etc/security/limits.conf', '유닛의 LimitNOFILE'] },
+      { label: '확인하는 법', values: ['셸에서 ulimit -n', '/proc/<PID>/limits'] },
+      { label: '왼쪽만 고치면', values: ['로그인한 세션에 걸려요', '한도가 그대로예요'] },
+    ]}
+  />
+</Figure>
+
 ## 5. 서버 전체가 찼는지 보세요
 
-오류가 `Too many open files in system`(`ENFILE`)이라면 프로세스 하나가 아니라 서버 전체의 한도에 닿은 거예요. 이 한도는 `/proc/sys/fs/file-max`에 있어요.
+에러가 `Too many open files in system`(`ENFILE`)이라면 프로세스 하나가 아니라 서버 전체의 한도에 닿은 거예요. 이 한도는 `/proc/sys/fs/file-max`에 있어요.
 
 **확인 방법**: `cat /proc/sys/fs/file-nr`의 세 숫자를 봐요. 할당된 수, 비어 있는 수, 최대치예요. 첫째 숫자가 셋째에 가깝다면 서버 전체에서 여는 수를 줄이거나 최대치를 올려요.
 
@@ -144,7 +180,7 @@ Prometheus 클라이언트 라이브러리는 프로세스 지표로 `process_op
 서버 전체는 node_exporter의 `node_filefd_allocated`와 `node_filefd_maximum`으로 봐요. `/proc/sys/fs/file-nr`의 첫째와 셋째 숫자예요.
 
 <Checkpoints>
-  <Check>오류가 나서 한도만 올렸다면, fd 수가 시간에 따라 계속 느는지 보세요. 새는 거라면 오류가 나는 날만 늦어져요.</Check>
+  <Check>에러가 나서 한도만 올렸다면, fd 수가 시간에 따라 계속 느는지 보세요. 새는 거라면 에러가 나는 날만 늦어져요.</Check>
   <Check>`/etc/security/limits.conf`를 고쳤는데 서비스의 한도가 그대로라면, systemd 유닛의 `LimitNOFILE`을 보세요.</Check>
   <Check>한도를 셸의 `ulimit -n`으로 확인했다면 다시 보세요. 서비스 프로세스의 실제 한도는 `/proc/<PID>/limits`에 있어요.</Check>
   <Check>`process_open_fds`를 그리기만 하고 알림이 없다면, `process_max_fds`에 대한 비율에 알림을 거세요. 한도에 닿은 뒤에는 새 연결을 못 받아 이미 장애예요.</Check>

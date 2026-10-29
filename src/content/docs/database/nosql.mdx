@@ -100,12 +100,12 @@ DynamoDB의 기본 읽기는 <Term term="database/eventual-consistency">결과�
 
 <Figure caption="읽기 용량을 초당 1,000단위로 정한 표의 예시예요. 1분 평균은 한도 아래인데도, 요청이 몰린 몇 초 때문에 같은 분에 스로틀링이 났어요.">
   <MiniLineChart
-    ariaLabel="1분 평균으로 본 초당 소비 읽기 용량이 600에서 990까지 올랐다가 내려오고, 정해 둔 용량 1000은 평평하며, 용량이 990 근처인 분에 스로틀된 요청이 솟는 선 그래프"
+    ariaLabel="1분 평균으로 본 초당 소비 읽기 용량이 600에서 990까지 올랐다가 내려오고, 정해 둔 용량 1000은 평평하며, 용량이 990 근처인 분에 스로틀링된 요청이 솟는 선 그래프"
     yMax={1200}
     series={[
       { label: '소비한 읽기 용량(1분 평균, 초당)', values: [600, 620, 700, 940, 990, 980, 700, 640] },
       { label: '정해 둔 용량', values: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000], tone: 'sub' },
-      { label: '스로틀된 요청(분당 건수)', values: [0, 0, 0, 90, 240, 150, 0, 0], tone: 'warn' },
+      { label: '스로틀링된 요청(분당 건수)', values: [0, 0, 0, 90, 240, 150, 0, 0], tone: 'warn' },
     ]}
   />
 </Figure>
@@ -120,9 +120,9 @@ SuccessfulRequestLatency는 DynamoDB 안에서 걸린 시간이에요. 네트워
 
 <Checkpoints>
   <Check>사용률을 ConsumedReadCapacityUnits의 Average로 계산했다면 다시 보세요. 1분 Sum을 60으로 나눠야 초당 소비량이에요.</Check>
-  <Check>표 사용률이 낮다고 스로틀링 원인에서 핫 파티션을 뺐다면 다시 보세요. KeyRange 스로틀 지표를 확인하세요.</Check>
+  <Check>표 사용률이 낮다고 스로틀링 원인에서 핫 파티션을 뺐다면 다시 보세요. KeyRange 스로틀링 지표를 확인하세요.</Check>
   <Check>방금 쓴 값이 안 읽힌다고 버그로 판단했다면 다시 보세요. 기본 읽기는 결과적 일관성이에요.</Check>
-  <Check>ThrottledRequests와 Throttle Events의 숫자가 달라 수집 오류로 봤다면 다시 보세요. 세는 단위가 달라요.</Check>
+  <Check>ThrottledRequests와 Throttle Events의 숫자가 달라 수집 에러로 봤다면 다시 보세요. 세는 단위가 달라요.</Check>
 </Checkpoints>
 
 <Deeper>

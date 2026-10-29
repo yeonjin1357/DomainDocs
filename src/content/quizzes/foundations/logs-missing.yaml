@@ -21,7 +21,7 @@ questions:
     explain: 한국 시간 10시는 UTC 1시인데, 이를 UTC 10시로 읽으니 9시간 뒤에 놓여요. 그래서 최근 30분을 검색하면 보이지 않아요.
   - id: dropped-silently
     type: ox
-    prompt: Fluent Bit이 재시도 한도를 넘겨 버린 로그는, 앱에 오류로 알려져 다시 쓰이나요?
+    prompt: Fluent Bit이 재시도 한도를 넘겨 버린 로그는, 앱에 에러로 알려져 다시 쓰이나요?
     answer: false
     explain: 버린 로그는 조용히 사라져요. 그래서 재시도 실패나 버린 수 지표에 알림을 걸어 둬요.
   - id: file-not-growing

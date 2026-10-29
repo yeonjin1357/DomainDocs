@@ -11,7 +11,7 @@ questions:
     explain: 모아 둔 토큰만큼은 한꺼번에 쓸 수 있어요. 다만 계속 이어서 쓸 수 있는 건 채우는 속도인 초당 20번이에요.
   - id: retry-immediately
     type: ox
-    prompt: 스로틀링 오류를 받으면 기다리지 않고 바로 몇 번 더 보내는 게 가장 빨리 성공하는 방법인가요?
+    prompt: 스로틀링 에러를 받으면 기다리지 않고 바로 몇 번 더 보내는 게 가장 빨리 성공하는 방법인가요?
     answer: false
     explain: 바로 다시 보내면 한도가 풀릴 틈 없이 계속 거절돼요. 간격을 두 배씩 늘리고 무작위로 흩어 보내요.
   - id: quota-vs-throttle

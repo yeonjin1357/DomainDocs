@@ -22,14 +22,14 @@ updated: 2026-10-29
 
 <OnDashboard title="주문 앱 · 오브젝트 토폴로지" caption="서비스에서 파드 2로 가는 선이 점선이에요. 파드 2는 셀렉터에는 맞지만 준비되지 않아 요청을 받지 않아요.">
   <Flow
-    ariaLabel="인그레스가 서비스로, 서비스가 파드 1과 파드 2로 이어지고, 레플리카셋과 디플로이먼트가 파드를 소유하는 관계도. 서비스에서 준비되지 않은 파드 2로 가는 선은 점선"
+    ariaLabel="인그레스가 서비스로, 서비스가 파드 1과 파드 2로 이어지고, ReplicaSet과 Deployment가 파드를 소유하는 관계도. 서비스에서 준비되지 않은 파드 2로 가는 선은 점선"
     nodes={[
       { id: 'ing', label: '인그레스', col: 0, row: 0 },
       { id: 'svc', label: '서비스', col: 1, row: 0 },
       { id: 'p1', label: '파드 1', col: 0, row: 1 },
       { id: 'p2', label: '파드 2', col: 1, row: 1, note: '준비 안 됨', tone: 'warn' },
-      { id: 'rs', label: '레플리카셋', col: 1, row: 2 },
-      { id: 'dep', label: '디플로이먼트', col: 2, row: 2 },
+      { id: 'rs', label: 'ReplicaSet', col: 1, row: 2 },
+      { id: 'dep', label: 'Deployment', col: 2, row: 2 },
     ]}
     edges={[
       { from: 'ing', to: 'svc' },
@@ -50,7 +50,7 @@ updated: 2026-10-29
     서비스와 파드 사이 선은 레이블 셀렉터로 정해요. 그런데 셀렉터에 맞아도 준비되지 않은 파드는 요청을 받지 않아요. 그래서 선에 준비 상태를 함께 보여 줘야 해요.
   </Point>
   <Point title="토폴로지는 그 순간의 사진이에요">
-    배포 중에는 파드와 레플리카셋이 계속 바뀌어요. 화면이 몇 시 몇 분의 모습인지 함께 봐야 해요.
+    배포 중에는 파드와 ReplicaSet이 계속 바뀌어요. 화면이 몇 시 몇 분의 모습인지 함께 봐야 해요.
   </Point>
 </KeyPoints>
 
@@ -58,13 +58,13 @@ updated: 2026-10-29
 
 | 선 | 근거가 되는 필드 |
 | --- | --- |
-| 디플로이먼트 → 레플리카셋 → 파드 | 아래 객체의 `metadata.ownerReferences` |
+| Deployment → ReplicaSet → 파드 | 아래 객체의 `metadata.ownerReferences` |
 | 서비스 → 파드 | 서비스의 셀렉터, 그 결과를 적은 EndpointSlice |
 | 인그레스 → 서비스 | 인그레스 규칙에 적은 대상 서비스 |
 | 파드 → 노드 | 파드의 `spec.nodeName` |
 | 파드 → PVC → PV | 파드의 볼륨에 적은 PVC, PVC와 PV의 연결 |
 
-<Term term="kubernetes/owner-reference">소유 관계</Term>는 "누가 이 객체를 만들고 관리하나"예요. 디플로이먼트가 레플리카셋을, 레플리카셋이 파드를 만들면 쿠버네티스가 이 필드를 자동으로 채워요.
+<Term term="kubernetes/owner-reference">소유 관계</Term>는 "누가 이 객체를 만들고 관리하나"예요. Deployment가 ReplicaSet을, ReplicaSet이 파드를 만들면 쿠버네티스가 이 필드를 자동으로 채워요.
 
 셀렉터는 "어떤 객체를 고르나"예요. 서비스는 셀렉터에 맞는 <Term term="kubernetes/label">레이블</Term>이 붙은 파드를 고르고, 컨트롤 플레인이 그 파드들을 <Term term="kubernetes/endpoint-slice">EndpointSlice</Term>에 적어요.
 
@@ -95,19 +95,19 @@ EndpointSlice 하나에는 기본으로 끝점 100개까지 담겨요. 파드가
 
 노드 장애의 영향을 볼 때는 클러스터 토폴로지가 빨라요. 요청이 왜 한 파드로 안 가는지 볼 때는 오브젝트 토폴로지가 빨라요.
 
-배포 중에는 한 디플로이먼트 아래 레플리카셋이 둘로 보여요. 옛 버전과 새 버전이 함께 있는 정상 상태예요. 주인 없이 직접 만든 파드는 워크로드 아래에 매달리지 않고 따로 떠 있어요.
+배포 중에는 한 Deployment 아래 ReplicaSet이 둘로 보여요. 옛 버전과 새 버전이 함께 있는 정상 상태예요. 주인 없이 직접 만든 파드는 워크로드 아래에 매달리지 않고 따로 떠 있어요.
 
 <Checkpoints>
   <Check>서비스와 파드 사이 선을 셀렉터만으로 그렸다면 다시 보세요. 준비되지 않은 파드도 선이 이어져, 요청을 받는 것처럼 보여요.</Check>
   <Check>EndpointSlice를 서비스마다 하나만 읽었다면 다시 보세요. 끝점이 100개를 넘으면 슬라이스가 여러 개예요.</Check>
-  <Check>배포 중 레플리카셋이 두 개 보여 중복으로 판단했다면 다시 보세요. 롤링 업데이트 중에는 옛 것과 새 것이 함께 있어요.</Check>
+  <Check>배포 중 ReplicaSet이 두 개 보여 중복으로 판단했다면 다시 보세요. 롤링 업데이트 중에는 옛 것과 새 것이 함께 있어요.</Check>
   <Check>화면에 수집 시각이 없다면 넣어 주세요. 토폴로지는 그 시각의 사진이에요.</Check>
 </Checkpoints>
 
 <Deeper>
   ### 소유 관계와 함께 지우기
 
-  디플로이먼트를 지우면 레플리카셋과 파드가 함께 지워지는 것도 소유 관계 덕분이에요. 쿠버네티스는 이 필드를 보고 딸린 객체를 정리해요.
+  Deployment를 지우면 ReplicaSet과 파드가 함께 지워지는 것도 소유 관계 덕분이에요. 쿠버네티스는 이 필드를 보고 딸린 객체를 정리해요.
 
   ### 종료 중인 파드
 

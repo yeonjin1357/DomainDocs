@@ -28,7 +28,7 @@ sources:
     url: https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/V-SQL.html
   - title: Oracle 19c — Overview of SQL Plan Management
     url: https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/overview-of-sql-plan-management.html
-updated: 2026-10-26
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -42,6 +42,31 @@ updated: 2026-10-26
   <Item title="예상과 실제 행 수">계획의 예상 행 수가 실제와 크게 다른지 봐요.</Item>
   <Item title="통계와 바인드 값">통계가 낡았는지, 값마다 계획이 다른지 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 오른쪽은 그 단계에서 원인이 보일 때 할 일이에요. 1회 실행 시간이 그대로라면 계획이 아니라 더 자주 불린 거예요.">
+  <Flow
+    ariaLabel="1단계 한 번 실행 시간이 그대로면 호출 증가 쪽으로, 뛰었다면 2단계 예상과 실제 행 수로 가요. 3단계 통계가 낡았다면 ANALYZE를, 4단계 범용 계획 탓이면 그 세션에만 맞춤 계획을 쓰고, 둘 다 아니면 5단계 주변 변경을 보는 흐름도"
+    nodes={[
+      { id: 's1', label: '한 번 실행', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '호출 증가', col: 2, row: 0, note: '자주 불림' },
+      { id: 's2', label: '예상·실제 행', col: 0, row: 1, note: '2단계' },
+      { id: 's3', label: '통계', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: 'ANALYZE', col: 2, row: 2, note: '통계 다시' },
+      { id: 's4', label: '바인드 값', col: 0, row: 3, note: '4단계' },
+      { id: 'e4', label: '맞춤 계획', col: 2, row: 3, note: '세션·사용자만' },
+      { id: 's5', label: '주변 변경', col: 0, row: 4, note: '5단계', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '시간 그대로' },
+      { from: 's1', to: 's2', label: '뛰었음' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '낡음' },
+      { from: 's3', to: 's4' },
+      { from: 's4', to: 'e4', label: '범용 계획 탓' },
+      { from: 's4', to: 's5', label: '둘 다 아님' },
+    ]}
+  />
+</Figure>
 
 ## 1. 한 번 실행이 느려졌는지 보세요
 
@@ -80,6 +105,31 @@ LIMIT 10;
 
 앱이 준비된 문장(prepared statement)으로 SQL을 부를 때의 이야기예요. PostgreSQL은 처음 다섯 번은 값마다 맞춤 계획(custom plan)을 세워요. 그다음부터는 값을 보지 않는 <Term term="database/generic-plan">범용 계획</Term>이 맞춤 계획보다 크게 비싸지 않으면 범용 계획을 다시 써요.
 
+<Figure caption="준비된 문장을 부른 순서예요. 다섯 번까지는 값마다 맞춤 계획을 세워요. 그다음부터는 범용 계획이 크게 비싸지 않으면, 값을 보지 않고 범용 계획을 다시 써요.">
+  <Strip
+    ariaLabel="준비된 문장을 1번부터 5번까지는 값마다 맞춤 계획으로, 6번부터는 범용 계획으로 실행하는 칸 띠"
+    rows={[
+      {
+        label: '같은 준비된 문장을 부른 순서',
+        heads: ['1번', '2번', '3번', '4번', '5번', '6번', '7번'],
+        cells: [
+          { label: '맞춤', tone: 'accent' },
+          { label: '맞춤', tone: 'accent' },
+          { label: '맞춤', tone: 'accent' },
+          { label: '맞춤', tone: 'accent' },
+          { label: '맞춤', tone: 'accent' },
+          { label: '범용', tone: 'warn' },
+          { label: '범용', tone: 'warn' },
+        ],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 4, label: '값마다 맞춤 계획', tone: 'accent' },
+      { from: 5, to: 6, label: '범용 계획', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 값마다 행 수가 크게 다르면 여기서 문제가 생겨요. 아래는 PGlite(PostgreSQL 17.5)에서 재현한 예예요.
 
 <Figure caption="주문 20만 건 중 'pending'은 200건이에요. 처음에는 Nested Loop로 1.3ms였지만, 'done'으로 다섯 번 실행한 뒤에는 범용 계획(Hash Join)으로 바뀌어 같은 값이 125ms 걸렸어요.">
@@ -106,7 +156,7 @@ LIMIT 10;
 
 범용 계획이 원인이라면, 그 SQL을 쓰는 세션이나 사용자에만 `plan_cache_mode = force_custom_plan`을 걸 수 있어요. 대신 실행할 때마다 계획을 새로 세우는 시간이 들어요.
 
-두 열의 값이 함께 움직이면(예: 시와 구) 플래너는 따로 곱해 행 수를 너무 작게 예상해요. 이때는 `CREATE STATISTICS`로 두 열의 관계를 통계로 모아요.
+두 열의 값이 함께 움직이면(예: 시와 구) 옵티마이저는 따로 곱해 행 수를 너무 작게 예상해요. 이때는 `CREATE STATISTICS`로 두 열의 관계를 통계로 모아요.
 
 ## 다른 DB에서는
 

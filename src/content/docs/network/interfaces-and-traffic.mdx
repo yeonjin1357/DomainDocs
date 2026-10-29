@@ -1,6 +1,6 @@
 ---
 title: 인터페이스와 트래픽
-summary: 장비는 인터페이스마다 오간 양과 오류를 누적해 세요. bps와 사용률은 두 번 읽은 차이로 구해요.
+summary: 장비는 인터페이스마다 오간 양과 에러를 누적해 세요. bps와 사용률은 두 번 읽은 차이로 구해요.
 domain: network
 type: concept
 stage: basics
@@ -16,7 +16,7 @@ updated: 2026-10-21
 
 <KeyPoints>
   <Point title="인터페이스마다 오간 양을 세요">
-    받은 바이트와 보낸 바이트, 오류와 버린 패킷을 인터페이스마다 쌓아 세요.
+    받은 바이트와 보낸 바이트, 에러와 버린 패킷을 인터페이스마다 쌓아 세요.
   </Point>
   <Point title="bps와 사용률은 차이로 구해요">
     두 번 읽은 차이에 8을 곱해 걸린 초로 나누면 bps예요. 이걸 인터페이스 속도로 나누면 사용률이에요.
@@ -38,8 +38,8 @@ updated: 2026-10-21
 | --- | --- |
 | ifInOctets, ifOutOctets | 받은·보낸 바이트(32비트 카운터) |
 | ifHCInOctets, ifHCOutOctets | 같은 값을 64비트로 센 카운터 |
-| ifInErrors | 오류가 있어 위로 넘기지 못한 받은 패킷 수 |
-| ifInDiscards | 오류는 없었지만 버린 받은 패킷 수 |
+| ifInErrors | 에러가 있어 위로 넘기지 못한 받은 패킷 수 |
+| ifInDiscards | 에러는 없었지만 버린 받은 패킷 수 |
 | ifSpeed, ifHighSpeed | 인터페이스 속도(bps, ifHighSpeed는 Mbps 단위) |
 | ifAdminStatus | 관리자가 정한 상태(켬·끔) |
 | ifOperStatus | 지금 실제 동작 상태 |
@@ -71,23 +71,23 @@ updated: 2026-10-21
 
 장비를 다시 켜면 카운터는 0부터 다시 세요. 이때 차이를 그대로 계산하면 음수나 엄청나게 큰 값이 나와요.
 
-## 오류와 버린 패킷, 상태
+## 에러와 버린 패킷, 상태
 
-ifInErrors는 패킷에 오류가 있어 받지 못한 수예요. 흔히 케이블이나 포트 같은 물리 문제를 먼저 의심해요.
+ifInErrors는 패킷에 에러가 있어 받지 못한 수예요. 흔히 케이블이나 포트 같은 물리 문제를 먼저 의심해요.
 
-ifInDiscards는 오류는 없었지만 버린 수예요. 문서는 버퍼 공간을 비우려고 버리는 경우를 예로 들어요.
+ifInDiscards는 에러는 없었지만 버린 수예요. 문서는 버퍼 공간을 비우려고 버리는 경우를 예로 들어요.
 
 상태는 두 가지를 함께 봐요. 관리 상태(ifAdminStatus)는 관리자가 켜 두었는지, 동작 상태(ifOperStatus)는 실제로 통신이 되는지예요. 켜 두었는데 동작 상태가 down이라면 고장이고, 관리자가 꺼 둔 포트가 down인 건 정상이에요.
 
 ## 모니터링에서는
 
-<Figure caption="코어 스위치 업링크 포트의 예시예요. 받는 트래픽이 500Mbps(사용률 50%)이고, 입력 오류가 분당 120개씩 늘고 있어요.">
+<Figure caption="코어 스위치 업링크 포트의 예시예요. 받는 트래픽이 500Mbps(사용률 50%)이고, 입력 에러가 분당 120개씩 늘고 있어요.">
   <StatTile label="받는 트래픽" value="500" unit="Mbps" />
   <StatTile label="받는 쪽 사용률" value="50" unit="%" />
-  <StatTile label="입력 오류" value="120" unit="/분" tone="warn" />
+  <StatTile label="입력 에러" value="120" unit="/분" tone="warn" />
 </Figure>
 
-네트워크 장비 화면은 대부분 이 값들을 인터페이스마다 그래프로 보여 줘요. 트래픽과 사용률은 방향마다, 오류와 버린 패킷은 늘어나는 속도로 봐요.
+네트워크 장비 화면은 대부분 이 값들을 인터페이스마다 그래프로 보여 줘요. 트래픽과 사용률은 방향마다, 에러와 버린 패킷은 늘어나는 속도로 봐요.
 
 <Checkpoints>
   <Check>1Gbps 이상 인터페이스를 32비트 카운터(ifInOctets)로 1분마다 읽는다면 다시 보세요. 그사이 카운터가 한 바퀴 넘게 돌아 트래픽이 작게 나와요. ifHCInOctets로 읽으세요.</Check>

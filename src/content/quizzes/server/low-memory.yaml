@@ -26,10 +26,10 @@ questions:
     explain: RSS는 프로세스 전체가 실제 메모리에 올린 양이고, 힙은 그중 일부예요. 둘을 따로 보면 어디가 느는지 갈라져요.
   - id: vanished-process
     type: choice
-    prompt: 앱 프로세스가 오류 로그도 없이 사라졌어요. 가장 먼저 볼 곳은?
+    prompt: 앱 프로세스가 에러 로그도 없이 사라졌어요. 가장 먼저 볼 곳은?
     choices:
       - 커널 로그의 Killed process 기록
-      - 앱의 오류 로그
+      - 앱의 에러 로그
       - 디스크 사용률 그래프
       - CPU 부하 그래프
     answer: 0

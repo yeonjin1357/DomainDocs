@@ -34,7 +34,7 @@ sources:
     url: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#cardinality-limits
   - title: OpenTelemetry — Prometheus and OpenMetrics compatibility (Metric Attributes)
     url: https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/#metric-attributes
-updated: 2026-10-14
+updated: 2026-10-29
 ---
 
 <Situation>
@@ -48,6 +48,29 @@ updated: 2026-10-14
   <Item title="어느 레이블의 값이 늘었는지">값 개수가 끝없이 늘어나는 레이블을 봐요.</Item>
   <Item title="언제부터 늘었는지">늘기 시작한 시각이 배포 시각과 맞는지 봐요.</Item>
 </FirstLook>
+
+<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 지표와 레이블을 찾아 계측 코드를 고치고, 마지막에 수집 한도를 둬요. 오른쪽은 단계마다 조건에 맞을 때 볼 곳이에요.">
+  <Flow
+    ariaLabel="1단계 시계열이 많은 지표를 찾고, 배포 시각부터 늘었다면 그 배포의 계측 코드를 의심해요. 2단계 값이 늘어나는 레이블을 찾고, 3단계 계측 코드를 고쳐요. 급하면 배포를 되돌리고 안 되면 그 지표를 버려요. 4단계 수집 한도를 두고, up이 0이 되면 평소 값에 걸린 것이라 한도를 올리는 흐름도"
+    nodes={[
+      { id: 's1', label: '많은 지표', col: 0, row: 0, note: '1단계', tone: 'warn' },
+      { id: 'e1', label: '배포한 코드', col: 2, row: 0, note: '원인 후보' },
+      { id: 's2', label: '레이블 값', col: 0, row: 1, note: '2단계' },
+      { id: 's3', label: '계측 코드', col: 0, row: 2, note: '3단계' },
+      { id: 'e3', label: '배포 되돌림', col: 2, row: 2, note: '안 되면 버림' },
+      { id: 's4', label: '수집 한도', col: 0, row: 3, note: '4단계', tone: 'accent' },
+      { id: 'e4', label: '한도 올리기', col: 2, row: 3, note: '평소 값에 걸림' },
+    ]}
+    edges={[
+      { from: 's1', to: 'e1', label: '배포 때부터' },
+      { from: 's1', to: 's2' },
+      { from: 's2', to: 's3' },
+      { from: 's3', to: 'e3', label: '급하면' },
+      { from: 's3', to: 's4' },
+      { from: 's4', to: 'e4', label: 'up이 0' },
+    ]}
+  />
+</Figure>
 
 ## 1. 시계열이 많은 지표를 찾으세요
 
@@ -79,6 +102,17 @@ scrape_samples_scraped{job="api"}
 지표를 찾았으면 레이블마다 값이 몇 개인지 세요. `method`나 `status`처럼 값이 몇 개로 정해진 레이블은 시계열을 끝없이 늘리지 못해요. 그래서 값이 다른 레이블보다 훨씬 많은 레이블이 원인이에요.
 
 끝없이 늘어나는 값의 예는 실제 경로(`/users/123`), 사용자 ID·요청 ID, 에러 메시지 원문이에요. 요청이나 사용자마다 새 값이 나와서, 새 값마다 시계열이 생겨요. Prometheus 문서도 사용자 ID처럼 끝없는 값은 레이블로 쓰지 말라고 해요.
+
+<Figure caption="같은 요청을 두 방식으로 route 레이블에 넣었어요. 실제 경로를 넣으면 새 사용자가 올 때마다 시계열이 하나씩 늘어요.">
+  <Compare
+    columns={['경로 틀을 넣을 때', '실제 경로를 넣을 때']}
+    rows={[
+      { label: 'route 값', values: ['/users/:id 하나', '/users/1, /users/2, …'] },
+      { label: '새 사용자의 요청', values: ['있던 시계열에 더해요', '새 시계열이 생겨요'] },
+      { label: '시계열 수', values: ['경로 틀 개수만큼', '사용자 수만큼 늘어요'] },
+    ]}
+  />
+</Figure>
 
 **확인 방법**: TSDB status 화면의 Top 10 label names with value count 표부터 봐요. 값이 수천 개인 레이블이 1단계 지표에 붙었는지는 아래 첫 질의로 Table 탭에서 확인해요. 화면이 없다면 `route` 자리에 레이블 이름을 바꿔 넣으며 실행해요.
 
@@ -114,7 +148,18 @@ scrape_configs:
         action: drop
 ```
 
-늘어난 레이블만 지우는 `labeldrop`은 여기에 쓰지 않아요. 그 레이블만 달랐던 시계열이 같은 레이블 조합이 되면, 값 하나만 남고 나머지는 오류 없이 사라져요. 또 `metric_relabel_configs`는 수집한 뒤에 버리는 거라, 앱은 그 시계열을 계속 만들어 내보내요.
+늘어난 레이블만 지우는 `labeldrop`은 여기에 쓰지 않아요. 그 레이블만 달랐던 시계열이 같은 레이블 조합이 되면, 값 하나만 남고 나머지는 에러 없이 사라져요. 또 `metric_relabel_configs`는 수집한 뒤에 버리는 거라, 앱은 그 시계열을 계속 만들어 내보내요.
+
+<Figure caption="route만 다른 시계열 세 개에서 route를 지운 예시예요. 남은 레이블이 모두 같아져 한 조합으로 겹치고, 값은 하나만 남아요.">
+  <Strip
+    ariaLabel="method가 모두 GET이고 route가 /users/1, /users/2, /users/3인 시계열 세 개에서 route를 지우면, 셋 다 method GET만 남아 같은 조합이 되고 값은 하나만 남는 칸 띠"
+    rows={[
+      { label: '지우기 전 route (method는 모두 GET)', cells: ['/users/1', '/users/2', '/users/3'] },
+      { label: 'route를 지운 뒤', cells: [{ label: 'GET', tone: 'warn' }, { label: 'GET', tone: 'warn' }, { label: 'GET', tone: 'warn' }] },
+    ]}
+    ranges={[{ row: 1, from: 0, to: 2, label: '같은 조합이라 값 하나만 남아요', tone: 'warn' }]}
+  />
+</Figure>
 
 **확인 방법**: 고친 코드를 배포했으면 임시로 버리던 설정을 지우고, 2단계의 값 개수 질의를 다시 실행해요. `route` 값 개수가 경로 틀 개수만큼으로 줄면 돼요. TSDB status 화면의 Number of Series는 옛 시계열이 head block에서 정리될 때까지 몇 시간 높게 남을 수 있어요.
 
@@ -139,7 +184,7 @@ scrape_configs:
 
 한도를 넘으면 늘어난 시계열만이 아니라 그 대상의 <Term slug="foundations/empty-graph">새 값이 모두 끊기고</Term>, `up`(수집 성공 1, 실패 0)은 0이 돼요. 그래서 한도는 평소 값보다 넉넉하게 잡고, `up == 0` 알림과 함께 둬요. 평소 샘플 수는 `scrape_samples_post_metric_relabeling{job="api"}`(거르고 남은 샘플 수)로 봐요.
 
-**확인 방법**: 설정을 적용한 뒤 `up{job="api"}`가 1로 남는지 봐요. 0이 됐다면 Status → Target health 화면의 오류에 `limit exceeded`가 있는지 봐요. 있다면 평소 값에 걸린 거라 한도를 올려요.
+**확인 방법**: 설정을 적용한 뒤 `up{job="api"}`가 1로 남는지 봐요. 0이 됐다면 Status → Target health 화면의 에러에 `limit exceeded`가 있는지 봐요. 있다면 평소 값에 걸린 거라 한도를 올려요.
 
 시계열 수가 갑자기 늘면 알림으로 받아요. Prometheus는 head block의 시계열 수를 `prometheus_tsdb_head_series`로 내보내요. 아래 규칙은 이 값이 하루 전의 1.5배를 넘은 채로 30분 이어지면 울려요.
 
