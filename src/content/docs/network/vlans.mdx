@@ -1,0 +1,136 @@
+---
+title: VLAN
+summary: 스위치 한 대를 여러 개의 독립된 네트워크처럼 나눠 쓰는 기능이에요.
+domain: network
+type: concept
+stage: basics
+order: 22
+icon: network
+keywords: [VLAN, 가상 LAN, 802.1Q, VLAN tag, trunk, 트렁크, access port, native VLAN, SVI, Q-BRIDGE-MIB]
+related: [network/switches-and-routers, network/interfaces-and-traffic, network/addresses, network/topology-discovery]
+sources:
+  - title: Cisco — Inter-Switch Link and IEEE 802.1Q Frame Format
+    url: https://www.cisco.com/c/en/us/support/docs/lan-switching/8021q/17056-741-4.html
+  - title: Cisco — Catalyst 2960 Software Configuration Guide, Configuring VLANs
+    url: https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst2960/software/release/12-2_58_se/configuration/guide/2960scg/swvlan.html
+  - title: Cisco — Catalyst 9500 VLAN Configuration Guide (IOS XE 17.7), Configuring VLANs
+    url: https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9500/software/release/17-7/configuration_guide/vlan/b_177_vlan_9500_cg/configuring_vlans.html
+  - title: RFC 4363 — Q-BRIDGE-MIB (Virtual LAN Extensions)
+    url: https://www.rfc-editor.org/rfc/rfc4363.html
+updated: 2026-10-29
+---
+
+<KeyPoints>
+  <Point title="스위치 한 대를 여러 네트워크로 나눠요">
+    같은 스위치에 꽂혀 있어도 VLAN이 다르면 서로 다른 네트워크예요. 플러딩도 VLAN 안에서만 퍼져요.
+  </Point>
+  <Point title="스위치 사이에서는 태그로 구분해요">
+    여러 VLAN을 한 선으로 나를 때는 프레임마다 4바이트 번호표(태그)를 붙여요.
+  </Point>
+  <Point title="VLAN 사이는 라우터를 거쳐요">
+    다른 VLAN과 통신하려면 라우터나 L3 스위치를 지나야 해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="칸막이는 눈에 보이지만 VLAN은 설정으로만 나뉘어요. 그래서 같은 케이블 안에서 여러 VLAN이 섞여 다니고, 설정이 틀리면 엉뚱한 칸으로 새요.">
+  넓은 사무실 한 층을 칸막이로 나눈 것과 같아요. 같은 층이어도 칸막이 너머 대화는 들리지 않고, 다른 칸으로 가려면 복도를 지나야 해요.
+</Analogy>
+
+## 왜 나누나요
+
+<Figure caption="개발팀과 회계팀 PC가 같은 스위치에 꽂혀 있지만 VLAN이 달라요. 두 팀은 서로 다른 네트워크라 직접 닿지 않아요.">
+  <Flow
+    ariaLabel="스위치 하나에 VLAN 10 개발팀 PC 두 대와 VLAN 20 회계팀 PC 두 대가 연결된 구조도"
+    nodes={[
+      { id: 'sw', label: '스위치', col: 1, row: 0, tone: 'accent' },
+      { id: 'd1', label: '개발 PC 1', col: 0, row: 1 },
+      { id: 'd2', label: '개발 PC 2', col: 0, row: 2 },
+      { id: 'a1', label: '회계 PC 1', col: 2, row: 1 },
+      { id: 'a2', label: '회계 PC 2', col: 2, row: 2 },
+    ]}
+    edges={[
+      { from: 'd1', to: 'sw' },
+      { from: 'd2', to: 'sw' },
+      { from: 'a1', to: 'sw' },
+      { from: 'a2', to: 'sw' },
+    ]}
+    groups={[
+      { label: 'VLAN 10', cols: [0, 0], rows: [1, 2] },
+      { label: 'VLAN 20', cols: [2, 2], rows: [1, 2] },
+    ]}
+  />
+</Figure>
+
+<Term term="network/switch">스위치</Term>는 원래 연결된 모든 포트를 한 네트워크로 묶어요. 받는 쪽을 모를 때 모든 포트로 보내는 <Term term="network/flooding">플러딩</Term>도 그 네트워크 전체에 퍼져요. 장비가 많아지면 상관없는 트래픽이 모두에게 닿아요.
+
+<Term term="network/vlan">VLAN</Term>(Virtual LAN)은 포트마다 번호를 붙여 네트워크를 나눠요. 같은 번호의 포트끼리만 한 네트워크예요. 위 그림의 두 팀은 같은 스위치를 쓰지만 서로의 플러딩을 받지 않아요.
+
+보통 VLAN 하나에 <Term term="network/subnet">서브넷</Term> 하나를 맞춰요. 예를 들어 VLAN 10은 `10.0.10.0/24`, VLAN 20은 `10.0.20.0/24`처럼 나눠요.
+
+## 포트의 두 종류
+
+| 포트 | 하는 일 | 흔한 연결 |
+| --- | --- | --- |
+| 액세스(access) | VLAN 하나에만 속해요. 태그 없이 주고받아요 | PC, 서버, 프린터 |
+| 트렁크(trunk) | 여러 VLAN을 한 선으로 날라요. 프레임마다 태그를 붙여요 | 스위치끼리, 스위치와 라우터 |
+
+PC는 자기가 어느 VLAN에 있는지 몰라요. <Term term="network/access-port">액세스 포트</Term>의 설정을 보고 스위치가 알아서 나눠요.
+
+스위치끼리 이은 선 하나로 여러 VLAN을 날라야 할 때는 <Term term="network/trunk-port">트렁크 포트</Term>를 써요. 트렁크로 나가는 프레임에는 어느 VLAN인지 적은 태그가 붙어요.
+
+## 태그는 4바이트 번호표예요
+
+트렁크로 나가는 프레임에는 보낸 쪽 MAC 주소 바로 뒤에 4바이트 <Term term="network/vlan-tag">802.1Q 태그</Term>가 끼어요. 프레임이 바뀌었으니 스위치는 끝의 오류 검사 값도 다시 계산해요.
+
+| 칸 | 크기 | 내용 |
+| --- | --- | --- |
+| 받는 MAC 주소 | 6바이트 | |
+| 보낸 MAC 주소 | 6바이트 | |
+| **802.1Q 태그** | **4바이트** | `0x8100`, 우선순위 3비트, CFI 1비트, VLAN 번호 12비트 |
+| 타입 | 2바이트 | IPv4 같은 다음 내용의 종류 |
+| 데이터 | | |
+
+앞 2바이트 `0x8100`이 "태그가 붙었다"는 표시예요. VLAN 번호는 12비트라 0부터 4095까지 담을 수 있어요. Cisco 스위치 설정에서 쓰는 번호는 1부터 4094까지예요.
+
+트렁크에서도 태그 없이 다니는 VLAN이 하나 있어요. 이를 <Term term="network/native-vlan">네이티브 VLAN</Term>이라고 하고, Cisco 스위치의 기본값은 VLAN 1이에요. 트렁크 양쪽의 네이티브 VLAN은 같아야 해요.
+
+## VLAN 사이는 라우터가 이어요
+
+VLAN이 다르면 다른 네트워크라서, 스위치는 VLAN 사이로 프레임을 넘기지 않아요. 둘을 이으려면 <Term term="network/router">라우터</Term>를 거쳐야 해요.
+
+L3 스위치는 VLAN마다 가상 인터페이스를 하나씩 두고 그 사이를 라우팅해요. Cisco는 이 인터페이스를 <Term term="network/svi">SVI</Term>(Switch Virtual Interface)라고 불러요. VLAN 안의 PC는 이 주소를 <Term term="network/default-gateway">기본 게이트웨이</Term>로 써요.
+
+## 모니터링에서는
+
+<Figure caption="같은 스위치의 인터페이스 목록 예시예요. 물리 포트와 VLAN 인터페이스는 세는 트래픽이 달라요.">
+  <Compare
+    columns={['물리 포트 Gi1/0/1', 'VLAN 인터페이스 Vlan10']}
+    rows={[
+      { label: '무엇인가요', values: ['선이 꽂힌 실제 포트', 'VLAN 10의 가상 인터페이스'] },
+      { label: '세는 트래픽', values: ['그 포트로 오간 모든 프레임', 'VLAN 10이 라우팅으로 밖과 오간 양'] },
+      { label: '빠지는 것', values: ['다른 포트의 트래픽', 'VLAN 10 안에서만 오간 트래픽'] },
+    ]}
+  />
+</Figure>
+
+장비의 인터페이스 목록에는 물리 포트와 함께 VLAN 인터페이스도 따로 나와요. VLAN 인터페이스의 트래픽은 그 VLAN이 다른 네트워크와 오간 양이에요. 같은 VLAN 안의 PC끼리 주고받은 양은 잡히지 않아요.
+
+트렁크 포트 하나가 끊기면 그 위의 모든 VLAN이 한꺼번에 끊겨요. 그래서 트렁크 포트는 액세스 포트보다 알림의 무게를 높게 둬요.
+
+트렁크는 기본으로 모든 VLAN을 통과시켜요. 허용 목록을 줄였다가 VLAN 하나를 빠뜨리면, 링크는 살아 있는데 그 VLAN만 통신이 안 돼요. 포트 상태만 보면 정상으로 보여요.
+
+<Checkpoints>
+  <Check>포트는 up인데 특정 팀만 통신이 안 된다면, 트렁크의 허용 VLAN 목록과 네이티브 VLAN이 양쪽에서 같은지 보세요.</Check>
+  <Check>VLAN 인터페이스의 트래픽을 그 VLAN의 전체 트래픽으로 여겼다면 다시 보세요. 같은 VLAN 안에서만 오간 양은 빠져요.</Check>
+  <Check>트렁크 포트와 액세스 포트를 같은 무게로 알리고 있다면 다시 보세요. 트렁크 하나에 여러 VLAN이 걸려 있어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 번호 범위
+
+  Cisco 스위치는 1~1005를 일반 범위, 1006~4094를 확장 범위로 나눠요. 1002~1005는 예전 토큰 링과 FDDI용으로 예약돼 있어요. VLAN 1은 처음부터 있는 기본 VLAN이라 지울 수 없어요.
+
+  ### SNMP로 읽는 VLAN 정보
+
+  VLAN 목록과 VLAN별 MAC 주소 표는 표준 Q-BRIDGE-MIB(RFC 4363)로 읽어요. 제조사마다 전용 MIB를 따로 두기도 해요.
+</Deeper>

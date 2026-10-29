@@ -1,0 +1,34 @@
+questions:
+  - id: read-after-gc
+    type: choice
+    prompt: GC 로그 'GC(7) Pause Young (Normal) (G1 Evacuation Pause) 110M->103M(128M) 0.940ms'에서 GC 직후 힙 사용량은?
+    choices: [103MB, 110MB, 128MB, 7MB]
+    answer: 0
+    explain: 화살표 앞은 GC 전, 뒤는 GC 후 사용량이에요. 괄호 안 128M은 지금 힙 크기예요.
+  - id: rotation-flag
+    type: ox
+    prompt: JDK 21에서 -XX:+UseGCLogFileRotation을 주면 경고만 내고 그대로 실행되나요?
+    answer: false
+    explain: Unrecognized VM option으로 JVM이 시작되지 않아요. 돌려쓰기는 -Xlog의 filecount와 filesize로 정해요.
+  - id: concurrent-not-pause
+    type: choice
+    prompt: GC로 멈춘 시간의 합계를 낼 때 더하지 말아야 할 줄은?
+    choices: [Concurrent Mark Cycle, Pause Young (Normal), Pause Remark, Pause Full]
+    answer: 0
+    explain: Concurrent Mark Cycle은 앱과 함께 돌아서 앱을 멈추지 않아요. Pause가 들어간 줄만 더해요.
+  - id: after-evac-failure
+    type: choice
+    prompt: G1 로그에 Evacuation Failure가 이어진 뒤 흔히 따라오는 것은?
+    choices:
+      - Pause Full (G1 Compaction Pause)
+      - Pause Cleanup만 반복돼요
+      - GC가 더 이상 일어나지 않아요
+      - 힙 크기가 저절로 두 배가 돼요
+    answer: 0
+    explain: 옮길 자리가 없다는 뜻이라, G1은 결국 힙 전체를 압축하는 Full GC를 해요. 힙이 모자라다는 신호예요.
+  - id: serial-in-small-pod
+    type: choice
+    prompt: CPU 한도 1개, 메모리 한도 1GB인 파드에서 JDK 21이 기본으로 고르는 GC는?
+    choices: [Serial, G1, ZGC, Parallel]
+    answer: 0
+    explain: CPU 2개 이상, 메모리 1792MB 이상이어야 서버급으로 보고 G1을 골라요. 그 아래에서는 Serial이에요.

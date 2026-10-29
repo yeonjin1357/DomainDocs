@@ -1,0 +1,38 @@
+questions:
+  - id: delete-later-layer
+    type: ox
+    prompt: Dockerfile에서 50MB 파일을 만들고 다음 줄의 RUN에서 지우면, 이미지가 그만큼 작아지나요?
+    answer: false
+    explain: 지우는 레이어에는 '없음' 표시만 담기고, 50MB를 만든 레이어는 그대로 남아요. 만든 RUN 안에서 함께 지워야 작아져요.
+  - id: shared-base
+    type: choice
+    prompt: 같은 alpine 베이스로 만든 이미지 두 개를 한 노드에 받을 때 일어나는 일은?
+    choices:
+      - 베이스 레이어는 한 번만 받아요
+      - 베이스 레이어를 두 번 받아 따로 둬요
+      - 두 번째 이미지는 받지 못해요
+      - 두 이미지를 합쳐 새 레이어를 만들어요
+    answer: 0
+    explain: 레이어는 내용의 지문(다이제스트)으로 가리켜요. 지문이 같은 레이어가 노드에 있으면 다시 받지 않아요.
+  - id: cow-where
+    type: choice
+    prompt: 실행 중인 컨테이너가 이미지에 있던 /etc/motd를 고치면, 고친 파일은 어디에 남을까요?
+    choices:
+      - 그 컨테이너의 쓰기 레이어
+      - 이미지의 베이스 레이어
+      - 레지스트리
+      - 같은 이미지의 모든 컨테이너가 함께 쓰는 레이어
+    answer: 0
+    explain: 고칠 때 파일을 쓰기 레이어로 복사한 뒤 고쳐요. 아래 레이어는 그대로라 다른 컨테이너에 영향이 없어요.
+  - id: pull-policy-default
+    type: choice
+    prompt: imagePullPolicy를 적지 않고 이미지를 app:1.4.2로 지정했어요. 기본 정책은?
+    choices: [IfNotPresent, Always, Never, OnFailure]
+    answer: 0
+    explain: latest가 아닌 태그나 다이제스트로 가리키면 IfNotPresent예요. latest이거나 태그가 없으면 Always예요.
+  - id: cow-name
+    type: input
+    prompt: 아래 층의 파일을 고칠 때 위 층으로 복사한 뒤 고치는 방식을 무엇이라고 할까요?
+    answer: [쓸 때 복사, copy-on-write, CoW, 카피 온 라이트]
+    term: kubernetes/copy-on-write
+    explain: 그래서 같은 이미지로 띄운 컨테이너들이 읽기 전용 레이어를 함께 써도 서로 영향을 주지 않아요.

@@ -1,0 +1,133 @@
+---
+title: 네트워크 성능 모니터링(NPM)
+summary: 서버 사이의 연결마다 지연과 재전송을 재서, 어느 구간이 느린지 찾아요.
+domain: network
+type: concept
+stage: monitoring
+order: 79
+icon: network
+keywords: [NPM, network performance monitoring, 네트워크 성능, 재전송, retransmission, RTT, eBPF, ss, RetransSegs, 서비스 간 트래픽]
+related: [network/tcp-connections, network/flows, network/latency-and-loss, network/ping-and-latency, apm/service-map]
+sources:
+  - title: RFC 4022 — Management Information Base for TCP (tcpRetransSegs, tcpOutSegs)
+    url: https://www.rfc-editor.org/rfc/rfc4022.html
+  - title: Linux man-pages — ss(8)
+    url: https://man7.org/linux/man-pages/man8/ss.8.html
+  - title: eBPF.io — What is eBPF?
+    url: https://ebpf.io/what-is-ebpf/
+updated: 2026-10-29
+---
+
+<OnDashboard title="서버 간 통신 · 최근 15분" caption="주문 서버에서 결제 서버로 가는 연결의 RTT와 재전송이 함께 올랐어요. 앱이 느려진 원인이 네트워크 쪽이라는 신호예요.">
+  <StatTile label="주문 → 결제 RTT" value="38" unit="ms" tone="warn" note="평소 2ms" />
+  <StatTile label="재전송 비율" value="3.1" unit="%" tone="warn" />
+  <StatTile label="연결 실패" value="0" unit="번" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="장비가 아니라 연결을 봐요">
+    SNMP 화면이 장비와 포트를 본다면, NPM(Network Performance Monitoring)은 서버와 서버 사이의 연결을 봐요. "주문 서버 → 결제 서버" 같은 줄마다 오간 양, 지연, 재전송을 보여 줘요.
+  </Point>
+  <Point title="재전송은 손실의 흔적이에요">
+    TCP는 받았다는 답이 오지 않으면 같은 조각을 다시 보내요. 재전송이 늘었다면 그 사이 어딘가에서 패킷이 버려지거나 늦게 도착한 거예요.
+  </Point>
+  <Point title="값은 서버의 커널이 이미 세요">
+    연결마다 RTT와 재전송 수는 서버의 TCP 처리부가 이미 재고 있어요. 요즘 도구는 eBPF로 이 값을 커널 안에서 바로 모아요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="택배는 잃어버리면 그걸로 끝이지만, TCP는 잃어버린 조각을 다시 보내요. 그래서 네트워크 손실은 실패보다 재전송과 지연으로 먼저 나타나요.">
+  톨게이트마다 지나간 차를 세는 게 장비 모니터링이라면, NPM은 택배 하나하나의 출발지, 도착지, 걸린 시간을 적는 거예요.
+</Analogy>
+
+## 무엇을 재나요
+
+| 값 | 뜻 |
+| --- | --- |
+| 보낸·받은 바이트 | 연결마다 오간 양 |
+| RTT | 조각을 보내고 받았다는 답이 오기까지 걸린 시간 |
+| 재전송 | 다시 보낸 조각 수 |
+| 연결 실패·리셋 | 연결을 맺지 못했거나 강제로 끊긴 수 |
+
+값은 연결의 양 끝(서버 IP, 포트, 프로세스)으로 묶어요. 그러면 어느 서비스가 어느 서비스와 얼마나, 얼마나 빠르게 주고받았는지 보여요.
+
+<Term slug="network/flows">흐름 정보</Term>가 장비를 지나간 패킷을 센다면, NPM은 서버가 직접 겪은 지연과 재전송을 재요. 둘은 같은 통신을 다른 자리에서 봐요.
+
+## 서버가 이미 세고 있어요
+
+리눅스는 연결마다 <Term term="network/rtt">RTT</Term>와 재전송 수를 이미 재고 있어요. `ss -ti` 명령으로 볼 수 있어요. 아래는 WSL의 Ubuntu에서 실제 연결 하나를 본 결과의 일부예요.
+
+```text
+rtt:236.89/89.307 minrtt:236.599
+cwnd:10 unacked:2
+```
+
+`rtt:236.89/89.307`은 평균 RTT 236.89ms와 그 흔들림 89.307ms예요. ss 문서는 두 값을 평균 왕복 시간과 평균 편차라고 설명해요.
+
+서버 전체의 재전송은 `/proc/net/snmp`의 `RetransSegs`로 세요. 보낸 조각 수 `OutSegs`와 함께 읽어요.
+
+## 재전송 비율 읽기
+
+재전송은 수보다 비율로 봐요. 같은 1분 동안 `RetransSegs`가 30, `OutSegs`가 1,000 늘었다면 재전송 비율은 3%예요.
+
+RFC 4022에 따르면 `OutSegs`는 재전송한 바이트만 담은 조각을 세지 않아요. 그래서 이 비율은 정확히 "새로 보낸 조각 대비 다시 보낸 조각"이에요.
+
+두 값은 계속 늘기만 하는 <Term slug="foundations/counters-and-rate">카운터</Term>예요. 그래서 구간 사이의 차이로 계산해요.
+
+## eBPF로 모아요
+
+<Figure caption="NPM 에이전트는 커널의 TCP 처리 지점에 eBPF 프로그램을 붙여 연결마다 값을 모아요. 앱 코드는 고치지 않아요.">
+  <Flow
+    ariaLabel="앱 프로세스의 통신이 커널 TCP 처리부를 지나고, 그곳에 붙은 eBPF 프로그램의 값을 에이전트가 모아 모니터링 서버로 보내는 구조도"
+    nodes={[
+      { id: 'app', label: '앱 프로세스', col: 0, row: 0 },
+      { id: 'tcp', label: '커널 TCP', col: 1, row: 0, note: 'eBPF가 붙어요', tone: 'accent' },
+      { id: 'agent', label: 'NPM 에이전트', col: 1, row: 1 },
+      { id: 'server', label: '모니터링 서버', col: 2, row: 1 },
+    ]}
+    edges={[
+      { from: 'app', to: 'tcp' },
+      { from: 'tcp', to: 'agent' },
+      { from: 'agent', to: 'server' },
+    ]}
+  />
+</Figure>
+
+<Term term="network/ebpf">eBPF</Term>는 리눅스 커널 안에서 작은 프로그램을 안전하게 돌리는 기능이에요. 커널 소스를 고치거나 커널 모듈을 올리지 않아도 돼요. 올리기 전에 검사기(verifier)가 안전한지 먼저 확인해요.
+
+NPM 에이전트는 eBPF 프로그램을 TCP 처리 지점에 붙여, 연결이 열리고 닫히고 다시 보낼 때마다 기록해요. 그래서 앱을 고치지 않아도 서버 사이의 연결이 모두 보여요.
+
+## 화면에서 읽는 법
+
+<Figure caption="같은 주문 서버에서 나가는 두 연결이에요. 결제 서버로 가는 쪽만 RTT가 뛰어서, 주문 서버가 아니라 결제 쪽 경로를 의심해요.">
+  <MiniLineChart
+    ariaLabel="주문에서 결제로 가는 RTT는 2ms에서 38ms까지 뛰었다가 돌아오고, 주문에서 재고로 가는 RTT는 2ms 안팎으로 그대로인 선 그래프"
+    series={[
+      { label: '주문 → 결제 RTT(ms)', values: [2, 2, 3, 2, 25, 38, 36, 4, 2], tone: 'warn' },
+      { label: '주문 → 재고 RTT(ms)', values: [2, 2, 2, 3, 2, 2, 3, 2, 2], tone: 'sub' },
+    ]}
+  />
+</Figure>
+
+RTT와 재전송이 함께 오르면 경로에서 패킷이 버려지는 중이에요. RTT만 오르고 재전송이 그대로라면, 경로가 붐비거나 상대가 늦게 답하는 중일 수 있어요.
+
+한 서버에서 나가는 모든 연결이 함께 나빠지면 그 서버나 그 서버의 링크를 봐요. 특정 상대로 가는 연결만 나빠지면 그 상대나 그 사이 경로를 봐요.
+
+RTT는 조각을 보내고 받았다는 답이 오기까지예요. 답은 상대 커널이 보내서, 앱이 요청을 처리한 시간은 들어 있지 않아요. 앱 처리 시간은 <Term slug="apm/transactions-and-response-time">트랜잭션 응답시간</Term>으로 봐요.
+
+<Checkpoints>
+  <Check>재전송 수를 비율 없이 서버끼리 견줬다면 다시 보세요. 많이 보내는 서버는 재전송 수도 많아요. OutSegs와 함께 비율로 보세요.</Check>
+  <Check>RTT를 앱의 응답시간으로 읽었다면 다시 보세요. RTT에는 앱이 요청을 처리한 시간이 들어 있지 않아요.</Check>
+  <Check>에이전트를 설치한 서버 사이만 보인다는 점을 화면에 밝혔는지 보세요. 에이전트가 없는 서버와 장비 쪽 구간은 비어 있어요.</Check>
+  <Check>RetransSegs를 그대로 그래프에 그렸다면 다시 보세요. 계속 늘기만 하는 카운터라 구간 사이의 차이로 바꿔야 해요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### RFC 4022의 정의
+
+  `tcpRetransSegs`는 이미 보낸 바이트를 하나 이상 다시 담아 보낸 조각의 수예요. `tcpOutSegs`는 보낸 조각의 수인데, 재전송한 바이트만 담은 조각은 빼요. 리눅스의 `/proc/net/snmp`에서는 각각 `RetransSegs`, `OutSegs`라는 이름으로 나와요.
+
+  ### 패킷을 통째로 보는 방법과의 차이
+
+  패킷을 모두 복사해 분석하는 방식도 있어요. 정확하지만 복사와 분석에 자원이 많이 들어요. eBPF.io는 eBPF를 낮은 부담으로 세밀한 값을 모으는 관측 도구로 소개해요.
+</Deeper>

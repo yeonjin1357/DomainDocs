@@ -1,0 +1,128 @@
+---
+title: 열 지향 DB와 데이터 웨어하우스
+summary: 값을 행이 아니라 열마다 모아 저장해, 많은 행의 몇 열만 읽는 분석을 빠르게 해요.
+domain: database
+type: concept
+stage: basics
+order: 94
+icon: database
+keywords: [columnar, 열 지향, column store, data warehouse, 데이터 웨어하우스, Redshift, ClickHouse, WLM, Parquet, Too many parts]
+related: [database/memory-and-disk, database/nosql, database/partitioning, database/indexes]
+sources:
+  - title: Amazon Redshift — Columnar storage
+    url: https://docs.aws.amazon.com/redshift/latest/dg/c_columnar_storage_disk_mem_mgmnt.html
+  - title: Amazon Redshift — Performance data (CloudWatch metrics)
+    url: https://docs.aws.amazon.com/redshift/latest/mgmt/metrics-listing.html
+  - title: ClickHouse — Selecting an insert strategy
+    url: https://clickhouse.com/docs/best-practices/selecting-an-insert-strategy
+  - title: ClickHouse — MergeTree settings (parts_to_throw_insert)
+    url: https://github.com/ClickHouse/ClickHouse/blob/master/src/Storages/MergeTree/MergeTreeSettings.cpp
+updated: 2026-10-29
+---
+
+<KeyPoints>
+  <Point title="같은 열의 값을 모아 저장해요">
+    행 지향 DB는 한 행의 값을 붙여 저장하고, 열 지향 DB는 한 열의 값을 붙여 저장해요.
+  </Point>
+  <Point title="필요한 열만 읽어요">
+    분석은 많은 행에서 몇 열만 봐요. 열 지향 DB는 그 열만 읽어서 디스크를 훨씬 덜 읽어요.
+  </Point>
+  <Point title="조금씩 자주 넣기에는 약해요">
+    한 행이 여러 열에 흩어져 있어서, 한 행씩 자주 넣거나 고치는 일은 부담이 커요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="학생 한 명의 모든 과목을 보려면 과목마다 따로 꺼내야 해서 오히려 번거로워요. 열 지향 DB에서 한 행 전체를 읽는 일이 그래요.">
+  학생 카드 묶음과 과목별 점수표의 차이예요. 반의 수학 평균을 구할 때 학생 카드를 한 장씩 넘기는 대신, 수학 점수표 한 장만 읽어요.
+</Analogy>
+
+## 행으로 저장하나, 열로 저장하나
+
+<Figure caption="같은 표를 디스크에 붙여 담는 방향이 달라요. 그래서 잘하는 일도 달라요.">
+  <Compare
+    columns={['행 지향', '열 지향']}
+    rows={[
+      { label: '붙여 담는 것', values: ['한 행의 모든 열', '한 열의 모든 행'] },
+      { label: '잘하는 일', values: ['한 건 읽고 쓰기(주문 처리)', '많은 행의 몇 열 집계(통계)'] },
+      { label: '예', values: ['PostgreSQL, MySQL, Oracle', 'Redshift, ClickHouse'] },
+    ]}
+  />
+</Figure>
+
+주문을 처리하는 DB는 주문 한 건의 모든 값을 한 번에 읽고 써요. 그래서 한 행을 붙여 담는 행 지향이 맞아요.
+
+"지난달 상품별 평균 응답시간"을 묻는 분석은 수억 행에서 두세 열만 봐요. <Term term="database/columnar-storage">열 지향 저장</Term>은 그 열만 읽어요. Redshift 문서는 100열짜리 표에서 5열을 쓰는 질의라면 데이터의 약 5%만 읽는다고 해요.
+
+## 같은 값이 모여서 잘 줄어요
+
+요청 기록 100만 행을 행 단위 파일(CSV)과 열 단위 파일(Parquet)로 저장해 크기를 쟀어요. Parquet는 열 지향 DB처럼 열마다 값을 모아 압축하는 파일 형식이에요.
+
+<Figure caption="같은 요청 기록 100만 행을 두 형식으로 저장한 크기예요. 열마다 모아 압축하니 13분의 1쯤이 됐어요.">
+  <StatTile label="CSV(행 단위)" value="48.2" unit="MB" />
+  <StatTile label="Parquet(열 단위)" value="3.8" unit="MB" tone="accent" />
+</Figure>
+
+한 열에는 같은 종류의 값이 모여 있어서 잘 줄어요. 값의 종류가 적을수록 더 줄어요.
+
+| 열 | 값의 종류 | 저장 크기 |
+| --- | --- | --- |
+| 시각 | 100만 개 모두 달라요 | 2.6MB |
+| 응답시간 | 0~300 사이 무작위 | 1.1MB |
+| 경로 | 1,000가지 | 26KB |
+| 호스트 | 50가지 | 3.8KB |
+| 상태 코드 | 200, 500 두 가지 | 0.7KB |
+
+평균 응답시간을 구하는 질의는 응답시간 열 1.1MB만 읽으면 돼요. 같은 데이터를 CSV로 두면 48MB를 다 읽어야 해요.
+
+## 조금씩 자주 넣으면 힘들어요
+
+열 지향 DB는 데이터를 큰 묶음으로 넣는 걸 전제로 해요. ClickHouse는 INSERT 한 번마다 디스크에 조각(part) 하나를 만들고, 뒤에서 작은 조각들을 큰 조각으로 합쳐요.
+
+그래서 ClickHouse 문서는 한 번에 최소 1,000행, 가능하면 1만~10만 행씩 넣으라고 권해요. 한 행씩 자주 넣으면 조각이 합치는 속도보다 빨리 쌓여요.
+
+한 파티션의 조각이 1,000개를 넘으면 넣기를 일부러 늦춰요. 3,000개를 넘으면 `Too many parts` 오류로 넣기를 거절해요. 둘 다 기본값이에요.
+
+## 데이터 웨어하우스
+
+<Term term="database/data-warehouse">데이터 웨어하우스</Term>는 여러 시스템의 데이터를 모아 분석용으로 쌓아 두는 DB예요. 운영 DB가 지금 들어오는 일을 처리한다면, 웨어하우스는 쌓인 기록을 분석해요. Redshift 같은 웨어하우스는 열 지향으로 저장해요.
+
+운영 DB의 데이터는 정해진 주기로 웨어하우스에 옮겨요. 그래서 웨어하우스의 숫자는 옮기는 주기만큼 늦어요.
+
+## 모니터링에서는
+
+<Figure caption="Redshift 질의 시간의 예시예요. 실행 시간은 그대로인데 대기열에서 기다린 시간이 늘었어요. 질의가 느려진 게 아니라 자리가 모자란 거예요.">
+  <MiniLineChart
+    ariaLabel="질의 실행 시간은 3초 안팎으로 그대로이고, 대기열에서 기다린 시간은 0.2초에서 9초까지 늘었다가 줄어드는 선 그래프"
+    series={[
+      { label: '대기열에서 기다린 시간(초)', values: [0.2, 0.3, 0.3, 4, 9, 8, 0.5], tone: 'warn' },
+      { label: '실행 시간(초)', values: [3, 3.2, 3.1, 3.3, 3, 3.2, 3.1], tone: 'sub' },
+    ]}
+  />
+</Figure>
+
+분석 질의는 원래 수 초에서 수 분씩 걸려요. 그래서 질의 시간을 기다린 시간과 실행 시간으로 나눠 봐요.
+
+Redshift는 질의를 대기열(<Term term="database/wlm">WLM</Term>)에 넣고 자리가 나면 실행해요. 대기열에서 기다린 시간은 WLMQueueWaitTime으로, 기다리는 질의 수는 WLMQueueLength로 봐요. 디스크 사용률(PercentageDiskSpaceUsed)도 기본으로 함께 봐요.
+
+ClickHouse라면 파티션마다 조각 수를 지켜봐요. 조각 수가 늘기만 한다면 넣는 속도가 합치는 속도보다 빠른 거예요.
+
+<Checkpoints>
+  <Check>분석 DB에 한 행씩 자주 넣는 구현이라면 다시 보세요. 묶어서 넣어야 조각과 합치기 부담이 줄어요.</Check>
+  <Check>분석 질의가 느려졌다고 SQL부터 고치려 했다면 대기 시간을 먼저 보세요. 실행은 그대로이고 대기열에서 기다렸을 수 있어요.</Check>
+  <Check>열 지향 DB에서 모든 열을 읽는 SELECT *를 쓰고 있다면 다시 보세요. 모든 열을 읽어서 장점이 사라져요.</Check>
+  <Check>웨어하우스의 숫자를 운영 DB의 지금 값과 바로 견줬다면, 데이터를 옮기는 주기부터 확인하세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 재현 조건
+
+  DuckDB로 100만 행을 만들고, CSV와 Parquet(zstd 압축)로 저장했어요. 열마다 크기는 Parquet 파일의 메타데이터에서 읽었어요. 시각은 1초씩 늘렸고, 응답시간은 0~300 사이 무작위 정수예요.
+
+  ### 블록 크기
+
+  흔한 DB의 블록은 2KB~32KB예요. Redshift는 1MB 블록을 써서, 많은 데이터를 한 번에 읽고 넣는 일에 맞춰요.
+
+  ### 조각 한도의 변화
+
+  ClickHouse의 `parts_to_throw_insert`는 23.6 전에는 300이었어요. 값을 올리면 오류는 덜 나지만, 읽을 조각이 늘어 SELECT가 느려질 수 있어요.
+</Deeper>

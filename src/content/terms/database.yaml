@@ -296,3 +296,76 @@ terms:
     aliases: [temp file, temporary file, spill, 디스크로 넘침, external merge]
     short: 정렬이나 해시가 메모리에 다 안 들어갈 때 디스크에 잠깐 쓰는 파일이에요.
     doc: database/temp-spill
+  - id: nosql
+    name: NoSQL
+    en: NoSQL
+    aliases: [비관계형 DB, non-relational, 노에스큐엘]
+    short: 관계형 표 대신 키나 문서 같은 단위로 저장하는 DB를 두루 부르는 말이에요.
+    doc: database/nosql
+  - id: partition-key
+    name: 파티션 키
+    en: Partition key
+    aliases: [partition key, 해시 키, hash key]
+    short: 해시해서 항목을 저장할 파티션을 정하는 키예요.
+    doc: database/nosql
+  - id: hot-partition
+    name: 핫 파티션
+    en: Hot partition
+    aliases: [hot partition, hot key, 핫 키]
+    short: 한 키에 요청이 몰려 그 파티션만 처리 한도에 닿은 상태예요.
+    doc: database/nosql
+  - id: capacity-unit
+    name: 용량 단위
+    en: Capacity unit
+    aliases: [RCU, WCU, read capacity unit, write capacity unit, 읽기 용량 단위, 쓰기 용량 단위]
+    short: DynamoDB가 초당 읽기와 쓰기의 양을 세는 단위예요.
+    doc: database/nosql
+  - id: eventual-consistency
+    name: 결과적 일관성
+    en: Eventual consistency
+    aliases: [eventually consistent, 최종 일관성]
+    short: 방금 쓴 값이 잠시 뒤에야 모든 읽기에 보이는 일관성 수준이에요.
+    doc: database/nosql
+  - id: in-memory-store
+    name: 인메모리 저장소
+    en: In-memory data store
+    aliases: [in-memory, Redis, Valkey, 레디스]
+    short: 데이터를 디스크가 아니라 메모리에 두고 처리하는 저장소예요.
+    doc: database/in-memory-store
+  - id: rdb
+    name: RDB
+    en: Redis Database snapshot
+    aliases: [RDB 스냅숏, dump.rdb, BGSAVE]
+    short: Redis 데이터 전체를 정한 간격마다 파일로 떠 두는 스냅숏이에요.
+    doc: database/in-memory-store
+  - id: aof
+    name: AOF
+    en: Append Only File
+    aliases: [append only file, appendonly, appendfsync]
+    short: Redis가 쓰기 명령을 파일 끝에 계속 덧붙여 남기는 기록이에요.
+    doc: database/in-memory-store
+  - id: slowlog
+    name: SLOWLOG
+    en: Slow log
+    aliases: [슬로 로그, slow log, slowlog-log-slower-than]
+    short: Redis에서 실행이 오래 걸린 명령을 남겨 두는 기록이에요.
+    doc: database/in-memory-store
+  - id: columnar-storage
+    name: 열 지향 저장
+    en: Columnar storage
+    aliases: [columnar, column store, 컬럼형, 열 지향]
+    short: 같은 열의 값을 모아 저장해 필요한 열만 읽게 하는 방식이에요.
+    analogy: 학생 카드 대신 과목별 점수표로 모아 두는 것과 같아요.
+    doc: database/columnar
+  - id: data-warehouse
+    name: 데이터 웨어하우스
+    en: Data warehouse
+    aliases: [data warehouse, DW, 웨어하우스]
+    short: 여러 시스템의 데이터를 모아 분석용으로 쌓아 두는 DB예요.
+    doc: database/columnar
+  - id: wlm
+    name: WLM
+    en: Workload management
+    aliases: [workload management, WLM 대기열, WLM queue]
+    short: Redshift가 질의를 대기열에 넣고 자리가 나면 실행하게 하는 기능이에요.
+    doc: database/columnar

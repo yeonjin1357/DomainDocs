@@ -1,0 +1,139 @@
+---
+title: 관계형이 아닌 DB(NoSQL)
+summary: 표와 조인 대신 키나 문서 단위로 저장해, 정해 둔 방식의 읽기·쓰기를 빠르게 해요.
+domain: database
+type: concept
+stage: basics
+order: 90
+icon: database
+keywords: [NoSQL, key-value, 키-값, document DB, 문서 DB, DynamoDB, MongoDB, DocumentDB, partition key, eventual consistency]
+related: [database/in-memory-store, database/columnar, database/replication, cloud/managed-databases, cloud/throttling]
+sources:
+  - title: Amazon DynamoDB — Read consistency
+    url: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html
+  - title: Amazon DynamoDB — Provisioned capacity mode (RCU, WCU)
+    url: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/provisioned-capacity-mode.html
+  - title: Amazon DynamoDB — Partition key design
+    url: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html
+  - title: Amazon DynamoDB — Metrics and dimensions
+    url: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.html
+  - title: MongoDB — Limits and Thresholds
+    url: https://www.mongodb.com/docs/manual/reference/limits/
+updated: 2026-10-29
+---
+
+<KeyPoints>
+  <Point title="읽는 모양 그대로 저장해요">
+    관계형 DB는 표를 나눠 두고 읽을 때 조인해요. NoSQL은 자주 읽는 모양 그대로 한 덩어리로 저장해요.
+  </Point>
+  <Point title="파티션 키가 데이터 자리를 정해요">
+    키를 해시해서 저장할 칸(파티션)을 골라요. 한 키에 요청이 몰리면 그 칸만 바빠져요.
+  </Point>
+  <Point title="방금 쓴 값이 늦게 보일 수 있어요">
+    DynamoDB의 기본 읽기는 결과적 일관성이라, 방금 쓴 값이 바로 안 보일 수 있어요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="실제 NoSQL은 키 말고 다른 값으로도 찾도록 보조 인덱스를 둘 수 있어요. 대신 인덱스가 늘수록 쓰기마다 할 일도 늘어요.">
+  번호 사물함과 같아요. 번호만 알면 바로 열지만, "빨간 가방이 든 사물함"을 찾으려면 다 열어 봐야 해요.
+</Analogy>
+
+## 대표적인 두 모양
+
+<Figure caption="키-값 저장소는 키로 값을 바로 꺼내요. 문서 DB는 JSON 같은 문서를 통째로 담고, 문서 안의 필드로도 찾아요.">
+  <Compare
+    columns={['키-값', '문서']}
+    rows={[
+      { label: '저장 단위', values: ['키 하나에 값 하나', 'JSON 같은 문서 하나'] },
+      { label: '찾는 법', values: ['키로 바로', '키, 또는 문서 안의 필드로'] },
+      { label: '예', values: ['DynamoDB, Redis', 'MongoDB, Amazon DocumentDB'] },
+    ]}
+  />
+</Figure>
+
+<Term term="database/nosql">NoSQL</Term>은 관계형 표가 아닌 방식으로 저장하는 DB를 두루 부르는 말이에요. 그중 흔히 만나는 것이 키-값 저장소와 문서 DB예요.
+
+관계형 DB라면 주문, 주문 항목, 고객을 표 세 개에 나누고 조인해서 읽어요. 문서 DB에서는 주문 하나에 항목과 고객 이름을 함께 담아 한 번에 읽어요.
+
+대신 같은 정보가 여러 문서에 복사돼요. 고객 이름이 바뀌면 그 이름이 담긴 문서를 모두 고쳐야 해요.
+
+## 파티션 키가 자리를 정해요
+
+<Figure caption="키를 해시해 칸을 골라요. 같은 키의 요청은 늘 같은 칸으로 가서, 인기 있는 키 하나가 그 칸만 바쁘게 만들어요.">
+  <Flow
+    ariaLabel="user#42 키의 요청이 해시로 파티션 2에만 몰리고, 파티션 1과 3은 한가한 구조도"
+    nodes={[
+      { id: 'req', label: '요청', col: 1, row: 0, note: '키 user#42' },
+      { id: 'p1', label: '파티션 1', col: 0, row: 1 },
+      { id: 'p2', label: '파티션 2', col: 1, row: 1, note: '요청이 몰려요', tone: 'warn' },
+      { id: 'p3', label: '파티션 3', col: 2, row: 1 },
+    ]}
+    edges={[
+      { from: 'req', to: 'p2', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+항목은 <Term term="database/partition-key">파티션 키</Term>의 해시값으로 저장할 파티션을 정해요. 같은 키는 늘 같은 파티션에 있어요. 파티션 키로 찾으면 그 칸 하나만 보면 돼서 빨라요.
+
+DynamoDB 파티션 하나는 초당 읽기 3,000단위, 쓰기 1,000단위까지 처리해요. 표 전체에 여유가 있어도 한 키에 몰리면 그 칸에서 막혀요. 이를 <Term term="database/hot-partition">핫 파티션</Term>이라고 해요.
+
+그래서 파티션 키는 값의 종류가 많고 요청이 고르게 퍼지는 값으로 골라요. 사용자 ID는 잘 퍼지지만, 오늘 날짜는 오늘 쓰는 요청이 모두 한 칸으로 몰려요.
+
+## 처리량을 용량 단위로 세요
+
+DynamoDB는 처리량을 <Term term="database/capacity-unit">용량 단위</Term>로 세요. 읽기 1단위는 4KB 이하 항목을 강한 일관성으로 초당 1번 읽는 양이에요. 결과적 일관성 읽기라면 초당 2번이에요.
+
+쓰기 1단위는 1KB 이하 항목을 초당 1번 쓰는 양이에요. 항목이 크면 크기를 단위 크기로 나눠 올림한 만큼 들어요.
+
+예를 들어 3KB 항목을 강한 일관성으로 초당 80번 읽으려면 읽기 80단위가 필요해요. 3KB를 4KB 단위로 올림해 한 번에 1단위씩 들기 때문이에요.
+
+정해 둔 용량을 넘는 요청은 거절돼요. 이를 스로틀링이라고 하고, 다시 보내는 법은 <Term slug="cloud/throttling">요청 한도와 스로틀링</Term>에서 다뤄요.
+
+## 방금 쓴 값이 보일까요
+
+DynamoDB의 기본 읽기는 <Term term="database/eventual-consistency">결과적 일관성</Term>이에요. 방금 끝난 쓰기가 바로 안 보일 수 있고, 잠시 뒤 다시 읽으면 보여요.
+
+강한 일관성 읽기를 고르면 성공한 쓰기를 모두 반영한 값을 받아요. 대신 용량을 두 배로 써요. 전역 보조 인덱스(GSI)에서는 결과적 일관성 읽기만 돼요.
+
+## 모니터링에서는
+
+<Figure caption="읽기 용량을 초당 1,000단위로 정한 표의 예시예요. 1분 평균은 한도 아래인데도, 요청이 몰린 몇 초 동안 스로틀링이 났어요.">
+  <MiniLineChart
+    ariaLabel="초당 소비 읽기 용량이 600에서 1000 가까이 올랐다가 내려오고, 정해 둔 용량 1000은 평평한 선 그래프"
+    yMax={1200}
+    series={[
+      { label: '소비한 읽기 용량(초당 평균)', values: [600, 620, 700, 940, 990, 980, 700, 640] },
+      { label: '정해 둔 용량', values: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000], tone: 'sub' },
+    ]}
+  />
+</Figure>
+
+CloudWatch의 ConsumedReadCapacityUnits는 1분마다 모아요. 초당 값은 1분 Sum을 60으로 나눠 구하고, 정해 둔 용량과 견줘요. 1분 평균에는 몇 초짜리 급증이 묻혀서, 평균이 한도 아래여도 스로틀링이 날 수 있어요.
+
+스로틀링은 ThrottledRequests와 ReadThrottleEvents·WriteThrottleEvents로 봐요. 이벤트 지표는 표와 인덱스에 쓰는 일을 하나하나 세고, ThrottledRequests는 요청 단위로 세요. 그래서 둘의 숫자가 달라요.
+
+파티션 한도에 걸린 요청은 따로 세요. ReadKeyRangeThroughputThrottleEvents처럼 이름에 KeyRange가 들어간 지표예요. 표 전체 사용률은 낮은데 이 값이 오르면 핫 파티션을 의심해요.
+
+SuccessfulRequestLatency는 DynamoDB 안에서 걸린 시간이에요. 네트워크와 클라이언트 쪽 시간은 들어 있지 않아요.
+
+<Checkpoints>
+  <Check>사용률을 ConsumedReadCapacityUnits의 Average로 계산했다면 다시 보세요. 1분 Sum을 60으로 나눠야 초당 소비량이에요.</Check>
+  <Check>표 사용률이 낮다고 스로틀링 원인에서 핫 파티션을 뺐다면 다시 보세요. KeyRange 스로틀 지표를 확인하세요.</Check>
+  <Check>방금 쓴 값이 안 읽힌다고 버그로 판단했다면 다시 보세요. 기본 읽기는 결과적 일관성이에요.</Check>
+  <Check>ThrottledRequests와 Throttle Events의 숫자가 달라 수집 오류로 봤다면 다시 보세요. 세는 단위가 달라요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 인덱스와 쓰기
+
+  보조 인덱스가 셋인 표에 항목 하나를 쓰면, 표 쓰기 1번과 인덱스 쓰기 3번이 생겨요. WriteThrottleEvents는 이 넷을 하나하나 세요. 그중 하나만 막혀도 ThrottledRequests는 1 늘어요.
+
+  ### 문서 크기의 한도
+
+  MongoDB 문서 하나는 최대 16MiB예요. 이보다 큰 파일은 GridFS로 나눠 담으라고 해요.
+
+  ### 다른 모양의 NoSQL
+
+  열 묶음 단위로 저장하는 와이드 컬럼 DB, 점과 선으로 관계를 담는 그래프 DB도 NoSQL로 묶여요. 저장 모양이 달라서 지표도 따로 봐요.
+</Deeper>

@@ -1,0 +1,126 @@
+---
+title: 토폴로지 자동 발견(LLDP·CDP)
+summary: 장비가 옆 장비에게 자기 이름과 포트를 알리고, 관리 서버가 이를 모아 연결도를 그려요.
+domain: network
+type: concept
+stage: basics
+order: 52
+icon: network
+keywords: [LLDP, CDP, topology, 토폴로지, 네트워크 맵, 이웃, neighbor, 802.1AB, LLDP-MIB, lldpRemTable]
+related: [network/snmp, network/switches-and-routers, network/vlans, network/device-unreachable]
+sources:
+  - title: IEEE 802.1AB — LLDP-MIB (lldpMessageTxInterval, lldpRemTable)
+    url: http://ieee802.org/1/files/public/MIBs/LLDP-MIB-200505060000Z.mib
+  - title: Cisco — Nexus 7000 System Management Configuration Guide, Configuring LLDP
+    url: https://www.cisco.com/c/en/us/td/docs/switches/datacenter/sw/5_x/nx-os/system_management/configuration/guide/sm_nx_os_cg/sm_lldp.html
+  - title: Cisco — Catalyst 2960 Software Configuration Guide, Configuring CDP
+    url: https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst2960/software/release/12-2_55_se/configuration/guide/scg_2960/swcdp.html
+updated: 2026-10-29
+---
+
+<KeyPoints>
+  <Point title="장비는 바로 옆 장비만 알아요">
+    LLDP와 CDP는 선으로 바로 이어진 이웃에게만 자기 정보를 알려요. 한 칸 너머의 장비는 몰라요.
+  </Point>
+  <Point title="관리 서버가 이웃 목록을 이어 붙여요">
+    장비마다 쌓인 이웃 표를 SNMP로 모아, "A의 1번 포트와 B의 24번 포트가 이어졌다"를 선으로 그려요.
+  </Point>
+  <Point title="빠진 장비는 연결도에서 구멍이 돼요">
+    LLDP를 끈 장비나 읽을 수 없는 장비는 이웃 표에 없어서, 그 자리의 선이 빠져요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="학생은 물어볼 때 답하지만, 장비는 30초마다 스스로 옆에 알려요. 관리 서버는 그렇게 쌓인 기록을 나중에 읽어요. 대답하지 않는 학생의 자리는 빈칸으로 남아요.">
+  반 학생마다 "네 양옆에 누가 앉았니"를 물어, 답을 이어 붙여 자리 배치도를 만드는 것과 같아요.
+</Analogy>
+
+## 옆 장비에게 자기소개를 보내요
+
+<Figure caption="스위치끼리 포트마다 자기소개를 주고받아 이웃 표에 적어요. 관리 서버는 나중에 SNMP로 그 표를 읽어요.">
+  <Sequence
+    ariaLabel="스위치 A와 B가 서로 자기 이름과 포트를 알리고, 관리 서버가 스위치 A의 이웃 표를 SNMP로 읽는 순서"
+    participants={['스위치 A', '스위치 B', '관리 서버']}
+    messages={[
+      { from: '스위치 A', to: '스위치 B', label: '나는 A, 1번 포트' },
+      { from: '스위치 B', to: '스위치 A', label: '나는 B, 24번 포트' },
+      { from: '관리 서버', to: '스위치 A', label: '이웃 표 주세요(SNMP)', tone: 'accent' },
+      { from: '스위치 A', to: '관리 서버', label: '1번 옆은 B의 24번', dashed: true },
+    ]}
+  />
+</Figure>
+
+<Term term="network/lldp">LLDP</Term>(Link Layer Discovery Protocol)는 IEEE 802.1AB 표준이에요. 장비는 포트마다 자기 이름, 포트 이름, 관리 주소 같은 정보를 담아 옆 장비에 보내요. 받은 장비는 그 내용을 이웃 표에 적어 둬요.
+
+LLDP는 제조사와 상관없이 써요. <Term term="network/cdp">CDP</Term>(Cisco Discovery Protocol)는 Cisco 장비끼리 쓰는 같은 목적의 방식이에요.
+
+## 얼마나 자주, 얼마나 오래
+
+| | LLDP | CDP |
+| --- | --- | --- |
+| 표준 | IEEE 802.1AB | Cisco 전용 |
+| 보내는 간격(기본) | 30초 | 60초 |
+| 보관 시간(기본) | 120초 | 180초 |
+
+보관 시간 안에 새 소식이 오지 않으면 그 이웃을 표에서 지워요. LLDP의 120초는 보내는 간격 30초에 배수 4를 곱한 값이에요.
+
+## 관리 서버가 연결도를 그려요
+
+이웃 정보는 장비 안의 표에 쌓여요. LLDP라면 LLDP-MIB의 `lldpRemTable`이에요. 관리 서버는 <Term term="network/snmp">SNMP</Term>로 장비마다 이 표를 읽어요.
+
+<Figure caption="코어 스위치와 두 스위치의 이웃 표를 이어 붙인 연결도예요. 상자 아래 글자는 양쪽 포트 번호예요.">
+  <Flow
+    ariaLabel="코어 스위치 아래에 스위치 A와 B가 이어진 연결도. A의 1번 포트는 코어의 24번에, B의 1번 포트는 코어의 48번에 이어져요"
+    nodes={[
+      { id: 'core', label: '코어 스위치', col: 1, row: 0, tone: 'accent' },
+      { id: 'a', label: '스위치 A', col: 0, row: 1, note: '1번 ↔ 코어 24번' },
+      { id: 'b', label: '스위치 B', col: 2, row: 1, note: '1번 ↔ 코어 48번' },
+    ]}
+    edges={[
+      { from: 'a', to: 'core', both: true },
+      { from: 'b', to: 'core', both: true },
+    ]}
+  />
+</Figure>
+
+표의 한 줄은 "내 몇 번 포트 옆에 어떤 장비의 어떤 포트가 있다"예요. 이웃은 장비 ID(Chassis ID)와 포트 ID로 구별하고, 장비 이름도 함께 담겨요.
+
+스위치 A의 표에 "1번 옆은 코어의 24번"이 있고, 코어의 표에 "24번 옆은 A의 1번"이 있으면 둘 사이에 선을 그어요. 이렇게 모든 장비의 표를 이어 붙이면 <Term term="network/topology">토폴로지</Term>(연결도)가 돼요.
+
+## 모니터링에서는
+
+<Figure caption="방화벽에서 LLDP가 꺼져 있으면 코어 스위치의 이웃 표에 방화벽이 없어요. 실제로는 이어져 있어도 연결도에는 선을 그리지 못해요.">
+  <Flow
+    ariaLabel="코어 스위치와 스위치 A는 실선으로 이어져 있고, LLDP가 꺼진 방화벽과는 점선으로만 표시된 연결도"
+    nodes={[
+      { id: 'core', label: '코어 스위치', col: 1, row: 0, tone: 'accent' },
+      { id: 'a', label: '스위치 A', col: 0, row: 1 },
+      { id: 'fw', label: '방화벽', col: 2, row: 1, note: 'LLDP 꺼짐', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'a', to: 'core', both: true },
+      { from: 'fw', to: 'core', dashed: true, tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+연결도는 장비들이 서로 알려 준 내용만큼만 정확해요. LLDP가 꺼진 장비, SNMP로 읽을 수 없는 장비, 관리 대상에 없는 장비가 있으면 그 자리의 선이 빠져요.
+
+연결도는 이웃 표를 읽을 때마다 다시 그린 사진이에요. 포트를 옮겨 꽂으면 이웃 표가 바뀌고, 그다음 수집 때 연결도도 바뀌어요.
+
+양쪽 표가 서로 다르게 말하면 의심해요. A는 "옆에 B가 있다"는데 B의 표에는 A가 없다면, 한쪽 정보가 오래됐거나 한쪽 수집이 실패했을 수 있어요.
+
+<Checkpoints>
+  <Check>연결도에서 선이 빠졌다면, 그 장비에 LLDP나 CDP가 켜져 있는지와 SNMP로 이웃 표를 읽을 수 있는지 보세요.</Check>
+  <Check>이웃을 장비 이름으로만 맞추고 있다면 다시 보세요. 이름이 같거나 바뀐 장비가 있으면 엉뚱한 선이 그어져요. 장비 ID도 함께 보세요.</Check>
+  <Check>연결도를 실시간 상태로 여겼다면 다시 보세요. 마지막으로 이웃 표를 읽은 시각의 모습이에요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 바로 옆에서 멈추는 이유
+
+  LLDP 프레임은 스위치가 다음 장비로 넘기지 않는 예약된 주소로 보내요. 그래서 링크 하나 안에서만 오가고, 이웃 표에는 바로 옆 장비만 남아요.
+
+  ### 담기는 정보
+
+  Cisco Nexus 문서는 기본으로 보내는 정보로 관리 주소, 포트 설명, 포트 VLAN, 장비 기능, 장비 설명, 장비 이름을 들어요. 항목은 장비 설정으로 하나씩 끌 수 있어요.
+</Deeper>

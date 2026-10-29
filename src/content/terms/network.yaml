@@ -298,3 +298,70 @@ terms:
     aliases: [chain, 체인, 중간 인증서, intermediate certificate, 루트 인증서, root certificate]
     short: 서버 인증서에서 중간 인증서를 거쳐 믿는 루트까지 서명으로 이어진 줄이에요.
     doc: network/tls-certificates
+  - id: vlan
+    name: VLAN
+    en: Virtual LAN
+    aliases: [가상 LAN, virtual LAN, 브이랜]
+    short: 스위치 포트를 번호로 묶어 스위치 한 대를 여러 네트워크로 나누는 기능이에요.
+    analogy: 넓은 사무실 한 층을 칸막이로 나눈 것과 같아요.
+    doc: network/vlans
+  - id: vlan-tag
+    name: 802.1Q 태그
+    en: IEEE 802.1Q tag
+    aliases: [VLAN 태그, VLAN tag, dot1q, 802.1Q, '0x8100']
+    short: 트렁크로 나가는 프레임에 붙여 어느 VLAN인지 적는 4바이트 표시예요.
+    doc: network/vlans
+  - id: access-port
+    name: 액세스 포트
+    en: Access port
+    aliases: [access port, access 모드]
+    short: VLAN 하나에만 속해 태그 없이 주고받는 스위치 포트예요.
+    doc: network/vlans
+  - id: trunk-port
+    name: 트렁크 포트
+    en: Trunk port
+    aliases: [trunk, 트렁크, trunk port]
+    short: 여러 VLAN의 프레임에 태그를 붙여 한 선으로 나르는 포트예요.
+    doc: network/vlans
+  - id: native-vlan
+    name: 네이티브 VLAN
+    en: Native VLAN
+    aliases: [native VLAN, 네이티브, untagged VLAN]
+    short: 트렁크에서도 태그 없이 오가는 VLAN이에요.
+    doc: network/vlans
+  - id: svi
+    name: SVI
+    en: Switch Virtual Interface
+    aliases: [VLAN 인터페이스, VLAN interface, interface vlan]
+    short: L3 스위치가 VLAN마다 두고 VLAN 사이를 라우팅하는 가상 인터페이스예요.
+    doc: network/vlans
+  - id: lldp
+    name: LLDP
+    en: Link Layer Discovery Protocol
+    aliases: [802.1AB, IEEE 802.1AB, 엘엘디피]
+    short: 장비가 바로 옆 장비에게 자기 이름과 포트를 알리는 표준 규약이에요.
+    analogy: 옆자리 사람에게 명함을 건네는 것과 같아요.
+    doc: network/topology-discovery
+  - id: cdp
+    name: CDP
+    en: Cisco Discovery Protocol
+    aliases: [Cisco Discovery Protocol, 시디피]
+    short: Cisco 장비끼리 옆 장비에게 자기 정보를 알리는 Cisco 전용 규약이에요.
+    doc: network/topology-discovery
+  - id: topology
+    name: 토폴로지
+    en: Topology
+    aliases: [topology, 연결도, 네트워크 맵, network map, 구성도]
+    short: 장비나 객체가 서로 어떻게 이어졌는지 그린 연결도예요.
+    doc: network/topology-discovery
+  - id: npm
+    name: NPM
+    en: Network Performance Monitoring
+    aliases: [네트워크 성능 모니터링, network performance monitoring]
+    short: 서버 사이의 연결마다 오간 양, 지연, 재전송을 재는 모니터링이에요.
+    doc: network/network-performance
+  - id: ebpf
+    name: eBPF
+    aliases: [BPF, 이비피에프]
+    short: 커널 소스를 고치지 않고 커널 안에서 작은 프로그램을 안전하게 돌리는 기능이에요.
+    doc: network/network-performance

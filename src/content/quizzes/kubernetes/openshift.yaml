@@ -1,0 +1,34 @@
+questions:
+  - id: ingress-makes-route
+    type: ox
+    prompt: OpenShift에서 인그레스를 만들면 대응하는 Route가 자동으로 생기나요?
+    answer: true
+    explain: OpenShift가 Route를 만들어 인그레스를 주인으로 가리켜요. 그래서 바깥 접속을 볼 때는 Route까지 함께 봐요.
+  - id: project-is-namespace
+    type: choice
+    prompt: OpenShift의 프로젝트는 쿠버네티스의 무엇에 해당할까요?
+    choices: [네임스페이스, 노드, 디플로이먼트, 서비스 계정]
+    answer: 0
+    explain: OpenShift 문서는 프로젝트를 주석이 더 붙은 쿠버네티스 네임스페이스라고 설명해요.
+  - id: scc-uid
+    type: choice
+    prompt: 기본 SCC에서 runAsUser를 정하지 않은 파드는 어떤 UID로 실행될까요?
+    choices:
+      - 프로젝트에 정해 둔 UID 범위의 첫 값
+      - 0(root)
+      - '1000'
+      - 노드마다 무작위로 고른 값
+    answer: 0
+    explain: 기본 규칙은 프로젝트의 openshift.io/sa.scc.uid-range 범위에서 실행하고, 따로 정하지 않으면 범위의 첫 값을 써요.
+  - id: dc-deprecated
+    type: choice
+    prompt: OpenShift 4.14부터 deprecated된 객체는?
+    choices: [DeploymentConfig, Deployment, Route, Project]
+    answer: 0
+    explain: DeploymentConfig는 아직 동작하지만 보안과 치명적 문제만 고쳐요. 새 배포에는 디플로이먼트를 써요.
+  - id: scc-name
+    type: input
+    prompt: OpenShift에서 파드가 쓸 UID와 권한을 정해 두고 만들 때 검사하는 규칙은?
+    answer: [SCC, Security Context Constraints, 보안 컨텍스트 제약]
+    term: kubernetes/scc
+    explain: SCC에 걸리면 파드 자체가 만들어지지 않아서, 이유는 레플리카셋 같은 상위 객체의 이벤트에 남아요.

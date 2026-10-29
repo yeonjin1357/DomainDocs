@@ -1,0 +1,139 @@
+---
+title: OpenShift
+summary: Red Hat이 쿠버네티스에 Route, 보안 규칙, 모니터링을 더해 묶은 배포판이에요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 87
+icon: container
+keywords: [OpenShift, OCP, Route, 라우트, SCC, security context constraints, project, 프로젝트, DeploymentConfig, HAProxy]
+related: [kubernetes/services-and-ingress, kubernetes/rbac, kubernetes/workloads, kubernetes/metrics-sources, kubernetes/overview]
+sources:
+  - title: OpenShift Docs — About security context constraints
+    url: https://github.com/openshift/openshift-docs/blob/main/modules/security-context-constraints-about.adoc
+  - title: OpenShift Docs — Security context constraints pre-allocated values
+    url: https://github.com/openshift/openshift-docs/blob/main/modules/security-context-constraints-pre-allocated-values.adoc
+  - title: OpenShift Docs — Projects and namespaces
+    url: https://github.com/openshift/openshift-docs/blob/main/modules/rbac-projects-namespaces.adoc
+  - title: OpenShift Docs — Creating a route through an Ingress object
+    url: https://github.com/openshift/openshift-docs/blob/main/modules/nw-ingress-creating-a-route-via-an-ingress.adoc
+  - title: OpenShift Docs — DeploymentConfig deprecation notice
+    url: https://github.com/openshift/openshift-docs/blob/main/snippets/deployment-config-deprecated.adoc
+  - title: OpenShift Docs — Default monitoring components
+    url: https://github.com/openshift/openshift-docs/blob/main/modules/monitoring-default-monitoring-components.adoc
+  - title: OpenShift router (GitHub)
+    url: https://github.com/openshift/router
+updated: 2026-10-29
+---
+
+<KeyPoints>
+  <Point title="쿠버네티스에 기능을 더한 배포판이에요">
+    파드, 디플로이먼트, 서비스는 그대로 있어요. 그 위에 Route, 프로젝트, SCC 같은 OpenShift만의 객체가 더해져요.
+  </Point>
+  <Point title="바깥 요청은 Route로 들어와요">
+    Route에 호스트 이름과 대상 서비스를 적으면, 라우터가 바깥 요청을 그 서비스로 넘겨요.
+  </Point>
+  <Point title="기본 규칙은 특권 실행을 막아요">
+    파드는 SCC라는 보안 규칙을 통과해야 만들어져요. 기본 규칙은 프로젝트마다 정해 둔 UID로 실행해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="완성차는 옵션을 떼기 어렵지만, OpenShift는 쿠버네티스 API를 그대로 써서 표준 객체는 대부분 그대로 돼요. 반대로 OpenShift 전용 객체는 일반 쿠버네티스에 없어요.">
+  쿠버네티스가 기본 차체라면, OpenShift는 같은 차체에 옵션을 얹고 안전 규정을 더 엄격하게 맞춘 완성차예요.
+</Analogy>
+
+## 무엇이 더해졌나요
+
+<Term term="kubernetes/openshift">OpenShift</Term>는 Red Hat이 쿠버네티스를 바탕으로 만든 제품이에요. 아래는 쿠버네티스에는 없거나 이름이 다른 것들이에요.
+
+| OpenShift | 하는 일 | 쿠버네티스와의 관계 |
+| --- | --- | --- |
+| 프로젝트 | 팀이나 용도별로 객체를 묶어요 | 주석이 더 붙은 네임스페이스예요 |
+| Route | 바깥 요청을 서비스로 넘겨요 | 인그레스를 만들면 Route가 함께 생겨요 |
+| SCC | 파드가 쓸 UID와 권한을 정해요 | 파드를 만들 때 검사해요 |
+| DeploymentConfig | 파드를 배포하고 갱신해요 | 4.14부터 deprecated라 디플로이먼트를 써요 |
+
+<Term term="kubernetes/openshift-project">프로젝트</Term>는 `oc new-project 이름`으로 만들어요. OpenShift 문서는 프로젝트를 "주석이 더 붙은 쿠버네티스 네임스페이스"라고 설명해요. 그래서 네임스페이스 단위로 보는 화면은 그대로 써요.
+
+## Route: 바깥 요청을 서비스로
+
+<Figure caption="Route는 호스트 이름과 대상 서비스를 적어 둔 객체예요. 라우터가 Route를 읽어 바깥 요청을 서비스의 파드로 넘겨요.">
+  <Flow
+    ariaLabel="사용자의 요청이 라우터를 거쳐 서비스로 가고, 서비스가 파드 두 개로 넘기는 구조도"
+    nodes={[
+      { id: 'user', label: '사용자', col: 0, row: 0 },
+      { id: 'router', label: '라우터', col: 1, row: 0, note: 'HAProxy', tone: 'accent' },
+      { id: 'svc', label: '서비스', col: 2, row: 0 },
+      { id: 'p1', label: '파드 1', col: 1, row: 1 },
+      { id: 'p2', label: '파드 2', col: 2, row: 1 },
+    ]}
+    edges={[
+      { from: 'user', to: 'router' },
+      { from: 'router', to: 'svc' },
+      { from: 'svc', to: 'p1' },
+      { from: 'svc', to: 'p2' },
+    ]}
+  />
+</Figure>
+
+<Term term="kubernetes/openshift-route">Route</Term>에는 바깥에서 부를 호스트 이름과 대상 서비스를 적어요. 클러스터의 라우터가 Route를 읽어 요청을 그 서비스의 파드로 넘겨요. OpenShift 라우터의 기준 구현은 HAProxy예요.
+
+TLS를 어디서 풀지도 Route에 정해요.
+
+| 방식 | TLS를 푸는 곳 |
+| --- | --- |
+| edge | 라우터에서 풀고 파드까지는 평문으로 보내요 |
+| passthrough | 라우터는 풀지 않고 파드까지 그대로 넘겨요 |
+| reencrypt | 라우터에서 풀었다가 다시 암호화해 파드로 보내요 |
+
+<Term term="kubernetes/ingress">인그레스</Term>를 만들어도 OpenShift가 대응하는 Route를 자동으로 만들어요. 이 Route는 인그레스를 주인으로 가리켜, 인그레스를 지우면 함께 사라져요.
+
+## SCC: 파드가 지켜야 할 보안 규칙
+
+<Term term="kubernetes/scc">SCC</Term>(Security Context Constraints)는 파드가 무엇을 할 수 있는지 정한 규칙이에요. 특권 컨테이너, 실행할 UID, 리눅스 권한(capability), 쓸 수 있는 볼륨 종류 같은 것을 정해요. 파드는 쓸 수 있는 SCC 중 하나를 통과해야 만들어져요.
+
+인증된 사용자가 만든 파드는 기본으로 restricted 계열 SCC를 받아요. 이 규칙은 특권 실행을 막고, 리눅스 권한을 모두 빼요. 실행할 UID는 프로젝트마다 미리 정해 둔 범위에서 골라요.
+
+그 범위는 프로젝트의 `openshift.io/sa.scc.uid-range` 주석에 적혀 있어요. 파드가 UID를 따로 정하지 않으면 범위의 첫 값으로 실행해요. 그래서 루트(UID 0)로 실행된다고 가정한 이미지는 그대로 뜨지 않을 수 있어요.
+
+## 모니터링이 기본으로 들어 있어요
+
+OpenShift에는 모니터링 묶음이 기본으로 들어 있어요. Prometheus, Alertmanager, Thanos Querier가 기본 구성이에요. 노드와 객체의 지표는 node-exporter와 kube-state-metrics가 모아요.
+
+이 구성은 Cluster Monitoring Operator가 깔고 관리해요.
+
+Route 같은 OpenShift 전용 객체의 지표는 openshift-state-metrics가 따로 내요.
+
+## 모니터링에서는
+
+<Figure caption="같은 앱을 띄워도 OpenShift에서는 화면에 이어 보여 줄 객체와 확인할 실패 이유가 더 있어요.">
+  <Compare
+    columns={['일반 쿠버네티스', 'OpenShift']}
+    rows={[
+      { label: '바깥 접속', values: ['인그레스', 'Route, 인그레스(→ Route)'] },
+      { label: '이름 묶음', values: ['네임스페이스', '프로젝트(= 네임스페이스)'] },
+      { label: '파드 생성 거절', values: ['권한, 할당량 등', '여기에 SCC 검사가 더해져요'] },
+    ]}
+  />
+</Figure>
+
+OpenShift를 보는 화면이라면 Route도 서비스와 이어서 보여 줘야 해요. 바깥 요청이 어느 Route로 들어와 어느 서비스로 가는지가 경로의 첫 칸이에요.
+
+SCC에 걸리면 파드 자체가 만들어지지 않아요. 파드가 없으니 파드 화면은 비어 있고, 이유는 레플리카셋 같은 상위 객체의 <Term term="kubernetes/k8s-event">이벤트</Term>에 남아요.
+
+<Checkpoints>
+  <Check>OpenShift 화면에서 인그레스만 세고 있다면 다시 보세요. 바깥 접속은 Route로도 열고, 인그레스도 Route로 바뀌어요.</Check>
+  <Check>이미지가 루트로 실행된다고 가정했다면 다시 보세요. 기본 SCC에서는 프로젝트마다 정한 UID로 실행돼요.</Check>
+  <Check>DeploymentConfig를 새로 쓰는 구현이라면 다시 보세요. 4.14부터 deprecated라 디플로이먼트를 써요.</Check>
+  <Check>파드가 하나도 안 보여 화면이 비었다면, 레플리카셋 이벤트에서 생성 실패 이유를 보세요. SCC에 걸리면 파드가 만들어지지 않아요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 기본 SCC의 이름
+
+  기본 SCC는 버전에 따라 restricted-v2나 restricted-v3예요. restricted-v3는 restricted-v2와 같은 규칙에, 파드를 리눅스 사용자 네임스페이스 안에서 돌리게 한 것이에요. 쓰는 버전의 문서에서 기본값을 확인해요.
+
+  ### DeploymentConfig
+
+  DeploymentConfig는 아직 동작하지만, 4.14부터는 보안과 치명적인 문제만 고쳐요. 새로 만드는 배포에는 쓰지 않아요.
+</Deeper>

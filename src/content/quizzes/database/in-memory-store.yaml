@@ -1,0 +1,38 @@
+questions:
+  - id: single-thread-block
+    type: choice
+    prompt: 키가 200만 개인 Redis에서 KEYS *가 도는 동안 다른 클라이언트의 GET은 어떻게 될까요?
+    choices:
+      - KEYS가 끝날 때까지 기다려요
+      - 다른 스레드에서 바로 처리돼요
+      - 오류로 거절돼요
+      - Redis가 KEYS를 SCAN으로 바꿔 실행해요
+    answer: 0
+    explain: 명령을 실행하는 스레드가 하나라서, 오래 걸리는 명령이 끝나야 다음 명령이 실행돼요.
+  - id: noeviction-default
+    type: ox
+    prompt: maxmemory에 닿으면 Redis는 기본으로 오래된 키를 지워 자리를 만드나요?
+    answer: false
+    explain: 기본 정책 noeviction은 키를 지우지 않고 새 데이터를 넣는 명령을 OOM 오류로 거절해요. 읽기는 그대로 돼요.
+  - id: engine-cpu
+    type: choice
+    prompt: 4 vCPU ElastiCache 노드의 CPUUtilization이 25%인데 응답이 느려요. 먼저 볼 지표는?
+    choices: [EngineCPUUtilization, Evictions, CurrConnections, ReplicationLag]
+    answer: 0
+    explain: 명령 실행 스레드 하나가 꽉 차도 4 vCPU 전체로는 25%로 보여요. 그 스레드만 잰 값이 EngineCPUUtilization이에요.
+  - id: aof-loss
+    type: choice
+    prompt: AOF를 기본 fsync 정책으로 켠 Redis가 정전으로 꺼졌어요. 잃을 수 있는 쓰기는?
+    choices:
+      - 마지막 1초쯤의 쓰기
+      - 마지막 스냅숏 이후의 쓰기 전부
+      - 하나도 없어요
+      - 하루치 쓰기
+    answer: 0
+    explain: 기본 appendfsync는 everysec라 1초마다 디스크에 확정해요. 그래서 마지막 1초쯤을 잃을 수 있어요.
+  - id: slowlog-name
+    type: input
+    prompt: Redis에서 실행이 오래 걸린 명령을 남겨 두는 기능은?
+    answer: [SLOWLOG, 슬로 로그, slow log]
+    term: database/slowlog
+    explain: 기본으로 10ms보다 오래 걸린 명령을 최근 128개까지 남겨요. 클라이언트와 주고받은 시간은 빠지고 실행 시간만 재요.

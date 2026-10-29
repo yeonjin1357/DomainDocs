@@ -211,3 +211,45 @@ terms:
     short: 새 버전을 일부 트래픽에만 먼저 내보내 기존 버전과 견주는 배포 방식이에요.
     analogy: 광부가 탄광에 카나리아를 먼저 들여보내 위험을 살피던 데서 온 말이에요.
     doc: apm/slow-after-deploy
+  - id: resource-error
+    name: 자원 불러오기 실패
+    en: Resource loading error
+    aliases: [resource error, 리소스 오류, 이미지 404, 스크립트 로드 실패]
+    short: 이미지나 스크립트 같은 파일을 브라우저가 불러오지 못한 오류예요.
+    doc: apm/browser-errors
+  - id: error-grouping
+    name: 오류 묶음
+    en: Error grouping
+    aliases: [issue, 이슈, fingerprint, 지문, 오류 묶기, grouping]
+    short: 같은 원인의 오류 이벤트를 하나로 묶은 단위예요.
+    doc: apm/browser-errors
+  - id: gc-log
+    name: GC 로그
+    en: GC log
+    aliases: [gc log, -Xlog:gc, Xlog, gc.log, PrintGCDetails]
+    short: JVM이 GC마다 종류, 전후 힙 크기, 멈춘 시간을 남기는 기록이에요.
+    doc: apm/gc-logs
+  - id: young-gc
+    name: young 수집
+    en: Young collection
+    aliases: [Pause Young, young GC, minor GC, 마이너 GC]
+    short: 새로 만든 객체가 있는 영역만 치우는 GC예요.
+    doc: apm/gc-logs
+  - id: mixed-gc
+    name: mixed 수집
+    en: Mixed collection
+    aliases: [Mixed GC, Pause Young (Mixed)]
+    short: G1이 young 영역과 함께 old 영역 일부도 치우는 GC예요.
+    doc: apm/gc-logs
+  - id: full-gc
+    name: Full GC
+    en: Full GC
+    aliases: [full gc, 풀 GC, Pause Full, 전체 GC]
+    short: 힙 전체를 치우고 압축해서 가장 오래 멈추는 GC예요.
+    doc: apm/gc-logs
+  - id: evacuation-failure
+    name: Evacuation Failure
+    en: Evacuation failure
+    aliases: [evacuation failure, to-space exhausted, 옮기기 실패]
+    short: G1이 살아 있는 객체를 옮길 빈 자리를 찾지 못한 상태예요.
+    doc: apm/gc-logs

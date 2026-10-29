@@ -1,0 +1,38 @@
+questions:
+  - id: denormalize
+    type: choice
+    prompt: 문서 DB에서 주문 화면을 한 번에 빠르게 읽으려고 흔히 하는 설계는?
+    choices:
+      - 주문 문서 안에 항목과 고객 이름을 함께 담아요
+      - 주문, 항목, 고객을 따로 두고 읽을 때 조인해요
+      - 항목마다 다른 DB에 나눠 둬요
+      - 모든 주문을 문서 하나에 담아요
+    answer: 0
+    explain: 자주 읽는 모양 그대로 한 덩어리로 저장해요. 대신 같은 정보가 여러 문서에 복사돼 고칠 곳이 늘어요.
+  - id: hot-key
+    type: choice
+    prompt: 표 전체 읽기 용량은 30%만 쓰는데 스로틀링이 나요. 가장 그럴듯한 원인은?
+    choices:
+      - 한 파티션 키에 요청이 몰렸어요
+      - 표의 용량을 너무 크게 잡았어요
+      - 결과적 일관성 읽기를 썼어요
+      - 항목이 너무 작아요
+    answer: 0
+    explain: 파티션 하나는 초당 읽기 3,000단위까지만 처리해요. 표 전체에 여유가 있어도 한 키에 몰리면 그 칸에서 막혀요.
+  - id: rcu-calc
+    type: choice
+    prompt: 6KB 항목을 강한 일관성으로 초당 10번 읽으려면 읽기 용량 단위가 몇 개 필요할까요?
+    choices: ['20', '10', '15', '60']
+    answer: 0
+    explain: 6KB를 4KB 단위로 올림하면 2단위예요. 초당 10번이니 20단위가 필요해요.
+  - id: eventual-default
+    type: ox
+    prompt: DynamoDB의 기본 읽기는 방금 성공한 쓰기를 늘 반영하나요?
+    answer: false
+    explain: 기본 읽기는 결과적 일관성이라 방금 쓴 값이 바로 안 보일 수 있어요. 필요하면 강한 일관성 읽기를 골라요.
+  - id: partition-key-name
+    type: input
+    prompt: 항목을 저장할 파티션을 정하려고 해시하는 키는?
+    answer: [파티션 키, partition key, 해시 키, hash key]
+    term: database/partition-key
+    explain: 같은 키는 늘 같은 파티션에 가요. 그래서 값의 종류가 많고 요청이 고르게 퍼지는 값으로 골라요.

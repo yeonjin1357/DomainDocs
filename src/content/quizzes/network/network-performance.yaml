@@ -1,0 +1,34 @@
+questions:
+  - id: npm-unit
+    type: choice
+    prompt: SNMP로 보는 장비 화면과 견줘, NPM 화면이 주로 보여 주는 단위는?
+    choices: [서버와 서버 사이의 연결, 스위치 포트, 장비의 CPU, 라우터의 경로표]
+    answer: 0
+    explain: NPM은 서버가 직접 겪은 연결마다 오간 양, 지연, 재전송을 보여 줘요. 장비와 포트는 SNMP 화면의 단위예요.
+  - id: retrans-rate
+    type: choice
+    prompt: 1분 동안 RetransSegs가 50, OutSegs가 2,000 늘었어요. 재전송 비율은?
+    choices: ['2.5%', '0.25%', '25%', '5%']
+    answer: 0
+    explain: 50을 2,000으로 나누면 0.025, 즉 2.5%예요. 두 값 모두 카운터라 구간 사이의 차이로 계산해요.
+  - id: rtt-not-app
+    type: ox
+    prompt: 두 서버 사이의 TCP RTT가 2ms라면, 그 사이 API의 응답시간도 2ms 안팎인가요?
+    answer: false
+    explain: RTT는 조각을 보내고 받았다는 답이 오기까지예요. 답은 상대 커널이 보내서, 앱이 요청을 처리한 시간은 들어 있지 않아요.
+  - id: one-peer
+    type: choice
+    prompt: 주문 서버에서 나가는 연결 중 결제 서버로 가는 것만 RTT와 재전송이 올랐어요. 먼저 의심할 곳은?
+    choices:
+      - 결제 서버나 그 사이 경로
+      - 주문 서버의 디스크
+      - 주문 서버의 모든 링크
+      - DNS 서버
+    answer: 0
+    explain: 한 서버의 모든 연결이 나빠지면 그 서버를, 특정 상대로 가는 연결만 나빠지면 그 상대나 경로를 봐요.
+  - id: ebpf-name
+    type: input
+    prompt: 커널 소스를 고치지 않고 커널 안에서 작은 프로그램을 안전하게 돌리는 리눅스 기능은?
+    answer: [eBPF, ebpf, 이비피에프]
+    term: network/ebpf
+    explain: NPM 에이전트는 eBPF 프로그램을 TCP 처리 지점에 붙여, 앱을 고치지 않고 연결마다 값을 모아요.

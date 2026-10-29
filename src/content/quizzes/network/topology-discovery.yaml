@@ -1,0 +1,38 @@
+questions:
+  - id: lldp-one-hop
+    type: ox
+    prompt: 스위치 A, B, C가 한 줄로 이어져 있어요. 스위치 A의 LLDP 이웃 표에 C도 나오나요?
+    answer: false
+    explain: LLDP는 바로 이어진 링크 하나 안에서만 오가요. A의 이웃 표에는 B만 있어요. C까지 그리려면 B의 이웃 표도 읽어 이어 붙여요.
+  - id: how-map-built
+    type: choice
+    prompt: 관리 서버가 장비 사이에 선을 긋는 근거로 가장 알맞은 것은?
+    choices:
+      - 장비마다 쌓인 LLDP·CDP 이웃 표
+      - 장비 사이의 ping 응답 시간
+      - 인터페이스마다 오간 트래픽 양
+      - 장비 이름의 알파벳 순서
+    answer: 0
+    explain: 이웃 표의 한 줄은 내 포트 옆에 어떤 장비의 어떤 포트가 있는지예요. 관리 서버가 이를 SNMP로 모아 선을 그어요.
+  - id: missing-link
+    type: choice
+    prompt: 연결도에서 방화벽과 코어 스위치 사이 선만 빠져 있어요. 실제 케이블은 꽂혀 있어요. 먼저 볼 것은?
+    choices:
+      - 방화벽에서 LLDP가 켜져 있는지
+      - 코어 스위치의 CPU 사용률
+      - 방화벽 인증서의 만료일
+      - 코어 스위치의 DNS 설정
+    answer: 0
+    explain: 연결도는 장비들이 알려 준 내용만큼만 정확해요. LLDP가 꺼진 장비는 이웃 표에 남지 않아 선이 빠져요.
+  - id: lldp-hold
+    type: choice
+    prompt: LLDP 기본값에서 받은 이웃 정보를 보관하는 시간은?
+    choices: [120초, 30초, 60초, 180초]
+    answer: 0
+    explain: 보내는 간격 30초에 배수 4를 곱한 120초예요. 180초는 CDP의 기본 보관 시간이에요.
+  - id: cdp-name
+    type: input
+    prompt: Cisco 장비끼리 옆 장비에게 자기 정보를 알리는 Cisco 전용 규약은?
+    answer: [CDP, Cisco Discovery Protocol]
+    term: network/cdp
+    explain: CDP는 Cisco 전용이고, 제조사와 상관없이 쓰는 표준은 LLDP예요.

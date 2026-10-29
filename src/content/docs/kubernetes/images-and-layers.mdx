@@ -1,0 +1,156 @@
+---
+title: 컨테이너 이미지와 레이어
+summary: 이미지는 바뀐 파일만 담은 레이어를 겹겹이 쌓은 것이고, 같은 레이어는 나눠 써요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 15
+icon: container
+keywords: [image layer, 레이어, Dockerfile, copy-on-write, 쓰기 레이어, whiteout, docker history, registry, 레지스트리, imagePullPolicy]
+related: [kubernetes/containers, kubernetes/pod-status, kubernetes/pods-and-nodes, kubernetes/rollout-stuck]
+sources:
+  - title: OCI Image Format Specification — Image Layer Filesystem Changeset
+    url: https://github.com/opencontainers/image-spec/blob/main/layer.md
+  - title: Docker Docs — Storage drivers (layers, copy-on-write)
+    url: https://docs.docker.com/engine/storage/drivers/
+  - title: Kubernetes — Images (imagePullPolicy, ImagePullBackOff)
+    url: https://kubernetes.io/docs/concepts/containers/images/
+  - title: Kubernetes — Garbage Collection (container images)
+    url: https://kubernetes.io/docs/concepts/architecture/garbage-collection/
+  - title: Kubernetes — Kubelet Configuration (imageGCHighThresholdPercent)
+    url: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/
+updated: 2026-10-29
+---
+
+<KeyPoints>
+  <Point title="이미지는 레이어를 쌓은 것이에요">
+    Dockerfile의 명령마다 바뀐 파일만 담은 레이어가 하나씩 생겨요. 실행할 때 레이어를 아래부터 겹쳐 하나의 파일 시스템으로 보여 줘요.
+  </Point>
+  <Point title="같은 레이어는 한 번만 받아요">
+    레이어는 내용의 지문(다이제스트)으로 가리켜요. 같은 베이스를 쓰는 이미지끼리는 레이어를 나눠 써요.
+  </Point>
+  <Point title="지운 파일도 용량은 남아요">
+    뒤 레이어에서 파일을 지우면 안 보이게 표시만 해요. 앞 레이어에 담긴 용량은 그대로예요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="필름은 지우개로 지울 수 있지만 레이어는 한번 만들면 고칠 수 없어요. 지우려면 위 필름에 '여기 없음' 표시를 덧대야 해서, 아래 필름의 무게는 그대로 남아요.">
+  투명 필름을 겹쳐 완성한 그림과 같아요. 아래 필름은 그대로 두고, 바꿀 부분만 새 필름에 그려 위에 덧대요.
+</Analogy>
+
+## 레이어를 쌓아 만들어요
+
+아래 Dockerfile로 이미지를 만들어 레이어를 봤어요. 50MB짜리 파일을 만들고, 다음 줄에서 바로 지워요.
+
+```dockerfile
+FROM alpine:3.20
+RUN dd if=/dev/urandom of=/big.bin bs=1M count=50
+RUN rm /big.bin
+```
+
+<Figure caption="위 이미지의 레이어를 docker history로 본 크기예요. 아래 세 층은 읽기 전용이고, 컨테이너를 띄우면 맨 위에 쓰기 레이어가 하나 더 생겨요.">
+  <Layers
+    ariaLabel="위에서부터 컨테이너 쓰기 레이어, rm 레이어 4.1kB, dd 레이어 52.4MB, alpine 베이스 8.47MB가 쌓인 계층도"
+    layers={[
+      { label: '컨테이너 쓰기 레이어', note: '실행 중에 바뀐 것', tone: 'accent' },
+      { label: 'RUN rm /big.bin', note: '4.1kB · 지움 표시만' },
+      { label: 'RUN dd … big.bin', note: '52.4MB' },
+      { label: 'alpine 3.20 베이스', note: '8.47MB' },
+    ]}
+  />
+</Figure>
+
+파일을 바꾸는 명령마다 <Term term="kubernetes/image-layer">레이어</Term>가 하나씩 생겨요. 레이어에는 앞 레이어와 달라진 파일, 즉 더한 것, 고친 것, 지운 것만 담겨요.
+
+실행할 때는 레이어를 아래부터 차례로 겹쳐 하나의 파일 시스템처럼 보여 줘요. `docker history 이미지이름`으로 레이어마다 어떤 명령이 얼마를 차지하는지 볼 수 있어요.
+
+## 지운 파일도 용량은 남아요
+
+위 이미지는 50MB 파일을 만들고 바로 다음 줄에서 지웠어요. 컨테이너 안에서는 파일이 보이지 않지만, 52.4MB 레이어는 이미지에 그대로 남아요.
+
+지우는 레이어에는 파일 대신 "이 파일 없음" 표시만 담겨요. OCI 이미지 표준은 이를 화이트아웃(whiteout)이라 부르고, `.wh.`로 시작하는 이름으로 남겨요.
+
+그래서 큰 파일은 만든 명령과 같은 RUN 안에서 지워야 이미지가 작아져요. Docker 문서도 뒤 레이어에서 지운 캐시가 이미지 크기에 그대로 남는다고 해요.
+
+## 같은 레이어는 나눠 써요
+
+<Figure caption="alpine 3.20으로 만든 두 이미지가 첫 레이어를 같은 다이제스트로 가리켜요. 노드에는 한 번만 저장돼요.">
+  <Flow
+    ariaLabel="이미지 A와 이미지 B가 같은 alpine 베이스 레이어를 함께 가리키는 구조도"
+    nodes={[
+      { id: 'a', label: '이미지 A', col: 0, row: 0 },
+      { id: 'b', label: '이미지 B', col: 2, row: 0 },
+      { id: 'base', label: 'alpine 베이스', col: 1, row: 1, note: 'sha256:08bc4e…', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'a', to: 'base' },
+      { from: 'b', to: 'base' },
+    ]}
+  />
+</Figure>
+
+레이어는 내용으로 만든 지문인 다이제스트로 가리켜요. 내용이 같으면 지문도 같아서, 노드에 이미 있는 레이어는 다시 받지 않아요. 직접 만든 세 이미지는 모두 첫 레이어가 `sha256:08bc4e53…`로 같았어요.
+
+같은 이미지로 띄운 컨테이너도 읽기 전용 레이어를 모두 나눠 써요. 컨테이너마다 따로 갖는 것은 맨 위의 얇은 쓰기 레이어뿐이에요.
+
+## 쓰기 레이어와 쓸 때 복사
+
+컨테이너가 이미지에 있던 파일을 고치면, 그 파일을 쓰기 레이어로 복사한 뒤 고쳐요. 이를 <Term term="kubernetes/copy-on-write">쓸 때 복사</Term>(copy-on-write)라고 해요. 아래 레이어는 그대로라 다른 컨테이너에 영향이 없어요.
+
+`docker diff`로 <Term term="kubernetes/writable-layer">쓰기 레이어</Term>에 쌓인 변경을 볼 수 있어요. 컨테이너 안에서 새 파일을 만들고 `/etc/motd`를 고친 뒤 본 결과예요. 새 파일은 `A`, 고친 파일은 `C`로 나와요.
+
+```text
+C /etc
+C /etc/motd
+A /new.txt
+```
+
+쓰기 레이어는 컨테이너를 지우면 함께 사라져요. 남겨야 할 데이터는 볼륨에 둬요. 볼륨은 <Term slug="kubernetes/config-and-storage">설정과 저장소</Term>에서 다뤄요.
+
+## 쿠버네티스는 이미지를 이렇게 받아요
+
+파드가 노드에 배정되면, 그 노드의 <Term term="kubernetes/kubelet">kubelet</Term>이 컨테이너 런타임에게 이미지를 받게 해요. 이미지는 <Term term="kubernetes/registry">레지스트리</Term>에서 받아요.
+
+<Term term="kubernetes/image-pull-policy">imagePullPolicy</Term>를 적지 않으면 이미지를 가리킨 방식에 따라 기본값이 정해져요.
+
+| 이미지 지정 | 기본 imagePullPolicy | 뜻 |
+| --- | --- | --- |
+| `:latest`이거나 태그 없음 | Always | 띄울 때마다 레지스트리에 물어봐요 |
+| 그 밖의 태그 | IfNotPresent | 노드에 없을 때만 받아요 |
+| 다이제스트 | IfNotPresent | 노드에 없을 때만 받아요 |
+
+Always여도 레이어를 매번 새로 받지는 않아요. 런타임이 레지스트리에서 지문을 확인하고, 노드에 없는 레이어만 받아요.
+
+## 모니터링에서는
+
+<Figure caption="노드의 이미지 디스크 사용률 예시예요. 기본 설정에서는 85%를 넘으면 kubelet이 오래 안 쓴 이미지부터 지워 80%까지 내려요.">
+  <StatTile label="노드 디스크 사용률" value="86" unit="%" tone="warn" note="정리 시작 85%" />
+  <StatTile label="정리 목표" value="80" unit="%" />
+</Figure>
+
+노드 디스크에는 받은 이미지가 계속 쌓여요. kubelet은 디스크 사용률이 85%를 넘으면 가장 오래 안 쓴 이미지부터 지워 80%까지 내려요. 두 값은 기본값이고 kubelet 설정으로 바꿀 수 있어요.
+
+이미지가 크면 새 노드에서 파드가 뜨기까지 오래 걸려요. 파드 이벤트에 받기 시작(`Pulling`)과 받기 끝(`Pulled`)이 남아서, 두 이벤트 사이로 받는 시간을 볼 수 있어요.
+
+이미지를 받지 못하면 ImagePullBackOff로 남고, 다시 시도하는 간격을 늘려 최대 5분까지 기다려요. 자세한 건 <Term slug="kubernetes/pod-status">파드 상태와 재시작</Term>에 있어요.
+
+<Checkpoints>
+  <Check>Dockerfile에서 큰 파일을 다음 RUN에서 지웠다면 다시 보세요. 이미지 크기는 줄지 않아요. 만든 RUN 안에서 함께 지워야 해요.</Check>
+  <Check>컨테이너 안에 쓴 파일이 다시 뜬 뒤 사라졌다고 버그로 판단했다면 다시 보세요. 쓰기 레이어는 컨테이너와 함께 사라져요.</Check>
+  <Check>노드 디스크가 85% 근처에서 오르내린다면 이미지 정리 때문일 수 있어요. 정리 뒤 새 파드는 이미지를 다시 받느라 늦게 떠요.</Check>
+  <Check>`docker ps -s`의 virtual 크기를 모두 더해 디스크 사용량을 냈다면 다시 보세요. 함께 쓰는 레이어가 여러 번 더해져요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 크기 숫자가 여러 가지인 이유
+
+  `docker ps -s`의 size는 그 컨테이너의 쓰기 레이어 크기예요. virtual은 이미지 크기에 쓰기 레이어를 더한 값이에요. 위 실험의 컨테이너는 size 24.6kB, virtual 8.52MB였어요.
+
+  이미지 크기도 화면마다 달라요. 위 실험의 이미지는 Docker 29에서 `docker image inspect`로 약 56MB였어요. 같은 이미지가 `docker images`에서는 117MB로 보였어요.
+
+  Docker 문서에 따르면 29부터 새로 설치하면 containerd 이미지 저장소를 써서, 명령의 출력이 이전과 다를 수 있어요.
+
+  ### 화이트아웃의 범위
+
+  OCI 표준에서 화이트아웃은 아래 레이어의 파일에만 효과가 있어요. 같은 레이어에 담긴 파일은 지우지 못해요.
+</Deeper>

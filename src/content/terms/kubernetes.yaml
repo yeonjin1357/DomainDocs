@@ -293,3 +293,70 @@ terms:
     short: PVC가 요청하면 어떤 저장소를 어떻게 만들지 적어 둔 등급이에요.
     analogy: 창고를 빌릴 때 고르는 창고 등급표와 같아요.
     doc: kubernetes/volume-not-attaching
+  - id: image-layer
+    name: 이미지 레이어
+    en: Image layer
+    aliases: [layer, 레이어, layer digest]
+    short: 앞 레이어와 달라진 파일만 담은 이미지의 한 층이에요.
+    analogy: 겹쳐 그린 그림의 투명 필름 한 장과 같아요.
+    doc: kubernetes/images-and-layers
+  - id: writable-layer
+    name: 쓰기 레이어
+    en: Container layer
+    aliases: [container layer, 컨테이너 레이어, writable layer]
+    short: 컨테이너마다 맨 위에 하나씩 생겨, 실행 중에 바뀐 파일을 담는 층이에요.
+    doc: kubernetes/images-and-layers
+  - id: copy-on-write
+    name: 쓸 때 복사
+    en: Copy-on-write
+    aliases: [CoW, copy-on-write, 카피 온 라이트]
+    short: 아래 층의 파일을 고칠 때 위 층으로 복사한 뒤 고치는 방식이에요.
+    doc: kubernetes/images-and-layers
+  - id: registry
+    name: 레지스트리
+    en: Container registry
+    aliases: [registry, 이미지 저장소, 컨테이너 레지스트리, Docker Hub]
+    short: 컨테이너 이미지를 보관하고 노드에 나눠 주는 서버예요.
+    doc: kubernetes/images-and-layers
+  - id: image-pull-policy
+    name: imagePullPolicy
+    en: Image pull policy
+    aliases: [이미지 받기 정책, Always, IfNotPresent]
+    short: 컨테이너를 띄울 때 이미지를 새로 받을지 정하는 설정이에요.
+    doc: kubernetes/images-and-layers
+  - id: openshift
+    name: OpenShift
+    en: Red Hat OpenShift
+    aliases: [오픈시프트, OCP, OpenShift Container Platform]
+    short: Red Hat이 쿠버네티스에 기능을 더해 묶은 배포판이에요.
+    doc: kubernetes/openshift
+  - id: openshift-route
+    name: Route
+    en: OpenShift Route
+    aliases: [라우트, route]
+    short: OpenShift에서 바깥 호스트 이름으로 온 요청을 서비스로 넘기는 객체예요.
+    doc: kubernetes/openshift
+  - id: openshift-project
+    name: 프로젝트
+    en: OpenShift Project
+    aliases: [project, oc new-project]
+    short: OpenShift에서 주석이 더 붙은 쿠버네티스 네임스페이스예요.
+    doc: kubernetes/openshift
+  - id: scc
+    name: SCC
+    en: Security Context Constraints
+    aliases: [security context constraints, restricted-v2, 보안 컨텍스트 제약]
+    short: OpenShift에서 파드가 쓸 UID와 권한을 정해 두고 검사하는 규칙이에요.
+    doc: kubernetes/openshift
+  - id: owner-reference
+    name: 소유 관계
+    en: Owner reference
+    aliases: [ownerReferences, owner, 주인, dependent]
+    short: 이 객체를 만들고 관리하는 주인 객체를 적어 둔 필드예요.
+    doc: kubernetes/topology
+  - id: endpoint-slice
+    name: EndpointSlice
+    en: EndpointSlice
+    aliases: [엔드포인트슬라이스, endpoint slice, Endpoints]
+    short: 서비스가 고른 파드의 주소와 준비 상태를 적어 둔 객체예요.
+    doc: kubernetes/topology
