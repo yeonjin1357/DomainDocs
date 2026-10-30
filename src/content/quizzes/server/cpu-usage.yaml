@@ -11,16 +11,16 @@ questions:
     explain: 리눅스 부하는 디스크를 기다리는 일(D 상태)까지 세요. 이런 일은 CPU를 쓰지 않아서 사용률은 낮은데 부하만 높아요.
   - id: over-100-percent
     type: ox
-    prompt: top의 프로세스 목록에서 한 프로세스의 CPU가 380%로 보여요. 잘못 잰 값인가요?
+    prompt: top의 프로세스 목록에서 프로세스의 CPU 사용률은, 서버의 모든 코어를 합쳐 100%로 세나요?
     answer: false
-    explain: 프로세스 사용률은 보통 코어 하나를 100%로 세요. 여러 스레드가 코어 여럿을 함께 쓰면 100%를 넘어요.
+    explain: 프로세스 사용률은 보통 코어 하나를 100%로 세요. 그래서 여러 스레드가 코어 여럿을 함께 쓰면 380%처럼 100%를 넘어요.
   - id: average-hides-core
     type: choice
     prompt: 코어 8개 서버에서 스레드 하나만 쓰는 프로그램이 코어 하나를 100% 채웠어요. 서버 전체 평균 CPU 사용률은 얼마로 보일까요?
     choices:
       - 약 12.5%
       - 100%
-      - 약 50%
+      - 약 87.5%
       - 800%
     answer: 0
     explain: 코어 8개의 평균이라 100 ÷ 8 = 12.5%예요. 평균만 보면 한가해 보이니 코어별로도 봐요.
@@ -36,6 +36,6 @@ questions:
     explain: st는 다른 가상 머신에 CPU를 빼앗긴 시간이에요. 내 앱이 아니라 같은 물리 서버의 이웃이 원인이에요.
   - id: iowait-not-busy
     type: ox
-    prompt: iowait가 높다면 CPU가 입출력을 처리하느라 바쁘다는 뜻인가요?
-    answer: false
-    explain: iowait는 CPU가 쉬는 동안 입출력을 기다린 일이 있던 시간이에요. 그동안 CPU 자체는 쉬고 있어요.
+    prompt: CPU 시간 가운데 iowait(wa)는, CPU가 쉬는 동안에 세는 시간인가요?
+    answer: true
+    explain: iowait는 CPU가 쉬는 동안 입출력을 기다린 일이 있던 시간이에요. 입출력을 기다리는 건 작업이고, 그동안 CPU 자체는 쉬어요.

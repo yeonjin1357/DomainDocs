@@ -1,34 +1,34 @@
 questions:
   - id: high-ratio-not-healthy
     type: ox
-    prompt: 버퍼 캐시 적중률이 99.9%라면 SQL들이 효율적으로 돌고 있다고 볼 수 있나요?
-    answer: false
-    explain: 나쁜 계획이 같은 블록을 몇 번이고 다시 읽으면 적중률은 오히려 올라가요. 비율보다 SQL마다 읽은 블록 수를 봐요.
+    prompt: 나쁜 실행 계획이 같은 블록을 몇 번이고 다시 읽으면, 버퍼 캐시 적중률은 올라가나요?
+    answer: true
+    explain: 다시 읽는 블록은 대부분 캐시에 있어 적중으로 세요. 그래서 일을 많이 할수록 비율은 오히려 올라가요.
   - id: rank-by-blocks
     type: choice
     prompt: 캐시 안에서 일을 지나치게 많이 하는 SQL을 찾으려면 무엇으로 줄 세워요?
     choices:
-      - SQL마다 읽은 블록 수(hit + read)
+      - SQL마다 hit와 read를 더한 블록 수
+      - SQL마다 캐시에 없어 read로 센 블록 수
       - SQL마다 계산한 적중률
       - DB 전체의 적중률
-      - SQL 글자의 길이
     answer: 0
-    explain: 비율은 일의 양을 지워요. 읽은 블록 수로 줄 세우면 캐시 안에서 많이 일하는 SQL이 위로 올라와요.
+    explain: 비율은 일의 양을 지우고, read만 세면 캐시 안의 일이 빠져요. hit와 read를 더해 줄 세우면 많이 일하는 SQL이 올라와요.
   - id: read-not-always-disk
     type: choice
     prompt: PostgreSQL이 캐시에 없어 읽었다고 센 블록(blks_read)에 대해 맞는 말은?
     choices:
-      - 운영체제의 파일 캐시에서 나왔을 수도 있어요
-      - 언제나 디스크에서 직접 읽은 블록이에요
-      - 버퍼 캐시에서 찾은 블록이에요
-      - 커밋할 때 디스크에 쓴 블록이에요
+      - 운영체제 파일 캐시에서 온 블록도 섞여 있어요
+      - 디스크 장치에서 직접 읽어 들인 블록만 따로 세요
+      - 버퍼 캐시에서 찾은 블록을 함께 세요
+      - 커밋할 때 디스크에 쓴 블록을 세요
     answer: 0
     explain: PostgreSQL은 자기 버퍼 캐시에서 찾은 것만 적중으로 세요. 그 밖에서 읽은 블록도 운영체제 캐시에서 나왔을 수 있어요.
   - id: bigger-cache-not-always
     type: ox
-    prompt: 적중률이 낮다면 버퍼 캐시를 키우는 것만으로 언제나 나아지나요?
+    prompt: 한 번 읽고 마는 데이터가 대부분인 DB에서, 버퍼 캐시를 키우면 적중률이 크게 오르나요?
     answer: false
-    explain: 한 번 읽고 마는 데이터가 많으면 캐시를 키워도 소용없어요. Oracle 문서도 낮은 적중률이 곧 캐시를 키우라는 뜻은 아니라고 해요.
+    explain: 다시 읽지 않는 블록은 캐시에 오래 둬도 다시 적중하지 않아요. Oracle 문서도 낮은 적중률이 곧 캐시를 키우라는 뜻은 아니라고 해요.
   - id: shared-buffers-start
     type: choice
     prompt: 메모리가 1GB를 넘는 전용 DB 서버에서, PostgreSQL 문서가 shared_buffers의 출발점으로 드는 값은?

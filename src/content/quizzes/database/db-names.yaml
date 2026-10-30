@@ -14,11 +14,11 @@ questions:
     prompt: SQL Server에서 지금 요청을 막고 있는 세션 번호를 보는 곳은?
     choices:
       - sys.dm_exec_requests의 blocking_session_id
-      - sys.dm_os_wait_stats의 wait_type
-      - sys.dm_exec_query_stats
-      - Query Store
+      - sys.dm_os_wait_stats의 wait_time_ms
+      - sys.dm_exec_query_stats의 total_worker_time
+      - sys.dm_exec_sessions의 status
     answer: 0
-    explain: dm_exec_requests는 지금 실행 중인 요청마다 막는 세션과 기다리는 종류를 보여 줘요.
+    explain: dm_exec_requests는 지금 실행 중인 요청마다 막는 세션과 기다리는 종류를 보여 줘요. dm_os_wait_stats는 서버 전체에 쌓인 대기예요.
   - id: units
     type: ox
     prompt: MySQL processlist의 TIME과 SQL Server dm_exec_requests의 total_elapsed_time은 같은 단위인가요?
@@ -29,9 +29,9 @@ questions:
     prompt: sys.dm_os_wait_stats 값을 그대로 그렸더니 계속 오르기만 해요. 왜일까요?
     choices:
       - 다시 시작하거나 지운 뒤로 쌓인 값이라서요
-      - 대기가 끝없이 늘고 있어서요
-      - 밀리초를 초로 바꾸지 않아서요
-      - 세션 수가 늘어서요
+      - 대기가 풀리지 않고 계속 늘고 있어서요
+      - 밀리초 단위를 초로 바꾸지 않고 그려서요
+      - 세션마다 지금 기다리는 시간을 더한 값이라서요
     answer: 0
     explain: 쌓이는 값은 구간마다 늘어난 양으로 봐야 해요. pg_stat_statements도 같아요.
   - id: oracle-serial

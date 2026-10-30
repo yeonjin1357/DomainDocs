@@ -8,20 +8,20 @@ questions:
     type: choice
     prompt: 이체 코드에서 교착이 자주 나요. 가장 좋은 예방책은?
     choices:
-      - 보내는 쪽·받는 쪽과 상관없이 계좌 번호가 작은 행부터 바꿔요
-      - 커넥션 풀을 키워요
-      - deadlock_timeout을 늘려요
-      - 인덱스를 지워요
+      - 계좌 번호가 작은 행부터 바꾸게 순서를 맞춰요
+      - 보내는 쪽 계좌 행부터 먼저 잠그게 해요
+      - deadlock_timeout을 늘려 교착 검사를 늦춰요
+      - 트랜잭션 격리 수준을 REPEATABLE READ로 올려요
     answer: 0
-    explain: 모든 트랜잭션이 같은 순서로 잠그면 같은 행에서 줄을 설 뿐 엇갈리지 않아요. PostgreSQL 문서가 꼽는 가장 좋은 방법이에요.
+    explain: 모든 트랜잭션이 같은 순서로 잠그면 같은 행에서 줄을 설 뿐 엇갈리지 않아요. 보내는 쪽부터 잠그면 반대 방향 이체와 엇갈려요.
   - id: retry-whole
     type: choice
     prompt: 앱이 교착 에러를 받았을 때 알맞은 처리는?
     choices:
       - 트랜잭션 전체를 처음부터 다시 시도해요
-      - 실패한 SQL 하나만 다시 보내요
+      - 실패한 SQL 하나만 같은 트랜잭션에서 다시 보내요
       - 연결을 끊고 사용자에게 실패를 알려요
-      - 커밋을 시도해요
+      - 잠시 기다렸다가 그대로 커밋을 시도해요
     answer: 0
     explain: 실패한 쪽 트랜잭션은 이미 통째로 되돌려졌어요. 그래서 처음부터 다시 해요.
   - id: mysql-all-deadlocks
@@ -30,7 +30,7 @@ questions:
     choices:
       - innodb_print_all_deadlocks
       - innodb_lock_wait_timeout
-      - max_execution_time
+      - innodb_status_output_locks
       - log_lock_waits
     answer: 0
     explain: innodb_print_all_deadlocks를 켜면 교착마다 정보를 에러 로그에 써요. log_lock_waits는 PostgreSQL 설정이에요.

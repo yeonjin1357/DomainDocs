@@ -21,21 +21,21 @@ questions:
     explain: 값이 줄어든 순간을 재시작으로 봐요. 재시작 전에 늘어난 50과 뒤의 20을 더해 70으로 세요.
   - id: sum-then-rate
     type: ox
-    prompt: 여러 서버의 카운터를 먼저 더한 다음 rate를 구해도 괜찮나요?
-    answer: false
-    explain: 한 서버만 재시작해도 합계가 줄어, 전체를 재시작으로 보고 rate가 튀어요. 서버마다 rate를 먼저 구한 뒤 더해요.
+    prompt: 여러 서버의 카운터를 먼저 더한 뒤 rate를 구하면, 한 서버만 재시작해도 rate가 크게 튀나요?
+    answer: true
+    explain: 한 서버만 재시작해도 합계가 줄어, rate가 합계 전체를 재시작으로 봐요. 서버마다 rate를 먼저 구한 뒤 더해요.
   - id: gauge-change
     type: choice
     prompt: 메모리 사용량 같은 게이지가 얼마나 변했는지 보려면 어떤 함수를 쓸까요?
     choices:
       - delta()나 deriv()
-      - rate()
-      - increase()
-      - irate()
+      - rate()나 irate()
+      - increase()나 rate()
+      - irate()나 increase()
     answer: 0
     explain: rate 계열은 값이 줄면 재시작으로 보고 더해서, 게이지에 쓰면 의미 없는 값이 나와요.
   - id: raw-counter-graph
     type: ox
-    prompt: 카운터 값을 그대로 그린 그래프로, 지금 얼마나 바쁜지 알 수 있나요?
-    answer: false
-    explain: 카운터는 시작부터 쌓인 값이라 오르기만 해요. 지금 상태는 rate로 봐요.
+    prompt: 요청이 평소의 절반으로 줄어도, 카운터 값을 그대로 그린 선은 계속 오르나요?
+    answer: true
+    explain: 카운터는 시작부터 쌓인 값이라 요청이 있는 한 오르기만 해요. 지금 얼마나 바쁜지는 rate로 봐요.

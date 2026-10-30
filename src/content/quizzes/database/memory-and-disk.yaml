@@ -1,9 +1,9 @@
 questions:
   - id: block-unit-read
     type: ox
-    prompt: 행 하나만 필요하면 DB는 디스크에서 그 행만 쏙 골라 읽나요?
-    answer: false
-    explain: DB는 블록(페이지) 단위로 읽어요. 행 하나가 필요해도 그 행이 든 블록을 통째로 읽어요.
+    prompt: 행 하나만 필요할 때도, DB는 그 행이 든 블록(보통 8KB)을 통째로 읽나요?
+    answer: true
+    explain: DB는 블록(페이지) 단위로 읽고 써요. 같은 블록에 있는 다른 행도 함께 메모리로 올라와요.
   - id: innodb-page-size
     type: choice
     prompt: 다음 중 기본 블록(페이지) 크기가 나머지와 다른 것은?
@@ -20,14 +20,14 @@ questions:
     choices:
       - 체크포인트
       - 커밋
-      - 하드 파스
+      - 로그 선행 기록
       - 장애 조치
     answer: 0
     explain: 체크포인트에서 더티 블록을 디스크에 써요. 그 사이 장애가 나면 먼저 적어 둔 로그로 메워요.
   - id: restart-cold-cache
     type: ox
-    prompt: DB를 다시 시작한 직후 한동안 디스크 읽기가 늘어나는 건 이상한 일인가요?
-    answer: false
+    prompt: DB를 다시 시작한 직후 한동안은, 평소보다 디스크 읽기가 늘어나나요?
+    answer: true
     explain: 다시 시작하면 버퍼 캐시가 비어 있어요. 자주 쓰는 블록이 다시 캐시에 찰 때까지 디스크에서 읽어요.
   - id: dirty-block-name
     type: input

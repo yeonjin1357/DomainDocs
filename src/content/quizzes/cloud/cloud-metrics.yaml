@@ -6,14 +6,14 @@ questions:
       - 5분 단위로 묶여 남아요
       - 1분 단위 그대로 남아요
       - 모두 지워져요
-      - 1초 단위로 더 잘게 나뉘어요
+      - 1시간 단위로 묶여 남아요
     answer: 0
     explain: 오래 둘수록 더 큰 단위로 묶어요. 1분 자료는 15일 뒤 5분, 63일 뒤 1시간 단위가 돼요.
   - id: old-graph-max
     type: ox
-    prompt: 두 달 전 그래프의 최댓값이 어제보다 낮아요. 그때는 짧은 급등이 없었다고 볼 수 있나요?
+    prompt: CloudWatch에서 석 달 전 하루의 CPU 사용률을 평균으로 그렸어요. 그날 1분만 90%로 튄 값이 그래프에 90% 가까이 찍히나요?
     answer: false
-    explain: 오래된 자료는 1시간 단위로 묶여서 짧은 급등이 평평하게 지워져요.
+    explain: 63일이 지난 1분 자료는 1시간 단위로 묶여요. 1분만 튄 값은 1시간 평균에 묻혀 평평해져요.
   - id: sum-for-counts
     type: choice
     prompt: 에러 수처럼 일어난 횟수를 세는 지표는 어떤 통계로 봐야 할까요?
@@ -28,7 +28,7 @@ questions:
     type: choice
     prompt: CloudWatch 경보의 상태가 INSUFFICIENT_DATA예요. 무슨 뜻일 수 있을까요?
     choices:
-      - 지표가 들어오지 않거나 판단할 자료가 모자라요
+      - 판단할 지표 자료가 모자라요
       - 지표가 정한 기준 안에 있어요
       - 지표가 정한 기준을 벗어났어요
       - 경보가 꺼져 있어요
@@ -38,9 +38,9 @@ questions:
     type: choice
     prompt: CloudWatch에서 지표 하나를 가리키는 이름표가 아닌 것은?
     choices:
-      - 통계(Average, Sum 같은 것)
-      - 네임스페이스
-      - 지표 이름
-      - 차원
+      - 통계(Average)
+      - 네임스페이스(AWS/EC2)
+      - 지표 이름(CPUUtilization)
+      - 차원(InstanceId)
     answer: 0
     explain: 지표는 네임스페이스, 지표 이름, 차원으로 가려요. 통계는 그 지표를 기간마다 묶어 볼 때 고르는 거예요.

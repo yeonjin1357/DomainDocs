@@ -1,9 +1,9 @@
 questions:
   - id: lower-email
     type: ox
-    prompt: email 열에 보통 인덱스만 있을 때, WHERE lower(email) = 'a@x.com'은 그 인덱스로 찾을 수 있나요?
-    answer: false
-    explain: 인덱스는 email 값 그대로를 정렬해 둔 거라 lower(email)과 모양이 달라요. lower(email)로 만든 식 인덱스가 따로 있어야 해요.
+    prompt: email 열에 lower(email)로 식 인덱스를 만들면, WHERE lower(email) = 'a@x.com'도 Index Scan으로 찾나요?
+    answer: true
+    explain: 조건의 모양이 인덱스의 식과 같아져서 써요. email 값 그대로를 정렬한 보통 인덱스로는 Seq Scan이었어요.
   - id: date-range
     type: choice
     prompt: created_at에 인덱스가 있어요. 2026년 3월 1일 하루치를 인덱스로 찾기에 알맞은 조건은?
@@ -18,12 +18,12 @@ questions:
     type: choice
     prompt: bigint 열 id를 id = 42.0으로 찾았더니 계획에 (id)::numeric = 42.0과 Seq Scan이 나왔어요. 왜 그럴까요?
     choices:
-      - 값의 형에 맞추느라 열 쪽을 numeric으로 바꿔서 인덱스를 못 써요
-      - 42.0이라는 값이 표에 없어서요
-      - 기본 키 인덱스가 깨져서요
-      - 통계가 낡아서요
+      - 열에 형 변환이 씌워져 인덱스를 못 써요
+      - 42.0이라는 값이 표에 없어서 끝까지 읽어요
+      - 기본 키 인덱스가 깨져서 쓸 수 없어요
+      - 통계가 낡아 행 수를 잘못 어림했어요
     answer: 0
-    explain: 열에 변환이 씌워지면 함수를 씌운 것과 같아요. 값의 형을 열과 맞추면 다시 인덱스를 써요.
+    explain: 값의 형에 맞추느라 열 쪽을 numeric으로 바꿨어요. 함수를 씌운 것과 같아서, 값의 형을 열과 맞추면 다시 인덱스를 써요.
   - id: leading-wildcard
     type: ox
     prompt: email LIKE '%@example.com'처럼 %로 시작하는 패턴도 email의 보통 B-tree 인덱스로 범위를 좁힐 수 있나요?
@@ -33,9 +33,9 @@ questions:
     type: choice
     prompt: 행의 99%가 status = 'done'이에요. WHERE status = 'done'에 Seq Scan이 나왔다면?
     choices:
-      - 대부분을 읽으니 처음부터 다 읽는 쪽이 싸서 고른 옳은 선택이에요
-      - status 인덱스가 깨졌어요
-      - 인덱스를 강제로 쓰게 해야 해요
-      - 통계를 지워야 해요
+      - 표 대부분을 고르니 다 읽는 쪽이 싸서 고른 거예요
+      - status 인덱스가 깨져 옵티마이저가 건너뛴 거예요
+      - status에 함수가 씌워져 인덱스를 못 쓴 거예요
+      - 인덱스를 강제로 쓰게 힌트를 줘야 하는 상황이에요
     answer: 0
-    explain: 고르는 행이 많으면 인덱스를 거치는 게 더 비싸요. 드문 값인 'pending'으로 찾을 때는 인덱스를 썼어요.
+    explain: 고르는 행이 많으면 인덱스를 거치는 게 더 비싸서 옳은 선택이에요. 드문 값인 'pending'으로 찾을 때는 인덱스를 썼어요.

@@ -1,9 +1,9 @@
 questions:
   - id: many-connections-busy
     type: ox
-    prompt: DB 연결 수가 한도에 닿았다면, DB가 SQL을 처리하느라 그만큼 바쁘다는 뜻인가요?
-    answer: false
-    explain: 쉬는 연결도 자리를 차지해요. 연결 대부분이 쉬고 있을 수 있으니, 지금 일하는 액티브 세션 수를 함께 봐요.
+    prompt: DB의 연결 수에는, 다음 명령을 기다리며 쉬는 idle 연결도 들어가나요?
+    answer: true
+    explain: 쉬는 연결도 자리를 차지해요. 연결 수가 한도에 닿아도 일하는 세션은 몇 개뿐일 수 있어 액티브 세션 수를 함께 봐요.
     doc: database/too-many-connections
   - id: postgres-process-per-connection
     type: choice
@@ -20,9 +20,9 @@ questions:
     prompt: 앱이 커넥션 풀로 연결을 돌려 쓰는 가장 큰 이유는?
     choices:
       - 요청마다 연결을 맺고 인증하는 비용을 줄이려고
-      - DB의 연결 수 한도를 없애려고
+      - DB가 받을 수 있는 연결 수 한도를 늘리려고
       - 옵티마이저가 더 빠른 계획을 고르게 하려고
-      - 세션 설정을 요청마다 새로 정하려고
+      - 요청마다 세션 설정을 깨끗한 상태로 새로 받으려고
     answer: 0
     explain: 연결을 맺으려면 네트워크를 여러 번 오가고 인증하고 서버 쪽 일꾼을 준비해야 해요. 풀은 맺어 둔 연결을 다시 써요.
   - id: session-setting-sticks

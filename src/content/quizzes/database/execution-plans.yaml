@@ -9,9 +9,9 @@ questions:
     prompt: EXPLAIN ANALYZE 결과에서 가장 먼저 찾아볼 곳은?
     choices:
       - 예상 행 수와 실제 행 수가 크게 다른 노드
-      - cost 숫자가 가장 큰 노드
-      - width 값이 가장 큰 노드
-      - 맨 위에 있는 노드
+      - 예상 cost가 가장 크게 찍힌 노드
+      - 행 하나의 평균 바이트(width)가 가장 큰 노드
+      - 전체 시간이 찍힌 맨 위의 노드
     answer: 0
     explain: 예상이 크게 빗나가면 그 자리에 맞지 않는 방법을 고르기 쉬워요. 8건을 예상하고 고른 Nested Loop가 12,000건 앞에서 느려지는 식이에요.
   - id: loops-multiply
@@ -20,14 +20,14 @@ questions:
     choices:
       - 약 1,200ms
       - 약 0.1ms
-      - 약 12ms
+      - 약 12,000ms
       - 약 120ms
     answer: 0
     explain: 여러 번 실행된 노드의 시간은 한 번 실행의 평균이에요. loops를 곱하면 0.1ms × 12,000 = 1,200ms예요.
   - id: analyze-runs-dml
     type: ox
-    prompt: UPDATE 문을 EXPLAIN ANALYZE로 보면, 계획만 보여 주고 데이터는 바꾸지 않나요?
-    answer: false
+    prompt: UPDATE 문 앞에 EXPLAIN ANALYZE를 붙여 실행하면, 표의 데이터도 바뀌나요?
+    answer: true
     explain: EXPLAIN ANALYZE는 SQL을 실제로 실행해요. 데이터를 남기지 않으려면 BEGIN과 ROLLBACK 사이에서 실행해요.
   - id: explain-analyze-name
     type: input

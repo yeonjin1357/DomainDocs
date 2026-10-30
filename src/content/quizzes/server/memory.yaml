@@ -11,9 +11,9 @@ questions:
     explain: 리눅스는 남는 메모리를 파일 캐시로 쓰고, 필요하면 비워 줘요. 비울 수 있는 캐시까지 계산한 값이 available이에요.
   - id: used-minus-free
     type: ox
-    prompt: (전체 − free) ÷ 전체로 계산한 메모리 사용률이 92%예요. 앱들이 메모리를 92% 쓰고 있다고 볼 수 있나요?
+    prompt: 메모리 사용률을 (전체 − free) ÷ 전체로 계산하면, 파일 캐시로 쓰는 메모리는 여유 쪽으로 세나요?
     answer: false
-    explain: 이렇게 계산하면 파일 캐시까지 사용으로 잡혀서 늘 꽉 차 보여요. available을 기준으로 계산해야 앱이 실제로 쓰는 몫이에요.
+    explain: free는 아무것도 담지 않은 메모리라, 이렇게 계산하면 파일 캐시까지 사용으로 잡혀요. available을 기준으로 계산해야 앱이 실제로 쓰는 몫이에요.
   - id: rss-not-vmsize
     type: choice
     prompt: 프로세스가 실제 메모리에 올려 둔 양을 보려면 어떤 값을 봐야 할까요?
@@ -26,9 +26,9 @@ questions:
     explain: 가상 메모리 크기는 잡아 둔 주소 공간이라 실제보다 훨씬 커요. 실제로 메모리에 올라온 양은 RSS예요.
   - id: swap-used-not-active
     type: ox
-    prompt: 스왑 사용량은 높지만 vmstat의 si·so가 0에 가까워요. 지금 스왑 때문에 서버가 느려지고 있다고 볼 수 있나요?
-    answer: false
-    explain: 한 번 내보낸 메모리는 다시 쓰이기 전까지 스왑에 남아요. 지금 스왑을 오가는 양이 있어야 느려져요.
+    prompt: 스왑으로 한 번 내보낸 메모리는, 다시 쓰이기 전까지 스왑 사용량에 그대로 남나요?
+    answer: true
+    explain: 한 번 내보낸 메모리는 다시 쓰이기 전까지 스왑에 남아요. 그래서 사용량이 높아도 si·so가 0에 가까우면 스왑 때문에 느려지지는 않아요.
   - id: oom-killer-name
     type: input
     prompt: 프로세스가 에러 로그도 없이 사라졌어요. 메모리가 끝내 모자랄 때 커널이 프로세스 하나를 골라 끝내는 기능은?

@@ -1,24 +1,24 @@
 questions:
   - id: zero-vs-nodata
     type: ox
-    prompt: 에러율 0%와 '데이터 없음'은 같은 뜻인가요?
+    prompt: 수집이 멈추고 10분 뒤, Prometheus의 에러율 질의는 0%를 돌려주나요?
     answer: false
-    explain: 0%는 재 봤더니 에러가 없었다는 기록이고, 데이터 없음은 기록 자체가 없다는 뜻이에요. 수집이 멈췄을 수도 있어요.
+    explain: 고른 시계열이 없어 0%가 아니라 빈 결과가 나와요. 0%는 재 봤더니 에러가 없었다는 기록이라, 데이터 없음과 달라요.
   - id: fill-zero-risk
     type: choice
     prompt: 빈 질의 결과에 ?? 0을 붙여 0을 넣는 화면 코드의 위험은?
     choices:
-      - 수집이 멈춘 장애가 에러 0%처럼 정상으로 보여요
-      - 화면이 느려져요
-      - 화면에 NaN이 떠요
-      - 숫자가 실제보다 커져요
+      - 수집이 멈춘 장애가 에러 0%로 보여요
+      - 요청이 없던 구간이 데이터 없음으로 보여요
+      - 멈추기 전 마지막 값이 계속 떠 있어요
+      - 빈 값이 null로 남아 선이 끊겨 보여요
     answer: 0
     explain: 장애 한가운데서 가장 건강한 숫자가 떠서, 확인하러 갈 이유가 사라져요. 빈 값은 '데이터 없음'으로 보여 줘요.
   - id: never-seen-series
     type: choice
     prompt: Prometheus Go 클라이언트로 status 레이블을 붙여 요청을 세요. 500 응답이 한 번도 없던 경로의 에러율 질의 결과는?
     choices:
-      - 0%가 아니라 빈 결과
+      - 빈 결과
       - 0%
       - NaN
       - 100%
@@ -26,16 +26,16 @@ questions:
     explain: 레이블 조합은 처음 기록할 때 시계열이 생겨요. 한 번도 안 난 500 응답엔 시계열이 없어서 결과가 비어요.
   - id: alert-on-empty
     type: ox
-    prompt: Prometheus 알림 규칙은 식의 결과가 비면 울리나요?
-    answer: false
-    explain: 결과가 비면 울리지 않고, 울리던 알림도 해제돼요. 그래서 값이 끊긴 걸 알리는 알림을 따로 둬요.
+    prompt: Prometheus 알림 규칙은 식의 결과가 비면, 울리던 알림도 해제하나요?
+    answer: true
+    explain: 결과가 비면 새로 울리지 않고, 울리던 알림도 해제돼요. 그래서 값이 끊긴 걸 알리는 알림을 따로 둬요.
   - id: absent-alert
     type: choice
     prompt: 수집 대상이 목록에서 통째로 사라진 것까지 잡으려면 어떤 알림을 둘까요?
     choices:
       - absent_over_time(up{job="api"}[10m])
-      - up == 0
-      - rate(up[5m])
-      - sum(up) > 0
+      - count_over_time(up{job="api"}[10m]) == 0
+      - max_over_time(up{job="api"}[10m]) == 0
+      - up{job="api"} == 0
     answer: 0
-    explain: 목록에서 빠진 대상은 up이 0이 아니라 사라져요. absent_over_time은 구간 내내 값이 없을 때 1을 내요.
+    explain: 목록에서 빠진 대상은 up이 0이 아니라 사라져서, 다른 식은 결과가 비어 울리지 않아요. absent_over_time은 구간 내내 값이 없을 때 1을 내요.
