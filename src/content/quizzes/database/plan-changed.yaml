@@ -33,5 +33,4 @@ questions:
     type: input
     prompt: PostgreSQL에서 표의 행 수와 값 분포를 다시 모아 통계를 새로 고치는 명령은?
     answer: [ANALYZE, analyze, VACUUM ANALYZE, 애널라이즈]
-    term: database/statistics
     explain: 큰 적재나 삭제 뒤에 돌리면 낡은 통계 때문에 나빠진 계획이 돌아와요. MySQL은 ANALYZE TABLE이에요.

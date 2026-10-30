@@ -18,7 +18,7 @@ questions:
     type: choice
     prompt: 커넥션 풀의 DB 연결이 한참 쉬고 난 뒤, 첫 쿼리에서 끊김이 나요. 앱과 DB 사이에 NAT가 있어요. 의심할 것은?
     choices:
-      - NAT가 오래 쉰 연결을 표에서 지웠어요
+      - NAT가 쉰 연결을 표에서 지웠어요
       - DB의 연결 수 한도가 꽉 찼어요
       - 방화벽에 거부 규칙이 새로 생겼어요
       - DNS 레코드의 TTL이 끝났어요
@@ -29,9 +29,9 @@ questions:
     prompt: 리눅스 게이트웨이에서 새 연결만 가끔 실패하고, 이미 맺은 연결은 멀쩡해요. 커널 로그에서 찾아볼 메시지는?
     choices:
       - "nf_conntrack: table full, dropping packet"
-      - "Out of memory: Killed process"
+      - "Out of memory: Killed process 1234 (java)"
+      - "TCP: Possible SYN flooding on port 443. Sending cookies."
       - "No space left on device"
-      - "link down"
     answer: 0
     explain: 연결 추적 표가 꽉 차면 새 연결의 패킷만 버려져요. nf_conntrack_count와 nf_conntrack_max의 비율을 미리 봐 둬요.
   - id: nat-name

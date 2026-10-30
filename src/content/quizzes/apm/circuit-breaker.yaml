@@ -33,5 +33,4 @@ questions:
     type: input
     prompt: 바깥 호출의 실패가 쌓이면 한동안 호출을 끊고 바로 실패시키는 장치는?
     answer: [서킷 브레이커, circuit breaker, 회로 차단기]
-    term: apm/circuit-breaker
     explain: 아픈 서비스를 더 두드리지 않고, 기다리느라 스레드가 묶이지 않게 해서 장애가 번지는 걸 막아요.

@@ -33,5 +33,4 @@ questions:
     type: input
     prompt: 정해 둔 위치에서 주기적으로 주소를 열어 보며 정상 여부와 속도를 재는 감시를 뭐라고 부를까요?
     answer: [외부 감시, URL 모니터링, synthetic monitoring, 합성 모니터링, 신세틱 모니터링]
-    term: apm/synthetic-monitoring
     explain: 사용자가 없을 때도 장애를 먼저 알 수 있어요. 실제 사용자 감시(RUM)와 함께 써요.

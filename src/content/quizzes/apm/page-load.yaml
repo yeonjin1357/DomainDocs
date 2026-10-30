@@ -37,6 +37,5 @@ questions:
   - id: rum-name
     type: input
     prompt: 실제 사용자의 브라우저에서 페이지 구간별 시각을 모아 서버로 보내는 모니터링 방식의 약어는?
-    answer: [RUM]
-    term: apm/rum
+    answer: [RUM, 실제 사용자 모니터링]
     explain: RUM은 실제 사용자의 기기와 네트워크에서 걸린 시간을 보여 줘요. 정해 둔 곳에서 재는 외부 감시와는 숫자가 달라요.

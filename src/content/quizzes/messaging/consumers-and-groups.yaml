@@ -37,6 +37,5 @@ questions:
   - id: rebalance-name
     type: input
     prompt: 컨슈머가 죽거나 새로 들어와 그룹 구성원이 바뀌면, 파티션을 다시 나눠요. 이 일을 무엇이라고 하나요?
-    answer: [리밸런스, 리밸런싱, rebalance]
-    term: messaging/rebalance
+    answer: [리밸런스, 리밸런싱, rebalance, rebalancing, 재조정]
     explain: 리밸런스 동안에는 파티션을 옮기느라 처리가 잠시 멈출 수 있어요. 너무 잦으면 지연이 늘어요.

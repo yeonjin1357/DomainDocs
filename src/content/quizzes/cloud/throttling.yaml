@@ -32,6 +32,5 @@ questions:
   - id: throttling-term
     type: input
     prompt: 정해 둔 속도보다 요청이 많을 때 넘친 요청을 거절하는 일을 뭐라고 부를까요?
-    answer: [스로틀링, throttling, 쓰로틀링, rate limiting, 속도 제한]
-    term: cloud/throttling
+    answer: [스로틀링, throttling, 쓰로틀링, rate limiting, 속도 제한, throttle]
     explain: HTTP에서는 보통 429 Too Many Requests로 돌아와요. 고장이 아니라 천천히 보내라는 뜻이에요.

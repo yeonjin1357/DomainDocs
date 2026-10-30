@@ -38,5 +38,4 @@ questions:
     type: input
     prompt: 서버 인증서에서 중간 인증서를 거쳐 믿는 루트 인증서까지 서명으로 이어진 줄을 뭐라고 부를까요?
     answer: [인증서 체인, 체인, certificate chain, chain]
-    term: network/certificate-chain
     explain: 루트는 클라이언트가 이미 갖고 있고, 서버는 그 앞의 인증서들을 보내야 해요.

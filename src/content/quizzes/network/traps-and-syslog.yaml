@@ -8,10 +8,10 @@ questions:
     type: choice
     prompt: 인터페이스 장애를 linkDown Trap만으로 알아채고 있어요. 무엇이 문제일까요?
     choices:
-      - Trap은 UDP라서 중간에 사라져도 아무도 몰라요
-      - Trap은 하루에 한 번만 모아서 와요
-      - Trap에는 어느 인터페이스인지가 없어요
-      - Trap은 관리 서버가 물어야만 와요
+      - UDP라 사라져도 아무도 몰라요
+      - 하루에 한 번만 모아서 와요
+      - 어느 인터페이스인지가 빠져요
+      - 관리 서버가 물어야만 와요
     answer: 0
     explain: Trap에는 받았다는 확인이 없어요. 폴링한 동작 상태(ifOperStatus)로도 함께 확인해요.
   - id: inform-acked

@@ -29,5 +29,4 @@ questions:
     type: input
     prompt: OpenShift에서 파드가 쓸 UID와 권한을 정해 두고 만들 때 검사하는 규칙은?
     answer: [SCC, Security Context Constraints, 보안 컨텍스트 제약]
-    term: kubernetes/scc
     explain: SCC에 걸리면 파드 자체가 만들어지지 않아서, 이유는 ReplicaSet 같은 상위 객체의 이벤트에 남아요.

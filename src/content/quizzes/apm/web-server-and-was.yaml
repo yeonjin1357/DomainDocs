@@ -38,5 +38,4 @@ questions:
     type: input
     prompt: 앞에서 요청을 받아 뒤의 서버로 넘겨 주는 역할을 무엇이라고 하나요?
     answer: [리버스 프록시, reverse proxy]
-    term: apm/reverse-proxy
     explain: nginx 같은 웹 서버가 이 역할을 하며, 앱 코드가 필요한 요청을 뒤의 WAS로 넘겨요.

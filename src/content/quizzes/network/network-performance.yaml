@@ -2,7 +2,7 @@ questions:
   - id: npm-unit
     type: choice
     prompt: SNMP로 보는 장비 화면과 견줘, NPM 화면이 주로 보여 주는 단위는?
-    choices: [서버와 서버 사이의 연결, 스위치 포트, 장비의 CPU, 라우터의 경로표]
+    choices: [서버 사이의 연결, 스위치의 포트, 장비의 CPU 사용률, 라우터의 경로표]
     answer: 0
     explain: NPM은 서버가 직접 겪은 연결마다 오간 양, 지연, 재전송을 보여 줘요. 장비와 포트는 SNMP 화면의 단위예요.
   - id: retrans-rate

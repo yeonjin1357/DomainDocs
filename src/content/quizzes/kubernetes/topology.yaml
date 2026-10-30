@@ -38,5 +38,4 @@ questions:
     type: input
     prompt: 서비스가 고른 파드의 주소와 준비 상태를 적어 두는 객체는?
     answer: [EndpointSlice, 엔드포인트슬라이스, endpoint slice]
-    term: kubernetes/endpoint-slice
     explain: 슬라이스 하나에는 기본으로 끝점 100개까지 담겨요. 파드가 많으면 슬라이스가 여러 개예요.

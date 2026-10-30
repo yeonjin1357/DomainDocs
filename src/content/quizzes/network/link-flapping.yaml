@@ -1,25 +1,25 @@
 questions:
   - id: polling-misses-flap
     type: ox
-    prompt: 2분마다 읽은 ifOperStatus가 늘 up이에요. 링크가 한 번도 끊기지 않았다고 볼 수 있나요?
-    answer: false
-    explain: 폴링 사이에 끊겼다 붙으면 읽을 때마다 up으로 보여요. 상태가 바뀐 시각(ifLastChange)이 달라졌는지 함께 봐요.
-  - id: last-change
+    prompt: 2분마다 읽은 ifOperStatus는 늘 up인데, ifLastChange 값이 읽을 때마다 달라요. 그사이 링크 상태가 바뀌었나요?
+    answer: true
+    explain: ifLastChange는 지금 상태로 들어간 때의 가동 시간 값이라, 바뀌었다면 그사이 끊겼다 붙은 거예요. 폴링 사이에 다시 up이 되면 상태만으로는 안 보여요.
+  - id: count-with-lastchange
     type: choice
-    prompt: 폴링 사이에 인터페이스 상태가 바뀌었는지 알려 주는 값은?
+    prompt: 플래핑 횟수를 linkDown Trap 수로 세고 있어요. 빠짐없이 세려면 무엇을 함께 맞춰 볼까요?
     choices:
-      - ifLastChange
-      - ifSpeed
-      - ifInOctets
-      - ifAdminStatus
+      - ifLastChange와 Syslog
+      - 장비 CPU와 메모리 사용률
+      - 인터페이스 사용률과 bps
+      - ifInOctets와 ifOutOctets
     answer: 0
-    explain: ifLastChange는 지금 상태로 들어간 때의 장비 가동 시간 값이에요. 읽을 때마다 바뀐다면 그사이 상태가 또 바뀐 거예요.
+    explain: Trap은 UDP라 사라져도 알 수 없어요. 폴링한 ifLastChange와 장비가 남긴 Syslog를 함께 맞춰 횟수와 시각을 모아요.
   - id: physical-first
     type: choice
     prompt: 링크가 끊겼다 붙기를 되풀이하고, 받은 에러(ifInErrors)도 함께 늘어요. 먼저 의심할 것은?
     choices:
-      - 케이블이나 광 모듈 같은 물리 문제
-      - 서버의 DNS 설정
+      - 케이블이나 광 모듈
+      - 서버의 DNS 리졸버 설정
       - 앱의 커넥션 풀 크기
       - SNMP 커뮤니티 문자열
     answer: 0
@@ -28,9 +28,9 @@ questions:
     type: choice
     prompt: 플래핑하는 포트 하나가 10분 동안 알림 30개를 만들어요. 알림은 어떻게 보내는 게 좋을까요?
     choices:
-      - 같은 포트의 변화를 묶어 "10분 동안 30번 바뀜" 하나로 보내요
+      - 같은 포트의 변화를 한 알림으로 묶어요
       - 바뀔 때마다 하나씩 그대로 보내요
-      - 그 포트의 알림을 모두 꺼요
-      - linkUp 알림만 보내요
+      - 그 포트의 알림을 모두 꺼 둬요
+      - linkUp 알림만 골라서 보내요
     answer: 0
-    explain: 쏟아지는 알림은 다른 중요한 알림을 묻어요. 한 사건으로 묶으면 횟수 정보는 살리면서 소음은 줄여요.
+    explain: 쏟아지는 알림은 다른 중요한 알림을 묻어요. "10분 동안 30번 바뀜"처럼 한 사건으로 묶으면 횟수 정보는 살리면서 소음은 줄여요.

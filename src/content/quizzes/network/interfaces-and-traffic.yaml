@@ -13,17 +13,17 @@ questions:
     type: choice
     prompt: 10Gbps 인터페이스를 32비트 카운터(ifInOctets)로 1분마다 읽었더니, 트래픽이 실제보다 훨씬 작게 나와요. 왜일까요?
     choices:
-      - 읽는 사이에 카운터가 한 바퀴 넘게 돌아서
+      - 카운터가 한 바퀴 넘게 돌아서
       - 장비의 시계가 어긋나서
-      - SNMP 커뮤니티 문자열이 틀려서
+      - 커뮤니티 문자열이 틀려서
       - 받은 양과 보낸 양을 더해서
     answer: 0
     explain: 32비트 카운터는 빠른 인터페이스에서 1분도 안 돼 한 바퀴를 돌아요. 그러면 몇 바퀴 돌았는지 몰라 값이 틀려요. 64비트 ifHC 카운터로 읽어요.
   - id: admin-down-ok
     type: ox
-    prompt: 관리자가 꺼 둔(ifAdminStatus가 down인) 포트의 동작 상태가 down이에요. 장애 알림을 보내야 하나요?
-    answer: false
-    explain: 꺼 둔 포트가 down인 건 정상이에요. 관리 상태가 up인데 동작 상태가 down일 때가 고장이에요.
+    prompt: ifAdminStatus는 up인데 ifOperStatus가 down인 포트는, 켜 두었는데 통신이 안 되는 고장 상태인가요?
+    answer: true
+    explain: 관리자가 켜 둔 포트가 실제로 동작하지 않는 거예요. 관리자가 꺼 둔(ifAdminStatus가 down인) 포트의 down은 정상이라 알리지 않아요.
   - id: errors-physical
     type: choice
     prompt: 업링크 포트의 ifInErrors가 분당 120개씩 늘어요. 흔히 먼저 의심하는 것은?
@@ -36,6 +36,6 @@ questions:
     explain: ifInErrors는 패킷에 에러가 있어 받지 못한 수예요. 에러 없이 버린 패킷은 ifInDiscards로 따로 세요.
   - id: utilization-per-direction
     type: ox
-    prompt: 받은 양과 보낸 양을 더한 뒤 인터페이스 속도 하나로 나누면 맞는 사용률인가요?
+    prompt: 1Gbps 포트에서 받는 쪽 600Mbps, 보내는 쪽 600Mbps가 오가요. 이 포트는 이미 속도를 넘겨 가득 찬 상태인가요?
     answer: false
-    explain: 받는 쪽과 보내는 쪽은 보통 동시에 각자 속도만큼 쓸 수 있어요. 그래서 사용률은 방향마다 따로 나눠요.
+    explain: 받는 쪽과 보내는 쪽은 보통 동시에 각자 속도만큼 쓸 수 있어서, 방향마다 60%예요. 둘을 더해 속도 하나로 나누면 120%처럼 틀린 값이 나와요.

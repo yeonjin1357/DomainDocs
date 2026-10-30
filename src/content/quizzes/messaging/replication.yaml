@@ -37,6 +37,5 @@ questions:
   - id: isr-name
     type: input
     prompt: 리더를 잘 따라오고 있어서, 리더가 죽으면 새 리더가 될 수 있는 복제본 묶음을 부르는 약어는?
-    answer: [ISR]
-    term: messaging/isr
+    answer: [ISR, in-sync replicas]
     explain: 이벤트는 ISR 모두가 받아야 커밋돼요. 그래서 ISR 안에서 새 리더를 뽑으면 커밋된 이벤트를 잃지 않아요.

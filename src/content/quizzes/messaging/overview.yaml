@@ -27,6 +27,5 @@ questions:
   - id: broker-name
     type: input
     prompt: 이벤트를 저장하고 컨슈머에게 내주는 Kafka 서버를 무엇이라고 하나요?
-    answer: [브로커, broker]
-    term: messaging/broker
+    answer: [브로커, broker, Kafka broker, 카프카 브로커]
     explain: Kafka는 브로커 여러 대가 하나의 클러스터로 돌고, 이벤트를 여러 브로커에 복사해 둬요.

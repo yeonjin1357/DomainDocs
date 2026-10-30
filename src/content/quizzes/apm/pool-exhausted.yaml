@@ -32,6 +32,5 @@ questions:
   - id: connection-leak-name
     type: input
     prompt: 빌린 커넥션을 닫지 않아 풀로 돌아오지 않는 일을 무엇이라고 할까요?
-    answer: [커넥션 누수, connection leak, 연결 누수]
-    term: apm/connection-leak
+    answer: [커넥션 누수, connection leak, 연결 누수, 커넥션 반납 누락]
     explain: 예외가 났을 때 닫는 코드를 건너뛰는 경우가 흔해요. HikariCP는 leakDetectionThreshold를 켜면 오래 풀 밖에 있는 커넥션을 경고해요.

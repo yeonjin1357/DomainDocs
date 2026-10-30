@@ -37,6 +37,5 @@ questions:
   - id: heap-name
     type: input
     prompt: 자바 코드가 만든 객체가 담기는 JVM의 메모리 영역은?
-    answer: [힙, heap]
-    term: apm/heap
+    answer: [힙, heap, 자바 힙, Java heap]
     explain: 힙의 최대 크기는 -Xmx로 정해요. 더는 쓰지 않는 객체는 GC가 치워요.

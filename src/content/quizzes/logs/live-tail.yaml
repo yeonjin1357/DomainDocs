@@ -30,5 +30,4 @@ questions:
     type: input
     prompt: 새로 들어오는 로그를 실시간으로 흘려 보여 주는 기능은?
     answer: [라이브 테일, live tail, Live Tail, 실시간 로그]
-    term: logs/live-tail
     explain: tail -f처럼 지금 들어오는 줄을 보여 줘요. 지난 범위를 찾는 검색과는 달라요.

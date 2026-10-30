@@ -1,17 +1,17 @@
 questions:
   - id: ping-fail-not-dead
     type: ox
-    prompt: 장비가 ping에 응답하지 않아요. 그 장비는 꺼져 있다고 봐도 되나요?
-    answer: false
-    explain: 방화벽이 ICMP만 막았을 수 있어요. SNMP나 서비스 포트처럼 다른 방법으로도 확인해요.
+    prompt: 길 위의 방화벽이 ICMP만 막고 있으면, 그 서버의 웹 서비스가 정상이어도 ping은 실패하나요?
+    answer: true
+    explain: ICMP는 TCP·UDP와 다른 규약이라 따로 막힐 수 있어요. 그래서 ping이 실패해도 꺼졌다고 단정하지 말고, SNMP나 서비스 포트로도 확인해요.
   - id: ping-ok-app-down
     type: choice
     prompt: 서버로 ping은 잘 되는데 웹 서비스가 응답하지 않아요. 맞는 해석은?
     choices:
-      - 장비와 경로는 살아 있으니, 앱 쪽을 봐야 해요
+      - 장비는 살아 있고 앱 쪽 문제예요
       - 방화벽이 ICMP를 막고 있어요
-      - 네트워크가 끊겼어요
-      - 서버가 꺼졌어요
+      - 네트워크 경로가 끊겼어요
+      - 서버가 꺼져 있어요
     answer: 0
     explain: ping은 장비와 경로가 살아 있다는 것만 알려 줘요. 앱이 응답하는지는 그 앱의 포트로 직접 확인해요.
   - id: loss-and-average

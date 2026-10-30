@@ -37,6 +37,5 @@ questions:
   - id: ndots-name
     type: input
     prompt: 파드의 resolv.conf에서, 이름에 점이 몇 개보다 적으면 검색 도메인부터 붙여 볼지 정하는 옵션은?
-    answer: [ndots]
-    term: kubernetes/ndots
+    answer: [ndots, "ndots:5"]
     explain: 쿠버네티스 파드는 ndots:5를 받아요. 그래서 점이 4개 이하인 바깥 이름도 검색 도메인부터 붙여 봐요.

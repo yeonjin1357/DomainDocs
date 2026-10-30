@@ -33,5 +33,4 @@ questions:
     type: input
     prompt: 줄이고 합친 자바스크립트의 에러 위치를 원래 파일과 줄로 되돌리는 대응표는?
     answer: [소스 맵, source map, sourcemap]
-    term: apm/source-map
     explain: 코드 끝의 sourceMappingURL 주석이 이 파일을 가리켜요. 배포 버전마다 RUM 도구에 올려 둬요.

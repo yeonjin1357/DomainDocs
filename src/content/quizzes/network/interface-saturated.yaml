@@ -13,17 +13,22 @@ questions:
     type: choice
     prompt: 5분 평균 사용률은 70%인데, 보내는 쪽의 버린 패킷(ifOutDiscards)이 계속 늘어요. 의심할 것은?
     choices:
-      - 평균에 가려진 몇 초짜리 순간 폭주
+      - 평균에 가려진 순간 폭주
       - 케이블이나 커넥터의 손상
       - 바이트 카운터가 한 바퀴 돈 것
       - 관리자가 포트를 꺼 둔 것
     answer: 0
     explain: 평균은 짧은 폭주를 지워요. 몇 초 동안 넘치면 버퍼가 차서 패킷이 버려지니, 짧은 간격으로 다시 봐요.
   - id: full-but-no-drops
-    type: ox
-    prompt: 회선 사용률이 95%인데 버린 패킷은 늘지 않아요. 당장 문제는 아니라고 볼 수 있나요?
-    answer: true
-    explain: 꽉 차게 잘 쓰고 있는 거예요. 버린 패킷이 함께 늘 때가 정말 넘치는 때예요.
+    type: choice
+    prompt: 회선 사용률이 95%예요. 정말 넘치고 있는지 가리려면 함께 볼 값은?
+    choices:
+      - 보내는 쪽 버린 패킷 수
+      - 받는 쪽 에러 패킷 수
+      - 장비의 가동 시간
+      - 인터페이스 동작 상태
+    answer: 0
+    explain: 버린 패킷(ifOutDiscards)이 함께 늘 때가 정말 넘치는 때예요. 사용률만 높고 버림이 없다면 꽉 차게 잘 쓰고 있는 거예요.
   - id: who-uses-it
     type: choice
     prompt: 회선을 가득 채운 게 어느 서버와 서비스인지 찾으려면 무엇을 봐야 할까요?

@@ -11,9 +11,9 @@ questions:
     explain: 에러는 없었지만 내보낼 자리가 없어 버린 패킷이에요. 받은 에러(ifInErrors)는 케이블 같은 물리 쪽을 먼저 봐요.
   - id: cumulative-not-rate
     type: ox
-    prompt: 포트의 ifInErrors 값이 수십만이에요. 이 숫자만으로 지금 문제가 있다고 볼 수 있나요?
+    prompt: 포트의 ifInErrors 값은 32만인데, 지난 한 시간 동안은 하나도 늘지 않았어요. 지금 이 포트에서 에러가 나고 있나요?
     answer: false
-    explain: 카운터는 부팅 뒤 계속 쌓이는 누적값이에요. 같은 구간 동안 받은 패킷과 견줘 비율로 봐요.
+    explain: 카운터는 부팅 뒤 계속 쌓이는 누적값이라, 32만은 지난 일의 합이에요. 같은 구간에 늘어난 양을 받은 패킷과 견줘 비율로 봐요.
   - id: error-ratio
     type: choice
     prompt: 5분 동안 받은 패킷 60만 개 중 3,000개가 에러였어요. 에러 비율은?
@@ -28,9 +28,9 @@ questions:
     type: choice
     prompt: 한쪽 포트는 받은 에러(FCS)가, 맞은편 포트는 늦은 충돌(late collision)이 늘어요. 의심할 것은?
     choices:
-      - 양쪽 끝의 이중 통신(duplex) 설정이 서로 달라요
+      - 양쪽 duplex 설정이 달라요
       - 회선이 넘쳐 패킷을 버려요
-      - SNMP 커뮤니티 문자열이 틀려요
+      - 광 모듈의 받는 빛이 약해요
       - 라우터의 경로가 바뀌었어요
     answer: 0
     explain: 이중 통신이 어긋나면 한쪽은 FCS 에러, 다른 쪽은 늦은 충돌이 늘어요. 그래서 맞은편 포트도 함께 봐요.

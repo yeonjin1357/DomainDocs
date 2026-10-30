@@ -33,5 +33,4 @@ questions:
     type: input
     prompt: 네임스페이스 안에서 요청·한도를 안 적은 컨테이너에 기본값을 넣어 주는 객체는?
     answer: [LimitRange, 리밋 레인지]
-    term: kubernetes/limit-range
     explain: LimitRange는 기본값을 채우고, 컨테이너 하나나 파드 하나가 정한 범위를 벗어나지 않게 막아요.

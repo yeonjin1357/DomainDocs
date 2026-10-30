@@ -38,5 +38,4 @@ questions:
     type: input
     prompt: 캐시 메모리가 차서 덜 쓰는 값을 골라 지우는 일을 뭐라고 부를까요?
     answer: [축출, eviction, evict, 쫓아내기, 퇴출]
-    term: apm/eviction
     explain: Redis에서는 evicted_keys로 그 수를 봐요. 꾸준히 늘면 메모리가 모자라 다시 쓸 값까지 지워지는 거예요.

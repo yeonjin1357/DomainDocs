@@ -38,5 +38,4 @@ questions:
     type: input
     prompt: PostgreSQL에서 정렬·해시 단계 하나가 디스크로 넘치기 전까지 쓸 수 있는 메모리 설정 이름은?
     answer: [work_mem]
-    term: database/work-mem
     explain: 기본값은 4MB예요. 해시 단계는 여기에 hash_mem_multiplier를 곱한 만큼까지 써요.
