@@ -1,9 +1,9 @@
 questions:
   - id: base64-not-encryption
     type: ox
-    prompt: Secret 값은 base64로 적혀 있으니, 암호화돼서 안전한가요?
+    prompt: Secret에 base64로 적힌 값은, 암호 키가 있어야 원래 값으로 되돌릴 수 있나요?
     answer: false
-    explain: base64는 글자를 바꿔 적는 방식일 뿐 누구나 되돌릴 수 있어요. 기본 설정에서는 etcd에 암호화 없이 저장돼서, 접근 권한을 따로 막아야 해요.
+    explain: base64는 글자를 바꿔 적는 방식일 뿐 암호화가 아니에요. 기본 설정에서는 etcd에도 암호화 없이 저장돼서, 접근 권한을 따로 막아야 해요.
   - id: env-needs-restart
     type: choice
     prompt: ConfigMap을 고쳤는데 앱이 그대로예요. 앱이 그 값을 환경 변수로 받는다면 어떻게 해야 할까요?
@@ -11,14 +11,14 @@ questions:
       - 파드를 다시 시작해요
       - 조금 기다리면 저절로 바뀌어요
       - ConfigMap을 지웠다가 다시 만들어요
-      - 노드를 재부팅해요
+      - 노드의 kubelet을 다시 시작해요
     answer: 0
     explain: 환경 변수는 컨테이너가 시작할 때 정해져서 자동으로 바뀌지 않아요. 볼륨 파일로 받으면 시간이 지나 내용이 바뀌어요.
   - id: emptydir-lost
     type: ox
-    prompt: emptyDir에 둔 데이터는, 파드가 노드에서 사라진 뒤에도 남아 있나요?
-    answer: false
-    explain: emptyDir은 파드가 노드에 머무는 동안만 남아요. 파드보다 오래 남아야 할 데이터는 PVC로 빌린 저장소에 둬요.
+    prompt: emptyDir에 둔 데이터는, 그 파드의 컨테이너가 죽었다 다시 떠도 남아 있나요?
+    answer: true
+    explain: emptyDir은 파드가 노드에 머무는 동안 남아서, 컨테이너가 다시 떠도 그대로예요. 파드가 노드에서 사라지면 함께 지워지니, 오래 남길 데이터는 PVC에 둬요.
   - id: delete-reclaim
     type: choice
     prompt: StorageClass가 자동으로 만든 PV에 묶인 PVC를 지우면, 기본으로 어떻게 될까요?

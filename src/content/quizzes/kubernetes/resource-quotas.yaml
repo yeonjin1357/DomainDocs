@@ -3,7 +3,7 @@ questions:
     type: ox
     prompt: CPU 요청 할당량이 꽉 찬 네임스페이스에 새 Deployment를 만들면, Deployment 만들기 명령 자체가 실패하나요?
     answer: false
-    explain: Deployment 객체는 만들어지고, 그 뒤 ReplicaSet이 파드를 만들 때 거부돼요. 그래서 원하는 파드 수보다 적게 떠요.
+    explain: 만들기는 성공하고, 그 뒤 ReplicaSet이 파드를 만들 때 거부돼요. 그래서 원하는 파드 수보다 적게 떠요.
   - id: counts-requests-not-usage
     type: choice
     prompt: 할당량은 requests.cpu 4코어예요. 요청 1코어짜리 파드 3개가 실제로는 0.2코어씩 써요. 요청 1.5코어짜리 파드를 하나 더 만들면?

@@ -3,12 +3,12 @@ questions:
     type: choice
     prompt: 노드 CPU 사용률은 30%로 한가한데, 새 파드가 insufficient cpu로 Pending이에요. 왜일까요?
     choices:
-      - 스케줄러는 실제 사용량이 아니라 요청 합계로 자리를 따져서
-      - 노드 CPU 일부가 고장 나서
-      - 이미지가 너무 커서
-      - 서비스가 아직 없어서
+      - 요청 합계로 자리를 따져서
+      - CPU 한도 합계로 자리를 따져서
+      - 최근 5분 최대 사용량으로 따져서
+      - 노드 CPU가 스로틀링돼서
     answer: 0
-    explain: 노드마다 요청 합계에 남은 자리가 없으면 한가해 보여도 못 들어가요. 요청을 실제 사용량에 맞게 줄이는 것도 방법이에요.
+    explain: 스케줄러는 실제 사용량이 아니라 요청 합계로 자리를 따져요. 요청을 실제 사용량에 맞게 줄이는 것도 방법이에요.
   - id: taint-blocks
     type: choice
     prompt: 자리는 남는데, 특정 노드에만 파드가 놓이지 않아요. 먼저 볼 것은?
@@ -16,24 +16,24 @@ questions:
       - 그 노드의 taint
       - 그 노드의 디스크 사용률
       - 파드의 재시작 횟수
-      - 서비스 종류
+      - 파드의 이미지 태그
     answer: 0
     explain: taint가 있는 노드에는 맞는 toleration이 없는 파드가 놓이지 않아요. nodeSelector의 레이블 오타도 함께 봐요.
   - id: pvc-not-bound
     type: choice
     prompt: 파드가 100Gi PVC를 쓰는데, 자동으로 만들어 주는 저장소 설정 없이 50Gi짜리 PV만 있어요. 어떻게 될까요?
     choices:
-      - PVC가 PV에 묶이지 않아 파드도 기다려요
+      - 파드가 Pending으로 기다려요
       - 50Gi만 붙여서 시작해요
       - PV가 저절로 100Gi로 커져요
-      - 파드가 저장소 없이 시작해요
+      - 저장소 없이 먼저 시작해요
     answer: 0
-    explain: 맞는 볼륨이 없으면 PVC는 계속 묶이지 않은 채로 남아요. kubectl get pvc의 STATUS가 Pending인지 봐요.
-  - id: not-always-add-nodes
+    explain: 맞는 볼륨이 없으면 PVC가 PV에 묶이지 않은 채로 남고, 파드도 기다려요. kubectl get pvc의 STATUS가 Pending인지 봐요.
+  - id: selector-typo
     type: ox
-    prompt: Pending 파드가 생길 때마다 노드를 늘리는 게 언제나 첫 번째 해결책인가요?
-    answer: false
-    explain: 먼저 파드 요청이 실제 사용량보다 지나치게 크지 않은지 봐요. 필요 없는 파드를 지워 자리를 만들 수도 있어요.
+    prompt: 파드의 nodeSelector에 적은 레이블 값에 오타가 있으면, 자리가 남는 노드가 있어도 파드는 Pending에 머무나요?
+    answer: true
+    explain: 그 레이블이 붙은 노드가 없으니 놓을 곳이 없어요. 노드의 Labels와 파드의 nodeSelector를 견줘 봐요.
   - id: image-pull-waiting
     type: choice
     prompt: 노드는 정해졌는데 컨테이너가 Waiting에 머물러 있어요. 가장 흔한 원인은?

@@ -1,34 +1,39 @@
 questions:
   - id: short-name-other-namespace
     type: ox
-    prompt: shop 네임스페이스의 파드가 짧은 이름 pay만으로 billing 네임스페이스의 pay 서비스를 찾을 수 있나요?
-    answer: false
-    explain: 짧은 이름에는 자기 네임스페이스 도메인부터 붙여서 pay.shop.svc.cluster.local을 찾아요. 다른 네임스페이스는 pay.billing처럼 적어요.
+    prompt: shop 네임스페이스의 파드가 billing 네임스페이스의 pay 서비스를 부르려면, pay.billing처럼 네임스페이스까지 적어야 하나요?
+    answer: true
+    explain: 짧은 이름에는 자기 네임스페이스 도메인부터 붙어서, pay만 적으면 pay.shop.svc.cluster.local을 찾아요. 다른 네임스페이스는 pay.billing처럼 적어요.
   - id: first-query
     type: choice
-    prompt: ndots:5인 shop 네임스페이스 파드가 api.example.com을 찾을 때, 가장 먼저 묻는 이름은?
+    prompt: ndots:5인 shop 네임스페이스 파드가 api.example.com의 IPv4 주소를 찾아요. 원래 이름 api.example.com은 몇 번째로 물을까요?
     choices:
-      - api.example.com.shop.svc.cluster.local
-      - api.example.com
-      - api.example.com.cluster.local
-      - shop.svc.cluster.local
+      - 넷째
+      - 첫째
+      - 둘째
+      - 다섯째
     answer: 0
-    explain: 점이 5개보다 적어서 검색 도메인부터 차례로 붙여 봐요. 원래 이름은 마지막에 물어요.
+    explain: 점이 5개보다 적어서 검색 도메인 셋을 차례로 붙여 본 뒤, 넷째에 원래 이름을 물어요. IPv6 주소도 함께 찾으면 이 넷이 한 번씩 더 나가요.
   - id: nxdomain-ratio
     type: choice
-    prompt: CoreDNS 응답의 70%가 NXDOMAIN이에요. 먼저 떠올릴 이유는?
+    prompt: CoreDNS 응답의 70%가 NXDOMAIN인데, SERVFAIL과 처리 시간은 평소와 같아요. 먼저 떠올릴 이유는?
     choices:
-      - 검색 도메인을 붙여 본 질의가 없는 이름으로 끝난 거예요
-      - CoreDNS가 멈춘 거예요
-      - 서비스가 모두 지워진 거예요
-      - 노드의 디스크가 가득 찬 거예요
+      - 검색 도메인을 붙인 질의라서
+      - CoreDNS가 멈춰 답을 못 해서
+      - 서비스가 지워져 이름이 사라져서
+      - 바깥 DNS 서버가 답을 거절해서
     answer: 0
-    explain: 바깥 이름 하나를 찾을 때도 검색 도메인 질의 대부분이 NXDOMAIN이에요. 장애 신호로는 SERVFAIL과 처리 시간을 봐요.
+    explain: 바깥 이름 하나를 찾을 때도 검색 도메인을 붙인 질의는 대부분 NXDOMAIN이에요. 장애 신호로는 SERVFAIL과 처리 시간을 봐요.
   - id: default-dns-policy
-    type: ox
-    prompt: 파드에 dnsPolicy를 적지 않으면 Default 정책이 쓰이나요?
-    answer: false
-    explain: 적지 않으면 ClusterFirst예요. Default는 이름과 달리 노드의 DNS 설정을 그대로 받는 정책이에요.
+    type: choice
+    prompt: dnsPolicy를 적지 않은 파드는 어떤 DNS 정책을 받을까요?
+    choices:
+      - ClusterFirst
+      - Default
+      - None
+      - ClusterFirstWithHostNet
+    answer: 0
+    explain: 적지 않으면 ClusterFirst예요. Default는 이름과 달리 기본값이 아니고, 노드의 DNS 설정을 그대로 받는 정책이에요.
   - id: ndots-name
     type: input
     prompt: 파드의 resolv.conf에서, 이름에 점이 몇 개보다 적으면 검색 도메인부터 붙여 볼지 정하는 옵션은?

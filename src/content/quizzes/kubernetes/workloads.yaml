@@ -1,24 +1,24 @@
 questions:
   - id: daemonset-for-agent
     type: choice
-    prompt: 노드마다 꼭 하나씩 돌아야 하는 로그 수집기는 어떤 워크로드로 띄울까요?
+    prompt: 클러스터에 노드를 하나 더 붙였더니, 로그 수집 파드가 그 노드에도 저절로 하나 떴어요. 이 파드를 띄운 워크로드는?
     choices:
       - DaemonSet
       - Deployment
       - Job
       - StatefulSet
     answer: 0
-    explain: DaemonSet은 노드마다 파드를 하나씩 띄우고, 새 노드가 들어오면 그 노드에도 띄워요.
+    explain: DaemonSet은 노드마다 파드를 하나씩 띄우고, 새 노드가 들어오면 그 노드에도 띄워요. Deployment는 개수만 지키고 노드마다 놓지는 않아요.
   - id: statefulset-for-db
     type: choice
-    prompt: 파드마다 고유한 이름과 저장소가 필요한 데이터베이스에 맞는 워크로드는?
+    prompt: db-0 파드가 지워졌다가 다시 떴는데, 이름이 또 db-0이고 전과 같은 저장소를 붙였어요. 어떤 워크로드일까요?
     choices:
       - StatefulSet
       - Deployment
       - DaemonSet
       - CronJob
     answer: 0
-    explain: StatefulSet의 파드는 db-0처럼 번호 붙은 이름을 받고, 다시 떠도 같은 이름과 저장소를 이어받아요.
+    explain: StatefulSet의 파드는 번호 붙은 이름을 받고, 다시 떠도 같은 이름과 저장소를 이어받아요. Deployment가 다시 띄운 파드는 이름이 새로 생겨요.
   - id: rolling-min-available
     type: choice
     prompt: 파드 4개짜리 Deployment를 기본 설정으로 롤링 업데이트해요. 떠 있는 파드는 최소 몇 개를 지킬까요?
@@ -31,16 +31,16 @@ questions:
     explain: 기본 설정에서는 원하는 개수의 25%까지만 모자라도 돼요. 4개의 75%인 3개 아래로는 내려가지 않아요.
   - id: cronjob-not-job-success
     type: ox
-    prompt: CronJob이 정상으로 보이면, 일정마다 만들어진 Job도 모두 성공했다고 볼 수 있나요?
-    answer: false
-    explain: CronJob은 일정마다 Job을 만드는 일만 해요. 만들어진 Job이 성공했는지는 따로 봐야 해요.
-  - id: job-backoff-limit
+    prompt: 매일 새벽 2시 CronJob이 만든 3일 Job이 실패했어요. 4일 새벽 2시에도 CronJob은 새 Job을 만드나요?
+    answer: true
+    explain: CronJob은 일정마다 Job을 만드는 일만 해요. 앞 Job의 실패와 상관없이 다음 Job을 만들어서, 성공했는지는 Job마다 따로 봐야 해요.
+  - id: new-replicaset
     type: choice
-    prompt: Job이 실패로 보기 전에, 기본으로 몇 번까지 다시 시도할까요?
+    prompt: Deployment의 이미지를 새 버전으로 바꿨어요. 새 버전 파드는 누가 만들까요?
     choices:
-      - 6번
-      - 3번
-      - 끝없이 다시 시도해요
-      - 다시 시도하지 않아요
+      - 새로 생긴 ReplicaSet
+      - 원래 있던 ReplicaSet
+      - Deployment가 직접
+      - 스케줄러가 직접
     answer: 0
-    explain: 다시 시도하는 횟수는 backoffLimit으로 정하고, 적지 않으면 6이에요.
+    explain: Deployment는 새 ReplicaSet을 만들어 새 쪽은 늘리고 옛 쪽은 줄여요. 그래서 문제가 생기면 옛 ReplicaSet으로 되돌릴 수 있어요.

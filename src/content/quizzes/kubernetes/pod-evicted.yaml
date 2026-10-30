@@ -6,7 +6,7 @@ questions:
       - kubelet이 노드 압박이나 한도 때문에 파드째 내보냈어요
       - 컨테이너가 메모리 한도를 넘어 커널에 죽었어요
       - liveness 프로브가 실패해 컨테이너를 다시 시작했어요
-      - 이미지를 받지 못했어요
+      - 노드가 재부팅돼 파드가 옮겨 갔어요
     answer: 0
     explain: Evicted는 파드째 끝나고 새 파드가 떠요. OOMKilled와 프로브 실패는 같은 파드 안에서 컨테이너만 다시 시작해요.
   - id: eviction-order
@@ -21,19 +21,19 @@ questions:
     explain: 요청보다 더 쓰는 파드가 먼저예요. 요청이 없는 파드는 조금만 써도 요청을 넘은 셈이라 앞쪽에 서요.
   - id: evicted-pods-remain
     type: ox
-    prompt: 쫓겨난 파드는 대신할 새 파드가 뜨면 목록에서 저절로 바로 사라지나요?
+    prompt: 대신할 새 파드가 뜨면, 쫓겨난 파드는 목록에서 바로 지워지나요?
     answer: false
-    explain: Evicted 파드는 Failed로 남아요. 누가 지우거나, 끝난 파드가 기본 12,500개를 넘어야 정리돼요.
+    explain: Evicted 파드는 Failed로 남아서, 누가 지우거나 끝난 파드가 기본 12,500개를 넘어야 정리돼요. 그래서 Evicted 파드 수를 지금 실패 중인 파드 수로 세면 안 돼요.
   - id: ephemeral-limit
     type: choice
     prompt: "Pod ephemeral local storage usage exceeds the total limit of containers라는 축출 메시지가 나왔어요. 무슨 뜻일까요?"
     choices:
-      - 파드가 노드 디스크에 쓴 양이 자기 임시 저장 한도를 넘었어요
-      - 노드 메모리가 100Mi 아래로 내려갔어요
-      - PVC가 가득 찼어요
-      - 컨테이너 이미지가 너무 커요
+      - 파드가 자기 임시 저장 한도를 넘었어요
+      - 노드 디스크 여유가 10% 아래로 내려갔어요
+      - 파드의 PVC가 요청 크기만큼 찼어요
+      - 컨테이너 이미지가 한도보다 커요
     answer: 0
-    explain: 컨테이너 안에 쓴 파일, emptyDir, 로그가 임시 저장 한도를 넘으면 노드 압박을 기다리지 않고 바로 내보내요.
+    explain: 컨테이너 안에 쓴 파일, emptyDir, 로그를 합친 양이 한도를 넘었어요. 노드 디스크가 모자랄 때는 low on resource 메시지가 나와요.
   - id: eviction-term
     type: input
     prompt: kubelet이 노드를 지키려고 파드를 노드에서 내보내는 일을 무엇이라고 할까요?

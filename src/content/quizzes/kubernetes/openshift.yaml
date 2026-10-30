@@ -14,18 +14,17 @@ questions:
     type: choice
     prompt: 기본 SCC에서 runAsUser를 정하지 않은 파드는 어떤 UID로 실행될까요?
     choices:
-      - 프로젝트에 정해 둔 UID 범위의 첫 값
-      - 0(root)
-      - '1000'
+      - 프로젝트 UID 범위의 첫 값
+      - 이미지에 적힌 USER의 값
+      - root인 0번
       - 노드마다 무작위로 고른 값
     answer: 0
-    explain: 기본 규칙은 프로젝트의 openshift.io/sa.scc.uid-range 범위에서 실행하고, 따로 정하지 않으면 범위의 첫 값을 써요.
-  - id: dc-deprecated
-    type: choice
-    prompt: OpenShift 4.14부터 deprecated된 객체는?
-    choices: [DeploymentConfig, Deployment, Route, Project]
-    answer: 0
-    explain: DeploymentConfig는 아직 동작하지만 보안과 치명적 문제만 고쳐요. 새 배포에는 Deployment를 써요.
+    explain: 기본 규칙은 프로젝트의 openshift.io/sa.scc.uid-range 범위에서 실행하고, 따로 정하지 않으면 범위의 첫 값을 써요. 그래서 root로 돈다고 가정한 이미지는 그대로 뜨지 않을 수 있어요.
+  - id: router-direct
+    type: ox
+    prompt: OpenShift 라우터는 Route로 받은 요청을 서비스 IP로 보내고, 서비스가 파드로 나눠 주나요?
+    answer: false
+    explain: 라우터는 서비스에서 파드 주소 목록만 얻고, 요청은 파드로 바로 넘겨요. 서비스 IP를 거치지 않아요.
   - id: scc-name
     type: input
     prompt: OpenShift에서 파드가 쓸 UID와 권한을 정해 두고 만들 때 검사하는 규칙은?

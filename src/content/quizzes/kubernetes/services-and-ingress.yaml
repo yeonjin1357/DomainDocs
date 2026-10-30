@@ -1,14 +1,14 @@
 questions:
   - id: selector-mismatch
     type: choice
-    prompt: 서비스로 보낸 요청이 어떤 파드에도 닿지 않아요. 먼저 볼 것은?
+    prompt: 서비스로 보낸 요청이 어떤 파드에도 닿지 않고, 서비스의 대상 파드가 0개로 나와요. 먼저 볼 것은?
     choices:
-      - 서비스의 셀렉터와 파드의 레이블이 정확히 같은지
-      - 노드의 CPU 사용률
-      - 이미지 태그
-      - 파드의 재시작 횟수
+      - 셀렉터와 파드 레이블이 맞는지
+      - 파드의 재시작 횟수가 오르는지
+      - 노드의 CPU 사용률이 높은지
+      - 인그레스 규칙에 경로가 있는지
     answer: 0
-    explain: 서비스는 레이블로 파드를 골라요. 글자 하나만 달라도 대상이 0개가 돼요.
+    explain: 서비스는 레이블로 파드를 골라요. 셀렉터와 레이블이 글자 하나만 달라도 대상이 0개가 돼요.
   - id: ingress-needs-controller
     type: ox
     prompt: 인그레스 객체만 만들면, 인그레스 컨트롤러가 없어도 바깥 요청이 서비스로 들어오나요?
@@ -18,29 +18,29 @@ questions:
     type: choice
     prompt: 같은 네임스페이스의 주문 파드가 결제 서비스(pay)를 부르는 가장 알맞은 방법은?
     choices:
-      - http://pay처럼 서비스 이름으로 불러요
-      - 결제 파드의 IP를 적어 두고 불러요
-      - 결제 파드가 있는 노드의 IP로 불러요
+      - 서비스 이름 pay로 불러요
+      - 결제 파드의 IP로 불러요
+      - 결제 파드가 있는 노드 IP로 불러요
       - 결제 파드의 이름으로 불러요
     answer: 0
-    explain: 파드 IP와 이름은 다시 뜨면 바뀌어요. 서비스 이름은 그대로라, 같은 네임스페이스에서는 이름만으로 찾아가요.
+    explain: 파드 IP와 이름은 다시 뜨면 바뀌어요. 서비스 이름은 그대로라, 같은 네임스페이스에서는 http://pay처럼 이름만으로 찾아가요.
   - id: running-not-ready
     type: choice
     prompt: 파드가 Running인데 서비스 요청을 받지 않아요. 먼저 볼 것은?
     choices:
-      - 파드가 Ready인지(readiness 프로브)
-      - 이미지 태그
-      - 노드의 요청 합계
-      - 인그레스 규칙
+      - 파드가 Ready 상태인지
+      - 파드의 이미지 태그가 맞는지
+      - 노드의 요청 합계가 찼는지
+      - 서비스 종류가 ClusterIP인지
     answer: 0
-    explain: 준비가 안 된 파드는 서비스 대상(EndpointSlice)에서 빠져요.
+    explain: readiness 프로브가 실패해 준비가 안 된 파드는 서비스 대상(EndpointSlice)에서 빠져요.
   - id: clusterip-default
     type: choice
-    prompt: 서비스 종류를 적지 않으면 기본으로 만들어지는, 클러스터 안에서만 닿는 종류는?
+    prompt: type을 적지 않고 서비스를 만들었어요. 이 서비스의 주소로 닿을 수 있는 곳은?
     choices:
-      - ClusterIP
-      - NodePort
-      - LoadBalancer
-      - ExternalName
+      - 클러스터 안의 파드에서만
+      - 모든 노드 IP의 고정 포트로도
+      - 클라우드 로드 밸런서로도
+      - 클러스터 밖 어디서나
     answer: 0
-    explain: ClusterIP는 파드끼리 부를 때 써요. 바깥에서 닿게 하려면 NodePort, LoadBalancer나 인그레스를 써요.
+    explain: 기본 종류는 ClusterIP라 클러스터 안에서만 닿아요. 바깥에서 닿게 하려면 NodePort, LoadBalancer나 인그레스를 써요.

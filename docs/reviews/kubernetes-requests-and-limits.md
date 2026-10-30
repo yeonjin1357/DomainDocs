@@ -14,3 +14,4 @@
 | CFS 기본 주기 100ms, 몫을 다 쓰면 다음 주기까지 멈춤, nr_throttled·throttled_time | https://docs.kernel.org/scheduler/sched-bwc.html |
 
 - 메모: StatTile 예시(4코어 노드, 요청 합계 3, 새 파드 1.5)와 메모리 그래프는 설명용으로 만든 숫자예요.
+- 퀴즈 확인(2026-10-30): 한도 1코어 cgroup에서 1초에 한 번 스레드 8개가 20ms씩 쓰게 돌렸더니, 평균 0.16코어인데도 일할 때마다 스로틀링됐어요(5번 중 5번). 자세한 건 docs/reviews/kubernetes-quiz.md에 있어요.

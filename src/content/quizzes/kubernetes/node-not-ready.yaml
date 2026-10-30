@@ -3,12 +3,12 @@ questions:
     type: choice
     prompt: 노드의 Ready 조건이 Unknown이에요. 무슨 뜻일까요?
     choices:
-      - 노드 컨트롤러가 정해진 시간 동안 그 노드의 소식을 못 들었어요
+      - 노드의 소식이 한동안 끊겼어요
       - 노드가 스스로 아프다고 알렸어요
-      - 노드가 건강하고 파드를 받을 수 있어요
-      - 노드에 파드가 하나도 없어요
+      - 노드에 압박 조건이 켜졌어요
+      - 노드가 새 파드를 받지 않게 막혔어요
     answer: 0
-    explain: 기본 50초 동안 소식이 없으면 Unknown이 돼요. 노드가 꺼졌거나, 네트워크가 끊겼거나, kubelet이 멈춘 경우예요.
+    explain: 노드 컨트롤러가 기본 50초 동안 소식을 못 들으면 Unknown이 돼요. 노드가 꺼졌거나, 네트워크가 끊겼거나, kubelet이 멈춘 경우예요.
   - id: eviction-wait
     type: choice
     prompt: 노드 연락이 끊긴 뒤, 그 위의 파드가 쫓겨나 다른 노드에 새로 뜨기까지 기본으로 얼마나 기다릴까요?
@@ -23,24 +23,24 @@ questions:
     type: choice
     prompt: 노드의 DiskPressure가 True가 됐어요. kubelet은 어떻게 할까요?
     choices:
-      - 노드를 지키려고 파드를 쫓아내기 시작해요
+      - 치우고, 모자라면 파드를 내보내요
       - 디스크 크기를 자동으로 늘려요
-      - 아무것도 하지 않아요
-      - 노드를 재부팅해요
+      - 노드를 NotReady로 바꿔요
+      - 노드를 다시 부팅해요
     answer: 0
-    explain: 압박 조건이 켜지면 노드 압박 축출이 시작돼요. 쌓인 로그와 쓰지 않는 컨테이너 이미지를 먼저 봐요.
+    explain: 끝난 컨테이너와 안 쓰는 이미지를 먼저 지우고, 그래도 모자라면 파드를 내보내요. 압박 조건만으로는 NotReady가 되지 않아요.
   - id: stale-running
     type: ox
-    prompt: Ready가 Unknown인 노드 위의 파드가 Running으로 보여요. 지금도 잘 돌고 있다고 확신할 수 있나요?
-    answer: false
-    explain: 연락이 끊긴 노드의 파드 상태는 마지막으로 들은 값일 수 있어요.
+    prompt: 노드 연락이 끊기고 2분이 지났어요. 그 노드 위 파드의 단계(phase)는 아직 Running으로 남아 있나요?
+    answer: true
+    explain: kubelet이 새 상태를 알리지 못해서 마지막으로 들은 값이 남아요. 그래서 Running만 보고 잘 돈다고 볼 수 없어요.
   - id: kubelet-logs
     type: choice
-    prompt: 노드에 들어가 kubelet의 로그를 보려면 무엇을 쓸까요? (kubelet은 systemd 서비스로 돌아요)
+    prompt: 노드에 들어가 kubelet의 로그를 보려면 무엇을 쓸까요? kubelet은 systemd 서비스로 돌아요.
     choices:
       - journalctl -u kubelet
       - kubectl logs kubelet
-      - kubectl get pvc
-      - df -i
+      - docker logs kubelet
+      - kubectl describe node
     answer: 0
-    explain: kubelet은 파드가 아니라 노드의 서비스라 kubectl logs로는 못 봐요. systemctl status kubelet으로 상태도 함께 봐요.
+    explain: kubelet은 파드나 컨테이너가 아니라 노드의 서비스라서 journalctl로 봐요. describe node는 조건과 이벤트만 보여 줘요.

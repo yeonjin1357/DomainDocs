@@ -11,27 +11,27 @@ questions:
     explain: 원하는 파드 수는 올림(지금 파드 수 × 지금 값 ÷ 목표 값)이에요. 4 × 90 ÷ 60 = 6개예요.
   - id: utilization-of-request
     type: ox
-    prompt: HPA의 CPU 사용률 60%는 노드 CPU의 60%를 뜻하나요?
-    answer: false
-    explain: 컨테이너가 요청한 CPU 대비 퍼센트예요. 요청이 0.5코어인데 0.3코어를 쓰면 60%예요.
+    prompt: 4코어 노드에서 CPU 요청이 0.5코어인 컨테이너가 0.3코어를 써요. HPA가 보는 이 컨테이너의 CPU 사용률은 60%인가요?
+    answer: true
+    explain: HPA의 사용률은 노드 CPU가 아니라 컨테이너가 요청한 CPU 대비예요. 0.3 ÷ 0.5라서 60%예요.
   - id: hpa-not-moving
     type: choice
-    prompt: HPA를 만들었는데 파드 수가 전혀 바뀌지 않아요. 먼저 볼 것은?
+    prompt: CPU 목표로 HPA를 만들었는데, 부하가 늘어도 원하는 파드 수가 전혀 바뀌지 않아요. 먼저 볼 것은?
     choices:
-      - 컨테이너에 CPU 요청이 있는지와 Metrics Server가 도는지
-      - 노드의 디스크 사용률
-      - 서비스의 셀렉터
-      - 이미지 태그
+      - CPU 요청이 적혀 있는지
+      - 노드에 빈 자리가 있는지
+      - 서비스 셀렉터가 맞는지
+      - 롤링 업데이트 중인지
     answer: 0
-    explain: 요청이 없으면 사용률을 계산하지 못해요. CPU·메모리 사용량은 따로 설치하는 Metrics Server가 HPA에 줘요.
+    explain: 요청이 없으면 사용률을 계산하지 못해요. 그다음엔 CPU 사용량을 HPA에 주는 Metrics Server가 도는지 봐요.
   - id: slow-scale-down
     type: choice
     prompt: 부하가 끝났는데도 파드 수가 한동안 그대로예요. 기본 설정에서 그 이유는?
     choices:
-      - 줄일 때는 5분 동안 지켜본 뒤에 줄여서
-      - HPA가 고장 나서
-      - 한 번 늘린 파드는 줄일 수 없어서
-      - 늘릴 때와 줄일 때 계산식이 달라서
+      - 5분 동안 지켜본 뒤에 줄여서
+      - 늘릴 때와 계산식이 달라서
+      - 줄일 땐 15분마다 계산해서
+      - 한 번에 1개씩만 줄일 수 있어서
     answer: 0
     explain: 줄일 때는 지난 5분 동안 계산한 값 중 가장 큰 값을 따라요. 부하가 잠깐 내려갔다 오를 때 출렁이지 않게 하려는 거예요.
   - id: scaled-but-pending

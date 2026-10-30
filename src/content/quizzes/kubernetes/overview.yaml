@@ -1,34 +1,34 @@
 questions:
   - id: api-server-down
     type: ox
-    prompt: API 서버가 멈추면, 이미 떠 있는 파드도 모두 멈추나요?
+    prompt: API 서버가 멈추면, 이미 떠 있는 파드도 함께 멈추나요?
     answer: false
-    explain: 이미 떠 있는 파드는 그대로 돌아요. 새 배포나 변경처럼 API 서버를 거쳐야 하는 일이 멈춰요.
+    explain: 떠 있는 컨테이너는 노드에서 그대로 돌아요. 새 배포나 변경처럼 API 서버를 거쳐야 하는 일만 멈춰요.
   - id: scheduler-role
     type: choice
     prompt: 아직 노드가 정해지지 않은 파드에 알맞은 노드를 정해 주는 구성 요소는?
     choices:
       - 스케줄러
       - kubelet
-      - etcd
+      - 컨트롤러 매니저
       - kube-proxy
     answer: 0
-    explain: 스케줄러가 노드를 정하면, 그 노드의 kubelet이 컨테이너를 실제로 띄워요.
-  - id: etcd-role
+    explain: 스케줄러가 노드를 정하면, 그 노드의 kubelet이 컨테이너를 실제로 띄워요. 컨트롤러 매니저는 파드를 만드는 쪽이에요.
+  - id: through-api-server
     type: choice
-    prompt: API 서버가 다루는 클러스터의 모든 데이터를 담는 저장소는?
+    prompt: 스케줄러가 파드를 노드 2에 두기로 정했어요. 노드 2의 kubelet은 이 결정을 어떻게 알게 될까요?
     choices:
-      - etcd
-      - kubelet
-      - 컨테이너 런타임
-      - 컨트롤러 매니저
+      - API 서버에 적힌 것을 보고 알아요
+      - 스케줄러가 kubelet에 직접 보내요
+      - etcd가 kubelet에 바로 알려요
+      - 컨트롤러 매니저가 노드에 전해요
     answer: 0
-    explain: 원하는 상태와 지금 상태 같은 클러스터의 데이터는 모두 etcd에 담겨요.
+    explain: 구성 요소들은 서로 직접 부르기보다 API 서버를 거쳐 움직여요. 스케줄러는 결정을 API 서버에 적고, kubelet은 API 서버에서 자기 노드의 파드를 읽어요.
   - id: reconcile
     type: ox
-    prompt: Deployment가 관리하는 파드 하나가 죽으면, 쿠버네티스가 원하는 개수에 맞추려고 새 파드를 띄우나요?
+    prompt: Deployment가 관리하는 파드 하나가 죽으면, 사람이 다시 띄우라고 하지 않아도 새 파드가 생기나요?
     answer: true
-    explain: 컨트롤 플레인은 지금 상태를 원하는 상태와 같아지도록 계속 맞춰요. 사람이 다시 띄우라고 할 필요가 없어요.
+    explain: 컨트롤 플레인은 지금 상태를 원하는 상태와 같아지도록 계속 맞춰요. 파드 수가 원하는 수보다 적으면 새로 띄워요.
   - id: kubelet-name
     type: input
     prompt: 노드마다 돌면서 파드의 컨테이너를 띄우고, 잘 돌고 있는지 지키는 구성 요소는?
