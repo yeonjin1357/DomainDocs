@@ -23,8 +23,9 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc9293.html
   - title: RFC 793 — Transmission Control Protocol (sockets)
     url: https://www.rfc-editor.org/rfc/rfc793.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
+import SubnetDemo from '../../../components/demos/SubnetDemo.tsx';
 
 <KeyPoints>
   <Point title="IP 주소는 네트워크 위의 위치예요">
@@ -60,6 +61,10 @@ IPv4 주소는 32비트예요. 8비트씩 끊어 `192.168.10.25`처럼 숫자 �
 </Figure>
 
 앞부분이 같은 장비끼리를 같은 네트워크(<Term term="network/subnet">서브넷</Term>)라고 불러요. 같은 네트워크 안은 스위치가, 다른 네트워크로는 라우터가 넘겨 줘요.
+
+아래에서 / 뒤의 숫자를 바꿔 보세요.
+
+<SubnetDemo client:visible />
 
 ## MAC 주소와 ARP
 

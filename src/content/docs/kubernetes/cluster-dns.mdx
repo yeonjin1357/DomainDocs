@@ -25,6 +25,7 @@ sources:
     url: https://coredns.io/plugins/cache/
 updated: 2026-10-30
 ---
+import DnsSearchDemo from '../../../components/demos/DnsSearchDemo.tsx';
 
 <KeyPoints>
   <Point title="파드는 클러스터 DNS에 물어요">
@@ -126,6 +127,10 @@ updated: 2026-10-30
 </Figure>
 
 이름 끝에 점을 붙이면 '이미 완전한 이름'이라는 뜻이라, 검색 도메인을 붙이지 않아요. 바깥 API를 자주 부르는 파드라면 `dnsConfig`로 그 파드의 `ndots`를 낮추는 방법도 있어요. 둘 다 쿠버네티스 문서가 다루는 방법이에요.
+
+점이 ndots 이상인 이름은 거꾸로 이름 그대로부터 묻고, 없으면 검색 도메인을 붙여요. 아래에서 이름과 ndots를 바꿔 보세요.
+
+<DnsSearchDemo client:visible />
 
 ## DNS 정책
 

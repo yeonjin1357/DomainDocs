@@ -27,8 +27,9 @@ sources:
     url: https://docs.cloud.google.com/architecture/framework/reliability/define-reliability-based-on-user-experience-goals
   - title: Prometheus — Histograms and summaries (300ms 안에 끝난 요청의 비율)
     url: https://prometheus.io/docs/practices/histograms/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import SloBudgetDemo from '../../../components/demos/SloBudgetDemo.tsx';
 
 <OnDashboard title="결제 API · SLO 99.9% · 30일" caption="30일 동안 요청 100만 건 중 1,000건(0.1%)까지 실패할 수 있는데, 500건이 실패했어요. 그래서 성공률은 99.95%이고, 에러 버짓은 절반이 남았어요.">
   <MiniLineChart
@@ -133,6 +134,10 @@ SLA(service level agreement, 서비스 수준 협약)는 목표를 못 지켰을
 </Figure>
 
 99.99%로 9를 하나 더하면 버짓은 4.32분으로 10분의 1이 돼요. Google SRE Book은 신뢰성을 한 단계 올리는 비용이 앞 단계의 100배일 수도 있다고 해요. 같은 책의 예에선 버짓이 남으면 배포를 이어 가고, 다 쓰면 잠시 멈춰요.
+
+아래에서 SLO와 지금 에러율을 바꿔 보세요. 에러율을 SLO가 허용하는 실패 비율로 나눈 값이 burn rate(버짓을 쓰는 속도)예요.
+
+<SloBudgetDemo client:visible />
 
 <Checkpoints>
   <Check>SLI를 '평균 응답시간 300ms 이하'로 정했다면 다시 보세요. <Term slug="foundations/percentiles">평균</Term>은 느린 요청을 숨기고, 나쁜 요청을 세지 않아 에러 버짓으로 바꾸기 어려워요. '300ms 안에 끝난 요청의 비율'처럼 임계값 안에 든 요청을 세세요.</Check>

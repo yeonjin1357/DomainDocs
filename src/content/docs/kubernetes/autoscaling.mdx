@@ -15,6 +15,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/cluster-administration/node-autoscaling/
 updated: 2026-10-30
 ---
+import HpaDemo from '../../../components/demos/HpaDemo.tsx';
 
 <KeyPoints>
   <Point title="파드 수를 바꿔요">
@@ -64,6 +65,10 @@ HPA는 기본 15초마다 지표를 보고, 원하는 파드 수를 이렇게 �
 여기서 CPU 사용률은 컨테이너가 요청한 CPU 대비 퍼센트예요. 요청이 0.5코어인데 0.45코어를 쓰면 90%예요. 그래서 파드의 컨테이너 중 하나라도 CPU 요청이 없으면 사용률을 못 정해, HPA가 그 지표로는 아무것도 하지 않아요.
 
 지금 값과 목표 값의 비율이 1에 가까우면 바꾸지 않아요. 기본 허용 범위는 0.1이라, 비율이 0.9에서 1.1 사이면 그대로 둬요. 작은 흔들림마다 파드 수가 바뀌지 않게 하려는 거예요.
+
+아래에서 사용량과 요청을 바꿔 보세요. 요청을 크게 적으면 같은 사용량도 사용률이 낮게 나와요.
+
+<HpaDemo client:visible />
 
 ## 늘릴 땐 바로, 줄일 땐 천천히
 

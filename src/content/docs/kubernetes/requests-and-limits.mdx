@@ -17,6 +17,7 @@ sources:
     url: https://docs.kernel.org/scheduler/sched-bwc.html
 updated: 2026-10-30
 ---
+import CpuThrottleDemo from '../../../components/demos/CpuThrottleDemo.tsx';
 
 <KeyPoints>
   <Point title="요청은 자리 예약이에요">
@@ -107,6 +108,10 @@ CPU 1은 코어 1개예요. 노드가 물리 서버면 물리 코어 하나, 가
 CPU 한도는 짧은 주기마다 쓸 수 있는 CPU 시간으로 걸어요. 리눅스의 기본 주기는 100ms예요.
 
 그 주기 안에서 몫을 다 쓰면, 다음 주기가 올 때까지 실행이 멈춰요. 이걸 <Term term="kubernetes/cpu-throttling">스로틀링</Term>이라고 해요.
+
+이 몫은 컨테이너의 모든 스레드가 함께 써요. 그래서 스레드가 여럿이면 몫을 더 빨리 다 써요. 아래에서 한도와 스레드 수를 바꿔 보세요.
+
+<CpuThrottleDemo client:visible />
 
 메모리 한도를 넘으면 보통 커널의 OOM(메모리 부족) 처리가 컨테이너 안의 프로세스를 끝내요. 그 프로세스가 컨테이너의 첫 프로세스면 컨테이너가 끝나고, 쿠버네티스가 다시 시작해요. 이때 종료 이유가 <Term term="kubernetes/oomkilled">OOMKilled</Term>로 남아요.
 

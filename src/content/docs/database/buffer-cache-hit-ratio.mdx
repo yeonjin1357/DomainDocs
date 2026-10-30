@@ -19,8 +19,9 @@ sources:
     url: https://www.postgresql.org/docs/current/using-explain.html
   - title: Oracle — Tuning the Database Buffer Cache (Interpreting the Buffer Cache Hit Ratio)
     url: https://docs.oracle.com/en/database/oracle/oracle-database/19/tgdba/tuning-database-buffer-cache.html
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import CacheRereadDemo from '../../../components/demos/CacheRereadDemo.tsx';
 
 <OnDashboard title="VIP 고객 주문 조회 · EXPLAIN (ANALYZE, BUFFERS)" caption="통계가 낡은 계획은 캐시에서 블록을 84,253번 읽어 적중률이 99.9%였어요. 통계를 다시 모은 계획은 1,406번만 읽었어요.">
   <StatTile label="고치기 전 적중률" value="99.9" unit="%" note="84,253블록 읽음" />
@@ -97,6 +98,10 @@ DB는 데이터를 블록(PostgreSQL은 보통 8kB) 단위로 읽어요. 읽으�
 </Figure>
 
 Oracle 문서도 같은 표나 인덱스를 반복해 훑으면 적중률이 인위적으로 부풀 수 있다고 해요. 그래서 비율보다 SQL마다 읽은 블록 수를 봐요.
+
+아래에서 같은 블록을 읽는 횟수를 늘려 보세요.
+
+<CacheRereadDemo client:visible />
 
 ## 캐시 밖 읽기도 디스크 읽기가 아닐 수 있어요
 

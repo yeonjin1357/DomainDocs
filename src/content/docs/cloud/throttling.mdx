@@ -27,6 +27,7 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc6585
 updated: 2026-10-30
 ---
+import TokenBucketDemo from '../../../components/demos/TokenBucketDemo.tsx';
 
 <KeyPoints>
   <Point title="API는 초당 부를 수 있는 양이 정해져 있어요">
@@ -61,6 +62,10 @@ AWS의 많은 API는 토큰 바구니(token bucket) 방식으로 한도를 걸�
 한도는 API마다 따로예요. 다른 API의 바구니는 영향을 받지 않아요.
 
 EC2 문서는 필터와 페이지 나누기 없이 전부를 읽는 `DescribeInstances` 같은 호출에 더 작은 바구니를 줘요. 50개를 초당 10개씩 채워요.
+
+아래에서 그림의 바구니(100개, 초당 20개)로 부르는 횟수를 바꿔 보세요.
+
+<TokenBucketDemo client:visible />
 
 ## 거절은 이렇게 보여요
 

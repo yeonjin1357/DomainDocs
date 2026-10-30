@@ -19,8 +19,9 @@ sources:
     url: https://kafka.apache.org/43/operations/consumer-rebalance-protocol/
   - title: Apache Kafka 4.3 — Monitoring (consumer metrics)
     url: https://kafka.apache.org/43/operations/monitoring/
-updated: 2026-10-21
+updated: 2026-10-30
 ---
+import ConsumerGroupDemo from '../../../components/demos/ConsumerGroupDemo.tsx';
 
 <KeyPoints>
   <Point title="컨슈머가 가져가요">
@@ -125,6 +126,10 @@ updated: 2026-10-21
 </Figure>
 
 그래서 그룹 안에서 동시에 일하는 컨슈머 수는 파티션 수를 넘지 못해요. 파티션이 4개인데 컨슈머를 6개 띄우면, 2개는 맡을 파티션 없이 놀아요.
+
+아래에서 파티션과 컨슈머 수를 바꿔 보세요.
+
+<ConsumerGroupDemo client:visible />
 
 ## 리밸런스
 

@@ -31,8 +31,9 @@ sources:
     url: https://opentelemetry.io/docs/specs/semconv/http/http-metrics/
   - title: OpenTelemetry — Prometheus 호환 (히스토그램 변환)
     url: https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import HistogramQuantileDemo from '../../../components/demos/HistogramQuantileDemo.tsx';
 
 <OnDashboard title="결제 API · 응답시간 히스토그램 · 5분" caption="5분 동안 들어온 요청 1,000건 중 0.5초 이하가 985건, 1초 이하가 995건이에요. 99% 위치인 990번째 요청이 그 사이라서, 실제 p99는 0.5~1초 어딘가예요.">
   <StatTile label="0.5초 이하" value="985" unit="건" />
@@ -99,6 +100,10 @@ updated: 2026-10-29
 </Figure>
 
 그래서 실제 <Term slug="foundations/percentiles">p99</Term>는 0.5~1초 어디든 될 수 있어요. 오차는 많아야 이 버킷의 폭(0.5초)이라, 정확도는 버킷 경계가 정해요.
+
+아래에서 0.5초와 1초 사이에 경계를 더해 보세요. 실제 p99 가까이에 경계가 있을수록 추정이 맞아져요.
+
+<HistogramQuantileDemo client:visible />
 
 ## 버킷 경계는 판단할 값에 맞춰요
 

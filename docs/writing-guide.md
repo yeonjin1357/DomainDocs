@@ -305,7 +305,7 @@ updated: 2026-10-13
 | `Timeline` | `lanes`, `ariaLabel`, `start?`, `end?`, `marks?`, `ticks?` | 시간 띠. `lanes`는 `{ label, segments: [{ start, end, label?, tone? }] }` 배열이고, 줄마다 시간에 비례한 구간을 그려요. `marks`(`{ at, label, tone? }`)는 모든 줄을 가로지르는 세로선, `ticks`(`{ at, label }`)는 아래 시간축 눈금이에요. 줄 이름은 6자 안팎, 구간 글자는 띠 안에 들어갈 만큼 짧게 써요. 같은 줄 이름이나 눈금 글자가 360px에서 겹치지 않는지 확인해요 |
 | `Strip` | `rows`, `ariaLabel`, `marks?`, `ranges?` | 칸 띠. `rows`는 `{ label?, cells, heads? }` 배열이고, `cells`는 글자나 `{ label, tone? }`예요. `heads`는 칸마다 위에 붙는 작은 글자(예: 버킷 경계)로, 칸 수와 같아야 해요. 칸은 12개까지예요. `marks`(`{ row?, at, label, tone? }`)는 칸 하나를 위에서 가리키고, `ranges`(`{ row?, from, to, label, tone? }`)는 여러 칸을 아래에서 묶어요. 번호는 모두 0부터예요. 칸 `tone: 'sub'`는 지나간 칸이나 빈자리처럼 흐리게 그려요 |
 | SVG 그림 | `aria-label` | 위 그림으로 안 되는 그림은 `src/assets/figures/{domain}/{name}.svg`에 그려 default import해요. `Figure` 안에 두고 `aria-label`을 꼭 붙여요. 색은 `currentColor`나 `var(--color-…)`만 써야 다크 모드에서도 보여요 |
-| `PercentileDemo`, `DownsamplingDemo`, `LittlesLawDemo`, `RetryFanoutDemo`, `RateWindowDemo`, `CardinalityDemo` | 없음 | 직접 만져 보는 데모. default import 후 `client:visible`로 써요. 계산은 `src/lib/demo-models.ts`에 두고 단위 테스트로 확인해요 |
+| `src/components/demos/`의 데모(`PercentileDemo`, `HistogramQuantileDemo`, `CircuitBreakerDemo` 등 22개) | 없음 | 직접 만져 보는 데모. default import 후 `client:visible`로 써요. 계산은 `src/lib/demo-models.ts`에 두고 단위 테스트로 확인해요. 데모는 값을 바꿔 봐야 보이는 관계(공식, 문턱, 직관과 다른 결과)에만 넣어요. 목록이나 그림 하나로 충분한 곳에는 넣지 않아요 |
 
 `MiniLineChart`, `StatTile`, `Flow` 같은 그림 컴포넌트는 한 줄에 하나씩 써요. 한 줄에 여러 개를 쓰면 단락으로 묶여 배치가 깨져요.
 

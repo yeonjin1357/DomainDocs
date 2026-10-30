@@ -49,8 +49,9 @@ sources:
     url: https://opentelemetry.io/docs/collector/
   - title: OpenTelemetry Collector 소스 — hostmetrics cpuscraper metadata (system.cpu.utilization)
     url: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/hostmetricsreceiver/internal/scraper/cpuscraper/metadata.yaml#L71-L78
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import ScrapeSpikeDemo from '../../../components/demos/ScrapeSpikeDemo.tsx';
 
 <OnDashboard title="CPU 사용률 · 15초마다 수집" caption="3초 동안 100%였던 스파이크가 수집 사이에 끝나 게이지에는 남지 않았어요. 카운터로 구한 1분 평균에는 43%로 조금 남아요.">
   <MiniLineChart
@@ -102,6 +103,10 @@ updated: 2026-10-29
 </Figure>
 
 그래서 이 데이터에 "CPU 90% 초과" 알림을 걸어도 이 스파이크엔 울리지 않아요. 수집하는 순간에 걸린 스파이크만 보여요.
+
+아래에서 수집 주기와 첫 수집 시각을 바꿔 보세요. 스파이크가 수집 주기보다 짧으면, 기록에 남을지는 수집 시각에 달려요.
+
+<ScrapeSpikeDemo client:visible />
 
 ## 카운터엔 수집 사이의 일도 남지만 평균으로 보여요
 

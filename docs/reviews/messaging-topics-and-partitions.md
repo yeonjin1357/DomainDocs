@@ -12,3 +12,11 @@
 | num.partitions 기본 1 | https://kafka.apache.org/43/configuration/broker-configs/ |
 
 - 메모: "컨슈머가 파티션보다 많으면 남는 컨슈머가 논다"는 "파티션 하나는 그룹 안의 컨슈머 하나에만 배정"에서 나온 결과예요.
+
+## 다시 확인 (2026-10-30)
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 키 있는 이벤트의 기본 파티션은 toPositive(murmur2(직렬화한 키)) % 파티션 수, murmur2는 시드 0x9747b28c·little-endian | https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/clients/producer/internals/BuiltInPartitioner.java , https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/utils/Utils.java |
+
+- 더한 것: 파티션 수를 바꾸면 키의 파티션이 바뀌는 데모예요. 해시 구현은 Kafka UtilsTest의 값 여섯 개로 단위 테스트에서 맞춰 봤어요.

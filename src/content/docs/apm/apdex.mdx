@@ -23,8 +23,9 @@ sources:
     url: https://prometheus.io/docs/practices/histograms/
   - title: OpenTelemetry — Semantic conventions for HTTP metrics (버킷 경계)
     url: https://opentelemetry.io/docs/specs/semconv/http/http-metrics/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import ApdexDemo from '../../../components/demos/ApdexDemo.tsx';
 
 <OnDashboard title="주문 API · 최근 1시간 · T 0.5초" caption="요청 1,000건 중 800건이 0.5초 안에, 100건이 0.5~2초에 끝났어요. 나머지 100건은 2초를 넘었거나 에러였어요.">
   <StatTile label="Apdex" value="0.85" tone="accent" note="T 0.5초" />
@@ -78,6 +79,10 @@ Apdex(Application Performance Index)는 응답시간을 만족도 점수로 바�
     ]}
   />
 </Figure>
+
+아래에서 같은 요청 1,000건에 T만 바꿔 보세요.
+
+<ApdexDemo client:visible />
 
 ## Apdex는 얼마나 느린지를 지워요
 

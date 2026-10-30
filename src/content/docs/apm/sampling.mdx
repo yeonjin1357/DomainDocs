@@ -23,8 +23,9 @@ sources:
     url: https://opentelemetry.io/docs/specs/otel/metrics/sdk/
   - title: OpenTelemetry Collector — Tail Sampling Processor
     url: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/tailsamplingprocessor/README.md
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import TailSamplingDemo from '../../../components/demos/TailSamplingDemo.tsx';
 
 <OnDashboard title="주문 API · 최근 5분 · 요청 10,000건" caption="에러 트레이스는 모두 남기고 나머지는 10%만 남겼어요. 남은 트레이스로 센 에러율이 실제의 열 배 가까이 부풀었어요.">
   <StatTile label="실제 에러율" value="0.5" unit="%" note="10,000건 중 50건" />
@@ -83,6 +84,10 @@ span을 다 모은 뒤 정하는 tail 샘플링은 에러와 느린 트레이스
     ]}
   />
 </Figure>
+
+아래에서 고르는 방식과 비율을 바꿔 보세요. 맨 위 화면처럼 에러 0.5%, 나머지 10%에서 시작해요.
+
+<TailSamplingDemo client:visible />
 
 ## APM 지표는 샘플링 전에 세요
 

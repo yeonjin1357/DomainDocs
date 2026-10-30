@@ -21,6 +21,7 @@ sources:
     url: https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/circuit_breaking
 updated: 2026-10-30
 ---
+import CircuitBreakerDemo from '../../../components/demos/CircuitBreakerDemo.tsx';
 
 <OnDashboard title="주문 서비스 → 결제 API · 최근 10분" caption="결제 API를 부르는 서킷 브레이커가 열렸어요. 주문 서비스의 에러는 늘었는데, 그 에러 응답은 3ms 만에 끝나요. 결제 API까지 가지 않고 바로 실패했기 때문이에요.">
   <StatTile label="서킷 상태" value="열림" note="OPEN" tone="warn" />
@@ -88,7 +89,7 @@ updated: 2026-10-30
 
 열림에서 60초를 기다린 뒤에도 기본 설정에서는 저절로 반열림이 되지 않아요. 다음 호출이 들어올 때 반열림으로 바뀌어요.
 
-<Figure caption="Resilience4j 2.2로 직접 돌린 결과예요. 시험하기 쉽게 창 크기와 최소 호출 수를 10, 기다림을 1초로 줄였어요.">
+<Figure caption="Resilience4j 2.2로 직접 돌린 결과예요. 시험하기 쉽게 창 크기와 최소 호출 수를 10, 기다림을 1초, 반열림 시험 호출을 3번으로 줄였어요.">
   <StatTile label="호출 10번 중 실패" value="7" unit="번" note="실패율 70%" />
   <StatTile label="상태" value="열림" tone="warn" note="CLOSED → OPEN" />
   <StatTile label="1초 뒤 시험 3번 성공" value="닫힘" tone="accent" note="HALF_OPEN → CLOSED" />
@@ -101,6 +102,10 @@ CallNotPermittedException:
 CircuitBreaker 'payment' is OPEN
 and does not permit further calls
 ```
+
+아래에서 호출을 하나씩 보내 보세요. 위 재현과 같은 설정이에요.
+
+<CircuitBreakerDemo client:visible />
 
 ## 대신 줄 응답(폴백)
 

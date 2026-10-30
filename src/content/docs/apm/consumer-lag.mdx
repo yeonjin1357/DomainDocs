@@ -19,8 +19,9 @@ sources:
     url: https://github.com/linkedin/Burrow/wiki/Consumer-Lag-Evaluation-Rules
   - title: OpenTelemetry — Semantic conventions for messaging spans
     url: https://opentelemetry.io/docs/specs/semconv/messaging/messaging-spans/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import LagDrainDemo from '../../../components/demos/LagDrainDemo.tsx';
 
 <OnDashboard title="주문 알림 컨슈머 · 최근 10분" caption="들어오는 메시지(초당 500건)보다 처리(초당 400건)가 느려서, lag이 1분에 6,000건씩 늘어 60,000건이 됐어요.">
   <MiniLineChart ariaLabel="lag이 0건에서 10분 동안 일정하게 늘어 60,000건이 된 그래프" series={[{ label: 'lag', values: [0, 6000, 12000, 18000, 24000, 30000, 36000, 42000, 48000, 54000, 60000], tone: 'warn', value: '60,000건' }]} />
@@ -89,6 +90,10 @@ lag을 처리 속도로 나누면, 지금 쌓인 몫을 처리하는 데 걸릴 
     ]}
   />
 </Figure>
+
+아래에서 두 속도를 바꿔 보세요. lag이 0이 되기까지는 lag을 두 속도의 차이로 나눈 만큼 걸려요.
+
+<LagDrainDemo client:visible />
 
 <Checkpoints>
   <Check>lag 하나에 고정 임계값으로 알림을 걸었다면 다시 보세요. 바쁜 시간엔 정상이어도 울리고, 한가한 토픽은 컨슈머가 멈춰도 lag이 작아 늦게 울려요.</Check>

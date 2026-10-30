@@ -313,3 +313,223 @@
 .demo-segment label.is-warn.is-active {
   background: var(--color-warn);
 }
+
+/* 여러 데모가 함께 쓰는 SVG 그림 */
+.demo-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.demo-svg .fill-accent {
+  fill: var(--color-accent);
+}
+
+.demo-svg .fill-warn {
+  fill: var(--color-warn);
+}
+
+.demo-svg .fill-weak {
+  fill: var(--color-accent-weak);
+}
+
+.demo-svg .fill-card {
+  fill: var(--color-card);
+}
+
+.demo-svg .fill-sub {
+  fill: var(--color-text-weak);
+}
+
+.demo-svg .stroke-text {
+  stroke: var(--color-text);
+  stroke-width: 2;
+}
+
+.demo-svg .stroke-line {
+  stroke: var(--color-line);
+  stroke-width: 1;
+}
+
+.demo-svg .stroke-sub {
+  stroke: var(--color-text-weak);
+  stroke-width: 2;
+}
+
+.demo-svg .fill-accent-mid {
+  fill: var(--color-accent);
+  opacity: 0.4;
+}
+
+.demo-svg text {
+  fill: var(--color-text-sub);
+  font-size: 12px;
+}
+
+/* 줄마다 이름과 값을 놓는 목록(DNS 질의, 키와 파티션 등) */
+.demo-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.demo-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--color-card);
+}
+
+.demo-list .demo-list-name {
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 13px;
+}
+
+.demo-list .demo-list-value {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.demo-list.is-two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.demo-list li.is-accent .demo-list-value {
+  color: var(--color-accent);
+}
+
+.demo-list li.is-warn .demo-list-value {
+  color: var(--color-warn);
+}
+
+/* 작은 칸 묶음(파티션, 호출 결과, 비트) */
+.demo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.demo-chip {
+  min-width: 28px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  background: var(--color-card);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.demo-chip.is-accent {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.demo-chip.is-warn {
+  background: var(--color-warn);
+  color: #fff;
+}
+
+.demo-chip.is-sub {
+  color: var(--color-text-weak);
+}
+
+.demo-chip.is-dot {
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 4px;
+}
+
+/* 누르는 단추(서킷 브레이커 데모) */
+.demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.demo-button {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--color-card);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.demo-button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.demo-button.is-warn {
+  color: var(--color-warn);
+}
+
+.demo-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* 서브넷 데모: 주소의 32비트를 8비트씩 */
+.demo-octets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+.demo-octet {
+  display: grid;
+  gap: 4px;
+}
+
+.demo-octet-value {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.demo-octet .demo-chips {
+  gap: 2px;
+}
+
+.demo-chip.is-bit {
+  width: 12px;
+  min-width: 12px;
+  padding: 2px 0;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.demo-stat-value.demo-stat-small {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+/* 값이 길어 이름 아래로 내려 쓰는 칸 */
+@media (max-width: 519px) {
+  .demo-stat.is-stacked {
+    grid-template-columns: 1fr;
+    row-gap: 4px;
+  }
+
+  .demo-stat.is-stacked .demo-stat-label {
+    grid-row: auto;
+  }
+
+  .demo-stat.is-stacked .demo-stat-value {
+    text-align: left;
+  }
+}
