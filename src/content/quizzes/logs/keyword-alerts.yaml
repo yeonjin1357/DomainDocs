@@ -11,9 +11,9 @@ questions:
     explain: LogQL의 |= 필터는 대소문자를 구분해요. 모두 잡으려면 정규식에 (?i)를 붙이거나 레벨 필드로 걸어요.
   - id: substring-false
     type: ox
-    prompt: LogQL에서 |= "ERROR"로 건 알림은 "NO_ERROR"가 든 줄에는 맞지 않나요?
-    answer: false
-    explain: 줄에 그 글자가 들어 있으면 맞아요. 그래서 NO_ERROR, ERROR_COUNT=0 같은 줄에도 울릴 수 있어요.
+    prompt: LogQL에서 |= "ERROR"로 건 알림은, "NO_ERROR"가 든 줄에도 맞나요?
+    answer: true
+    explain: 줄에 그 글자가 들어 있기만 하면 맞아요. 그래서 NO_ERROR, ERROR_COUNT=0 같은 줄에도 울릴 수 있어요.
   - id: field-better
     type: choice
     prompt: 엉뚱한 일치를 가장 크게 줄이는 조건은?
@@ -28,14 +28,19 @@ questions:
     type: choice
     prompt: 오늘 만든 CloudWatch 지표 필터의 그래프가 어제 구간에서 비어 있어요. 왜일까요?
     choices:
-      - 지표 필터는 만든 뒤에 들어온 로그만 세요
-      - 어제는 로그가 하나도 없었어요
-      - 지표 필터는 하루 늦게 계산돼요
-      - 그래프의 시간대가 틀렸어요
+      - 만든 뒤 들어온 로그만 세서
+      - 어제는 로그가 하나도 없어서
+      - 필터는 하루 늦게 계산돼서
+      - 그래프의 시간대가 틀려서
     answer: 0
     explain: CloudWatch 문서에 따르면 필터는 지난 로그를 거슬러 세지 않아요.
   - id: late-logs
-    type: ox
-    prompt: 로그가 2분쯤 늦게 도착하는데 최근 1분만 세는 알림이라면, 도착하지 않은 줄 때문에 덜 셀 수 있나요?
-    answer: true
+    type: choice
+    prompt: 로그가 2분쯤 늦게 도착하는데, 최근 1분만 세는 키워드 알림이에요. 어떻게 될까요?
+    choices:
+      - 아직 안 온 줄을 못 세요
+      - 늦은 줄을 기다렸다 세요
+      - 늦은 줄을 두 번 세요
+      - 지연과 상관없이 정확해요
+    answer: 0
     explain: 세는 순간 아직 도착하지 않은 줄은 빠져요. 구간을 수집 지연보다 넉넉히 잡아요.

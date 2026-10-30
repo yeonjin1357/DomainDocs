@@ -14,7 +14,7 @@ questions:
     type: choice
     prompt: Loki에 retention_period를 7일로 적었는데 로그가 계속 남아요. 먼저 볼 것은?
     choices:
-      - compactor의 보관 기능이 켜져 있는지
+      - compactor 보관 기능
       - 레이블 수가 너무 적은지
       - 로그 레벨이 DEBUG인지
       - 검색 시간 범위가 넓은지

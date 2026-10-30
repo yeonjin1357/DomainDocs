@@ -13,16 +13,16 @@ questions:
     type: choice
     prompt: 로그의 Timestamp와 ObservedTimestamp가 크게 벌어져 있어요. 무엇을 뜻할까요?
     choices:
-      - 로그가 수집 쪽에 늦게 도착했어요
+      - 수집 쪽에 늦게 도착했어요
       - 로그 레벨이 잘못 적혔어요
       - 로그가 두 번 저장됐어요
-      - 로그 본문이 잘렸어요
+      - 로그 본문이 잘려 나갔어요
     answer: 0
     explain: 하나는 일이 일어난 시각, 다른 하나는 수집 쪽이 그 로그를 본 시각이에요. 차이가 곧 늦게 도착한 정도예요.
   - id: blocked-step
     type: ox
-    prompt: 수집 단계가 막혀도, 이미 만든 키워드 알림은 그 시각의 로그를 계속 셀 수 있나요?
-    answer: false
+    prompt: 수집 단계가 막히면, 그 뒤의 검색 화면과 키워드 알림도 그 시각의 로그를 보지 못하나요?
+    answer: true
     explain: 알림과 검색은 저장소에 들어온 로그만 봐요. 앞 단계가 막히면 그 뒤의 화면이 모두 비어요.
   - id: parsing-name
     type: input

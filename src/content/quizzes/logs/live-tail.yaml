@@ -1,9 +1,9 @@
 questions:
   - id: sampled
     type: ox
-    prompt: CloudWatch Live Tail 화면에 보이지 않은 줄은 저장소에도 없다고 봐도 되나요?
-    answer: false
-    explain: 필터에 맞는 로그가 초당 500건을 넘으면 일부만 보여 줘요. 화면에 보인 비율을 함께 봐요.
+    prompt: CloudWatch Live Tail 화면에 보인 비율이 40%로 떠 있어요. 화면에 안 보인 줄도 저장소에는 들어 있나요?
+    answer: true
+    explain: 필터에 맞는 로그가 초당 500건을 넘으면 일부만 보여 줘요. 저장은 그대로라, 라이브 테일로는 개수를 세지 않아요.
   - id: session-limit
     type: choice
     prompt: CloudWatch Live Tail 세션 하나는 최대 얼마나 열어 둘 수 있을까요?
@@ -14,10 +14,10 @@ questions:
     type: choice
     prompt: 중앙 저장소의 라이브 테일에는 아무것도 안 보이는데 kubectl logs -f에는 로그가 흘러요. 어디가 막혔을까요?
     choices:
-      - 수집 에이전트에서 저장소까지의 길
-      - 앱이 로그를 쓰는 부분
+      - 수집 에이전트에서 저장소까지
+      - 앱이 로그를 쓰는 코드
       - 파드의 컨테이너 런타임
-      - kubectl의 권한
+      - kubectl을 쓰는 계정 권한
     answer: 0
     explain: kubectl logs는 노드의 kubelet에서 바로 읽어서 수집 길을 거치지 않아요. 앱은 쓰고 있고, 수집 길이 막힌 거예요.
   - id: selector-pods
