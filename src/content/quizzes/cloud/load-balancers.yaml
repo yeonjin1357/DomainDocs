@@ -18,12 +18,12 @@ questions:
     type: choice
     prompt: 사용자는 에러를 겪는데 앱 로그는 깨끗해요. 먼저 볼 로드 밸런서 지표는?
     choices:
-      - 로드 밸런서가 직접 만든 5xx 수(HTTPCode_ELB_5XX_Count)
-      - 대상이 만든 5xx 수(HTTPCode_Target_5XX_Count)
-      - 처리한 요청 수(RequestCount)
-      - 대상의 응답시간(TargetResponseTime)
+      - HTTPCode_ELB_5XX_Count
+      - HTTPCode_Target_5XX_Count
+      - RequestCount
+      - TargetResponseTime
     answer: 0
-    explain: 대상까지 가지 못한 에러는 앱 로그에 남지 않고, 로드 밸런서 지표로만 보여요.
+    explain: 로드 밸런서가 직접 만든 5xx 수예요. 대상까지 가지 못한 에러는 앱 로그에 남지 않고, 로드 밸런서 지표로만 보여요.
   - id: l7-routing
     type: choice
     prompt: /api로 오는 요청은 API 서버로, 나머지는 웹 서버로 나누고 싶어요. 무엇을 써야 할까요?

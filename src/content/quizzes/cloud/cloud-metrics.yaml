@@ -34,13 +34,13 @@ questions:
       - 경보가 꺼져 있어요
     answer: 0
     explain: 막 만든 경보이거나 지표가 끊긴 경우예요. 문제없다고 넘기지 말고 지표가 들어오는지 봐요.
-  - id: not-an-identifier
+  - id: dimension-name
     type: choice
-    prompt: CloudWatch에서 지표 하나를 가리키는 이름표가 아닌 것은?
+    prompt: CloudWatch에서 InstanceId=i-0abc처럼, 같은 지표를 어느 대상에서 쟀는지 나누는 이름=값을 무엇이라고 하나요?
     choices:
-      - 통계(Average)
-      - 네임스페이스(AWS/EC2)
-      - 지표 이름(CPUUtilization)
-      - 차원(InstanceId)
+      - 차원
+      - 네임스페이스
+      - 통계
+      - 지표 이름
     answer: 0
-    explain: 지표는 네임스페이스, 지표 이름, 차원으로 가려요. 통계는 그 지표를 기간마다 묶어 볼 때 고르는 거예요.
+    explain: 지표 하나는 네임스페이스, 지표 이름, 차원으로 가려요. 차원 값이 다르면 다른 지표예요. 통계는 기간마다 묶어 볼 때 고르는 거예요.

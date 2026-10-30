@@ -3,7 +3,7 @@ questions:
     type: choice
     prompt: CloudWatch 지표 스트림(Metric Streams)은 지표를 어떻게 전하나요?
     choices:
-      - CloudWatch가 생기는 대로 Firehose를 거쳐 보내요
+      - CloudWatch가 Firehose로 보내요
       - 수집기가 주기마다 GetMetricData로 물어요
       - 에이전트가 서버 안에서 직접 읽어 보내요
       - 콘솔 화면을 내려받아 읽어요
@@ -11,9 +11,9 @@ questions:
     explain: 스트림은 CloudWatch가 보내기를 시작해요. 주기마다 묻는 건 API 방식이에요.
   - id: stream-cost-extra
     type: ox
-    prompt: 지표 스트림의 비용은 CloudWatch의 지표 갱신 요금만 계산하면 되나요?
-    answer: false
-    explain: 스트림은 Firehose를 거쳐 전달돼서 그 요금이 따로 붙어요. 받는 쪽의 요금도 생각해요.
+    prompt: 지표 스트림을 쓰면 CloudWatch의 갱신 요금과 별도로, 전달 경로인 Firehose의 요금이 붙나요?
+    answer: true
+    explain: 스트림은 Firehose를 거쳐 전달돼서 그 요금이 따로 붙어요. 받는 쪽의 요금도 함께 생각해요.
   - id: late-update
     type: ox
     prompt: 스트림으로 이미 보낸 시각의 값이 나중에 고쳐지면, 스트림이 고친 값을 다시 보내 주나요?

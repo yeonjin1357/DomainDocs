@@ -6,7 +6,7 @@ questions:
       - CPU 크레딧 잔량
       - 디스크 용량
       - 보안 그룹 규칙
-      - 고른 리전
+      - 디스크의 IOPS 한도
     answer: 0
     explain: Standard 모드에서 크레딧이 바닥나면 CPU가 기준선(t3.large는 30%)에 묶여 더 오르지 못해요.
   - id: type-letter

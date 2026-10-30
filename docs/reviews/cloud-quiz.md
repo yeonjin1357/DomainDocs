@@ -19,3 +19,19 @@
 | cloud-metrics-missing · zero-not-reported, not-breaching, five-minute-default | 0이 아닐 때만 보고하는 지표, 경보 빠진 데이터 기본 missing·notBreaching, EC2 기본 5분 | 글 본문과 docs/reviews/cloud-cloud-metrics-missing.md |
 | lambda-errors · async-retries | 비동기 호출 함수 오류 시 기본 두 번 더 시도 | 글 본문과 docs/reviews/cloud-lambda-errors.md |
 | vm-status-check · reboot-same-host, auto-recovery-limit | 재부팅은 같은 호스트에 머물 수 있음, 자동 복구는 새 호스트로 옮길 뿐 | 글 본문과 docs/reviews/cloud-vm-status-check.md |
+
+## 2026-10-30 문제 다시 쓰기
+
+- 문제: src/content/quizzes/cloud/*.yaml (17개 파일, 83문제)
+- 바꾼 까닭: OX 정답의 O가 29%, 정답이 가장 긴 보기인 객관식이 47%였어요. 부정으로 묻는 문제가 둘, 판단을 묻는 OX("볼 만한가요", "늘 옮겨지나요")가 있었어요.
+- 정답이 둘이 되는 문제: throttling의 토큰 바구니 문제는 "가득 찬 바구니(100개, 초당 20개 채움)로 1초 동안 몇 번 성공하나"를 묻고 정답을 100으로 뒀어요. 실제 토큰 바구니는 그 1초 동안에도 채워져서 오답 120도 맞을 수 있었어요. 글의 데모는 초마다 한 번에 계산하는 단순 모델이라 100이 나와요. "계속 부를 때 이어서 성공하는 속도"(초당 20번)를 묻는 문제(token-bucket-sustained)로 바꿨어요.
+- 고친 뒤: OX 28문제 중 O 15(54%), 객관식 53문제 중 정답이 가장 긴 보기 12(23%), 정답이 가장 긴 오답의 1.2배를 넘는 문제 0개예요.
+- 새로 들어간 주장만 아래에서 확인했어요.
+
+| 문제(파일 · id) | 확인한 주장 | 근거 |
+| --- | --- | --- |
+| lb-5xx · deploy-503 | 대상 그룹에 등록된 대상이 없으면 ALB가 503을 줘요 | https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-troubleshooting.html (HTTP 503: Service unavailable, no registered targets) |
+| vm-status-check · reboot-same-host | 재부팅은 같은 물리 호스트에 머물고, 멈췄다 켜야 대개 새 호스트로 옮겨져요 | 글 본문과 https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-reboot.html |
+| regions-and-zones · split-by-az | 세 영역 중 한 곳만 30%면 고르게 나뉜 전체는 10%예요 | 계산 |
+| throttling · monitoring-throttled | GetMetricData 한도는 계정·리전마다라, 같은 계정의 도구들이 나눠 써요 | 글 본문과 docs/reviews/cloud-throttling.md |
+| cloud-metrics-missing · not-breaching | 오답 후보였던 ignore는 경보 상태를 그대로 두는 설정이라 이 문제의 증상도 멈출 수 있어서 보기에서 뺐어요 | https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html (treat missing data) |

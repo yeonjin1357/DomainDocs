@@ -28,10 +28,10 @@ questions:
     type: choice
     prompt: EBS 디스크의 용량은 여유로운데, 디스크 I/O 대기가 길어요. 먼저 볼 것은?
     choices:
-      - 볼륨의 IOPS·처리량 한도에 붙어 있는지
-      - 남은 디스크 용량
-      - 보안 그룹 규칙
-      - 인스턴스 유형 이름
+      - 볼륨의 IOPS·처리량 한도
+      - 파일 시스템의 inode 수
+      - 인스턴스의 CPU 크레딧
+      - 인스턴스의 메모리 사용률
     answer: 0
     explain: 클라우드 디스크는 볼륨마다 낼 수 있는 IOPS와 처리량에 한도가 있어요. 한도에 붙으면 용량과 상관없이 느려요.
   - id: s3-read-after-write
