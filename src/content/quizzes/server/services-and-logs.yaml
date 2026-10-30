@@ -24,14 +24,14 @@ questions:
       - journalctl은 지난 부팅을 볼 수 없어서
     answer: 0
     explain: 메모리(/run/log/journal)에만 둔 저널은 재부팅 때 사라져요. 디스크(/var/log/journal)에 둬야 재부팅 뒤에도 남아요.
-  - id: not-in-journald
+  - id: app-log-not-in-journal
     type: choice
-    prompt: 다음 중 journald가 모으지 않는 로그는?
+    prompt: 서비스는 active이고 요청도 잘 처리하는데, journalctl -u myapp에는 앱 로그가 하나도 안 보여요. 가장 그럴듯한 이유는?
     choices:
-      - 앱이 자기 파일에 따로 쓰는 로그
-      - 서비스가 표준 출력으로 내보낸 글
-      - 커널 메시지
-      - syslog로 보낸 메시지
+      - 앱이 로그를 자기 파일에만 써요
+      - 저널을 메모리에만 두고 있어요
+      - 커널 링 버퍼가 가득 찼어요
+      - 서비스의 Restart=가 꺼져 있어요
     answer: 0
     explain: journald는 서비스의 출력, syslog, 커널 메시지 같은 것을 받아요. 앱이 따로 쓰는 파일은 그 파일을 직접 읽어야 해요.
   - id: systemd-name

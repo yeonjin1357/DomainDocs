@@ -17,3 +17,14 @@
 | low-memory · vanished-process, container-oom | OOM killer는 커널 로그에 Killed process를 남김, 컨테이너는 자기 한도를 넘어도 끝남 | 글 본문과 docs/reviews/server-low-memory.md |
 | disk-filling-up · df-du-gap, truncate-not-rm | df와 du의 차이, lsof +L1, 내용 비우기 | 글 본문과 docs/reviews/server-disk-filling-up.md |
 | clock-drift · no-sudden-step, ntp-name | chrony는 보통 서서히 맞추고 makestep은 일부 소프트웨어에 심각한 영향 경고 | 글 본문과 docs/reviews/server-clock-drift.md |
+
+## 2026-10-30 문제 다시 보기
+
+15편 72문제를 글과 나란히 읽고 다시 봤어요. '아닌 것은'·'모으지 않는 것은' 문제 3개를 상황을 해석하는 문제로 바꾸고, 판단을 묻는 말(괜찮을까요, 좋나요, 두 번 더해질 수 있나요)을 없앴어요. 정답만 한두 자 길던 보기 7개는 길이를 맞췄어요. OX의 O는 44%에서 52%, 정답이 가장 긴 객관식은 28%에서 13%가 됐어요.
+
+| 문제 | 주장 | 근거 |
+| --- | --- | --- |
+| disk-filling-up · find-what-grew | du -x는 다른 파일 시스템을 건너뛰며 크기를 잼, 페이지 캐시는 메모리라 디스크 공간과 무관 | 글 2단계, docs/reviews/server-disk-filling-up.md |
+| slow-disk · nightly-disk-spike | 백업·로그 압축·인덱스 재생성·배치가 디스크를 크게 씀, pidstat -d로 프로세스별 읽기·쓰기 | 글 3단계 |
+| services-and-logs · app-log-not-in-journal | 앱이 따로 쓰는 파일 로그는 journald를 거치지 않음 | 글 본문, docs/reviews/server-services-and-logs.md |
+| server-not-reporting · gap-zero-misread | 0은 재 봤더니 없었다는 기록이라, 수집 못 한 구간을 0으로 채우면 일이 없던 것처럼 읽힘 | 글 4단계, foundations/no-data-vs-zero |

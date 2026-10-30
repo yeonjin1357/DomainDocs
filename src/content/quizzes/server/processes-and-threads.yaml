@@ -18,17 +18,17 @@ questions:
     type: choice
     prompt: 좀비 프로세스가 계속 쌓여요. 어디를 고쳐야 할까요?
     choices:
-      - 자식을 거두지 않는 부모 프로그램
+      - 자식을 안 거두는 부모 프로그램
       - 좀비가 된 프로세스 자신의 코드
       - 코어 수가 적은 CPU
       - 스왑이 꺼진 메모리 설정
     answer: 0
     explain: 좀비는 이미 끝났지만 부모가 아직 거두지 않은 프로세스예요. 부모 프로그램이 자식을 제대로 거두게 고쳐요.
-  - id: thread-leak
+  - id: thread-leak-memory-grows
     type: ox
-    prompt: 앱의 스레드 수가 줄지 않고 계속 늘기만 해도, 스레드는 메모리를 거의 쓰지 않으니 괜찮을까요?
-    answer: false
-    explain: 스레드마다 스택 메모리를 써요. 만들고 끝내지 않는 스레드가 쌓이면 결국 메모리가 모자라요.
+    prompt: 만들고 끝내지 않는 스레드가 쌓여 앱의 스레드 수가 계속 늘면, 그 프로세스의 메모리 사용량도 함께 늘어나나요?
+    answer: true
+    explain: 스레드마다 스택 메모리를 써요. 끝내지 않는 스레드가 쌓이면 결국 메모리가 모자라요.
   - id: scheduler-name
     type: input
     prompt: 실행할 준비가 된 스레드가 코어보다 많을 때, 다음에 CPU에서 돌릴 스레드를 고르는 커널의 부분은?
