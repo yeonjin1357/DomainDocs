@@ -27,7 +27,7 @@ questions:
       - 마지막 1초쯤의 쓰기
       - 마지막 스냅숏 이후의 쓰기 전부
       - 하나도 없어요
-      - 하루치 쓰기
+      - 마지막 명령 하나만
     answer: 0
     explain: 기본 appendfsync는 everysec라 1초마다 디스크에 확정해요. 그래서 마지막 1초쯤을 잃을 수 있어요.
   - id: slowlog-name

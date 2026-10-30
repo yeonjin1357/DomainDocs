@@ -24,11 +24,12 @@ questions:
       - 앱이 직접 보낸 SQL이 빠져요
     answer: 0
     explain: 호출 수와 시간은 마지막 초기화 뒤로 쌓인 값이라, 지금 무거운 SQL이 드러나지 않아요. 구간을 보려면 두 시점 값의 차이를 써요.
-  - id: fast-sql-long-db-span
-    type: ox
-    prompt: SQL 평균은 빠른데 앱 트레이스의 DB 구간이 길다면, 같은 SQL을 요청마다 여러 번 부르는지 의심해 볼 만한가요?
-    answer: true
-    explain: N+1 질의처럼 같은 SQL을 여러 번 부르면, 한 번은 빨라도 합이 커요. 그래서 호출 수를 함께 봐요.
+  - id: n-plus-one-count
+    type: choice
+    prompt: SQL 하나의 평균 실행 시간은 2ms인데, 앱 트레이스의 DB 구간은 요청마다 400ms예요. DB 구간이 모두 이 SQL이라면 요청 하나가 이 SQL을 몇 번쯤 부를까요?
+    choices: [약 200번, 약 20번, 약 2번, '약 2,000번']
+    answer: 0
+    explain: 400ms ÷ 2ms = 200번이에요. N+1 질의처럼 같은 SQL을 여러 번 부르면 한 번은 빨라도 합이 커서, 호출 수를 함께 봐요.
   - id: statements-extension
     type: input
     prompt: PostgreSQL에서 SQL별 호출 수와 실행 시간 합을 모아 보여 주는 확장의 이름은?

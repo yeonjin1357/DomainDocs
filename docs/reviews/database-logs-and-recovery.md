@@ -13,3 +13,5 @@
 | binlog는 변경 이벤트, 복제에 씀 | https://dev.mysql.com/doc/refman/8.4/en/binary-log.html |
 | log file sync | https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/descriptions-of-wait-events.html "When a user session commits, the session's redo information must be flushed to the redo logfile" |
 | 백업 + WAL 재적용으로 원하는 시각까지 | wal-intro "replay the WAL just as far as the desired time" |
+
+- 고친 것(2026-10-30): '오래 열린 트랜잭션이 그 시작점 뒤의 로그를 남긴다'를 SQL Server의 일로 밝혔어요. PostgreSQL 문서(https://www.postgresql.org/docs/18/wal-configuration.html)가 WAL을 남겨 두는 조건으로 드는 것은 체크포인트, wal_keep_size, 보관, 복제 슬롯, WAL 요약뿐이에요. MySQL·Oracle도 오래 열린 트랜잭션이 붙잡는 것은 리두가 아니라 언두예요. 그림 caption과 모니터링 단락도 함께 고쳤어요.

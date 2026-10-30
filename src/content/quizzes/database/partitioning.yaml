@@ -9,11 +9,11 @@ questions:
       - WHERE created_at < '2026-02-01'
     answer: 0
     explain: 기준 열인 created_at으로 걸러야 맞지 않는 칸을 건너뛰어요. 기준 열이 없는 조건은 모든 칸을 읽어요.
-  - id: drop-vs-delete
+  - id: drop-frees-space
     type: ox
-    prompt: 보관 기간이 지난 한 달 치 데이터를 지울 때, 그 달의 파티션을 DROP하면 DELETE보다 VACUUM 뒷정리가 더 필요한가요?
-    answer: false
-    explain: 칸을 지우거나 떼면 죽은 행이 남지 않아요. DELETE는 지운 행마다 VACUUM이 치울 거리가 남아요.
+    prompt: 보관 기간이 지난 한 달 치를 지우려고 그 달의 파티션을 DROP했어요. VACUUM을 기다리지 않고 그 칸이 쓰던 디스크 공간이 바로 비나요?
+    answer: true
+    explain: 칸을 지우면 그 칸의 파일이 통째로 사라져서 죽은 행이 남지 않아요. DELETE는 지운 행마다 VACUUM이 치울 거리가 남아요.
   - id: missing-partition
     type: choice
     prompt: 1월 1일 0시부터 주문 저장이 no partition of relation found for row 에러로 실패해요. 원인은?

@@ -14,16 +14,16 @@ questions:
       - 앱이 다음 명령을 보내지 않고 쉬고 있어요
     answer: 0
     explain: 대기 종류가 원인의 갈래를 알려 줘요. Lock 대기만 늘었다면 쿼리가 무거워진 게 아니라 잠금 때문에 줄을 선 거예요.
-  - id: idle-wait-excluded
+  - id: clientread-top
     type: choice
-    prompt: PostgreSQL에서 성능 문제를 찾을 때 빼고 보는 쉬는 대기는?
+    prompt: PostgreSQL 대기 이벤트를 대기 시간 순으로 줄 세웠더니 ClientRead가 맨 위예요. 어떻게 읽을까요?
     choices:
-      - 앱이 다음 데이터를 보내길 기다리는 ClientRead
-      - 표 데이터 파일을 읽는 DataFileRead
-      - 다른 트랜잭션이 끝나길 기다리는 transactionid
-      - 공유 메모리 구조를 기다리는 LWLock
+      - 할 일 없이 앱을 기다리는 중이에요
+      - 디스크에서 표 데이터를 읽느라 바빠요
+      - 다른 트랜잭션의 잠금을 기다리고 있어요
+      - 앱에 결과를 보내다 네트워크가 막혔어요
     answer: 0
-    explain: ClientRead는 DB가 할 일이 없어 앱을 기다리는 대기예요. Oracle도 Idle 종류의 대기는 빼고 보라고 해요.
+    explain: ClientRead는 앱이 다음 데이터를 보내길 기다리는 쉬는 대기라, 성능 문제를 찾을 때는 빼고 봐요. 결과를 보내다 막히면 ClientWrite로 보여요.
   - id: rank-waits-by-time
     type: ox
     prompt: 대기 이벤트를 일어난 횟수 순으로 줄 세우면, DB 시간을 가장 많이 쓴 대기가 맨 위에 오나요?

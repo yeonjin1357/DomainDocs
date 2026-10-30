@@ -14,11 +14,11 @@ questions:
     prompt: 트랜잭션 안에서 쿼리를 취소당한 연결은, 다음 SQL을 바로 정상적으로 실행할 수 있나요?
     answer: false
     explain: 그 트랜잭션은 실패 상태라 current transaction is aborted 에러가 나요. ROLLBACK을 해야 다시 쓸 수 있어요.
-  - id: mysql-rollback
+  - id: mysql-rollback-restarts
     type: ox
-    prompt: MySQL에서 큰 UPDATE를 KILL한 뒤 되돌리기가 오래 걸리면, DB를 재시작해서 빨리 끝낼 수 있나요?
-    answer: false
-    explain: MySQL 문서는 프로세스를 죽여도 소용없고, 다시 켜질 때 되돌리기가 처음부터 다시 시작된다고 해요.
+    prompt: MySQL에서 큰 UPDATE를 KILL했더니 되돌리기가 오래 걸려 DB를 재시작했어요. 다시 켜지면 되돌리기가 처음부터 다시 시작되나요?
+    answer: true
+    explain: MySQL 문서는 프로세스를 죽여도 소용없고, 다시 켜질 때 되돌리기가 처음부터 다시 시작된다고 해요. 그래서 끝날 때까지 기다리는 편이 빨라요.
   - id: idle-in-tx-timeout-target
     type: choice
     prompt: PostgreSQL에서 idle_in_transaction_session_timeout을 30초로 두면 어떤 세션이 끊길까요?
@@ -29,8 +29,13 @@ questions:
       - 트랜잭션 없이 30초 넘게 쉬는 세션
     answer: 0
     explain: 트랜잭션을 연 채 쉬는 세션만 끊어서, 쥔 잠금을 풀어 줘요. 오래 도는 SQL은 statement_timeout, 잠금 대기는 lock_timeout이 맡아요.
-  - id: true-means-sent
-    type: ox
-    prompt: pg_terminate_backend가 true를 돌려주면, 그 세션이 이미 끝났다고 확신해도 되나요?
-    answer: false
-    explain: 시간 인자를 주지 않으면 true는 신호를 보냈다는 뜻일 뿐이에요. pg_stat_activity에서 다시 확인해요.
+  - id: true-means-signal-sent
+    type: choice
+    prompt: 오래 도는 UPDATE를 멈추려고 pg_cancel_backend(pid)를 불렀더니 true가 나왔어요. 이 true가 뜻하는 것은?
+    choices:
+      - 멈추라는 신호를 보냈어요
+      - 쿼리가 이미 멈췄어요
+      - 바꾼 행을 모두 되돌렸어요
+      - 연결까지 끊었어요
+    answer: 0
+    explain: true는 신호를 보냈다는 뜻일 뿐이에요. 실제로 멈췄는지는 pg_stat_activity에서 그 세션을 다시 봐요.

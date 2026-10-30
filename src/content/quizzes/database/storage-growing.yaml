@@ -1,9 +1,9 @@
 questions:
-  - id: vacuum-no-shrink
+  - id: vacuum-half-size
     type: ox
-    prompt: PostgreSQL에서 행을 많이 지우고 보통 VACUUM을 돌리면, 표 파일이 곧바로 그만큼 작아지나요?
+    prompt: PostgreSQL에서 표 전체에 고르게 흩어진 행 절반(id가 짝수인 행)을 DELETE하고 보통 VACUUM을 돌리면, 표 파일도 절반쯤으로 줄어드나요?
     answer: false
-    explain: 보통 VACUUM은 죽은 행 자리를 다시 쓸 수 있게 표시할 뿐이에요. 표 끝의 페이지가 통째로 비었을 때만 줄어요.
+    explain: 보통 VACUUM은 죽은 행 자리를 다시 쓸 수 있게 표시할 뿐이에요. 표 끝의 페이지가 통째로 비었을 때만 줄고, 공간을 돌려받으려면 VACUUM FULL이 필요해요.
   - id: vacuum-full-cost
     type: choice
     prompt: 운영 중인 큰 표에 VACUUM FULL을 돌릴 때 조심할 점은?
@@ -19,11 +19,11 @@ questions:
     prompt: 자동 VACUUM은 도는데 죽은 행이 계속 쌓여요. 무엇을 의심할까요?
     choices:
       - 몇 시간째 열려 있는 트랜잭션
-      - 표에 인덱스가 너무 적음
-      - 버퍼 캐시 적중률이 높음
-      - 동시 연결 수가 적음
+      - VACUUM FULL을 돌리지 않음
+      - 낡은 옵티마이저 통계
+      - 높은 버퍼 캐시 적중률
     answer: 0
-    explain: 누군가 아직 볼 수 있는 옛 행은 VACUUM이 지우지 못해요. 오래 열린 트랜잭션과 멈춘 슬롯이 정리를 붙잡아요.
+    explain: 누군가 아직 볼 수 있는 옛 행은 VACUUM이 지우지 못해요. VACUUM FULL도 마찬가지라, 오래 열린 트랜잭션이나 멈춘 슬롯부터 찾아요.
   - id: slot-wal-default
     type: ox
     prompt: PostgreSQL 기본 설정에는, 멈춘 복제 슬롯이 붙잡아 둘 수 있는 WAL 크기에 한도가 있나요?

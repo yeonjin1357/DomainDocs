@@ -1,9 +1,9 @@
 questions:
-  - id: async-loses-recent
+  - id: async-commit-before-replica
     type: ox
-    prompt: 비동기 복제를 쓰면, 주 서버가 갑자기 죽어도 커밋된 데이터는 하나도 잃지 않나요?
-    answer: false
-    explain: 비동기는 복제 서버가 받기 전에 커밋을 끝내요. 로그를 보내기 전에 주 서버가 죽으면 그 최근 커밋은 사라질 수 있어요.
+    prompt: 비동기 복제에서 주 서버는, 복제 서버가 로그를 받았는지 확인하기 전에 앱에 커밋 완료를 알리나요?
+    answer: true
+    explain: 비동기는 복제 서버를 기다리지 않고 커밋을 끝내요. 로그를 보내기 전에 주 서버가 죽으면 그 최근 커밋은 사라질 수 있어요.
   - id: sync-cost
     type: choice
     prompt: 동기 복제의 대가로 맞는 것은?
@@ -24,11 +24,11 @@ questions:
       - 복제 서버의 버퍼 캐시가 꺼져 있어서
     answer: 0
     explain: 비동기 복제 서버에는 변경이 조금 늦게 도착해요. 방금 쓴 데이터는 주 서버에서 읽어요.
-  - id: replica-not-backup
+  - id: delete-replicates
     type: ox
-    prompt: 복제 서버가 있으면 실수로 지운 데이터도 복제 서버에서 되찾을 수 있나요?
-    answer: false
-    explain: 복제는 주 서버의 변경을 그대로 따라 해요. 실수로 지운 것도 복제 서버에서 똑같이 지워져요.
+    prompt: 주 서버에서 실수로 주문 행을 DELETE하고 커밋했어요. 잠시 뒤 복제 서버에서도 그 행이 지워져 있나요?
+    answer: true
+    explain: 복제는 주 서버의 변경을 그대로 따라 해서, 실수로 지운 것도 똑같이 지워요. 그래서 복제 서버는 백업을 대신하지 못해요.
   - id: failover-name
     type: input
     prompt: 주 서버가 죽었을 때 복제 서버가 주 서버 역할을 넘겨받는 일을 무엇이라고 하나요?

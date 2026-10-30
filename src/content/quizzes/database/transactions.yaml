@@ -24,6 +24,11 @@ questions:
       - 실행 계획이 매번 새로 만들어져요
     answer: 0
     explain: 트랜잭션은 끝날 때까지 잡은 잠금을 쥐고 있어요. 기다리는 동안 같은 행을 바꾸려는 다른 세션이 줄을 서요.
+  - id: autocommit-partial
+    type: ox
+    prompt: PostgreSQL에 BEGIN 없이 출금 UPDATE와 입금 UPDATE를 차례로 보냈는데 입금이 실패했어요. 출금은 이미 커밋돼 남아 있나요?
+    answer: true
+    explain: BEGIN이 없으면 문장마다 따로 커밋해요. 함께 성공해야 하는 SQL은 트랜잭션을 직접 열어 묶어요.
   - id: autocommit-name
     type: input
     prompt: 트랜잭션을 직접 열지 않으면 SQL 한 문장마다 트랜잭션을 열고 커밋하는 동작을 무엇이라고 하나요?

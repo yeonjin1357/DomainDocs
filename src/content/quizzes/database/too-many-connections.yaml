@@ -19,11 +19,11 @@ questions:
       - 60개
     answer: 0
     explain: 풀 최대치에 서버 수를 곱해요. 30 × 4 = 120개라서, 한도가 100이면 이 앱만으로도 넘쳐요.
-  - id: admin-reserved
+  - id: superuser-still-connects
     type: ox
-    prompt: PostgreSQL에서 연결 수가 한도에 닿으면, 관리자 계정도 접속하지 못하나요?
-    answer: false
-    explain: 마지막 몇 자리(superuser_reserved_connections, 기본 3개)는 관리자 몫으로 남겨 둬요. 그래서 관리자는 들어와 상황을 볼 수 있어요.
+    prompt: PostgreSQL에서 연결 수가 한도에 붙어 앱의 새 연결이 거절되는 중이에요. 이때도 슈퍼유저 계정은 새로 접속할 수 있나요?
+    answer: true
+    explain: 마지막 몇 자리(superuser_reserved_connections, 기본 3개)는 슈퍼유저 몫으로 남겨 둬요. 그래서 관리자는 들어와 누가 연결을 쥐었는지 볼 수 있어요.
   - id: hikari-min-idle
     type: ox
     prompt: HikariCP에서 minimumIdle을 따로 정하지 않으면, 일이 없을 때는 연결을 조금만 열어 두나요?

@@ -1,7 +1,7 @@
 questions:
-  - id: tablespace-files
+  - id: tablespace-one-file
     type: ox
-    prompt: Oracle의 테이블스페이스 하나는 꼭 데이터 파일 하나로만 이뤄지나요?
+    prompt: Oracle에서 테이블스페이스와 데이터 파일은 하나씩 짝지어져, 테이블스페이스 수와 데이터 파일 수가 같나요?
     answer: false
     explain: 테이블스페이스는 논리적인 공간이고, 데이터 파일이나 임시 파일 하나 이상에 저장돼요.
   - id: snapshot-too-old

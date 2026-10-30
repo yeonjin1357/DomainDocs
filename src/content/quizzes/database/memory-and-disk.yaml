@@ -14,16 +14,16 @@ questions:
       - SQL Server
     answer: 0
     explain: MySQL InnoDB의 기본 페이지는 16KB이고, 나머지는 기본 8KB예요.
-  - id: dirty-block-checkpoint
+  - id: periodic-write-spike
     type: choice
-    prompt: 메모리에서만 바뀌고 아직 디스크에 쓰지 않은 블록을 한꺼번에 디스크에 쓰는 때를 무엇이라고 하나요?
+    prompt: DB 화면에서 디스크 쓰기가 몇 분마다 봉우리처럼 솟아요. 요청 수와 디스크 읽기는 고르게 유지돼요. 가장 그럴듯한 까닭은?
     choices:
-      - 체크포인트
-      - 커밋
-      - 로그 선행 기록
-      - 장애 조치
+      - 체크포인트가 더티 블록을 몰아 써서
+      - 캐시에서 못 찾은 블록이 늘어서
+      - 커밋마다 데이터 파일에 블록을 써서
+      - 인덱스가 쓰이지 않아 전체 스캔해서
     answer: 0
-    explain: 체크포인트에서 더티 블록을 디스크에 써요. 그 사이 장애가 나면 먼저 적어 둔 로그로 메워요.
+    explain: 바꾼 블록은 메모리에 모였다가 체크포인트 때 디스크에 써요. 커밋은 로그만 적고, 캐시 실패와 전체 스캔은 읽기를 늘려요.
   - id: restart-cold-cache
     type: ox
     prompt: DB를 다시 시작한 직후 한동안은, 평소보다 디스크 읽기가 늘어나나요?

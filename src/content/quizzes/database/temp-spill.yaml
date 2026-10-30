@@ -9,11 +9,16 @@ questions:
       - 정렬이 실패해 다시 시도했어요
     answer: 0
     explain: 메모리에서 끝났다면 quicksort Memory로 나와요. external merge Disk는 임시 파일로 넘쳤다는 표시예요.
-  - id: spill-not-always-slow
-    type: ox
-    prompt: 정렬이 디스크로 넘쳤다면, work_mem을 올려 메모리에서 정렬하게 하면 언제나 더 빨라지나요?
-    answer: false
-    explain: 임시 파일이 운영체제 캐시에 머물기도 해서 꼭 느리지 않아요. 재현에서는 메모리 정렬이 오히려 느렸어요. 넘친 SQL이 정말 느린지부터 봐요.
+  - id: check-before-fixing-spill
+    type: choice
+    prompt: 월말 리포트 SQL의 계획에 external merge Disk가 보여요. 이 넘침을 고칠 대상으로 삼기 전에 먼저 확인할 것은?
+    choices:
+      - SQL이 정말 느리고 디스크가 바쁜지
+      - 해시 조인으로 바꾸면 넘치지 않는지
+      - 임시 파일 지우기가 밀려 있는지
+      - 서버의 swap이 켜져 있는지
+    answer: 0
+    explain: 넘친 것과 느린 것은 따로 봐요. 임시 파일이 운영체제 캐시에 머물면 시간이 크게 늘지 않기도 해서, 실제로 느리거나 디스크가 바쁠 때 고쳐요.
   - id: work-mem-multiply
     type: choice
     prompt: work_mem을 64MB로 올렸어요. 정렬이 2개 든 SQL을 연결 100개가 동시에 돌리면 최대 얼마까지 쓸 수 있을까요?

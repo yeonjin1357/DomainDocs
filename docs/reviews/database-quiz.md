@@ -30,3 +30,21 @@
 | --- | --- | --- |
 | stop-long-query · idle-in-tx-timeout-target | idle_in_transaction_session_timeout은 트랜잭션을 연 채 쉬는 세션만 끊고, 트랜잭션 밖에서 쉬는 세션은 idle_session_timeout이 맡음 | https://www.postgresql.org/docs/18/runtime-config-client.html |
 | too-many-connections · pgbouncer-transaction-mode | transaction 모드는 트랜잭션이 끝나면 서버 연결을 풀로 돌려받음, 기본 pool_mode는 session | https://www.pgbouncer.org/config.html |
+
+## 2026-10-30 문제 다시 보기
+
+29편 144문제를 글과 나란히 읽고 다시 봤어요. 흘리는 말(반드시, 언제나, 늘, 꼭, 확실한가요, 확신해도 되나요, 의심해 볼 만한가요)을 없애고, 엉뚱한 오답을 같은 글의 착각으로 바꾸고, 답이 둘일 수 있던 문제(DynamoDB 핫 파티션)에 조건을 더했어요. OX의 O는 37%에서 55%가 됐어요.
+
+| 문제 | 주장 | 근거 |
+| --- | --- | --- |
+| logs-and-recovery · sqlserver-log-backup-ok | SQL Server는 로그 백업을 해도 오래 열린 트랜잭션 뒤의 로그를 비우지 못함 | https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-log-architecture-and-management-guide (ACTIVE_TRANSACTION) |
+| memory-and-disk · periodic-write-spike | 더티 블록은 체크포인트 때 몰아 쓰고, 커밋은 로그만 씀 | 글 본문, https://www.postgresql.org/docs/18/wal-configuration.html |
+| active-sessions · clientread-top | ClientRead는 클라이언트에서 읽기를, ClientWrite는 클라이언트에 쓰기를 기다리는 대기 | PGlite(PostgreSQL 17.5)의 pg_wait_events: "Waiting to read data from the client", "Waiting to write data to the client" |
+| too-many-connections · superuser-still-connects | 연결 수가 max_connections − superuser_reserved_connections에 닿으면 슈퍼유저만 새로 접속 | https://www.postgresql.org/docs/18/runtime-config-connection.html |
+| nosql · hot-key | 강한 일관성의 두 배 소비와 4KB 올림은 소비량에 이미 들어 있음 | https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/provisioned-capacity-mode.html, HowItWorks.ReadConsistency.html (docs/reviews/database-nosql.md) |
+| plan-changed · correlated-columns | 옵티마이저는 조건끼리 독립이라 보고 곱해 함께 움직이는 열을 적게 예상함 | https://www.postgresql.org/docs/18/planner-stats.html#PLANNER-STATS-EXTENDED, PGlite 재현: 실제 1,000행을 91행으로 예상, CREATE STATISTICS (dependencies) 뒤 1,020행 |
+| storage-growing · vacuum-half-size | 고르게 흩어진 행을 지우면 VACUUM 뒤에도 파일 크기 그대로, 끝쪽 행을 지우면 줄어듦 | PGlite 재현: 10만 행 표에서 짝수 id 삭제 뒤 14,131,200 → 14,131,200바이트, 뒤쪽 절반 삭제 뒤 7,069,696바이트 |
+| partitioning · drop-frees-space | 칸을 DROP하면 파일째 지워져 VACUUM을 기다리지 않음 | https://www.postgresql.org/docs/18/ddl-partitioning.html (docs/reviews/database-partitioning.md: DROP·DETACH가 대량 DELETE보다 빠르고 VACUUM 부담이 없음) |
+| stop-long-query · true-means-signal-sent | pg_cancel_backend의 true는 신호를 보냈다는 뜻 | 글 본문과 docs/reviews/database-stop-long-query.md |
+
+- 고친 글: logs-and-recovery에서 '오래 열린 트랜잭션이 로그를 붙잡는다'를 SQL Server의 일로 고쳤어요. PostgreSQL WAL은 트랜잭션 때문에 남지 않아요(wal-configuration이 드는 조건은 체크포인트, wal_keep_size, 보관, 복제 슬롯, WAL 요약뿐).

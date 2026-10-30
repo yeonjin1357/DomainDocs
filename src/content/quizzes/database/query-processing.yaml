@@ -24,6 +24,11 @@ questions:
       - 옵티마이저를 건너뛰고 바로 실행해요
     answer: 0
     explain: Oracle은 SQL 글자로 캐시를 찾아서, 값만 달라도 다른 SQL로 봐요. 그래서 계획을 처음부터 다시 세워요.
+  - id: literal-sql-scattered
+    type: ox
+    prompt: SQL 글자 그대로 묶어 통계를 보여 주는 화면이 있어요. 앱이 주문 번호를 SQL 문자열에 이어 붙여 보내면, 같은 조회가 주문 번호마다 따로 한 줄씩 생기나요?
+    answer: true
+    explain: 값이 다르면 SQL 글자도 달라서 서로 다른 SQL로 묶여요. 바인드 변수로 넘기면 한 줄로 모이고, Oracle에서는 계획도 다시 써요.
   - id: bind-variable-name
     type: input
     prompt: 값이 바뀌는 자리는 비워 두고 값은 따로 넘겨서, 같은 SQL의 계획을 다시 쓰게 하는 방법은?
