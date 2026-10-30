@@ -1,9 +1,9 @@
 questions:
-  - id: g1-not-default
+  - id: metaspace-not-heap
     type: ox
-    prompt: CPU 1개, 메모리 1GiB인 파드에서 GC를 따로 정하지 않으면, JVM은 G1 GC를 쓰나요?
+    prompt: "OutOfMemoryError: Metaspace가 났어요. -Xmx를 늘리면 이 에러가 풀리나요?"
     answer: false
-    explain: JVM은 CPU 2개 이상, 메모리 1792MB 이상일 때만 G1을 골라요. 그보다 작으면 Serial GC가 돌아요.
+    explain: 메타스페이스는 클래스 정보를 담는 힙 밖 메모리라, 힙 크기를 늘려도 그대로예요. 에러 뒤의 이름이 어느 메모리가 모자랐는지 알려 줘요.
   - id: container-limit-equals-xmx
     type: choice
     prompt: 컨테이너 메모리 한도를 -Xmx와 똑같이 잡았어요. 생길 수 있는 일은?

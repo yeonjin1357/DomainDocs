@@ -31,8 +31,8 @@ questions:
     explain: 기본 최대는 10개예요. 다 빌려 가면 다음 요청은 connectionTimeout(기본 30초)까지 기다리다 예외를 던져요.
   - id: scale-out-connections
     type: ox
-    prompt: 풀이 20개인 앱 서버를 10대로 늘려도, DB에 맺는 연결 수는 늘지 않나요?
-    answer: false
+    prompt: 풀이 20개인 앱 서버를 10대로 늘리면, DB에 맺는 연결은 최대 200개까지 늘어나나요?
+    answer: true
     explain: 서버마다 풀을 가지니 최대 20 × 10 = 200개까지 늘어요. DB의 연결 한도와 견줘 봐요.
   - id: api-inside-tx
     type: ox

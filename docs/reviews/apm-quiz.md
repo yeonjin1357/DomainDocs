@@ -24,3 +24,22 @@
 | timeouts-and-retries · retry-multiplies | 계층마다 4번 시도 → 4 × 4 × 4 = 64 | 글 본문과 docs/reviews/apm-timeouts-and-retries.md |
 | consumer-lag · lag-to-time, in-faster-than-out, stalled-consumer | 60,000 ÷ 400 = 150초, (500 − 400) × 60 = 6,000건/분, Burrow STALLED | 글 본문·Deeper와 docs/reviews/apm-consumer-lag.md |
 | cascading-failure · shed-more-load | SRE Book 예: 11,000건에서 무너진 뒤 9,000건으로는 회복하지 않음 | 글 본문과 docs/reviews/apm-cascading-failure.md |
+
+## 2026-10-30 문제 다시 쓰기
+
+- 문제: src/content/quizzes/apm/*.yaml (35개 파일, 171문제)
+- 바꾼 까닭: OX 정답의 O가 26%, 정답이 가장 긴 보기인 객관식이 59%였어요. "언제나", "볼 수 있나요", "괜찮나요" 같은 말이 답을 흘렸고, 부정으로 묻는 문제("~아닌 것은?")와 글끼리 겹치는 문제(GC 직후 바닥, Serial GC, 힙 밖 메모리, 되돌리기)가 있었어요.
+- 채점 결함: pool-exhausted의 주관식은 설정 이름(leakDetectionThreshold)을 물으면서 용어 '커넥션 누수'를 이어 둬서, '커넥션 누수'도 정답으로 받았어요. 개념을 떠올리는 문제(connection-leak-name)로 바꿨어요.
+- 고친 뒤: OX 51문제 중 O 23(45%), 객관식 106문제 중 정답이 가장 긴 보기 22(21%), 정답이 가장 긴 오답의 1.2배를 넘는 문제 0개예요.
+- 새로 들어간 주장과 계산만 아래에서 확인했어요. 나머지는 글 본문과 각 글의 검토 기록에 기대요.
+
+| 문제(파일 · id) | 확인한 주장 | 근거 |
+| --- | --- | --- |
+| web-server-and-was · was-down-502 | WAS 프로세스가 죽어 연결이 거부되면 nginx는 시간 제한을 기다리지 않고 502를 줘요 | 연결 거부(RST)는 바로 실패하고, nginx는 시간 초과만 504, 연결 실패는 502로 바꿔요. docs/reviews/apm-gateway-errors.md의 ngx_http_upstream_next 소스 확인 |
+| transactions-and-response-time · health-check-dilution | 기능 100건 평균 800ms와 헬스체크 900건 평균 2ms를 섞은 평균은 81.8ms예요 | node로 계산 |
+| slow-response · service-wide-p95 | 3%만 1.5초이고 97%가 300ms 안쪽이면 전체 p95는 300ms 안쪽이에요 | node로 1,000건을 만들어 p95 289.8ms 확인 |
+| trace-waterfall · overlapping-spans, longest-bar-trap | 300ms 두 개가 겹치면 합 600ms가 부모 500ms보다 커요. 50ms × 8 = 400ms라 한 번으로 묶으면 350ms가 줄어 300ms 막대보다 커요 | 계산 |
+| jvm-memory · metaspace-not-heap | Metaspace는 힙 밖이라 -Xmx를 늘려도 풀리지 않아요 | 글 본문(메타스페이스는 힙 밖, 에러 뒤 이름으로 칸을 가름)과 docs/reviews/apm-jvm-memory.md |
+| memory-growing · floor-plateau | GC 직후 바닥이 오르다 멈추면 정해진 크기까지 채우는 캐시일 수 있어요 | 글 본문 3단계 |
+| slow-after-deploy · compare-past-week | 옛 버전이 없으면 배포 전 같은 요일·시간대와 견줘요 | 글 본문 2단계 |
+| thread-pools · tomcat-order | Tomcat 요청 스레드 풀은 대기열보다 스레드부터 maxThreads까지 늘려요 | 글 본문과 docs/reviews/apm-thread-pools.md |

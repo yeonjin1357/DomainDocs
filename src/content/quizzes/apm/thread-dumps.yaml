@@ -36,6 +36,6 @@ questions:
       - WAITING이나 TIMED_WAITING
       - RUNNABLE이나 BLOCKED
       - BLOCKED나 TERMINATED
-      - NEW나 RUNNABLE
+      - RUNNABLE이나 TERMINATED
     answer: 0
     explain: 쉬는 스레드도 WAITING이라서, WAITING이 많다는 것만으로는 문제가 아니에요. 요청을 처리하던 스레드인지 먼저 봐요.

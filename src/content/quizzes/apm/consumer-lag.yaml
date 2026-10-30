@@ -13,29 +13,29 @@ questions:
     type: choice
     prompt: 메시지는 초당 500건 들어오고, 컨슈머는 초당 400건을 처리해요. lag은 어떻게 될까요?
     choices:
-      - 1분에 6,000건씩 계속 늘어요
-      - 그대로 유지돼요
-      - 점점 줄어요
-      - 곧 0이 돼요
+      - 1분에 6,000건씩 늘어요
+      - 1분에 6,000건씩 줄어요
+      - 지금 크기에서 유지돼요
+      - 1분에 100건씩 늘어요
     answer: 0
     explain: 초당 100건씩 더 쌓여서 1분이면 6,000건이에요. 컨슈머를 늘리거나 한 건의 처리 시간을 줄여야 해요.
   - id: nonzero-lag-ok
     type: ox
-    prompt: 바쁜 토픽에서 lag이 0이 아니면, 그 자체로 장애인가요?
+    prompt: LinkedIn의 Burrow는 lag이 정해 둔 고정 임계값을 넘으면 경고하나요?
     answer: false
-    explain: 바쁜 토픽은 잘 돌 때도 lag이 0이 아닐 때가 많아요. 크기보다 줄어드는지, offset이 앞으로 가는지를 봐요.
+    explain: 바쁜 토픽은 잘 돌 때도 lag이 0이 아닐 때가 많아서, Burrow는 고정 임계값을 두지 않아요. lag이 줄어드는지, offset이 앞으로 가는지로 판단해요.
   - id: stalled-consumer
     type: choice
     prompt: 컨슈머가 offset을 계속 기록하는데 값이 그대로이고, lag도 남아 있어요. 의심할 것은?
     choices:
-      - 같은 메시지를 계속 실패하며 다시 처리하고 있어요
+      - 같은 메시지를 계속 실패하고 있어요
       - 아무 문제 없이 잘 돌고 있어요
-      - 생산자가 메시지 보내기를 멈췄어요
-      - 브로커의 디스크가 꽉 찼어요
+      - 생산자가 보내기를 멈췄어요
+      - 브로커 디스크가 꽉 찼어요
     answer: 0
     explain: offset이 움직이지 않으면 앞으로 나아가지 못하는 거예요. Burrow는 이 상태를 STALLED라고 불러요.
   - id: consumer-metric-vanishes
     type: ox
-    prompt: 컨슈머가 내는 records-lag-max만 보고 있어요. 컨슈머가 죽으면 이 값이 크게 올라가서 알 수 있나요?
-    answer: false
-    explain: 컨슈머가 내는 지표라 컨슈머가 없으면 값 자체가 사라져요. 브로커 쪽 offset으로 잰 lag도 함께 둬요.
+    prompt: 컨슈머가 내는 records-lag-max는, 컨슈머가 죽으면 0이 되는 게 아니라 값 자체가 사라지나요?
+    answer: true
+    explain: 컨슈머가 내는 지표라 컨슈머가 없으면 값도 없어요. 그래서 브로커 쪽 offset으로 잰 lag도 함께 둬요.

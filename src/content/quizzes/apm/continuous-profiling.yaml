@@ -8,10 +8,10 @@ questions:
     type: choice
     prompt: 요청이 느린데 CPU 프로파일에는 눈에 띄는 함수가 없어요. 무엇을 의심할까요?
     choices:
-      - DB 응답이나 잠금을 기다리느라 CPU를 쓰지 않는 시간
-      - 프로파일러가 고장 났어요
-      - CPU가 너무 빨라서요
-      - 불꽃 그래프를 거꾸로 봤어요
+      - DB나 잠금을 기다린 시간
+      - 프로파일러가 고장 난 것
+      - 불꽃 그래프를 거꾸로 본 것
+      - 짧은 함수가 표본에서 빠진 것
     answer: 0
     explain: 기다리는 동안은 CPU를 쓰지 않아 CPU 프로파일에 나오지 않아요. Off-CPU나 벽시계 시간 프로파일을 봐요.
   - id: heap-vs-alloc
@@ -26,9 +26,9 @@ questions:
     explain: 많이 할당해도 곧 풀리면 새는 게 아니에요. 계속 남아 쌓이는 쪽이 Heap 프로파일에 보여요.
   - id: sampling-overhead
     type: ox
-    prompt: 표본 방식의 프로파일러는 모든 함수 호출의 시작과 끝을 재서, 운영 서버에서는 쓰기 어렵나요?
-    answer: false
-    explain: 정해진 간격마다 호출 줄만 적어서 부담이 작아요. 그래서 운영에서 늘 켜 두는 지속 프로파일링이 가능해요.
+    prompt: 1초에 100번 표본을 뜨는 Go의 CPU 프로파일러로 10초를 재면, 바쁜 코어 하나에서 표본이 1,000개쯤 모이나요?
+    answer: true
+    explain: 모든 호출을 재지 않고 정해진 간격마다 호출 줄만 적어서 부담이 작아요. 그래서 운영에서 늘 켜 둘 수 있고, 대신 짧게 재면 몫이 흔들려요.
   - id: profiling-signal
     type: input
     prompt: 로그, 메트릭, 트레이스에 이어 OpenTelemetry가 네 번째 신호로 다루기 시작한, 코드 수준의 자원 사용 기록은?

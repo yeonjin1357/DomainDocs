@@ -21,9 +21,9 @@ questions:
     explain: T 이하는 만족, T 초과 4T 이하는 허용, 4T를 넘으면 불만이에요. 4T는 2초예요.
   - id: compare-needs-same-t
     type: ox
-    prompt: T가 서로 다른 두 서비스의 Apdex 점수를 그대로 견줄 수 있나요?
-    answer: false
-    explain: 같은 요청도 T가 바뀌면 점수가 달라져요. 그래서 점수는 0.85 [0.5]처럼 T와 함께 읽어요.
+    prompt: 같은 요청 1,000건인데 T만 0.5초에서 1초로 바꾸면, Apdex 점수가 달라지나요?
+    answer: true
+    explain: T가 바뀌면 만족·허용·불만의 경계가 함께 움직여요. 그래서 점수는 0.85 [0.5]처럼 T와 함께 읽고, T가 다른 서비스끼리는 견주지 않아요.
   - id: slower-same-score
     type: ox
     prompt: 이미 4T를 넘은 요청이 3초에서 30초로 더 느려져도, Apdex 점수는 그대로인가요?

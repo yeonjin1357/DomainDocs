@@ -26,9 +26,9 @@ questions:
     explain: 많은 값을 떠날 때 보내서, 그 순간을 놓치면 기록이 없어요. 광고·추적 차단과 샘플링까지 더해 RUM 사용자 수는 서버 로그보다 보통 적어요.
   - id: promise-error
     type: ox
-    prompt: async 함수 안에서 잡지 않은 에러도 window의 error 이벤트로 잡히나요?
-    answer: false
-    explain: 처리하지 않은 Promise 거부는 unhandledrejection 이벤트로 와요. 두 이벤트를 함께 들어야 해요.
+    prompt: async 함수 안에서 잡지 않은 에러는, window의 unhandledrejection 이벤트로 오나요?
+    answer: true
+    explain: 처리하지 않은 Promise 거부라서 error 이벤트가 아니라 unhandledrejection으로 와요. 두 이벤트를 함께 들어야 해요.
   - id: source-map-name
     type: input
     prompt: 줄이고 합친 자바스크립트의 에러 위치를 원래 파일과 줄로 되돌리는 대응표는?

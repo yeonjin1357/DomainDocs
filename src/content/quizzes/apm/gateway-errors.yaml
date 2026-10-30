@@ -23,7 +23,7 @@ questions:
     type: choice
     prompt: 느린 GET 요청이 WAS 두 대의 로그에 모두 남았어요. nginx 기본 설정에서 왜 그럴까요?
     choices:
-      - nginx가 다음 WAS로 다시 보내서
+      - 다음 WAS로 다시 보내서
       - 사용자가 버튼을 두 번 눌러서
       - 로드 밸런서가 요청을 복제해서
       - WAS끼리 요청을 서로 넘겨서

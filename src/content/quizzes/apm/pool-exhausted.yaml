@@ -8,30 +8,30 @@ questions:
     type: choice
     prompt: 예외 끝에 (total=10, active=10, idle=0, waiting=25)가 붙어 있어요. 무엇을 알 수 있나요?
     choices:
-      - 커넥션 10개를 모두 빌려 갔고, 25개 스레드가 더 기다려요
-      - 커넥션 25개가 쉬고 있어요
-      - DB 연결 한도가 10이에요
-      - 커넥션 10개가 끊겼어요
+      - 10개 모두 빌려 갔고 25개가 기다려요
+      - 10개가 쉬고 25개가 사용 중이에요
+      - DB 연결 한도가 10이라 막혔어요
+      - 커넥션 10개가 끊겨 25개를 새로 맺어요
     answer: 0
-    explain: active가 최대 크기와 같고 idle이 0이면 풀이 바닥난 거예요. waiting은 아직 기다리는 다른 스레드 수예요.
+    explain: active가 최대 크기와 같고 idle이 0이면 풀이 바닥난 거예요. waiting은 이 요청 말고 더 기다리는 스레드 수예요.
   - id: hold-time-external
     type: choice
     prompt: DB 화면은 한가한데 커넥션을 쥐는 시간만 길어요. 가장 먼저 의심할 코드는?
     choices:
-      - 트랜잭션 안에서 외부 API를 부르는 코드
-      - 인덱스를 쓰는 SELECT
-      - 커넥션 풀 크기 설정
-      - 로그를 남기는 코드
+      - 트랜잭션 안의 외부 API 호출
+      - 인덱스를 쓰는 빠른 SELECT
+      - 커넥션 풀의 최대 크기 설정
+      - 요청마다 남기는 로그 코드
     answer: 0
     explain: 트랜잭션을 연 채로 바깥 응답을 기다리면, 그동안 커넥션을 쥐고 있어요. DB는 한가한데 풀은 비어요.
   - id: leak-at-night
     type: ox
-    prompt: 요청이 거의 없는 새벽에도 사용 중 커넥션이 최대값에 붙어 있다면 커넥션 누수를 의심할 만한가요?
-    answer: true
-    explain: 일이 없는데 커넥션이 돌아오지 않는 거예요. leakDetectionThreshold를 켜면 빌린 코드 줄이 스택 트레이스로 남아요.
-  - id: leak-setting
+    prompt: 요청이 거의 없는 새벽에도 사용 중 커넥션이 최대값에 붙어 있어요. 풀 크기를 두 배로 늘리면 이 문제가 풀리나요?
+    answer: false
+    explain: 일이 없는데 커넥션이 돌아오지 않는 누수예요. 늘린 커넥션도 차례로 새서 다시 차요. leakDetectionThreshold를 켜서 빌린 코드 줄을 찾아요.
+  - id: connection-leak-name
     type: input
-    prompt: 커넥션이 정한 시간보다 오래 풀 밖에 있으면 경고를 남기는 HikariCP 설정 이름은?
-    answer: [leakDetectionThreshold]
+    prompt: 빌린 커넥션을 닫지 않아 풀로 돌아오지 않는 일을 무엇이라고 할까요?
+    answer: [커넥션 누수, connection leak, 연결 누수]
     term: apm/connection-leak
-    explain: 기본값 0은 꺼짐이고, 켤 때 가장 작은 값은 2초예요. 정상적으로 오래 쥐는 작업보다 길게 잡아요.
+    explain: 예외가 났을 때 닫는 코드를 건너뛰는 경우가 흔해요. HikariCP는 leakDetectionThreshold를 켜면 오래 풀 밖에 있는 커넥션을 경고해요.

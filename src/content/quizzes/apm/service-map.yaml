@@ -16,7 +16,7 @@ questions:
       - 부른 쪽 span의 속성으로 가상 노드
       - 어떤 방법으로도 맵에 못 나와요
       - 늘 user라는 노드로 나와요
-      - 맵 도구가 직접 접속해 알아내요
+      - 맵 도구가 직접 접속해 정보를 알아내요
     answer: 0
     explain: 받은 쪽 span이 없으니 부른 쪽의 peer.service, db.system 같은 속성으로 그려요. 그런 속성조차 없으면 맵에 나오지 않아요.
   - id: batch-missing

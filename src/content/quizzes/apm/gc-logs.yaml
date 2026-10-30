@@ -20,12 +20,12 @@ questions:
     type: choice
     prompt: G1 로그에 Evacuation Failure가 이어진 뒤 흔히 따라오는 것은?
     choices:
-      - Pause Full (G1 Compaction Pause)
+      - Pause Full로 힙 전체 압축
       - Pause Cleanup만 반복돼요
       - GC가 더 이상 일어나지 않아요
       - 힙 크기가 저절로 두 배가 돼요
     answer: 0
-    explain: 옮길 자리가 없다는 뜻이라, G1은 결국 힙 전체를 압축하는 Full GC를 해요. 힙이 모자라다는 신호예요.
+    explain: 옮길 자리가 없다는 뜻이라, G1은 결국 힙 전체를 압축하는 Full GC(G1 Compaction Pause)를 해요. 힙이 모자라다는 신호예요.
   - id: serial-in-small-pod
     type: choice
     prompt: CPU 한도 1개, 메모리 한도 1GB인 파드에서 JDK 21이 기본으로 고르는 GC는?

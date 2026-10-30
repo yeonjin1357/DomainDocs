@@ -21,8 +21,8 @@ questions:
     explain: 샘플 비율의 역수를 곱해요. 1 ÷ 0.05 = 20이라 트레이스 하나를 20건으로 세요.
   - id: tail-skews-errors
     type: ox
-    prompt: 에러 트레이스는 모두 남기고 나머지만 10% 남기는 tail 샘플링에서, 남은 트레이스로 센 에러율은 실제와 같나요?
-    answer: false
+    prompt: 에러 트레이스는 모두 남기고 나머지만 10% 남기는 tail 샘플링에서, 남은 트레이스로 센 에러율은 실제보다 높게 나오나요?
+    answer: true
     explain: 에러 쪽을 더 남겼으니 에러율이 부풀어요. 이렇게 고른 트레이스는 비율을 곱해도 바로잡을 수 없어요.
   - id: metrics-before-sampling
     type: choice
