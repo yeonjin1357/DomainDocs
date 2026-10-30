@@ -26,8 +26,8 @@ questions:
     explain: 같은 요청도 T가 바뀌면 점수가 달라져요. 그래서 점수는 0.85 [0.5]처럼 T와 함께 읽어요.
   - id: slower-same-score
     type: ox
-    prompt: 이미 4T를 넘은 요청이 3초에서 30초로 더 느려지면, Apdex 점수도 더 떨어지나요?
-    answer: false
+    prompt: 이미 4T를 넘은 요청이 3초에서 30초로 더 느려져도, Apdex 점수는 그대로인가요?
+    answer: true
     explain: 4T를 넘으면 3초든 30초든 같은 불만 한 건이에요. 얼마나 느린지는 p99와 함께 봐요.
   - id: weighted-merge
     type: choice

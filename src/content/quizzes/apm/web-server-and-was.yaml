@@ -19,21 +19,21 @@ questions:
       - "404"
     answer: 0
     explain: 504는 뒤의 서버에서 제때 응답을 받지 못했다는 뜻이에요. WAS가 죽었거나 이상한 응답을 주면 502가 나요.
-  - id: apm-misses-front-wait
+  - id: was-down-502
     type: ox
-    prompt: APM의 응답시간에는 웹 서버 앞이나 WAS 대기열에서 기다린 시간까지 들어 있나요?
+    prompt: WAS 프로세스가 죽어 있으면, nginx는 60초를 다 기다린 뒤 504를 돌려주나요?
     answer: false
-    explain: APM 에이전트는 보통 WAS 안에서 요청이 들어오고 나가는 지점을 재요. 그 바깥에서 기다린 시간은 빠져요.
+    explain: 죽은 WAS에는 연결부터 안 돼서, 기다리지 않고 502(잘못된 응답을 받음)를 돌려줘요. 504는 WAS가 살아 있지만 제때 답하지 못할 때예요.
   - id: request-time-gap
     type: choice
     prompt: nginx 로그의 $request_time이 같은 요청의 APM 응답시간보다 훨씬 길어요. 무슨 뜻일까요?
     choices:
-      - WAS 바깥(대기열, 웹 서버, 네트워크)에서 기다렸어요
+      - WAS 바깥에서 기다렸어요
       - APM이 시간을 잘못 쟀어요
       - WAS 안의 앱 코드가 느려요
-      - DB 쿼리가 느려요
+      - WAS가 부른 DB가 느려요
     answer: 0
-    explain: 웹 서버는 요청을 받은 때부터 응답을 다 보낼 때까지 재요. 그 차이만큼 WAS 밖에서 시간을 쓴 거예요.
+    explain: APM은 WAS 안에서 재고, 웹 서버는 요청을 받은 때부터 응답을 다 보낼 때까지 재요. 그 차이만큼 대기열, 웹 서버, 네트워크에서 시간을 쓴 거예요.
   - id: reverse-proxy-name
     type: input
     prompt: 앞에서 요청을 받아 뒤의 서버로 넘겨 주는 역할을 무엇이라고 하나요?

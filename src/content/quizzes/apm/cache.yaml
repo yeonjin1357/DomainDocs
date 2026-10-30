@@ -11,24 +11,29 @@ questions:
     explain: DB로 가는 몫은 1에서 적중률을 뺀 값이라 5%에서 10%가 돼요. 적중률 몇 %p가 DB에는 몇 배로 돌아와요.
   - id: miss-slower
     type: ox
-    prompt: cache-aside 방식에서 캐시에 없는 요청(miss)은, 캐시를 아예 안 쓸 때보다 조금 더 걸릴 수 있나요?
-    answer: true
-    explain: 캐시를 먼저 묻고, DB에서 읽고, 캐시에 넣는 일까지 더해져서예요. 적중률이 낮으면 캐시가 오히려 짐이 돼요.
+    prompt: cache-aside 방식에서 캐시에 없는 요청(miss)은, 캐시를 아예 안 쓸 때보다 빨리 끝나나요?
+    answer: false
+    explain: 캐시를 먼저 묻고, DB에서 읽고, 캐시에 넣는 일까지 더해져서 조금 더 걸려요. 적중률이 낮으면 캐시가 오히려 짐이 돼요.
   - id: noeviction-default
     type: choice
     prompt: Redis가 maxmemory에 닿았는데 maxmemory-policy를 기본값으로 두었어요. 어떻게 될까요?
     choices:
-      - 아무것도 지우지 않고 새 값을 넣는 명령에 에러를 돌려줘요
-      - 가장 오래 쓰지 않은 키부터 지워요
-      - 무작위로 키를 지워요
-      - 만료가 가장 가까운 키부터 지워요
+      - 새 값을 넣는 명령이 에러를 받아요
+      - 가장 오래 안 쓴 키부터 지워요
+      - 무작위로 고른 키를 지워요
+      - 만료가 가장 가까운 키를 지워요
     answer: 0
-    explain: 기본값은 noeviction이에요. 캐시로 쓴다면 allkeys-lru 같은 축출 정책을 골라요.
+    explain: 기본값은 noeviction이라 아무것도 지우지 않아요. 캐시로 쓴다면 allkeys-lru 같은 축출 정책을 골라요.
   - id: same-ttl-stampede
-    type: ox
-    prompt: 상품 정보 수만 개를 같은 시각에 같은 TTL로 넣어 두면, 만료되는 순간 DB에 요청이 몰릴 수 있나요?
-    answer: true
-    explain: 한꺼번에 만료되면 그 순간의 요청이 모두 DB로 가요. TTL에 무작위로 몇 초를 더해 만료 시각을 흩어요.
+    type: choice
+    prompt: 상품 정보 수만 개를 같은 시각에 같은 TTL로 캐시에 넣어 둬요. 만료되는 순간 DB로 몰리는 걸 막으려면?
+    choices:
+      - TTL에 무작위로 몇 초를 더해요
+      - 모든 키의 TTL을 똑같이 늘려요
+      - 축출 정책을 LRU로 바꿔요
+      - 캐시 서버를 한 대 더 둬요
+    answer: 0
+    explain: 만료 시각을 흩어 둬야 한꺼번에 비지 않아요. TTL을 똑같이 늘리면 몰리는 때가 뒤로 밀릴 뿐이에요.
   - id: eviction-term
     type: input
     prompt: 캐시 메모리가 차서 덜 쓰는 값을 골라 지우는 일을 뭐라고 부를까요?

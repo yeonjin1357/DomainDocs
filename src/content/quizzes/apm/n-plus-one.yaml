@@ -3,37 +3,37 @@ questions:
     type: choice
     prompt: 주문 목록 API가 1.2초인데, 그 요청의 SQL은 모두 하나에 2ms 안쪽이에요. 가장 먼저 의심할 것은?
     choices:
-      - 같은 SQL을 요청마다 수백 번 부르는 N+1
-      - DB의 디스크가 느린 것
-      - 인덱스가 없는 것
-      - 커넥션 풀이 너무 큰 것
+      - 같은 SQL을 수백 번 부르는 것
+      - 인덱스가 빠진 큰 테이블
+      - DB 서버의 CPU 포화
+      - SQL 결과를 캐시하지 않은 것
     answer: 0
-    explain: SQL 하나는 빨라도 수백 번이면 합이 커요. 트레이스에서 같은 SQL 막대가 줄지어 있는지 봐요.
+    explain: SQL 하나는 빨라도 수백 번이면 합이 커요. 이런 N+1은 트레이스에서 같은 SQL 막대가 줄지어 있는지로 봐요.
   - id: top-sql-sign
     type: choice
     prompt: Top SQL에서 N+1을 의심할 만한 SQL은?
     choices:
-      - 호출 수가 요청 수보다 훨씬 많고, 한 번 시간은 짧은 SQL
-      - 호출 수는 적고, 한 번 시간이 아주 긴 SQL
+      - 호출 수는 많고 한 번은 짧은 SQL
+      - 호출 수는 적고 한 번이 아주 긴 SQL
       - 읽은 행 수가 가장 많은 SQL
       - 에러가 가장 많은 SQL
     answer: 0
-    explain: 호출 수를 요청 수로 나누면 요청 하나가 몇 번 부르는지 나와요. 100이면 요청마다 100번이에요.
+    explain: 호출 수를 같은 시간의 요청 수로 나누면 요청 하나가 몇 번 부르는지 나와요. 100이면 요청마다 100번이에요.
   - id: lazy-hidden
     type: ox
-    prompt: 코드에 SQL 문장이 보이지 않으면 N+1이 생길 수 없나요?
+    prompt: 목록을 도는 반복문 안에 SQL 문장이 하나도 없으면, 그 반복문은 SQL을 보내지 않나요?
     answer: false
-    explain: ORM의 지연 로딩은 연관 객체를 읽는 순간 SQL을 보내요. 목록을 도는 반복문 안에서 연관 객체를 읽는 곳이 범인이에요.
+    explain: ORM의 지연 로딩은 연관 객체를 읽는 순간 SQL을 보내요. 반복문 안에서 order.getCustomer() 같은 연관 객체를 읽는 곳이 범인이에요.
   - id: best-fix
     type: choice
-    prompt: Hibernate 문서가 N+1을 피하는 방법으로 거의 언제나 쓰라고 권하는 것은?
+    prompt: Hibernate 문서가 N+1을 피하는 기본 방법으로 권하는 것은?
     choices:
-      - 조인으로 함께 가져오기(join fetch)
-      - 배치 가져오기
-      - 지연 로딩 켜기
-      - 커넥션 풀 키우기
+      - 조인으로 함께 가져오기
+      - 배치로 묶어 가져오기
+      - 연관을 EAGER로 바꾸기
+      - 2차 캐시에 담아 두기
     answer: 0
-    explain: 배치 가져오기는 SQL 수를 줄여 줄 뿐 없애지는 못해요. 조인하면 결과가 너무 커지는 드문 경우에만 배치를 골라요.
+    explain: JPA라면 join fetch예요. 배치는 SQL 수를 줄일 뿐 없애지 못하고, EAGER로 바꿔도 JPQL 질의에서는 연관마다 SQL이 따로 나가요.
   - id: lazy-loading-name
     type: input
     prompt: 연관 객체를 처음 읽는 순간에야 DB에서 가져오는 ORM의 로딩 방식은?

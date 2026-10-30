@@ -1,9 +1,9 @@
 questions:
   - id: runnable-not-cpu
     type: ox
-    prompt: 스레드 덤프에 RUNNABLE 스레드가 많으면, CPU가 바쁘다는 뜻인가요?
-    answer: false
-    explain: 소켓에서 DB나 외부 API의 응답을 기다리는 스레드도 RUNNABLE로 보여요. 스택 맨 위를 함께 봐요.
+    prompt: DB의 응답을 소켓에서 읽으며 기다리는 스레드도, 스레드 덤프에는 RUNNABLE로 보이나요?
+    answer: true
+    explain: RUNNABLE은 JVM 안에서 실행 중이라는 뜻이라, 운영체제의 소켓 읽기를 기다리는 중이어도 RUNNABLE이에요. 그래서 RUNNABLE이 많다고 CPU가 바쁜 건 아니에요.
   - id: blocked-same-lock
     type: choice
     prompt: 5초 간격으로 덤프 세 장을 떴더니, 요청 스레드 30개가 세 번 모두 같은 잠금에서 BLOCKED예요. 무슨 뜻일까요?
@@ -18,10 +18,10 @@ questions:
     type: choice
     prompt: 스택 맨 위가 같은 소켓 읽기인 RUNNABLE 스레드가 잔뜩 몰려 있어요. 의심할 곳은?
     choices:
-      - 그 소켓의 상대인 DB나 외부 API가 느려요
+      - 소켓 상대인 DB나 외부 API
       - 앱 코드 안의 무거운 계산
       - synchronized 잠금 경쟁
-      - 스레드 풀이 너무 커요
+      - 너무 큰 스레드 풀 크기
     answer: 0
     explain: 소켓을 읽고 있다면 상대의 응답을 기다리는 중이에요. 그 상대가 느려진 거예요.
   - id: one-dump-not-enough
@@ -34,8 +34,8 @@ questions:
     prompt: 스레드 풀에서 새 일을 기다리며 쉬는 스레드는, 덤프에 보통 어떤 상태로 보일까요?
     choices:
       - WAITING이나 TIMED_WAITING
-      - RUNNABLE
-      - BLOCKED
-      - NEW
+      - RUNNABLE이나 BLOCKED
+      - BLOCKED나 TERMINATED
+      - NEW나 RUNNABLE
     answer: 0
     explain: 쉬는 스레드도 WAITING이라서, WAITING이 많다는 것만으로는 문제가 아니에요. 요청을 처리하던 스레드인지 먼저 봐요.

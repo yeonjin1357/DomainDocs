@@ -15,15 +15,20 @@ questions:
     choices:
       - 웹 서버
       - WAS
+      - 로드 밸런서
       - DB
-      - 외부 API
     answer: 0
-    explain: 웹 서버는 정적 파일을 바로 주고, 앱 코드가 필요한 요청만 WAS로 넘겨요.
+    explain: 웹 서버는 정적 파일을 바로 주고, 앱 코드가 필요한 요청만 WAS로 넘겨요. 로드 밸런서는 서버 여러 대 중 하나를 고를 뿐이에요.
   - id: waterfall-shows
-    type: ox
-    prompt: APM의 워터폴은 요청 하나 안에서 DB나 외부 API를 부른 구간을 시간 순서로 보여 주나요?
-    answer: true
-    explain: 워터폴을 보면 요청 하나가 어디에 시간을 썼는지 구간별로 알 수 있어요.
+    type: choice
+    prompt: 주문 API 요청 하나가 2초 걸렸어요. 그중 DB를 부른 구간이 얼마인지 보려면 APM의 어느 화면을 볼까요?
+    choices:
+      - 그 요청의 워터폴
+      - 서비스 맵
+      - 트랜잭션 목록
+      - 로드 밸런서 로그
+    answer: 0
+    explain: 워터폴은 요청 하나 안에서 DB나 외부 API를 부른 구간을 시간 순서로 보여 줘요. 서비스 맵은 서비스끼리 부르는 모습을 그려요.
   - id: transaction-name
     type: input
     prompt: APM에서 요청 하나를 처리한 단위를 무엇이라고 부르나요?
