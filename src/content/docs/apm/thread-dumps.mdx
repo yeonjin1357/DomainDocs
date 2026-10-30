@@ -13,7 +13,7 @@ sources:
     url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.State.html
   - title: Java SE 21 — The jcmd Command (Thread.print)
     url: https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -45,6 +45,16 @@ updated: 2026-10-21
 ```
 
 첫 줄은 스레드 이름이에요. 둘째 줄이 상태이고, 그 아래가 스택이에요. 스택은 위로 갈수록 지금 실행 중인 곳이라, 이 스레드는 `OrderService.reserve`의 88번째 줄에서 잠금을 기다리고 있어요.
+
+<Figure caption="위 덤프의 스택을 층으로 그렸어요. 아래 메서드가 위 메서드를 불렀고, 맨 위가 지금 멈춰 있는 곳이에요.">
+  <Layers
+    ariaLabel="스택 맨 위인 OrderService.reserve 88번째 줄에서 잠금을 기다리고, 그 아래 OrderController.create 41번째 줄이 reserve를 부른 곳인 계층도"
+    layers={[
+      { label: 'OrderService.reserve · 88번째 줄', note: '맨 위: 지금 여기서 잠금을 기다려요', tone: 'warn' },
+      { label: 'OrderController.create · 41번째 줄', note: '위 메서드를 부른 곳' },
+    ]}
+  />
+</Figure>
 
 실행 중인 JVM에서는 `jcmd <PID> Thread.print`로 덤프를 떠요.
 

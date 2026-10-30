@@ -23,7 +23,7 @@ sources:
     url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html
   - title: AWS — Manage detailed monitoring for your EC2 instances
     url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/manage-detailed-monitoring.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -47,6 +47,20 @@ updated: 2026-10-21
 AWS에서는 가상 머신을 <Term term="cloud/instance">인스턴스</Term>라고 불러요. EC2 인스턴스는 AWS 클라우드 안의 가상 서버예요. 물리 서버 한 대 위에서 여러 고객의 가상 서버가 함께 돌아요.
 
 인스턴스를 만들 때는 이미지를 골라요. AWS의 AMI는 운영체제와 기본 소프트웨어를 묶은 서버 틀이에요. 같은 이미지로 만들면 같은 상태의 서버가 떠요.
+
+<Figure caption="AMI로 내 인스턴스를 만들어요. 인스턴스는 물리 서버 한 대 위에서 다른 고객의 가상 서버와 함께 돌아요.">
+  <Flow
+    ariaLabel="AMI로 만든 내 인스턴스가 물리 서버 한 대 안에서 다른 고객의 가상 서버 두 대 옆에서 함께 도는 구조도"
+    nodes={[
+      { id: 'ami', label: 'AMI', col: 2, row: 0, note: '서버 틀' },
+      { id: 'o1', label: '다른 고객', col: 0, row: 1, note: '가상 서버' },
+      { id: 'o2', label: '다른 고객', col: 1, row: 1, note: '가상 서버' },
+      { id: 'mine', label: '내 인스턴스', col: 2, row: 1, tone: 'accent' },
+    ]}
+    edges={[{ from: 'ami', to: 'mine', tone: 'accent' }]}
+    groups={[{ label: '물리 서버 한 대', cols: [0, 2], rows: [1, 1] }]}
+  />
+</Figure>
 
 인스턴스의 CPU는 vCPU(가상 CPU)로 세요. 인스턴스 안에 들어가면 보통의 서버와 같아서, CPU·메모리를 읽는 법도 <Term slug="server/cpu-usage">CPU 사용률</Term>과 같아요.
 

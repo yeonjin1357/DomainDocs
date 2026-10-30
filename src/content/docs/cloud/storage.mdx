@@ -23,7 +23,7 @@ sources:
     url: https://docs.aws.amazon.com/AmazonS3/latest/userguide/DataDurability.html
   - title: Microsoft Learn — Introduction to Azure Storage
     url: https://learn.microsoft.com/en-us/azure/storage/common/storage-introduction
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -76,6 +76,29 @@ updated: 2026-10-21
 
 볼륨과 인스턴스는 같은 가용 영역에 있어야 해요. 다른 가용 영역의 인스턴스에 붙이려면 스냅숏을 떠서 그 가용 영역에 새 볼륨을 만들어요.
 
+<Figure caption="볼륨은 같은 가용 영역의 인스턴스에만 붙어요. AZ b의 인스턴스에 같은 데이터를 붙이려면, AZ a의 볼륨으로 스냅숏을 떠서 AZ b에 새 볼륨을 만들어요.">
+  <Flow
+    ariaLabel="가용 영역 a에서 볼륨이 같은 가용 영역의 인스턴스에 붙어 있고, 그 볼륨으로 뜬 스냅숏에서 가용 영역 b에 새 볼륨을 만들어 가용 영역 b의 인스턴스에 붙이는 구조도"
+    nodes={[
+      { id: 'i1', label: '인스턴스', col: 0, row: 0 },
+      { id: 'v1', label: '볼륨', col: 0, row: 1, tone: 'accent' },
+      { id: 'snap', label: '스냅숏', col: 1, row: 1 },
+      { id: 'v2', label: '새 볼륨', col: 2, row: 1, tone: 'accent' },
+      { id: 'i2', label: '인스턴스', col: 2, row: 0 },
+    ]}
+    edges={[
+      { from: 'v1', to: 'i1', label: '붙임', tone: 'accent' },
+      { from: 'v1', to: 'snap' },
+      { from: 'snap', to: 'v2' },
+      { from: 'v2', to: 'i2', label: '붙임', tone: 'accent' },
+    ]}
+    groups={[
+      { label: 'AZ a', cols: [0, 0], rows: [0, 1] },
+      { label: 'AZ b', cols: [2, 2], rows: [0, 1] },
+    ]}
+  />
+</Figure>
+
 블록 디스크의 성능은 IOPS(초당 읽기·쓰기 횟수)와 처리량(초당 옮기는 양)으로 정해요. 범용 SSD인 gp3는 기본으로 3,000 IOPS가 요금에 들어 있고, 더 원하면 추가 요금을 내고 올려요. IOPS를 읽는 법은 서버·OS의 <Term slug="server/disk-io">디스크 I/O</Term>와 같아요.
 
 ## 파일 저장소
@@ -93,6 +116,20 @@ updated: 2026-10-21
 - 키는 버킷 안에서 객체를 가리키는 하나뿐인 이름이에요.
 
 S3는 폴더 없이 평평한 구조예요. 콘솔에서 폴더처럼 보이는 건 `logs/2026/10/app.log`처럼 키의 앞부분이 같은 객체를 묶어 보여 주는 거예요.
+
+<Figure caption="한 버킷 안 객체 두 개의 키 예시예요. 칸을 나눠 그렸지만 키는 통째로 이름 하나예요. 콘솔은 앞부분이 같은 두 키를 한 폴더에 든 것처럼 묶어 보여 줘요.">
+  <Strip
+    ariaLabel="객체 두 개의 키 logs/2026/10/app.log와 logs/2026/10/db.log를 칸으로 나눠, 각 키가 통째로 이름 하나이고, 앞부분 logs/2026/10/이 같아 콘솔에서 폴더처럼 묶여 보이는 칸 띠"
+    rows={[
+      { label: '객체 1의 키', cells: ['logs/', '2026/', '10/', { label: 'app.log', tone: 'accent' }] },
+      { label: '객체 2의 키', cells: ['logs/', '2026/', '10/', { label: 'db.log', tone: 'accent' }] },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 3, label: '키 전체가 이름 하나' },
+      { row: 1, from: 0, to: 2, label: '앞부분이 같아 폴더처럼 보임', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 S3는 넣거나 지운 직후에 읽어도 바로 새 내용이 보여요. 이걸 강한 read-after-write 일관성이라고 해요.
 

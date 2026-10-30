@@ -19,7 +19,7 @@ sources:
     url: https://man7.org/linux/man-pages/man8/vmstat.8.html
   - title: Linux man-pages — proc_pid_oom_score_adj(5)
     url: https://man7.org/linux/man-pages/man5/proc_pid_oom_score_adj.5.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -67,6 +67,30 @@ updated: 2026-10-21
 실제 메모리에 올라와 있는 양은 <Term term="server/rss">RSS</Term>(VmRSS)예요. 프로세스 목록의 메모리 사용량은 보통 이 값이에요.
 
 RSS에는 여러 프로세스가 함께 쓰는 라이브러리 같은 공유 메모리도 프로세스마다 들어가요. 그래서 모든 프로세스의 RSS를 더하면 전체 메모리보다 클 수도 있어요.
+
+<Figure caption="칸 하나를 메모리 한 덩이로 친 예시예요. 실선 칸만 실제 메모리에 올라와 RSS에 들어가고, 점선 칸은 잡아 둔 주소일 뿐이에요. 공유 칸은 A와 B의 RSS에 모두 들어가서, RSS를 더하면 5칸이지만 실제 메모리는 4칸이에요.">
+  <Strip
+    ariaLabel="프로세스 A는 주소 공간 6칸 중 3칸, 프로세스 B는 4칸 중 2칸이 실제 메모리에 올라와 있고, 공유 라이브러리 1칸이 양쪽 RSS에 모두 들어가서 RSS 합 5칸이 실제 메모리 4칸보다 많은 칸 띠"
+    rows={[
+      {
+        label: '프로세스 A의 주소 공간',
+        cells: [{ label: 'A', tone: 'accent' }, { label: 'A', tone: 'accent' }, { label: '공유', tone: 'accent' }, { label: '주소', tone: 'sub' }, { label: '주소', tone: 'sub' }, { label: '주소', tone: 'sub' }],
+      },
+      {
+        label: '프로세스 B의 주소 공간',
+        cells: [{ label: 'B', tone: 'accent' }, { label: '공유', tone: 'accent' }, { label: '주소', tone: 'sub' }, { label: '주소', tone: 'sub' }],
+      },
+      { label: '실제 메모리', cells: ['A', 'A', 'B', '공유'] },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 2, label: 'RSS 3칸', tone: 'accent' },
+      { row: 0, from: 0, to: 5, label: 'VmSize 6칸' },
+      { row: 1, from: 0, to: 1, label: 'RSS 2칸', tone: 'accent' },
+      { row: 1, from: 0, to: 3, label: 'VmSize 4칸' },
+      { row: 2, from: 0, to: 3, label: '실제로 쓰는 4칸' },
+    ]}
+  />
+</Figure>
 
 ## 모자라면 스왑, 그다음 OOM
 

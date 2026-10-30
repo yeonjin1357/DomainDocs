@@ -15,7 +15,7 @@ sources:
     url: https://grafana.com/docs/loki/latest/query/bp-query/
   - title: Amazon CloudWatch Logs — Creating metrics from log events using filters
     url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <OnDashboard title="주문 API · 레벨별 로그 수 · 최근 6시간" caption="ERROR 줄이 오후 3시부터 늘었어요. 같은 시각 WARN도 함께 늘어서, 한 가지 원인이 두 레벨에 걸쳐 남는 중이에요.">
@@ -54,6 +54,24 @@ sum by (level) (
 
 위 질의는 JSON 로그에서 level 필드를 꺼내, 1분마다 레벨별 줄 수를 세요. 이렇게 만든 값은 보통의 <Term slug="foundations/time-series-and-labels">시계열</Term>처럼 그래프와 알림에 써요.
 
+<Figure caption="1분마다 들어온 줄을 레벨별로 모아 센 예시예요. 1분이 지날 때마다 레벨마다 숫자가 하나씩 생기고, 이 숫자를 이으면 레벨별 시계열이 돼요.">
+  <Strip
+    ariaLabel="첫 1분에는 INFO 3줄, WARN 2줄, ERROR 1줄, 다음 1분에는 INFO 2줄, WARN 1줄, ERROR 3줄이 들어와 레벨마다 줄 수 하나씩이 되는 칸 띠"
+    rows={[
+      { label: '첫 1분에 들어온 줄', cells: ['INFO', 'INFO', 'INFO', 'WARN', 'WARN', { label: 'ERROR', tone: 'warn' }] },
+      { label: '다음 1분에 들어온 줄', cells: ['INFO', 'INFO', 'WARN', { label: 'ERROR', tone: 'warn' }, { label: 'ERROR', tone: 'warn' }, { label: 'ERROR', tone: 'warn' }] },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 2, label: 'INFO 3' },
+      { row: 0, from: 3, to: 4, label: 'WARN 2' },
+      { row: 0, from: 5, to: 5, label: 'ERROR 1', tone: 'warn' },
+      { row: 1, from: 0, to: 1, label: 'INFO 2' },
+      { row: 1, from: 2, to: 2, label: 'WARN 1' },
+      { row: 1, from: 3, to: 5, label: 'ERROR 3', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 ## 줄 속 숫자 꺼내기
 
 줄에 `latency_ms` 같은 숫자 필드가 있으면, 줄 수 대신 그 값으로 계산해요. Loki는 `unwrap`으로 필드를 숫자로 바꿔 써요.
@@ -66,6 +84,19 @@ quantile_over_time(0.99,
 ```
 
 위 질의는 5분 동안 로그에 적힌 응답시간의 p99를 구해요. 다만 남은 로그로만 계산해요. 샘플링하거나 버린 로그가 있으면 그만큼 빠진 값이에요.
+
+<Figure caption="칸 하나가 로그 한 줄에 적힌 latency_ms이고, 숫자는 설명용 예시예요. unwrap은 이 숫자들로 p99를 계산해요. 흐린 칸처럼 버린 줄의 값은 계산에 들어가지 않아요.">
+  <Strip
+    ariaLabel="5분 동안 로그 여섯 줄에 적힌 응답시간 120, 95, 2,300, 110, 105, 130밀리초 가운데 2,300밀리초인 줄이 버려져 계산에서 빠지는 칸 띠"
+    rows={[
+      {
+        label: '5분 동안 로그에 적힌 latency_ms',
+        cells: [{ label: '120', tone: 'accent' }, { label: '95', tone: 'accent' }, { label: '2,300', tone: 'sub' }, { label: '110', tone: 'accent' }, { label: '105', tone: 'accent' }, { label: '130', tone: 'accent' }],
+      },
+    ]}
+    marks={[{ at: 2, label: '버린 줄', tone: 'warn' }]}
+  />
+</Figure>
 
 ## CloudWatch의 지표 필터
 

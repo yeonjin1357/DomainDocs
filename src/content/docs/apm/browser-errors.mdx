@@ -21,7 +21,7 @@ sources:
     url: https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
   - title: Sentry — Event grouping
     url: https://docs.sentry.io/concepts/data-management/event-grouping/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <OnDashboard title="웹 에러 · 최근 24시간" caption="에러 이벤트 수만 보면 커 보여요. 같은 에러끼리 묶고, 묶음마다 겪은 사용자 수로 보면 무엇부터 고칠지 보여요.">
@@ -111,11 +111,27 @@ MDN에 따르면 크기 감시 콜백이 크기를 다시 바꿔서, 한 프레�
 
 콜백이 크기를 계속 바꾸게 두자, Chromium에서 0.8초 동안 이 에러가 50번 넘게 쌓였어요. 페이지 보기 한 번이 에러 수를 크게 부풀릴 수 있어요.
 
+<Figure caption="크기 감시 콜백이 크기를 계속 바꾸게 둔 실험이에요. 페이지를 한 번 열었을 뿐인데, Chromium에서 0.8초 만에 같은 에러가 50번 넘게 쌓였어요.">
+  <StatTile label="페이지 보기" value="1" unit="번" />
+  <StatTile label="ResizeObserver 에러" value="50+" unit="번" tone="warn" note="0.8초 동안" />
+</Figure>
+
 문자열로 거부한 Promise도 위치를 알 수 없어요. `Promise.reject('plain string')`은 세 엔진 모두 reason이 문자열이었고 스택이 없었어요. Error 객체로 거부해야 위치가 남아요.
 
 ## 화면에서 읽는 법
 
 에러 수, 묶음 수, 겪은 사용자 수는 서로 다른 질문에 답해요. 에러 수는 사용자 한 명이 수백 번 낼 수 있어서 부풀기 쉬워요. 고칠 순서는 <Term term="apm/error-grouping">에러 묶음</Term>마다 겪은 사용자 수로 정해요.
+
+<Figure caption="에러 묶음 둘의 예시예요. 에러 수로 줄 세우면 A가 먼저지만, A는 3명이 되풀이해 낸 에러예요. 겪은 사용자 수로 보면 B를 먼저 고쳐요.">
+  <Compare
+    columns={['묶음 A', '묶음 B']}
+    rows={[
+      { label: '에러 수', values: ['5,000번', '400번'] },
+      { label: '겪은 사용자', values: ['3명', '350명'] },
+      { label: '고칠 순서', values: ['나중에', '먼저'] },
+    ]}
+  />
+</Figure>
 
 비율로 볼 때는 분모를 밝혀요. "페이지 보기 중 에러가 난 비율"과 "사용자 중 에러를 겪은 비율"은 같은 데이터로도 값이 달라요.
 

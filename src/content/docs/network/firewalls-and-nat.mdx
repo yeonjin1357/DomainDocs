@@ -25,7 +25,7 @@ sources:
     url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html
   - title: AWS — Troubleshoot NAT gateways
     url: https://docs.aws.amazon.com/vpc/latest/userguide/nat-gateway-troubleshooting.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -118,6 +118,26 @@ NAT 뒤의 서버들은 바깥에서 보면 모두 같은 주소예요. 그래�
 둘째, 오래 쉬는 연결은 표에서 지워요. 지워진 뒤 그 연결로 다시 보내면 장비가 그 연결을 몰라서 막거나 끊어요. 앱은 오래 쉬던 연결의 첫 요청에서 멈추거나 끊김을 받아요.
 
 얼마나 쉬면 지우는지는 장비마다 달라요. 리눅스 연결 추적은 기본으로 열린 TCP 연결을 5일 동안 둬요. AWS NAT 게이트웨이는 350초만 쉬어도 연결을 끊어요.
+
+<Figure caption="AWS NAT 게이트웨이를 지나는 연결이 오래 쉰 예시예요. 마지막 요청 뒤 350초가 지나면 NAT가 표에서 연결을 지워요. 앱은 이를 모르고 다음 요청을 보냈다가 끊김을 받아요.">
+  <Timeline
+    ariaLabel="50초에 마지막 요청을 보낸 연결이 350초 동안 쉬어 400초에 NAT 표에서 지워지고, 앱은 연결이 열린 줄 알고 420초에 요청을 보냈다가 끊기는 시간 띠"
+    end={500}
+    lanes={[
+      {
+        label: '앱',
+        segments: [
+          { start: 0, end: 50, tone: 'accent' },
+          { start: 50, end: 420, label: '쉬는 중' },
+          { start: 420, end: 500, label: '끊김', tone: 'warn' },
+        ],
+      },
+      { label: 'NAT 표', segments: [{ start: 0, end: 400, label: '연결이 적혀 있음', tone: 'accent' }, { start: 400, end: 500, label: '없음', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 50, label: '마지막 요청' }, { at: 400, label: '350초 지나 지움', tone: 'warn' }]}
+    ticks={[{ at: 0, label: '0초' }, { at: 100, label: '100' }, { at: 200, label: '200' }, { at: 300, label: '300' }, { at: 400, label: '400' }, { at: 500, label: '500초' }]}
+  />
+</Figure>
 
 ## 모니터링에서는
 

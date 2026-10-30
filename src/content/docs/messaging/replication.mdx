@@ -17,7 +17,7 @@ sources:
     url: https://kafka.apache.org/43/configuration/topic-configs/
   - title: Apache Kafka 4.3 — Monitoring (broker metrics)
     url: https://kafka.apache.org/43/operations/monitoring/
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -66,6 +66,28 @@ Kafka는 토픽의 파티션마다 복제본을 여러 브로커에 둬요. 복�
 리더는 자기를 잘 따라오는 복제본 목록을 관리해요. 이 목록을 <Term term="messaging/isr">ISR</Term>(in-sync replicas)이라고 불러요. 리더 자신도 ISR에 들어 있어요.
 
 팔로워가 정해진 시간 동안 가져가지 않거나 리더를 따라잡지 못하면, 리더는 그 팔로워를 ISR에서 빼요. 이 시간은 `replica.lag.time.max.ms`이고 기본 30초예요. 나중에 다시 따라잡으면 ISR로 돌아와요.
+
+<Figure caption="팔로워 2가 10초부터 리더를 따라오지 못한 예시예요. 기본 30초가 지난 40초에 ISR에서 빠지고, 다시 따라잡은 70초에 ISR로 돌아와요.">
+  <Timeline
+    ariaLabel="리더와 팔로워 1은 내내 ISR에 있고, 팔로워 2는 10초부터 뒤처져 30초 뒤인 40초에 ISR에서 빠졌다가 70초에 다시 따라잡아 돌아오는 시간 띠"
+    end={90}
+    lanes={[
+      { label: '리더', segments: [{ start: 0, end: 90, label: 'ISR', tone: 'accent' }] },
+      { label: '팔로워 1', segments: [{ start: 0, end: 90, label: 'ISR', tone: 'accent' }] },
+      {
+        label: '팔로워 2',
+        segments: [
+          { start: 0, end: 10, tone: 'accent' },
+          { start: 10, end: 40, label: '뒤처짐', tone: 'warn' },
+          { start: 40, end: 70, label: 'ISR 밖' },
+          { start: 70, end: 90, label: 'ISR', tone: 'accent' },
+        ],
+      },
+    ]}
+    marks={[{ at: 40, label: 'ISR에서 빠짐', tone: 'warn' }, { at: 70, label: '다시 들어옴', tone: 'accent' }]}
+    ticks={[{ at: 10, label: '10초' }, { at: 40, label: '40초' }, { at: 70, label: '70초' }]}
+  />
+</Figure>
 
 이벤트는 ISR의 모든 복제본이 받아야 커밋됐다고 봐요. 커밋된 이벤트는 그 파티션을 복제하는 브로커가 하나라도 살아 있으면 잃지 않아요.
 

@@ -21,7 +21,7 @@ sources:
     url: https://dev.mysql.com/doc/refman/8.4/en/binary-log.html
   - title: Oracle Database Reference 19c — Descriptions of Wait Events (log file sync)
     url: https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/descriptions-of-wait-events.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -99,6 +99,38 @@ DB를 다시 켜면 먼저 마지막 <Term term="database/checkpoint">체크포�
 - 복제 서버가 아직 받지 못한 로그예요. 복제가 밀리면 보낼 로그가 남아요.
 
 이 중 하나라도 걸리면 로그가 계속 커지고, 끝내 디스크를 채워요. SQL Server는 로그를 더 늘릴 수 없으면 9002 에러를 내요.
+
+<Figure caption="로그를 오래된 것부터 늘어놓은 예시예요. 체크포인트 앞이라도, 오래 열린 트랜잭션이 시작한 곳부터는 비우지 못해요. 백업이 안 된 로그, 복제 서버가 아직 못 받은 로그도 이렇게 남아요.">
+  <Strip
+    ariaLabel="로그 열 칸 중 앞 두 칸은 비울 수 있고, 셋째 칸에서 오래 열린 트랜잭션이 시작해서 일곱째 칸의 체크포인트 앞인 셋째부터 여섯째 칸도 비우지 못하며, 체크포인트 뒤 네 칸은 복구에 필요한 칸 띠"
+    rows={[
+      {
+        label: '로그(왼쪽이 오래된 것)',
+        cells: [
+          { label: '1', tone: 'sub' },
+          { label: '2', tone: 'sub' },
+          { label: '3', tone: 'warn' },
+          { label: '4', tone: 'warn' },
+          { label: '5', tone: 'warn' },
+          { label: '6', tone: 'warn' },
+          '7',
+          '8',
+          '9',
+          '10',
+        ],
+      },
+    ]}
+    marks={[
+      { at: 2, label: '트랜잭션 시작', tone: 'warn' },
+      { at: 6, label: '체크포인트' },
+    ]}
+    ranges={[
+      { from: 0, to: 1, label: '비워요' },
+      { from: 2, to: 5, label: '아직 못 비워요', tone: 'warn' },
+      { from: 6, to: 9, label: '복구에 필요해요', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 ## 모니터링에서는
 

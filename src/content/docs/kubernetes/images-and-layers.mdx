@@ -19,7 +19,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/architecture/garbage-collection/
   - title: Kubernetes — Kubelet Configuration (imageGCHighThresholdPercent)
     url: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -72,6 +72,17 @@ RUN rm /big.bin
 
 그래서 큰 파일은 만든 명령과 같은 RUN 안에서 지워야 이미지가 작아져요. Docker 문서도 뒤 레이어에서 지운 캐시가 이미지 크기에 그대로 남는다고 해요.
 
+<Figure caption="50MB 파일을 어느 RUN에서 지우느냐에 따라 이미지 크기가 달라요. 컨테이너 안에서는 둘 다 안 보이지만, 다음 RUN에서 지우면 52.4MB 레이어가 그대로 남아요.">
+  <Compare
+    columns={['다음 RUN에서 지움', '같은 RUN에서 지움']}
+    rows={[
+      { label: 'big.bin', values: ['dd 레이어에 52.4MB 남아요', '레이어에 남지 않아요'] },
+      { label: '컨테이너 안에서', values: ['안 보여요', '안 보여요'] },
+      { label: '이미지 크기', values: ['줄지 않아요', '작아져요'] },
+    ]}
+  />
+</Figure>
+
 ## 같은 레이어는 나눠 써요
 
 <Figure caption="alpine 3.20으로 만든 두 이미지가 첫 레이어를 같은 다이제스트로 가리켜요. 노드에는 한 번만 저장돼요.">
@@ -104,6 +115,16 @@ C /etc
 C /etc/motd
 A /new.txt
 ```
+
+<Figure caption="위 실험의 컨테이너예요. 고친 /etc/motd는 쓰기 레이어에 복사본으로 생기고, 컨테이너는 위층의 복사본을 봐요. 아래 이미지 레이어의 원본은 그대로예요.">
+  <Layers
+    ariaLabel="위층인 쓰기 레이어에 복사해서 고친 /etc/motd와 새로 만든 /new.txt가 있고, 아래 읽기 전용 이미지 레이어에는 /etc/motd 원본이 그대로 있는 계층도"
+    layers={[
+      { label: '컨테이너 쓰기 레이어', note: 'C /etc/motd 복사해서 고친 것 · A /new.txt 새로 만든 것', tone: 'accent' },
+      { label: '이미지 레이어(읽기 전용)', note: '/etc/motd 원본 그대로 · 같은 이미지의 컨테이너와 함께 써요' },
+    ]}
+  />
+</Figure>
 
 쓰기 레이어는 컨테이너를 지우면 함께 사라져요. 남겨야 할 데이터는 볼륨에 둬요. 볼륨은 <Term slug="kubernetes/config-and-storage">설정과 저장소</Term>에서 다뤄요.
 

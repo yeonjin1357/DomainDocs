@@ -11,7 +11,7 @@ related: [network/snmp, network/switches-and-routers, foundations/counters-and-r
 sources:
   - title: RFC 2863 — The Interfaces Group MIB
     url: https://www.rfc-editor.org/rfc/rfc2863.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -52,6 +52,30 @@ updated: 2026-10-21
 
 <Term term="network/link-utilization">사용률</Term>은 이 값을 인터페이스 속도로 나눠요. 500Mbps ÷ 1Gbps = 50%예요. 보통 받는 쪽과 보내는 쪽이 동시에 각자 속도만큼 쓸 수 있어서, 사용률도 방향마다 따로 계산해요.
 
+<Figure caption="받는 쪽은 본문 예시를 계산한 모습이에요. 보내는 쪽도 같은 식으로 따로 계산해서, 사용률이 방향마다 하나씩 나와요.">
+  <Flow
+    ariaLabel="받는 쪽은 60초 동안 늘어난 3,750,000,000바이트에 8을 곱하고 60초로 나눠 500Mbps, 이를 1Gbps로 나눠 사용률 50%를 구하고, 보내는 쪽도 같은 식으로 따로 bps와 사용률을 구하는 구조도"
+    nodes={[
+      { id: 'inB', label: '바이트 차이', col: 0, row: 0, note: '3,750,000,000' },
+      { id: 'inBps', label: 'bps', col: 0, row: 1, note: '500Mbps', tone: 'accent' },
+      { id: 'inU', label: '사용률', col: 0, row: 2, note: '50%', tone: 'accent' },
+      { id: 'outB', label: '바이트 차이', col: 2, row: 0 },
+      { id: 'outBps', label: 'bps', col: 2, row: 1 },
+      { id: 'outU', label: '사용률', col: 2, row: 2 },
+    ]}
+    edges={[
+      { from: 'inB', to: 'inBps', label: '× 8 ÷ 60초' },
+      { from: 'inBps', to: 'inU', label: '÷ 1Gbps' },
+      { from: 'outB', to: 'outBps', label: '× 8 ÷ 60초' },
+      { from: 'outBps', to: 'outU', label: '÷ 1Gbps' },
+    ]}
+    groups={[
+      { label: '받는 쪽', cols: [0, 0], rows: [0, 2] },
+      { label: '보내는 쪽', cols: [2, 2], rows: [0, 2] },
+    ]}
+  />
+</Figure>
+
 ## 32비트 카운터는 한 바퀴 돌아요
 
 32비트 카운터는 4,294,967,295까지 세고 0으로 돌아가요. 1Gbps는 초당 1억 2,500만 바이트라, 가득 오가면 약 34초면 한 바퀴를 돌아요.
@@ -78,6 +102,18 @@ ifInErrors는 패킷에 에러가 있어 받지 못한 수예요. 흔히 케이�
 ifInDiscards는 에러는 없었지만 버린 수예요. 문서는 버퍼 공간을 비우려고 버리는 경우를 예로 들어요.
 
 상태는 두 가지를 함께 봐요. 관리 상태(ifAdminStatus)는 관리자가 켜 두었는지, 동작 상태(ifOperStatus)는 실제로 통신이 되는지예요. 켜 두었는데 동작 상태가 down이라면 고장이고, 관리자가 꺼 둔 포트가 down인 건 정상이에요.
+
+<Figure caption="동작 상태가 똑같이 down이어도 관리 상태에 따라 뜻이 달라요. 관리 상태가 up인데 동작 상태가 down일 때만 고장이에요.">
+  <Compare
+    columns={['켜 둔 포트', '꺼 둔 포트']}
+    rows={[
+      { label: '관리 상태(ifAdminStatus)', values: ['up', 'down'] },
+      { label: '동작 상태(ifOperStatus)', values: ['down', 'down'] },
+      { label: '뜻', values: ['고장이에요', '정상이에요'] },
+      { label: 'down 알림', values: ['보내요', '보내지 않아요'] },
+    ]}
+  />
+</Figure>
 
 ## 모니터링에서는
 

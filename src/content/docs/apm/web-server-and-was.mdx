@@ -21,7 +21,7 @@ sources:
     url: https://tomcat.apache.org/tomcat-10.1-doc/config/http.html
   - title: RFC 9110 — HTTP Semantics (502, 504)
     url: https://www.rfc-editor.org/rfc/rfc9110.html
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -87,6 +87,19 @@ WAS가 아예 죽어 있거나 이상한 응답을 주면 502(잘못된 응답�
 APM 에이전트는 보통 WAS 안에서 요청이 들어오고 나가는 지점을 재요. 그래서 APM의 응답시간에는 웹 서버까지 오는 시간과 대기열에서 기다린 시간이 빠져요.
 
 웹 서버는 따로 시간을 남겨요. nginx의 `$request_time`은 클라이언트에게서 첫 바이트를 받은 때부터 응답을 다 보낼 때까지예요. `$upstream_response_time`은 WAS에서 응답을 받는 데 쓴 시간이에요.
+
+<Figure caption="WAS의 스레드가 모두 바빴던 요청 하나의 예시예요. 웹 서버는 900ms를 남겼지만, APM은 스레드가 요청을 맡은 뒤의 280ms만 재요.">
+  <Waterfall
+    ariaLabel="nginx의 request_time 900ms 안에 upstream_response_time 880ms가 있고, 그 안에서 대기열에서 기다린 600ms 뒤에 APM 응답시간 280ms가 오는 워터폴"
+    unit="ms"
+    spans={[
+      { label: 'nginx $request_time', start: 0, duration: 900 },
+      { label: '$upstream_response_time', start: 10, duration: 880, depth: 1 },
+      { label: '대기열에서 기다림', start: 10, duration: 600, depth: 2, tone: 'warn' },
+      { label: 'APM 응답시간', start: 610, duration: 280, depth: 2, tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 웹 서버 쪽 시간이 APM 응답시간보다 훨씬 길다면, 그 사이에서 기다린 거예요.
 

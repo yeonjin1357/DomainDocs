@@ -15,7 +15,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/
   - title: Linux kernel — CFS Bandwidth Control
     url: https://docs.kernel.org/scheduler/sched-bwc.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -47,6 +47,28 @@ resources:
     cpu: 500m
     memory: 512Mi
 ```
+
+<Figure caption="위 설정을 칸으로 그렸어요. CPU 1코어는 1000m라 칸 하나가 250m이고, 메모리는 칸 하나가 128Mi예요. 괄호가 요청과 한도가 차지하는 양이에요.">
+  <Strip
+    ariaLabel="CPU 1코어를 250m씩 네 칸으로 나눠 요청 250m은 한 칸, 한도 500m은 두 칸이고, 메모리 512Mi를 128Mi씩 네 칸으로 나눠 요청 256Mi는 두 칸, 한도 512Mi는 네 칸인 칸 띠"
+    rows={[
+      {
+        label: 'CPU 1코어 = 1000m(칸 하나가 250m)',
+        cells: [{ label: '250m', tone: 'accent' }, '250m', { label: '250m', tone: 'sub' }, { label: '250m', tone: 'sub' }],
+      },
+      {
+        label: '메모리 512Mi(칸 하나가 128Mi)',
+        cells: [{ label: '128Mi', tone: 'accent' }, { label: '128Mi', tone: 'accent' }, '128Mi', '128Mi'],
+      },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 0, label: '요청 250m', tone: 'accent' },
+      { row: 0, from: 0, to: 1, label: '한도 500m' },
+      { row: 1, from: 0, to: 1, label: '요청 256Mi', tone: 'accent' },
+      { row: 1, from: 0, to: 3, label: '한도 512Mi' },
+    ]}
+  />
+</Figure>
 
 CPU 1은 코어 1개예요. 노드가 물리 서버면 물리 코어 하나, 가상 머신이면 가상 코어 하나예요. `250m`은 0.25 CPU이고 "250밀리코어"라고 읽어요.
 

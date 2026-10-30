@@ -19,7 +19,7 @@ sources:
     url: https://github.com/lxc/lxcfs/blob/main/README.md
   - title: Prometheus — Query functions (rate)
     url: https://prometheus.io/docs/prometheus/latest/querying/functions/
-updated: 2026-10-26
+updated: 2026-10-30
 ---
 
 <OnDashboard title="같은 서버의 CPU 사용률 · 같은 시각" caption="세 화면 모두 같은 커널 값에서 왔어요. 몇 초 동안의 평균인지가 달라서 숫자가 달라요.">
@@ -99,6 +99,17 @@ Prometheus 생태계의 서버 에이전트는 node_exporter예요. 기본으로
 - **'사용'에 넣는 시간**: 디스크를 기다린 시간(iowait)을 쉬는 시간으로 보느냐에 따라 사용률이 달라요. 시간의 종류는 <Term slug="server/cpu-usage">CPU 사용률과 부하</Term>에 있어요.
 - **메모리의 '사용'**: 전체에서 MemFree를 빼느냐, MemAvailable을 빼느냐에 따라 크게 달라요. 차이는 <Term slug="server/memory">메모리</Term>에서 다뤘어요.
 
+<Figure caption="CPU가 잠깐 92%로 치솟은 1분 동안의 예시예요. 몇 초 단위로 보면 폭주가 그대로 보이고, 1분 평균으로 보면 41%로 깎여요.">
+  <MiniLineChart
+    ariaLabel="몇 초 단위 CPU 사용률은 20%대에서 잠깐 92%로 치솟았다가 내려오고, 같은 1분의 평균은 41%로 평평한 그래프"
+    yMax={100}
+    series={[
+      { label: '몇 초 단위', values: [20, 22, 25, 92, 92, 92, 40, 22, 20, 22, 25, 20], tone: 'warn', value: '최고 92%' },
+      { label: '1분 평균', values: [41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41], tone: 'accent', value: '41%' },
+    ]}
+  />
+</Figure>
+
 두 화면의 숫자가 다르면 이 셋을 맞춰 보고 견줘요. 순서는 <Term slug="foundations/why-numbers-differ">같은 지표가 화면마다 다르게 보이는 이유</Term>에 있어요.
 
 ## 컨테이너에서는
@@ -106,6 +117,21 @@ Prometheus 생태계의 서버 에이전트는 node_exporter예요. 기본으로
 `/proc/meminfo`, `/proc/stat` 같은 파일은 컨테이너 안에서 읽어도 서버 전체의 값을 보여 줘요. 그래서 컨테이너 안의 프로그램이 '메모리가 넉넉하다'고 잘못 판단하기도 해요. LXCFS 같은 도구는 이 파일들을 컨테이너에 맞춘 값으로 바꿔 보여 주려고 만들어졌어요.
 
 컨테이너가 쓰는 양은 리눅스가 컨테이너를 묶는 단위인 cgroup의 파일에 있어요. cgroup v2에서는 `memory.current`가 지금 쓰는 메모리, `memory.max`가 한도, `cpu.stat`이 쓴 CPU 시간이에요.
+
+<Figure caption="컨테이너 안의 같은 프로그램도 어느 파일을 읽느냐에 따라 값이 달라요. /proc 파일은 서버 전체의 값이고, cgroup 파일은 그 컨테이너가 쓰는 양이에요.">
+  <Flow
+    ariaLabel="컨테이너 안의 프로그램이 /proc 파일을 읽으면 서버 전체의 값을, cgroup 파일을 읽으면 그 컨테이너의 값을 얻는 구조도"
+    nodes={[
+      { id: 'app', label: '프로그램', col: 1, row: 0, note: '컨테이너 안', tone: 'accent' },
+      { id: 'proc', label: '/proc 파일', col: 0, row: 1, note: '서버 전체 값', tone: 'warn' },
+      { id: 'cg', label: 'cgroup 파일', col: 2, row: 1, note: '이 컨테이너 값', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'app', to: 'proc', tone: 'warn' },
+      { from: 'app', to: 'cg', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 반대로 서버 전체를 재는 node_exporter를 컨테이너로 돌리면, 서버의 파일 시스템과 프로세스를 보도록 따로 연결해 줘야 해요. README는 서버의 루트를 읽기 전용으로 붙이고 `--path.rootfs`로 알려 주라고 해요.
 

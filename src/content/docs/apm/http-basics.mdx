@@ -11,7 +11,7 @@ related: [apm/overview, apm/web-server-and-was, apm/errors-and-exceptions, apm/t
 sources:
   - title: RFC 9110 — HTTP Semantics
     url: https://www.rfc-editor.org/rfc/rfc9110.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -48,6 +48,17 @@ Content-Type: application/json
 ```
 
 요청의 첫 줄은 메서드(`GET`)와 주소(`/orders/42`)예요. 응답의 첫 줄에는 <Term term="apm/status-code">상태 코드</Term>(`200`)가 와요. 그 아래 줄들은 헤더이고, 빈 줄 뒤가 본문이에요.
+
+<Figure caption="위 요청과 응답을 같은 틀로 나란히 놓았어요. 첫 줄에 담기는 것만 다르고, 그 아래 헤더와 빈 줄 뒤 본문의 순서는 같아요.">
+  <Compare
+    columns={['요청', '응답']}
+    rows={[
+      { label: '첫 줄', values: ['메서드와 주소(GET /orders/42)', '상태 코드(200 OK)'] },
+      { label: '헤더', values: ['Host, Accept', 'Content-Type'] },
+      { label: '빈 줄 뒤 본문', values: ['이 예에는 없어요', '{"id": 42, …}'] },
+    ]}
+  />
+</Figure>
 
 ## 메서드
 

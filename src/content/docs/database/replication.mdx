@@ -21,7 +21,7 @@ sources:
     url: https://learn.microsoft.com/en-us/sql/database-engine/availability-groups/windows/availability-modes-always-on-availability-groups
   - title: Oracle Data Guard Concepts 19c — Introduction to Oracle Data Guard
     url: https://docs.oracle.com/en/database/oracle/oracle-database/19/sbydb/introduction-to-oracle-data-guard-concepts.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -45,6 +45,18 @@ updated: 2026-10-21
 - 장애에 대비해요. 주 서버가 죽으면 복제 서버가 주 서버 역할을 넘겨받아요. 이를 <Term term="database/failover">장애 조치</Term>라고 불러요.
 - 읽기를 나눠요. 복제 서버에서 조회를 돌리면 주 서버의 부담이 줄어요.
 - 멀리 떨어진 곳에 사본을 둬요. 데이터센터 하나가 통째로 멈춰도 다른 곳에 데이터가 남아요.
+
+<Figure caption="첫째 이유인 장애 조치의 예시예요. 평소에는 복제 서버가 주 서버의 로그를 따라 적다가, 주 서버가 멈추면 주 서버 역할을 넘겨받아요.">
+  <Timeline
+    ariaLabel="주 서버가 읽기와 쓰기를 맡다가 장애로 멈추고, 그동안 로그를 따라 적던 복제 서버가 장애 뒤 주 서버 역할을 넘겨받는 시간 띠"
+    end={10}
+    lanes={[
+      { label: '주 서버', segments: [{ start: 0, end: 6, label: '읽기·쓰기', tone: 'accent' }, { start: 6, end: 10, label: '멈춤', tone: 'warn' }] },
+      { label: '복제 서버', segments: [{ start: 0, end: 6, label: '로그 따라 적기', tone: 'sub' }, { start: 7, end: 10, label: '주 역할', tone: 'accent' }] },
+    ]}
+    marks={[{ at: 6, label: '장애', tone: 'warn' }]}
+  />
+</Figure>
 
 ## 로그를 보내 따라 해요
 

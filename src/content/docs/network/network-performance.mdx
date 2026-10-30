@@ -15,7 +15,7 @@ sources:
     url: https://man7.org/linux/man-pages/man8/ss.8.html
   - title: eBPF.io — What is eBPF?
     url: https://ebpf.io/what-is-ebpf/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <OnDashboard title="서버 간 통신 · 최근 15분" caption="주문 서버에서 결제 서버로 가는 연결의 RTT와 재전송이 함께 올랐어요. 앱이 느려진 원인이 네트워크 쪽이라는 신호예요.">
@@ -66,6 +66,16 @@ cwnd:10 unacked:2
 
 서버 전체의 재전송은 `/proc/net/snmp`의 `RetransSegs`로 세요. 보낸 조각 수 `OutSegs`와 함께 읽어요.
 
+<Figure caption="두 곳 모두 커널이 이미 세어 둔 값을 보여 줘요. ss -ti는 연결 하나하나를, /proc/net/snmp는 서버 전체를 봐요.">
+  <Compare
+    columns={['ss -ti', '/proc/net/snmp']}
+    rows={[
+      { label: '보는 범위', values: ['연결 하나하나', '서버 전체'] },
+      { label: '보이는 값', values: ['RTT와 흔들림, 재전송 수', 'RetransSegs, OutSegs'] },
+    ]}
+  />
+</Figure>
+
 ## 재전송 비율 읽기
 
 재전송은 수보다 비율로 봐요. 같은 1분 동안 `RetransSegs`가 30, `OutSegs`가 1,000 늘었다면 재전송 비율은 3%예요.
@@ -73,6 +83,24 @@ cwnd:10 unacked:2
 RFC 4022에 따르면 `OutSegs`는 재전송한 바이트만 담은 조각을 세지 않아요. 그래서 이 비율은 정확히 "새로 보낸 조각 대비 다시 보낸 조각"이에요.
 
 두 값은 계속 늘기만 하는 <Term slug="foundations/counters-and-rate">카운터</Term>예요. 그래서 구간 사이의 차이로 계산해요.
+
+<Figure caption="두 카운터를 1분 간격으로 읽은 예시예요. 읽은 값끼리가 아니라 늘어난 수끼리 나눠요. 30 ÷ 1,000 = 3%예요.">
+  <Strip
+    ariaLabel="RetransSegs는 0분에 1,200, 1분에 1,230으로 30 늘고, OutSegs는 0분에 50,000, 1분에 51,000으로 1,000 늘어서, 늘어난 수끼리 나눈 재전송 비율이 3%인 칸 띠"
+    rows={[
+      {
+        label: 'RetransSegs(다시 보낸 조각)',
+        heads: ['0분에 읽음', '1분에 읽음', '늘어난 수'],
+        cells: ['1,200', '1,230', { label: '+30', tone: 'warn' }],
+      },
+      {
+        label: 'OutSegs(새로 보낸 조각)',
+        heads: ['0분에 읽음', '1분에 읽음', '늘어난 수'],
+        cells: ['50,000', '51,000', { label: '+1,000', tone: 'accent' }],
+      },
+    ]}
+  />
+</Figure>
 
 ## eBPF로 모아요
 

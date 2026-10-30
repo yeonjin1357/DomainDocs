@@ -19,7 +19,7 @@ sources:
     url: https://martinfowler.com/bliki/CircuitBreaker.html
   - title: Envoy — Circuit breaking
     url: https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/circuit_breaking
-updated: 2026-10-28
+updated: 2026-10-30
 ---
 
 <OnDashboard title="주문 서비스 → 결제 API · 최근 10분" caption="결제 API를 부르는 서킷 브레이커가 열렸어요. 주문 서비스의 에러는 늘었는데, 그 에러 응답은 3ms 만에 끝나요. 결제 API까지 가지 않고 바로 실패했기 때문이에요.">
@@ -118,6 +118,16 @@ Resilience4j를 Micrometer로 내보내면 Prometheus에서 이런 이름으로 
 - `resilience4j_circuitbreaker_calls_seconds`: 호출 시간이에요. `kind` 레이블로 성공과 실패를 나눠요.
 
 <Term slug="apm/service-map">서비스 맵</Term>을 볼 때 조심해요. 열린 동안에는 호출이 상대에게 가지 않아서, 부르는 쪽은 빨간데 상대 서비스는 조용해 보여요. 상대 쪽 요청 수가 갑자기 줄었다면 서킷이 열렸는지부터 봐요.
+
+<Figure caption="결제 API가 실패하기 시작해 서킷이 열린 예시예요. 주문 서비스의 에러는 높게 이어지는데, 결제 API가 받는 요청은 거의 0으로 떨어져요. 결제 API 쪽 지표만 보면 조용해 보여요.">
+  <MiniLineChart
+    ariaLabel="결제 API가 실패하며 주문 서비스의 에러가 분당 10번에서 1,240번으로 오르고, 서킷이 열린 뒤 결제 API가 받는 요청은 분당 1,250번에서 거의 0으로 떨어지는 그래프"
+    series={[
+      { label: '주문 서비스 에러', values: [10, 10, 10, 700, 1240, 1240, 1240, 1240, 1240, 1240], tone: 'warn', value: '1,240번/분' },
+      { label: '결제 API가 받은 요청', values: [1250, 1250, 1250, 1250, 10, 10, 10, 10, 10, 10], tone: 'sub' },
+    ]}
+  />
+</Figure>
 
 실패율 지표의 -1을 0%로 그리면 안 돼요. -1은 '아직 계산할 만큼 호출이 없음'이라는 표시예요.
 

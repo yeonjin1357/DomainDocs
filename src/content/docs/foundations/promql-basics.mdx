@@ -15,7 +15,7 @@ sources:
     url: https://prometheus.io/docs/prometheus/latest/querying/operators/
   - title: Prometheus — Query functions (rate, *_over_time)
     url: https://prometheus.io/docs/prometheus/latest/querying/functions/
-updated: 2026-10-26
+updated: 2026-10-30
 ---
 
 <OnDashboard title="서비스별 5xx 비율 · 질의 한 줄" caption="아래 KeyPoints의 질의 하나로 그린 값이에요. 서버 두 대인 api와 한 대인 web의 5xx 비율을 서비스마다 하나씩 보여 줘요.">
@@ -113,11 +113,47 @@ sum by (job) (
 
 이럴 때는 `ignoring(status)`로 그 레이블을 빼고 짝을 짓게 해요. 한쪽 여러 줄이 다른 쪽 한 줄과 짝을 지으면 `group_left`도 붙여요. 그러면 api의 500은 1%, 503은 1.5%처럼 상태 코드마다 비율이 나와요.
 
+<Figure caption="왼쪽은 by (job, status), 오른쪽은 by (job)로 묶은 결과예요. status를 빼지 않으면 레이블이 같은 짝이 하나도 없어요. ignoring(status)로 빼면 화살표처럼 api 두 줄이 api 한 줄과 짝을 지어요(group_left).">
+  <Flow
+    ariaLabel="왼쪽의 api 500, api 503, web 500 세 줄이 status를 뺀 뒤 오른쪽의 api와 web 두 줄과 짝을 짓는 구조도. api 500과 api 503은 모두 api와, web 500은 web과 이어짐"
+    nodes={[
+      { id: 'a500', label: 'api · 500', col: 0, row: 0, note: '0.2건/초' },
+      { id: 'a503', label: 'api · 503', col: 0, row: 1, note: '0.3건/초' },
+      { id: 'w500', label: 'web · 500', col: 0, row: 2, note: '0.05건/초' },
+      { id: 'api', label: 'api', col: 2, row: 0, note: '20건/초', tone: 'accent' },
+      { id: 'web', label: 'web', col: 2, row: 1, note: '5건/초', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'a500', to: 'api', tone: 'accent' },
+      { from: 'a503', to: 'api', tone: 'accent' },
+      { from: 'w500', to: 'web', tone: 'accent' },
+    ]}
+    groups={[
+      { label: '왼쪽 5xx', cols: [0, 0], rows: [0, 2] },
+      { label: '오른쪽 전체', cols: [2, 2], rows: [0, 1] },
+    ]}
+  />
+</Figure>
+
 ## 모니터링에서는
 
 그래프 패널은 같은 질의를 시각마다 되풀이해 계산한 값을 이어 그려요. 그래서 `[5m]` 구간과 그래프의 점 간격은 따로예요.
 
 점 간격이 구간보다 길면 그 사이의 값은 계산에 들어가지 않아요. 구간을 잡는 기준은 <Term slug="foundations/collection-interval">수집 방식과 수집 주기</Term>에 있어요.
+
+<Figure caption="점 간격 10분에 [5m] 구간을 쓴 예시예요. 점마다 앞 5분만 계산해서, 점 사이의 5분씩은 어느 점에도 들어가지 않아요.">
+  <Timeline
+    ariaLabel="10분, 20분, 30분에 찍은 점이 각각 앞 5분만 계산하고, 10분에서 15분, 20분에서 25분 사이의 값은 빠지는 시간 띠"
+    start={5}
+    end={30}
+    lanes={[
+      { label: '계산 구간', segments: [{ start: 5, end: 10, label: '5m', tone: 'accent' }, { start: 15, end: 20, label: '5m', tone: 'accent' }, { start: 25, end: 30, label: '5m', tone: 'accent' }] },
+      { label: '빠짐', segments: [{ start: 10, end: 15, tone: 'warn' }, { start: 20, end: 25, tone: 'warn' }] },
+    ]}
+    marks={[{ at: 10, label: '점 1' }, { at: 20, label: '점 2' }, { at: 30, label: '점 3' }]}
+    ticks={[{ at: 5, label: '5분' }, { at: 10, label: '10분' }, { at: 15, label: '15분' }, { at: 20, label: '20분' }, { at: 25, label: '25분' }, { at: 30, label: '30분' }]}
+  />
+</Figure>
 
 질의 결과가 비면 그래프도 비어요. 0이 아니라 데이터가 없는 거예요. 그 차이는 <Term slug="foundations/no-data-vs-zero">데이터 없음과 0은 달라요</Term>에서 다뤄요.
 

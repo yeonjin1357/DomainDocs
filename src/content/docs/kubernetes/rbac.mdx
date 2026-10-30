@@ -21,7 +21,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
   - title: Kubernetes — Role Based Access Control Good Practices
     url: https://kubernetes.io/docs/concepts/security/rbac-good-practices/
-updated: 2026-10-23
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -100,6 +100,23 @@ rules:
 파드에는 서비스 계정의 토큰이 `/var/run/secrets/kubernetes.io/serviceaccount/` 아래에 들어가요. 프로그램은 이 토큰을 실어 API 서버에 요청해요.
 
 쿠버네티스의 기본 RBAC 정책은 `kube-system` 밖의 서비스 계정에 권한을 주지 않아요. API 목록을 알아보는 정도만 할 수 있어요. 그래서 API를 읽는 프로그램에는 서비스 계정을 따로 만들고 필요한 역할을 묶어 줘요.
+
+<Figure caption="API를 읽는 프로그램에 서비스 계정을 따로 만들어 준 모습이에요. 역할은 바인딩으로 계정에 묶이고, 파드에는 그 계정의 토큰이 들어가요. 프로그램은 이 토큰을 실어 API 서버를 불러요.">
+  <Flow
+    ariaLabel="역할이 바인딩으로 서비스 계정에 묶이고, 서비스 계정의 토큰이 파드에 들어가며, 파드가 토큰을 실어 API 서버에 요청하는 구조도"
+    nodes={[
+      { id: 'role', label: '역할', col: 0, row: 0, note: '파드·노드 읽기' },
+      { id: 'sa', label: '서비스 계정', col: 2, row: 0, note: '따로 만든 계정', tone: 'accent' },
+      { id: 'api', label: 'API 서버', col: 0, row: 1, note: '역할대로 허락' },
+      { id: 'pod', label: '파드', col: 2, row: 1, note: 'API를 읽는 앱' },
+    ]}
+    edges={[
+      { from: 'role', to: 'sa', label: '바인딩' },
+      { from: 'sa', to: 'pod', label: '토큰' },
+      { from: 'pod', to: 'api', label: '토큰을 실어 요청', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 ## 모니터링에서는
 

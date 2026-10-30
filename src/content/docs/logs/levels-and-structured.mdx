@@ -13,7 +13,7 @@ sources:
     url: https://opentelemetry.io/docs/specs/otel/logs/data-model/
   - title: Grafana Loki — Log queries (json, logfmt parsers)
     url: https://grafana.com/docs/loki/latest/query/log_queries/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -66,6 +66,23 @@ updated: 2026-10-29
 위 줄은 사람이 읽기 쉬워요. 하지만 응답시간만 꺼내려면 줄을 나누는 규칙이 따로 있어야 해요. 그 규칙은 <Term slug="logs/parsing">파싱과 필드 추출</Term>에서 다뤄요.
 
 아래 줄이 <Term term="logs/structured-log">구조화 로그</Term>예요. 기계가 바로 필드로 읽어서, "latency_ms가 3000 넘는 줄"처럼 값으로 찾을 수 있어요. Loki의 `| json`은 JSON의 필드를 꺼내 레이블로 써요.
+
+<Figure caption="위 두 줄에서 값을 꺼내는 길이에요. 텍스트 줄은 줄을 나누는 규칙을 따로 만들어야 필드가 돼요. JSON 줄은 | json만으로 필드를 꺼내 값으로 찾아요.">
+  <Flow
+    ariaLabel="텍스트 줄은 파싱 규칙을 거쳐야 필드가 되고, JSON 줄은 Loki의 json으로 바로 필드가 되어 값으로 찾는 구조도"
+    nodes={[
+      { id: 'text', label: '텍스트 줄', col: 0, row: 0, note: '읽기 쉬워요' },
+      { id: 'rule', label: '파싱 규칙', col: 1, row: 0, note: '따로 만들어요' },
+      { id: 'json', label: 'JSON 줄', col: 0, row: 1, note: '구조화 로그', tone: 'accent' },
+      { id: 'field', label: '필드', col: 2, row: 1, note: '값으로 찾아요', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'text', to: 'rule' },
+      { from: 'rule', to: 'field' },
+      { from: 'json', to: 'field', label: '| json', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 key=value를 공백으로 이어 쓰는 logfmt도 흔해요. Loki에는 이 형식을 읽는 `| logfmt`가 따로 있어요.
 

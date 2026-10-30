@@ -19,7 +19,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/services-networking/gateway/
   - title: Kubernetes — Labels and Selectors
     url: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -71,11 +71,36 @@ updated: 2026-10-21
 
 준비가 안 된 파드는 대상에서 빠져요. readiness 프로브가 실패하면 그 파드의 IP가 EndpointSlice에서 빠지기 때문이에요. 프로브는 <Term slug="kubernetes/pod-status">파드 상태와 재시작</Term>에서 다뤄요.
 
+<Figure caption="서비스의 셀렉터는 app: pay이고, 아래 상자 이름은 파드에 붙은 레이블이에요. 셀렉터에 맞고 준비된 가운데 파드만 요청을 받아요. 왼쪽은 레이블은 맞지만 준비되지 않아 빠지고, 오른쪽은 레이블이 달라 처음부터 대상이 아니에요.">
+  <Flow
+    ariaLabel="셀렉터가 app: pay인 결제 서비스가 레이블이 app=pay이고 준비된 파드로만 요청을 넘기고, app=pay지만 준비되지 않은 파드와 레이블이 app=web인 파드로는 넘기지 않는 구조도"
+    nodes={[
+      { id: 'svc', label: '결제 서비스', col: 1, row: 0, note: 'app: pay', tone: 'accent' },
+      { id: 'notready', label: 'app=pay', col: 0, row: 1, note: '준비 안 됨', tone: 'warn' },
+      { id: 'ready', label: 'app=pay', col: 1, row: 1, note: '준비됨', tone: 'accent' },
+      { id: 'other', label: 'app=web', col: 2, row: 1, note: '레이블 다름', tone: 'sub' },
+    ]}
+    edges={[{ from: 'svc', to: 'ready', label: '요청', tone: 'accent' }]}
+  />
+</Figure>
+
 ## 이름으로 찾아가요
 
 쿠버네티스는 서비스마다 <Term term="network/dns">DNS</Term> 이름을 만들어요. 이름은 `서비스.네임스페이스.svc.클러스터도메인` 꼴이고, 서비스의 IP로 풀려요.
 
 같은 네임스페이스 안에서는 서비스 이름만 써도 돼요. kubelet이 파드의 DNS 설정에 검색 도메인을 넣어 두기 때문이에요. 그래서 주문 파드는 그냥 `http://pay`로 결제 서비스를 불러요.
+
+<Figure caption="주문 파드가 http://pay를 부를 때의 순서예요. 먼저 클러스터 DNS에 pay를 물어 결제 서비스의 IP를 받고, 그 IP로 요청을 보내요.">
+  <Sequence
+    ariaLabel="주문 파드가 클러스터 DNS에 pay의 주소를 묻고, 결제 서비스 IP 10.96.0.20을 받은 뒤, 그 IP로 결제 서비스에 요청하는 순서"
+    participants={['주문 파드', '클러스터 DNS', '결제 서비스']}
+    messages={[
+      { from: '주문 파드', to: '클러스터 DNS', label: 'pay는 어디?' },
+      { from: '클러스터 DNS', to: '주문 파드', label: '10.96.0.20', dashed: true },
+      { from: '주문 파드', to: '결제 서비스', label: '10.96.0.20으로 요청', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 이름을 찾는 과정은 <Term slug="kubernetes/cluster-dns">클러스터 안의 DNS</Term>에서 자세히 다뤄요.
 

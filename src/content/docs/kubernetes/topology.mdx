@@ -17,7 +17,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/services-networking/endpoint-slices/
   - title: Kubernetes — Persistent Volumes (binding)
     url: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <OnDashboard title="주문 앱 · 오브젝트 토폴로지" caption="서비스에서 파드 2로 가는 선이 점선이에요. 파드 2는 셀렉터에는 맞지만 준비되지 않아 요청을 받지 않아요.">
@@ -79,6 +79,23 @@ EndpointSlice에는 파드마다 상태가 함께 적혀요. `serving`은 지금
 그래서 셀렉터에 맞는 파드라도 준비되지 않았으면 서비스 요청을 받지 않아요. 위 화면의 파드 2가 그런 경우예요.
 
 EndpointSlice 하나에는 기본으로 끝점 100개까지 담겨요. 파드가 많은 서비스는 슬라이스가 여러 개라서, 하나만 읽으면 선이 빠져요.
+
+<Figure caption="끝점이 250개인 서비스의 예시예요. 슬라이스 하나에 100개까지라 끝점이 적어도 세 슬라이스에 나뉘어요. 첫 슬라이스만 읽으면 나머지 슬라이스의 파드로 가는 선이 빠져요.">
+  <Strip
+    ariaLabel="끝점 250개인 서비스의 EndpointSlice가 100개까지 담는 슬라이스 셋으로 나뉘고, 첫 슬라이스만 읽으면 둘째와 셋째 슬라이스의 끝점으로 가는 선이 빠지는 칸 띠"
+    rows={[
+      {
+        label: '끝점 250개인 서비스의 EndpointSlice',
+        heads: ['100개까지', '100개까지', '100개까지'],
+        cells: [{ label: '슬라이스 1', tone: 'accent' }, '슬라이스 2', '슬라이스 3'],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 0, label: '하나만 읽음', tone: 'accent' },
+      { from: 1, to: 2, label: '여기 파드는 선이 빠져요', tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 ## 선이 없는 서비스
 

@@ -23,7 +23,7 @@ sources:
     url: https://coredns.io/plugins/metrics/
   - title: CoreDNS — cache plugin
     url: https://coredns.io/plugins/cache/
-updated: 2026-10-28
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -63,6 +63,29 @@ updated: 2026-10-28
 `shop` 네임스페이스의 파드가 `pay`를 찾으면, 리졸버는 첫 검색 도메인을 붙여 `pay.shop.svc.cluster.local`을 물어요. 여기서 답을 받으면 바로 끝나요.
 
 다른 네임스페이스의 서비스는 짧은 이름으로 못 찾아요. `billing` 네임스페이스의 `pay`라면 `pay.billing`처럼 네임스페이스까지 적어요.
+
+<Figure caption="shop 네임스페이스의 파드가 서비스를 부를 때 완성되는 이름이에요. 진한 칸은 직접 적는 부분이고, 흐린 칸은 검색 도메인이 붙여 줘요. 다른 네임스페이스(NS)의 서비스는 NS까지 적어요.">
+  <Strip
+    ariaLabel="같은 네임스페이스의 pay는 pay만 적고 shop.svc.cluster.local을 검색 도메인이 붙이고, billing 네임스페이스의 pay는 pay.billing까지 적고 svc.cluster.local을 검색 도메인이 붙이는 칸 띠"
+    rows={[
+      {
+        label: 'shop의 pay를 부를 때',
+        heads: ['서비스', 'NS', '', '클러스터', '도메인'],
+        cells: [{ label: 'pay', tone: 'accent' }, { label: 'shop', tone: 'sub' }, { label: 'svc', tone: 'sub' }, { label: 'cluster', tone: 'sub' }, { label: 'local', tone: 'sub' }],
+      },
+      {
+        label: 'billing의 pay를 부를 때',
+        cells: [{ label: 'pay', tone: 'accent' }, { label: 'billing', tone: 'accent' }, { label: 'svc', tone: 'sub' }, { label: 'cluster', tone: 'sub' }, { label: 'local', tone: 'sub' }],
+      },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 0, label: '적는 이름', tone: 'accent' },
+      { row: 0, from: 1, to: 4, label: '검색 도메인이 붙여요' },
+      { row: 1, from: 0, to: 1, label: '적는 이름', tone: 'accent' },
+      { row: 1, from: 2, to: 4, label: '검색 도메인이 붙여요' },
+    ]}
+  />
+</Figure>
 
 ## 바깥 이름은 왜 여러 번 묻나요
 

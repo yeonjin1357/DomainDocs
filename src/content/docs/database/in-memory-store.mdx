@@ -23,7 +23,7 @@ sources:
     url: https://redis.io/docs/latest/commands/info/
   - title: Amazon ElastiCache — Metrics for Valkey and Redis OSS
     url: https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/CacheMetrics.Redis.html
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -80,6 +80,18 @@ OOM command not allowed when used memory > 'maxmemory'.
 ```
 
 캐시로만 쓴다면 `allkeys-lru`처럼 덜 쓴 키를 지우는 정책을 골라요. 이렇게 지우는 일을 <Term term="apm/eviction">축출</Term>이라고 하고, 지운 키 수는 INFO의 `evicted_keys`로 세요.
+
+<Figure caption="메모리가 maxmemory에 닿았을 때 두 정책이 하는 일이에요. 기본값은 키를 지키고 쓰기를 거절하고, 캐시용 정책은 덜 쓴 키를 지워 자리를 만들어요.">
+  <Compare
+    columns={['noeviction(기본값)', 'allkeys-lru']}
+    rows={[
+      { label: '한도에 닿으면', values: ['키를 지우지 않아요', '덜 쓴 키를 지워요'] },
+      { label: '새 데이터를 넣는 명령', values: ['OOM 에러를 받아요', '지운 자리에 넣어요'] },
+      { label: 'evicted_keys', values: ['늘지 않아요', '지운 만큼 늘어요'] },
+      { label: '고르는 때', values: ['따로 정하지 않으면', '캐시로만 쓸 때'] },
+    ]}
+  />
+</Figure>
 
 ## 디스크에 남기는 법
 

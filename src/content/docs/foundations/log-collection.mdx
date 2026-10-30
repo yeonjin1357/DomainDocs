@@ -23,7 +23,7 @@ sources:
     url: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver
   - title: Kubernetes — Logging Architecture
     url: https://kubernetes.io/docs/concepts/cluster-administration/logging/
-updated: 2026-10-23
+updated: 2026-10-30
 ---
 
 <OnDashboard title="결제 서버 · 로그 수집 에이전트 · 최근 1시간" caption="저장소가 10분 동안 응답하지 않는 사이, 에이전트가 재시도를 포기한 로그 묶음을 버렸어요. 그 10분의 로그는 검색해도 나오지 않아요.">
@@ -85,6 +85,37 @@ updated: 2026-10-23
 
 갑자기 죽었을 때는 반대로 겹칠 수 있어요. Fluent Bit 문서는 이때 기록이 실제로 보낸 위치보다 조금 뒤처질 수 있다고 해요. 그래서 다시 시작하면 이미 보낸 줄을 조금 다시 보내요.
 
+<Figure caption="칸 하나가 줄 하나이고, 흐린 칸은 이미 보낸 줄이에요. 위 두 줄은 4번째 줄까지 보내고 꺼진 사이 5~8번째 줄이 쓰인 경우예요. 아래 줄은 6번째 줄까지 보냈는데 기록이 4번째에 머문 채 죽은 경우예요.">
+  <Strip
+    ariaLabel="위치 기록이 있으면 4번째 줄 기록에서 이어 5~8번째 줄을 읽고, 기록이 없으면 파일 끝부터 읽어 5~8번째 줄을 놓치고, 갑자기 죽어 기록이 4번째에 머물렀으면 이미 보낸 5~6번째 줄을 다시 보내는 칸 띠"
+    rows={[
+      {
+        label: '위치 기록이 있으면',
+        cells: [{ label: '1', tone: 'sub' }, { label: '2', tone: 'sub' }, { label: '3', tone: 'sub' }, { label: '4', tone: 'sub' }, { label: '5', tone: 'accent' }, { label: '6', tone: 'accent' }, { label: '7', tone: 'accent' }, { label: '8', tone: 'accent' }],
+      },
+      {
+        label: '위치 기록이 없으면',
+        cells: [{ label: '1', tone: 'sub' }, { label: '2', tone: 'sub' }, { label: '3', tone: 'sub' }, { label: '4', tone: 'sub' }, { label: '5', tone: 'warn' }, { label: '6', tone: 'warn' }, { label: '7', tone: 'warn' }, { label: '8', tone: 'warn' }],
+      },
+      {
+        label: '갑자기 죽었다가 다시 켜면',
+        cells: [{ label: '1', tone: 'sub' }, { label: '2', tone: 'sub' }, { label: '3', tone: 'sub' }, { label: '4', tone: 'sub' }, { label: '5', tone: 'warn' }, { label: '6', tone: 'warn' }, '7', '8'],
+      },
+    ]}
+    marks={[
+      { row: 0, at: 3, label: '기록한 위치' },
+      { row: 1, at: 7, label: '끝부터 읽음', tone: 'warn' },
+      { row: 2, at: 3, label: '기록' },
+      { row: 2, at: 5, label: '보낸 곳', tone: 'warn' },
+    ]}
+    ranges={[
+      { row: 0, from: 4, to: 7, label: '이어 읽음', tone: 'accent' },
+      { row: 1, from: 4, to: 7, label: '놓침', tone: 'warn' },
+      { row: 2, from: 4, to: 5, label: '다시 보냄', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 ## 회전할 때 빠지거나 겹쳐요
 
 로그 파일은 계속 커져서, 일정 크기나 기간마다 이름을 바꿔 보관하고 새 파일에 써요. 이 일을 로그 회전이라고 하고, 리눅스에서는 logrotate가 흔해요.
@@ -112,11 +143,46 @@ updated: 2026-10-23
 
 Fluent Bit은 재시도 한도(`Retry_Limit`)를 넘긴 묶음을 버려요. 기본값이 1이라, 따로 정하지 않으면 한 번 다시 보내 실패한 묶음은 사라져요. 저장소 점검처럼 몇 분 멈추는 일이 있다면 한도를 넉넉히 잡아요.
 
+<Figure caption="저장소가 응답하지 않으면 묶음은 버퍼에 남아 다시 보내져요. 재시도 한도를 넘긴 묶음은 버려요. Fluent Bit은 한도가 기본 1이라, 한 번 다시 보내 실패하면 버려요.">
+  <Flow
+    ariaLabel="에이전트가 읽은 로그 묶음을 저장소로 보내고, 실패하면 버퍼에 두고 다시 보내며, 재시도 한도를 넘기면 버리는 구조도"
+    nodes={[
+      { id: 'chunk', label: '묶음', col: 0, row: 0, note: '읽은 로그' },
+      { id: 'store', label: '저장소', col: 2, row: 0, note: '응답 없음', tone: 'warn' },
+      { id: 'buf', label: '버퍼', col: 0, row: 1, note: '다시 보냄' },
+      { id: 'drop', label: '버림', col: 0, row: 2, note: '기본 한도 1', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'chunk', to: 'store', label: '보냄' },
+      { from: 'chunk', to: 'buf', label: '실패' },
+      { from: 'buf', to: 'store' },
+      { from: 'buf', to: 'drop', label: '한도 넘김', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 메모리 버퍼에 한도(`mem_buf_limit`)를 걸면, 한도에 닿을 때 그 파일 읽기를 잠시 멈춰요. 멈춘 사이에 복사 후 비우기 회전이 일어나면, 아직 읽지 않은 줄을 잃을 수 있어요.
 
 ## 한 줄이 로그 하나예요
 
 에이전트는 보통 줄바꿈 하나를 로그 하나로 봐요. 그래서 여러 줄짜리 스택 트레이스는 따로 묶지 않으면 줄마다 다른 로그로 쪼개져요. Fluent Bit tail과 OpenTelemetry filelog 모두 여러 줄을 하나로 묶는 설정이 있어요.
+
+<Figure caption="네 줄짜리 스택 트레이스예요. 묶지 않으면 로그 4개로 쪼개져 'at' 줄만 보고는 어느 예외인지 알 수 없어요. 묶으면 로그 하나로 들어가요.">
+  <Strip
+    ariaLabel="예외 줄과 at 줄 세 개로 된 스택 트레이스가, 묶지 않으면 로그 4개로 쪼개지고 여러 줄을 묶으면 로그 하나가 되는 칸 띠"
+    rows={[
+      { label: '묶지 않으면', cells: ['Exception', 'at …', 'at …', 'at …'] },
+      { label: '여러 줄을 묶으면', cells: [{ label: 'Exception', tone: 'accent' }, { label: 'at …', tone: 'accent' }, { label: 'at …', tone: 'accent' }, { label: 'at …', tone: 'accent' }] },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 0, label: '로그 1', tone: 'warn' },
+      { row: 0, from: 1, to: 1, label: '로그 2', tone: 'warn' },
+      { row: 0, from: 2, to: 2, label: '로그 3', tone: 'warn' },
+      { row: 0, from: 3, to: 3, label: '로그 4', tone: 'warn' },
+      { row: 1, from: 0, to: 3, label: '로그 하나', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 로그를 JSON 한 줄처럼 구조화해서 쓰면, 레벨이나 trace id 같은 값을 필드로 찾을 수 있어요. 글자 검색보다 정확하고, 알림도 필드 값으로 걸 수 있어요. trace id로 트레이스와 잇는 법은 <Term slug="foundations/logs-metrics-traces">로그, 메트릭, 트레이스</Term>에서 다뤄요.
 

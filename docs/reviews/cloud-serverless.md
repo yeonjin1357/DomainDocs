@@ -13,3 +13,12 @@
 | Azure Functions = 서버를 배포·관리하지 않는 서버리스 | https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview |
 
 - 메모: 워터폴의 단계별 시간과 동시성 예시(400 × 3 = 1,200)는 설명용 숫자예요. Lambda 문서는 최근 Event·Web Functions 등으로 나눠 설명하는데, 글은 이벤트 함수 기준이에요.
+
+## 다시 확인 (2026-10-30)
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 리전 기본 동시성 한도 1,000은 그대로 | https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html |
+| 새 계정은 동시성·메모리 할당량이 낮게 시작하고, 쓰는 양에 따라 AWS가 자동으로 올림 | https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html |
+
+- 고친 것: 더 깊이에 "새 계정은 한도가 낮게 시작해요"를 더하고, 출처에 Lambda quotas를 더했어요.

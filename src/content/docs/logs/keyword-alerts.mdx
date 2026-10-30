@@ -15,7 +15,7 @@ sources:
     url: https://grafana.com/docs/loki/latest/query/metric_queries/
   - title: Amazon CloudWatch Logs — Creating metrics from log events using filters
     url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <OnDashboard title="주문 API · 키워드 알림 · 최근 1시간" caption="5분 동안 ERROR가 든 줄이 37줄이라 기준 20줄을 넘었어요. 그런데 이 중 몇 줄이 진짜 에러인지는 일치 조건을 봐야 알아요.">
@@ -47,6 +47,23 @@ sum(count_over_time(
 
 `{app="order-api"}`로 스트림을 고르고, `|= "ERROR"`로 줄을 거른 뒤, `[5m]` 동안의 줄 수를 세요. 스트림이 여럿이면 `sum`으로 합쳐요.
 
+<Figure caption="위 질의를 안쪽부터 풀었어요. 스트림 2개와 줄 수는 설명용 예시예요. 스트림마다 센 수를 합쳐 숫자 하나가 되면, 그다음은 보통의 지표 알림처럼 기준과 견줘요.">
+  <Flow
+    ariaLabel="order-api 스트림 2개를 고르고, ERROR가 든 줄만 거르고, 5분 동안 스트림마다 25줄과 12줄을 센 뒤, 합친 37이 20을 넘는지 견주는 구조도"
+    nodes={[
+      { id: 'sel', label: '스트림 고르기', col: 0, row: 0, note: '스트림 2개' },
+      { id: 'filter', label: '줄 거르기', col: 1, row: 0, note: 'ERROR 든 줄' },
+      { id: 'count', label: '줄 세기', col: 2, row: 0, note: '25줄 · 12줄' },
+      { id: 'sum', label: 'sum > 20', col: 2, row: 1, note: '37 > 20', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'sel', to: 'filter' },
+      { from: 'filter', to: 'count' },
+      { from: 'count', to: 'sum', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 CloudWatch Logs에서는 <Term term="logs/metric-filter">지표 필터</Term>를 만들어요. 맞는 줄이 들어올 때마다 지표 값을 1씩 올리고, 그 지표에 알람을 걸어요.
 
 ## 글자 일치의 함정
@@ -75,6 +92,29 @@ sum(count_over_time(
 CloudWatch 지표 필터에는 기본값(default value)이 있어요. 로그는 들어왔는데 맞는 줄이 없으면 이 값을 보내요. 0으로 정해 두면 매분 값이 이어져요.
 
 로그가 아예 안 들어온 분에는 기본값도 보내지 않아요.
+
+<Figure caption="세 가지 경우의 결과예요. Loki는 맞는 줄이 없을 때도 비어 있을 수 있어, 로그가 끊긴 때와 같아 보여요. 기본값을 0으로 둔 지표 필터는 둘을 가르지만, 로그가 끊기면 역시 비어요.">
+  <Strip
+    ariaLabel="맞는 줄이 3개면 둘 다 3, 로그는 들어왔지만 맞는 줄이 0개면 Loki는 비고 기본값 0인 지표 필터는 0, 로그가 아예 없으면 둘 다 비는 칸 띠"
+    rows={[
+      {
+        label: 'Loki count_over_time',
+        heads: ['맞는 줄 3개', '맞는 줄 0개', '로그 없음'],
+        cells: ['3', { label: '비어요', tone: 'sub' }, { label: '비어요', tone: 'sub' }],
+      },
+      {
+        label: 'CloudWatch 지표 필터(기본값 0)',
+        heads: ['맞는 줄 3개', '맞는 줄 0개', '로그 없음'],
+        cells: ['3', { label: '0', tone: 'accent' }, { label: '비어요', tone: 'sub' }],
+      },
+    ]}
+    ranges={[
+      { row: 0, from: 1, to: 2, label: '둘을 가리지 못해요', tone: 'warn' },
+      { row: 1, from: 1, to: 1, label: '기본값', tone: 'accent' },
+      { row: 1, from: 2, to: 2, label: '기본값도 없음', tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 ## 늦게 도착하는 로그
 

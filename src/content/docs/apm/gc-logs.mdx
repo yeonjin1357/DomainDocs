@@ -15,7 +15,7 @@ sources:
     url: https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-g1-garbage-collector1.html
   - title: OpenJDK jdk21u — os.cpp (is_server_class_machine)
     url: https://github.com/openjdk/jdk21u/blob/master/src/hotspot/share/runtime/os.cpp
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <OnDashboard title="주문 API · GC 기록 · 최근 1시간" caption="GC로 멈춘 시간이 전체의 7% 가까이 돼요. Full GC가 났고, GC 직후 힙의 바닥도 오르는 중이에요.">
@@ -99,6 +99,27 @@ GC(13) Pause Full (G1 Compaction Pause) 127M->53M(128M) 7.268ms
 ```
 
 G1은 살아 있는 객체를 빈 영역으로 옮기며 치워요. 옮길 자리가 모자라면 <Term term="apm/evacuation-failure">Evacuation Failure</Term>가 찍혀요. Oracle 문서는 이 상태가 이어지면 G1이 결국 힙 전체를 압축하는 Full GC를 한다고 해요.
+
+<Figure caption="칸 하나가 힙의 영역 하나예요(칸 수는 예시). 평소에는 치울 영역의 산 객체를 빈 영역으로 옮겨요. 힙이 거의 차서 빈 영역이 없으면 옮기지 못해 Evacuation Failure가 찍혀요.">
+  <Strip
+    ariaLabel="힙 영역 여섯 칸 가운데 평소에는 빈 영역 두 칸이 있어 치울 영역의 산 객체를 그리로 옮기고, 126M/128M로 거의 찼을 때는 빈 영역이 없어 옮기지 못하고 Evacuation Failure가 나는 칸 띠"
+    rows={[
+      {
+        label: '평소',
+        cells: [{ label: '치울', tone: 'accent' }, { label: '치울', tone: 'accent' }, '사용', '사용', { label: '빔', tone: 'sub' }, { label: '빔', tone: 'sub' }],
+      },
+      {
+        label: '거의 찼을 때(126M/128M)',
+        cells: [{ label: '치울', tone: 'warn' }, { label: '치울', tone: 'warn' }, '사용', '사용', '사용', '사용'],
+      },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 1, label: '산 객체를', tone: 'accent' },
+      { row: 0, from: 4, to: 5, label: '여기로 옮겨요', tone: 'accent' },
+      { row: 1, from: 0, to: 5, label: '옮길 빈 영역이 없어요 → Evacuation Failure', tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 위 실험에서도 Evacuation Failure 두 줄 바로 뒤에 <Term term="apm/full-gc">Full GC</Term>가 따라왔어요. GC 전후가 모두 거의 찬 상태(126M → 126M)라는 것도 함께 보여요.
 

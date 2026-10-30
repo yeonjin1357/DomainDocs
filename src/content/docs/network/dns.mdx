@@ -19,7 +19,7 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc2308
   - title: Linux man-pages — resolv.conf(5)
     url: https://man7.org/linux/man-pages/man5/resolv.conf.5.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -80,6 +80,26 @@ DNS에 담기는 정보를 레코드라고 해요. 자주 보는 레코드는 �
 레코드마다 <Term term="network/dns-ttl">TTL</Term>(time to live)이 있어요. 이 답을 몇 초 동안 캐시해도 되는지예요. 리졸버는 TTL이 끝날 때까지 같은 질문에 캐시의 답을 써요.
 
 그래서 DNS 레코드를 바꿔도 바로 모두에게 퍼지지 않아요. 옛 답을 캐시한 리졸버는 TTL이 끝날 때까지 옛 주소를 알려 줘요. 주소를 옮길 계획이라면, 미리 TTL을 짧게 줄여 둬요.
+
+<Figure caption="TTL이 5분인 레코드를 2분에 바꾼 예시예요. 리졸버는 0분에 받은 옛 답을 TTL이 끝나는 5분까지 써서, 그사이 3분 동안 옛 주소를 알려 줘요.">
+  <Timeline
+    ariaLabel="레코드는 2분에 새 주소로 바뀌지만, 0분에 옛 답을 받아 캐시한 리졸버는 TTL이 끝나는 5분까지 옛 주소를 알려 주고 그 뒤에야 새 주소를 알려 주는 시간 띠"
+    end={8}
+    lanes={[
+      { label: '레코드', segments: [{ start: 0, end: 2, label: '옛 주소' }, { start: 2, end: 8, label: '새 주소', tone: 'accent' }] },
+      {
+        label: '리졸버',
+        segments: [
+          { start: 0, end: 2, label: '옛 주소' },
+          { start: 2, end: 5, label: '아직 옛 주소', tone: 'warn' },
+          { start: 5, end: 8, label: '새 주소', tone: 'accent' },
+        ],
+      },
+    ]}
+    marks={[{ at: 2, label: '레코드 바꿈' }, { at: 5, label: 'TTL 끝', tone: 'accent' }]}
+    ticks={[{ at: 0, label: '0분' }, { at: 2, label: '2분' }, { at: 5, label: '5분' }, { at: 8, label: '8분' }]}
+  />
+</Figure>
 
 "그런 이름은 없다"는 답도 캐시돼요. 이걸 부정 캐시(negative caching)라고 해요. 그래서 새 레코드를 만들기 전에 그 이름을 물었던 리졸버는, 한동안 "없다"는 답을 계속 줄 수 있어요.
 

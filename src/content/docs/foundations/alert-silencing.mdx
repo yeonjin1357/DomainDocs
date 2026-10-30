@@ -23,7 +23,7 @@ sources:
     url: https://grafana.com/docs/grafana/latest/alerting/configure-notifications/mute-timings/
   - title: Prometheus Operator runbooks — Watchdog
     url: https://runbooks.prometheus-operator.dev/runbooks/general/watchdog/
-updated: 2026-10-26
+updated: 2026-10-30
 ---
 
 <OnDashboard title="DB 점검 · 일요일 02:00~04:00" caption="점검하는 2시간 동안 알림 48개가 울렸지만 사일런스로 보내지 않았어요. 점검이 끝난 뒤에도 하나가 풀리지 않아, 그건 사람이 봐야 해요.">
@@ -62,6 +62,19 @@ amtool silence add \
 
 이 사일런스는 `cluster="b"`의 `DiskSlow`만 2시간 동안 막아요. 점검이 일찍 끝나면 `amtool silence expire <ID>`로 바로 풀어요.
 
+<Figure caption="위 사일런스를 건 2시간이에요. 조건에 맞는 b의 DiskSlow는 울려도 보내지 않고, 조건에 맞지 않는 a의 알림은 그대로 보내요. 시각은 설명용 예시예요.">
+  <Timeline
+    ariaLabel="0시간부터 2시간까지 사일런스가 걸린 동안 cluster b의 DiskSlow는 울려도 보내지 않고, cluster a의 알림은 그대로 보내는 시간 띠"
+    end={3}
+    lanes={[
+      { label: '사일런스', segments: [{ start: 0, end: 2, label: '2시간', tone: 'accent' }] },
+      { label: 'b의 알림', segments: [{ start: 0.5, end: 1.5, label: '안 보냄', tone: 'sub' }] },
+      { label: 'a의 알림', segments: [{ start: 1, end: 1.8, label: '보냄', tone: 'warn' }] },
+    ]}
+    ticks={[{ at: 0, label: '0시간' }, { at: 1, label: '1시간' }, { at: 2, label: '2시간' }, { at: 3, label: '3시간' }]}
+  />
+</Figure>
+
 조건은 좁게 잡아요. 서버 이름이나 클러스터처럼 점검하는 대상만 고르고, 알림 이름도 함께 적어요. 조건을 넓게 잡으면 점검과 상관없는 진짜 장애까지 조용해져요.
 
 ## 점검 시간: 되풀이되는 시간
@@ -81,6 +94,18 @@ time_intervals:
 
 경로에서는 `mute_time_intervals: [sunday-maint]`로 이 구간을 불러요. 시간대(`location`)를 적지 않으면 시각을 UTC로 읽어요. 그러면 한국 시간 새벽 2시가 아니라 오전 11시에 알림이 꺼져요.
 
+<Figure caption="가로축은 일요일 한국 시간이에요. 시간대를 적으면 새벽 2~4시에 꺼지고, 적지 않으면 같은 02:00~04:00을 UTC로 읽어 오전 11시~오후 1시에 꺼져요.">
+  <Timeline
+    ariaLabel="일요일 한국 시간으로, 시간대를 적은 점검 시간은 2시부터 4시까지 알림을 끄고, 시간대를 적지 않은 점검 시간은 11시부터 13시까지 끄는 시간 띠"
+    end={16}
+    lanes={[
+      { label: '시간대 적음', segments: [{ start: 2, end: 4, tone: 'accent' }] },
+      { label: '안 적음', segments: [{ start: 11, end: 13, tone: 'warn' }] },
+    ]}
+    ticks={[{ at: 2, label: '2시' }, { at: 4, label: '4시' }, { at: 11, label: '11시' }, { at: 13, label: '13시' }]}
+  />
+</Figure>
+
 ## 억제: 큰 알림이 작은 알림을 덮어요
 
 억제는 어떤 알림(원인)이 울리는 동안, 조건에 맞는 다른 알림(결과)을 보내지 않는 규칙이에요. 두 알림의 `equal`에 적은 레이블 값이 같아야 걸려요.
@@ -95,6 +120,18 @@ inhibit_rules:
 ```
 
 이 규칙은 `ClusterDown`이 울리는 동안 같은 클러스터의 warning 알림을 막아요. 다른 클러스터의 warning은 그대로 보내요. 알림을 묶는 다른 방법은 <Term slug="foundations/alert-fatigue">알림이 너무 많이 울릴 때</Term>에 있어요.
+
+<Figure caption="클러스터 b에 ClusterDown이 울리는 동안의 예시예요. cluster 값이 같은 b의 warning은 막고, 값이 다른 a의 warning은 그대로 보내요.">
+  <Timeline
+    ariaLabel="클러스터 b의 ClusterDown이 울리는 동안 클러스터 b의 warning은 보내지 않고, 클러스터 a의 warning은 보내는 시간 띠"
+    end={5}
+    lanes={[
+      { label: 'b 다운', segments: [{ start: 0.5, end: 4.5, label: 'ClusterDown 울림', tone: 'warn' }] },
+      { label: 'b warning', segments: [{ start: 1, end: 4, label: '안 보냄', tone: 'sub' }] },
+      { label: 'a warning', segments: [{ start: 2, end: 3.5, label: '보냄', tone: 'warn' }] },
+    ]}
+  />
+</Figure>
 
 ## 알림이 오지 않는 것도 알아야 해요
 

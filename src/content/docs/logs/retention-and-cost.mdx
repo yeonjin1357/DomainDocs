@@ -15,7 +15,7 @@ sources:
     url: https://grafana.com/docs/loki/latest/operations/storage/retention/
   - title: Elastic — Index lifecycle (phases)
     url: https://www.elastic.co/docs/manage-data/lifecycle/index-lifecycle-management/index-lifecycle
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -83,6 +83,21 @@ CloudWatch Logs는 보관 기간이 지나도 바로 지우지 않아요. 문서
 - **되풀이**: 같은 에러가 초당 수백 번 나면, 몇 줄만 남기고 수를 세어 둬요.
 - **큰 본문**: 요청과 응답 본문을 통째로 남기지 않아요.
 - **나눠 보관**: 오래 둘 로그와 짧게 둘 로그를 다른 그룹이나 스트림으로 나눠요.
+
+<Figure caption="같은 에러가 1초에 300번 나는 예시예요. 위는 300줄을 모두 저장하고, 아래는 3줄만 남기고 나머지 297번은 수만 세어 둬요. 몇 번 났는지는 그대로 알 수 있어요.">
+  <Strip
+    ariaLabel="1초에 같은 timeout 에러가 300번 날 때, 그대로 남기면 300줄을 모두 저장하고, 몇 줄만 남기면 3줄을 저장하고 나머지 297번은 수만 세는 칸 띠"
+    rows={[
+      { label: '그대로 남기면', cells: [{ label: 'timeout', tone: 'warn' }, { label: 'timeout', tone: 'warn' }, { label: 'timeout', tone: 'warn' }, { label: 'timeout', tone: 'warn' }, { label: '…', tone: 'warn' }] },
+      { label: '몇 줄만 남기고 세면', cells: ['timeout', 'timeout', 'timeout', { label: '297번', tone: 'accent' }] },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 4, label: '300줄 저장', tone: 'warn' },
+      { row: 1, from: 0, to: 2, label: '3줄 저장' },
+      { row: 1, from: 3, to: 3, label: '수만 셈', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 ## 모니터링에서는
 

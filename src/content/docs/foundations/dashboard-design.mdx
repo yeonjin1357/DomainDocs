@@ -13,7 +13,7 @@ sources:
     url: https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/best-practices/
   - title: Google SRE Book — Monitoring Distributed Systems (four golden signals, dashboard)
     url: https://sre.google/sre-book/monitoring-distributed-systems/
-updated: 2026-10-26
+updated: 2026-10-30
 ---
 
 <OnDashboard title="결제 서비스 대시보드 · 위에서 아래로" caption="맨 위 한 줄만 봐도 '지금 괜찮은가'에 답해요. 아래로 내려갈수록 원인을 찾는 패널이에요.">
@@ -56,6 +56,12 @@ Google SRE Book은 사용자가 쓰는 시스템에서 네 가지만 잴 수 있
 
 응답시간은 평균만 두지 말고 p99 같은 <Term slug="foundations/percentiles">백분위수</Term>를 함께 둬요. 평균은 느린 요청을 숨겨요.
 
+<Figure caption="맨 위 한 줄의 예시예요. 남은 에러 버짓 하나로 '좋음, 나쁨'을 답하고, 응답시간은 p99를 크게 두고 평균을 옆에 적어요. 숫자는 설명용이에요.">
+  <StatTile label="남은 에러 버짓" value="62" unit="%" tone="accent" />
+  <StatTile label="에러율" value="0.02" unit="%" />
+  <StatTile label="응답시간 p99" value="820" unit="ms" note="평균 140ms" />
+</Figure>
+
 ## 한 패널에는 한 가지
 
 패널 하나는 질문 하나에 답해요. 선이 수십 개 겹치면 아무것도 읽히지 않아요. '어느 서버가 문제인가'를 묻는다면 모든 서버를 그리지 말고, 값이 큰 몇 개만(`topk`) 그려요.
@@ -64,6 +70,17 @@ Google SRE Book은 사용자가 쓰는 시스템에서 네 가지만 잴 수 있
 
 값을 위로 쌓는 누적 그래프(stacked)는 조심해요. 선마다 높이가 아래 선 위에 얹혀서 각 값을 읽기 어렵고, 잘못 읽히기 쉬워요. Grafana 문서도 대부분은 끄라고 해요.
 
+<Figure caption="누적 그래프의 예시예요. 서버 b의 값은 30에서 17로 줄고 있는데, 쌓으면 서버 a 위에 얹혀 50에서 61로 오르는 선으로 보여요.">
+  <MiniLineChart
+    ariaLabel="서버 a는 20에서 44로 오르고, 서버 b의 실제 값은 30에서 17로 내려가는데, 서버 a 위에 쌓은 서버 b 선은 50에서 61로 올라가는 그래프"
+    series={[
+      { label: '서버 b 쌓은 선', values: [50, 51, 52, 53, 55, 57, 59, 61], tone: 'warn', value: '61' },
+      { label: '서버 a', values: [20, 22, 25, 28, 32, 36, 40, 44], tone: 'sub', value: '44' },
+      { label: '서버 b 실제 값', values: [30, 29, 27, 25, 23, 21, 19, 17], tone: 'accent', value: '17' },
+    ]}
+  />
+</Figure>
+
 ## 숫자를 읽기 쉽게
 
 - **단위를 붙여요**: 바이트인지 비트인지, 초인지 밀리초인지 축에 적어요. 자세한 건 <Term slug="foundations/units-and-notation">단위와 숫자 표기</Term>에 있어요.
@@ -71,9 +88,30 @@ Google SRE Book은 사용자가 쓰는 시스템에서 네 가지만 잴 수 있
 - **색에 뜻을 줘요**: 빨강은 나쁜 상태에만 써요. 임계값을 넘었을 때 색이 바뀌게 해요.
 - **빈 것과 0을 가려요**: 데이터가 없는 걸 0으로 그리면 '문제없음'으로 읽혀요. <Term slug="foundations/no-data-vs-zero">데이터 없음과 0은 달라요</Term>를 봐요.
 
+<Figure caption="크기가 크게 다른 두 서비스를 한 패널에 그린 예시예요. 작은 서비스의 요청이 초당 10건에서 30건으로 세 배가 됐지만, 바닥에 붙은 선이라 거의 보이지 않아요.">
+  <MiniLineChart
+    ariaLabel="초당 1,000건 안팎인 큰 서비스와 같은 축에 그린 작은 서비스는 초당 10건에서 30건으로 세 배가 뛰어도 바닥에 붙어 거의 평평해 보이는 그래프"
+    series={[
+      { label: '큰 서비스', values: [1000, 1010, 990, 1005, 995, 1000, 1010, 1000], tone: 'sub', value: '1,000건/초' },
+      { label: '작은 서비스', values: [10, 10, 10, 30, 30, 10, 10, 10], tone: 'warn', value: '30건/초' },
+    ]}
+  />
+</Figure>
+
 ## 같은 대시보드를 여러 벌 만들지 않아요
 
 서버마다, 환경마다 대시보드를 복사하면 한 벌을 고쳐도 나머지는 그대로예요. 대신 서비스, 환경, 서버를 고르는 변수(템플릿 변수)를 둬서 한 벌로 바꿔 봐요.
+
+<Figure caption="복사본은 서버 수만큼 생기고, 고칠 때마다 모두 손봐야 해요. 변수를 두면 한 벌을 고치는 것으로 끝나요.">
+  <Compare
+    columns={['서버마다 복사', '변수로 한 벌']}
+    rows={[
+      { label: '대시보드 수', values: ['서버 수만큼', '한 벌'] },
+      { label: '패널 하나를 고치면', values: ['고친 한 벌만 바뀜', '모든 서버에 반영'] },
+      { label: '다른 서버를 볼 때', values: ['다른 대시보드를 엶', '변수에서 서버를 고름'] },
+    ]}
+  />
+</Figure>
 
 대시보드끼리는 링크로 이어요. 맨 위 서비스 상태에서 서비스를 누르면 그 서비스의 상세 대시보드로 내려가게 해요. 이걸 drill-down이라고 불러요.
 

@@ -35,7 +35,7 @@ sources:
     url: https://opentelemetry.io/docs/collector/internal-telemetry/
   - title: opentelemetry-collector PR 14403 (otlp 내보내기를 otlp_grpc로 이름 바꿈)
     url: https://github.com/open-telemetry/opentelemetry-collector/pull/14403
-updated: 2026-10-26
+updated: 2026-10-30
 ---
 
 <OnDashboard title="서비스별 분당 요청 · 지난 1시간" caption="서비스 이름(service.name)을 정하지 않은 자바 앱은 unknown_service:java로 보여요. 이름이 없는 앱끼리는 한 서비스로 섞여요.">
@@ -83,6 +83,17 @@ API는 '이 구간을 span으로 기록해'처럼 계측 코드가 부르는 이
 
 모든 코드를 손으로 계측하지는 않아요. HTTP 서버, DB 드라이버 같은 흔한 라이브러리는 계측 라이브러리가 대신 span과 지표를 만들어요. 자바처럼 코드를 고치지 않고 에이전트를 붙여 계측하는 방식(zero-code)도 있어요.
 
+<Figure caption="위층이 아래층을 불러요. 손으로 쓴 계측 코드와 계측 라이브러리는 API를 부르고, 실제로 데이터를 만들고 내보내는 일은 SDK가 해요.">
+  <Layers
+    ariaLabel="위에서부터 계측 코드와 계측 라이브러리, 그것이 부르는 API, 호출을 받아 데이터를 만들고 샘플링하고 내보내는 SDK 순서로 쌓은 층 그림"
+    layers={[
+      { label: '계측 코드 · 계측 라이브러리', note: '이 구간을 span으로 기록해' },
+      { label: 'API', note: '계측 코드가 부르는 이름표' },
+      { label: 'SDK', note: '만들기 · 샘플링 · 내보내기', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
 데이터에는 어느 앱에서 왔는지 알리는 속성(resource)이 붙어요. 그중 `service.name`이 가장 중요하고, 정하지 않으면 SDK가 `unknown_service:` 뒤에 실행 파일 이름을 붙여 넣어요. 보통 환경 변수 `OTEL_SERVICE_NAME`으로 정해요.
 
 ## 이름을 맞추는 약속
@@ -112,6 +123,26 @@ service:
 ```
 
 받는 쪽, 보내는 쪽을 정의만 해서는 일하지 않아요. 맨 아래 `service.pipelines`에 신호(traces, metrics, logs)마다 무엇을 이을지 적어야 켜져요.
+
+<Figure caption="Collector 안에서 receiver가 받고, processor가 가공하고, exporter가 내보내요. 셋은 파이프라인으로 이어야 데이터가 흘러요. 위 설정은 processor 없이 receiver와 exporter만 이었어요.">
+  <Flow
+    ariaLabel="앱의 SDK가 보낸 데이터를 Collector 안의 receiver가 받아 processor가 가공하고 exporter가 백엔드로 내보내는 구조도"
+    nodes={[
+      { id: 'app', label: '앱 + SDK', col: 0, row: 0 },
+      { id: 'be', label: '백엔드', col: 2, row: 0 },
+      { id: 'recv', label: 'receiver', col: 0, row: 1, note: '받기', tone: 'accent' },
+      { id: 'proc', label: 'processor', col: 1, row: 1, note: '가공' },
+      { id: 'exp', label: 'exporter', col: 2, row: 1, note: '내보내기', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'app', to: 'recv' },
+      { from: 'recv', to: 'proc' },
+      { from: 'proc', to: 'exp' },
+      { from: 'exp', to: 'be' },
+    ]}
+    groups={[{ label: 'Collector 파이프라인', cols: [0, 2], rows: [1, 1] }]}
+  />
+</Figure>
 
 Collector를 두는 방식은 둘이에요. 에이전트는 쿠버네티스의 사이드카나 DaemonSet처럼 앱 곁이나 같은 서버에 하나씩 둬요. 게이트웨이는 클러스터나 리전마다 따로 띄워 한곳에 모아요.
 

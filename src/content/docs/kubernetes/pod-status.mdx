@@ -19,7 +19,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/
   - title: Kubernetes — kubectl logs
     url: https://kubernetes.io/docs/reference/kubectl/generated/kubectl_logs/
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -85,6 +85,23 @@ Deployment의 파드는 Always만 쓸 수 있어요. Job은 보통 OnFailure나 
 ## CrashLoopBackOff
 
 <Term term="kubernetes/crashloopbackoff">CrashLoopBackOff</Term>는 컨테이너가 죽고 다시 뜨기를 되풀이해서, 기다리는 시간이 걸려 있는 상태예요. 그 자체가 원인은 아니고, "계속 죽고 있다"는 표시예요.
+
+<Figure caption="CrashLoopBackOff는 이 고리를 되풀이하는 상태예요. 원인을 고치기 전까지 고리는 끝나지 않아요. 원인은 죽은 실행의 로그와 종료 이유에서 찾아요.">
+  <Flow
+    ariaLabel="컨테이너가 시작했다가 원인이 그대로라 다시 죽고, 10초부터 두 배씩 늘어나는 시간만큼 기다린 뒤 다시 시작하는 고리. 이 고리 전체가 CrashLoopBackOff"
+    nodes={[
+      { id: 'start', label: '컨테이너 시작', col: 0, row: 0 },
+      { id: 'die', label: '다시 죽음', col: 2, row: 0, note: '종료 이유 남음', tone: 'warn' },
+      { id: 'wait', label: '기다림', col: 1, row: 1, note: '10초부터 두 배' },
+    ]}
+    edges={[
+      { from: 'start', to: 'die', label: '원인 그대로', tone: 'warn' },
+      { from: 'die', to: 'wait' },
+      { from: 'wait', to: 'start' },
+    ]}
+    groups={[{ label: 'CrashLoopBackOff', cols: [0, 2], rows: [0, 1] }]}
+  />
+</Figure>
 
 쿠버네티스 문서는 흔한 원인으로 이런 것들을 꼽아요.
 

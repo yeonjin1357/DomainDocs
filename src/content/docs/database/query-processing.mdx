@@ -23,7 +23,7 @@ sources:
     url: https://dev.mysql.com/doc/refman/8.4/en/statement-caching.html
   - title: OWASP — SQL Injection Prevention Cheat Sheet
     url: https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -76,6 +76,18 @@ updated: 2026-10-21
 옵티마이저가 비용을 어림할 때 기대는 것은 <Term term="database/statistics">통계</Term>예요. 통계는 테이블에 행이 몇 개쯤 있는지, 값이 어떻게 퍼져 있는지 미리 모아 둔 요약이에요.
 
 통계가 실제와 다르면 계획도 틀려요. 통계는 행이 100개라는데 실제로는 100만 개라면, 옵티마이저는 작은 테이블에 맞는 방법을 골라요. 그러면 실행이 한참 느려져요.
+
+<Figure caption="같은 100만 행 테이블을 두고, 통계만 다른 두 경우예요. 옵티마이저는 실제 행을 세지 않고 통계를 믿어서, 통계가 낡으면 맞지 않는 방법을 골라요.">
+  <Compare
+    columns={['통계가 맞을 때', '통계가 낡았을 때']}
+    rows={[
+      { label: '통계가 아는 행 수', values: ['100만 개', '100개'] },
+      { label: '실제 행 수', values: ['100만 개', '100만 개'] },
+      { label: '옵티마이저가 고른 방법', values: ['큰 테이블에 맞는 방법', '작은 테이블에 맞는 방법'] },
+      { label: '실행', values: ['어림대로 돌아요', '한참 느려져요'] },
+    ]}
+  />
+</Figure>
 
 계획이 실제로 어떻게 돌았는지, 추정과 실제가 얼마나 달랐는지는 <Term slug="database/execution-plans">실행 계획 읽기</Term>에서 봐요.
 

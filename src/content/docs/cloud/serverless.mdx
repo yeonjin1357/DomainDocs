@@ -21,7 +21,9 @@ sources:
     url: https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html
   - title: Microsoft Learn — Azure Functions overview
     url: https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview
-updated: 2026-10-21
+  - title: AWS Lambda — Lambda quotas
+    url: https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -45,6 +47,29 @@ updated: 2026-10-21
 <Term term="cloud/serverless">서버리스 함수</Term>는 서버를 빌리지 않고 코드만 올려 실행하는 방식이에요. AWS Lambda, Azure Functions가 대표적이에요. 서버 유지 보수, 용량 준비, 확장, 패치를 사업자가 맡아요.
 
 함수는 이벤트에 반응해 실행돼요. API 요청, 저장소에 파일이 올라옴, 큐에 메시지가 들어옴 같은 일이 이벤트예요. 실행 하나하나는 서로 상태를 나누지 않고 따로 돌아요.
+
+<Figure caption="이벤트가 오면 올려 둔 함수가 실행돼요. 아래 실행 셋은 서로 상태를 나누지 않고 따로 돌아요.">
+  <Flow
+    ariaLabel="API 요청, 파일 올라옴, 큐 메시지라는 세 이벤트가 같은 함수를 부르고, 함수가 서로 이어지지 않은 실행 셋으로 따로 도는 구조도"
+    nodes={[
+      { id: 'api', label: 'API 요청', col: 0, row: 0 },
+      { id: 'file', label: '파일 올라옴', col: 1, row: 0 },
+      { id: 'queue', label: '큐 메시지', col: 2, row: 0 },
+      { id: 'fn', label: '함수', col: 1, row: 1, note: '올려 둔 코드', tone: 'accent' },
+      { id: 'r1', label: '실행', col: 0, row: 2 },
+      { id: 'r2', label: '실행', col: 1, row: 2 },
+      { id: 'r3', label: '실행', col: 2, row: 2 },
+    ]}
+    edges={[
+      { from: 'api', to: 'fn' },
+      { from: 'file', to: 'fn' },
+      { from: 'queue', to: 'fn' },
+      { from: 'fn', to: 'r1', tone: 'accent' },
+      { from: 'fn', to: 'r2', tone: 'accent' },
+      { from: 'fn', to: 'r3', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 요금은 쓴 만큼 내요. 요청이 없으면 실행도 없어서, 가끔 도는 일에 특히 싸요.
 
@@ -118,6 +143,10 @@ Lambda는 함수마다 이런 지표를 내보내요.
   ### 실행 환경은 몇 시간마다 바뀌어요
 
   AWS 문서는 계속 호출되는 함수라도 런타임 업데이트와 유지 보수를 위해 몇 시간마다 실행 환경을 끝낸다고 해요. 그래서 함수는 상태를 남기지 않게 만들어요.
+
+  ### 새 계정은 한도가 낮게 시작해요
+
+  AWS 문서는 새 계정의 Lambda 동시성 할당량을 기본보다 낮게 두고, 쓰는 양에 따라 자동으로 올린다고 해요. 새 계정에서 1,000보다 일찍 스로틀링되면 Service Quotas 화면에서 지금 한도를 확인해요.
 
   ### 초기화 단계의 시간 제한
 

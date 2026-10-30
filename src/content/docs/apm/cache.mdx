@@ -19,7 +19,7 @@ sources:
     url: https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html
   - title: AWS Whitepaper — Database Caching Strategies Using Redis (Cache validity, TTL jitter)
     url: https://docs.aws.amazon.com/whitepapers/latest/database-caching-strategies-using-redis/cache-validity.html
-updated: 2026-10-23
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -76,6 +76,19 @@ updated: 2026-10-23
 ## 언제 지워지나요
 
 캐시의 값은 두 가지로 지워져요. 하나는 정해 둔 시간(<Term term="apm/ttl">TTL</Term>)이 지나서 만료되는 거예요. TTL이 길면 적중률은 오르지만, 옛 값을 주는 시간도 길어져요.
+
+<Figure caption="TTL 5분으로 넣은 상품 42의 가격이에요(시각과 값은 예시). 3분에 DB가 바뀌어도 캐시는 5분에 만료될 때까지 옛 값을 줘요. 만료 뒤 첫 요청이 새 값을 가져와 다시 넣어요.">
+  <Timeline
+    ariaLabel="DB의 가격이 3분에 1,000원에서 1,200원으로 바뀌어도 캐시는 5분에 만료될 때까지 1,000원을 주고, 비어 있던 캐시에 6분의 요청이 1,200원을 가져와 넣는 시간 띠"
+    end={8}
+    lanes={[
+      { label: 'DB', segments: [{ start: 0, end: 3, label: '1,000원' }, { start: 3, end: 8, label: '1,200원', tone: 'accent' }] },
+      { label: '캐시', segments: [{ start: 0, end: 3, label: '1,000원' }, { start: 3, end: 5, label: '1,000원', tone: 'warn' }, { start: 6, end: 8, label: '1,200원', tone: 'accent' }] },
+    ]}
+    marks={[{ at: 3, label: 'DB 바뀜' }, { at: 5, label: '만료', tone: 'warn' }]}
+    ticks={[{ at: 0, label: '0분' }, { at: 3, label: '3분' }, { at: 5, label: '5분' }, { at: 8, label: '8분' }]}
+  />
+</Figure>
 
 다른 하나는 메모리가 차서 쫓겨나는 <Term term="apm/eviction">축출</Term>이에요. 보통은 가장 오래 쓰지 않은 값(LRU)부터 지워요. 축출이 잦으면 다시 쓸 값까지 지워져 적중률이 떨어져요.
 

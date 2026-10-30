@@ -19,3 +19,11 @@
 
 - 고친 것: 「요청과 한도」의 "이때는 요청보다 더 쓰고 있는 파드만 후보가 돼요"를 고쳤어요. 문서는 요청 안에서 쓰는 파드도 마지막 순서로 쫓겨날 수 있다고 해요. "요청보다 더 쓰고 있는 파드가 먼저 쫓겨나서, 대체로 BestEffort, Burstable, Guaranteed 순"으로 바꿨어요.
 - 함께 한 것: 용어 eviction, ephemeral-storage를 올리고 퀴즈 5문제를 썼어요.
+
+## 다시 확인 (2026-10-30)
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 리눅스 하드 기준 기본값에 `imagefs.inodesFree<5%`도 들어 있음(지금 문서는 다섯 가지) | https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/ |
+
+- 고친 것: 3단계 기준 표에 `imagefs.inodesFree` 5% 미만 줄을 더했어요.

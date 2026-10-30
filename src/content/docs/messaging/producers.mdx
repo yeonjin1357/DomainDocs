@@ -17,7 +17,7 @@ sources:
     url: https://kafka.apache.org/43/configuration/topic-configs/
   - title: Apache Kafka 4.3 — Monitoring (producer metrics)
     url: https://kafka.apache.org/43/operations/monitoring/
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -91,6 +91,19 @@ acks=all은 "ISR 모두"를 기다려요. 그런데 복제본이 줄어 리더 �
 다시 보내다 보면 중복이 생길 수 있어요. 첫 요청이 사실은 성공했는데 응답만 늦어 다시 보낸 경우예요. 그래서 Kafka 프로듀서는 <Term term="messaging/idempotent-producer">멱등성</Term>을 지원해요.
 
 브로커가 프로듀서마다 ID를 주고, 이벤트마다 붙은 순번으로 같은 이벤트를 걸러내요. 지금은 기본으로 켜져 있어요.
+
+<Figure caption="첫 요청은 사실 성공했는데 확인만 늦었어요(순번은 예시). 프로듀서가 같은 이벤트를 다시 보내도, 브로커는 프로듀서 ID와 순번 5를 보고 이미 받은 이벤트로 걸러내요.">
+  <Sequence
+    ariaLabel="프로듀서가 순번 5인 이벤트를 보냈는데 확인이 늦어 같은 순번으로 다시 보내고, 브로커가 이미 받은 순번이라 걸러내는 순서"
+    participants={['프로듀서', '브로커']}
+    messages={[
+      { from: '프로듀서', to: '브로커', label: '이벤트 (순번 5)', tone: 'accent' },
+      { from: '브로커', to: '프로듀서', label: '확인이 늦음', dashed: true, tone: 'warn' },
+      { from: '프로듀서', to: '브로커', label: '다시 보내기 (순번 5)' },
+      { from: '브로커', to: '프로듀서', label: '같은 순번이라 걸러냄', dashed: true },
+    ]}
+  />
+</Figure>
 
 재시도와 멱등성의 일반 원리는 <Term slug="apm/timeouts-and-retries">타임아웃과 재시도</Term>에서 다뤄요.
 

@@ -17,7 +17,7 @@ sources:
     url: https://clickhouse.com/docs/best-practices/selecting-an-insert-strategy
   - title: ClickHouse — MergeTree settings (parts_to_throw_insert)
     url: https://github.com/ClickHouse/ClickHouse/blob/master/src/Storages/MergeTree/MergeTreeSettings.cpp
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -81,6 +81,18 @@ updated: 2026-10-29
 그래서 ClickHouse 문서는 한 번에 최소 1,000행, 가능하면 1만~10만 행씩 넣으라고 권해요. 한 행씩 자주 넣으면 조각이 합치는 속도보다 빨리 쌓여요.
 
 한 파티션의 조각이 1,000개를 넘으면 넣기를 일부러 늦춰요. 3,000개를 넘으면 `Too many parts` 에러로 넣기를 거절해요. 둘 다 기본값이에요.
+
+<Figure caption="한 행씩 자주 넣을 때 한 파티션의 조각 수 예시예요. 합치는 속도보다 빨리 쌓여서 1,000개 선을 넘으면 넣기가 늦춰지고, 3,000개 선을 넘으면 거절돼요.">
+  <MiniLineChart
+    ariaLabel="한 행씩 자주 넣을 때 한 파티션의 조각 수가 100에서 3,100까지 계속 오르며, 넣기를 늦추는 1,000개 선과 넣기를 거절하는 3,000개 선을 차례로 넘는 선 그래프"
+    yMax={3500}
+    series={[
+      { label: '조각 수(한 행씩 자주 넣을 때)', values: [100, 500, 900, 1300, 1800, 2400, 3100], tone: 'accent' },
+      { label: '넣기를 늦추는 선', values: [1000, 1000, 1000, 1000, 1000, 1000, 1000], tone: 'sub', value: '1,000개' },
+      { label: 'Too many parts 선', values: [3000, 3000, 3000, 3000, 3000, 3000, 3000], tone: 'warn', value: '3,000개' },
+    ]}
+  />
+</Figure>
 
 ## 데이터 웨어하우스
 

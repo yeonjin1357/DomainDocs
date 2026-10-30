@@ -21,7 +21,7 @@ sources:
     url: https://support.pagerduty.com/main/docs/escalation-policies
   - title: Alertmanager 소스 — notify/metrics.go (알림 실패 지표)
     url: https://github.com/prometheus/alertmanager/blob/main/notify/metrics.go
-updated: 2026-10-26
+updated: 2026-10-30
 ---
 
 <Figure caption="team=payment인 알림은 결제 채팅방으로 가고, 그중 severity=critical만 결제 당직을 호출해요. 어디에도 맞지 않는 알림은 기본 경로의 운영 채팅방으로 가요.">
@@ -72,6 +72,24 @@ route:
 
 레이블 값은 글자 그대로 견줘요. `team="Payment"`처럼 대소문자만 달라도 결제 경로에 맞지 않고 기본 경로로 가요.
 
+<Figure caption="위 설정에 알림 네 개를 넣은 모습이에요. 진한 칸이 마지막으로 맞은 경로이고, 흐린 칸은 맞지 않아 내려가지 못한 경로예요. 알림은 진한 칸의 받는 곳으로 가요.">
+  <Strip
+    ariaLabel="team=payment이고 severity=critical인 알림은 기본 경로, 결제 팀, critical까지 내려가 결제 당직으로 가고, 결제 팀의 warning은 결제 팀에서 멈춰 결제 채팅방으로, 팀 레이블이 없는 알림과 team=Payment인 알림은 기본 경로에서 멈춰 기본 채팅방으로 가는 칸 띠"
+    rows={[
+      { label: 'team=payment, severity=critical', cells: ['기본 경로', '결제 팀', { label: 'critical', tone: 'accent' }] },
+      { label: 'team=payment, severity=warning', cells: ['기본 경로', { label: '결제 팀', tone: 'accent' }, { label: 'critical', tone: 'sub' }] },
+      { label: '팀 레이블 없음', cells: [{ label: '기본 경로', tone: 'accent' }, { label: '결제 팀', tone: 'sub' }, { label: 'critical', tone: 'sub' }] },
+      { label: 'team=Payment', cells: [{ label: '기본 경로', tone: 'accent' }, { label: '결제 팀', tone: 'sub' }, { label: 'critical', tone: 'sub' }] },
+    ]}
+    ranges={[
+      { row: 0, from: 2, to: 2, label: '결제 당직', tone: 'accent' },
+      { row: 1, from: 1, to: 1, label: '결제 채팅방', tone: 'accent' },
+      { row: 2, from: 0, to: 0, label: '기본 채팅방', tone: 'accent' },
+      { row: 3, from: 0, to: 0, label: '기본 채팅방', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
 ## 심각도마다 방법을 달리해요
 
 모든 알림이 사람을 깨울 필요는 없어요. Google SRE Book은 '모든 호출은 사람이 행동할 수 있어야 한다'고 해요. 그래서 알림의 급한 정도에 따라 보내는 방법을 나눠요.
@@ -90,7 +108,33 @@ route:
 
 에스컬레이션은 단계로 정해요. PagerDuty에서는 첫 단계 사람에게 바로 알려요. 정한 시간(escalation timeout) 안에 확인이나 해결이 없으면 다음 단계로 넘겨요.
 
+<Figure caption="넘기는 시간을 10분으로 둔 예시예요. 1단계가 10분 동안 확인하지 않아서, 그때부터 2단계의 확인을 기다려요.">
+  <Timeline
+    ariaLabel="1단계가 0분부터 10분까지 확인을 기다리다 정한 시간이 지나고, 10분부터 2단계가 확인을 기다리는 시간 띠"
+    end={20}
+    lanes={[
+      { label: '1단계', segments: [{ start: 0, end: 10, label: '확인 기다림', tone: 'warn' }] },
+      { label: '2단계', segments: [{ start: 10, end: 20, label: '확인 기다림', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 10, label: '정한 시간 지남', tone: 'warn' }]}
+    ticks={[{ at: 0, label: '0분' }, { at: 10, label: '10분' }, { at: 20, label: '20분' }]}
+  />
+</Figure>
+
 누가 확인하면 그 뒤로는 넘기지 않아요. 그래서 확인(acknowledge)은 '내가 보고 있다'는 약속이에요. 확인만 하고 손을 놓으면, 다음 사람에게도 넘어가지 않아 장애가 그대로 남아요.
+
+<Figure caption="같은 설정에서 1단계가 4분에 확인한 예시예요. 10분이 지나도 2단계로 넘어가지 않아요. 확인한 사람이 손을 놓으면 아무도 보지 않아요.">
+  <Timeline
+    ariaLabel="1단계가 4분에 확인한 뒤로는 10분이 지나도 2단계 줄이 비어 있는 시간 띠"
+    end={20}
+    lanes={[
+      { label: '1단계', segments: [{ start: 0, end: 4, label: '기다림', tone: 'warn' }, { start: 4, end: 20, label: '확인함', tone: 'accent' }] },
+      { label: '2단계', segments: [] },
+    ]}
+    marks={[{ at: 4, label: '확인', tone: 'accent' }, { at: 10, label: '정한 시간' }]}
+    ticks={[{ at: 0, label: '0분' }, { at: 10, label: '10분' }, { at: 20, label: '20분' }]}
+  />
+</Figure>
 
 ## 모니터링에서는
 

@@ -31,7 +31,7 @@ sources:
     url: https://man7.org/linux/man-pages/man2/syslog.2.html
   - title: systemd NEWS (CHANGES WITH 235, NRestarts)
     url: https://github.com/systemd/systemd/blob/main/NEWS
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -138,6 +138,24 @@ Loaded 줄에는 유닛 파일의 위치와 enabled 여부가 나와요. enabled
 ## 커널 로그에는 커널만 아는 일이 남아요
 
 <Term term="server/kernel-log">커널 로그</Term>는 커널이 남기는 메시지예요. 커널은 이 메시지를 메모리 안의 정해진 크기 공간(링 버퍼)에 쌓아요. 가득 차면 오래된 메시지부터 밀려나요.
+
+<Figure caption="메시지 6개가 차는 크기로 줄인 예시예요. 가득 찬 뒤 새 메시지 7이 들어오면, 가장 오래된 1이 밀려나요.">
+  <Strip
+    ariaLabel="메시지 1부터 6까지로 가득 찬 링 버퍼에 새 메시지 7이 들어오자, 가장 오래된 메시지 1이 밀려나고 2부터 7까지가 남는 칸 띠"
+    rows={[
+      { label: '가득 찬 링 버퍼', cells: ['1', '2', '3', '4', '5', '6'] },
+      { label: '새 메시지 7이 들어온 뒤', cells: [{ label: '1', tone: 'sub' }, '2', '3', '4', '5', '6', { label: '7', tone: 'accent' }] },
+    ]}
+    marks={[
+      { row: 1, at: 0, label: '밀려남', tone: 'warn' },
+      { row: 1, at: 6, label: '새 메시지', tone: 'accent' },
+    ]}
+    ranges={[
+      { row: 0, from: 0, to: 5, label: '정해진 크기' },
+      { row: 1, from: 1, to: 6, label: '정해진 크기' },
+    ]}
+  />
+</Figure>
 
 `dmesg`로 이 공간을 읽어요. journald도 커널 메시지를 받아 두어서, `journalctl -k`로도 볼 수 있어요.
 

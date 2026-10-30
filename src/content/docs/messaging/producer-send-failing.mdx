@@ -16,7 +16,7 @@ sources:
     url: https://kafka.apache.org/43/configuration/broker-configs/
   - title: Apache Kafka 4.3 — Monitoring (producer metrics)
     url: https://kafka.apache.org/43/operations/monitoring/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <Situation>
@@ -124,6 +124,8 @@ acks=all로 쓸 때 ISR이 토픽의 `min.insync.replicas`보다 적으면, 브�
     ]}
   />
 </Figure>
+
+화면에서는 세 값이 함께 나빠져요. 브로커의 요청 지연이 늘고, 버퍼 남은 양이 0이 되고, 보내기 실패가 늘어요.
 
 <Figure caption="버퍼가 찬 프로듀서의 예시예요. 브로커 응답이 느려지자 버퍼가 차고, 보내기 호출이 기다리다 실패했어요.">
   <StatTile label="요청 지연" value="850" unit="ms" tone="warn" note="평소 15ms" />

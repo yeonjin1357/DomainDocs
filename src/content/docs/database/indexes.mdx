@@ -25,7 +25,7 @@ sources:
     url: https://docs.oracle.com/en/database/oracle/oracle-database/19/cncpt/tables-and-table-clusters.html
   - title: PostgreSQL — The Cumulative Statistics System (pg_stat_all_indexes)
     url: https://www.postgresql.org/docs/current/monitoring-stats.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -96,6 +96,28 @@ updated: 2026-10-21
 - 가져올 행이 많을 때예요. 테이블의 행 대부분을 가져온다면 처음부터 다 읽는 편이 더 싸요.
 - 열에 함수를 씌운 조건이에요. `WHERE lower(email) = …`은 `email` 순서로 정렬한 인덱스와 모양이 달라요. `lower(email)`로 만든 인덱스가 따로 있어야 써요.
 - 여러 열을 묶은 <Term term="database/composite-index">복합 인덱스</Term>에서 앞 열 조건이 없을 때예요. `(고객, 주문일)` 인덱스는 고객으로 먼저 정렬돼 있어서, 주문일만으로 찾으면 효율이 크게 떨어져요. 계획으로 확인하고 고치는 순서는 <Term slug="database/index-not-used">인덱스가 있는데도 안 쓰일 때</Term>에 있어요.
+
+<Figure caption="(고객, 주문일) 복합 인덱스에 든 값의 예시예요. 칸 위 작은 글자가 고객, 칸 안이 주문일이에요. 고객 B는 한곳에 붙어 있지만, 5일 주문은 고객마다 흩어져 있어요.">
+  <Strip
+    ariaLabel="고객 A, B, C 순서로 정렬하고 고객 안에서 주문일 순서로 정렬한 복합 인덱스 칸 띠. 고객 B로 찾으면 붙어 있는 두 칸만 보면 되고, 주문일 5일로 찾으면 고객 A, B, C에 흩어진 세 칸을 찾아야 함"
+    rows={[
+      {
+        label: '고객 B로 찾을 때',
+        heads: ['A', 'A', 'A', 'B', 'B', 'C', 'C', 'C'],
+        cells: ['1일', '5일', '9일', { label: '2일', tone: 'accent' }, { label: '5일', tone: 'accent' }, '1일', '5일', '8일'],
+      },
+      {
+        label: '주문일 5일로 찾을 때',
+        heads: ['A', 'A', 'A', 'B', 'B', 'C', 'C', 'C'],
+        cells: ['1일', { label: '5일', tone: 'warn' }, '9일', '2일', { label: '5일', tone: 'warn' }, '1일', { label: '5일', tone: 'warn' }, '8일'],
+      },
+    ]}
+    ranges={[
+      { row: 0, from: 3, to: 4, label: '한곳에 붙어 있어요', tone: 'accent' },
+      { row: 1, from: 0, to: 7, label: '고객마다 흩어져 있어요', tone: 'warn' },
+    ]}
+  />
+</Figure>
 
 ## 모니터링에서는
 

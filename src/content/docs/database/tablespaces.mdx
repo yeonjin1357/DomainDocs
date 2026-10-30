@@ -27,7 +27,7 @@ sources:
     url: https://docs.oracle.com/en/error-help/db/ora-01653/
   - title: PostgreSQL 18 — Tablespaces
     url: https://www.postgresql.org/docs/18/manage-ag-tablespaces.html
-updated: 2026-10-28
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -77,6 +77,19 @@ Oracle은 행을 바꿀 때 바꾸기 전 값을 <Term term="database/undo">언�
 커밋한 뒤의 언두도 한동안 남겨 둬요. 자동 확장하는 언두라면 `UNDO_RETENTION`(기본 900초)을 최소 보관 시간으로 지키려 하고, 모자라면 먼저 파일을 늘려요. 최대 크기에 닿으면 보관 시간이 안 지난 언두도 덮어쓸 수 있어요.
 
 오래 도는 조회가 이미 덮어쓴 옛 값을 찾으면 ORA-01555(snapshot too old)가 나요. 문서는 일관된 읽기에 필요한 언두를 다른 쓰기가 덮어썼다는 뜻으로 설명해요. 그래서 긴 조회와 많은 쓰기가 겹칠 때 잘 나요.
+
+<Figure caption="긴 조회가 도는 동안 다른 세션이 행을 바꿔서, 바꾸기 전 값이 언두에 남았어요. 그 뒤 많은 쓰기가 그 언두를 덮어써서, 조회가 옛 값을 찾을 때 ORA-01555가 나요.">
+  <Timeline
+    ariaLabel="긴 조회가 도는 중에 행이 바뀌어 바꾸기 전 값이 언두에 남고, 이어진 많은 쓰기가 그 언두를 덮어쓴 뒤, 조회가 옛 값을 찾다가 ORA-01555로 끝나는 시간 띠"
+    end={20}
+    lanes={[
+      { label: '긴 조회', segments: [{ start: 0, end: 16, label: '리포트 조회', tone: 'sub' }] },
+      { label: '쓰기', segments: [{ start: 2, end: 3, tone: 'accent' }, { start: 8, end: 14, label: '많은 쓰기', tone: 'warn' }] },
+      { label: '언두', segments: [{ start: 2, end: 10, label: '바꾸기 전 값', tone: 'accent' }, { start: 10, end: 20, label: '덮어씀', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 2, label: '행 바꿈', tone: 'accent' }, { at: 16, label: 'ORA-01555', tone: 'warn' }]}
+  />
+</Figure>
 
 PostgreSQL에는 따로 언두가 없어요. 옛 값을 표 안에 그대로 두고, 나중에 VACUUM이 치워요. 이 차이는 <Term slug="database/concurrency">동시에 읽고 쓰기</Term>에서 다뤄요.
 

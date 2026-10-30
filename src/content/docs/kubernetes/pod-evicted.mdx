@@ -20,7 +20,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
   - title: Kubernetes 소스 — kubelet eviction helpers (축출 메시지)
     url: https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/eviction/helpers.go
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <Situation>
@@ -113,6 +113,7 @@ kubelet은 노드의 남은 자원이 기준 아래로 내려가면 압박 조�
 | `nodefs.available` | 10% 미만 | DiskPressure |
 | `imagefs.available` | 15% 미만 | DiskPressure |
 | `nodefs.inodesFree` | 5% 미만 | DiskPressure |
+| `imagefs.inodesFree` | 5% 미만 | DiskPressure |
 
 nodefs는 kubelet과 파드 로그, emptyDir가 쓰는 노드의 주 파일 시스템이에요. imagefs는 컨테이너 런타임이 이미지를 따로 두는 파일 시스템이에요. 따로 없으면 둘은 같은 디스크예요.
 

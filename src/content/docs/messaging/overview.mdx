@@ -16,7 +16,7 @@ sources:
     url: https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html
   - title: Apache Kafka 4.3 — KRaft vs ZooKeeper
     url: https://kafka.apache.org/43/getting-started/zk2kraft/
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <Analogy limit="실제 게시판은 누가 어디까지 읽었는지 모르지만, Kafka는 읽는 쪽마다 어디까지 읽었는지 번호로 따로 기록해요.">
@@ -51,6 +51,26 @@ updated: 2026-10-21
 전통적인 메시지 시스템은 두 가지 방식이 있어요. 큐 방식은 메시지 하나를 받는 쪽 하나가 가져가요. 발행·구독 방식은 구독한 모두가 같은 메시지를 받아요.
 
 Kafka는 <Term term="messaging/consumer-group">컨슈머 그룹</Term>으로 둘을 함께 해요. 같은 그룹 안에서는 이벤트 하나를 한 컨슈머만 처리해서 큐처럼 일을 나눠요. 그룹이 여럿이면 그룹마다 같은 이벤트를 모두 받아서 발행·구독처럼 동작해요.
+
+<Figure caption="결제 그룹과 알림 그룹이 같은 토픽을 읽는 예시예요. 이벤트 하나가 그룹마다 한 번씩 가서 발행·구독처럼 동작해요. 결제 그룹 안에서는 결제 1만 받아서 큐처럼 일을 나눠요.">
+  <Flow
+    ariaLabel="주문됨 이벤트 하나가 결제 그룹의 결제 1과 알림 그룹의 알림 1로 가고, 같은 결제 그룹의 결제 2는 그 이벤트를 받지 않는 구조도"
+    nodes={[
+      { id: 'pay1', label: '결제 1', col: 0, row: 0, tone: 'accent' },
+      { id: 'ev', label: '주문됨', col: 1, row: 0, note: '이벤트 하나', tone: 'accent' },
+      { id: 'noti', label: '알림 1', col: 2, row: 0, tone: 'accent' },
+      { id: 'pay2', label: '결제 2', col: 0, row: 1, note: '받지 않음' },
+    ]}
+    edges={[
+      { from: 'ev', to: 'pay1', tone: 'accent' },
+      { from: 'ev', to: 'noti', tone: 'accent' },
+    ]}
+    groups={[
+      { label: '결제 그룹', cols: [0, 0], rows: [0, 1] },
+      { label: '알림 그룹', cols: [2, 2], rows: [0, 0] },
+    ]}
+  />
+</Figure>
 
 또 Kafka는 읽어 간 이벤트를 지우지 않아요. 토픽마다 정한 기간 동안 보관하고, 그 기간이 지나면 오래된 것부터 버려요. 그래서 필요하면 예전 이벤트를 다시 읽을 수 있어요.
 

@@ -19,7 +19,7 @@ sources:
     url: https://docs.oracle.com/en/java/javase/21/troubleshoot/troubleshooting-memory-leaks.html
   - title: Java SE 21 — The jcmd Command
     url: https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -63,6 +63,24 @@ updated: 2026-10-21
 자바 코드는 객체를 직접 지우지 않아요. 더는 아무도 가리키지 않는 객체는 <Term term="apm/gc">GC</Term>(가비지 컬렉터)가 찾아 치워요.
 
 서버에서 흔히 도는 G1은 힙을 young과 old 두 세대로 나눠요. 새 객체는 young에 담기고, young을 치울 때 살아남은 객체는 old로 옮겨요. G1은 힙을 같은 크기의 영역(region) 여러 개로 나눠 관리해요.
+
+<Figure caption="새 객체는 young에 담겨요. young을 치울 때 더는 쓰지 않는 객체는 치워지고, 살아남은 객체는 old로 옮겨요. old의 객체도 더는 쓰지 않으면 GC가 치워요.">
+  <Flow
+    ariaLabel="새 객체가 young에 담기고, young에서 쓰지 않는 객체는 GC가 치우고 살아남은 객체는 old로 옮기며, old에서도 쓰지 않는 객체는 GC가 치우는 구조도"
+    nodes={[
+      { id: 'new', label: '새 객체', col: 0, row: 0 },
+      { id: 'young', label: 'young', col: 0, row: 1, note: '새 객체 세대', tone: 'accent' },
+      { id: 'old', label: 'old', col: 0, row: 2, note: '오래 산 객체' },
+      { id: 'gone', label: 'GC가 치움', col: 2, row: 1 },
+    ]}
+    edges={[
+      { from: 'new', to: 'young', label: '담겨요', tone: 'accent' },
+      { from: 'young', to: 'old', label: '살아남으면' },
+      { from: 'young', to: 'gone', label: '안 쓰면' },
+      { from: 'old', to: 'gone' },
+    ]}
+  />
+</Figure>
 
 G1이 늘 기본은 아니에요. JVM은 CPU 2개 이상, 메모리 1792MB 이상일 때만 G1을 고르고, 그보다 작으면 Serial GC를 골라요. 작은 파드에서 무엇이 도는지는 <Term slug="apm/gc-logs">GC 로그 읽기</Term>에서 확인해요.
 

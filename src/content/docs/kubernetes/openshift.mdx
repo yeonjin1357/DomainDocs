@@ -23,7 +23,7 @@ sources:
     url: https://github.com/openshift/openshift-docs/blob/main/modules/monitoring-default-monitoring-components.adoc
   - title: OpenShift router (GitHub)
     url: https://github.com/openshift/router
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -94,6 +94,23 @@ TLS를 어디서 풀지도 Route에 정해요.
 
 인증된 사용자가 만든 파드는 기본으로 restricted 계열 SCC를 받아요. 이 규칙은 특권 실행을 막고, 리눅스 권한을 모두 빼요. 실행할 UID는 프로젝트마다 미리 정해 둔 범위에서 골라요.
 
+<Figure caption="파드는 만들어지기 전에 SCC 검사를 받아요. 기본 restricted 계열만 받은 파드가 특권 실행을 요청하면 거절돼, 파드가 아예 만들어지지 않아요. 통과한 파드는 UID를 따로 정하지 않았다면 프로젝트 범위의 첫 값으로 실행돼요.">
+  <Flow
+    ariaLabel="파드 만들기 요청이 SCC 검사를 거쳐, 통과하면 프로젝트 범위의 첫 UID로 파드가 만들어지고, 특권 실행을 요청하면 거절되어 파드가 없는 구조도"
+    nodes={[
+      { id: 'req', label: '파드 만들기', col: 0, row: 0 },
+      { id: 'scc', label: 'SCC 검사', col: 1, row: 0, note: 'restricted', tone: 'accent' },
+      { id: 'ok', label: '파드 생성', col: 2, row: 0, note: '범위 첫 UID' },
+      { id: 'no', label: '거절', col: 1, row: 1, note: '파드 없음', tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'req', to: 'scc' },
+      { from: 'scc', to: 'ok', tone: 'accent' },
+      { from: 'scc', to: 'no', label: '특권 요청', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
 그 범위는 프로젝트의 `openshift.io/sa.scc.uid-range` 주석에 적혀 있어요. 파드가 UID를 따로 정하지 않으면 범위의 첫 값으로 실행해요. 그래서 루트(UID 0)로 실행된다고 가정한 이미지는 그대로 뜨지 않을 수 있어요.
 
 ## 모니터링이 기본으로 들어 있어요
@@ -103,6 +120,17 @@ OpenShift에는 모니터링 묶음이 기본으로 들어 있어요. Prometheus
 이 구성은 Cluster Monitoring Operator가 깔고 관리해요.
 
 Route 같은 OpenShift 전용 객체의 지표는 openshift-state-metrics가 따로 내요.
+
+<Figure caption="OpenShift에 기본으로 깔리는 모니터링 묶음이에요. 가운데 층이 지표를 모으거나 내는 쪽이고, 맨 아래 Cluster Monitoring Operator가 위의 구성 요소를 깔고 관리해요.">
+  <Layers
+    ariaLabel="위에서부터 Prometheus, Alertmanager, Thanos Querier 층, 노드와 객체와 OpenShift 전용 객체의 지표를 내는 node-exporter, kube-state-metrics, openshift-state-metrics 층, 이들을 깔고 관리하는 Cluster Monitoring Operator 층의 계층도"
+    layers={[
+      { label: 'Prometheus · Alertmanager · Thanos Querier', note: '기본 구성' },
+      { label: 'node-exporter · kube-state-metrics · openshift-state-metrics', note: '노드, 객체, Route 같은 OpenShift 전용 객체의 지표' },
+      { label: 'Cluster Monitoring Operator', note: '위 구성을 깔고 관리해요', tone: 'accent' },
+    ]}
+  />
+</Figure>
 
 ## 모니터링에서는
 

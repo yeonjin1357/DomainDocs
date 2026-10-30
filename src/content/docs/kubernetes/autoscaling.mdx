@@ -13,7 +13,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/
   - title: Kubernetes — Node Autoscaling
     url: https://kubernetes.io/docs/concepts/cluster-administration/node-autoscaling/
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 <KeyPoints>
@@ -94,6 +94,19 @@ HPA는 파드만 늘려요. 새 파드를 놓을 노드에 자리가 없으면 �
 
 ## 모니터링에서는
 
+<Figure caption="응답시간과 파드 수를 같은 시간축에 놓은 1분 간격의 예시예요. 응답시간이 먼저 튀고, 2분 뒤에야 파드가 늘기 시작했어요. 확장이 부하를 따라가지 못한 모습이에요.">
+  <MiniLineChart
+    ariaLabel="응답시간이 200ms에서 넷째 분에 600ms, 다섯째 분에 900ms로 튀었다가 내려오는 그래프"
+    yMax={1000}
+    series={[{ label: '응답시간', values: [200, 200, 210, 600, 900, 850, 500, 250, 210, 200, 200, 200], tone: 'warn', value: '최고 900ms' }]}
+  />
+  <MiniLineChart
+    ariaLabel="같은 시간축에서 파드 수가 2개로 있다가 응답시간이 튄 2분 뒤인 여섯째 분부터 4개, 6개로 느는 그래프"
+    yMax={7}
+    series={[{ label: '파드 수', values: [2, 2, 2, 2, 2, 4, 6, 6, 6, 6, 6, 6], tone: 'accent', value: '2 → 6개' }]}
+  />
+</Figure>
+
 HPA 화면은 지금 지표와 목표, 지금 파드 수와 원하는 파드 수를 함께 보여 줘요. 원하는 파드 수가 최대값에 붙어 있다면, 더 늘릴 수 없는 상태예요.
 
 파드 수 그래프는 요청량, 응답시간 그래프와 같은 시간축에 놓고 봐요. 파드가 늘기 전에 응답시간이 먼저 튀었다면, 확장이 부하를 따라가지 못한 거예요.
@@ -115,4 +128,6 @@ HPA 화면은 지금 지표와 목표, 지금 파드 수와 원하는 파드 수
   ### 0개까지 줄이기
 
   최소 파드 수를 0으로 두면, 부하가 없을 때 파드를 모두 내릴 수도 있어요. 다만 CPU 같은 파드 자원 지표만으로는 안 되고, 바깥 지표 같은 다른 지표가 하나 이상 있어야 해요.
+
+  이 기능은 `HPAScaleToZero` 기능 게이트로 켜요. 쿠버네티스 1.37부터 베타라 기본으로 켜져 있고, 그 전 버전에서는 직접 켜야 해요.
 </Deeper>
