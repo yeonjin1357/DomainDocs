@@ -75,3 +75,11 @@ describe('용어 파일 검사', () => {
     expect(at(GOOD.replace('doc: foundations/test', 'doc: foundations/secret'))).toEqual([['reference', 2]]);
   });
 });
+
+describe('용어 파일의 용어 규칙', () => {
+  it('name·short·analogy의 쓰지 않는 말을 잡고, aliases는 둔다', () => {
+    expect(at(GOOD.replace('aliases: [에스엔엠피]', 'aliases: [에스엔엠피, 오류]'))).toEqual([]);
+    expect(at(GOOD.replace('표준 규약이에요.', '표준 규약이라 오류가 적어요.'))).toEqual([['term', 2]]);
+    expect(at(GOOD.replace('name: 스위치', 'name: 톰캣'))).toEqual([['term', 9]]);
+  });
+});

@@ -24,6 +24,7 @@ export type RuleId =
   | 'paragraph-length'
   | 'formal-ending'
   | 'banned-phrase'
+  | 'term'
   | 'analogy-limit'
   | 'glossary'
   | 'quiz'
@@ -264,6 +265,39 @@ function checkBlocks(tree: Root, report: Report): void {
 
 const MDX_COMPONENTS: readonly string[] = LINT_CONFIG.mdxComponents;
 
+const TERM_PATTERNS = LINT_CONFIG.preferredTerms.map((t) => ({ ...t, re: new RegExp('pattern' in t ? t.pattern : t.avoid, 'gu') }));
+
+/** 글자에서 하나로 맞춘 용어 대신 쓴 말을 찾는다. 백틱(`)으로 감싼 코드는 뺀다. offset은 text 안 위치다. */
+export function findAvoidedTerms(text: string): { offset: number; message: string }[] {
+  const masked = text.replace(/`[^`\n]*`/g, (m) => ' '.repeat(m.length));
+  return TERM_PATTERNS.flatMap((t) =>
+    [...masked.matchAll(t.re)].map((m) => ({ offset: m.index, message: `"${t.avoid}" 대신 "${t.use}"로 써요. 기준은 글쓰기 가이드 7장 "자주 쓰는 용어" 표예요.` })),
+  );
+}
+
+/** 본문 글자(단락·소제목·표·목록), 컴포넌트 속성, 머리말 title·summary에서 쓰지 않는 말을 찾는다. */
+function checkTerms(tree: Root, fm: Record<string, unknown>, report: Report): void {
+  const scan = (text: string, line: number, column: number) => {
+    for (const f of findAvoidedTerms(text)) {
+      const before = text.slice(0, f.offset).split('\n');
+      report('term', line + before.length - 1, before.length === 1 ? column + f.offset : 1, f.message);
+    }
+  };
+  for (const key of ['title', 'summary']) {
+    const v = fm[key];
+    if (typeof v === 'string') scan(v, 1, 1);
+  }
+  visit(tree, (node) => {
+    if (node.type === 'text') scan(node.value, lineOf(node), columnOf(node));
+    else if (isJsx(node)) {
+      for (const v of Object.values(jsxAttrs(node))) {
+        if (typeof v === 'string') scan(v, lineOf(node), 1);
+        else if (typeof v === 'object') scan(v.expression, lineOf(node), 1);
+      }
+    }
+  });
+}
+
 /** 등록된 컴포넌트와 import한 데모·SVG 그림만 쓰게 한다. 데모에는 client 지시어, SVG 그림에는 Figure와 aria-label이 있어야 한다. */
 function checkComponents(tree: Root, demos: Set<string>, svgs: Set<string>, report: Report): void {
   visitParents(tree, (node, ancestors) => {
@@ -409,6 +443,7 @@ export function lintSource(src: SourceFile, ctx: LintContext): LintIssue[] {
   checkBlocks(tree, report);
   checkComponents(tree, demos, svgs, report);
   checkProse(tree, report);
+  checkTerms(tree, fm, report);
 
   checkReferences(tree, fm, src, ctx, report);
   visit(tree, 'link', (node) => {

@@ -1,6 +1,6 @@
 import { isMap, isScalar, isSeq, LineCounter, parseDocument, type YAMLMap } from 'yaml';
 import { DOMAIN_IDS } from '../../src/data/domains';
-import { lintProseText, type LintContext, type LintIssue, type RuleId, type TermMeta } from './rules';
+import { findAvoidedTerms, lintProseText, type LintContext, type LintIssue, type RuleId, type TermMeta } from './rules';
 
 export interface GlossaryFile {
   file: string;
@@ -89,6 +89,9 @@ export function lintGlossaryFile(file: GlossaryFile, ctx: LintContext): LintIssu
 
     for (const text of [short, str(node, 'analogy')]) {
       if (text) for (const p of lintProseText(text)) report(p.rule, line, p.message);
+    }
+    for (const text of [name, short, str(node, 'analogy')]) {
+      if (text) for (const t of findAvoidedTerms(text)) report('term', line, t.message);
     }
 
     const doc = str(node, 'doc');

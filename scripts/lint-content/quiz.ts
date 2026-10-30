@@ -1,5 +1,5 @@
 import { isMap, isScalar, isSeq, LineCounter, parseDocument, type YAMLMap } from 'yaml';
-import { lintProseText, type LintContext, type LintIssue, type RuleId } from './rules';
+import { findAvoidedTerms, lintProseText, type LintContext, type LintIssue, type RuleId } from './rules';
 
 export interface QuizFile {
   file: string;
@@ -88,6 +88,10 @@ export function lintQuizFile(file: QuizFile, ctx: LintContext): LintIssue[] {
       if (!accepted || accepted.length === 0 || accepted.some((a) => a.trim() === '')) report('quiz', line, '주관식 answer는 정답 글자 목록으로 써요. 예: [Syslog, 시스로그]');
       const term = str(node, 'term');
       if (term !== undefined && !ctx.terms.has(term)) report('reference', line, `term: 대상 용어가 없어요 (${term}).`);
+    }
+
+    for (const text of [prompt, explain, ...(strings(node.get('choices', true)) ?? [])]) {
+      if (text) for (const t of findAvoidedTerms(text)) report('term', line, t.message);
     }
 
     const docRef = str(node, 'doc');

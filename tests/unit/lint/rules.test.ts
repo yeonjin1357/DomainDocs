@@ -296,3 +296,25 @@ describe('머리말과 참조 규칙', () => {
     expect(issues[0].line).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('용어 규칙', () => {
+  it('본문·소제목·표·속성·머리말의 쓰지 않는 말을 잡는다', () => {
+    const issues = lint(FRONT() + CONCEPT_BODY.replace('응답은 1~2초 사이예요.', '응답 오류가 늘어요.'));
+    expect(issues.map((i) => i.rule)).toEqual(['term']);
+    expect(issues[0].message).toContain('"오류" 대신 "에러"');
+    const before = (block: string) => FRONT() + CONCEPT_BODY.replace('<Checkpoints>', `${block}\n\n<Checkpoints>`);
+    expect(rules(before('## 라벨 고르기'))).toEqual(['term']);
+    expect(rules(before('| 이름 | 뜻 |\n| --- | --- |\n| 톰캣 | 서버 |'))).toEqual(['term']);
+    expect(rules(FRONT() + CONCEPT_BODY.replace('title="응답시간"', 'title="연결 풀"'))).toEqual(['term']);
+    expect(rules(FRONT().replace('테스트 글', '스로틀 보기') + CONCEPT_BODY)).toEqual(['term']);
+  });
+  it('줄 번호는 여러 줄 단락에서도 맞는 줄을 가리킨다', () => {
+    const issues = lint(FRONT() + CONCEPT_BODY.replace('응답은 1~2초 사이예요.', '응답은 1~2초예요.\n    레플리카셋이 늘어요.'));
+    const at = (FRONT() + CONCEPT_BODY).split('\n').findIndex((l) => l.includes('응답은 1~2초')) + 2;
+    expect(issues.map((i) => [i.rule, i.line])).toEqual([['term', at]]);
+  });
+  it('인라인 코드, 코드 블록, 허용한 문맥, keywords는 잡지 않는다', () => {
+    const body = CONCEPT_BODY.replace('응답은 1~2초 사이예요.', '`metrics-server`는 플래너라고 부르지 않아요. 스로틀링돼요.');
+    expect(lint(FRONT('keywords: [오류, 라벨]\n') + body.replace('<Checkpoints>', '```\n오류 라벨\n```\n\n<Checkpoints>'))).toEqual([]);
+  });
+});

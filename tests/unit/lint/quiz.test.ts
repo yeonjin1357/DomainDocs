@@ -81,3 +81,12 @@ describe('퀴즈 파일 검사', () => {
     expect(at(GOOD.replace('term: foundations/snmp', 'term: foundations/none'))).toEqual([['reference', 14]]);
   });
 });
+
+describe('문제 파일의 용어 규칙', () => {
+  it('prompt·choices·explain의 쓰지 않는 말을 잡고, answer는 둔다', () => {
+    expect(at(GOOD.replace('answer: [Syslog, 시스로그]', 'answer: [Syslog, 시스로그, 오류]'))).toEqual([]);
+    expect(at(GOOD.replace('받는 값인가요?', '받는 오류인가요?'))).toEqual([['term', 2]]);
+    expect(at(GOOD.replace('[스위치, 라우터, 방화벽, 로드 밸런서]', '[스위치, 라우터, 방화벽, 톰캣]'))).toEqual([['term', 7]]);
+    expect(at(GOOD.replace('폴링이에요.', '폴링이라 `오류`는 없어요.'))).toEqual([]);
+  });
+});
