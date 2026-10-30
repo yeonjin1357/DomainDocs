@@ -18,12 +18,12 @@ questions:
     type: choice
     prompt: 재부팅 전 로그를 보려고 journalctl -b -1을 했는데 아무것도 나오지 않아요. 가장 그럴듯한 이유는?
     choices:
-      - 저널을 메모리(/run/log/journal)에만 두고 있어서
+      - 저널을 메모리에만 두고 있어서
       - 커널 로그의 링 버퍼가 가득 차서
       - 서비스의 Restart=가 꺼져 있어서
       - journalctl은 지난 부팅을 볼 수 없어서
     answer: 0
-    explain: 메모리에만 둔 저널은 재부팅 때 사라져요. 디스크(/var/log/journal)에 둬야 재부팅 뒤에도 남아요.
+    explain: 메모리(/run/log/journal)에만 둔 저널은 재부팅 때 사라져요. 디스크(/var/log/journal)에 둬야 재부팅 뒤에도 남아요.
   - id: not-in-journald
     type: choice
     prompt: 다음 중 journald가 모으지 않는 로그는?

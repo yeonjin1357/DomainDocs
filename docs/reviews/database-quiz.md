@@ -21,3 +21,12 @@
 | buffer-cache-hit-ratio · shared-buffers-start, read-not-always-disk | 1GB 넘는 전용 서버는 메모리 25%에서 시작, 기본 보통 128MB, blks_read는 OS 캐시일 수 있음 | 글 본문과 docs/reviews/database-buffer-cache-hit-ratio.md |
 | too-many-connections · admin-reserved, hikari-min-idle, pgbouncer-transaction-mode | superuser_reserved_connections 기본 3, HikariCP minimumIdle 기본은 maximumPoolSize와 같음, PgBouncer transaction 모드 | 글 본문과 docs/reviews/database-too-many-connections.md |
 | slow-database · blocking-pids-name | pg_blocking_pids(pid)는 막고 있는 세션들의 pid를 돌려줌 | 글 본문과 docs/reviews/database-slow-database.md |
+
+## 2026-10-30 검사 규칙에 맞춰 고치기
+
+정답 보기만 길던 15문제를 줄이고 자세한 말은 해설로 옮겼어요. 새로 확인한 주장만 적어요.
+
+| 문제 | 주장 | 근거 |
+| --- | --- | --- |
+| stop-long-query · idle-in-tx-timeout-target | idle_in_transaction_session_timeout은 트랜잭션을 연 채 쉬는 세션만 끊고, 트랜잭션 밖에서 쉬는 세션은 idle_session_timeout이 맡음 | https://www.postgresql.org/docs/18/runtime-config-client.html |
+| too-many-connections · pgbouncer-transaction-mode | transaction 모드는 트랜잭션이 끝나면 서버 연결을 풀로 돌려받음, 기본 pool_mode는 session | https://www.pgbouncer.org/config.html |

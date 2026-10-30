@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lintGlossaryFile } from '../../../scripts/lint-content/glossary';
+import { collectTerms, lintGlossaryFile } from '../../../scripts/lint-content/glossary';
 import type { LintContext } from '../../../scripts/lint-content/rules';
 
 const ctx: LintContext = {
@@ -81,5 +81,15 @@ describe('용어 파일의 용어 규칙', () => {
     expect(at(GOOD.replace('aliases: [에스엔엠피]', 'aliases: [에스엔엠피, 오류]'))).toEqual([]);
     expect(at(GOOD.replace('표준 규약이에요.', '표준 규약이라 오류가 적어요.'))).toEqual([['term', 2]]);
     expect(at(GOOD.replace('name: 스위치', 'name: 톰캣'))).toEqual([['term', 9]]);
+  });
+});
+
+describe('용어 키 모으기', () => {
+  it('주관식 채점이 받는 이름(name, 괄호를 뺀 name, aliases)을 함께 모은다', () => {
+    const source = GOOD.replace('name: 스위치', 'name: 스위치(L2)');
+    expect(collectTerms({ file: 'foundations.yaml', domain: 'foundations', source })).toEqual([
+      { key: 'foundations/snmp', doc: 'foundations/test', names: ['SNMP', 'SNMP', '에스엔엠피'] },
+      { key: 'foundations/switch', doc: undefined, names: ['스위치(L2)', '스위치'] },
+    ]);
   });
 });

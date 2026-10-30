@@ -18,12 +18,12 @@ questions:
     type: choice
     prompt: sum by (job, status)로 구한 5xx 수를 sum by (job)으로 구한 전체 요청 수로 나눴더니 결과가 비었어요. 왜 그럴까요?
     choices:
-      - 왼쪽에만 status 레이블이 있어 짝이 맞는 시계열이 없어서요
+      - status 레이블 탓에 짝이 없어서요
       - 5xx 요청이 하나도 없어서요
       - 나눗셈은 PromQL에서 쓸 수 없어서요
       - rate 구간이 너무 짧아서요
     answer: 0
-    explain: 나누기는 양쪽 레이블이 똑같은 시계열끼리 짝을 지어요. ignoring(status)와 group_left로 짝짓는 법을 바꿀 수 있어요.
+    explain: 나누기는 양쪽 레이블이 똑같은 시계열끼리 짝을 지어요. 왼쪽에만 status가 있으면 짝이 없어요. ignoring(status)와 group_left로 짝짓는 법을 바꿀 수 있어요.
   - id: sum-without-by
     type: ox
     prompt: sum(rate(http_requests_total[5m]))처럼 by 없이 sum을 쓰면, 서비스마다 하나씩 결과가 나오나요?

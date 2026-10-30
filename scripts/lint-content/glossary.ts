@@ -42,7 +42,14 @@ const str = (node: YAMLMap, key: string): string | undefined => {
 export function collectTerms(file: GlossaryFile): TermMeta[] {
   return readTerms(file.source).items.flatMap(({ node }) => {
     const id = isMap(node) ? str(node, 'id') : undefined;
-    return id ? [{ key: `${file.domain}/${id}`, doc: str(node, 'doc') }] : [];
+    if (!id) return [];
+    const name = str(node, 'name');
+    const aliases = node.get('aliases');
+    const names = [
+      ...(name ? [name, name.replace(/\s*\([^)]*\)\s*/g, '').trim()] : []),
+      ...(isSeq(aliases) ? aliases.items.flatMap((a) => (isScalar(a) && typeof a.value === 'string' ? [a.value] : [])) : []),
+    ].filter((n) => n !== '');
+    return [{ key: `${file.domain}/${id}`, doc: str(node, 'doc'), names }];
   });
 }
 

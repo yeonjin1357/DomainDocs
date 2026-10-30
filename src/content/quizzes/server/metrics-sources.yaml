@@ -8,7 +8,7 @@ questions:
     type: choice
     prompt: 같은 서버, 같은 시각인데 top은 CPU 92%, 에이전트 그래프는 41%를 보여요. 가장 그럴듯한 이유는?
     choices:
-      - 평균 낸 시간이 달라서, 짧은 폭주가 1분 평균에 깎였어요
+      - 짧은 폭주가 1분 평균에 깎였어요
       - 에이전트가 고장 나서 값을 잘못 읽었어요
       - top은 다른 서버를 보고 있어요
       - 커널이 도구마다 다른 값을 줘요
@@ -19,9 +19,9 @@ questions:
     prompt: node_exporter 지표로 서버 전체 CPU 사용률(0~1)을 구하는 식으로 알맞은 것은?
     choices:
       - 1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
-      - avg by (instance) (node_cpu_seconds_total{mode="idle"})
-      - sum by (instance) (node_cpu_seconds_total)
-      - rate(node_cpu_seconds_total{mode="user"}[5m])
+      - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
+      - 1 - avg by (instance) (node_cpu_seconds_total{mode="idle"})
+      - sum by (instance) (rate(node_cpu_seconds_total{mode="user"}[5m]))
     answer: 0
     explain: CPU 시간은 누적값이라 rate로 초당 증가량을 구해요. 쉬는 시간의 비율을 1에서 빼면 사용률이에요.
   - id: double-mount

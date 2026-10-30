@@ -1,4 +1,5 @@
 import { isMap, isScalar, isSeq, LineCounter, parseDocument, type YAMLMap } from 'yaml';
+import { normalizeAnswer } from '../../src/lib/quiz/answer';
 import { findAvoidedTerms, lintProseText, type LintContext, type LintIssue, type RuleId } from './rules';
 
 export interface QuizFile {
@@ -13,6 +14,11 @@ const TYPES = ['ox', 'choice', 'input'];
 const FIELDS = ['id', 'type', 'prompt', 'choices', 'answer', 'explain', 'doc', 'term'];
 const MAX_PROMPT = 200;
 const CHOICE_COUNT = 4;
+/** 정답 보기는 가장 긴 오답의 1.2배까지, 짧은 보기는 3자 더 길어도 된다. */
+const ANSWER_LENGTH = { ratio: 1.2, slack: 3 };
+/** 문제 전체 비율. 해당 형태 문제가 minCount개보다 적으면 보지 않는다. */
+const BANK = { minCount: 20, oxTrue: [0.4, 0.6], longestAnswer: 0.35 };
+const PAREN = /[()]/;
 
 const chars = (s: string) => [...s].length;
 const str = (node: YAMLMap, key: string): string | undefined => {
@@ -82,12 +88,23 @@ export function lintQuizFile(file: QuizFile, ctx: LintContext): LintIssue[] {
       else if (new Set(choices).size !== choices.length) report('quiz', line, '같은 보기가 두 번 나와요.');
       else if (!(typeof answerValue === 'number' && Number.isInteger(answerValue) && answerValue >= 0 && answerValue < CHOICE_COUNT)) {
         report('quiz', line, `객관식 answer는 정답 보기의 순서 번호(0~${CHOICE_COUNT - 1})로 써요.`);
+      } else {
+        const right = choices[answerValue];
+        const wrong = choices.filter((_, i) => i !== answerValue);
+        const longestWrong = Math.max(...wrong.map(chars));
+        if (chars(right) > Math.max(longestWrong * ANSWER_LENGTH.ratio, longestWrong + ANSWER_LENGTH.slack)) {
+          report('quiz', line, `정답 보기(${chars(right)}자)가 가장 긴 오답(${longestWrong}자)보다 너무 길어요. 자세한 말은 해설로 옮겨요.`);
+        }
+        if (PAREN.test(right) && !wrong.some((c) => PAREN.test(c))) report('quiz', line, '정답 보기에만 괄호 설명이 있어요. 괄호를 빼거나 오답에도 같은 꼴로 써요.');
       }
     } else {
       const accepted = strings(answer);
       if (!accepted || accepted.length === 0 || accepted.some((a) => a.trim() === '')) report('quiz', line, '주관식 answer는 정답 글자 목록으로 써요. 예: [Syslog, 시스로그]');
       const term = str(node, 'term');
       if (term !== undefined && !ctx.terms.has(term)) report('reference', line, `term: 대상 용어가 없어요 (${term}).`);
+      const graded = [...(accepted ?? []), ...((term && ctx.terms.get(term)?.names) ?? [])];
+      const leaked = prompt ? graded.find((a) => normalizeAnswer(a) !== '' && normalizeAnswer(prompt).includes(normalizeAnswer(a))) : undefined;
+      if (leaked) report('quiz', line, `정답으로 받는 말(${leaked})이 문제 글에 있어요. 문제를 고치거나, term이 넓히는 정답이면 term을 빼요.`);
     }
 
     for (const text of [prompt, explain, ...(strings(node.get('choices', true)) ?? [])]) {
@@ -100,6 +117,45 @@ export function lintQuizFile(file: QuizFile, ctx: LintContext): LintIssue[] {
       if (!linked) report('reference', line, `doc: 대상 글이 없어요 (${docRef}).`);
       else if (linked.draft) report('reference', line, `doc: 초안 글은 가리킬 수 없어요 (${docRef}).`);
     }
+  }
+  return issues;
+}
+
+/** 문제 전체에서 정답 쏠림을 본다. 형식이 틀린 파일·문제는 건너뛴다(위반은 lintQuizFile이 낸다). */
+export function lintQuizBank(files: QuizFile[], root = 'src/content/quizzes'): LintIssue[] {
+  let ox = 0;
+  let oxTrue = 0;
+  let choice = 0;
+  let longest = 0;
+  for (const file of files) {
+    const doc = parseDocument(file.source);
+    const questions = doc.errors.length === 0 && isMap(doc.contents) ? doc.contents.get('questions', true) : undefined;
+    if (!isSeq(questions)) continue;
+    for (const item of questions.items) {
+      if (!isMap(item)) continue;
+      const node = item as YAMLMap;
+      const answer = node.get('answer');
+      if (node.get('type') === 'ox' && typeof answer === 'boolean') {
+        ox++;
+        if (answer) oxTrue++;
+      }
+      const choices = strings(node.get('choices', true));
+      if (node.get('type') === 'choice' && choices && typeof answer === 'number' && choices[answer] !== undefined) {
+        choice++;
+        if (chars(choices[answer]) > Math.max(...choices.filter((_, i) => i !== answer).map(chars))) longest++;
+      }
+    }
+  }
+
+  const issues: LintIssue[] = [];
+  const report = (message: string) => issues.push({ file: root, line: 1, column: 1, rule: 'quiz', message });
+  const pct = (n: number) => `${Math.round(n * 100)}%`;
+  const [low, high] = BANK.oxTrue;
+  if (ox >= BANK.minCount && (oxTrue / ox < low || oxTrue / ox > high)) {
+    report(`OX 정답 중 O가 ${pct(oxTrue / ox)}예요(${oxTrue}/${ox}). ${pct(low)}~${pct(high)}로 맞춰요.`);
+  }
+  if (choice >= BANK.minCount && longest / choice > BANK.longestAnswer) {
+    report(`정답이 가장 긴 보기인 객관식이 ${pct(longest / choice)}예요(${longest}/${choice}). ${pct(BANK.longestAnswer)} 이하로 맞춰요.`);
   }
   return issues;
 }

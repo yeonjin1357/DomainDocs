@@ -60,6 +60,8 @@ export interface DocMeta {
 export interface TermMeta {
   key: string;
   doc?: string;
+  /** 주관식 채점이 정답으로 받는 이름(name, 괄호를 뺀 name, aliases). */
+  names?: string[];
 }
 
 export interface LintContext {

@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { collectTerms, lintGlossaryFile, type GlossaryFile } from './glossary';
-import { lintQuizFile, type QuizFile } from './quiz';
+import { lintQuizBank, lintQuizFile, type QuizFile } from './quiz';
 import { collectMeta, lintSource, type LintContext, type SourceFile } from './rules';
 
 const root = process.env.DOCS_CONTENT_DIR ?? 'src/content/docs';
@@ -58,6 +58,7 @@ const issues = [
   ...files.flatMap((f) => lintSource(f, ctx)),
   ...glossaries.flatMap((g) => lintGlossaryFile(g, ctx)),
   ...quizzes.flatMap((q) => lintQuizFile(q, ctx)),
+  ...lintQuizBank(quizzes, quizzesRoot),
 ];
 for (const i of issues) console.log(`${i.file}:${i.line}:${i.column} [${i.rule}] ${i.message}`);
 console.log(`글 ${files.length}편, 용어 파일 ${glossaries.length}개, 문제 파일 ${quizzes.length}개 검사, 위반 ${issues.length}건`);

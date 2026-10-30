@@ -19,16 +19,16 @@ questions:
     prompt: MySQL에서 큰 UPDATE를 KILL한 뒤 되돌리기가 오래 걸리면, DB를 재시작해서 빨리 끝낼 수 있나요?
     answer: false
     explain: MySQL 문서는 프로세스를 죽여도 소용없고, 다시 켜질 때 되돌리기가 처음부터 다시 시작된다고 해요.
-  - id: idle-in-tx-timeout
+  - id: idle-in-tx-timeout-target
     type: choice
-    prompt: 쿼리는 끝났는데 트랜잭션을 연 채 쉬며 잠금을 쥐는 세션을 자동으로 끊는 PostgreSQL 설정은?
+    prompt: PostgreSQL에서 idle_in_transaction_session_timeout을 30초로 두면 어떤 세션이 끊길까요?
     choices:
-      - idle_in_transaction_session_timeout
-      - statement_timeout
-      - lock_timeout
-      - deadlock_timeout
+      - 트랜잭션을 연 채 30초 넘게 쉬는 세션
+      - SQL 하나를 30초 넘게 실행하는 세션
+      - 잠금을 30초 넘게 기다리는 세션
+      - 트랜잭션 없이 30초 넘게 쉬는 세션
     answer: 0
-    explain: 트랜잭션을 연 채 정한 시간보다 오래 쉬면 세션을 끊어요. statement_timeout은 도는 SQL 하나에만 걸려요.
+    explain: 트랜잭션을 연 채 쉬는 세션만 끊어서, 쥔 잠금을 풀어 줘요. 오래 도는 SQL은 statement_timeout, 잠금 대기는 lock_timeout이 맡아요.
   - id: true-means-sent
     type: ox
     prompt: pg_terminate_backend가 true를 돌려주면, 그 세션이 이미 끝났다고 확신해도 되나요?

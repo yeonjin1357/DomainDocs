@@ -13,12 +13,12 @@ questions:
     type: choice
     prompt: CPU의 포화(Saturation)를 보여 주는 예는?
     choices:
-      - 실행 대기열(run queue)의 길이
+      - 실행 대기열의 길이
       - CPU 사용률
       - 디스크 I/O 에러 수
       - 요청의 응답시간
     answer: 0
-    explain: 포화는 처리하지 못하고 쌓아 둔 일의 양이에요. 사용률이 바쁜 정도라면 포화는 밀린 정도예요.
+    explain: 포화는 처리하지 못하고 쌓아 둔 일의 양이에요. CPU라면 실행 대기열(run queue)에 줄 선 작업 수예요. 사용률이 바쁜 정도라면 포화는 밀린 정도예요.
   - id: average-hides-saturation
     type: ox
     prompt: 5분 평균 CPU 사용률이 80%를 넘지 않으면, CPU 포화로 느려질 일은 없나요?
@@ -38,9 +38,9 @@ questions:
     type: choice
     prompt: 서비스 대시보드의 첫 화면에 둘 것은?
     choices:
-      - RED(요청·에러·지연)
+      - 요청 수·에러율·지연
       - CPU·메모리 사용률만
       - 디스크 용량
       - 네트워크 바이트 수
     answer: 0
-    explain: RED는 사용자가 겪는 일을 보여 줘요. 자원 지표는 RED가 나빠졌을 때 원인을 찾는 데 써요.
+    explain: 요청 수·에러율·지연(RED)은 사용자가 겪는 일을 보여 줘요. 자원 지표는 RED가 나빠졌을 때 원인을 찾는 데 써요.

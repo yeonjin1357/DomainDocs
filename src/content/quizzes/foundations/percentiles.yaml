@@ -33,7 +33,7 @@ questions:
     type: choice
     prompt: 요청이 50개뿐일 때, 순위로 값을 고르는 방식(nearest-rank)의 p99는?
     choices:
-      - 늘 가장 큰 값(50번째)이에요
+      - 가장 큰 값이에요
       - 49번째 값이에요
       - 가운데 값이에요
       - 계산할 수 없어요

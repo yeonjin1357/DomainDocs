@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lintQuizFile } from '../../../scripts/lint-content/quiz';
+import { lintQuizBank, lintQuizFile } from '../../../scripts/lint-content/quiz';
 import type { LintContext } from '../../../scripts/lint-content/rules';
 
 const ctx: LintContext = {
@@ -8,7 +8,7 @@ const ctx: LintContext = {
     ['foundations/other', { id: 'foundations/other', type: 'concept', draft: false }],
     ['foundations/secret', { id: 'foundations/secret', type: 'concept', draft: true }],
   ]),
-  terms: new Map([['foundations/snmp', { key: 'foundations/snmp' }]]),
+  terms: new Map([['foundations/snmp', { key: 'foundations/snmp', names: ['SNMP', '에스엔엠피'] }]]),
 };
 
 const GOOD = `questions:
@@ -79,6 +79,51 @@ describe('퀴즈 파일 검사', () => {
     expect(at(GOOD, 'foundations/secret')).toEqual([['reference', 1]]);
     expect(at(GOOD.replace('doc: foundations/other', 'doc: foundations/none'))).toEqual([['reference', 7]]);
     expect(at(GOOD.replace('term: foundations/snmp', 'term: foundations/none'))).toEqual([['reference', 14]]);
+  });
+});
+
+describe('문제 글만 보고 답이 보이는 문제', () => {
+  it('정답 보기가 가장 긴 오답보다 1.2배(짧은 보기는 3자) 넘게 길면 잡는다', () => {
+    expect(at(GOOD.replace('[스위치, 라우터, 방화벽, 로드 밸런서]', '[같은 네트워크 안을 잇는 스위치, 라우터, 방화벽, 로드 밸런서]'))).toEqual([['quiz', 7]]);
+    // 짧은 보기는 3자까지 봐준다: 정답 9자, 가장 긴 오답 6자.
+    expect(at(GOOD.replace('[스위치, 라우터, 방화벽, 로드 밸런서]', '[L2 스위치 장비, 라우터, 방화벽, 로드 밸런서]'))).toEqual([]);
+  });
+
+  it('정답 보기에만 괄호 설명이 붙으면 잡는다', () => {
+    expect(at(GOOD.replace('[스위치, 라우터, 방화벽, 로드 밸런서]', '[스위치(L2), 라우터, 방화벽, 로드 밸런서]'))).toEqual([['quiz', 7]]);
+    expect(at(GOOD.replace('[스위치, 라우터, 방화벽, 로드 밸런서]', '[스위치(L2), 라우터(L3), 방화벽, 로드 밸런서]'))).toEqual([]);
+  });
+
+  it('주관식에서 정답으로 받는 말이 문제 글에 들어 있으면 잡는다', () => {
+    expect(at(GOOD.replace('남겨 보내는 표준 형식은?', '남겨 보내는 표준 형식(syslog)은?'))).toEqual([['quiz', 14]]);
+    // term으로 이은 용어의 이름·별칭도 정답으로 받으니 함께 본다.
+    expect(at(GOOD.replace('남겨 보내는 표준 형식은?', 'SNMP 말고, 남겨 보내는 표준 형식은?'))).toEqual([['quiz', 14]]);
+  });
+});
+
+describe('문제 전체의 비율', () => {
+  const ox = (n: number, trues: number) =>
+    Array.from({ length: n }, (_, i) => `  - id: ox-${i}\n    type: ox\n    prompt: 문제 ${i}인가요?\n    answer: ${i < trues}\n    explain: 해설이에요.\n`).join('');
+  const choice = (n: number, longest: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const choices = i < longest ? '[정답이에요, 오답, 오답2, 오답3]' : '[정답, 오답이에요, 오답2, 오답3]';
+      return `  - id: ch-${i}\n    type: choice\n    prompt: 문제 ${i}는?\n    choices: ${choices}\n    answer: 0\n    explain: 해설이에요.\n`;
+    }).join('');
+  const bank = (body: string) => lintQuizBank([{ file: 'a.yaml', id: 'foundations/test', source: `questions:\n${body}` }]).map((i) => i.rule);
+
+  it('OX 정답의 O가 40~60%를 벗어나면 잡는다', () => {
+    expect(bank(ox(20, 8) + choice(20, 0))).toEqual([]);
+    expect(bank(ox(20, 4) + choice(20, 0))).toEqual(['quiz']);
+    expect(bank(ox(20, 13) + choice(20, 0))).toEqual(['quiz']);
+  });
+
+  it('정답이 가장 긴 보기인 객관식이 35%를 넘으면 잡는다', () => {
+    expect(bank(ox(20, 10) + choice(20, 7))).toEqual([]);
+    expect(bank(ox(20, 10) + choice(20, 8))).toEqual(['quiz']);
+  });
+
+  it('OX나 객관식이 20개보다 적으면 그 비율은 보지 않는다', () => {
+    expect(bank(ox(3, 0) + choice(3, 3))).toEqual([]);
   });
 });
 

@@ -18,12 +18,12 @@ questions:
     type: choice
     prompt: pg_stat_statements의 total_exec_time을 받은 그대로 그래프로 그리면 생기는 문제는?
     choices:
-      - 누적값이라 오르기만 해서 지금 무거운 SQL이 보이지 않아요
+      - 누적값이라 오르기만 하는 선이 돼요
       - 평균값이라 호출 수가 지워져요
       - 1분마다 0으로 돌아가서 선이 끊겨요
       - 앱이 직접 보낸 SQL이 빠져요
     answer: 0
-    explain: 호출 수와 시간은 마지막 초기화 뒤로 쌓인 값이에요. 구간을 보려면 두 시점 값의 차이를 써요.
+    explain: 호출 수와 시간은 마지막 초기화 뒤로 쌓인 값이라, 지금 무거운 SQL이 드러나지 않아요. 구간을 보려면 두 시점 값의 차이를 써요.
   - id: fast-sql-long-db-span
     type: ox
     prompt: SQL 평균은 빠른데 앱 트레이스의 DB 구간이 길다면, 같은 SQL을 요청마다 여러 번 부르는지 의심해 볼 만한가요?
