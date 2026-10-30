@@ -298,3 +298,20 @@ test('서킷 브레이커 데모: 9번 실패해도 닫혀 있고, 10번째에 �
   await ok.click();
   await expect(stat(demo, 'state')).toHaveText('닫힘');
 });
+
+test('화면 둘러보기: 칸을 누르면 그 줄 아래에 설명이 펼쳐지고, 다음 칸으로 넘어간다', async ({ page }) => {
+  const demo = await openDemo(page, 'DashboardTour', 'tour-apm');
+  const panel = demo.locator('[data-tour-panel]');
+  await expect(panel).toHaveCount(0);
+  await demo.locator('[data-tour-widget="errors"]').click();
+  await expect(panel).toContainText('에러율');
+  await expect(panel).toContainText('흔한 함정');
+  await expect(panel.getByRole('link', { name: '에러와 예외' })).toHaveAttribute('href', '/DomainDocs/apm/errors-and-exceptions/');
+  // 에러율(3번째)은 Apdex(4번째)와 같은 줄이라, 설명은 두 칸 뒤에 붙어요.
+  await expect(demo.locator('.tour-grid > *').nth(4)).toHaveAttribute('data-tour-panel');
+  await panel.getByRole('button', { name: '다음 칸' }).click();
+  await expect(demo.locator('[data-tour-widget="apdex"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(panel).toContainText('Apdex');
+  await demo.locator('[data-tour-widget="apdex"]').click();
+  await expect(panel).toHaveCount(0);
+});

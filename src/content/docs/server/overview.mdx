@@ -16,8 +16,9 @@ sources:
     url: https://man7.org/linux/man-pages/man5/proc.5.html
   - title: Linux man-pages — proc_stat(5)
     url: https://man7.org/linux/man-pages/man5/proc_stat.5.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
+import DashboardTour from '../../../components/demos/DashboardTour.tsx';
 
 <Analogy limit="사무실 관리자는 가끔 자리를 비워도 되지만, 운영체제 커널은 한순간도 빠짐없이 모든 자원 사용을 중간에서 맡아요.">
   서버는 사무실과 비슷해요. 직원(CPU 코어)이 책상(메모리)에서 서류를 펴 놓고 일하고, 오래 둘 서류는 캐비닛(디스크)에 넣어요. 관리자(운영체제)는 누가 언제 어느 책상을 쓸지 정해요.
@@ -58,6 +59,12 @@ updated: 2026-10-21
 리눅스 커널은 자기 상태를 `/proc`라는 가상 파일로 내놓아요. 실제 디스크에 있는 파일이 아니라, 읽을 때마다 커널이 지금 값을 만들어 줘요.
 
 CPU가 어떤 일에 시간을 썼는지는 `/proc/stat`에, 부하는 `/proc/loadavg`에 있어요. 이 값 대부분은 부팅 뒤 계속 쌓이는 누적값이라, 사용률은 두 시점의 차이로 계산해요. 누적값을 다루는 법은 <Term slug="foundations/counters-and-rate">카운터와 rate</Term>에 있어요.
+
+## 화면으로 둘러봐요
+
+서버 모니터링 화면을 예시로 그렸어요. 칸을 누르면 그 칸이 무엇인지, 어떻게 읽는지, 흔한 함정이 무엇인지 펼쳐져요.
+
+<DashboardTour client:visible screen="server" />
 
 ## 단계를 하나씩 확대해 봐요
 

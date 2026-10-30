@@ -14,8 +14,9 @@ sources:
     url: https://grafana.com/docs/loki/latest/get-started/overview/
   - title: Elasticsearch — Text field type
     url: https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/text
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import DashboardTour from '../../../components/demos/DashboardTour.tsx';
 
 <Analogy limit="작업 일지는 하루에 몇 쪽이지만, 로그는 서버 한 대에서도 초당 수천 줄이 쏟아져요. 그래서 무엇을 남기고 얼마나 오래 둘지가 곧 비용이에요.">
   로그는 공장 곳곳의 작업 일지와 같아요. 일지를 걷어 오고, 날짜와 항목별로 옮겨 적고, 찾기 쉽게 색인을 붙여 보관해요. 그래서 필요할 때 찾아보고, 특정 단어가 나오면 바로 알려 줄 수 있어요.
@@ -67,6 +68,12 @@ OpenTelemetry는 로그 한 건을 아래 칸으로 나눠 다뤄요. 도구마�
 시각이 두 개라는 점을 기억해 둬요. 두 시각의 차이가 곧 로그가 늦게 도착한 정도예요. 늦게 도착하는 로그는 알림과 검색 결과를 흔들어요.
 
 TraceId로 트레이스와 로그를 잇는 법은 <Term slug="foundations/logs-metrics-traces">로그, 메트릭, 트레이스</Term>에서 다뤄요.
+
+## 화면으로 둘러봐요
+
+로그 화면을 예시로 그렸어요. 칸을 누르면 그 칸이 무엇인지, 어떻게 읽는지, 흔한 함정이 무엇인지 펼쳐져요.
+
+<DashboardTour client:visible screen="logs" />
 
 ## 단계를 하나씩 확대해 봐요
 

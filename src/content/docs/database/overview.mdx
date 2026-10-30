@@ -18,8 +18,9 @@ sources:
     url: https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/sql-processing.html
   - title: SQL Server — Query processing architecture guide
     url: https://learn.microsoft.com/en-us/sql/relational-databases/query-processing-architecture-guide
-updated: 2026-10-21
+updated: 2026-10-30
 ---
+import DashboardTour from '../../../components/demos/DashboardTour.tsx';
 
 <Analogy limit="식당은 요리를 낸 뒤 장부를 정리해도 되지만, DB는 바뀐 내용을 로그에 먼저 적어야 커밋을 끝낼 수 있어요.">
   DB는 큰 식당 주방과 비슷해요. 손님이 자리에 앉고(연결), 주문서를 읽고(해석), 조리 순서를 정하고(계획), 요리해서(실행) 내보내요. 자주 쓰는 재료는 조리대에, 나머지는 창고에 있어요.
@@ -61,6 +62,12 @@ updated: 2026-10-21
 6. **결과**: 모은 행을 같은 연결로 앱에 돌려줘요.
 
 로그에 먼저 적는 이유는 장애에 대비하기 위해서예요. 데이터 파일에 미처 쓰지 못한 변경이 있어도, 다시 켤 때 로그를 보고 되살려요.
+
+## 화면으로 둘러봐요
+
+DB 모니터링 화면을 예시로 그렸어요. 칸을 누르면 그 칸이 무엇인지, 어떻게 읽는지, 흔한 함정이 무엇인지 펼쳐져요.
+
+<DashboardTour client:visible screen="database" />
 
 ## 단계를 하나씩 확대해 봐요
 

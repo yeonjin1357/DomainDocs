@@ -14,8 +14,9 @@ sources:
     url: https://kubernetes.io/docs/concepts/overview/working-with-objects/
   - title: Kubernetes — Overview
     url: https://kubernetes.io/docs/concepts/overview/
-updated: 2026-10-21
+updated: 2026-10-30
 ---
+import DashboardTour from '../../../components/demos/DashboardTour.tsx';
 
 <Analogy limit="항구 관제탑은 사람이 지시를 내리지만, 쿠버네티스는 사람이 '원하는 모습'만 적어 두면 지금 모습과의 차이를 스스로 계속 메워요.">
   쿠버네티스는 큰 항구와 비슷해요. 화주는 "컨테이너 세 개를 실어 줘"라고 원하는 상태만 적어 내요. 관제탑(컨트롤 플레인)이 어느 배(노드)에 실을지 정하고, 배마다 있는 선원(kubelet)이 실제로 싣고 지켜요.
@@ -55,6 +56,12 @@ updated: 2026-10-21
 | 컨테이너 런타임 | 노드마다 | 컨테이너를 실제로 실행해요 |
 
 구성 요소들은 서로 직접 부르기보다 API 서버를 거쳐 움직여요. 그래서 API 서버가 멈추면 새 배포나 변경이 모두 멈춰요. 이미 떠 있는 파드는 그대로 돌아요.
+
+## 화면으로 둘러봐요
+
+쿠버네티스 모니터링 화면을 예시로 그렸어요. 칸을 누르면 그 칸이 무엇인지, 어떻게 읽는지, 흔한 함정이 무엇인지 펼쳐져요.
+
+<DashboardTour client:visible screen="kubernetes" />
 
 ## 단계를 하나씩 확대해 봐요
 

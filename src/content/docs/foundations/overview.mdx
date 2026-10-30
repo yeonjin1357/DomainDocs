@@ -14,8 +14,9 @@ sources:
     url: https://opentelemetry.io/docs/concepts/observability-primer/
   - title: Google SRE Book — Monitoring Distributed Systems
     url: https://sre.google/sre-book/monitoring-distributed-systems/
-updated: 2026-10-21
+updated: 2026-10-30
 ---
+import DashboardTour from '../../../components/demos/DashboardTour.tsx';
 
 <Analogy limit="기상 예보관은 관측값을 보고 사람이 판단하지만, 모니터링 화면은 정해 둔 계산을 그대로 보여 줘요. 평균을 고를지 p99를 고를지 하나만 바꿔도 같은 데이터에서 다른 결론이 나와요.">
   모니터링은 기상 관측과 비슷해요. 관측소가 기온을 재고(계측), 정해진 시각마다 모아(수집) 기록부(저장)에 적어요. 예보관은 평균·최고 기온을 계산하고(질의), 폭염이면 경보(알림)를 내요.
@@ -43,6 +44,12 @@ updated: 2026-10-21
 5. **화면과 알림**: 계산한 값을 그래프로 그리고, 조건을 넘으면 알림을 보내요. 값이 빈 것을 0으로 읽지 않는 게 중요해요.
 
 화면의 숫자가 이상하다면 이 다섯 단계 중 어디서 달라졌는지 거슬러 올라가요. 이 영역의 글은 그 단계마다 생기는 함정을 다뤄요.
+
+## 화면으로 둘러봐요
+
+서비스 하나를 보는 화면을 예시로 그렸어요. 어느 영역에서나 만나는 숫자들이에요. 칸을 누르면 그 칸이 무엇인지, 어떻게 읽는지, 흔한 함정이 무엇인지 펼쳐져요.
+
+<DashboardTour client:visible screen="foundations" />
 
 ## 단계마다 읽을 글
 

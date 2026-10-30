@@ -14,8 +14,9 @@ sources:
     url: https://aws.amazon.com/compliance/shared-responsibility-model/
   - title: Microsoft Learn — Shared responsibility in the cloud
     url: https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility
-updated: 2026-10-21
+updated: 2026-10-30
 ---
+import DashboardTour from '../../../components/demos/DashboardTour.tsx';
 
 <Analogy limit="사무실 임대는 보통 달이나 해 단위 계약이지만, 클라우드는 몇 분 만에 빌리고 다 쓰면 바로 반납해요. 쓴 양도 자동으로 재서 청구해요.">
   클라우드는 사무실 임대 빌딩과 같아요. 건물을 직접 짓지 않고, 필요한 크기의 사무실을 빌려 들어가요. 전기·냉방·건물 보안은 빌딩이 맡고, 사무실 안의 살림은 우리가 챙겨요.
@@ -81,6 +82,12 @@ NIST가 꼽은 다섯 가지 특징을 보면 뜻이 또렷해져요.
 | 관리형 데이터베이스 | RDS | Azure SQL Database 등 |
 | 서버리스 함수 | Lambda | Functions |
 | 지표·로그 | CloudWatch | Azure Monitor |
+
+## 화면으로 둘러봐요
+
+클라우드 모니터링 화면을 예시로 그렸어요. 칸을 누르면 그 칸이 무엇인지, 어떻게 읽는지, 흔한 함정이 무엇인지 펼쳐져요.
+
+<DashboardTour client:visible screen="cloud" />
 
 ## 단계를 하나씩 확대해 봐요
 

@@ -18,6 +18,7 @@ sources:
     url: https://kafka.apache.org/43/getting-started/zk2kraft/
 updated: 2026-10-30
 ---
+import DashboardTour from '../../../components/demos/DashboardTour.tsx';
 
 <Analogy limit="실제 게시판은 누가 어디까지 읽었는지 모르지만, Kafka는 읽는 쪽마다 어디까지 읽었는지 번호로 따로 기록해요.">
   메시지 큐는 사내 게시판과 같아요. 글쓴이는 게시판에 글을 붙이고 바로 자기 일로 돌아가요. 읽는 사람은 자기 속도로 와서 읽고, 여러 팀이 같은 글을 각자 읽을 수도 있어요.
@@ -92,6 +93,12 @@ Kafka는 <Term term="messaging/consumer-group">컨슈머 그룹</Term>으로 둘
 Kafka는 서버 여러 대가 하나의 클러스터로 돌아요. 이벤트를 저장하는 서버를 <Term term="messaging/broker">브로커</Term>라고 불러요. 서버 하나가 고장 나도 다른 서버가 그 일을 넘겨받아요.
 
 이벤트는 여러 브로커에 복사해 둬요. 운영에서는 복사본 3개가 흔한 설정이에요. 그래서 브로커 하나가 멈춰도 이벤트를 잃지 않아요.
+
+## 화면으로 둘러봐요
+
+Kafka 모니터링 화면을 예시로 그렸어요. 칸을 누르면 그 칸이 무엇인지, 어떻게 읽는지, 흔한 함정이 무엇인지 펼쳐져요.
+
+<DashboardTour client:visible screen="messaging" />
 
 ## 단계를 하나씩 확대해 봐요
 

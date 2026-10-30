@@ -14,8 +14,9 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc1812.html
   - title: RFC 4188 — Definitions of Managed Objects for Bridges
     url: https://www.rfc-editor.org/rfc/rfc4188.html
-updated: 2026-10-21
+updated: 2026-10-30
 ---
+import DashboardTour from '../../../components/demos/DashboardTour.tsx';
 
 <Analogy limit="택배는 상자 하나가 그대로 끝까지 가지만, 네트워크 데이터는 잘게 나뉜 패킷 여러 개로 가고, 패킷마다 다른 길로 갈 수도 있어요.">
   네트워크는 택배와 비슷해요. 상자(패킷)에 보내는 곳과 받는 곳의 주소를 적어요. 같은 건물 안이면 건물 우편실(스위치)이 바로 전해 주고, 다른 동네면 우체국(라우터)이 다음 우체국으로 넘겨요.
@@ -63,6 +64,12 @@ updated: 2026-10-21
 | 로드 밸런서 | 들어온 요청을 여러 서버에 나눠 줘요 |
 
 장비마다 데이터가 드나드는 구멍(포트)이 여러 개 있어요. 장비 쪽에서는 이 구멍 하나하나를 인터페이스라고 불러요. 네트워크 장비 모니터링은 대부분 이 인터페이스마다 무엇이 오가는지 보는 일이에요.
+
+## 화면으로 둘러봐요
+
+네트워크 모니터링 화면을 예시로 그렸어요. 칸을 누르면 그 칸이 무엇인지, 어떻게 읽는지, 흔한 함정이 무엇인지 펼쳐져요.
+
+<DashboardTour client:visible screen="network" />
 
 ## 단계를 하나씩 확대해 봐요
 

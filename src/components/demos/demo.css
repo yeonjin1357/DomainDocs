@@ -483,6 +483,266 @@
   cursor: default;
 }
 
+/* 화면 둘러보기: 예시 대시보드와 칸 설명 */
+.tour-screen {
+  padding: 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  background: var(--color-card);
+}
+
+.tour-bar-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tour-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tour-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px;
+  border: 1.5px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tour-widget.span-2 {
+  grid-column: 1 / -1;
+}
+
+.tour-widget.is-selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-weak);
+}
+
+.tour-widget:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.tour-widget-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-sub);
+}
+
+.tour-num {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.tour-value {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.tour-value small {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-sub);
+}
+
+.tour-value.is-warn {
+  color: var(--color-warn);
+}
+
+.tour-note {
+  font-size: 12px;
+  color: var(--color-text-sub);
+}
+
+.tour-chart {
+  display: block;
+  width: 100%;
+  height: 70px;
+}
+
+.tour-line {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+
+.tour-line.is-warn {
+  stroke: var(--color-warn);
+}
+
+.tour-line.is-sub {
+  stroke: var(--color-text-weak);
+}
+
+.tour-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 12px;
+  color: var(--color-accent);
+}
+
+.tour-legend .is-warn {
+  color: var(--color-warn);
+}
+
+.tour-legend .is-sub {
+  color: var(--color-text-sub);
+}
+
+.tour-bars {
+  display: grid;
+  gap: 6px;
+}
+
+.tour-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.tour-bar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.tour-bar-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-card);
+  overflow: hidden;
+}
+
+.tour-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}
+
+.tour-bar.is-warn .tour-bar-fill {
+  background: var(--color-warn);
+}
+
+.tour-bar-text {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tour-table {
+  display: grid;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.tour-tr {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 28px 36px;
+  gap: 6px;
+  padding: 4px 0;
+  border-top: 1px solid var(--color-line);
+}
+
+.tour-tr > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 상태 칸은 줄을 바꿔도 돼요(CrashLoop 뒤에 줄바꿈 자리를 둬요). */
+.tour-tr > span:nth-child(2) {
+  white-space: normal;
+}
+
+.tour-tr.is-head {
+  border-top: 0;
+  color: var(--color-text-sub);
+}
+
+.tour-tr.is-warn > span:nth-child(2) {
+  color: var(--color-warn);
+  font-weight: 600;
+}
+
+.tour-panel {
+  grid-column: 1 / -1;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--color-accent-weak);
+}
+
+.tour-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tour-explain {
+  margin: 10px 0 0;
+}
+
+.tour-explain dt {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.tour-explain dd {
+  margin: 2px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.tour-links {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.tour-links a {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.tour-links a::after {
+  content: ' →';
+}
+
+.tour-panel .demo-buttons {
+  margin-top: 12px;
+}
+
 /* 서브넷 데모: 주소의 32비트를 8비트씩 */
 .demo-octets {
   display: grid;

@@ -14,8 +14,9 @@ sources:
     url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
   - title: Apache Tomcat — Home
     url: https://tomcat.apache.org/
-updated: 2026-10-21
+updated: 2026-10-30
 ---
+import DashboardTour from '../../../components/demos/DashboardTour.tsx';
 
 <Analogy limit="은행 손님은 한 명씩 오지만, 웹 요청은 짧은 메시지라 1초에 수천 개가 몰려와요. 그래서 창구 수와 대기 줄이 앱 성능을 크게 좌우해요.">
   앱은 은행 지점과 비슷해요. 손님(요청)이 오면 안내 데스크(웹 서버)가 창구(WAS)로 보내요. 창구 직원(스레드)은 금고(DB)나 다른 은행(외부 API)에 확인한 뒤 결과를 돌려줘요.
@@ -55,6 +56,12 @@ updated: 2026-10-21
 APM(애플리케이션 성능 모니터링)은 이 길에서 요청 하나가 어디에 시간을 썼는지 재요. 요청 하나를 <Term slug="apm/transactions-and-response-time">트랜잭션</Term>이라 부르고, 그 안에서 DB나 외부 API를 부른 구간은 <Term slug="apm/trace-waterfall">워터폴</Term>로 보여 줘요.
 
 서비스 여러 개가 서로 부르는 모습은 <Term slug="apm/service-map">서비스 맵</Term>으로 그려요. 이런 모니터링 글은 아래 기초를 읽은 뒤 이어 보면 더 잘 읽혀요.
+
+## 화면으로 둘러봐요
+
+APM 제품의 서비스 화면을 예시로 그렸어요. 칸을 누르면 그 칸이 무엇인지, 어떻게 읽는지, 흔한 함정이 무엇인지 펼쳐져요.
+
+<DashboardTour client:visible screen="apm" />
 
 ## 단계를 하나씩 확대해 봐요
 
