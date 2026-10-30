@@ -17,8 +17,9 @@ sources:
     url: https://sre.google/sre-book/handling-overload/
   - title: gRPC — Deadlines
     url: https://grpc.io/docs/guides/deadlines/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import RetryFanoutDemo from '../../../components/demos/RetryFanoutDemo.tsx';
 
 <OnDashboard title="사용자 동작 한 번 · DB가 과부하로 실패할 때" caption="브라우저, 프런트 서버, 백엔드가 저마다 실패하면 3번씩 다시 시도해요. 사용자 동작 한 번이 DB에서는 64번이 돼요.">
   <StatTile label="사용자 동작" value="1" unit="번" />
@@ -80,6 +81,10 @@ Amazon은 받아들일 헛 타임아웃 비율(예: 0.1%)을 먼저 정해요. �
 </Figure>
 
 상대가 과부하로 실패하는 중이라면, 재시도가 부하를 더 키워 회복을 늦춰요. 그래서 Amazon은 재시도를 한 계층에서만 하라고 권해요.
+
+아래에서 계층 수와 보내는 횟수를 바꿔 보세요. 계층을 하나 늘릴 때마다 맨 아래가 받는 수가 곱으로 커져요.
+
+<RetryFanoutDemo client:visible />
 
 ## 다시 보낼 땐 간격을 벌리고 흩뜨려요
 

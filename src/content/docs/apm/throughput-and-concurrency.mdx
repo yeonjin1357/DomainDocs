@@ -15,8 +15,9 @@ sources:
     url: https://opentelemetry.io/docs/specs/semconv/http/http-metrics/
   - title: Apache Tomcat 10.1 — The HTTP Connector (maxThreads, maxConnections, acceptCount)
     url: https://tomcat.apache.org/tomcat-10.1-doc/config/http.html
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import LittlesLawDemo from '../../../components/demos/LittlesLawDemo.tsx';
 
 <OnDashboard title="주문 API · DB가 느려진 뒤 10분" caption="DB가 느려져 응답시간이 세 배가 되자, 활성 트랜잭션이 스레드 상한 200에 붙었어요. 처리량은 초당 200건에서 133건으로 떨어졌어요.">
   <MiniLineChart ariaLabel="활성 트랜잭션이 100에서 오르기 시작해 200에 닿은 뒤 평평하게 이어지는 그래프" yMax={250} series={[{ label: '활성 트랜잭션', values: [100, 100, 100, 100, 150, 200, 200, 200, 200, 200, 200, 200], tone: 'warn', value: '200개' }]} />
@@ -101,6 +102,10 @@ updated: 2026-10-29
     ticks={[{ at: 0, label: '0초' }, { at: 1, label: '1초' }, { at: 2, label: '2초' }, { at: 3, label: '3초' }]}
   />
 </Figure>
+
+아래에서 처리량과 응답시간을 바꿔 보세요. 필요한 수가 스레드 200개를 넘는 순간부터 처리량이 꺾여요.
+
+<LittlesLawDemo client:visible />
 
 <Checkpoints>
   <Check>처리량이 줄었다고 손님이 줄었다고 보지 마세요. 응답시간과 활성 트랜잭션이 함께 늘었다면 처리할 힘이 모자란 <Term slug="foundations/red-and-use">포화</Term>예요. 손님이 줄었다면 활성 트랜잭션도 함께 줄어요.</Check>

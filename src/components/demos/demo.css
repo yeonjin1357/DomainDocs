@@ -200,3 +200,116 @@
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+
+/* 리틀의 법칙 데모: 처리 중인 요청 막대와 스레드 상한 선 */
+.demo-meter {
+  width: 100%;
+  height: auto;
+}
+
+.demo-meter-track {
+  fill: var(--color-card);
+}
+
+.demo-meter-fill {
+  fill: var(--color-accent);
+}
+
+.demo-meter-over {
+  fill: var(--color-warn);
+}
+
+.demo-meter-limit {
+  stroke: var(--color-text);
+  stroke-width: 2;
+}
+
+/* 재시도 데모: 계층마다 받는 요청 수 막대 */
+.demo-bars {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demo-bars li {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.demo-bar-track {
+  height: 14px;
+  border-radius: 7px;
+  background: var(--color-card);
+  overflow: hidden;
+}
+
+.demo-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 7px;
+  background: var(--color-accent);
+}
+
+.demo-bars li.is-warn .demo-bar-fill {
+  background: var(--color-warn);
+}
+
+.demo-bar-value {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.demo-bars li.is-warn .demo-bar-value {
+  color: var(--color-warn);
+}
+
+/* rate 구간 데모: 수집한 샘플 점과 구간 칸 */
+.demo-timeline {
+  width: 100%;
+  height: auto;
+}
+
+.demo-window {
+  fill: var(--color-accent-weak);
+}
+
+.demo-sample {
+  fill: var(--color-text-weak);
+}
+
+.demo-sample.is-in {
+  fill: var(--color-accent);
+}
+
+.demo-sample.is-lost {
+  fill: var(--color-bg);
+  stroke: var(--color-warn);
+  stroke-width: 2;
+}
+
+.demo-axis {
+  fill: var(--color-text-sub);
+  font-size: 12px;
+}
+
+/* 카디널리티 데모: 곱셈 식 */
+.demo-formula {
+  margin: 0;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.demo-formula strong {
+  font-size: 22px;
+}
+
+.demo-segment label.is-warn.is-active {
+  background: var(--color-warn);
+}

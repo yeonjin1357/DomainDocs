@@ -21,8 +21,9 @@ sources:
     url: https://grafana.com/docs/grafana/latest/datasources/prometheus/template-variables/
   - title: Grafana Blog — $__rate_interval for Prometheus rate queries that just work
     url: https://grafana.com/blog/2020/09/28/new-in-grafana-7.2-__rate_interval-for-prometheus-rate-queries-that-just-work/
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import RateWindowDemo from '../../../components/demos/RateWindowDemo.tsx';
 
 <OnDashboard title="처리한 요청 수 · 10초마다 수집" caption="위는 카운터를 그대로 그린 선이에요. 아래는 이웃한 두 값 사이 증가량을 10초로 나눈 rate예요. 재시작한 순간에도 rate는 이어져요.">
   <MiniLineChart
@@ -72,6 +73,10 @@ rate(초당 증가량)는 구간 동안 늘어난 양을 구간 길이(초)로 �
     ]}
   />
 </Figure>
+
+구간 안에 샘플이 2개 이상 있어야 rate가 나와요. 아래에서 수집 주기와 구간을 바꿔 보세요.
+
+<RateWindowDemo client:visible />
 
 ## rate는 재시작을 알아서 메워요
 

@@ -35,8 +35,9 @@ sources:
     url: https://opentelemetry.io/docs/specs/otel/metrics/sdk/#cardinality-limits
   - title: OpenTelemetry — Prometheus and OpenMetrics compatibility (Metric Attributes)
     url: https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/#metric-attributes
-updated: 2026-10-29
+updated: 2026-10-30
 ---
+import CardinalityDemo from '../../../components/demos/CardinalityDemo.tsx';
 
 <OnDashboard title="활성 시계열 수 · 배포 전후" caption="레이블에 사용자 ID를 넣어 배포한 뒤로, 새 사용자가 요청할 때마다 시계열이 늘어요.">
   <MiniLineChart
@@ -105,6 +106,10 @@ Prometheus는 수집할 때 수집 대상마다 `instance` 레이블을 붙여�
     ]}
   />
 </Figure>
+
+아래에서 레이블을 붙였다 떼어 보세요. user_id처럼 끝없이 늘어나는 레이블 하나가 곱을 크게 키워요.
+
+<CardinalityDemo client:visible />
 
 ## 끝없이 늘어나는 값은 레이블에 넣지 마세요
 

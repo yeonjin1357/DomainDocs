@@ -66,3 +66,82 @@ test.describe('다운샘플링 데모', () => {
     await expect(demo.locator('[data-stat="visible-peak"] .demo-stat-value')).toHaveText('67%');
   });
 });
+
+test.describe('리틀의 법칙 데모', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('foundations/demos/');
+    await waitForIsland(page, 'LittlesLawDemo');
+  });
+
+  test('초당 200건을 0.5초씩이면 100건이 처리 중이고, 1.5초로 늘리면 처리량이 133건으로 꺾인다', async ({ page }) => {
+    const demo = page.locator('[data-demo="littles-law"]');
+    await expect(demo.locator('[data-stat="needed"] .demo-stat-value')).toHaveText('100건');
+    await expect(demo.locator('[data-stat="served"] .demo-stat-value')).toHaveText('초당 200건');
+    await demo.getByRole('slider', { name: '응답시간' }).focus();
+    for (let i = 0; i < 10; i++) await page.keyboard.press('ArrowRight');
+    await expect(demo.locator('[data-response]')).toHaveText('1.5초');
+    await expect(demo.locator('[data-stat="needed"] .demo-stat-value')).toHaveText('300건');
+    await expect(demo.locator('[data-stat="served"] .demo-stat-value')).toHaveText('초당 133건');
+    await expect(demo.locator('[data-demo-message]')).toContainText('줄을 서요');
+  });
+});
+
+test.describe('재시도 곱셈 데모', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('foundations/demos/');
+    await waitForIsland(page, 'RetryFanoutDemo');
+  });
+
+  test('세 계층이 4번씩 보내면 DB는 64번, 다섯 계층이 3번씩이면 243번 받는다', async ({ page }) => {
+    const demo = page.locator('[data-demo="retry-fanout"]');
+    const bottom = demo.locator('[data-stat="bottom"] .demo-stat-value');
+    await expect(bottom).toHaveText('64번');
+    await expect(demo.locator('.demo-bars li')).toHaveCount(4);
+    await demo.locator('label', { hasText: /^5계층$/ }).click();
+    await demo.locator('label', { hasText: /^3번$/ }).click();
+    await expect(bottom).toHaveText('243번');
+    await expect(demo.locator('.demo-bars li')).toHaveCount(6);
+    await expect(demo.locator('[data-stat="single"] .demo-stat-value')).toHaveText('3번');
+  });
+});
+
+test.describe('rate 구간 데모', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('foundations/demos/');
+    await waitForIsland(page, 'RateWindowDemo');
+  });
+
+  test('15초 수집에 [15s]면 비고, [1m]이면 나오며, 수집이 빠지면 샘플이 하나 준다', async ({ page }) => {
+    const demo = page.locator('[data-demo="rate-window"]');
+    const samples = demo.locator('[data-stat="samples"] .demo-stat-value');
+    const rate = demo.locator('[data-stat="rate"] .demo-stat-value');
+    await expect(samples).toHaveText('1개');
+    await expect(rate).toHaveText('비어요');
+    await demo.locator('label', { hasText: /^\[1m\]$/ }).click();
+    await expect(samples).toHaveText('4개');
+    await expect(rate).toHaveText('나와요');
+    await expect(demo.locator('.demo-sample.is-in')).toHaveCount(4);
+    await demo.locator('label', { hasText: '바로 앞 수집 한 번 실패' }).click();
+    await expect(samples).toHaveText('3개');
+    await demo.locator('label', { hasText: /^\[30s\]$/ }).click();
+    await expect(rate).toHaveText('비어요');
+  });
+});
+
+test.describe('카디널리티 데모', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('foundations/demos/');
+    await waitForIsland(page, 'CardinalityDemo');
+  });
+
+  test('method·status·route는 10,000개, instance를 더하면 500,000개, user_id까지 붙이면 50억 개다', async ({ page }) => {
+    const demo = page.locator('[data-demo="cardinality"]');
+    const series = demo.locator('[data-stat="series"] .demo-stat-value');
+    await expect(series).toHaveText('10,000개');
+    await demo.locator('label', { hasText: /^instance/ }).click();
+    await expect(series).toHaveText('500,000개');
+    await demo.locator('label', { hasText: /^user_id/ }).click();
+    await expect(series).toHaveText('5,000,000,000개');
+    await expect(demo.locator('[data-demo-message]')).toContainText('user_id는');
+  });
+});
