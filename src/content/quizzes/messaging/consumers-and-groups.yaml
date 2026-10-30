@@ -13,22 +13,22 @@ questions:
     type: choice
     prompt: 새 컨슈머 그룹을 띄웠는데, 토픽에 남아 있는 예전 이벤트를 하나도 읽지 않아요. 왜일까요?
     choices:
-      - auto.offset.reset 기본값이 latest라서
+      - 시작 위치 기본값이 latest라서
       - 보관 기간이 지나 모두 지워져서
-      - 파티션이 하나뿐이라서
-      - 리밸런스가 끝나지 않아서
+      - 컨슈머가 파티션보다 많아서
+      - 리밸런스가 아직 안 끝나서
     answer: 0
-    explain: 커밋된 위치가 없으면 기본으로 지금부터 들어오는 이벤트만 읽어요. 예전 것부터 읽으려면 earliest로 둬요.
+    explain: 커밋된 위치가 없으면 auto.offset.reset을 따라요. 기본값 latest는 지금부터 들어오는 이벤트만 읽어서, 예전 것부터 읽으려면 earliest로 둬요.
   - id: slow-processing-rebalance
     type: choice
     prompt: 이벤트 하나를 처리하는 데 오래 걸리자, 리밸런스가 자꾸 일어나요. 관련된 설정은?
     choices:
-      - max.poll.interval.ms(기본 5분)
+      - max.poll.interval.ms
       - session.timeout.ms
       - auto.offset.reset
       - batch.size
     answer: 0
-    explain: 다음 이벤트를 이 시간 안에 가져가지 않으면 그룹을 떠나요. 하트비트는 잘 보내도 처리가 길면 빠져요.
+    explain: 다음 이벤트를 이 시간(기본 5분) 안에 가져가지 않으면 그룹을 떠나요. 하트비트는 잘 보내도 처리가 길면 빠져요.
   - id: pull-model
     type: ox
     prompt: Kafka는 브로커가 컨슈머에게 이벤트를 밀어주는 방식인가요?

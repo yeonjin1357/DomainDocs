@@ -4,31 +4,31 @@ questions:
     prompt: 평소에 0이어야 하는 Kafka 브로커 지표는?
     choices:
       - UnderReplicatedPartitions
-      - BytesInPerSec
-      - TotalTimeMs
+      - ReplicationBytesInPerSec
+      - RequestHandlerAvgIdlePercent
       - MessagesInPerSec
     answer: 0
-    explain: 따라오는 복제본이 모든 복제본보다 적은 파티션 수예요. 0이 아니면 복제가 밀리거나 브로커가 빠진 거예요.
+    explain: 따라오는 복제본이 모든 복제본보다 적은 파티션 수예요. 0이 아니면 복제가 밀리거나 브로커가 빠진 거예요. 처리 스레드가 쉬는 비율은 0.3보다 커야 좋아요.
   - id: active-controller-sum
     type: ox
-    prompt: 브로커 3대 중 두 대의 ActiveControllerCount가 0이면 문제가 있다는 뜻인가요?
-    answer: false
-    explain: 컨트롤러는 클러스터에 하나라, 한 대만 1이고 나머지는 0이 정상이에요. 클러스터 합이 1인지 봐요.
+    prompt: 브로커 3대 클러스터에서 ActiveControllerCount를 모두 더했더니 2예요. 컨트롤러가 둘이 된 이상 상태인가요?
+    answer: true
+    explain: 컨트롤러는 클러스터에 하나라, 한 대만 1이고 나머지는 0이어야 해요. 그래서 브로커마다 따로 보지 말고 클러스터 합이 1인지 봐요.
   - id: lag-from-broker
     type: ox
-    prompt: 브로커의 JMX 지표만 모으면, 컨슈머 그룹별 지연(records-lag-max)도 함께 볼 수 있나요?
+    prompt: 브로커의 JMX 지표에도 컨슈머 그룹별 지연(records-lag-max)이 들어 있나요?
     answer: false
     explain: records-lag-max는 컨슈머가 내는 지표예요. 앱 지표로 모으거나, 그룹이 커밋한 오프셋과 파티션 끝을 견줘 따로 계산해요.
   - id: handler-idle
     type: choice
     prompt: RequestHandlerAvgIdlePercent가 0.1까지 떨어졌어요. 무슨 뜻일까요?
     choices:
-      - 요청을 처리하는 스레드가 거의 쉬지 못해 요청이 밀리기 시작해요
-      - 브로커가 요청을 받지 않고 쉬고 있어요
-      - 복제가 10% 모자라요
-      - 디스크가 10% 남았어요
+      - 처리 스레드가 쉬지 못해 밀려요
+      - 브로커가 요청 없이 쉬고 있어요
+      - 복제가 10%만큼 모자라요
+      - 디스크가 10%만 남았어요
     answer: 0
-    explain: 처리 스레드가 쉬는 비율이라, Kafka 문서는 0.3보다 크길 권해요. 낮으면 요청이 대기열에서 기다리기 시작해요.
+    explain: 요청을 처리하는 스레드가 쉬는 비율이라, Kafka 문서는 0.3보다 크길 권해요. 낮으면 요청이 대기열에서 기다리기 시작해요.
   - id: jmx-term
     type: input
     prompt: Kafka 브로커와 클라이언트가 지표를 내놓는, 자바 프로그램의 관리 인터페이스 이름은?

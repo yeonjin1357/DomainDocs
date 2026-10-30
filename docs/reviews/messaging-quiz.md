@@ -17,3 +17,17 @@
 | rebalance-storm · reduce-poll-records, static-membership | max.poll.records 기본 500, group.instance.id 고정 멤버 | 글 본문과 docs/reviews/messaging-rebalance-storm.md |
 | under-replicated · isr-shrinks-zero | 내려갔다 올라올 때 말고는 IsrShrinksPerSec·IsrExpandsPerSec가 0 | 글 본문과 docs/reviews/messaging-under-replicated.md |
 | producer-send-failing · delivery-timeout, record-too-large | delivery.timeout.ms 기본 2분, max.request.size 1,048,576바이트 | 글 본문과 docs/reviews/messaging-producer-send-failing.md |
+
+## 2026-10-30 문제 다시 쓰기
+
+- 문제: src/content/quizzes/messaging/*.yaml (12개 파일, 59문제)
+- 바꾼 까닭: OX 정답의 O가 31%, 정답이 가장 긴 보기인 객관식이 61%였어요. 정답에만 기본값 괄호("(기본 5분)", "(기본 500)")가 붙은 문제가 다섯, 부정으로 묻는 문제가 둘이었어요.
+- 고친 뒤: OX 16문제 중 O 9(56%), 객관식 38문제 중 정답이 가장 긴 보기 9(24%), 정답이 가장 긴 오답의 1.2배를 넘는 문제 0개예요.
+- 새로 들어간 주장만 아래에서 확인했어요. 나머지는 글 본문과 각 글의 검토 기록에 기대요.
+
+| 문제(파일 · id) | 확인한 주장 | 근거 |
+| --- | --- | --- |
+| under-replicated · below-min-isr | ISR이 min.insync.replicas보다 적으면 acks=all 쓰기만 실패하고, acks=1 쓰기는 그대로 돼요(오답 "acks=1 쓰기도 실패해요") | https://kafka.apache.org/documentation/#topicconfigs_min.insync.replicas ("When a producer sets acks to "all" (or "-1"), min.insync.replicas specifies...") |
+| delivery-guarantees · duplicates-possible | 프로듀서 멱등성은 쓰는 구간에서 로그에 한 번만 쌓이게 할 뿐, 컨슈머가 커밋 전에 죽으면 같은 이벤트를 다시 처리해요 | 글 본문(보장은 쓰는 구간과 읽는 구간을 따로 봄)과 https://kafka.apache.org/documentation/#semantics |
+| metrics-sources · active-controller-sum | 클러스터의 ActiveControllerCount 합이 2면 이상 상태예요 | 글 본문(클러스터 합 1, 0이거나 2 이상이면 문제) |
+| retention · tombstone | 키는 있고 값이 빈 이벤트는 삭제 표시(툼스톤)예요 | 글 본문과 docs/reviews/messaging-retention.md |

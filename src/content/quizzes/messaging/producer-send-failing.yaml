@@ -3,12 +3,12 @@ questions:
     type: choice
     prompt: 프로듀서가 NotEnoughReplicas 에러를 받아요. 어디를 고쳐야 할까요?
     choices:
-      - 클러스터의 복제 부족(브로커와 팔로워)
-      - 프로듀서의 acks를 1로 낮추기
-      - 이벤트 크기 줄이기
-      - 프로듀서 버퍼 키우기
+      - 클러스터의 복제 부족
+      - 프로듀서의 acks 설정
+      - 이벤트의 크기 한도
+      - 프로듀서의 버퍼 크기
     answer: 0
-    explain: ISR이 최소 수보다 적어 브로커가 일부러 막은 거예요. acks를 낮추면 이벤트를 잃을 수 있어요.
+    explain: ISR이 최소 수보다 적어 브로커가 일부러 막은 거예요. 브로커와 팔로워를 봐요. acks를 낮추면 이벤트를 잃을 수 있어요.
   - id: error-after-retries
     type: ox
     prompt: 앱 로그에 프로듀서의 보내기 에러가 보였다면, 프로듀서가 이미 다시 보내기까지 해 보고 실패한 뒤인가요?
@@ -18,10 +18,10 @@ questions:
     type: choice
     prompt: RecordTooLargeException이 나요. 먼저 고려할 방법은?
     choices:
-      - 큰 데이터는 저장소에 두고, 위치만 이벤트로 보내요
-      - 프로듀서의 acks를 바꿔요
-      - 토픽의 파티션을 늘려요
-      - 컨슈머를 늘려요
+      - 저장소에 두고 위치만 보내요
+      - acks를 1로 낮춰 빨리 보내요
+      - 파티션을 늘려 나눠 실어요
+      - 압축을 끄고 그대로 보내요
     answer: 0
     explain: 기본 한도는 대략 1MB예요. 한도를 늘린다면 프로듀서와 브로커(또는 토픽) 설정을 함께 맞춰야 해요.
   - id: delivery-timeout
