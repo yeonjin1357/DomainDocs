@@ -1,9 +1,9 @@
 questions:
-  - id: cumulative-bucket
+  - id: bucket-includes-smaller
     type: ox
-    prompt: Prometheus 클래식 히스토그램의 le="0.5" 버킷에는, 바로 앞 경계(0.25초) 초과 0.5초 이하인 요청만 들어가나요?
-    answer: false
-    explain: 버킷은 그 경계 이하를 모두 세는 누적 개수예요. le="+Inf"는 전체 요청 수와 같아요.
+    prompt: Prometheus 클래식 히스토그램에서 le="0.5" 버킷의 개수에는, le="0.25" 버킷에 든 요청도 함께 들어가나요?
+    answer: true
+    explain: 버킷은 그 경계 이하를 모두 세는 누적 개수예요. 그래서 le="+Inf"는 전체 요청 수와 같아요.
   - id: interpolated-p99
     type: choice
     prompt: 5분 동안 1,000건 중 0.5초 이하가 985건, 1초 이하가 995건이에요. histogram_quantile이 내는 p99 추정값은?

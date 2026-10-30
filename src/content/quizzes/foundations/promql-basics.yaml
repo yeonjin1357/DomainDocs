@@ -4,23 +4,23 @@ questions:
     prompt: 상태 코드가 500, 503인 시계열이 있을 때, http_requests_total{status=~"5"}는 이 둘을 고르나요?
     answer: false
     explain: PromQL 정규식은 값 전체와 맞아야 해서 "5"는 값이 정확히 5인 것만 골라요. 5로 시작하는 세 자리는 "5.."로 써요.
-  - id: rate-then-sum
+  - id: without-keeps-rest
     type: choice
-    prompt: 서버 여러 대의 요청 카운터로 서비스 전체 초당 요청 수를 구하는 바른 순서는?
+    prompt: job, instance, status 레이블이 붙은 시계열을 sum without (instance)로 묶으면, 결과에 남는 레이블은?
     choices:
-      - 시계열마다 rate를 구한 뒤 sum으로 더해요
-      - sum으로 카운터를 먼저 더한 뒤 rate를 구해요
-      - avg_over_time으로 평균을 낸 뒤 sum으로 더해요
-      - 카운터 값을 그대로 sum으로 더해요
+      - job과 status
+      - instance 하나만
+      - 하나도 남지 않아요
+      - job 하나만
     answer: 0
-    explain: 먼저 더하면 서버 한 대가 다시 시작해 카운터가 0이 된 걸 rate가 알아채지 못해요. rate를 먼저, 합치기는 나중이에요.
+    explain: without은 적은 레이블만 빼고 나머지를 남겨요. 반대로 by는 적은 레이블만 남겨서, sum by (job)이면 job 하나만 남아요.
   - id: empty-division
     type: choice
     prompt: sum by (job, status)로 구한 5xx 수를 sum by (job)으로 구한 전체 요청 수로 나눴더니 결과가 비었어요. 왜 그럴까요?
     choices:
       - status 레이블 탓에 짝이 없어서요
       - 5xx 요청이 하나도 없어서요
-      - 나눗셈은 PromQL에서 쓸 수 없어서요
+      - 오른쪽 전체 요청 수가 0이라서요
       - rate 구간이 너무 짧아서요
     answer: 0
     explain: 나누기는 양쪽 레이블이 똑같은 시계열끼리 짝을 지어요. 왼쪽에만 status가 있으면 짝이 없어요. ignoring(status)와 group_left로 짝짓는 법을 바꿀 수 있어요.

@@ -29,13 +29,13 @@ questions:
     prompt: 1분마다 모으는 지표를 보여 주는 대시보드를 5초마다 새로 고치면, 화면의 값도 5초마다 바뀌나요?
     answer: false
     explain: 값은 1분에 한 번 바뀌어서 화면은 그대로이고 질의만 늘어요. 새로고침은 데이터가 바뀌는 속도에 맞춰요.
-  - id: golden-signals
+  - id: golden-signals-four
     type: choice
-    prompt: Google SRE Book이 서비스를 볼 때 먼저 보라고 한 네 가지 신호에 들지 않는 것은?
+    prompt: Google SRE Book이 사용자가 쓰는 시스템에서 네 가지만 잴 수 있다면 집중하라고 한 신호는?
     choices:
-      - 사용률
-      - 지연
-      - 트래픽
-      - 포화
+      - 지연·트래픽·에러·포화
+      - 사용률·포화·에러·지연
+      - 요청 수·에러·지연·CPU
+      - 지연·트래픽·에러·사용률
     answer: 0
     explain: 네 가지는 지연, 트래픽, 에러, 포화예요. 사용률은 자원을 보는 USE(사용률·포화·에러)의 한 글자예요.

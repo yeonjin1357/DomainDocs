@@ -1,7 +1,7 @@
 questions:
   - id: retention-15d
     type: choice
-    prompt: 30일 전 구간을 그리는 패널이 비어 있어요. Prometheus를 기본 보관 설정으로 쓴다면 이유는?
+    prompt: Prometheus 설정을 하나도 바꾸지 않고 쓰는데, 30일 전 구간을 그리는 패널만 비어 있어요. 가장 그럴듯한 이유는?
     choices:
       - 기본 보관 기간 15일이 지나 지워져서
       - 30일 범위라 점 간격이 넓어져 빠져서
@@ -9,16 +9,16 @@ questions:
       - 그 무렵 수집 대상이 목록에서 빠져서
     answer: 0
     explain: 보관 기간이 지난 데이터는 지워져서 아무리 질의해도 비어요.
-  - id: regex-full-match
+  - id: explore-ok-panel-empty
     type: choice
-    prompt: route=~"/api"로 /api/users 경로를 고르려 했는데 결과가 비어요. 왜일까요?
+    prompt: 패널의 질의를 Explore에서 그대로 실행하면 결과가 나오는데, 패널만 비어 있어요. 먼저 볼 것은?
     choices:
-      - =~도 값 전체가 맞아야 골라서
-      - =~는 앞이 아니라 끝부분을 맞춰 봐서
-      - =~ 뒤의 값은 따옴표 없이 적어야 해서
-      - 정규식은 =~가 아니라 =로 써야 해서
+      - 패널의 Transformations
+      - 수집 대상의 up 값
+      - Prometheus 보관 기간 설정
+      - 질의 속 지표 이름의 오타
     answer: 0
-    explain: Prometheus 정규식은 값 전체에 맞춰 봐요. 앞부분만 맞추려면 "/api.*"처럼 뒤에 .*를 붙여요.
+    explain: 같은 질의가 Explore에서 나온다면 데이터와 질의는 멀쩡해요. 질의 결과를 패널에서 가공하는 Transformations가 값을 걸러 냈는지 봐요.
   - id: job-renamed
     type: choice
     prompt: 배포한 시각부터 job="api" 조건의 그래프가 끊겼어요. 먼저 의심할 것은?

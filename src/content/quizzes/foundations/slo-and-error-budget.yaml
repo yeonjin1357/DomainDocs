@@ -19,11 +19,11 @@ questions:
       - 1.44분
     answer: 0
     explain: 43,200분의 0.1%는 43.2분이에요. 99.99%로 9를 하나 더하면 4.32분으로 10분의 1이 돼요.
-  - id: cpu-not-sli
+  - id: cpu-slo-misses-db
     type: ox
-    prompt: 서버 CPU 사용률은 좋은 SLI인가요?
+    prompt: SLO를 '서버 CPU 사용률 80% 이하'로 걸었어요. CPU는 30%인데 DB가 연결을 거부해 요청이 실패하면, 이 SLO가 깨지나요?
     answer: false
-    explain: SLI는 사용자가 겪는 품질을 재요. CPU 과부하는 원인일 뿐이라, CPU가 낮아도 사용자는 에러를 받을 수 있어요.
+    explain: CPU는 원인 지표라 사용자가 겪는 실패를 재지 못해요. SLI는 '300ms 안에 성공한 요청의 비율'처럼 사용자가 겪는 품질로 둬요.
   - id: sla-looser
     type: choice
     prompt: 계약인 SLA와 내부 목표인 SLO의 관계로 맞는 것은?
@@ -34,8 +34,8 @@ questions:
       - 둘은 서로 관계가 없어요
     answer: 0
     explain: 내부 목표가 먼저 깨져야 계약을 어기기 전에 손볼 수 있어요.
-  - id: slo-100
+  - id: slo-100-one-failure
     type: ox
-    prompt: SLO를 100%로 정하면, 배포할 여유(에러 버짓)가 넉넉해지나요?
-    answer: false
-    explain: 100%면 에러 버짓이 0이라 실패 한 건이 곧 위반이에요. 배포할 여유도 없어요.
+    prompt: SLO를 '30일 동안 100%'로 정하면, 30일 동안 실패한 요청이 한 건만 나와도 SLO를 어긴 게 되나요?
+    answer: true
+    explain: 100%면 에러 버짓이 0이라 실패 한 건이 곧 위반이에요. 배포할 여유도 없어서, 목표는 100%보다 낮게 잡아요.

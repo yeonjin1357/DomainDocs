@@ -29,8 +29,8 @@ questions:
       - 초당 500건
     answer: 0
     explain: 5분 구간엔 평소 4분이 섞여요. (4 × 100 + 1 × 400) ÷ 5 = 160이라, 1분 rate로 본 400보다 낮아요.
-  - id: timezone-shift
+  - id: utc-2pm-vs-kst-5am
     type: ox
-    prompt: 한 화면은 UTC로, 다른 화면은 KST로 시각을 읽으면, 같은 '오후 2시'가 9시간 어긋날 수 있나요?
-    answer: true
-    explain: 한국 시간은 UTC보다 9시간 빨라요. 하루 합계도 어느 시간대의 0시부터 세는지에 따라 달라져요.
+    prompt: UTC로 시각을 읽는 화면의 '오후 2시'는, KST로 읽는 화면의 '오전 5시'와 같은 순간인가요?
+    answer: false
+    explain: 한국 시간은 UTC보다 9시간 빨라서, UTC 14시에 9시간을 더한 KST 23시가 같은 순간이에요. 하루 합계도 어느 시간대의 0시부터 세는지에 따라 달라져요.

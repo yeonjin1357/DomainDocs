@@ -5,8 +5,8 @@ questions:
     choices:
       - 요청 수, 에러, 지연
       - 사용률, 포화, 에러
-      - 읽기, 에러, 삭제
-      - 복제, 에러, 지연
+      - 가용성, 에러, 지연
+      - 요청 수, 재시도, 지연
     answer: 0
     explain: Rate, Errors, Duration이에요. 사용률·포화·에러는 자원을 보는 USE예요.
   - id: cpu-saturation
@@ -19,11 +19,11 @@ questions:
       - 요청의 응답시간
     answer: 0
     explain: 포화는 처리하지 못하고 쌓아 둔 일의 양이에요. CPU라면 실행 대기열(run queue)에 줄 선 작업 수예요. 사용률이 바쁜 정도라면 포화는 밀린 정도예요.
-  - id: average-hides-saturation
+  - id: avg-blends-bursts
     type: ox
-    prompt: 5분 평균 CPU 사용률이 80%를 넘지 않으면, CPU 포화로 느려질 일은 없나요?
-    answer: false
-    explain: 5분 평균 안에 몇 초씩 100%가 숨어 있을 수 있어요. 그래서 사용률 옆에 포화 지표를 함께 둬요.
+    prompt: 5분 평균 CPU 사용률은, 그 5분 안에 몇 초씩 100%였던 순간을 나머지 시간과 섞어 낮게 보여 주나요?
+    answer: true
+    explain: 사용률은 구간 평균이라, 평균이 80%를 넘지 않아도 몇 초짜리 포화가 숨어 요청이 느려질 수 있어요. 그래서 사용률 옆에 실행 대기열 같은 포화 지표를 함께 둬요.
   - id: error-count-vs-rate
     type: choice
     prompt: 에러율은 0.4% 그대로인데, 요청이 초당 1,200건에서 2,400건이 됐어요. 초당 에러 건수는 어떻게 될까요?
@@ -39,8 +39,8 @@ questions:
     prompt: 서비스 대시보드의 첫 화면에 둘 것은?
     choices:
       - 요청 수·에러율·지연
-      - CPU·메모리 사용률만
-      - 디스크 용량
-      - 네트워크 바이트 수
+      - CPU·메모리·디스크 사용률
+      - 실행 대기열·디스크 대기열
+      - 서버 수·파드 수·배포 버전
     answer: 0
     explain: 요청 수·에러율·지연(RED)은 사용자가 겪는 일을 보여 줘요. 자원 지표는 RED가 나빠졌을 때 원인을 찾는 데 써요.

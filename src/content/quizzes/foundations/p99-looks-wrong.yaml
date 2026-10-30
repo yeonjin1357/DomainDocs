@@ -14,9 +14,9 @@ questions:
     prompt: histogram_quantile 안에서 sum(...)으로 le까지 지우고 합치면 어떻게 될까요?
     choices:
       - 결과가 비어요
-      - 정상적인 p99가 나와요
-      - p99가 두 배로 나와요
-      - 0이 나와요
+      - 서버별 p99의 평균이 나와요
+      - 모든 요청의 p99가 제대로 나와요
+      - +Inf 바로 앞 경계값이 나와요
     answer: 0
     explain: histogram_quantile은 le로 버킷을 알아봐요. sum by (le)나 sum by (job, le)처럼 le를 남겨요.
   - id: low-traffic-spike

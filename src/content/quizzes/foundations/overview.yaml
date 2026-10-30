@@ -29,8 +29,8 @@ questions:
       - 계측 단계
     answer: 0
     explain: 같은 값을 어떤 계산으로 바꾸느냐에 따라 숫자가 달라요. 평균은 느린 요청을 숨기고, p99는 드러내요.
-  - id: empty-not-zero
+  - id: stopped-collection-gap
     type: ox
-    prompt: 그래프가 비어 있으면, 그 시간에 일이 없었다는 뜻이니 0으로 읽어도 되나요?
-    answer: false
-    explain: 비어 있는 건 '모른다'는 뜻이에요. 수집이 멈췄을 수도 있어서 0으로 읽으면 장애를 놓쳐요.
+    prompt: 서버가 내려가 10분 동안 수집이 멈췄어요. 그 10분 동안 요청 수 그래프에는 0이 아니라 빈칸이 생기나요?
+    answer: true
+    explain: 수집하지 못한 동안에는 기록 자체가 없어요. 빈칸은 '모른다'는 뜻이라, 0으로 채워 읽으면 장애를 놓쳐요.

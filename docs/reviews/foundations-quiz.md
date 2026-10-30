@@ -22,3 +22,17 @@
 | p99-looks-wrong · low-traffic-spike, zero-requests-nan | 50건 중 1건 느리면 p99 약 1.75초, 요청 0건이면 NaN | 글 본문과 docs/reviews/foundations-p99-looks-wrong.md |
 | logs-metrics-traces · head-sampling-miss | 0.9의 5제곱 ≈ 59% | 글 Checkpoints(계산) |
 | cardinality-explosion · sample-limit-all, labeldrop-collision | sample_limit을 넘으면 수집 전체 실패, labeldrop 뒤 조합이 겹치면 값이 사라짐 | 글 본문과 docs/reviews/foundations-cardinality-explosion.md |
+
+## 2026-10-30 문제 다시 보기
+
+26편 128문제를 글과 나란히 읽고 다시 봤어요. 흘리는 말(괜찮나요, 0으로 읽어도 되나요, 망가졌다는 뜻인가요, 좋은 SLI인가요, 넉넉해지나요, 느려질 일은 없나요, 어긋날 수 있나요, ~만 설치하면 할 수 있나요)을 없앴어요. '들지 않는 것은' 문제와 엉뚱한 오답을 고치고, 글끼리 겹치던 문제(서버별 p99 평균, 정규식 전체 일치, rate 먼저 sum 나중)는 그 글만의 내용으로 바꿨어요. OX의 O는 37%에서 55%가 됐어요.
+
+| 문제 | 주장 | 근거 |
+| --- | --- | --- |
+| percentiles · two-slow-p99 | 0.13초 98개와 3초 2개의 nearest-rank p99(99번째)는 3초, 느린 요청이 1개면 0.13초 | 글 본문의 계산 |
+| percentiles · p99-tail-count | p99가 1.2초면 요청의 1%가 그보다 오래 걸림 | 글 본문의 정의 |
+| units-and-notation · df-h-g-is-1024 | df -h는 1024로 나누며 G라고 적고, df -H는 1000으로 나눔 | docs/reviews/foundations-units-and-notation.md (man7.org df(1)) |
+| promql-basics · without-keeps-rest | sum without (instance)는 instance만 빼고 job·status를 남김 | promtool 3.15.1 test rules: {job="api", status="500"} 6, {job="api", status="503"} 1 |
+| empty-graph · explore-ok-panel-empty | Explore에서 나오는데 패널만 비면 Transformations를 봄 | 글 2단계 |
+| why-numbers-differ · utc-2pm-vs-kst-5am | KST는 UTC+9라 UTC 14시는 KST 23시 | 글 4단계 |
+| slo-and-error-budget · cpu-slo-misses-db | CPU 같은 원인 지표 SLO는 DB 연결 거부로 인한 실패를 재지 못함 | 글 Checkpoints |

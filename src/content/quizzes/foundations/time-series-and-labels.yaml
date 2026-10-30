@@ -9,10 +9,10 @@ questions:
       - 2,000개
     answer: 0
     explain: 최대 시계열 수는 레이블 값 수의 곱이에요. 5 × 10 × 200 = 10,000개예요.
-  - id: user-id-label
+  - id: user-id-series-grow
     type: ox
-    prompt: 사용자 ID를 지표 레이블에 넣어도 괜찮나요?
-    answer: false
+    prompt: 사용자 10만 명이 쓰는 서비스의 요청 수 지표에 user_id 레이블을 붙이면, 시계열 수도 사용자 수에 따라 늘어나나요?
+    answer: true
     explain: 새 사용자마다 시계열이 생기고, 시계열마다 메모리와 디스크를 써요. 사용자별로 봐야 하면 로그나 트레이스에 남겨요.
   - id: route-template
     type: choice
