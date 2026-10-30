@@ -3,27 +3,27 @@ questions:
     type: choice
     prompt: CDN에서 받은 스크립트의 에러가 RUM에 Script error.로만 보여요. 무엇을 고칠까요?
     choices:
-      - script 태그에 crossorigin 속성을 붙이고 CDN이 CORS 헤더를 보내게 해요
-      - 소스 맵을 올려요
-      - 샘플링 비율을 올려요
-      - unhandledrejection 이벤트를 들어요
+      - crossorigin 속성과 CORS 헤더
+      - 그 배포 버전의 소스 맵 업로드
+      - unhandledrejection 리스너 추가
+      - 샘플링 비율을 100%로 올리기
     answer: 0
-    explain: 다른 출처 스크립트는 CORS 확인을 통과해야 에러 내용과 위치를 알려 줘요. 소스 맵은 위치를 되돌릴 뿐이에요.
+    explain: 다른 출처 스크립트는 script 태그의 crossorigin 속성과 CDN의 CORS 헤더가 있어야 에러 내용과 위치를 알려 줘요. 소스 맵은 위치를 되돌릴 뿐이에요.
   - id: send-timing
     type: choice
     prompt: RUM 데이터를 보낼 때로 MDN이 권하는 순간은?
     choices:
-      - visibilitychange 이벤트에서 페이지가 hidden이 될 때
-      - unload 이벤트
-      - beforeunload 이벤트
+      - 페이지가 hidden으로 바뀔 때
+      - 페이지의 unload 이벤트 때
+      - beforeunload 이벤트 때
       - 페이지를 연 직후 한 번
     answer: 0
-    explain: hidden으로 바뀌는 순간이 페이지가 믿고 받을 수 있는 마지막 이벤트예요. 이때 sendBeacon으로 보내요.
+    explain: visibilitychange 이벤트에서 hidden으로 바뀌는 순간이 페이지가 믿고 받을 수 있는 마지막 이벤트예요. 이때 sendBeacon으로 보내요.
   - id: rum-fewer-users
     type: ox
-    prompt: RUM의 사용자 수가 서버 접속 로그보다 적다면 RUM 수집에 버그가 있다고 봐야 하나요?
-    answer: false
-    explain: 광고·추적 차단, 보내기 전에 꺼진 페이지, 샘플링으로 빠지는 사용자가 있어요. RUM은 전송이 닿은 사용자의 숫자예요.
+    prompt: 사용자가 페이지를 보다가 RUM 데이터를 보내기 전에 브라우저가 강제로 꺼지면, 그 페이지 보기의 기록은 RUM에서 빠지나요?
+    answer: true
+    explain: 많은 값을 떠날 때 보내서, 그 순간을 놓치면 기록이 없어요. 광고·추적 차단과 샘플링까지 더해 RUM 사용자 수는 서버 로그보다 보통 적어요.
   - id: promise-error
     type: ox
     prompt: async 함수 안에서 잡지 않은 에러도 window의 error 이벤트로 잡히나요?

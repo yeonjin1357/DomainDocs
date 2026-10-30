@@ -1,41 +1,41 @@
 questions:
   - id: edge-from-span-pair
     type: choice
-    prompt: 서비스 맵의 선은 무엇을 짝지어 그릴까요?
+    prompt: 트레이스로 그리는 서비스 맵에서, 서비스 사이의 선은 무엇을 짝지어 그릴까요?
     choices:
-      - 부른 쪽의 CLIENT span과 받은 쪽의 SERVER span
-      - 두 서버의 IP 주소
-      - 두 서비스의 에러 로그
-      - 두 서버의 CPU 사용률
+      - 부른 쪽 span과 받은 쪽 span
+      - 두 서버 사이의 네트워크 연결
+      - 두 서비스의 로그에 남은 주소
+      - 두 서버의 같은 시각 CPU 사용률
     answer: 0
-    explain: 트레이스에서 부모·자식으로 이어진 두 span을 짝지어 선을 그어요. 선마다 요청 수, 실패 수, 응답시간을 모아요.
+    explain: 부른 쪽 CLIENT span과 받은 쪽 SERVER span이 부모·자식으로 이어진 짝마다 선을 그어요. 선마다 요청 수, 실패 수, 응답시간을 모아요.
   - id: virtual-node
     type: choice
     prompt: DB나 바깥 결제사처럼 span을 보내지 않는 곳은 서비스 맵에 어떻게 나올까요?
     choices:
-      - 부른 쪽 span의 peer.service, db.system 같은 속성으로 가상 노드가 생겨요
-      - 어떤 방법으로도 맵에 나올 수 없어요
+      - 부른 쪽 span의 속성으로 가상 노드
+      - 어떤 방법으로도 맵에 못 나와요
       - 늘 user라는 노드로 나와요
-      - 맵 도구가 그곳에 직접 접속해 정보를 가져와요
+      - 맵 도구가 직접 접속해 알아내요
     answer: 0
-    explain: 받은 쪽 span이 없으니 부른 쪽 정보로 그려요. 그런 속성조차 없으면 맵에 나오지 않아요.
+    explain: 받은 쪽 span이 없으니 부른 쪽의 peer.service, db.system 같은 속성으로 그려요. 그런 속성조차 없으면 맵에 나오지 않아요.
   - id: batch-missing
     type: ox
-    prompt: 하루 한 번 도는 배치만 부르는 서비스도, 최근 15분 서비스 맵에 늘 보이나요?
+    prompt: 새벽 2시 배치만 부르는 서비스가 있어요. 오후 3시에 '최근 15분' 서비스 맵을 열면 이 서비스가 보이나요?
     answer: false
-    explain: 선은 고른 기간에 실제로 호출이 있었을 때만 그려져요. 그 기간에 호출이 없으면 맵에서 빠져요.
+    explain: 선은 고른 기간에 실제로 호출이 있었을 때만 그려져요. 그 15분에 호출이 없으면 맵에서 빠져요.
   - id: internal-user-node
     type: choice
     prompt: 실제로는 서비스 A가 서비스 B를 부르는데, 맵에서는 B가 user에게 불린 것으로 나와요. 무슨 뜻일까요?
     choices:
-      - 트레이스가 끊겨 B에서 새 트레이스가 시작됐어요
+      - 트레이스가 끊겨 B에서 새로 시작했어요
       - B가 사용자 요청을 직접 받고 있어요
-      - A는 사실 B를 부르지 않아요
-      - B가 계측되지 않았어요
+      - A가 실제로는 B를 부르지 않아요
+      - B가 계측되지 않아 user로 보여요
     answer: 0
-    explain: 부른 쪽 span 없이 시작한 SERVER span은 부른 쪽을 user로 그려요. 내부 서비스끼리 부르는 자리라면 전파가 끊긴 거예요.
+    explain: 부른 쪽 span 없이 시작한 SERVER span은 부른 쪽을 user로 그려요. B가 계측되지 않았다면 B의 SERVER span이 없어서 B 쪽이 가상 노드가 돼요.
   - id: sampled-counts-low
     type: ox
-    prompt: 샘플링한 트레이스로 만든 서비스 맵의 요청 수는, 실제 트래픽보다 적게 나올 수 있나요?
+    prompt: head 샘플링으로 10%만 남긴 트레이스로 맵을 그렸고, 보정 설정은 없어요. 맵의 선에 찍힌 요청 수는 실제보다 적나요?
     answer: true
-    explain: 남긴 트레이스만 세니까 비율만큼 적어요. 샘플 비율을 곱해 보정하는 설정을 두기도 해요.
+    explain: 남긴 트레이스만 세니까 실제의 10% 안팎이에요. 샘플 비율을 곱해 보정하는 설정을 두기도 해요.
