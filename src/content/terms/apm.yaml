@@ -210,7 +210,7 @@ terms:
     aliases: [canary, canarying, 카나리, 카나리 릴리스]
     short: 새 버전을 일부 트래픽에만 먼저 내보내 기존 버전과 견주는 배포 방식이에요.
     analogy: 광부가 탄광에 카나리아를 먼저 들여보내 위험을 살피던 데서 온 말이에요.
-    doc: apm/slow-after-deploy
+    doc: foundations/deployments
   - id: resource-error
     name: 자원 불러오기 실패
     en: Resource loading error
@@ -279,3 +279,17 @@ terms:
     short: 주문 수나 결제 성공률처럼 서비스가 제 일을 했는지 세는 지표예요.
     analogy: 가게의 기계 점검표가 아니라 그날 판 물건 수와 같아요.
     doc: apm/business-metrics
+  - id: blue-green
+    name: 블루·그린 배포
+    en: Blue-green deployment
+    aliases: [blue-green, blue green, 블루그린, 블루 그린]
+    short: 새 버전 묶음을 옛 버전 옆에 다 띄운 뒤 트래픽을 한 번에 넘기는 배포 방식이에요.
+    analogy: 새 무대를 옆에 다 꾸며 두고 조명만 그쪽으로 돌리는 것과 같아요.
+    doc: foundations/deployments
+  - id: feature-flag
+    name: 기능 플래그
+    en: Feature flag
+    aliases: [feature flag, feature toggle, 기능 토글, 피처 플래그]
+    short: 배포한 코드 안의 기능을 설정으로 켜고 끄게 해 주는 스위치예요.
+    analogy: 공사를 다 해 두고 가림막만 걷었다 쳤다 하는 것과 같아요.
+    doc: foundations/deployments

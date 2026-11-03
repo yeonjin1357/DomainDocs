@@ -1,0 +1,208 @@
+---
+title: 배포 방식과 지켜보기
+summary: 장애는 대개 바꿀 때 나요. 조금씩 내보내고, 버전별로 견줘 보고, 바로 되돌릴 수 있게 배포해요.
+domain: foundations
+type: concept
+stage: basics
+order: 65
+icon: activity
+keywords: [배포, deployment, 롤링, 블루 그린, blue-green, 카나리, canary, 기능 플래그, feature flag, 롤백]
+related: [apm/slow-after-deploy, kubernetes/rollout-stuck, foundations/incident-response, foundations/alert-silencing, apm/business-metrics]
+sources:
+  - title: Google SRE Book — Introduction (Change Management)
+    url: https://sre.google/sre-book/introduction/
+  - title: Google SRE Workbook — Canarying Releases
+    url: https://sre.google/workbook/canarying-releases/
+  - title: Kubernetes — Deployments (strategy)
+    url: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+  - title: Martin Fowler — BlueGreenDeployment
+    url: https://martinfowler.com/bliki/BlueGreenDeployment.html
+  - title: Pete Hodgson — Feature Toggles (aka Feature Flags)
+    url: https://martinfowler.com/articles/feature-toggles.html
+  - title: Danilo Sato — ParallelChange
+    url: https://martinfowler.com/bliki/ParallelChange.html
+  - title: OpenTelemetry — Service attributes (service.version)
+    url: https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/
+updated: 2026-11-03
+---
+
+import DeployMarker from '../../../assets/figures/foundations/deploy-marker.svg';
+
+<KeyPoints>
+  <Point title="장애는 대개 바꿀 때 나요">
+    조금씩 내보내고, 빨리 알아채고, 바로 되돌릴 수 있게 배포해요. 배포 방식이 이 셋을 얼마나 쉽게 하는지가 달라요.
+  </Point>
+  <Point title="카나리는 같은 시간의 옛 버전과 견줘요">
+    배포 전과 후를 견주면 그사이 바뀐 트래픽까지 섞여요. 같은 시간에 함께 도는 옛 버전이 기준이에요.
+  </Point>
+  <Point title="버전별로 나눠 봐야 보여요">
+    새 버전이 트래픽 일부만 받을 때는, 새 버전의 에러가 전체 에러율에 묻혀요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="식당 손님은 맛이 없으면 말해 주지만, 서비스의 사용자는 대개 말없이 떠나요. 그래서 지표로 두 버전을 견줘야 해요.">
+  식당이 새 레시피를 한 테이블에만 먼저 내놓고, 반응이 나쁘면 바로 옛 메뉴로 돌리는 것과 같아요.
+</Analogy>
+
+## 장애는 대개 바꿀 때 나요
+
+Google SRE 책은 장애의 약 70%가 운영 중인 시스템을 바꿀 때 생긴다고 해요. 새 버전 배포, 설정 변경, DB 스키마 변경이 모두 여기에 들어요.
+
+그래서 SRE 책은 세 가지를 하라고 해요. 조금씩 내보내고, 문제를 빨리 정확히 알아채고, 문제가 나면 안전하게 되돌려요. 아래 절들이 이 셋을 하나씩 다뤄요.
+
+예시는 서버 10대에서 도는 주문 서비스를 v1.4에서 v1.5로 바꾸는 상황이에요.
+
+## 배포 방식 넷
+
+배포 방식은 새 버전에 트래픽을 어떤 순서로 넘기는지가 달라요.
+
+<Figure caption="네 방식에서 새 버전 v1.5가 받는 트래픽의 몫이 시간에 따라 바뀌는 모습이에요. 진할수록 새 버전이 많이 받아요.">
+  <Strip
+    ariaLabel="새 버전이 받는 트래픽 몫. 한꺼번에는 0%에서 끊긴 뒤 100%, 롤링은 0, 25, 50, 75, 100%, 블루·그린은 0%로 있다가 한 번에 100%, 카나리는 0, 5, 5, 50, 100%"
+    rows={[
+      { label: '한꺼번에 바꾸기', heads: ['시작', '1', '2', '3', '끝'], cells: [{ label: '0%', heat: 0 }, { label: '끊김', tone: 'warn' }, { label: '100%', heat: 1 }, { label: '100%', heat: 1 }, { label: '100%', heat: 1 }] },
+      { label: '롤링', heads: ['시작', '1', '2', '3', '끝'], cells: [{ label: '0%', heat: 0 }, { label: '25%', heat: 0.25 }, { label: '50%', heat: 0.5 }, { label: '75%', heat: 0.75 }, { label: '100%', heat: 1 }] },
+      { label: '블루·그린', heads: ['시작', '1', '2', '3', '끝'], cells: [{ label: '0%', heat: 0 }, { label: '0%', heat: 0 }, { label: '0%', heat: 0 }, { label: '100%', heat: 1 }, { label: '100%', heat: 1 }] },
+      { label: '카나리', heads: ['시작', '1', '2', '3', '끝'], cells: [{ label: '0%', heat: 0 }, { label: '5%', heat: 0.05 }, { label: '5%', heat: 0.05 }, { label: '50%', heat: 0.5 }, { label: '100%', heat: 1 }] },
+    ]}
+  />
+</Figure>
+
+- **한꺼번에 바꾸기**: 옛 버전을 모두 내리고 새 버전을 띄워요. 가장 단순하지만 그사이 서비스가 끊기고, 문제가 나면 사용자 모두가 겪어요. 쿠버네티스의 Recreate 방식이에요.
+- **롤링**: 서버를 몇 대씩 바꿔요. 끊기지 않지만 한동안 두 버전이 섞여 돌고, 되돌릴 때도 몇 대씩 되돌려요. 쿠버네티스 Deployment의 기본 방식인 <Term term="kubernetes/rolling-update">롤링 업데이트</Term>예요.
+- **<Term term="apm/blue-green">블루·그린</Term>**: 새 버전 묶음(그린)을 옛 버전(블루) 옆에 다 띄운 뒤, 트래픽을 한 번에 돌려요. 되돌리기는 트래픽을 다시 블루로 돌리면 돼서 몇 초면 끝나요. 대신 한동안 서버가 두 배 들어요.
+- **<Term term="apm/canary">카나리</Term>**: 새 버전을 트래픽 일부(예: 5%)에만 먼저 내보내 옛 버전과 견줘요. 문제가 나도 처음엔 5%만 겪어요. 견줘서 괜찮으면 몫을 늘려요.
+
+방식은 섞어 써요. 카나리로 5%를 먼저 보고, 괜찮으면 나머지를 롤링으로 바꾸는 식이에요.
+
+## 기능 플래그: 배포와 공개를 나눠요
+
+<Term term="apm/feature-flag">기능 플래그</Term>(feature flag)는 코드 안에 둔 켜고 끄는 스위치예요. 새 기능을 꺼 둔 채로 코드를 배포하고, 기능을 켜는 일은 설정으로 따로 해요.
+
+<Figure caption="v1.5를 배포한 뒤 새 결제 기능을 10%에만 켜 본 예시예요. 문제가 보이자 플래그만 꺼서, 다시 배포하지 않고 되돌렸어요.">
+  <Timeline
+    ariaLabel="코드는 1시에 v1.5로 배포되어 그대로 있고, 새 결제 기능은 3시까지 꺼져 있다가 3시부터 10%에 켜고, 5시에 문제가 보여 끈 시간 띠"
+    end={8}
+    lanes={[
+      { label: '코드', segments: [{ start: 0, end: 1, label: 'v1.4', tone: 'sub' }, { start: 1, end: 8, label: 'v1.5', tone: 'accent' }] },
+      { label: '새 결제', segments: [{ start: 1, end: 3, label: '꺼짐', tone: 'sub' }, { start: 3, end: 5, label: '10%에 켬', tone: 'accent' }, { start: 5, end: 8, label: '다시 끔', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 1, label: '배포' }, { at: 5, label: '문제 → 끄기', tone: 'warn' }]}
+  />
+</Figure>
+
+그래서 되돌리기가 '배포 되돌리기'가 아니라 '끄기'가 돼요. 몇 분이 걸리던 일이 몇 초로 줄어요.
+
+다만 다 쓴 플래그는 지워야 해요. 플래그가 쌓이면 켜짐과 꺼짐의 조합이 늘어 코드를 시험하기 어려워져요.
+
+## 그래프에 배포 시각을 겹쳐요
+
+배포 시각이 그래프에 없으면 "언제부터 나빠졌지"를 찾고, 그때 무엇을 바꿨는지 따로 찾아야 해요. 배포 표시(deployment marker)를 그래프에 겹치면 한눈에 보여요.
+
+<Figure caption="에러율 그래프에 배포와 되돌림 시각을 겹친 예시예요. 14:05 배포 뒤에 오르고, 14:30 되돌린 뒤에 내려와서 원인과 회복이 한 번에 보여요.">
+  <DeployMarker aria-label="5분마다 본 에러율이 0.2% 안팎이다가 14시 5분 v1.5 배포 표시 뒤 1.2%에서 1.9%까지 오르고, 14시 30분 되돌림 표시 뒤 0.2%로 돌아온 그래프" />
+</Figure>
+
+배포 표시는 되돌림이 효과가 있었는지도 보여 줘요. 되돌린 뒤에도 숫자가 그대로라면 원인은 그 배포가 아니에요.
+
+## 카나리는 같은 시간끼리 견줘요
+
+카나리를 평가할 때는 새 버전(카나리)과 같은 시간에 도는 옛 버전(대조군, control)을 견줘요. SRE Workbook은 배포 전과 배포 후를 견주는 평가가 위험하다고 해요. 시간이 지표를 바꾸는 가장 큰 원인이라, 그사이 트래픽이 바뀌면 배포 탓인지 알 수 없어요.
+
+<Figure caption="같은 10분 동안 옛 버전과 카나리를 견준 예시예요. 카나리의 에러율과 p99가 눈에 띄게 높아서 되돌릴 차례예요.">
+  <Compare
+    columns={['옛 버전 v1.4(95%)', '카나리 v1.5(5%)']}
+    rows={[
+      { label: '에러율', values: ['0.2%', '1.7%'] },
+      { label: 'p99 응답시간', values: ['310ms', '890ms'] },
+      { label: '주문 완료율', values: ['3.1%', '3.0%'] },
+      { label: '같은 10분의 요청', values: ['57,000건', '3,000건'] },
+    ]}
+  />
+</Figure>
+
+카나리가 받는 요청이 너무 적으면 숫자가 크게 흔들려요. 10분에 30건만 받았다면 에러 1건이 3.3%예요. 그래서 요청이 어느 정도 쌓인 뒤에 판단하고, 그 수를 기준에 함께 적어요.
+
+평가 시간과 지표의 집계 구간도 맞춰요. SRE Workbook은 30분짜리 카나리를 1시간 단위로 센 지표로 평가하다 엉뚱한 결론이 난 예를 들어요.
+
+## 되돌릴 기준은 배포 전에 정해요
+
+배포가 시작된 뒤에 기준을 정하면, 숫자를 보고 기준을 맞추고 싶어져요. 그래서 미리 적어 둬요. 예를 들어 "카나리 에러율이 옛 버전의 2배를 넘고, 카나리가 10분에 500건 넘게 받았으면 되돌린다"예요.
+
+지표에 버전 레이블이 있어야 이 기준을 질의로 쓸 수 있어요. OpenTelemetry는 서비스 버전을 `service.version` 속성으로 적어요. 아래는 그 버전이 `version` 레이블로 붙어 있다고 친 질의예요.
+
+```text
+(
+ sum(rate(http_requests_total{
+  version="1.5",
+  status=~"5.."}[10m]))
+ / sum(rate(http_requests_total{
+  version="1.5"}[10m]))
+)
+> 2 * (
+ sum(rate(http_requests_total{
+  version="1.4",
+  status=~"5.."}[10m]))
+ / sum(rate(http_requests_total{
+  version="1.4"}[10m]))
+)
+and
+sum(increase(http_requests_total{
+ version="1.5"}[10m])) > 500
+```
+
+에러율만 보지 않아요. p99 응답시간, 그리고 주문 완료율 같은 <Term slug="apm/business-metrics">비즈니스 지표</Term>도 기준에 넣어요. 에러 없이 느려지거나, 에러 없이 주문이 줄어드는 배포도 있어요.
+
+## 되돌리기 어려운 변경
+
+코드는 옛 버전으로 되돌리면 되지만, 데이터는 그렇지 않아요. 예를 들어 v1.5가 DB 열 이름을 `tel`에서 `phone`으로 바꿨다면, v1.4로 되돌려도 옛 열이 없어서 동작하지 않아요.
+
+그래서 스키마 변경은 앱 배포와 따로, 옛 버전과 새 버전이 함께 쓸 수 있게 나눠서 해요. 넓혔다가(expand) 옮기고(migrate) 좁히는(contract) 방법이에요.
+
+<Figure caption="열 이름을 바꾸는 일을 넷으로 나눈 모습이에요. 진한 칸이 그 단계에서 바뀐 곳이에요. 옛 열을 지우는 마지막 단계 전까지는 언제든 옛 버전으로 되돌릴 수 있어요.">
+  <Stages
+    ariaLabel="열 이름 바꾸기 단계. 처음엔 tel 열만 있고, 새 열 phone을 더하고, 두 열에 함께 쓰고, 읽기를 phone으로 옮기고, 마지막에 tel 열을 지우는 단계 칸"
+    hint={['DB의 열', '앱이 쓰고 읽는 곳']}
+    rows={[
+      { label: '처음', cells: ['tel', null, '쓰기 tel', '읽기 tel'] },
+      { label: '1. 새 열 더하기', end: '되돌릴 수 있어요', cells: ['tel', { label: 'phone', tone: 'accent' }, '쓰기 tel', '읽기 tel'] },
+      { label: '2. 두 열에 쓰기', end: '되돌릴 수 있어요', cells: ['tel', 'phone', { label: '쓰기 둘 다', tone: 'accent' }, '읽기 tel'] },
+      { label: '3. 읽기 옮기기', end: '되돌릴 수 있어요', cells: ['tel', 'phone', '쓰기 둘 다', { label: '읽기 phone', tone: 'accent' }] },
+      { label: '4. 옛 열 지우기', end: '이제 못 되돌려요', cells: [{ label: '지움', tone: 'warn' }, 'phone', '쓰기 phone', '읽기 phone'] },
+    ]}
+  />
+</Figure>
+
+블루·그린도 DB는 하나를 함께 쓰는 경우가 많아요. 그래서 Martin Fowler는 스키마 변경을 먼저 배포해 두 버전이 다 쓸 수 있게 하고, 앱은 그다음에 바꾸라고 해요.
+
+## 모니터링에서는
+
+<Figure caption="롤링 배포 동안의 에러율이에요. 전체 에러율은 새 버전의 몫이 늘면서 천천히 오르기만 해서 '조금 나빠짐'으로 보여요. 버전별로 나누면 v1.5만 2%예요.">
+  <MiniLineChart ariaLabel="롤링 배포 동안 v1.4의 에러율은 0.2%, v1.5의 에러율은 2%로 일정하고, 둘을 합친 전체 에러율은 0.38%에서 1.28%로 천천히 오르는 그래프" series={[{ label: 'v1.5', values: [2.0, 2.0, 2.0, 2.0, 2.0, 2.0], tone: 'warn', value: '2.0%' }, { label: '전체', values: [0.38, 0.56, 0.74, 0.92, 1.1, 1.28], tone: 'accent', value: '1.28%' }, { label: 'v1.4', values: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2], tone: 'sub', value: '0.2%' }]} />
+</Figure>
+
+배포를 지켜보려면 세 가지가 필요해요.
+
+- **배포 이벤트**: CI/CD가 배포를 시작하고 끝낼 때 그 시각과 버전을 모니터링에 보내요. 그래야 그래프에 표시가 생겨요.
+- **버전 레이블**: 지표와 트레이스에 버전을 달아요. 버전별로 나눌 수 없으면 카나리도 롤링도 견줄 수 없어요.
+- **버전별 비교 화면**: 배포 직후 30분처럼 정한 시간 동안, 버전마다 에러율·p99·비즈니스 지표를 나란히 보여 줘요.
+
+배포 중에 알림을 잠재우는 설정은 조심해요. 배포가 만든 장애까지 함께 잠재워요. <Term slug="foundations/alert-silencing">알림 잠재우기와 점검 시간</Term>에서 범위를 좁히는 법을 다뤄요.
+
+<Checkpoints>
+  <Check>"배포 전 1시간과 배포 후 1시간을 견줘 이상 없음"이라는 판단이라면 다시 보세요. 그사이 트래픽이 바뀌었을 수 있어요. 같은 시간의 옛 버전과 견주세요.</Check>
+  <Check>지표에 버전 레이블이 없는 대시보드라면 다시 보세요. 롤링이나 카나리 동안 새 버전의 문제가 전체 숫자에 묻혀요.</Check>
+  <Check>카나리가 몇십 건만 받았는데 '문제없음'이나 '문제 있음'으로 결론 낸 보고라면, 요청 수부터 보세요.</Check>
+  <Check>DB 스키마를 바꾸는 배포에 '문제 생기면 이전 버전으로 되돌림'이라고만 적은 계획이라면 다시 보세요. 옛 버전이 새 스키마에서 도는지 먼저 확인하세요.</Check>
+  <Check>쓰고 난 기능 플래그가 계속 남아 있다면 지우세요. 켜짐과 꺼짐의 조합이 늘어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 쿠버네티스 롤링 업데이트의 기본값
+
+  Deployment의 기본 방식은 RollingUpdate이고, `maxSurge`와 `maxUnavailable`의 기본값은 모두 25%예요. `maxSurge`는 올림, `maxUnavailable`은 내림으로 세요. 파드 10개라면 10의 25%인 2.5를 올려 새 파드를 3개까지 더 띄우고, 내려서 한 번에 2개까지 내려요.
+
+  ### 기능 플래그의 종류
+
+  Pete Hodgson은 플래그를 쓰임에 따라 나눠요. 출시를 위한 플래그(release toggle)는 한두 주 안에 지우라고 해요. 운영을 위한 플래그(ops toggle)는 성능이 걱정되는 새 기능을 바로 끄거나 줄일 수 있게 둬요.
+</Deeper>

@@ -1,0 +1,29 @@
+questions:
+  - id: blue-green-cost
+    type: ox
+    prompt: 블루·그린 배포는 새 버전을 띄우는 동안 옛 버전을 먼저 지워서, 서버가 더 들지 않나요?
+    answer: false
+    explain: 새 버전 묶음을 옛 버전 옆에 다 띄운 뒤 트래픽을 돌려요. 그래서 되돌리기는 몇 초면 되지만, 한동안 서버가 두 배 들어요.
+  - id: flag-rollback
+    type: ox
+    prompt: 기능 플래그로 감싼 새 기능에 문제가 생기면, 다시 배포하지 않고 플래그만 꺼서 되돌릴 수 있나요?
+    answer: true
+    explain: 기능 플래그는 배포와 공개를 나눠요. 코드는 그대로 두고 설정으로 기능만 꺼서, 몇 초 만에 되돌려요.
+  - id: canary-baseline
+    type: choice
+    prompt: 카나리 v1.5를 평가할 때 가장 알맞은 비교 대상은?
+    choices: [같은 시간에 도는 v1.4, 배포 전 1시간의 v1.4, 어제 같은 시간의 v1.4, 지난주 v1.4의 평균]
+    answer: 0
+    explain: 시간이 지표를 바꾸는 가장 큰 원인이라, 시간이 다른 기준과 견주면 배포 탓인지 알 수 없어요. 같은 시간의 옛 버전(대조군)과 견줘요.
+  - id: small-canary
+    type: choice
+    prompt: 카나리가 10분 동안 30건만 받았는데 에러가 1건 났어요. 먼저 할 일은?
+    choices: [요청이 더 쌓일 때까지 봐요, 에러율 3.3%로 보고 되돌려요, 문제없다고 보고 넓혀요, 배포 전 1시간과 견줘요]
+    answer: 0
+    explain: 30건에서는 에러 1건이 3.3%가 돼서 숫자가 크게 흔들려요. 미리 정한 요청 수가 쌓인 뒤에 판단해요.
+  - id: canary-name
+    type: input
+    prompt: 새 버전을 트래픽 일부에만 먼저 내보내 옛 버전과 견준 뒤 몫을 늘리는 배포 방식은?
+    answer: [카나리, canary, 카나리 배포]
+    term: apm/canary
+    explain: 카나리는 문제가 나도 처음엔 일부 사용자만 겪게 해요. 견줘 보고 괜찮을 때 몫을 늘려요.
