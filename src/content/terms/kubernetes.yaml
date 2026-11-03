@@ -442,3 +442,10 @@ terms:
     short: 파드 하나의 CPU·메모리 요청과 한도를 실제 사용량에 맞춰 바꾸는 기능이에요.
     analogy: 짐이 늘면 트럭을 더 부르는 대신 더 큰 트럭으로 바꾸는 것과 같아요.
     doc: kubernetes/autoscaling
+  - id: managed-kubernetes
+    name: 관리형 쿠버네티스
+    en: Managed Kubernetes
+    aliases: [EKS, AKS, GKE, managed Kubernetes, 매니지드 쿠버네티스]
+    short: 클라우드가 컨트롤 플레인을 대신 띄우고 관리해 주는 쿠버네티스 서비스예요.
+    analogy: 승강기와 전기는 관리실이 맡는 오피스텔과 같아요.
+    doc: kubernetes/managed-kubernetes

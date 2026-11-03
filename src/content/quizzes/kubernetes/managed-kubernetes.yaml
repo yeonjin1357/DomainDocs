@@ -1,0 +1,28 @@
+questions:
+  - id: nodegroup-upgrade
+    type: ox
+    prompt: EKS에서 컨트롤 플레인의 버전을 올리면, 관리형 노드 그룹의 노드도 함께 올라가나요?
+    answer: false
+    explain: 관리형 노드 그룹은 컨트롤 플레인을 올릴 때 저절로 올라가지 않아요. 노드 그룹 업데이트를 따로 해야 해요.
+  - id: logs-default-off
+    type: ox
+    prompt: EKS의 컨트롤 플레인 로그는 기본으로 꺼져 있어서, 종류마다 켜야 CloudWatch Logs에 쌓이나요?
+    answer: true
+    explain: 기본으로는 보내지 않아요. api, audit 같은 종류를 하나씩 켜야 하고, 켜기 전의 기록은 남지 않아요.
+  - id: extended-support
+    type: choice
+    prompt: EKS 클러스터의 버전이 표준 지원 14개월을 넘겨 연장 지원에 들어가면 어떻게 되나요?
+    choices: [클러스터 요금이 올라요, 클러스터가 바로 멈춰요, 노드가 모두 지워져요, 모든 파드가 재시작돼요]
+    answer: 0
+    explain: 연장 지원 동안 클러스터당 시간당 요금이 0.10달러에서 0.60달러가 돼요. 연장 지원이 끝나면 클러스터가 저절로 올라가요.
+  - id: etcd-metrics
+    type: choice
+    prompt: 관리형 쿠버네티스에서 대개 직접 들어가 볼 수 없는 것은?
+    choices: [etcd, 노드의 kubelet 지표, 파드의 로그, kube-state-metrics]
+    answer: 0
+    explain: etcd는 컨트롤 플레인 안에 있어서 클라우드가 맡아요. 노드와 파드 쪽 지표와 로그는 직접 운영할 때처럼 모아요.
+  - id: autopilot-name
+    type: input
+    prompt: GKE에서 노드와 확장까지 Google이 관리하는 운영 방식의 이름은?
+    answer: [Autopilot, 오토파일럿, GKE Autopilot]
+    explain: Autopilot에서는 노드까지 클라우드가 맡고, 나는 파드만 다뤄요. 반대 방식은 Standard예요.

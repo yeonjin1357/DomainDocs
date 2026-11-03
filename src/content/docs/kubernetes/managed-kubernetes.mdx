@@ -1,0 +1,136 @@
+---
+title: 관리형 쿠버네티스(EKS·AKS·GKE)
+summary: 클라우드가 컨트롤 플레인을 맡아 줘요. 대신 그 안은 덜 보이고, 버전 올리기는 정해진 때 해야 해요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 84
+icon: container
+keywords: [EKS, AKS, GKE, 관리형 쿠버네티스, managed Kubernetes, 노드 그룹, Fargate, Autopilot, 연장 지원, 컨트롤 플레인 로그]
+related: [kubernetes/control-plane-slow, kubernetes/pod-network, kubernetes/node-drain, cloud/costs, cloud/virtual-machines]
+sources:
+  - title: Amazon EKS — Kubernetes versions (standard and extended support)
+    url: https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html
+  - title: Amazon EKS — Pricing
+    url: https://aws.amazon.com/eks/pricing/
+  - title: Amazon EKS — Send control plane logs to CloudWatch Logs
+    url: https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
+  - title: Amazon EKS — Fetch control plane raw metrics
+    url: https://docs.aws.amazon.com/eks/latest/userguide/view-raw-metrics.html
+  - title: GKE — Release channels
+    url: https://cloud.google.com/kubernetes-engine/docs/concepts/release-channels
+  - title: GKE — Autopilot overview
+    url: https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview
+  - title: AKS — Supported Kubernetes versions
+    url: https://learn.microsoft.com/en-us/azure/aks/supported-kubernetes-versions
+  - title: Kubernetes — Version Skew Policy
+    url: https://kubernetes.io/releases/version-skew-policy/
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="컨트롤 플레인을 클라우드가 맡아요">
+    API 서버, etcd, 스케줄러를 클라우드가 띄우고 고쳐요. 노드와 그 위의 파드는 대개 내가 맡아요.
+  </Point>
+  <Point title="맡긴 만큼 덜 보여요">
+    컨트롤 플레인 서버에 들어갈 수 없어서, 클라우드가 열어 준 지표와 로그로만 봐요. 로그는 따로 켜야 쌓이기도 해요.
+  </Point>
+  <Point title="버전은 정해진 때 올려야 해요">
+    버전마다 지원 기간이 있어요. 지나면 비용이 늘거나 클라우드가 알아서 올려요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="관리실은 건물 안을 다 보여 주지 않아요. 클라우드도 컨트롤 플레인의 기계실은 열어 주지 않고, 정해 둔 계기판(지표와 로그)만 보여 줘요.">
+  관리형 쿠버네티스는 관리실이 있는 오피스텔과 같아요. 승강기와 전기(컨트롤 플레인)는 관리실이 맡고, 내 호실 안(노드와 파드)은 내가 꾸며요.
+</Analogy>
+
+## 누가 무엇을 맡나요
+
+쿠버네티스를 직접 깔면 <Term term="kubernetes/control-plane">컨트롤 플레인</Term>부터 노드까지 모두 내가 운영해요. EKS(AWS), AKS(Azure), GKE(Google Cloud)는 컨트롤 플레인을 클라우드가 맡는 <Term term="kubernetes/managed-kubernetes">관리형 쿠버네티스</Term> 서비스예요.
+
+<Figure caption="세 가지 운영 방식에서 맡는 쪽이에요. 관리형 노드 그룹도 노드 업데이트는 내가 시작해요. Fargate나 GKE Autopilot을 쓰면 노드까지 클라우드가 맡아요.">
+  <Strip
+    ariaLabel="직접 운영은 컨트롤 플레인, etcd, 노드 OS, 노드 수, 파드를 모두 내가 맡고, 관리형 노드 그룹은 컨트롤 플레인과 etcd를 클라우드가 맡고, 노드까지 맡기면 파드 말고 모두 클라우드가 맡는 칸 띠"
+    rows={[
+      { label: '직접 운영', heads: ['컨트롤 플레인', 'etcd', '노드 OS', '노드 수', '파드'], cells: ['내가', '내가', '내가', '내가', '내가'] },
+      { label: '관리형 + 노드 그룹', heads: ['컨트롤 플레인', 'etcd', '노드 OS', '노드 수', '파드'], cells: [{ label: '클라우드', tone: 'accent' }, { label: '클라우드', tone: 'accent' }, '내가', '내가', '내가'] },
+      { label: '노드까지 맡김(Fargate·Autopilot)', heads: ['컨트롤 플레인', 'etcd', '노드 OS', '노드 수', '파드'], cells: [{ label: '클라우드', tone: 'accent' }, { label: '클라우드', tone: 'accent' }, { label: '클라우드', tone: 'accent' }, { label: '클라우드', tone: 'accent' }, '내가'] },
+    ]}
+  />
+</Figure>
+
+GKE Autopilot은 노드, 확장, 보안 설정까지 Google이 관리해요. AWS의 Fargate는 파드마다 따로 떨어진 실행 환경을 마련해 줘요.
+
+## 컨트롤 플레인은 덜 보여요
+
+컨트롤 플레인 서버에는 들어갈 수 없어요. 그래서 etcd나 스케줄러의 지표를 직접 모으지 못하고, 클라우드가 열어 준 길로만 봐요.
+
+<Figure caption="EKS에서 컨트롤 플레인을 보는 길이에요. API 서버 지표는 그대로 읽히지만, 나머지는 클라우드가 열어 준 만큼만 보여요.">
+  <Tree
+    ariaLabel="EKS 컨트롤 플레인을 보는 길. API 서버 지표는 /metrics로 그대로, 스케줄러와 컨트롤러 매니저 지표는 1.28부터 metrics.eks.amazonaws.com으로, 컨트롤 플레인 로그는 종류마다 켜야 CloudWatch Logs로, etcd는 직접 볼 수 없어요"
+    root={{
+      label: 'EKS 컨트롤 플레인',
+      children: [
+        { label: 'API 서버 지표', note: 'API의 /metrics로 그대로 읽어요', tag: '늘', tone: 'accent' },
+        { label: '스케줄러·컨트롤러 매니저 지표', note: 'metrics.eks.amazonaws.com', tag: '1.28부터' },
+        { label: '컨트롤 플레인 로그', note: '종류마다 켜야 CloudWatch Logs로', tag: '기본 꺼짐', tone: 'warn' },
+        { label: 'etcd', note: '직접 들어가 볼 수 없어요', tag: '안 보여요' },
+      ],
+    }}
+  />
+</Figure>
+
+EKS의 컨트롤 플레인 로그는 다섯 종류예요. api, audit, authenticator, controllerManager, scheduler가 있어요.
+
+기본으로 꺼져 있어서, 장애가 난 뒤에 켜면 그 전 기록은 없어요. 켜면 CloudWatch Logs의 저장 비용이 따로 들어요.
+
+컨트롤 플레인이 느릴 때 무엇부터 볼지는 <Term slug="kubernetes/control-plane-slow">컨트롤 플레인이 느릴 때</Term>에서 다뤄요.
+
+## 버전은 정해진 때 올려요
+
+쿠버네티스는 넉 달쯤마다 새 마이너 버전이 나와요. 관리형 서비스는 버전마다 지원 기간을 두고, 기간이 끝나면 올리라고 해요.
+
+<Figure caption="EKS의 버전 하나가 지나는 길이에요. 출시 뒤 14개월은 표준 지원, 그다음 12개월은 연장 지원이에요. 연장 지원이 끝나면 클러스터가 저절로 올라가고 되돌릴 수 없어요.">
+  <Timeline
+    ariaLabel="EKS 버전 하나의 지원 기간. 0개월부터 14개월까지 표준 지원으로 클러스터당 시간당 0.10달러, 14개월부터 26개월까지 연장 지원으로 시간당 0.60달러, 26개월에 자동 업그레이드"
+    end={28}
+    lanes={[
+      {
+        label: 'EKS 버전',
+        segments: [
+          { start: 0, end: 14, label: '표준 $0.10/시간', tone: 'accent' },
+          { start: 14, end: 26, label: '연장 $0.60/시간', tone: 'warn' },
+        ],
+      },
+    ]}
+    marks={[{ at: 26, label: '자동 업그레이드', tone: 'warn' }]}
+    ticks={[{ at: 0, label: '출시' }, { at: 14, label: '14개월' }, { at: 26, label: '26개월' }]}
+  />
+</Figure>
+
+다른 클라우드도 방식은 달라도 같은 문제를 다뤄요. AKS는 최신 버전과 그 앞의 두 버전, 세 개를 지원해요. GKE는 릴리스 채널(Rapid, Regular, Stable, Extended)을 고르면 그 채널에 맞춰 클러스터를 올려요.
+
+컨트롤 플레인만 올라가고 노드는 남는 경우가 많아요. EKS의 관리형 노드 그룹도 컨트롤 플레인을 올릴 때 함께 올라가지 않아요. 쿠버네티스는 노드의 kubelet이 API 서버보다 세 마이너 버전까지 낮아도 되게 하지만, 높으면 안 돼요.
+
+## 클라우드와 이어지는 곳
+
+관리형 클러스터는 클라우드의 다른 서비스와 맞물려 돌아요. 문제도 그 이음새에서 자주 나요.
+
+- **파드 IP**: EKS의 기본 CNI(VPC CNI)는 파드에 VPC의 실제 IP를 줘요. 서브넷의 IP가 바닥나면 노드가 있어도 새 파드가 뜨지 않아요. 자세한 건 <Term slug="kubernetes/pod-network">파드 네트워크(CNI)</Term>에 있어요.
+- **로드 밸런서**: `type: LoadBalancer`인 Service를 만들면 클라우드의 로드 밸런서가 생겨요. 그 비용과 상태도 클라우드 쪽에서 봐요.
+- **권한**: 파드가 클라우드 API를 부를 때는 클라우드의 권한 체계(IAM)와 이어 줘요. EKS Pod Identity, GKE Workload Identity 같은 기능이에요.
+
+## 모니터링에서는
+
+노드와 파드는 직접 운영할 때처럼 모아요. kubelet, kube-state-metrics, 노드 에이전트는 그대로예요. 다른 점은 컨트롤 플레인과, 클라우드와 이어진 곳이에요.
+
+- **컨트롤 플레인**: API 서버 지표는 직접 모으고, 나머지는 클라우드의 지표와 로그를 끌어와요. 로그는 미리 켜 둬요.
+- **버전과 지원 기간**: 클러스터마다 버전과 지원이 끝나는 날을 보여 줘요. 연장 지원에 들어간 EKS 클러스터는 비용이 여섯 배가 돼요.
+- **IP와 할당량**: 서브넷의 남은 IP, 노드 그룹의 최대 크기처럼 클라우드 쪽 한도가 파드를 막을 수 있어요.
+
+<Checkpoints>
+  <Check>관리형 클러스터의 etcd나 스케줄러 지표를 직접 수집하려는 설계라면 다시 보세요. 클라우드가 열어 준 길로만 볼 수 있어요.</Check>
+  <Check>EKS 컨트롤 플레인 로그가 꺼진 채라면, 감사(audit)만이라도 켤지 정하세요. 장애 뒤에 켜면 그 전 기록이 없어요.</Check>
+  <Check>EKS 버전이 표준 지원 14개월을 넘겼다면 비용을 다시 보세요. 연장 지원 동안 클러스터당 시간당 요금이 0.10달러에서 0.60달러가 돼요.</Check>
+  <Check>컨트롤 플레인만 올리고 노드 그룹은 그대로인 클러스터라면, 노드와 API 서버의 버전 차이가 셋을 넘지 않는지 보세요.</Check>
+</Checkpoints>
