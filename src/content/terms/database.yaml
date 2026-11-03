@@ -336,7 +336,7 @@ terms:
   - id: hot-partition
     name: 핫 파티션
     en: Hot partition
-    aliases: [hot partition, hot key, 핫 키]
+    aliases: [hot partition, hot key, 핫 키, hot shard, 핫 샤드]
     short: 한 키에 요청이 몰려 그 파티션만 처리 한도에 닿은 상태예요.
     doc: database/nosql
   - id: capacity-unit
@@ -414,3 +414,17 @@ terms:
     short: 정한 시간보다 오래 걸린 SQL 실행을 한 건씩 남기는 로그예요.
     analogy: 이틀 넘게 걸린 배송만 송장째 따로 모아 둔 장부와 같아요.
     doc: database/slow-query-log
+  - id: shard
+    name: 샤드
+    en: Shard
+    aliases: [shard, 샤딩, sharding]
+    short: 여러 DB 서버에 나눠 담은 데이터 가운데 한 몫을 맡은 서버예요.
+    analogy: 책을 나눠 둔 도서관 분관 하나와 같아요.
+    doc: database/sharding
+  - id: shard-key
+    name: 샤드 키
+    en: Shard key
+    aliases: [shard key, 분산 키, distribution column]
+    short: 행이나 문서를 어느 샤드에 둘지 정하는 열이에요.
+    analogy: 책을 어느 분관에 둘지 정하는 저자 이름 같은 기준이에요.
+    doc: database/sharding
