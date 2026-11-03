@@ -1,0 +1,24 @@
+---
+import { checkTree, type TreeNode } from '../../lib/viz/tree';
+import TreeBranch from './TreeBranch.astro';
+
+interface Props {
+  /** 맨 위 마디. 아래 마디는 children으로 단다 */
+  root: TreeNode;
+  ariaLabel: string;
+}
+
+const { root, ariaLabel } = Astro.props;
+checkTree(root);
+---
+<ul class="tree" data-tree aria-label={ariaLabel}>
+  <TreeBranch node={root} />
+</ul>
+
+<style>
+  .tree {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

@@ -1,0 +1,23 @@
+---
+import { checkNest, type NestBox } from '../../lib/viz/nest';
+import NestItem from './NestItem.astro';
+
+interface Props {
+  /** 가장 바깥 상자들. 안에 든 것은 children으로 단다 */
+  boxes: NestBox[];
+  ariaLabel: string;
+}
+
+const { boxes, ariaLabel } = Astro.props;
+checkNest(boxes);
+---
+<div class="nest" data-nest role="img" aria-label={ariaLabel}>
+  {boxes.map((b) => <NestItem box={b} />)}
+</div>
+
+<style>
+  .nest {
+    display: grid;
+    gap: 8px;
+  }
+</style>

@@ -113,6 +113,27 @@ import Sample from '../../figures/sample.svg';
   />
 </Figure>
 
+<Figure caption="기다리는 쪽은 다시 갈려요.">
+  <Tree
+    ariaLabel="세션이 실행과 기다림으로, 기다림이 Lock과 IO로 갈리는 나무"
+    root={{ label: '세션', children: [{ label: '실행', tone: 'accent' }, { label: '기다림', children: [{ label: 'Lock', note: '잠금', tag: 'L1' }, { label: 'IO' }] }] }}
+  />
+</Figure>
+
+<Figure caption="스위치 한 대가 VLAN 둘로 나뉘어요.">
+  <Nest
+    ariaLabel="스위치 안에 VLAN 10과 VLAN 20이 있는 상자 그림"
+    boxes={[{ label: '스위치', children: [{ label: 'VLAN 10', tone: 'accent', children: [{ label: 'PC 1' }] }, { label: 'VLAN 20', children: [{ label: 'PC 2', note: '회계' }] }] }]}
+  />
+</Figure>
+
+<Figure caption="이름을 조각마다 읽어요.">
+  <Anatomy
+    ariaLabel="c7.large를 시리즈 c, 세대 7, 크기 large로 나눠 읽는 그림"
+    parts={[{ text: 'c', label: '시리즈' }, { text: '7', label: '세대', note: '7세대' }, { text: '.', label: '', tone: 'sub' }, { text: 'large', label: '크기' }]}
+  />
+</Figure>
+
 <Figure caption="직접 그린 SVG 그림이에요.">
   <Sample aria-label="테스트용 SVG 그림" />
 </Figure>

@@ -69,13 +69,14 @@ AWS에서는 가상 머신을 <Term term="cloud/instance">인스턴스</Term>라
 <Term term="cloud/instance-type">인스턴스 유형</Term>은 CPU, 메모리, 네트워크, 저장소의 조합이에요. 이름에 규칙이 있어서, 이름만 봐도 대강 알 수 있어요.
 
 <Figure caption="AWS 인스턴스 유형 이름의 읽는 법이에요. 앞 글자는 용도, 숫자는 세대, 그다음은 추가 옵션, 점 뒤는 크기예요.">
-  <Layers
-    ariaLabel="c7gn.4xlarge를 시리즈 c, 세대 7, 옵션 gn, 크기 4xlarge로 나눠 읽는 그림"
-    layers={[
-      { label: 'c', note: '시리즈: 컴퓨트 최적화', tone: 'accent' },
-      { label: '7', note: '세대: 7세대' },
-      { label: 'gn', note: '옵션: Graviton 칩, 네트워크 최적화' },
-      { label: '4xlarge', note: '크기', tone: 'accent' },
+  <Anatomy
+    ariaLabel="c7gn.4xlarge를 시리즈 c, 세대 7, 옵션 gn, 점 뒤의 크기 4xlarge로 나눠 읽는 그림"
+    parts={[
+      { text: 'c', label: '시리즈', note: '컴퓨트 최적화' },
+      { text: '7', label: '세대', note: '7세대' },
+      { text: 'gn', label: '옵션', note: 'Graviton 칩, 네트워크 최적화' },
+      { text: '.', label: '', tone: 'sub' },
+      { text: '4xlarge', label: '크기' },
     ]}
   />
 </Figure>

@@ -49,15 +49,11 @@ NIST가 꼽은 다섯 가지 특징을 보면 뜻이 또렷해져요.
 | SaaS | 완성된 소프트웨어 | 데이터와 계정 | 웹 메일, 협업 도구 |
 
 <Figure caption="IaaS에서 누가 무엇을 맡는지예요. 운영체제부터 위는 내가, 가상 머신부터 아래는 클라우드 사업자가 맡아요.">
-  <Layers
-    ariaLabel="위에서부터 데이터, 앱, 운영체제는 내가 맡고, 가상 머신, 물리 서버와 네트워크, 데이터센터 건물은 사업자가 맡는 층 그림"
-    layers={[
-      { label: '데이터', note: '내가', tone: 'accent' },
-      { label: '앱', note: '내가', tone: 'accent' },
-      { label: '운영체제', note: '내가', tone: 'accent' },
-      { label: '가상 머신', note: '사업자' },
-      { label: '물리 서버·네트워크', note: '사업자' },
-      { label: '데이터센터 건물', note: '사업자' },
+  <Stacks
+    ariaLabel="위에서부터 데이터, 앱, 운영체제는 내가 맡고, 가상 머신, 물리 서버와 네트워크, 데이터센터 건물은 클라우드 사업자가 맡는 그림"
+    columns={[
+      { title: 'IaaS의 층', blocks: ['데이터', '앱', '운영체제', '가상 머신', '물리 서버·네트워크', '데이터센터 건물'] },
+      { title: '누가 맡나', blocks: [{ label: '내가', span: 3, tone: 'accent' }, { label: '클라우드 사업자', span: 3 }] },
     ]}
   />
 </Figure>

@@ -1,0 +1,137 @@
+---
+import type { NestBox } from '../../lib/viz/nest';
+
+interface Props {
+  box: NestBox;
+}
+
+const { box } = Astro.props;
+const children = box.children ?? [];
+const cls = [children.length ? 'nest-box' : 'nest-leaf', `tone-${box.tone ?? 'plain'}`, box.wide ? 'wide' : '', box.dashed ? 'dashed' : ''].filter(Boolean).join(' ');
+---
+{
+  children.length > 0 ? (
+    <div class={cls}>
+      <p class="nest-title">
+        <span class="nest-label">{box.label}</span>
+        {box.note && <span class="nest-note">{box.note}</span>}
+      </p>
+      <div class="nest-children">
+        {children.map((c) => (
+          <Astro.self box={c} />
+        ))}
+      </div>
+    </div>
+  ) : (
+    <div class={cls}>
+      <span class="nest-label">{box.label}</span>
+      {box.note && <span class="nest-note">{box.note}</span>}
+    </div>
+  )
+}
+
+<style>
+  /* 안에 든 것을 감싸는 상자. 이름은 왼쪽 위에 두고, 안쪽 칸은 폭에 맞춰 여러 줄로 놓는다 */
+  .nest-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 10px;
+    border: 1.5px solid var(--color-line);
+    border-radius: 14px;
+  }
+
+  .nest-box.dashed {
+    border-style: dashed;
+  }
+
+  .nest-box.tone-accent {
+    border-color: var(--color-accent);
+  }
+
+  .nest-box.tone-warn {
+    border-color: var(--color-warn);
+  }
+
+  .nest-box.tone-sub {
+    border-style: dashed;
+    color: var(--color-text-sub);
+  }
+
+  .nest-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 8px;
+    margin: 0;
+    padding: 0 2px;
+  }
+
+  .nest-box > .nest-title .nest-label {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .nest-box.tone-accent > .nest-title .nest-label {
+    color: var(--color-accent);
+  }
+
+  .nest-box.tone-warn > .nest-title .nest-label {
+    color: var(--color-warn);
+  }
+
+  .nest-children {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr));
+    gap: 8px;
+  }
+
+  .nest-children > .wide {
+    grid-column: 1 / -1;
+  }
+
+  /* 맨 안쪽 칸 */
+  .nest-leaf {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 10px;
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    background: var(--color-card);
+  }
+
+  .nest-leaf .nest-label {
+    font-size: 14px;
+    font-weight: 600;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .nest-leaf.tone-accent {
+    border-color: var(--color-accent);
+    background: var(--color-accent-weak);
+  }
+
+  .nest-leaf.tone-warn {
+    border-color: var(--color-warn);
+    background: var(--color-warn-weak);
+  }
+
+  .nest-leaf.tone-sub {
+    border: 1.5px dashed var(--color-line);
+    background: transparent;
+    color: var(--color-text-sub);
+  }
+
+  .nest-note {
+    font-size: 12.5px;
+    color: var(--color-text-sub);
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+</style>

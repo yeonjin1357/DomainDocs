@@ -103,11 +103,11 @@ import DnsSearchDemo from '../../../components/demos/DnsSearchDemo.tsx';
   <Strip
     ariaLabel="pay는 첫째 시도인 pay.shop.svc.cluster.local에서 바로 찾고, api.example.com은 shop.svc, svc, cluster 검색 도메인을 붙인 세 번이 모두 없음이고 넷째로 원래 이름을 물어 주소를 받는 칸 띠"
     rows={[
-      { label: 'pay를 찾을 때', heads: ['1번'], cells: [{ label: '+shop.svc…', tone: 'accent' }] },
+      { label: 'pay를 찾을 때', heads: ['1번'], cells: [{ label: '+shop.svc', tone: 'accent' }] },
       {
         label: 'api.example.com을 찾을 때',
         heads: ['1번', '2번', '3번', '4번'],
-        cells: [{ label: '+shop.svc…', tone: 'warn' }, { label: '+svc…', tone: 'warn' }, { label: '+cluster…', tone: 'warn' }, { label: '원래 이름', tone: 'accent' }],
+        cells: [{ label: '+shop.svc', tone: 'warn' }, { label: '+svc', tone: 'warn' }, { label: '+cluster', tone: 'warn' }, { label: '원래 이름', tone: 'accent' }],
       },
     ]}
     ranges={[

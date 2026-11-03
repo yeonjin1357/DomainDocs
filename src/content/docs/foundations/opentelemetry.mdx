@@ -128,11 +128,11 @@ service:
   <Flow
     ariaLabel="앱의 SDK가 보낸 데이터를 Collector 안의 receiver가 받아 processor가 가공하고 exporter가 백엔드로 내보내는 구조도"
     nodes={[
-      { id: 'app', label: '앱 + SDK', col: 0, row: 0 },
-      { id: 'be', label: '백엔드', col: 2, row: 0 },
-      { id: 'recv', label: 'receiver', col: 0, row: 1, note: '받기', tone: 'accent' },
-      { id: 'proc', label: 'processor', col: 1, row: 1, note: '가공' },
-      { id: 'exp', label: 'exporter', col: 2, row: 1, note: '내보내기', tone: 'accent' },
+      { id: 'app', label: '앱 + SDK', col: 0, row: 1 },
+      { id: 'be', label: '백엔드', col: 2, row: 1 },
+      { id: 'recv', label: 'receiver', col: 0, row: 0, note: '받기', tone: 'accent' },
+      { id: 'proc', label: 'processor', col: 1, row: 0, note: '가공' },
+      { id: 'exp', label: 'exporter', col: 2, row: 0, note: '내보내기', tone: 'accent' },
     ]}
     edges={[
       { from: 'app', to: 'recv' },
@@ -140,7 +140,7 @@ service:
       { from: 'proc', to: 'exp' },
       { from: 'exp', to: 'be' },
     ]}
-    groups={[{ label: 'Collector 파이프라인', cols: [0, 2], rows: [1, 1] }]}
+    groups={[{ label: 'Collector 파이프라인', cols: [0, 2], rows: [0, 0] }]}
   />
 </Figure>
 

@@ -98,6 +98,33 @@ test('점검 순서는 단계 번호, 옆길, 다음 단계로 잇는 선을 보
   await expect(triage.locator('.triage-step.has-next')).toHaveCount(1);
 });
 
+test('나무는 아이 마디를 부모보다 안쪽에 들여 놓는다', async ({ page }) => {
+  const tree = page.getByRole('list', { name: '세션이 실행과 기다림으로, 기다림이 Lock과 IO로 갈리는 나무' });
+  await expect(tree.locator('.tree-label')).toHaveText(['세션', '실행', '기다림', 'Lock', 'IO']);
+  await expect(tree.locator('.tree-tag')).toHaveText('L1');
+  const root = await tree.locator('.tree-node').first().boundingBox();
+  const child = await tree.locator('.tree-node').nth(2).boundingBox();
+  const grandchild = await tree.locator('.tree-node').nth(3).boundingBox();
+  expect(child!.x).toBeGreaterThan(root!.x + 10);
+  expect(grandchild!.x).toBeGreaterThan(child!.x + 10);
+});
+
+test('포함 상자는 안에 든 칸을 바깥 상자 안에 그린다', async ({ page }) => {
+  const nest = page.getByRole('img', { name: '스위치 안에 VLAN 10과 VLAN 20이 있는 상자 그림' });
+  const outer = await nest.locator('.nest-box').first().boundingBox();
+  const leaf = await nest.locator('.nest-leaf').filter({ hasText: 'PC 2' }).boundingBox();
+  expect(leaf!.x).toBeGreaterThan(outer!.x);
+  expect(leaf!.x + leaf!.width).toBeLessThan(outer!.x + outer!.width);
+  expect(leaf!.y + leaf!.height).toBeLessThan(outer!.y + outer!.height);
+});
+
+test('이름 뜯어보기는 뜻 있는 조각에만 번호를 붙여 목록과 짝짓는다', async ({ page }) => {
+  const anatomy = page.getByRole('img', { name: 'c7.large를 시리즈 c, 세대 7, 크기 large로 나눠 읽는 그림' });
+  await expect(anatomy.locator('.anatomy-text')).toHaveText(['c', '7', '.', 'large']);
+  await expect(anatomy.locator('.anatomy-legend li')).toHaveCount(3);
+  await expect(anatomy.locator('.anatomy-legend .anatomy-label')).toHaveText(['시리즈', '세대', '크기']);
+});
+
 test('SVG 그림은 이름 붙은 그림이다', async ({ page }) => {
   await expect(page.getByRole('img', { name: '테스트용 SVG 그림' })).toBeVisible();
 });

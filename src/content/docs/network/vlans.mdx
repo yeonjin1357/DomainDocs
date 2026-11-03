@@ -39,24 +39,16 @@ updated: 2026-10-29
 ## 왜 나누나요
 
 <Figure caption="개발팀과 회계팀 PC가 같은 스위치에 꽂혀 있지만 VLAN이 달라요. 두 팀은 서로 다른 네트워크라 직접 닿지 않아요.">
-  <Flow
-    ariaLabel="스위치 하나에 VLAN 10 개발팀 PC 두 대와 VLAN 20 회계팀 PC 두 대가 연결된 구조도"
-    nodes={[
-      { id: 'sw', label: '스위치', col: 1, row: 0, tone: 'accent' },
-      { id: 'd1', label: '개발 PC 1', col: 0, row: 1 },
-      { id: 'd2', label: '개발 PC 2', col: 0, row: 2 },
-      { id: 'a1', label: '회계 PC 1', col: 2, row: 1 },
-      { id: 'a2', label: '회계 PC 2', col: 2, row: 2 },
-    ]}
-    edges={[
-      { from: 'd1', to: 'sw' },
-      { from: 'd2', to: 'sw' },
-      { from: 'a1', to: 'sw' },
-      { from: 'a2', to: 'sw' },
-    ]}
-    groups={[
-      { label: 'VLAN 10', cols: [0, 0], rows: [1, 2] },
-      { label: 'VLAN 20', cols: [2, 2], rows: [1, 2] },
+  <Nest
+    ariaLabel="스위치 한 대 안이 VLAN 10의 개발 PC 두 대와 VLAN 20의 회계 PC 두 대로 나뉜 그림"
+    boxes={[
+      {
+        label: '스위치 한 대',
+        children: [
+          { label: 'VLAN 10', note: '개발팀', tone: 'accent', children: [{ label: '개발 PC 1' }, { label: '개발 PC 2' }] },
+          { label: 'VLAN 20', note: '회계팀', children: [{ label: '회계 PC 1' }, { label: '회계 PC 2' }] },
+        ],
+      },
     ]}
   />
 </Figure>

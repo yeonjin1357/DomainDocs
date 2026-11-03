@@ -121,6 +121,9 @@ p99, rate, span 같은 말은 영어 그대로 써요. 처음 나올 때 한 번
 | 두 방식이 항목마다 달라요 | `Compare` |
 | 시간에 따라 구간이 겹치고 기다려요 | `Timeline` |
 | 번호 붙은 칸의 위치를 짚어요(오프셋, 버킷, 단위 칸) | `Strip` |
+| 위아래로 갈라지는 갈래(분류, OID, 알림 경로) | `Tree` |
+| 무엇이 무엇 안에 들어 있어요(포함, 부분집합) | `Nest` |
+| 이름 하나를 조각마다 읽어요(인스턴스 유형, 주소) | `Anatomy` |
 | 위 어디에도 맞지 않아요 | 새 컴포넌트나 SVG |
 
 - 나쁜 예: OSI 일곱 층과 TCP/IP 네 층의 대응을 `Compare`의 두 열에 넣고, 줄 이름을 '7·6·5층'처럼 써요.
@@ -318,13 +321,16 @@ updated: 2026-10-13
 | `ServiceMap` | `nodes`, `edges`, `ariaLabel`, `height?` | 서비스 맵. `nodes`는 `{ id, label, x, y, note?, tone?, virtual? }`(x·y는 %), `edges`는 `{ from, to, label?, tone? }` 배열이에요. 화살표가 없어서 부르는 쪽을 왼쪽에 두고 `caption`에 밝혀요. `virtual`은 점선으로 그려요 |
 | `Flow` | `nodes`, `edges`, `ariaLabel`, `groups?` | 구조도(화살표 있는 상자). `nodes`는 `{ id, label, col, row, note?, tone? }`(칸 위치), `edges`는 `{ from, to, label?, tone?, both?, dashed? }`, `groups`는 `{ label, cols: [시작, 끝], rows: [시작, 끝] }` 배열이에요. 한 줄에 3칸까지가 360px에서 읽혀요. 상자 이름은 8자 안팎으로 써요. 글자를 붙인 가로 화살표는 상자 사이에 빈 칸을 하나 둬요. 묶음(groups) 테두리를 지나는 화살표에는 글자를 붙이지 않아요. 테두리 위의 묶음 이름과 겹쳐요 |
 | `Sequence` | `participants`, `messages`, `ariaLabel` | 주고받기 순서. 참여자 2~4명, `messages`는 `{ from, to, label, tone?, dashed? }` 배열이고 위에서 아래로 시간 순이에요. 돌아오는 응답은 `dashed`로 그려요 |
-| `Layers` | `layers`, `ariaLabel` | 계층도. `layers`는 위층부터 `{ label, note?, tone? }` 배열이에요. 위아래로 기대는 층에만 써요. 나란히 있는 것은 `Flow`로 그려요 |
+| `Layers` | `layers`, `ariaLabel` | 계층도. `layers`는 위층부터 `{ label, note?, tone? }` 배열이에요. 위아래로 기대는 층에만 써요. 나란히 든 것은 `Nest`로, 이어진 것은 `Flow`로 그려요 |
 | `Compare` | `columns`, `rows` | 두 가지 비교. `columns`는 두 열 이름, `rows`는 `{ label, values: [왼쪽, 오른쪽] }` 배열이에요 |
 | `Timeline` | `lanes`, `ariaLabel`, `start?`, `end?`, `marks?`, `ticks?` | 시간 띠. `lanes`는 `{ label, segments: [{ start, end, label?, tone? }] }` 배열이고, 줄마다 시간에 비례한 구간을 그려요. `marks`(`{ at, label, tone? }`)는 모든 줄을 가로지르는 세로선, `ticks`(`{ at, label }`)는 아래 시간축 눈금이에요. 줄 이름은 6자 안팎, 구간 글자는 띠 안에 들어갈 만큼 짧게 써요. 같은 줄 이름이나 눈금 글자가 360px에서 겹치지 않는지 확인해요 |
 | `Strip` | `rows`, `ariaLabel`, `marks?`, `ranges?` | 칸 띠. `rows`는 `{ label?, cells, heads? }` 배열이고, `cells`는 글자나 `{ label, tone? }`예요. `heads`는 칸마다 위에 붙는 작은 글자(예: 버킷 경계)로, 칸 수와 같아야 해요. 칸은 12개까지예요. `marks`(`{ row?, at, label, tone? }`)는 칸 하나를 위에서 가리키고, `ranges`(`{ row?, from, to, label, tone? }`)는 여러 칸을 아래에서 묶어요. 번호는 모두 0부터예요. 칸 `tone: 'sub'`는 지나간 칸이나 빈자리처럼 흐리게 그려요 |
 | `Stages` | `rows`, `ariaLabel`, `grow?`, `hint?` | 단계 칸. 단계마다 같은 열에 칸을 맞춰, 단계를 지날 때 무엇이 붙거나 바뀌는지 보여 줘요(감싸기, 주소 바꾸기). `rows`는 `{ label, note?, end?, cells }` 배열이고, `cells`는 글자, `{ label, tone? }`, 빈자리 `null`이에요. 단계마다 칸 수가 같아야 하고 6열까지예요. 칸 `tone: 'accent'`는 이 단계에서 새로 붙거나 바뀐 칸이에요. `note`는 이름 옆 파란 글자, `end`는 이름 줄 오른쪽 끝의 흐린 글자예요. `grow`는 남는 폭을 차지할 열(0부터), `hint`는 그림 위 양 끝의 짧은 안내 두 개까지예요 |
 | `Stacks` | `columns`, `ariaLabel` | 나란한 기둥. 기둥마다 칸을 위에서부터 쌓고, 칸 하나가 여러 줄에 걸칠 수 있어서 한쪽 칸이 옆 기둥의 어느 칸들과 맞닿는지 보여 줘요(OSI와 TCP/IP, 파티션과 컨슈머). `columns`는 `{ title, blocks }` 배열이고, `blocks`는 글자, `{ label, span?, tone?, tag? }`, 한 줄 빈자리 `null`이에요. 기둥은 2~4개, 기둥마다 줄 수의 합이 같아야 하고 12줄까지예요. `tag`는 이름 앞 작은 글자(예: 층 번호), `tone: 'sub'`는 흐린 칸이에요 |
 | `Triage` | `steps`, `ariaLabel` | 점검 순서. 원인을 찾아 위에서부터 차례로 내려가는 단계와, 단계마다 옆으로 빠지는 길을 보여 줘요. `steps`는 위에서부터 `{ label, note?, when?, next?, exits?, tone? }` 배열이고 2~8개예요. 번호는 1부터 저절로 붙어요. `exits`는 `{ when, to, note?, tone? }`이고, `to`가 숫자면 그 단계(예: 3이면 '3단계'), 글자면 단계 밖에서 볼 곳이에요. `next`는 다음 단계로 내려가는 조건이고, `false`면 다음 단계와 잇지 않아요(갈래의 끝). `when`은 갈래로 들어온 단계의 조건이에요. 출발점은 `tone: 'warn'`, 갈래 끝은 `tone: 'accent'`로 둬요. 그림이 읽는 법을 보여 주니, `caption`에 '왼쪽 줄을 따라가요' 같은 읽는 법은 쓰지 않아요 |
+| `Tree` | `root`, `ariaLabel` | 나무. 위에서 아래로 갈라지는 갈래를 들여쓰기와 이음선으로 보여 줘요(분류, OID, 알림 경로). `root`는 `{ label, note?, tag?, tone?, children? }`이고 `children`도 같은 모양이에요. 4단, 16마디까지예요. `tag`는 오른쪽 고정폭 글자(예: OID, 맞춤 조건)예요. 갈래가 다시 합쳐지면 `Flow`로 그려요 |
+| `Nest` | `boxes`, `ariaLabel` | 포함 상자. 무엇이 무엇 안에 들어 있는지 보여 줘요(프로세스 메모리의 구성, 스위치 안의 VLAN, 줄어드는 부분집합). `boxes`는 `{ label, note?, tone?, children?, wide?, dashed? }` 배열이고, `children`이 있으면 상자, 없으면 맨 안쪽 칸이에요. 4겹까지예요. `wide`는 한 줄을 다 차지하고, `dashed`는 실제 경계가 아닌 묶음이에요. 화살표가 필요하면 `Flow`의 `groups`로 그려요 |
+| `Anatomy` | `parts`, `ariaLabel` | 이름 뜯어보기. 이름 하나를 조각으로 나눠 조각마다 번호와 뜻을 달아요(예: `c7gn.4xlarge`). `parts`는 앞에서부터 `{ text, label, note?, tone? }`이고, 조각을 이으면 전체 이름이 돼요. 점 같은 구분 기호는 `tone: 'sub'`로 두면 번호 없이 흐리게 보여요. 뜻 있는 조각은 6개까지예요 |
 | SVG 그림 | `aria-label` | 위 그림으로 안 되는 그림은 `src/assets/figures/{domain}/{name}.svg`에 그려 default import해요. `Figure` 안에 두고 `aria-label`을 꼭 붙여요. 색은 `currentColor`나 `var(--color-…)`만 써야 다크 모드에서도 보여요 |
 | `src/components/demos/`의 데모(`PercentileDemo`, `HistogramQuantileDemo`, `CircuitBreakerDemo` 등 22개) | 없음 | 직접 만져 보는 데모. default import 후 `client:visible`로 써요. 계산은 `src/lib/demo-models.ts`에 두고 단위 테스트로 확인해요. 데모는 값을 바꿔 봐야 보이는 관계(공식, 문턱, 직관과 다른 결과)에만 넣어요. 목록이나 그림 하나로 충분한 곳에는 넣지 않아요 |
 
@@ -376,6 +382,8 @@ updated: 2026-10-13
 | 근거 없는 단정 | "대부분", "늘", "절대"는 근거가 있을 때만 써요 |
 | 도구마다 다른 동작을 일반론으로 씀 | 도구, 버전, 설정을 밝혀요. 예: "Prometheus 3에서", "Grafana Stat 패널의 기본 계산 Last *". 숫자 예시는 전제(수집 주기, 패널 폭 등)도 밝혀요 |
 | 도구 화면 용어나 설정 키를 풀지 않음 | 처음 나올 때 풀어요. 예: Explore(질의를 따로 열어 고쳐 가며 실행하는 Grafana 화면), Query options(패널의 질의 간격·기간 설정), `$__rate_interval`(rate 구간을 자동으로 잡는 Grafana 변수), OTLP(OpenTelemetry 전송 규약) |
+| 그림을 있는 컴포넌트에 끼워 맞춤 | 2.11 표로 내용의 모양부터 정해요. 같은 크기 카드 목록(`Layers`)에 걸치는 대응을, 두 열 비교(`Compare`)에 여러 줄 대응을 넣으면 한눈에 안 들어와요. 맞는 형식이 없으면 새로 만들어요 |
+| 그림 읽는 법을 `caption`에 씀 | "왼쪽 줄을 위에서 아래로 따라가요" 같은 문장이 필요하면 그림 형식이 안 맞는다는 신호예요. 읽는 법이 보이는 형식으로 바꾸고, `caption`에는 그림이 말하는 내용을 써요 |
 | 사실 검토 수정을 지적받은 곳만 고침 | 같은 주장이 나오는 곳을 모두 찾아 고쳐요. `Point`, `Check`, `caption`, 그림의 글자(`label`, `value`, `ariaLabel`)까지 봐요 |
 
 ### 자주 쓰는 용어

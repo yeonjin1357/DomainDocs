@@ -25,17 +25,20 @@ updated: 2026-10-30
 ---
 
 <Figure caption="team=payment인 알림은 결제 채팅방으로 가고, 그중 severity=critical만 결제 당직을 호출해요. 어디에도 맞지 않는 알림은 기본 경로의 운영 채팅방으로 가요.">
-  <Flow
-    ariaLabel="모든 알림이 기본 경로로 들어와, team이 payment면 결제 채팅방으로, 그중 severity가 critical이면 결제 당직 호출로 가고, 어디에도 맞지 않으면 기본 채팅방으로 가는 경로 나무"
-    nodes={[
-      { id: 'root', label: '기본 경로', col: 0, row: 0, note: '운영 채팅방' },
-      { id: 'pay', label: '결제 팀', col: 2, row: 0, note: '결제 채팅방' },
-      { id: 'crit', label: 'critical', col: 2, row: 1, note: '결제 당직 호출', tone: 'warn' },
-    ]}
-    edges={[
-      { from: 'root', to: 'pay', label: 'team=payment' },
-      { from: 'pay', to: 'crit', label: 'severity=critical', tone: 'warn' },
-    ]}
+  <Tree
+    ariaLabel="모든 알림이 기본 경로로 들어와, team이 payment면 결제 팀 경로의 결제 채팅방으로, 그중 severity가 critical이면 결제 당직 호출로 가고, 어디에도 맞지 않으면 기본 경로의 운영 채팅방으로 가는 경로 나무"
+    root={{
+      label: '기본 경로',
+      note: '운영 채팅방',
+      children: [
+        {
+          label: '결제 팀',
+          note: '결제 채팅방',
+          tag: 'team=payment',
+          children: [{ label: 'critical', note: '결제 당직 호출', tag: 'severity=critical', tone: 'warn' }],
+        },
+      ],
+    }}
   />
 </Figure>
 

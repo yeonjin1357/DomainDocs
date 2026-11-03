@@ -41,13 +41,18 @@ updated: 2026-10-30
 ## JVM이 쓰는 메모리
 
 <Figure caption="JVM 프로세스의 메모리는 힙만이 아니에요. 메타스페이스, 스레드마다의 스택, 그 밖의 네이티브 메모리를 더한 만큼 서버 메모리를 써요.">
-  <Layers
-    ariaLabel="JVM 프로세스 메모리를 힙, 메타스페이스, 스레드 스택, 그 밖의 네이티브 메모리로 나눈 계층도"
-    layers={[
-      { label: '힙', note: '객체가 담기는 곳. 최대 크기 -Xmx', tone: 'accent' },
-      { label: '메타스페이스', note: '클래스 정보. 기본으로 크기 제한 없음' },
-      { label: '스레드 스택', note: '스레드마다 하나씩(-Xss)' },
-      { label: '그 밖의 네이티브 메모리', note: 'JVM 자체, 직접 버퍼 등' },
+  <Nest
+    ariaLabel="JVM 프로세스 메모리 상자 안에 힙, 메타스페이스, 스레드 스택, 그 밖의 네이티브 메모리가 함께 들어 있는 그림"
+    boxes={[
+      {
+        label: 'JVM 프로세스 메모리',
+        children: [
+          { label: '힙', note: '객체가 담기는 곳. 최대 크기 -Xmx', tone: 'accent', wide: true },
+          { label: '메타스페이스', note: '클래스 정보. 기본으로 크기 제한 없음' },
+          { label: '스레드 스택', note: '스레드마다 하나씩(-Xss)' },
+          { label: '그 밖의 네이티브 메모리', note: 'JVM 자체, 직접 버퍼 등', wide: true },
+        ],
+      },
     ]}
   />
 </Figure>

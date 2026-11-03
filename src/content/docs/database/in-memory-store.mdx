@@ -84,7 +84,7 @@ used memory > 'maxmemory'.
 
 <Figure caption="메모리가 maxmemory에 닿았을 때 두 정책이 하는 일이에요. 기본값은 키를 지키고 쓰기를 거절하고, 캐시용 정책은 덜 쓴 키를 지워 자리를 만들어요.">
   <Compare
-    columns={['noeviction(기본값)', 'allkeys-lru']}
+    columns={['noeviction (기본값)', 'allkeys-lru']}
     rows={[
       { label: '한도에 닿으면', values: ['키를 지우지 않아요', '덜 쓴 키를 지워요'] },
       { label: '새 데이터를 넣는 명령', values: ['OOM 에러를 받아요', '지운 자리에 넣어요'] },

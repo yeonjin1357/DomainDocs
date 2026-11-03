@@ -46,9 +46,13 @@ for (const r of rows) {
     gap: 8px;
   }
 
+  /* 한글 낱말 중간에서 줄이 바뀌지 않게 하고, 두 줄이면 길이를 고르게 나눈다 */
   .head-cell {
     font-weight: 700;
     text-align: center;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
   }
 
   .row-label {
@@ -64,6 +68,8 @@ for (const r of rows) {
     background: var(--color-card);
     font-size: 15px;
     text-align: center;
+    word-break: keep-all;
     overflow-wrap: anywhere;
+    text-wrap: balance;
   }
 </style>

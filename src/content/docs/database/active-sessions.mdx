@@ -62,23 +62,22 @@ DB에 붙은 세션 대부분은 다음 명령을 기다리며 쉬어요. 액티
 액티브 세션은 CPU에서 실행 중이거나, 무언가를 기다려요. PostgreSQL은 기다리는 대상을 `wait_event_type`으로 나눠요. 잠금은 Lock, 디스크 읽기·쓰기는 IO, 공유 메모리 구조는 LWLock이에요.
 
 <Figure caption="액티브 세션은 실행 중이거나 기다리는 중이에요. 기다리는 쪽은 무엇을 기다리는지에 따라 다시 갈려요. 맨 위 그래프에서 늘어난 건 Lock 갈래예요.">
-  <Flow
-    ariaLabel="액티브 세션이 CPU에서 실행 중인 갈래와 무언가 기다리는 갈래로 나뉘고, 기다리는 갈래는 잠금을 기다리는 Lock, 디스크를 기다리는 IO, 공유 메모리 구조를 기다리는 LWLock으로 다시 나뉘는 구조도"
-    nodes={[
-      { id: 'act', label: '액티브 세션', col: 1, row: 0 },
-      { id: 'cpu', label: 'CPU에서 실행', col: 2, row: 0, tone: 'accent' },
-      { id: 'wait', label: '무언가 기다림', col: 1, row: 1 },
-      { id: 'lock', label: 'Lock', col: 0, row: 2, note: '잠금', tone: 'warn' },
-      { id: 'io', label: 'IO', col: 1, row: 2, note: '디스크' },
-      { id: 'lwlock', label: 'LWLock', col: 2, row: 2, note: '공유 메모리' },
-    ]}
-    edges={[
-      { from: 'act', to: 'cpu' },
-      { from: 'act', to: 'wait' },
-      { from: 'wait', to: 'lock', tone: 'warn' },
-      { from: 'wait', to: 'io' },
-      { from: 'wait', to: 'lwlock' },
-    ]}
+  <Tree
+    ariaLabel="액티브 세션이 CPU에서 실행 중인 갈래와 무언가 기다리는 갈래로 나뉘고, 기다리는 갈래는 잠금을 기다리는 Lock, 디스크를 기다리는 IO, 공유 메모리 구조를 기다리는 LWLock으로 다시 나뉘는 나무"
+    root={{
+      label: '액티브 세션',
+      children: [
+        { label: 'CPU에서 실행', tone: 'accent' },
+        {
+          label: '무언가 기다림',
+          children: [
+            { label: 'Lock', note: '잠금', tone: 'warn' },
+            { label: 'IO', note: '디스크' },
+            { label: 'LWLock', note: '공유 메모리' },
+          ],
+        },
+      ],
+    }}
   />
 </Figure>
 

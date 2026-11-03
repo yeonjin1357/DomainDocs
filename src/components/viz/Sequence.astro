@@ -83,7 +83,7 @@ const inset = (x1: number, x2: number) => (x2 > x1 ? x2 - 2 : x2 + 2);
   }
 
   .lane-label {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     fill: var(--color-text);
   }
@@ -121,8 +121,14 @@ const inset = (x1: number, x2: number) => (x2 > x1 ? x2 - 2 : x2 + 2);
     fill: var(--color-warn);
   }
 
+  /* 360px에서도 읽히게 키우고, 생명선과 겹치는 곳은 바탕색 테두리로 띄운다 */
   .arrow-label {
-    font-size: 11px;
-    fill: var(--color-text-sub);
+    font-size: 12.5px;
+    font-weight: 500;
+    fill: var(--color-text);
+    paint-order: stroke;
+    stroke: var(--color-bg);
+    stroke-width: 4px;
+    stroke-linejoin: round;
   }
 </style>
