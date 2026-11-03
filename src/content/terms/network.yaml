@@ -455,3 +455,10 @@ terms:
     aliases: [PMTUD 블랙홀, black hole, PMTU black hole, 경로 MTU 블랙홀]
     short: ICMP가 막혀 큰 패킷만 소리 없이 사라지는 현상이에요.
     doc: network/tunnels
+  - id: packet-capture
+    name: 패킷 캡처
+    en: Packet capture
+    aliases: [packet capture, tcpdump, Wireshark, pcap, 패킷 덤프]
+    short: 네트워크 인터페이스를 지나는 패킷을 그대로 잡아 두고 읽는 일이에요.
+    analogy: 우체국 창구 카메라 영상을 돌려 보는 것과 같아요.
+    doc: network/packet-capture

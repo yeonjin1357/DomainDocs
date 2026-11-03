@@ -1,0 +1,28 @@
+questions:
+  - id: read-needs-root
+    type: ox
+    prompt: tcpdump로 이미 저장한 pcap 파일을 -r로 읽을 때도 root 권한이 있어야 하나요?
+    answer: false
+    explain: 인터페이스에서 패킷을 잡을 때만 특별한 권한이 필요해요. 저장한 파일을 읽는 데는 권한이 필요 없어요.
+  - id: refused-shape
+    type: ox
+    prompt: 닫힌 포트에 연결하면, 캡처에는 SYN 하나 뒤에 곧바로 RST가 보이나요?
+    answer: true
+    explain: 서버에 닿았지만 그 포트에 기다리는 프로그램이 없으면, 운영체제가 바로 RST로 거부해요. 왕복 한 번 만에 끝나요.
+  - id: where-lost
+    type: choice
+    prompt: 클라이언트 캡처에는 SYN만 되풀이되고, 서버 캡처에는 SYN과 SYN·ACK가 되풀이돼요. 패킷은 어디서 사라지나요?
+    choices: [서버에서 클라이언트로 오는 길, 클라이언트에서 서버로 가는 길, 서버의 애플리케이션, 클라이언트의 DNS 조회]
+    answer: 0
+    explain: 서버는 SYN을 받고 SYN·ACK를 보냈는데 클라이언트가 받지 못했어요. 오는 길의 방화벽이나 경로를 봐요.
+  - id: tls-visible
+    type: choice
+    prompt: TLS로 암호화된 HTTPS 연결을 캡처하면 그대로 보이지 않는 것은?
+    choices: [요청한 URL 경로, 상대 IP 주소와 포트, 패킷의 크기와 시각, 연결을 여는 SYN·ACK]
+    answer: 0
+    explain: 암호화된 내용(URL 경로, 헤더, 본문)은 보이지 않아요. 주소, 포트, 크기, 시각, TCP 플래그는 보여요.
+  - id: tool-name
+    type: input
+    prompt: 리눅스 명령줄에서 인터페이스의 패킷을 잡아 한 줄씩 보여 주거나 pcap 파일로 저장하는 도구는?
+    answer: [tcpdump, 티시피덤프]
+    explain: tcpdump로 잡은 pcap 파일은 Wireshark로 열어 화면에서 자세히 볼 수 있어요.

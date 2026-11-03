@@ -1,0 +1,168 @@
+---
+title: 패킷 캡처(tcpdump)
+summary: 지표로 안 보이는 원인은 실제로 오간 패킷을 잡아 봐요. tcpdump로 잡고 Wireshark로 읽어요.
+domain: network
+type: concept
+stage: basics
+order: 62
+icon: network
+keywords: [packet capture, 패킷 캡처, tcpdump, Wireshark, pcap, SYN, RST, 재전송, BPF 필터, 덤프]
+related: [network/tcp-connections, network/firewalls-and-nat, network/latency-and-loss, network/tls-certificates, logs/sensitive-data]
+sources:
+  - title: tcpdump — man page
+    url: https://www.tcpdump.org/manpages/tcpdump.1.html
+  - title: pcap-filter — filter syntax
+    url: https://www.tcpdump.org/manpages/pcap-filter.7.html
+  - title: Linux — ip-sysctl (tcp_syn_linear_timeouts)
+    url: https://docs.kernel.org/networking/ip-sysctl.html
+  - title: Wireshark User's Guide
+    url: https://www.wireshark.org/docs/wsug_html_chunked/
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="선 위에 실제로 오간 것을 봐요">
+    지표는 세어 둔 합이고, 캡처는 패킷 하나하나예요. 연결이 맺어졌는지, 누가 끊었는지, 다시 보냈는지가 보여요.
+  </Point>
+  <Point title="필터로 좁혀서 잡아요">
+    주소와 포트로 좁히지 않으면 파일이 금방 커지고, 상관없는 데이터까지 담겨요.
+  </Point>
+  <Point title="양쪽 끝에서 잡으면 위치가 나와요">
+    보낸 쪽 캡처에는 있는데 받는 쪽에 없으면, 그 사이에서 사라진 거예요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="창구 카메라는 봉투만 찍고 안의 편지는 못 읽어요. 암호화된(TLS) 연결도 같아서, 캡처로 주소와 크기는 보여도 내용은 보이지 않아요.">
+  우체국의 하루 배달 건수(지표)로는 편지 한 통이 어디서 멈췄는지 몰라요. 창구 카메라 영상(캡처)을 돌려 보면 그 편지가 언제 들어오고 언제 나갔는지 보여요.
+</Analogy>
+
+## 무엇을 잡나요
+
+패킷 캡처는 네트워크 인터페이스를 지나는 <Term term="network/packet">패킷</Term>을 그대로 잡아 두는 일이에요. 리눅스에서는 명령줄 도구 tcpdump를, 화면에서 읽을 때는 Wireshark를 많이 써요. 둘은 같은 pcap 파일 형식을 써서, tcpdump로 잡은 파일을 Wireshark로 열어요.
+
+```text
+tcpdump -i eth0 -nn \
+  host 10.0.2.9 and port 8080
+
+tcpdump -i eth0 -nn \
+  -w cap.pcap port 5432
+```
+
+- `-i eth0`: 잡을 인터페이스예요.
+- `-nn`: 주소와 포트를 이름으로 바꾸지 않아요. 이름을 찾느라 DNS 질의가 생기지 않아요.
+- `host 10.0.2.9 and port 8080`: 잡을 패킷을 고르는 필터예요. `or`, `not`도 써요.
+- `-w cap.pcap`: 화면에 찍지 않고 파일로 저장해요.
+
+인터페이스에서 잡으려면 root 같은 특별한 권한이 필요해요. 저장한 파일을 읽을 때(`-r cap.pcap`)는 권한이 필요 없어요.
+
+## 한 줄 읽기
+
+tcpdump는 패킷 하나를 한 줄로 보여 줘요. 아래는 리눅스에서 실제로 잡은 줄에서 옵션 부분을 줄인 거예요.
+
+<Figure caption="클라이언트가 서버에 연결을 열자고 보낸 첫 패킷이에요. 데이터 길이가 0이고, 플래그 S가 연결을 열자는 뜻이에요.">
+  <Anatomy
+    repeatText={false}
+    ariaLabel="tcpdump 한 줄을 조각으로 나눈 그림. 잡은 시각, 보낸 쪽 주소와 포트, 받는 쪽 주소와 포트, 플래그 S, 데이터 길이 0"
+    parts={[
+      { text: '20:44:57.583856', label: '잡은 시각', note: '마이크로초까지' },
+      { text: 'IP', label: '', tone: 'sub' },
+      { text: '10.0.1.5.47258', label: '보낸 쪽', note: '주소.포트' },
+      { text: '>', label: '', tone: 'sub' },
+      { text: '10.0.2.9.8080:', label: '받는 쪽', note: '주소.포트' },
+      { text: 'Flags [S],', label: '플래그', note: 'S는 연결 열기', tone: 'warn' },
+      { text: '…', label: '', tone: 'sub' },
+      { text: 'length 0', label: '데이터 길이' },
+    ]}
+  />
+</Figure>
+
+플래그는 이 패킷이 무슨 일을 하는지 알려 줘요.
+
+- `S`: 연결을 열자는 SYN이에요.
+- `.`: 받았다는 ACK예요. `[S.]`는 SYN과 ACK를 함께 보낸 거예요.
+- `P`: 데이터를 바로 넘기라는 표시예요. 요청과 응답 본문이 이 패킷에 실려요.
+- `F`: 다 보냈으니 닫자는 FIN이에요.
+- `R`: 연결을 당장 끊는 RST예요.
+
+## 정상 연결은 이렇게 보여요
+
+리눅스 네임스페이스 안에서 HTTP 요청 하나를 실제로 잡았어요. 패킷마다 15ms 지연을 넣어, 실제 네트워크처럼 줄 사이에 간격이 생기게 했어요.
+
+<Figure caption="실제로 잡은 HTTP 요청 하나예요. 연결을 여는 세 패킷, 요청과 응답, 닫는 패킷 순서로 지나가요. 응답이 늦다면 어느 간격이 긴지 보면 돼요.">
+  <Sequence
+    ariaLabel="클라이언트가 S를 보내고, 서버가 S와 ACK로 답하고, 클라이언트가 ACK를 보낸 뒤 GET 요청을 보내고, 서버가 200 OK로 답하고, 클라이언트가 F로 닫는 순서"
+    participants={['클라이언트', '서버']}
+    messages={[
+      { from: '클라이언트', to: '서버', label: '[S] 연결 열기' },
+      { from: '서버', to: '클라이언트', label: '[S.] 좋아요', dashed: true },
+      { from: '클라이언트', to: '서버', label: '[.] 확인' },
+      { from: '클라이언트', to: '서버', label: '[P.] GET /', tone: 'accent' },
+      { from: '서버', to: '클라이언트', label: '[P.] 200 OK', dashed: true, tone: 'accent' },
+      { from: '클라이언트', to: '서버', label: '[F.] 닫기' },
+    ]}
+  />
+</Figure>
+
+`-ttt`를 붙이면 맨 앞에 앞 패킷과의 간격이 찍혀요. 요청(`GET`)과 응답(`200 OK`) 사이가 길면 서버가 일을 오래 한 거예요. `[S]`와 `[S.]` 사이가 길면 가는 길이나 오는 길이 느린 거예요.
+
+## 연결이 안 될 때는 이렇게 보여요
+
+연결이 안 되는 두 경우는 캡처에서 모양이 확연히 달라요. 같은 실험에서 닫힌 포트와, 답을 버리는 포트에 연결해 봤어요.
+
+<Figure caption="같은 실험에서 잡은 두 실패예요. 거부는 왕복 한 번 만에 끝나고, 답이 없으면 SYN만 되풀이하다 앱이 포기해요.">
+  <Compare
+    columns={['연결 거부', '답이 없음']}
+    rows={[
+      { label: '캡처에 보이는 것', values: ['[S] 하나에 바로 [R.]', '[S]만 되풀이'] },
+      { label: '걸린 시간', values: ['왕복 한 번(15ms)', '앱이 포기할 때까지(4초)'] },
+      { label: '뜻', values: ['서버에 닿았고 그 포트가 닫혔어요', '가는 길이나 오는 길에서 사라져요'] },
+    ]}
+  />
+</Figure>
+
+답이 없을 때 SYN을 다시 보내는 간격은 운영체제마다 달라요. 이 실험의 리눅스(6.18)는 1초 간격으로 다시 보냈어요.
+
+리눅스 6.5부터는 간격이 1, 1, 1, 1, 1, 2, 4초처럼 처음엔 1초씩이다가 두 배씩 늘어요. 이 동작은 `tcp_syn_linear_timeouts`(기본 4)가 정해요.
+
+<Term term="network/retransmission">재전송</Term>은 캡처에서 같은 `seq` 번호의 패킷이 다시 나오는 모습으로 보여요. 연결 실패가 왜 둘로 나뉘는지는 <Term slug="network/tcp-connections">TCP 연결</Term>에서 다뤄요.
+
+## 어디서 잡을까
+
+한쪽 끝에서만 잡으면 패킷이 어디서 사라졌는지 알 수 없어요. 클라이언트와 서버 양쪽에서 같은 시각에 잡아 견줘요.
+
+<Figure caption="클라이언트(A)와 서버(B)에서 동시에 잡아 견준 예시예요. 어느 쪽 캡처에 무엇이 있는지로 문제의 자리가 갈려요.">
+  <Compare
+    columns={['A: 클라이언트에서', 'B: 서버에서']}
+    rows={[
+      { label: '가는 길에서 사라지면', values: ['[S]만 되풀이', '아무것도 없어요'] },
+      { label: '오는 길에서 사라지면', values: ['[S]만 되풀이', '[S]와 [S.]가 되풀이'] },
+      { label: '서버가 느리면', values: ['요청 뒤 응답이 늦어요', '요청 뒤 응답이 늦어요'] },
+    ]}
+  />
+</Figure>
+
+서버가 느릴 때는 B에서도 요청과 응답 사이가 길어요. B에서는 짧은데 A에서만 길다면, 그 사이의 네트워크나 중간 장비(방화벽, 로드 밸런서)를 봐요.
+
+## 조심할 것
+
+- **파일이 빨리 커져요**: 바쁜 서버는 몇 초 만에 수백 MB를 잡아요. 필터로 좁히고, `-c 1000`(1,000개만)이나 `-C 100 -W 5`(100MB씩 5개를 돌려 씀)로 크기를 묶어요.
+- **내용이 함께 잡혀요**: 기본으로 패킷마다 262,144바이트까지 잡아서, 암호화하지 않은 요청 본문이 그대로 담겨요. 파일을 넘기기 전에 <Term slug="logs/sensitive-data">민감 정보</Term>를 생각해요.
+- **TLS 내용은 안 보여요**: 암호화된 연결은 주소, 포트, 크기, 시각만 보여요. 연결을 여는 단계(TLS 핸드셰이크)의 서버 이름(SNI)은 대개 그대로 보여요.
+- **컨테이너는 그 안에서 잡아요**: 파드는 자기 네트워크 네임스페이스가 있어서, 노드의 `eth0`에서는 파드끼리의 패킷이 안 보일 수 있어요.
+
+## 모니터링에서는
+
+모니터링은 패킷을 모두 잡지 않아요. 대신 운영체제가 세어 둔 수를 모아요. 리눅스에서는 `nstat`이나 `netstat -s`로 그 수를 봐요.
+
+- `TcpRetransSegs`: 다시 보낸 세그먼트 수예요.
+- `TcpExtTCPSynRetrans`: 다시 보낸 SYN 수예요. 연결이 잘 안 열린다는 신호예요.
+- `TcpOutRsts`: 보낸 RST 수예요. 닫힌 포트로 오는 연결이 많으면 늘어요.
+
+이 수가 튀면 그때 캡처로 내려가요. 지표가 어디가 이상한지 알려 주면, 캡처가 무슨 일이 있었는지 보여 줘요.
+
+<Checkpoints>
+  <Check>운영 서버에서 필터 없이 캡처하는 절차라면 다시 보세요. 디스크를 채우고, 상관없는 사용자 데이터까지 담겨요.</Check>
+  <Check>한쪽 끝에서만 잡고 네트워크 문제라고 결론 냈다면 다시 보세요. 양쪽에서 잡아야 어디서 사라졌는지 나와요.</Check>
+  <Check>TLS 연결의 요청 내용을 캡처로 보려는 계획이라면 다시 보세요. 암호화된 내용은 보이지 않아요.</Check>
+  <Check>SYN 재전송 간격을 1초, 2초, 4초로 가정한 계산이라면, 커널 버전과 `tcp_syn_linear_timeouts`를 보세요.</Check>
+</Checkpoints>
