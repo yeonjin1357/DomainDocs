@@ -1,0 +1,36 @@
+questions:
+  - id: replication-copies-mistakes
+    type: ox
+    prompt: 주 서버에서 DROP TABLE을 실행했어요. 복제 서버의 같은 표도 곧 지워지나요?
+    answer: true
+    explain: 복제는 주 서버의 변경을 그대로 옮겨요. 실수로 지운 것도 함께 옮겨서, 지우기 전으로 돌아가려면 백업이 있어야 해요.
+  - id: pitr-ingredients
+    type: choice
+    prompt: 원하는 시각의 모습으로 되돌리는 시점 복구에 꼭 있어야 하는 두 가지는?
+    choices:
+      - 전체 백업과 그 뒤 로그
+      - 복제 서버와 스냅숏
+      - 논리 백업과 인덱스
+      - 차등 백업과 통계 정보
+    answer: 0
+    explain: 전체 백업으로 그 시각까지 돌아간 뒤, 끊김 없이 보관한 로그를 원하는 시각까지 다시 적용해요.
+  - id: daily-backup-loss
+    type: choice
+    prompt: 매일 새벽 2시에 전체 백업만 뜨고 로그는 보관하지 않아요. 그날 밤 11시에 디스크가 망가지면 최대 얼마치를 잃나요?
+    choices:
+      - 약 21시간치
+      - 잃는 게 없어요
+      - 약 2시간치
+      - 약 1시간치
+    answer: 0
+    explain: 되돌릴 수 있는 곳은 새벽 2시 백업뿐이에요. 2시부터 11시까지 21시간 동안의 변경을 잃어요.
+  - id: simple-recovery-no-pitr
+    type: ox
+    prompt: SQL Server의 단순(simple) 복구 모델 DB를 사고 1분 전 시각으로 되돌릴 수 있나요?
+    answer: false
+    explain: 단순 복구 모델은 로그 백업을 지원하지 않아서, 마지막 백업을 뜬 시각으로만 돌아가요. 원하는 시각으로 가려면 전체 복구 모델이어야 해요.
+  - id: rpo-name
+    type: input
+    prompt: 사고가 나도 잃어도 되는 데이터의 양을 '몇 분치', '하루치'처럼 시간으로 정한 목표를 무엇이라고 할까요?
+    answer: [RPO, Recovery Point Objective, 복구 시점 목표]
+    explain: RPO예요. 서비스가 멈춰도 되는 시간을 정한 RTO와 짝을 이뤄요.

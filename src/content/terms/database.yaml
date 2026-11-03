@@ -220,6 +220,31 @@ terms:
     aliases: [deadlock, 데드락, 교착 상태]
     short: 두 트랜잭션이 서로 상대가 쥔 잠금을 기다려 둘 다 못 나아가는 상태예요.
     doc: database/deadlock
+  - id: logical-backup
+    name: 논리 백업
+    en: Logical backup
+    aliases: [logical backup, 덤프, dump, SQL 덤프]
+    short: 데이터를 다시 만들 수 있는 SQL이나 행으로 내보낸 백업이에요. pg_dump가 대표예요.
+    doc: database/backup-and-restore
+  - id: pitr
+    name: 시점 복구
+    en: Point-in-Time Recovery
+    aliases: [PITR, point-in-time recovery, 특정 시점 복구]
+    short: 전체 백업에 보관한 로그를 원하는 시각까지만 다시 적용해, 그 시각의 모습으로 되돌리는 일이에요.
+    analogy: 어젯밤 장부 사본에 오늘 주문을 원하는 시각까지만 다시 적는 것과 같아요.
+    doc: database/backup-and-restore
+  - id: rpo
+    name: RPO
+    en: Recovery Point Objective
+    aliases: [복구 시점 목표]
+    short: 사고가 나도 잃어도 되는 데이터의 양을 시간으로 정한 목표예요.
+    doc: database/backup-and-restore
+  - id: rto
+    name: RTO
+    en: Recovery Time Objective
+    aliases: [복구 시간 목표]
+    short: 사고 뒤 서비스가 멈춰도 되는 최대 시간을 정한 목표예요.
+    doc: database/backup-and-restore
   - id: replication
     name: 복제
     en: Replication
