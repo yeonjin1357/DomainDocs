@@ -1,0 +1,28 @@
+questions:
+  - id: restart-loses-head
+    type: ox
+    prompt: Prometheus가 꺼졌다 켜지면, 아직 블록이 되지 않은 최근 샘플은 메모리와 함께 사라지나요?
+    answer: false
+    explain: 같은 내용을 WAL에도 적어 두었다가, 켜질 때 WAL을 다시 읽어 메모리를 되살려요. 그래서 재시작 직후 한동안은 질의를 받지 못해요.
+  - id: remote-write-from-wal
+    type: ox
+    prompt: Prometheus의 원격 쓰기는 WAL을 읽어서 원격 저장소로 샘플을 보내나요?
+    answer: true
+    explain: 원격 쓰기마다 WAL을 읽는 큐가 있어요. 그래서 WAL이 정리되기 전까지는 못 보낸 샘플을 다시 보낼 수 있어요.
+  - id: disk-estimate
+    type: choice
+    prompt: 시계열 150만 개를 15초마다 모아 30일 보관해요. 샘플 하나를 1.5바이트로 치면 블록에 필요한 디스크는 대략?
+    choices: [약 390GB, 약 39GB, 약 3.9TB, 약 13GB]
+    answer: 0
+    explain: 초당 샘플은 150만 ÷ 15 = 10만 개예요. 30일은 2,592,000초라, 2,592,000 × 10만 × 1.5바이트 ≈ 389GB예요.
+  - id: remote-down
+    type: choice
+    prompt: 원격 쓰기의 대상 저장소가 3시간째 응답하지 않아요. 무슨 일이 생길까요?
+    choices: [못 보낸 샘플 일부를 잃어요, Prometheus 수집이 멈춰요, 로컬 블록이 먼저 지워져요, 나중에 모두 다시 보내져요]
+    answer: 0
+    explain: 원격 쪽이 2시간 넘게 멈추면 WAL이 정리되면서 아직 못 보낸 샘플을 잃어요. 수집과 로컬 저장은 그대로 돌아요.
+  - id: wal-name
+    type: input
+    prompt: 시계열 DB가 메모리의 샘플을 잃지 않으려고 디스크에 먼저 적어 두는 기록을 영어 약자로 쓰면?
+    answer: [WAL, write-ahead log, write ahead log]
+    explain: WAL(write-ahead log)은 메모리에만 있는 최근 샘플의 사본이에요. 재시작하면 이것으로 메모리를 되살려요.
