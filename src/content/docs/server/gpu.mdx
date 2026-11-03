@@ -1,0 +1,221 @@
+---
+title: GPU 사용률과 메모리
+summary: GPU 사용률은 GPU가 일한 시간의 비율이에요. 연산을 얼마나 채웠는지와는 달라요.
+domain: server
+type: concept
+stage: basics
+order: 57
+icon: gauge
+keywords: [GPU, GPU 사용률, GPU utilization, SM, VRAM, GPU 메모리, nvidia-smi, DCGM, dcgm-exporter, XID]
+related: [server/cpu-usage, server/memory, server/metrics-sources, kubernetes/requests-and-limits, kubernetes/scheduling]
+sources:
+  - title: NVIDIA — nvidia-smi documentation (Utilization, Clocks Event Reasons)
+    url: https://docs.nvidia.com/deploy/nvidia-smi/index.html
+  - title: NVIDIA DCGM — Feature Overview (Profiling Metrics)
+    url: https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/feature-overview.html
+  - title: NVIDIA dcgm-exporter (기본 수집 지표, 포트 9400)
+    url: https://github.com/NVIDIA/dcgm-exporter
+  - title: NVIDIA — Xid Errors, Introduction
+    url: https://docs.nvidia.com/deploy/xid-errors/introduction.html
+  - title: CUDA Runtime API — cudaErrorMemoryAllocation
+    url: https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html
+  - title: PyTorch — CUDA semantics, Memory management
+    url: https://docs.pytorch.org/docs/stable/notes/cuda.html
+  - title: Kubernetes — Schedule GPUs
+    url: https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/
+  - title: NVIDIA k8s-device-plugin (MIG, time-slicing)
+    url: https://github.com/NVIDIA/k8s-device-plugin
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="GPU 사용률은 일한 시간의 비율이에요">
+    GPU에서 계산이 하나라도 돈 시간의 비율이에요. 100%여도 GPU를 꽉 채워 쓴다는 뜻은 아니에요.
+  </Point>
+  <Point title="GPU 메모리는 따로이고 모자라면 실패해요">
+    GPU는 서버 메모리와 다른 자기 메모리를 써요. 모자라면 스왑으로 버티지 않고 할당이 실패해요.
+  </Point>
+  <Point title="뜨거우면 스스로 느려져요">
+    온도나 전력이 한도에 닿으면 GPU가 클럭을 낮춰요. 사용률은 그대로인데 일이 느려져요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="공장은 스스로 일감을 찾지만, GPU는 CPU가 일감과 재료를 보내 줘야만 일해요. 그래서 GPU가 놀면 CPU 쪽이 늦게 보내는 건 아닌지도 봐요.">
+  GPU는 똑같은 작업대가 수천 개 늘어선 공장과 비슷해요. GPU 사용률은 공장에 불이 켜져 있던 시간의 비율이라, 작업대 하나만 일해도 불은 켜져요.
+</Analogy>
+
+## GPU는 무엇이 다를까요
+
+CPU는 몇십 개의 코어가 복잡한 일을 순서대로 빠르게 처리해요. GPU는 작은 코어 수천 개가 같은 계산을 한꺼번에 해요. 그래서 AI 학습·추론이나 영상 처리처럼 같은 계산을 많이 되풀이하는 일에 써요.
+
+<Term term="server/gpu">GPU</Term>는 서버에 꽂는 따로 된 장치예요. 자기 메모리가 있어서, CPU가 계산할 데이터를 서버 메모리에서 GPU 메모리로 옮겨 줘야 해요.
+
+<Figure caption="CPU가 데이터를 GPU 메모리로 옮기고 계산을 맡기면, GPU의 SM들이 계산해요. 서버 메모리와 GPU 메모리는 따로라, 지표도 따로 봐요.">
+  <Flow
+    ariaLabel="서버 안의 CPU와 서버 메모리, GPU 카드 안의 SM 수천 개 코어와 GPU 메모리가 나뉘어 있고, CPU가 일감을 SM에 보내고 서버 메모리의 데이터를 GPU 메모리로 복사하는 구조도"
+    nodes={[
+      { id: 'cpu', label: 'CPU', col: 0, row: 0, note: '일감을 보내요' },
+      { id: 'ram', label: '서버 메모리', col: 0, row: 1 },
+      { id: 'sm', label: 'SM 여러 개', col: 2, row: 0, note: '코어 수천 개', tone: 'accent' },
+      { id: 'vram', label: 'GPU 메모리', col: 2, row: 1, tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'cpu', to: 'sm' },
+      { from: 'ram', to: 'vram' },
+      { from: 'sm', to: 'vram', both: true },
+    ]}
+    groups={[
+      { label: '서버', cols: [0, 0], rows: [0, 1] },
+      { label: 'GPU 카드', cols: [2, 2], rows: [0, 1] },
+    ]}
+  />
+</Figure>
+
+GPU의 코어는 <Term term="server/sm">SM</Term>(streaming multiprocessor)이라는 묶음으로 나뉘어요. GPU 하나에 SM이 수십에서 백수십 개 있고, 계산은 이 SM들에 나뉘어 돌아요.
+
+## GPU 사용률은 일한 시간의 비율이에요
+
+nvidia-smi와 많은 수집기가 보여 주는 GPU 사용률은 지난 짧은 구간 동안 계산(커널)이 하나라도 돈 시간의 비율이에요. 구간은 제품에 따라 1초에서 1/6초예요.
+
+<Figure caption="1초 동안 계산이 0.3초와 0.1초, 모두 0.4초 돌았다면 GPU 사용률은 40%예요. 그 계산이 SM을 몇 개 썼는지는 이 숫자에 들어가지 않아요.">
+  <Timeline
+    ariaLabel="1초 구간 가운데 0초부터 0.3초, 0.6초부터 0.7초에 계산이 돌아 모두 0.4초라 GPU 사용률이 40%인 시간 띠"
+    end={1000}
+    lanes={[{ label: '계산', segments: [{ start: 0, end: 300, label: '0.3초', tone: 'accent' }, { start: 600, end: 700, tone: 'accent' }] }]}
+    ticks={[{ at: 0, label: '0초' }, { at: 500, label: '0.5초' }, { at: 1000, label: '1초' }]}
+  />
+</Figure>
+
+그래서 작은 계산 하나가 SM 몇 개만 쓰며 쉬지 않고 돌아도 사용률은 100%예요. 사용률 100%는 GPU가 쉬지 않았다는 뜻이지, 코어를 꽉 채웠다는 뜻이 아니에요.
+
+<Figure caption="두 GPU 모두 사용률 100%예요. 칸 하나가 SM 하나이고, 위 GPU는 모든 SM이 일하지만 아래 GPU는 두 개만 일해요.">
+  <Strip
+    ariaLabel="사용률이 둘 다 100%인 GPU 두 대의 SM 12개. 위 GPU는 12개가 모두 일하고, 아래 GPU는 2개만 일하고 10개는 쉬는 칸 띠"
+    rows={[
+      {
+        label: '사용률 100% · SM이 모두 일해요',
+        cells: Array.from({ length: 12 }, () => ({ label: '', tone: 'accent' })),
+      },
+      {
+        label: '사용률 100% · SM 두 개만 일해요',
+        cells: [{ label: '', tone: 'accent' }, { label: '', tone: 'accent' }, ...Array.from({ length: 10 }, () => ({ label: '', tone: 'sub' }))],
+      },
+    ]}
+    ranges={[{ row: 1, from: 2, to: 11, label: '쉬는 SM 10개', tone: 'warn' }]}
+  />
+</Figure>
+
+GPU를 얼마나 채워 쓰는지 보려면 SM 활동(SM activity)을 봐요. 모든 SM에 대해 일감이 하나라도 올라 있던 시간의 비율을 평균한 값이에요. NVIDIA 문서는 GPU를 잘 쓰려면 이 값이 적어도 0.8(80%)은 돼야 하고, 0.5(50%) 아래면 잘 못 쓰는 것 같다고 해요.
+
+## GPU 메모리는 따로 있어요
+
+<Term term="server/gpu-memory">GPU 메모리</Term>는 GPU 카드에 붙은 메모리예요. 계산할 데이터와 AI 모델의 가중치가 여기 올라가요. 서버 메모리가 넉넉해도 GPU 메모리가 모자라면 계산을 못 해요.
+
+GPU 메모리가 모자라면 할당이 바로 실패해요. 서버 메모리처럼 스왑으로 버티지 않아요. PyTorch라면 "CUDA out of memory" 에러로 멈춰요.
+
+PyTorch 같은 프레임워크는 한 번 잡은 GPU 메모리를 바로 돌려주지 않고 캐시로 들고 있어요. 다음 할당을 빠르게 하려는 거예요. 그래서 nvidia-smi의 메모리 사용량은 실제로 데이터가 쓰는 양보다 커요.
+
+<Figure caption="24GB GPU의 예시예요. 데이터는 14GB만 쓰지만, 프레임워크가 쉬는 캐시 6GB까지 잡고 있어서 nvidia-smi에는 20GB를 쓰는 것으로 보여요.">
+  <Parts
+    ariaLabel="24GB GPU 메모리를 데이터가 쓰는 14GB, 프레임워크가 쥐고 있는 쉬는 캐시 6GB, 빈 곳 4GB로 나눈 비율 막대. nvidia-smi가 보는 사용량은 앞의 둘을 더한 20GB예요"
+    rows={[
+      {
+        label: 'GPU 메모리',
+        total: '24GB',
+        segments: [
+          { label: '데이터가 씀', value: 14, display: '14GB', tone: 'accent' },
+          { label: '쉬는 캐시', value: 6, display: '6GB', tone: 'weak' },
+          { label: '빈 곳', value: 4, display: '4GB', tone: 'plain' },
+        ],
+      },
+    ]}
+    ranges={[{ from: 0, to: 20, label: 'nvidia-smi가 보는 사용량 20GB' }]}
+  />
+</Figure>
+
+'메모리'가 붙은 숫자가 하나 더 있어요. 메모리 사용률은 메모리가 찬 비율이 아니라, 메모리를 읽고 쓰느라 바빴던 시간의 비율이에요.
+
+<Figure caption="이름이 비슷한 두 숫자예요. 메모리가 모자란지는 사용량으로, 메모리를 오가는 길이 바쁜지는 사용률로 봐요.">
+  <Compare
+    columns={['메모리 사용량', '메모리 사용률']}
+    rows={[
+      { label: '재는 것', values: ['얼마나 찼나', '읽고 쓰느라 바빴던 시간'] },
+      { label: '단위', values: ['MiB, GB', '%'] },
+      { label: '높으면', values: ['새 할당이 실패할 수 있어요', '메모리를 기다리는 계산이 많아요'] },
+    ]}
+  />
+</Figure>
+
+## 뜨거우면 스스로 느려져요
+
+GPU는 전력과 온도에 한도가 있어요. 전력이 한도를 넘으면 소프트웨어가 클럭(동작 속도)을 낮춰요. 온도가 너무 높으면 하드웨어가 클럭을 절반 이하로 낮추기도 해요.
+
+클럭이 낮아져도 계산은 계속 돌아서 사용률은 그대로예요. 대신 같은 일을 하는 데 시간이 더 걸려요. 그래서 사용률만 보면 왜 느려졌는지 안 보여요.
+
+<Figure caption="온도가 오르자 클럭이 절반으로 내려간 예시예요. 사용률은 100% 그대로라서, 처리량이 줄어든 까닭은 클럭과 온도를 함께 봐야 보여요.">
+  <MiniLineChart
+    ariaLabel="사용률은 100%로 평평한데, 온도가 오른 뒤 SM 클럭이 최대의 100%에서 50%로 떨어지는 그래프"
+    yMax={100}
+    series={[
+      { label: 'GPU 사용률', values: [100, 100, 100, 100, 100, 100, 100, 100], tone: 'sub', value: '100% 그대로' },
+      { label: 'SM 클럭(최대 대비)', values: [100, 100, 100, 98, 60, 50, 50, 50], tone: 'warn', value: '100% → 50%' },
+    ]}
+  />
+</Figure>
+
+nvidia-smi는 클럭을 낮춘 이유를 'Clocks Event Reasons'로 알려 줘요. SW Power Cap은 전력 때문, HW Thermal Slowdown은 온도 때문이에요. 모두 Not Active면 클럭을 최대로 쓰고 있는 거예요.
+
+## 프로세스와 XID 에러
+
+nvidia-smi는 GPU를 쓰는 프로세스와 그 프로세스가 잡은 메모리를 보여 줘요. GPU 메모리가 찼다면 누가 잡았는지 여기서 찾아요.
+
+<Term term="server/xid">XID</Term>는 NVIDIA 드라이버가 GPU 에러를 커널 로그에 남기는 메시지예요. 하드웨어 고장, 드라이버 문제, 앱의 잘못된 사용 모두 XID로 남을 수 있어요. 번호마다 뜻이 달라서, NVIDIA의 XID 목록에서 번호로 찾아봐요.
+
+## 쿠버네티스에서는
+
+쿠버네티스에서는 GPU를 `nvidia.com/gpu` 같은 자원 이름으로 요청해요. GPU는 `limits`에 적고, `requests`를 따로 적으려면 `limits`와 같은 값이어야 해요.
+
+기본 설정에서는 GPU 한 장이 자원 하나라서, 컨테이너는 GPU를 한 장 단위로 받아요. 한 장을 여럿이 나눠 쓰려면 MIG(GPU를 하드웨어로 쪼개기)나 시간 나누기(time-slicing)를 따로 설정해요. 요청과 한도는 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>에서 다뤄요.
+
+## 모니터링에서는
+
+GPU 지표는 보통 NVIDIA의 dcgm-exporter로 모아요. GPU가 있는 서버마다 하나씩 띄우고, 기본 포트 9400의 `/metrics`로 Prometheus 형식의 값을 내보내요. 기본으로 모으는 지표는 이래요.
+
+- `DCGM_FI_DEV_GPU_UTIL`: GPU 사용률(%)이에요. 계산이 돈 시간의 비율이에요.
+- `DCGM_FI_DEV_FB_USED`: GPU 메모리 사용량(MiB)이에요.
+- `DCGM_FI_DEV_FB_FREE`: 남은 GPU 메모리(MiB)예요.
+- `DCGM_FI_DEV_GPU_TEMP`: GPU 온도(℃)예요.
+- `DCGM_FI_DEV_POWER_USAGE`: 지금 쓰는 전력(W)이에요.
+- `DCGM_FI_DEV_SM_CLOCK`: SM 클럭(MHz)이에요.
+- `DCGM_FI_DEV_XID_ERRORS`: 마지막으로 난 XID 번호예요.
+
+SM 활동(`DCGM_FI_PROF_SM_ACTIVE`)은 기본 목록에서 꺼져 있어서, 쓰려면 수집 목록에 더해요.
+
+<Figure caption="학습 작업이 도는 GPU 하나의 예시예요. 사용률은 100%인데 SM 활동은 22%라, GPU를 바쁘게 쓰지만 꽉 채우지는 못하고 있어요.">
+  <StatTile label="GPU 사용률" value="100" unit="%" />
+  <StatTile label="SM 활동" value="22" unit="%" tone="warn" note="50% 아래" />
+  <StatTile label="GPU 메모리" value="22" unit="/ 24GB" note="캐시 포함" />
+</Figure>
+
+<Checkpoints>
+  <Check>GPU 사용률이 100%라서 GPU를 더 사야 한다고 판단했다면, SM 활동을 함께 보세요. 계산이 작아 SM 몇 개만 쓰는 중일 수 있어요.</Check>
+  <Check>GPU 메모리 사용량이 늘 가득이라 누수라고 봤다면, 프레임워크가 캐시로 잡아 둔 몫인지 보세요. PyTorch는 쉬는 메모리도 돌려주지 않고 들고 있어요.</Check>
+  <Check>메모리 사용률(%)을 메모리가 찬 비율로 읽는 화면이라면 다시 보세요. 찬 정도는 사용량(MiB)이고, 사용률은 읽고 쓰느라 바빴던 시간이에요.</Check>
+  <Check>사용률은 그대로인데 처리량이 줄었다면 온도와 전력, 클럭을 함께 보세요. 한도에 닿으면 GPU가 스스로 클럭을 낮춰요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### SM 점유율과 텐서 코어
+
+  SM 점유율(SM occupancy)은 SM 하나가 동시에 올릴 수 있는 일감 수 대비 실제로 올라간 비율이에요. 높다고 늘 좋은 건 아니에요. 메모리를 기다리는 일이 많을 때는 점유율이 높을수록 좋지만, 계산만 하는 일에서는 점유율이 낮아도 빠를 수 있어요.
+
+  텐서 코어 활동(`DCGM_FI_PROF_PIPE_TENSOR_ACTIVE`)은 행렬 곱셈 전용 장치가 일한 비율이에요. AI 학습에서는 이 값이 실제 쓰임새에 더 가까워요.
+
+  ### 사용률의 구간
+
+  nvidia-smi 문서는 GPU 사용률을 재는 구간이 제품에 따라 1초에서 1/6초라고 해요. 그보다 짧게 튀는 일은 이 숫자에 묻혀요.
+
+  ### MIG와 시간 나누기
+
+  MIG는 A100, H100 같은 일부 GPU를 하드웨어로 몇 조각으로 나눠요. 조각마다 메모리와 SM이 따로라 서로 방해하지 않아요. 시간 나누기는 한 GPU를 차례로 돌려 써서, 메모리와 성능이 서로 영향을 줘요.
+</Deeper>

@@ -222,3 +222,28 @@ terms:
     aliases: [Windows Event Log, event log, 이벤트 뷰어, Event Viewer]
     short: 윈도우의 기록이 모이는 곳이에요. 기록마다 수준과 이벤트 ID가 붙어요.
     doc: server/windows
+  - id: gpu
+    name: GPU
+    en: Graphics Processing Unit
+    aliases: [그래픽 처리 장치, 그래픽 카드, gpu]
+    short: 작은 코어 수천 개로 같은 계산을 한꺼번에 하는 장치예요.
+    analogy: 똑같은 작업대가 수천 개 늘어선 공장과 같아요.
+    doc: server/gpu
+  - id: sm
+    name: SM
+    en: Streaming Multiprocessor
+    aliases: [스트리밍 멀티프로세서]
+    short: GPU 코어를 묶은 단위예요. 계산은 SM들에 나뉘어 돌아요.
+    doc: server/gpu
+  - id: gpu-memory
+    name: GPU 메모리
+    en: GPU memory
+    aliases: [VRAM, 비디오 메모리, 프레임 버퍼, framebuffer]
+    short: GPU 카드에 붙은 따로 된 메모리예요. 계산할 데이터와 모델이 여기 올라가요.
+    doc: server/gpu
+  - id: xid
+    name: XID
+    en: Xid error
+    aliases: [Xid 에러, XID 에러]
+    short: NVIDIA 드라이버가 GPU 에러를 커널 로그에 남기는 번호 붙은 메시지예요.
+    doc: server/gpu
