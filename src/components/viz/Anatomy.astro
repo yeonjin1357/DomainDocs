@@ -5,9 +5,11 @@ interface Props {
   /** 앞에서부터 이름을 이루는 조각 */
   parts: AnatomyPart[];
   ariaLabel: string;
+  /** 뜻 목록에 조각 글자를 다시 쓸지. 조각이 긴 로그 한 줄처럼 되풀이가 길기만 할 때 false */
+  repeatText?: boolean;
 }
 
-const { parts, ariaLabel } = Astro.props;
+const { parts, ariaLabel, repeatText = true } = Astro.props;
 const layout = layoutAnatomy(parts);
 // 이름이 길면 글자를 줄여 360px 한 줄에 들어가게 한다
 const size = layout.text.length > 22 ? 15 : layout.text.length > 14 ? 18 : 22;
@@ -30,7 +32,7 @@ const size = layout.text.length > 22 ? 15 : layout.text.length > 14 ? 18 : 22;
         .map((p) => (
           <li class={`tone-${p.tone ?? 'plain'}`}>
             <span class="anatomy-no">{p.number}</span>
-            <code class="anatomy-legend-text">{p.text}</code>
+            {repeatText && <code class="anatomy-legend-text">{p.text}</code>}
             <span class="anatomy-label">{p.label}</span>
             {p.note && <span class="anatomy-note">{p.note}</span>}
           </li>

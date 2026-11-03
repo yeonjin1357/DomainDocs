@@ -7,7 +7,7 @@ stage: monitoring
 order: 20
 icon: chart-column
 keywords: [Top SQL, 상위 SQL, pg_stat_statements, total_exec_time, mean_exec_time, calls, 호출 수, queryid, 정규화, 느린 쿼리]
-related: [database/active-sessions, foundations/counters-and-rate, apm/trace-waterfall, apm/n-plus-one]
+related: [database/active-sessions, database/slow-query-log, foundations/counters-and-rate, apm/trace-waterfall, apm/n-plus-one]
 sources:
   - title: PostgreSQL — pg_stat_statements
     url: https://www.postgresql.org/docs/current/pgstatstatements.html
@@ -49,6 +49,8 @@ SQL 하나가 DB를 쓴 시간은 호출 수 × 평균 시간이에요. 평균 �
 </Figure>
 
 DB 부하를 줄이려면 총 시간 위쪽부터 봐요. 그림의 SQL A는 2ms로 빠르지만, 100만 번 불려 DB 시간의 대부분을 써요.
+
+반대로 한 번 한 번이 언제, 어떤 값으로 느렸는지는 합에 묻혀요. 그런 실행은 <Term term="database/slow-query-log">슬로 쿼리 로그</Term>에 한 건씩 남아요.
 
 ## 값만 다른 SQL은 하나로 묶어요
 

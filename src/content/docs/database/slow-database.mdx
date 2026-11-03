@@ -113,6 +113,8 @@ GROUP BY 1;
 
 호출 수가 늘었다면 앱 쪽 변화부터 봐요. 배포로 같은 SQL을 더 자주 부르거나, 캐시가 만료돼 DB로 몰렸을 수 있어요. 평균 시간이 늘었다면 그 SQL을 <Term slug="database/execution-plans">EXPLAIN ANALYZE</Term>로 열어 예상과 실제 행 수를 견줘요.
 
+어떤 값으로 불렀을 때 느렸는지는 합으로는 안 보여요. <Term term="database/slow-query-log">슬로 쿼리 로그</Term>를 켜 두었다면 그 시각의 줄에 실제 값이 남아 있어요.
+
 **확인 방법**: `pg_stat_statements`의 값은 누적값이에요. 장애 직전과 지금 두 번 떠서, SQL마다 `calls`와 `total_exec_time`의 차이를 구해요.
 
 <Figure caption="숫자는 설명용 예시예요. 누적값만 보면 평소에 오래 쌓인 SQL A가 위에 있어요. 두 시점의 차이로 보면 장애 구간에 늘어난 건 SQL B예요.">

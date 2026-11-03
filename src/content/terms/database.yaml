@@ -407,3 +407,10 @@ terms:
     aliases: [reload, 리로드, pg_reload_conf, SIGHUP]
     short: DB를 끄지 않고 설정 파일을 다시 읽어 바뀐 값을 쓰게 하는 일이에요.
     doc: database/parameters
+  - id: slow-query-log
+    name: 슬로 쿼리 로그
+    en: Slow query log
+    aliases: [slow query log, 느린 쿼리 로그, 슬로우 쿼리 로그, log_min_duration_statement, long_query_time]
+    short: 정한 시간보다 오래 걸린 SQL 실행을 한 건씩 남기는 로그예요.
+    analogy: 이틀 넘게 걸린 배송만 송장째 따로 모아 둔 장부와 같아요.
+    doc: database/slow-query-log

@@ -123,6 +123,10 @@ test('이름 뜯어보기는 뜻 있는 조각에만 번호를 붙여 목록과 
   await expect(anatomy.locator('.anatomy-text')).toHaveText(['c', '7', '.', 'large']);
   await expect(anatomy.locator('.anatomy-legend li')).toHaveCount(3);
   await expect(anatomy.locator('.anatomy-legend .anatomy-label')).toHaveText(['시리즈', '세대', '크기']);
+  await expect(anatomy.locator('.anatomy-legend-text')).toHaveCount(3);
+  const log = page.getByRole('img', { name: '로그 한 줄을 걸린 시간과 SQL로 나눠 읽는 그림' });
+  await expect(log.locator('.anatomy-legend .anatomy-label')).toHaveText(['걸린 시간', '실행한 SQL']);
+  await expect(log.locator('.anatomy-legend-text')).toHaveCount(0);
 });
 
 test('막대는 값에 비례한 길이로 그린다', async ({ page }) => {

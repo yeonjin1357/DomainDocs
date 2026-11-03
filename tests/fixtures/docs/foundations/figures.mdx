@@ -134,6 +134,14 @@ import Sample from '../../figures/sample.svg';
   />
 </Figure>
 
+<Figure caption="로그 한 줄은 뜻 목록에 글자를 다시 쓰지 않아요.">
+  <Anatomy
+    ariaLabel="로그 한 줄을 걸린 시간과 SQL로 나눠 읽는 그림"
+    repeatText={false}
+    parts={[{ text: 'duration: 1532 ms', label: '걸린 시간' }, { text: 'select 1', label: '실행한 SQL' }]}
+  />
+</Figure>
+
 <Figure caption="조인이 N+1보다 훨씬 짧아요.">
   <Bars
     ariaLabel="N+1 20ms와 조인 5ms를 견준 막대"

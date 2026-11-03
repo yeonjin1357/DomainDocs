@@ -1,0 +1,255 @@
+---
+title: 슬로 쿼리 로그
+summary: 정한 시간보다 오래 걸린 SQL을 실행 한 건씩 남기는 DB 로그예요.
+domain: database
+type: concept
+stage: monitoring
+order: 25
+icon: timer
+keywords: [slow query log, 느린 쿼리, log_min_duration_statement, slow_query_log, long_query_time, Rows_examined, auto_explain, pt-query-digest, pgBadger]
+related: [database/top-sql, database/active-sessions, database/locks-and-blocking, database/indexes, database/parameters]
+sources:
+  - title: PostgreSQL — Error Reporting and Logging
+    url: https://www.postgresql.org/docs/current/runtime-config-logging.html
+  - title: PostgreSQL — auto_explain
+    url: https://www.postgresql.org/docs/current/auto-explain.html
+  - title: MySQL 8.4 — The Slow Query Log
+    url: https://dev.mysql.com/doc/refman/8.4/en/slow-query-log.html
+  - title: Amazon RDS — MySQL database log files
+    url: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_LogAccess.MySQL.LogFileSize.html
+  - title: Amazon RDS — PostgreSQL database log files
+    url: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_LogAccess.Concepts.PostgreSQL.html
+  - title: SQL Server — Monitor performance by using the Query Store
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/performance/monitoring-performance-by-using-the-query-store
+updated: 2026-11-03
+---
+
+import SlowThreshold from '../../../assets/figures/database/slow-threshold.svg';
+
+<OnDashboard title="주문 DB · 슬로 쿼리 건수 · 1분마다" caption="배포 직후 1분 동안 40건이 남은 예시예요. 그 시각의 로그를 열면 어떤 SQL이 어떤 값으로 느렸는지 보여요.">
+  <MiniLineChart ariaLabel="1분마다 센 슬로 쿼리 건수가 평소 1~3건이다가 배포 직후 40건, 38건으로 튀고 다시 2건 안팎으로 돌아온 그래프" series={[{ label: '슬로 쿼리(기준 1초)', values: [2, 1, 3, 2, 2, 40, 38, 5, 2, 1, 2], tone: 'warn', value: '최대 40건' }]} />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="기준보다 오래 걸린 실행만 남겨요">
+    걸린 시간이 기준을 넘은 SQL만 한 건씩 적어요. 언제, 얼마나, 어떤 값으로 느렸는지 보여요.
+  </Point>
+  <Point title="자주 도는 빠른 SQL은 로그에 없어요">
+    기준 아래 SQL은 아무리 많이 불려도 안 남아요. DB를 가장 많이 쓰는 SQL은 SQL별 부하 순위에서 찾아요.
+  </Point>
+  <Point title="기본으로 꺼져 있어요">
+    PostgreSQL과 MySQL 모두 켜고 기준을 정해야 남아요. 기준을 너무 낮추면 로그가 디스크를 채워요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="택배는 오는 중에도 조회되지만, 로그는 SQL이 끝난 뒤에야 한 줄을 남겨요. 지금 오래 도는 SQL은 로그가 아니라 액티브 세션에서 봐요.">
+  이틀 넘게 걸린 배송만 송장째 따로 모아 둔 장부와 같아요. 언제 보냈고, 얼마나 걸렸고, 무엇을 보냈는지 한 건씩 남아요.
+</Analogy>
+
+## 기준을 넘은 실행만 남아요
+
+슬로 쿼리 로그(slow query log)는 정한 시간보다 오래 걸린 SQL 실행을 한 건씩 남기는 로그예요. PostgreSQL은 `log_min_duration_statement`로, MySQL은 `long_query_time`으로 기준을 정해요.
+
+<Figure caption="SQL이 열 번 실행된 예시예요. 기준 1초를 넘은 세 번만 로그에 한 줄씩 남고, 나머지 일곱 번은 흔적이 없어요.">
+  <SlowThreshold aria-label="실행 10번의 걸린 시간 막대. 0.1~0.4초짜리 일곱 번은 기준선 1초 아래에 있고, 1.4초, 3.0초, 1.1초인 세 번만 기준선을 넘어 로그에 남은 그림" />
+</Figure>
+
+한 줄에는 끝난 시각, 걸린 시간, 실행한 SQL이 들어가요. SQL에는 그때 쓴 실제 값이 그대로 남아요. 그래서 어떤 값으로 불렀을 때 느렸는지 알 수 있어요.
+
+## 로그 한 줄 읽기
+
+PostgreSQL은 서버 로그에 한 줄로 남겨요. 아래는 기준이 1초일 때 주문 조회가 1.5초 걸린 모습이에요.
+
+<Figure caption="PostgreSQL 18에서 실제로 남긴 줄과 같은 모양이에요. SQL에 실제 값 42가 그대로 들어 있어요.">
+  <Anatomy
+    ariaLabel="PostgreSQL 슬로 쿼리 로그 한 줄을 조각으로 나눈 그림. 적힌 시각, 서버 프로세스 번호, 걸린 시간 1532ms, 실행한 SQL, 그때 쓴 값 user_id = 42"
+    repeatText={false}
+    parts={[
+      { text: '2026-11-03 19:11:17.138 KST', label: '적힌 시각', note: 'SQL이 끝난 때' },
+      { text: '[473]', label: '서버 프로세스 번호', note: '어느 세션인지' },
+      { text: 'LOG:', label: '', tone: 'sub' },
+      { text: 'duration: 1532.104 ms', label: '걸린 시간' },
+      { text: 'statement:', label: '', tone: 'sub' },
+      { text: 'select * from orders', label: '실행한 SQL' },
+      { text: 'where user_id = 42', label: '그때 쓴 값', note: '값이 그대로 남아요', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+앱이 바인드 변수로 SQL을 보내면 모양이 조금 달라요. SQL에는 `$1`이 남고, 값은 바로 아래 `DETAIL` 줄에 따로 남아요. JDBC처럼 값을 따로 보내는 드라이버가 이렇게 남겨요.
+
+```text
+LOG:  duration: 1532.104 ms
+  execute <unnamed>: select *
+  from orders where user_id = $1
+DETAIL:  Parameters: $1 = '42'
+```
+
+앞의 시각과 번호는 줄였고, 위 세 줄은 실제로는 한 줄이에요.
+
+MySQL은 슬로 쿼리 로그 파일을 따로 두고, 한 건을 여러 줄로 남겨요.
+
+```text
+# Time: 2026-11-03T10:21:52.598776Z
+# User@Host: app[app] @ 10.0.1.5
+# Query_time: 2.104512
+  Lock_time: 0.000002
+  Rows_sent: 1
+  Rows_examined: 5000000
+SET timestamp=1793701310;
+select id from orders
+  where memo = 'gift';
+```
+
+`Query_time`부터 `Rows_examined`까지는 실제로는 한 줄이에요. 칸마다 뜻은 이래요.
+
+- `Query_time`: 걸린 시간이에요. 단위는 초예요.
+- `Lock_time`: 그중 잠금을 기다린 시간이에요.
+- `Rows_sent`: 앱에 돌려준 행 수예요.
+- `Rows_examined`: 결과를 만들려고 살펴본 행 수예요.
+- `SET timestamp`: SQL이 시작한 시각이에요. 1970년부터 센 초로 적어요.
+
+<Figure caption="위 로그의 두 숫자예요. 1행을 돌려주려고 500만 행을 살펴봤어요. 조건에 맞는 인덱스가 없거나 쓰이지 않는다는 신호예요.">
+  <Bars
+    ariaLabel="살펴본 행 5,000,000행, 돌려준 행 1행을 막대 길이로 견준 그림"
+    bars={[
+      { label: '살펴본 행(Rows_examined)', value: 5000000, display: '5,000,000행', tone: 'warn' },
+      { label: '돌려준 행(Rows_sent)', value: 1, display: '1행' },
+    ]}
+  />
+</Figure>
+
+살펴본 행이 돌려준 행보다 훨씬 많으면 <Term slug="database/indexes">인덱스</Term>부터 봐요. PostgreSQL 로그에는 이 숫자가 없어서, 같은 SQL의 <Term slug="database/execution-plans">실행 계획</Term>을 따로 봐요.
+
+## 걸린 시간에는 기다린 시간도 들어요
+
+로그의 걸린 시간은 시작부터 끝까지 흐른 시간이에요. 다른 세션이 잡은 잠금을 기다린 시간도 들어가요. PostgreSQL 18과 MySQL 8.4에서 같은 행의 잠금을 2.5초 기다린 UPDATE가 둘 다 로그에 남았어요.
+
+<Figure caption="MySQL 8.4에서 다른 트랜잭션이 잡은 행을 기다린 UPDATE의 실제 기록이에요. 2.53초 가운데 2.51초가 잠금을 기다린 시간이에요.">
+  <Parts
+    ariaLabel="Query_time 2.53초를 나눈 비율 막대. 잠금을 기다린 Lock_time이 2.51초, 나머지가 0.02초예요"
+    rows={[
+      {
+        label: 'UPDATE 한 건',
+        total: '2.53초',
+        segments: [
+          { label: '잠금 대기(Lock_time)', value: 2.51, display: '2.51초', tone: 'warn' },
+          { label: '나머지', value: 0.02, display: '0.02초', tone: 'accent' },
+        ],
+      },
+    ]}
+  />
+</Figure>
+
+이런 SQL은 고칠 대상이 아니라, 막은 쪽을 찾을 단서예요. MySQL 8.4는 행 잠금을 기다린 시간을 `Lock_time`에 따로 보여 줘요. PostgreSQL은 나눠 주지 않으니, 그 시각에 <Term slug="database/locks-and-blocking">잠금 대기</Term>가 있었는지 함께 봐요.
+
+## 끝난 뒤에 적혀요
+
+로그는 SQL이 끝나야 적혀요. 지금 8초째 도는 SQL은 끝날 때까지 로그에 없어요. 지금 오래 도는 SQL은 <Term slug="database/active-sessions">액티브 세션</Term>에서 찾아요.
+
+<Figure caption="기준이 1초일 때예요. 3초 만에 끝난 SQL A는 끝난 순간 로그에 남았지만, 8초째 도는 SQL B는 아직 로그에 없어요.">
+  <Timeline
+    ariaLabel="SQL A는 0초에 시작해 3초에 끝나 그때 로그에 남고, SQL B는 2초에 시작해 10초인 지금도 실행 중이라 로그에 없는 시간 띠"
+    end={10}
+    lanes={[
+      { label: 'SQL A', segments: [{ start: 0, end: 3, label: '3초', tone: 'accent' }] },
+      { label: 'SQL B', segments: [{ start: 2, end: 10, label: '실행 중', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 3, label: 'A 기록', tone: 'accent' }, { at: 10, label: '지금' }]}
+    ticks={[{ at: 0, label: '0초' }, { at: 5, label: '5초' }, { at: 10, label: '10초' }]}
+  />
+</Figure>
+
+중간에 끊긴 SQL은 DB마다 다르게 남아요. PostgreSQL에서 시간 초과로 취소된 SQL은 `duration` 줄 없이 `ERROR` 줄과 `STATEMENT` 줄만 남아요. MySQL 8.4는 `KILL`로 멈춘 SQL도 기준을 넘었으면 슬로 쿼리 로그에 남겨요.
+
+```text
+ERROR:  canceling statement
+  due to statement timeout
+STATEMENT:  select pg_sleep(5)
+```
+
+PostgreSQL 18에서 `statement_timeout`(SQL 하나의 실행 시간 한도)에 걸린 SQL이에요. 위 두 줄은 실제로는 한 줄이에요. 그래서 `duration` 줄만 세면, 끝까지 가지 못한 가장 느린 SQL이 빠져요.
+
+## 기준은 어떻게 정하나요
+
+기본으로는 둘 다 남기지 않아요. PostgreSQL의 `log_min_duration_statement` 기본값은 -1(끔)이에요. MySQL은 `slow_query_log`가 꺼져 있고, 켜도 기준 `long_query_time`의 기본값이 10초예요.
+
+기준을 0으로 두면 모든 SQL이 남아요. 기준을 낮출수록 로그는 빠르게 늘어요.
+
+<Figure caption="초당 1,000번 SQL을 실행하는 DB에서, 100ms를 넘는 실행이 1%, 1초를 넘는 실행이 0.01%라고 잡은 예시예요. 한 줄을 200바이트로 치면 기준 0은 하루 17GB쯤이에요.">
+  <Bars
+    ariaLabel="하루에 남는 로그 줄 수. 기준 0이면 8,640만 줄, 100ms면 86만 4천 줄, 1초면 8,640줄"
+    bars={[
+      { label: '기준 0(모두)', value: 86400000, display: '8,640만 줄', tone: 'warn' },
+      { label: '기준 100ms', value: 864000, display: '86만 4천 줄' },
+      { label: '기준 1초', value: 8640, display: '8,640줄', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+로그를 쓰는 일도 디스크 I/O라서, 너무 많이 남기면 DB가 느려질 수 있어요. 기준은 서비스의 응답 목표에서 출발해요. 응답 목표가 0.5초인 API라면, SQL 하나가 0.5초를 넘는 순간 이미 늦어요.
+
+기준은 DB를 재시작하지 않고 바꿀 수 있어요. PostgreSQL은 <Term term="database/config-reload">다시 읽기</Term>로 열린 세션에도 바로 반영돼요. MySQL의 `SET GLOBAL long_query_time`은 새로 맺은 연결부터 적용돼요.
+
+MySQL 8.4에서 기준을 10초에서 1초로 바꿔 봤어요. 이미 열려 있던 연결은 10초 그대로였고, 새 연결만 1초였어요. 커넥션 풀이 오래 쥔 연결의 SQL은 한동안 예전 기준으로 남아요.
+
+## SQL별 부하 순위와 함께 봐요
+
+슬로 쿼리 로그와 <Term slug="database/top-sql">SQL별 부하 순위</Term>(Top SQL)는 서로 못 보는 것을 봐요. 로그는 실행 한 건을, 순위는 SQL마다 쌓은 합을 남겨요.
+
+<Figure caption="같은 DB를 보는 두 창이에요. 특정 요청이 왜 느렸는지는 로그로, 평소 DB를 무엇이 가장 많이 쓰는지는 순위로 봐요.">
+  <Compare
+    columns={['슬로 쿼리 로그', 'SQL별 부하 순위']}
+    rows={[
+      { label: '남기는 단위', values: ['기준을 넘은 실행 한 건', 'SQL마다 쌓은 합'] },
+      { label: '보이는 것', values: ['그때의 값, 시각, 걸린 시간', '호출 수, 총 시간, 평균'] },
+      { label: '못 보는 것', values: ['기준 아래로 자주 도는 SQL', '어떤 값으로 언제 느렸는지'] },
+      { label: '답하는 물음', values: ['그 요청은 왜 느렸나', 'DB를 무엇이 가장 많이 쓰나'] },
+    ]}
+  />
+</Figure>
+
+0.2초짜리 SQL이 1초에 100번 불리면, 로그에는 한 줄도 없지만 1초마다 DB 시간 20초를 써요. 반대로 하루 한 번 30초 걸린 SQL은 순위에서는 작아 보여도, 로그에는 그때의 값과 함께 남아요.
+
+## 모아서 보는 법
+
+모니터링 도구는 로그 파일을 읽어 1분마다 몇 건이 남았는지 세요. 값만 다른 SQL은 하나로 묶어 건수와 최대 시간을 보여 줘요. pgBadger(PostgreSQL)와 pt-query-digest(MySQL)도 같은 일을 하는 도구예요.
+
+건수 그래프는 기준값에 따라 달라요. 기준을 1초에서 100ms로 내리면 SQL이 그대로여도 건수가 수십 배 뛰어요. 그래프에 기준값을 함께 적어 둬요.
+
+관리형 DB에서는 로그를 꺼내는 길부터 봐요. Amazon RDS의 MySQL은 `log_output` 기본값이 `TABLE`이라, 로그가 `mysql.slow_log` 표에 쌓여요. CloudWatch Logs로 보내려면 `FILE`로 바꿔야 해요.
+
+<Checkpoints>
+  <Check>슬로 쿼리가 0건이라는 화면은 설정부터 보세요. 로그가 꺼져 있거나 MySQL 기본 기준 10초라면 3초짜리 SQL도 남지 않아요.</Check>
+  <Check>슬로 쿼리 건수로 DB 부하 순위를 매기는 화면은 다시 보세요. 기준 아래로 자주 도는 SQL이 빠져요. SQL별 부하 순위의 총 시간과 함께 두세요.</Check>
+  <Check>PostgreSQL 로그에서 `duration` 줄만 세는 집계는 다시 보세요. 시간 초과로 끊긴 SQL은 `ERROR` 줄로만 남아요.</Check>
+  <Check>건수를 DB끼리 견주는 화면이라면 기준값이 같은지 보세요. 기준이 1초인 DB와 100ms인 DB의 건수는 견줄 수 없어요.</Check>
+  <Check>걸린 시간이 긴 UPDATE를 고치자는 제안이라면 잠금 대기부터 보세요. 기다린 시간이 대부분이면 막은 쪽을 고쳐야 해요.</Check>
+  <Check>로그에는 SQL의 실제 값이 남아요. 이메일이나 전화번호로 찾는 SQL이면 개인정보가 로그에 쌓이니, 접근 권한과 보관 기간을 정하세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### PostgreSQL 설정 더 보기
+
+  `log_min_duration_statement`의 단위는 ms이고, -1은 끔, 0은 모든 SQL이에요. 바인드 변수로 보낸 SQL은 준비(Parse), 값 붙이기(Bind), 실행(Execute) 단계마다 따로 재요. 그래서 로그에 `execute <unnamed>` 같은 말이 붙어요.
+
+  PostgreSQL 13부터는 트래픽이 많을 때 표본만 남길 수도 있어요. `log_min_duration_sample`을 넘은 SQL 가운데 `log_statement_sample_rate` 비율만 남겨요. `log_min_duration_statement`를 넘은 SQL은 표본과 상관없이 늘 남아요.
+
+  `auto_explain` 모듈을 켜면 느린 SQL의 실행 계획까지 로그에 남아요. 기준은 `auto_explain.log_min_duration`이고 기본은 -1(끔)이에요. `auto_explain.log_analyze`를 켜면 로그에 남지 않을 SQL까지 모두 시간을 재서, 부담이 크게 늘 수 있어요.
+
+  ### MySQL 설정 더 보기
+
+  `long_query_time`은 마이크로초까지 쓸 수 있어요. 0.1이면 100ms예요. 파일 기본 이름은 데이터 폴더의 `호스트이름-slow.log`이고, `# Time`은 기본으로 UTC예요.
+
+  모든 잠금 대기가 `Lock_time`에 드는 건 아니에요. MySQL 8.4에서 `LOCK TABLES`로 막힌 SELECT를 봤어요. 기다린 2.5초가 `Query_time`에만 들고 `Lock_time`은 거의 0이었어요.
+
+  `log_slow_extra`를 켜면 시작·끝 시각, 에러 번호, 멈췄는지(`Killed`) 같은 칸이 더 붙어요.
+
+  `min_examined_row_limit`은 살펴본 행이 그보다 적은 SQL을 빼요. `log_queries_not_using_indexes`는 인덱스를 안 쓴 SQL을 시간과 상관없이 남겨요. 파일을 SQL별로 묶어 보는 `mysqldumpslow`가 MySQL에 함께 들어 있어요.
+
+  ### 다른 DB
+
+  Oracle과 SQL Server에는 같은 이름의 로그가 없어요. SQL Server는 Query Store(2022부터 새 DB에 기본으로 켜져요)나 Extended Events로 봐요. Oracle은 AWR 같은 실행 통계로 봐요.
+
+  Redis는 <Term term="database/slowlog">SLOWLOG</Term>가 같은 일을 해요. 다만 파일이 아니라 메모리에 최근 것만 둬요.
+</Deeper>
