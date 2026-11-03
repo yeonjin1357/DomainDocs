@@ -1,0 +1,36 @@
+questions:
+  - id: deny-beats-allow
+    type: ox
+    prompt: 한 정책이 S3 읽기를 Allow하고, 다른 정책이 같은 동작을 Deny해요. 이 사용자는 S3를 읽을 수 있나요?
+    answer: false
+    explain: 명시한 Deny는 어떤 Allow보다 앞서요. 허락이 여럿 있어도 거부가 하나 있으면 막혀요.
+  - id: default-deny
+    type: ox
+    prompt: 새로 만든 역할에 정책을 하나도 붙이지 않으면, 그 역할로 부르는 API 요청은 모두 막히나요?
+    answer: true
+    explain: AWS는 기본으로 모든 요청을 거부해요. 정책이 허락한 동작만 통과해요.
+  - id: sg-vs-iam
+    type: choice
+    prompt: EC2 서버의 앱이 S3 버킷을 읽으려다 AccessDenied를 받았어요. 무엇을 먼저 봐야 할까요?
+    choices:
+      - 서버에 붙은 역할의 정책
+      - 보안 그룹의 인바운드 규칙
+      - 서브넷의 라우팅 표
+      - 인스턴스 유형의 크기
+    answer: 0
+    explain: AccessDenied는 API 요청을 IAM이 막았다는 뜻이에요. 보안 그룹은 네트워크 연결을 거를 뿐, API 권한은 주지 않아요.
+  - id: role-over-access-key
+    type: choice
+    prompt: 수집기 설정 파일에 들어 있는 오래 쓰는 접근 키를 바꾸려 해요. AWS가 권하는 방법은?
+    choices:
+      - 서버에 역할을 붙여 쓰기
+      - 키를 환경 변수로 옮기기
+      - 키를 매일 손으로 바꾸기
+      - 루트 사용자 키로 바꾸기
+    answer: 0
+    explain: AWS는 서버와 앱이 역할의 임시 자격 증명을 쓰라고 권해요. 시간이 지나면 끝나서 새어 나가도 피해가 짧아요.
+  - id: external-id-name
+    type: input
+    prompt: 외부 모니터링 서비스에 내 계정의 역할을 맡길 때, 다른 고객의 부탁으로 그 역할이 쓰이는 일을 막으려고 역할에 함께 적어 두는 값은?
+    answer: [외부 ID, External ID, 외부 아이디, ExternalId, sts:ExternalId]
+    explain: 외부 ID예요. 혼동된 대리인(confused deputy) 문제를 막아요. AWS는 이 값을 비밀로 다루지 않아요.

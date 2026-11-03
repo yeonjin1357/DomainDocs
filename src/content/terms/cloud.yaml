@@ -151,3 +151,29 @@ terms:
     aliases: [quota, limit, 서비스 할당량, Service Quotas, 한도, 쿼터]
     short: 계정과 리전마다 만들거나 부를 수 있는 양에 사업자가 정해 둔 상한이에요.
     doc: cloud/throttling
+  - id: iam
+    name: IAM
+    en: Identity and Access Management
+    aliases: [identity and access management, 권한 관리]
+    short: 누가 어떤 클라우드 자원에 무엇을 할 수 있는지 정하는 서비스예요.
+    analogy: 빌딩의 출입증 제도와 같아요.
+    doc: cloud/iam
+  - id: iam-policy
+    name: IAM 정책
+    en: IAM policy
+    aliases: [IAM policy, 권한 정책]
+    short: 허락하거나 거부할 동작과 자원을 적은 JSON 문서예요. 사용자나 역할에 붙여요.
+    doc: cloud/iam
+  - id: iam-role
+    name: 역할
+    en: IAM role
+    aliases: [IAM role, IAM 역할, role]
+    short: 서버, 앱, 다른 계정이 맡아 정해진 시간만 쓰는 임시 자격 증명을 받는 IAM 신원이에요.
+    analogy: 그날만 쓰는 방문증과 같아요.
+    doc: cloud/iam
+  - id: managed-identity
+    name: 관리 ID
+    en: Managed identity
+    aliases: [managed identity, 관리 아이디, 관리되는 ID]
+    short: Azure 자원에 붙여, 앱이 자격 증명을 따로 두지 않고 토큰을 받게 하는 ID예요.
+    doc: cloud/iam

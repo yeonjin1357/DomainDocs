@@ -1,0 +1,182 @@
+---
+title: 권한과 역할(IAM)
+summary: IAM은 누가 어떤 자원에 무엇을 할 수 있는지 정해요. 서버와 앱은 역할로 임시 권한을 받아요.
+domain: cloud
+type: concept
+stage: basics
+order: 75
+icon: cloud
+keywords: [IAM, 권한, policy, 정책, role, 역할, access key, 접근 키, AccessDenied, managed identity]
+related: [cloud/networking, cloud/cloud-metrics, cloud/cloud-metrics-missing, cloud/overview, kubernetes/rbac]
+sources:
+  - title: AWS IAM — Policy evaluation logic (implicit deny, explicit deny)
+    url: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic_policy-eval-denyallow.html
+  - title: AWS IAM — Policy JSON element Version
+    url: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_version.html
+  - title: AWS IAM — Security best practices
+    url: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+  - title: AWS IAM — External IDs for third party access
+    url: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_third-party.html
+  - title: Amazon EC2 — IAM roles for Amazon EC2 (instance profile)
+    url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html
+  - title: Amazon CloudWatch — Permissions reference
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/permissions-reference-cw.html
+  - title: AWS CloudTrail — Record contents (errorCode)
+    url: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+  - title: Azure — What is Azure role-based access control (Azure RBAC)?
+    url: https://learn.microsoft.com/en-us/azure/role-based-access-control/overview
+  - title: Microsoft Entra — Managed identities for Azure resources
+    url: https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview
+  - title: Azure — Built-in roles for Monitor (Monitoring Reader)
+    url: https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/monitor
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="누가, 무엇을, 어디에 할지 적어요">
+    정책에 허락할 동작과 자원을 적어 사용자나 역할에 붙여요. 붙은 정책만큼만 API를 부를 수 있어요.
+  </Point>
+  <Point title="허락하지 않은 건 모두 막혀요">
+    기본은 거부예요. 정책이 허락한 것만 되고, 명시한 거부는 어떤 허락보다 앞서요.
+  </Point>
+  <Point title="서버와 앱은 역할로 권한을 받아요">
+    오래 쓰는 접근 키 대신, 정해진 시간만 쓰는 임시 자격 증명을 역할에서 받아요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="빌딩 출입증은 한 번 받으면 오래 쓰지만, 역할에서 받는 임시 자격 증명은 시간이 지나면 끝나요. 그래서 새어 나가도 쓸 수 있는 시간이 짧아요.">
+  IAM은 임대 빌딩의 출입증 제도와 비슷해요. 출입증마다 갈 수 있는 층과 할 일이 적혀 있는데, 이게 정책이에요. 정해진 일로 들르는 사람에게는 그날만 쓰는 방문증을 주는데, 이게 역할이에요.
+</Analogy>
+
+## 보안 그룹과 IAM은 다른 문을 지켜요
+
+클라우드에는 문이 둘 있어요. <Term term="cloud/security-group">보안 그룹</Term>은 서버로 오는 네트워크 연결을 거르고, IAM은 클라우드 API 요청을 걸러요.
+
+<Figure caption="보안 그룹은 네트워크 연결의 주소와 포트를, IAM은 API를 부른 사람과 동작을 봐요. 서버의 443 포트를 열어도 S3를 읽을 권한은 생기지 않아요.">
+  <Compare
+    columns={['보안 그룹', 'IAM']}
+    rows={[
+      { label: '거르는 것', values: ['서버로 오는 네트워크 연결', '클라우드 API 요청'] },
+      { label: '보는 것', values: ['IP 주소, 포트', '누가, 어떤 동작, 어떤 자원'] },
+      { label: '예', values: ['443 포트로 오는 요청', 'S3 읽기, 지표 읽기'] },
+    ]}
+  />
+</Figure>
+
+서버를 만들고 지표를 읽고 버킷에서 파일을 꺼내는 일은 모두 API 요청이에요. 그래서 이 요청마다 IAM이 허락할지 따져요. 보안 그룹은 <Term slug="cloud/networking">가상 네트워크</Term>에서 다뤄요.
+
+## 정책 읽기
+
+AWS의 <Term term="cloud/iam-policy">IAM 정책</Term>은 JSON 문서예요. 아래는 CloudWatch 지표를 읽게 허락하는 정책이에요.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": [
+      "cloudwatch:GetMetricData",
+      "cloudwatch:ListMetrics"
+    ],
+    "Resource": "*"
+  }]
+}
+```
+
+`Effect`는 허락(`Allow`)인지 거부(`Deny`)인지예요. `Action`은 `서비스:동작` 꼴의 API 이름이고, `Resource`는 그 동작을 할 수 있는 자원이에요. `*`은 모든 자원을 뜻해요.
+
+`Version`은 정책 문법의 버전이에요. 지금 버전은 `2012-10-17`이라, 날짜처럼 보여도 고치지 않고 그대로 적어요.
+
+## 허락은 쌓이고, 거부가 이겨요
+
+AWS는 요청마다 붙은 정책을 모두 모아 따져요. 기본은 거부예요. 어느 정책도 허락하지 않은 요청은 막혀요.
+
+<Figure caption="요청 하나를 판정하는 순서를 줄여 그렸어요. 명시한 Deny가 하나라도 있으면 끝이고, 없으면 Allow가 있는지 봐요. 둘 다 없으면 기본으로 막혀요.">
+  <Flow
+    ariaLabel="요청에 맞는 명시한 Deny가 있으면 거부, 없으면 Allow가 있는지 보고 있으면 허락, 없으면 기본 거부로 가는 흐름도"
+    nodes={[
+      { id: 'q1', label: 'Deny가 있나', col: 0, row: 0, note: '명시한 거부' },
+      { id: 'deny', label: '거부', col: 2, row: 0, tone: 'warn' },
+      { id: 'q2', label: 'Allow가 있나', col: 0, row: 1 },
+      { id: 'allow', label: '허락', col: 2, row: 1, tone: 'accent' },
+      { id: 'def', label: '기본 거부', col: 0, row: 2, tone: 'warn' },
+    ]}
+    edges={[
+      { from: 'q1', to: 'deny', label: '있음', tone: 'warn' },
+      { from: 'q1', to: 'q2', label: '없음' },
+      { from: 'q2', to: 'allow', label: '있음', tone: 'accent' },
+      { from: 'q2', to: 'def', label: '없음', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+명시한 거부는 어떤 허락보다 앞서요. 그래서 한 정책이 S3 읽기를 허락해도, 다른 정책에 S3 읽기 `Deny`가 있으면 막혀요.
+
+권한은 꼭 필요한 만큼만 줘요. AWS 문서도 이걸 최소 권한(least privilege)이라 부르며 권해요. 모니터링 수집기라면 읽기 동작만 있으면 돼요.
+
+## 서버와 앱은 역할로 권한을 받아요
+
+사람이나 프로그램이 API를 부르려면 자격 증명이 있어야 해요. 하나는 접근 키처럼 지울 때까지 쓰는 자격 증명이에요. 다른 하나는 <Term term="cloud/iam-role">역할</Term>(role)에서 받아 정해진 시간만 쓰는 임시 자격 증명이에요.
+
+<Figure caption="오래 쓰는 접근 키는 새어 나가면 지울 때까지 쓸 수 있어요. 역할의 임시 자격 증명은 시간이 지나면 끝나요.">
+  <Compare
+    columns={['접근 키', '역할']}
+    rows={[
+      { label: '수명', values: ['지울 때까지', '정해진 시간'] },
+      { label: '두는 곳', values: ['코드나 설정 파일', '따로 두지 않아요'] },
+      { label: '새어 나가면', values: ['지울 때까지 쓸 수 있어요', '시간이 지나면 못 써요'] },
+    ]}
+  />
+</Figure>
+
+AWS 문서는 서버와 앱이 역할의 임시 자격 증명을 쓰라고 권해요. EC2 서버에 역할을 붙이면, 그 안의 앱은 서버의 메타데이터에서 임시 자격 증명을 받아 써요. Lambda 함수도 실행 역할로 권한을 받아요.
+
+## 다른 계정에 맡길 때: 외부 ID
+
+외부 모니터링 서비스가 내 계정의 지표를 읽게 하려면, 그 서비스가 맡을 역할을 내 계정에 만들어요. 이때 역할에 외부 ID를 함께 적어 두라고 AWS 문서가 권해요.
+
+외부 ID는 그 서비스가 다른 고객의 부탁을 받고 내 역할을 잘못 맡는 일을 막아요. 이 문제를 혼동된 대리인(confused deputy)이라고 불러요. AWS는 외부 ID를 비밀로 다루지 않아서, 비밀번호처럼 숨기는 값은 아니에요.
+
+## Azure에서는
+
+Azure는 역할 할당으로 권한을 줘요. 역할 할당은 세 가지로 이뤄져요. 누구에게(보안 주체), 어떤 역할을(역할 정의), 어디에(범위)예요.
+
+보안 주체는 사용자, 그룹, 서비스 주체, 관리 ID 가운데 하나예요. <Term term="cloud/managed-identity">관리 ID</Term>는 Azure 자원에 붙이는 ID라서, 앱이 자격 증명을 따로 두지 않고 토큰을 받아요. AWS에서 서버에 역할을 붙이는 것과 닮았어요.
+
+지표와 로그를 읽기만 하는 역할로는 기본 역할인 Monitoring Reader가 있어요. 거부 할당(deny assignment)이 걸려 있으면, 역할 할당이 있어도 막혀요.
+
+## 모니터링에서는
+
+<Figure caption="CloudWatch 지표를 가져오는 수집기의 예시예요. 새로 붙인 역할에 동작 하나가 빠져, 요청 일부가 거부되고 있어요.">
+  <StatTile label="AccessDenied" value="214" unit="건/시간" tone="warn" />
+  <StatTile label="지표가 빈 서비스" value="2" unit="개" tone="warn" note="RDS, ELB" />
+  <StatTile label="잘 오는 서비스" value="9" unit="개" />
+</Figure>
+
+권한이 막히면 지표가 비어요. 에러는 수집기 로그에 AccessDenied로 남고, 화면에는 데이터 없음으로만 보여요. 비어 있는 지표를 찾는 순서는 <Term slug="cloud/cloud-metrics-missing">클라우드 지표가 비어 있을 때</Term>에 있어요.
+
+AWS에서는 API 요청 기록인 CloudTrail에서 거부된 요청을 찾아요. 실패한 요청에는 `errorCode` 칸에 에러 이름이 남아요.
+
+쿠버네티스도 같은 생각으로 권한을 다뤄요. 클러스터 안의 권한은 <Term slug="kubernetes/rbac">권한과 서비스 계정(RBAC)</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>수집기나 앱 설정 파일에 접근 키가 적혀 있다면 다시 보세요. 서버에 역할을 붙여 임시 자격 증명을 쓰게 바꾸세요.</Check>
+  <Check>모니터링용 역할에 `"Action": "*"`처럼 넓은 권한을 줬다면 다시 보세요. 지표를 읽는 데는 읽기 동작만 있으면 돼요.</Check>
+  <Check>몇몇 서비스의 지표만 빈다면 정책의 `Action` 목록에 그 서비스의 읽기 동작이 빠졌는지 보세요. 수집기 로그의 AccessDenied를 함께 보세요.</Check>
+  <Check>허락을 더했는데도 계속 거부된다면, 명시한 `Deny`가 어디 있는지 찾으세요. 거부는 허락보다 앞서요.</Check>
+  <Check>외부 서비스에 맡길 역할에 외부 ID가 없다면 더하세요. 다른 고객의 부탁으로 내 역할이 쓰이는 일을 막아요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 루트 사용자는 예외예요
+
+  AWS 계정을 만들 때 생기는 루트 사용자는 기본 거부의 예외라서 모든 권한을 가져요. 그래서 AWS 문서는 루트 사용자를 일상 작업에 쓰지 말고 따로 지키라고 해요.
+
+  ### 판정 순서는 더 길어요
+
+  그림은 한 계정 안의 정책만 줄여 그렸어요. 실제로는 조직 정책(SCP), 권한 경계, 세션 정책도 함께 따지고, 이들은 모두 허락해야 통과하는 교집합이에요. 어디서든 명시한 거부가 나오면 막혀요.
+
+  ### 옛 정책 버전
+
+  `Version`에는 `2008-10-17`이라는 옛 값도 있어요. 이 버전으로 쓰면 정책 변수 같은 새 기능을 쓰지 못해요.
+</Deeper>
