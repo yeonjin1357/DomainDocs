@@ -6,7 +6,7 @@ type: guide
 order: 90
 icon: container
 keywords: [CrashLoopBackOff, restart, 재시작, OOMKilled, exit code, "137", Last State, kubectl logs --previous, liveness probe, 원인 찾기]
-related: [kubernetes/pod-status, kubernetes/requests-and-limits, kubernetes/pod-evicted, server/low-memory, apm/jvm-memory]
+related: [kubernetes/pod-status, kubernetes/requests-and-limits, kubernetes/pod-evicted, kubernetes/container-logs, server/low-memory]
 sources:
   - title: Kubernetes — Pod Lifecycle
     url: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
@@ -97,6 +97,8 @@ OOMKilled는 컨테이너가 메모리 한도보다 더 쓰려 해서 끝난 거
 </Figure>
 
 **확인 방법**: `kubectl logs 파드이름 --previous`로 직전에 끝난 컨테이너의 로그를 봐요. 시작하자마자 죽는다면 맨 끝의 몇 줄에 원인이 있는 경우가 많아요.
+
+그보다 앞의 로그는 kubectl로 볼 수 없어요. 로그가 노드에 얼마나 남는지는 <Term slug="kubernetes/container-logs">컨테이너 로그가 남는 곳</Term>에서 다뤄요.
 
 흔한 원인은 이래요.
 

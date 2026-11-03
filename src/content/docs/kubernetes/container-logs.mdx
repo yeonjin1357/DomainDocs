@@ -1,0 +1,197 @@
+---
+title: 컨테이너 로그가 남는 곳
+summary: 앱이 stdout에 쓴 로그는 노드에 10Mi씩 5개까지만 남고, 파드가 지워지면 함께 사라져요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 72
+icon: container
+keywords: [container logs, 컨테이너 로그, stdout, kubectl logs, --previous, /var/log/pods, log rotation, containerLogMaxSize, CRI 로그, DaemonSet]
+related: [kubernetes/pods-and-nodes, kubernetes/pod-restarting, kubernetes/workloads, foundations/log-collection, foundations/logs-missing]
+sources:
+  - title: Kubernetes — Logging Architecture
+    url: https://kubernetes.io/docs/concepts/cluster-administration/logging/
+  - title: Kubernetes — Kubelet Configuration (v1beta1)
+    url: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/
+  - title: Kubernetes 소스 — container_log_manager.go (회전과 압축)
+    url: https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/logs/container_log_manager.go
+  - title: Kubernetes 소스 — cri-client logs.go (CRI 로그 형식)
+    url: https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/cri-client/pkg/logs/logs.go
+  - title: containerd — CRI plugin config (max_container_log_line_size)
+    url: https://github.com/containerd/containerd/blob/main/docs/cri/config.md
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="stdout에 쓴 것만 모여요">
+    쿠버네티스는 앱이 표준 출력(stdout)과 표준 에러(stderr)에 쓴 것만 모아요. 컨테이너 안 파일에 쓴 로그는 kubectl logs에 나오지 않아요.
+  </Point>
+  <Point title="노드에는 10Mi × 5개까지만 남아요">
+    넘치면 오래된 파일부터 지워요. kubectl logs는 그중 가장 최근 파일만 읽어요.
+  </Point>
+  <Point title="파드와 함께 사라져요">
+    파드가 지워지거나 축출되면 그 로그 파일도 지워져요. 남기려면 노드마다 에이전트를 두고 밖으로 보내요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="CCTV는 카메라 앞의 모든 것을 찍지만, 쿠버네티스는 앱이 stdout으로 내보낸 것만 담아요. 앱이 자기 수첩(컨테이너 안 파일)에 적은 것은 녹화기에 들어가지 않아요.">
+  매장 CCTV 녹화기와 같아요. 정해진 용량만큼만 덮어쓰며 저장하고, 매장을 닫으면 녹화기도 치워요. 본사 서버로 따로 올려 둔 영상만 남아요.
+</Analogy>
+
+## 로그가 지나는 길
+
+앱이 stdout이나 stderr에 한 줄을 쓰면, 컨테이너 런타임이 받아 노드의 파일에 적어요. 런타임은 containerd 같은 컨테이너 실행 프로그램이에요. 이 파일을 kubelet이 읽어 `kubectl logs`에 답하고, 수집 에이전트가 따라 읽어 밖으로 보내요.
+
+<Figure caption="컨테이너 로그가 지나는 길이에요. 노드의 로그 파일 하나를 kubelet과 수집 에이전트가 함께 읽어요. 노드 밖에 남는 건 에이전트가 보낸 것뿐이에요.">
+  <Flow
+    ariaLabel="앱이 stdout에 쓴 줄을 컨테이너 런타임이 받아 노드의 로그 파일에 적고, kubelet이 그 파일을 읽어 kubectl logs에 답하고, 수집 에이전트가 따라 읽어 노드 밖 로그 저장소로 보내는 구조도"
+    nodes={[
+      { id: 'app', label: '앱', col: 0, row: 0, note: 'stdout·stderr' },
+      { id: 'rt', label: '런타임', col: 2, row: 0, note: 'containerd 등' },
+      { id: 'kubelet', label: 'kubelet', col: 0, row: 1, note: 'kubectl logs' },
+      { id: 'file', label: '로그 파일', col: 2, row: 1, note: '노드 디스크', tone: 'accent' },
+      { id: 'store', label: '로그 저장소', col: 0, row: 2, note: '노드 밖' },
+      { id: 'agent', label: '에이전트', col: 2, row: 2, note: 'DaemonSet' },
+    ]}
+    edges={[
+      { from: 'app', to: 'rt', label: '출력' },
+      { from: 'rt', to: 'file' },
+      { from: 'file', to: 'kubelet', label: '읽기' },
+      { from: 'file', to: 'agent' },
+      { from: 'agent', to: 'store', label: '보내기' },
+    ]}
+  />
+</Figure>
+
+앱이 컨테이너 안의 파일(예: `/app/logs/app.log`)에 쓰면 이 길에 오르지 않아요. 그 파일은 컨테이너의 쓰기 레이어나 볼륨에만 있어요. 그래서 컨테이너 앱은 로그를 stdout으로 내보내는 게 기본이에요.
+
+## 노드에 남는 파일
+
+로그 파일은 노드의 `/var/log/pods` 아래에 파드와 컨테이너별로 나뉘어 있어요. 파일 이름은 그 컨테이너가 몇 번째로 뜬 것인지예요.
+
+<Figure caption="shop 네임스페이스의 api 파드에서 api 컨테이너가 한 번 재시작한 뒤의 폴더예요. 숫자는 재시작 횟수라, 1.log가 지금 컨테이너의 로그예요.">
+  <Tree
+    ariaLabel="/var/log/pods 아래에 네임스페이스_파드_UID 폴더, 그 아래 컨테이너 이름 폴더가 있고, 그 안에 지금 컨테이너의 1.log와 바로 전 컨테이너의 0.log가 있는 나무"
+    root={{
+      label: '/var/log/pods/',
+      children: [
+        {
+          label: 'shop_api-7d9f_8c2e…/',
+          note: '네임스페이스_파드_UID',
+          children: [
+            {
+              label: 'api/',
+              note: '컨테이너 이름',
+              children: [
+                { label: '1.log', note: '지금 컨테이너', tone: 'accent' },
+                { label: '0.log', note: '바로 전 컨테이너' },
+              ],
+            },
+          ],
+        },
+      ],
+    }}
+  />
+</Figure>
+
+파일의 한 줄은 앱이 쓴 글 앞에 런타임이 세 가지를 붙인 모양이에요. 이 형식을 <Term term="kubernetes/cri-log">CRI 로그 형식</Term>이라고 해요.
+
+<Figure caption="CRI 로그 한 줄이에요. 시각은 런타임이 받은 때라, 앱이 글 안에 적은 시각과 조금 다를 수 있어요.">
+  <Anatomy
+    repeatText={false}
+    ariaLabel="CRI 로그 한 줄을 조각으로 나눈 그림. 런타임이 붙인 시각, 출력 종류 stdout, 줄 조각 표시 F, 앱이 쓴 글"
+    parts={[
+      { text: '2026-11-03T10:15:30.123456789Z', label: '런타임이 받은 시각', note: 'UTC, 나노초까지' },
+      { text: 'stdout', label: '어느 출력', note: 'stdout이나 stderr' },
+      { text: 'F', label: '줄 조각 표시', note: 'F는 한 줄 끝, P는 뒤에 이어져요', tone: 'warn' },
+      { text: 'GET /orders 200 35ms', label: '앱이 쓴 글' },
+    ]}
+  />
+</Figure>
+
+긴 줄은 쪼개져요. containerd는 기본으로 16KiB가 넘는 줄을 여러 줄로 나눠 적고, 앞 조각에 `P`를 붙여요. 수집 에이전트가 `P` 조각을 이어 붙이지 않으면, 큰 JSON 한 줄이 여러 개로 깨져 보여요.
+
+## 10Mi씩 5개까지 돌려 써요
+
+로그 파일은 끝없이 커지지 않아요. kubelet이 10초마다 크기를 보다가 10Mi(`containerLogMaxSize`)를 넘으면 새 파일로 바꿔요. 컨테이너마다 파일은 5개(`containerLogMaxFiles`)까지 두고, 넘치면 가장 오래된 것부터 지워요.
+
+<Figure caption="kubelet 기본 설정에서 한 컨테이너의 로그 파일이에요. 회전된 파일은 다음 회전 때 gzip으로 압축돼요. kubectl logs는 맨 오른쪽 파일만 읽어요.">
+  <Strip
+    ariaLabel="한 컨테이너의 로그 파일 다섯 개. 앞의 세 개는 압축된 옛 파일, 넷째는 막 회전된 파일, 다섯째가 지금 쓰는 파일이고 kubectl logs는 다섯째만 읽는 칸 띠"
+    rows={[
+      {
+        label: '컨테이너 하나의 로그 파일(각 10Mi)',
+        heads: ['10:11', '10:12', '10:13', '10:14', '지금'],
+        cells: [{ label: '.gz', tone: 'sub' }, { label: '.gz', tone: 'sub' }, { label: '.gz', tone: 'sub' }, '회전됨', { label: '1.log', tone: 'accent' }],
+      },
+    ]}
+    marks={[{ at: 4, label: 'kubectl logs', tone: 'accent' }]}
+    ranges={[{ from: 0, to: 3, label: '회전된 옛 파일' }]}
+  />
+</Figure>
+
+그래서 `kubectl logs`는 최대 10Mi만 보여 줘요. 쿠버네티스 문서의 예로, 40MiB를 쓴 파드도 10MiB까지만 나와요. 그 앞은 노드에 남아 있어도 `kubectl logs`로는 볼 수 없어요.
+
+## kubectl logs로 볼 수 있는 것
+
+`kubectl logs`는 지금 컨테이너의 로그를, `kubectl logs --previous`는 바로 전 컨테이너의 로그를 보여 줘요. kubelet은 재시작한 컨테이너의 끝난 인스턴스를 하나만 남겨서, 그보다 앞은 볼 수 없어요.
+
+<Figure caption="kubectl logs와 노드 밖 로그 저장소가 볼 수 있는 범위예요. 장애 원인을 나중에 찾으려면 노드 밖에 모아 둬야 해요.">
+  <Compare
+    columns={['kubectl logs', '노드 밖 로그 저장소']}
+    rows={[
+      { label: '지금 컨테이너', values: ['가장 최근 파일만', '봐요'] },
+      { label: '바로 전 컨테이너', values: ['--previous로 봐요', '봐요'] },
+      { label: '그보다 앞 컨테이너', values: ['못 봐요', '봐요'] },
+      { label: '지운 파드', values: ['못 봐요', '보내 둔 데까지 봐요'] },
+      { label: '사라진 노드', values: ['못 봐요', '보내 둔 데까지 봐요'] },
+    ]}
+  />
+</Figure>
+
+파드가 지워지거나 축출되면, 그 파드의 컨테이너와 로그 파일도 함께 지워져요. 노드가 사라지면 그 노드의 모든 로그가 사라져요. 그래서 운영 클러스터는 노드 밖에 로그를 모아요.
+
+## 노드마다 에이전트로 모아요
+
+쿠버네티스 문서가 드는 흔한 방법은 노드마다 수집 에이전트를 하나씩 띄우는 거예요. <Term term="kubernetes/daemonset">DaemonSet</Term>으로 띄우면 노드가 늘어도 저절로 따라 떠요. 에이전트는 노드의 `/var/log/pods`를 읽어 로그 저장소로 보내요.
+
+앱이 꼭 파일로 써야 한다면 두 길이 있어요. 파일을 읽어 stdout으로 다시 내보내는 사이드카 컨테이너를 붙이거나, 앱이 로그 저장소로 직접 보내요. 에이전트가 파일을 따라 읽는 방식은 <Term slug="foundations/log-collection">로그가 모이는 길</Term>에서 다뤄요.
+
+## 모니터링에서는
+
+<Figure caption="기본 설정(10Mi × 5개, 약 50MiB)에서 로그를 쓰는 속도별로 노드에 남는 최대 시간이에요. 에이전트가 이보다 오래 멈추면 그 사이 로그는 되찾을 수 없어요.">
+  <Bars
+    ariaLabel="노드에 남는 최대 시간. 초당 10KB면 약 87분, 초당 100KB면 약 9분, 초당 1MB면 약 52초"
+    bars={[
+      { label: '초당 10KB', value: 5243, display: '약 87분', tone: 'accent' },
+      { label: '초당 100KB', value: 524, display: '약 9분' },
+      { label: '초당 1MB', value: 52, display: '약 52초', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+로그를 많이 쓰는 앱일수록 노드에 머무는 시간이 짧아요. 수집 에이전트가 재시작하거나 밀린 사이에 파일이 지워지면, 그 로그는 노드에도 저장소에도 없어요. 회전된 파일은 다음 회전 때 압축되니, 압축 파일을 읽지 않는 에이전트라면 더 빨리 놓쳐요.
+
+그래서 에이전트 자체를 지켜봐요. 노드마다 에이전트가 떠 있는지, 보내는 양이 갑자기 줄지 않았는지, 버리거나 다시 보낸 수가 늘지 않았는지 봐요. 로그가 비었을 때 볼 곳은 <Term slug="foundations/logs-missing">로그가 안 들어올 때</Term>에 정리해 두었어요.
+
+<Checkpoints>
+  <Check>앱이 컨테이너 안 파일에만 로그를 쓴다면 다시 보세요. kubectl logs에도 수집 에이전트에도 잡히지 않아요.</Check>
+  <Check>장애 뒤 원인을 kubectl logs로만 찾는 운영이라면 다시 보세요. 파드가 지워지거나 두 번 넘게 재시작하면 앞의 로그는 볼 수 없어요.</Check>
+  <Check>초당 수백 KB를 쓰는 앱이라면, 노드에 몇 분 치가 남는지 계산해 보세요. 에이전트가 그보다 오래 멈추면 잃어요.</Check>
+  <Check>큰 JSON을 한 줄로 쓰는 앱이라면, 16KiB를 넘는 줄이 조각나 저장되지 않는지 보세요.</Check>
+  <Check>로그의 시각으로 순서를 맞추는 화면이라면, 런타임이 붙인 시각과 앱이 적은 시각 가운데 무엇을 쓰는지 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### /var/log/containers
+
+  `/var/log/containers`에는 `파드_네임스페이스_컨테이너-컨테이너ID.log` 이름의 링크가 있어요. 실제 파일은 `/var/log/pods` 쪽에 있고, 예전부터 이 경로를 읽던 에이전트를 위해 남겨 둔 링크예요.
+
+  ### 회전의 세부
+
+  kubelet은 10초(`containerLogMonitorInterval`)마다 크기를 봐요. 그 사이 빠르게 쓰면 파일이 10Mi를 조금 넘기도 해요. 회전된 파일 이름 끝에는 `.20261103-101530` 같은 시각이 붙고, 다음 회전 때 `.gz`로 압축돼요.
+
+  ### kubelet과 런타임의 로그
+
+  kubelet과 컨테이너 런타임은 컨테이너가 아니라서 이 길로 오지 않아요. systemd를 쓰는 리눅스 노드에서는 journald에 쓰고, `journalctl -u kubelet`으로 봐요.
+</Deeper>
