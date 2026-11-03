@@ -16,6 +16,7 @@ sources:
 updated: 2026-10-30
 ---
 import HpaDemo from '../../../components/demos/HpaDemo.tsx';
+import ScalingFigure from '../../../assets/figures/kubernetes/scaling.svg';
 
 <KeyPoints>
   <Point title="파드 수를 바꿔요">
@@ -36,15 +37,10 @@ import HpaDemo from '../../../components/demos/HpaDemo.tsx';
 ## 수평 확장과 수직 확장
 
 <Figure caption="수평 확장은 파드 수를, 수직 확장은 파드 하나의 크기를 바꿔요. HPA는 수평 확장을 해요.">
-  <Compare
-    columns={['수평 확장', '수직 확장']}
-    rows={[
-      { label: '바꾸는 것', values: ['파드 수', '파드 하나의 CPU·메모리'] },
-      { label: '예', values: ['파드 3개 → 6개', '요청 1코어 → 2코어'] },
-      { label: '맞는 앱', values: ['파드끼리 일을 나눌 수 있는 앱', '나눠 돌리기 어려운 앱'] },
-    ]}
-  />
+  <ScalingFigure aria-label="수평 확장은 파드 3개를 6개로 늘리고, 수직 확장은 1코어 파드 하나를 2코어로 키우는 그림" />
 </Figure>
+
+수평 확장은 파드끼리 일을 나눌 수 있는 앱에 맞아요. 나눠 돌리기 어려운 앱은 파드 하나를 키우는 수직 확장이 맞아요.
 
 <Term term="kubernetes/hpa">HPA</Term>(HorizontalPodAutoscaler)는 Deployment나 StatefulSet 같은 워크로드의 파드 수를 자동으로 바꿔요. 부하가 늘면 파드를 더 띄워 일을 나눠요. 최소·최대 파드 수를 정해 두면 그 범위 안에서만 움직여요.
 

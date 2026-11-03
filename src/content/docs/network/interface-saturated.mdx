@@ -43,13 +43,13 @@ updated: 2026-10-29
 
 사용률은 bps를 인터페이스 속도로 나눈 값이에요. 그런데 장비에 적힌 속도가 실제 계약 속도와 다를 수 있어요. 1Gbps 포트에 100Mbps 회선을 물렸다면, 화면의 10%가 사실은 꽉 찬 거예요.
 
-<Figure caption="1Gbps 포트에 100Mbps 회선을 물린 경우예요. 같은 100Mbps를 어느 속도로 나누느냐에 따라 사용률이 10%도, 100%도 돼요.">
-  <Compare
-    columns={['장비에 적힌 속도로', '실제 회선 속도로']}
-    rows={[
-      { label: '나누는 속도', values: ['1Gbps(포트)', '100Mbps(회선)'] },
-      { label: '흐르는 양', values: ['100Mbps', '100Mbps'] },
-      { label: '사용률', values: ['10%', '100%, 꽉 참'] },
+<Figure caption="1Gbps 포트에 100Mbps 회선을 물리고 100Mbps가 흐르는 경우예요. 같은 양을 어느 속도로 나누느냐에 따라 사용률이 10%도, 100%도 돼요.">
+  <Bars
+    ariaLabel="같은 100Mbps를 장비에 적힌 1Gbps로 나누면 사용률 10%, 실제 회선 100Mbps로 나누면 100%로 꽉 찬 막대"
+    max={100}
+    bars={[
+      { label: '장비에 적힌 1Gbps로 나누면', value: 10, display: '10%' },
+      { label: '실제 회선 100Mbps로 나누면', value: 100, display: '100%', note: '꽉 찼어요', tone: 'warn' },
     ]}
   />
 </Figure>

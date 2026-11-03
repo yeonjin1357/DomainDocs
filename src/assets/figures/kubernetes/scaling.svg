@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 192" width="300" height="192">
+  <line x1="150" y1="6" x2="150" y2="186" stroke-width="1.5" stroke-dasharray="4 4" style="stroke:var(--color-line)" />
+
+  <text x="72" y="18" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">수평 확장</text>
+  <text x="72" y="36" text-anchor="middle" font-size="13" style="fill:var(--color-text-sub)">파드 수를 늘려요</text>
+  <rect x="31" y="52" width="26" height="26" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <rect x="59" y="52" width="26" height="26" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <rect x="87" y="52" width="26" height="26" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <text x="120" y="70" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">3개</text>
+  <line x1="72" y1="88" x2="72" y2="110" stroke-width="2" style="stroke:var(--color-text-weak)" />
+  <path d="M66 108 L72 117 L78 108 z" style="fill:var(--color-text-weak)" />
+  <rect x="31" y="126" width="26" height="26" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <rect x="59" y="126" width="26" height="26" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <rect x="87" y="126" width="26" height="26" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <rect x="31" y="156" width="26" height="26" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+  <rect x="59" y="156" width="26" height="26" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+  <rect x="87" y="156" width="26" height="26" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+  <text x="120" y="159" font-size="13" font-weight="700" style="fill:var(--color-accent)">6개</text>
+
+  <text x="228" y="18" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">수직 확장</text>
+  <text x="228" y="36" text-anchor="middle" font-size="13" style="fill:var(--color-text-sub)">파드 하나를 키워요</text>
+  <rect x="215" y="52" width="26" height="26" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <text x="248" y="70" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">1코어</text>
+  <line x1="228" y1="88" x2="228" y2="110" stroke-width="2" style="stroke:var(--color-text-weak)" />
+  <path d="M222 108 L228 117 L234 108 z" style="fill:var(--color-text-weak)" />
+  <rect x="200" y="126" width="56" height="56" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+  <text x="263" y="159" font-size="13" font-weight="700" style="fill:var(--color-accent)">2코어</text>
+</svg>

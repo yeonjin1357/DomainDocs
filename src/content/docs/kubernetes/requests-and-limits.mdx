@@ -79,11 +79,29 @@ CPU 1은 코어 1개예요. 노드가 물리 서버면 물리 코어 하나, 가
 
 스케줄러는 노드마다 이미 놓인 파드의 요청 합계를 봐요. 새 파드의 요청까지 더해도 노드 용량을 넘지 않는 노드에만 파드를 놓아요.
 
-<Figure caption="CPU 4코어 노드에 요청 합계가 3코어 차 있어요. 실제 사용은 1코어뿐이지만, 1.5코어를 요청한 새 파드는 이 노드에 놓이지 않아요.">
-  <StatTile label="노드 CPU 용량" value="4" unit="코어" />
-  <StatTile label="요청 합계" value="3" unit="코어" />
-  <StatTile label="실제 사용" value="1" unit="코어" />
-  <StatTile label="새 파드 요청" value="1.5" unit="코어" tone="warn" note="자리가 없어요" />
+<Figure caption="CPU 4코어 노드를 요청과 실제 사용으로 나눠 봤어요. 실제 사용은 1코어뿐이지만, 요청 합계가 3코어라 남은 자리는 1코어예요. 1.5코어를 요청한 새 파드는 이 노드에 놓이지 않아요.">
+  <Parts
+    ariaLabel="CPU 4코어 노드를 두 줄로 본 비율 막대. 스케줄러가 보는 요청 기준으로는 3코어가 차고 1코어만 남아 1.5코어를 요청한 새 파드가 못 들어가요. 실제 사용 기준으로는 1코어만 쓰고 3코어가 놀고 있어요"
+    rows={[
+      {
+        label: '스케줄러가 보는 것: 요청',
+        total: '노드 4코어',
+        segments: [
+          { label: '요청 합계', value: 3, display: '3코어', tone: 'weak' },
+          { label: '남은 자리', value: 1, display: '1코어', tone: 'plain' },
+        ],
+      },
+      {
+        label: '실제로 쓰는 양',
+        total: '노드 4코어',
+        segments: [
+          { label: '실제 사용', value: 1, display: '1코어' },
+          { label: '놀고 있음', value: 3, display: '3코어', tone: 'plain' },
+        ],
+      },
+    ]}
+    ranges={[{ row: 0, from: 3, to: 4, label: '새 파드 1.5코어는 안 들어가요', tone: 'warn' }]}
+  />
 </Figure>
 
 실제 사용량이 아니라 요청을 보는 게 핵심이에요. 지금은 한가해도 나중에 바빠질 때 자원이 모자라지 않게 하려는 거예요. 그래서 요청을 크게 잡으면 노드가 놀고 있어도 파드가 못 들어가요.

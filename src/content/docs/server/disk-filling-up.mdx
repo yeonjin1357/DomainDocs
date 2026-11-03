@@ -66,10 +66,24 @@ updated: 2026-10-29
 
 큰 로그 파일을 지웠는데 `df`의 사용량이 그대로일 때가 있어요. 그 파일을 아직 열고 있는 프로세스가 있으면, 이름만 사라지고 공간은 프로세스가 닫을 때까지 남아요.
 
-<Figure caption="10GB 로그 파일을 rm으로 지웠지만, 앱이 아직 그 파일을 열고 쓰고 있어요. df는 그대로이고, du로는 그 10GB가 어디에도 안 보여요.">
-  <StatTile label="df 사용량" value="95" unit="%" tone="warn" note="그대로예요" />
-  <StatTile label="du 합계" value="72" unit="%" note="지운 파일은 안 셈" />
-  <StatTile label="열린 채 지워진 파일" value="10" unit="GB" tone="warn" />
+<Figure caption="10GB 로그 파일을 rm으로 지웠지만, 앱이 아직 그 파일을 열고 쓰고 있어요. df는 빨간 몫까지 세어 95% 그대로이고, du는 이름이 남은 파일만 세어 72%예요.">
+  <Parts
+    ariaLabel="디스크 하나를 나눈 비율 막대. 이름이 남은 파일이 72%, 지웠지만 앱이 열고 있는 10GB 파일이 23%, 빈 곳이 5%예요. df는 앞의 두 몫을 더한 95%를, du는 이름이 남은 파일 72%만 세요"
+    rows={[
+      {
+        label: '디스크 하나',
+        segments: [
+          { label: '이름이 남은 파일', value: 72, display: '72%' },
+          { label: '열린 채 지워진 파일', value: 23, display: '10GB', tone: 'warn' },
+          { label: '빈 곳', value: 5, display: '5%', tone: 'plain' },
+        ],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 72, label: 'du 합계 72%' },
+      { from: 72, to: 95, label: 'du에 안 보여요', tone: 'warn' },
+    ]}
+  />
 </Figure>
 
 `df`와 `du`의 숫자가 크게 다르다면 거의 이 경우예요. `df`는 파일 시스템이 쓴 공간을, `du`는 이름이 남아 있는 파일만 세기 때문이에요.

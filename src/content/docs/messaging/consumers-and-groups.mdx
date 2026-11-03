@@ -66,13 +66,16 @@ import ConsumerGroupDemo from '../../../components/demos/ConsumerGroupDemo.tsx';
 
 컨슈머가 죽었다 다시 뜨면, 커밋된 위치부터 읽어요. 그래서 언제 커밋하느냐가 "한 번은 처리했는가"를 정해요.
 
-<Figure caption="처리한 뒤에 커밋하면, 커밋 직전에 죽었을 때 그 이벤트를 다시 처리해요. 커밋한 뒤에 처리하면, 처리 중에 죽었을 때 그 이벤트를 놓쳐요.">
-  <Compare
-    columns={['처리 → 커밋', '커밋 → 처리']}
+<Figure caption="흐린 칸은 죽어서 하지 못한 일이에요. 처리한 뒤에 커밋하면, 커밋 직전에 죽었을 때 그 이벤트를 다시 처리해요. 커밋한 뒤에 처리하면, 처리 중에 죽었을 때 그 이벤트를 놓쳐요.">
+  <Strip
+    ariaLabel="처리한 뒤 커밋하는 쪽은 처리하고 커밋하기 전에 죽으면 다시 떠서 같은 이벤트를 또 처리하고(최소 한 번), 커밋한 뒤 처리하는 쪽은 커밋하고 처리하기 전에 죽으면 그 이벤트를 건너뛰는(최대 한 번) 칸 띠"
     rows={[
-      { label: '사이에 죽으면', values: ['같은 이벤트를 다시 처리해요', '그 이벤트를 놓쳐요'] },
-      { label: '결과', values: ['중복은 있어도 잃지 않아요', '중복은 없어도 잃을 수 있어요'] },
-      { label: '부르는 말', values: ['최소 한 번', '최대 한 번'] },
+      { label: '처리 → 커밋 · 최소 한 번', cells: ['가져오기', '처리', { label: '죽음', tone: 'warn' }, { label: '커밋', tone: 'sub' }] },
+      { label: '커밋 → 처리 · 최대 한 번', cells: ['가져오기', '커밋', { label: '죽음', tone: 'warn' }, { label: '처리', tone: 'sub' }] },
+    ]}
+    ranges={[
+      { row: 0, from: 1, to: 1, label: '다시 뜨면 또 처리', tone: 'warn' },
+      { row: 1, from: 3, to: 3, label: '건너뛰어요', tone: 'warn' },
     ]}
   />
 </Figure>
