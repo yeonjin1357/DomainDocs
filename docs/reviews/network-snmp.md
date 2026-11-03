@@ -13,3 +13,11 @@
 | 재초기화 때 카운터가 끊김 | https://www.rfc-editor.org/rfc/rfc2863.html |
 
 - 메모: mib-2 = 1.3.6.1.2.1, interfaces = mib-2 2는 MIB-II 배정이에요. 벤더 MIB는 enterprises 아래에 제조사마다 정해요. 답이 없을 때 다시 묻는 건 관리 서버 구현에 따라 달라서 "보통"으로 썼어요.
+
+## 그림 다시 그림(2026-11-03)
+
+OID 나무 그림에 번호를 줄이지 않고 다 적었어요.
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| system은 mib-2.1(1.3.6.1.2.1.1), interfaces는 mib-2.2(1.3.6.1.2.1.2), sysUpTime은 system.3(1.3.6.1.2.1.1.3), ifTable은 interfaces.2(1.3.6.1.2.1.2.2) | https://www.rfc-editor.org/rfc/rfc1213.txt (`system ::= { mib-2 1 }`, `interfaces ::= { mib-2 2 }`, `sysUpTime ::= { system 3 }`, `ifTable ::= { interfaces 2 }`) |

@@ -65,12 +65,31 @@ updated: 2026-10-21
 ## 가상 머신과의 차이
 
 <Figure caption="가상 머신은 저마다 운영체제를 통째로 돌리고, 컨테이너는 서버의 커널을 함께 써요. 그래서 컨테이너가 가볍지만 격리는 더 느슨해요.">
-  <Compare
-    columns={['가상 머신', '컨테이너']}
-    rows={[
-      { label: '운영체제', values: ['VM마다 자기 운영체제', '서버의 커널을 함께 써요'] },
-      { label: '무게', values: ['무거워요', '가벼워요'] },
-      { label: '격리', values: ['더 강해요', '더 느슨해요'] },
+  <Nest
+    ariaLabel="가상 머신 쪽은 앱 A와 앱 B가 저마다 자기 운영체제를 얹고 하이퍼바이저 위에서 돌고, 컨테이너 쪽은 앱 A와 앱 B가 서버의 운영체제 커널 하나를 함께 쓰는 그림"
+    boxes={[
+      {
+        label: '가상 머신',
+        cols: 2,
+        children: [
+          { label: '앱 A' },
+          { label: '앱 B' },
+          { label: '운영체제 A', tone: 'accent' },
+          { label: '운영체제 B', tone: 'accent' },
+          { label: '하이퍼바이저', wide: true },
+          { label: '서버 한 대', wide: true },
+        ],
+      },
+      {
+        label: '컨테이너',
+        cols: 2,
+        children: [
+          { label: '앱 A' },
+          { label: '앱 B' },
+          { label: '운영체제 커널 하나', note: '두 앱이 함께 써요', tone: 'accent', wide: true },
+          { label: '서버 한 대', wide: true },
+        ],
+      },
     ]}
   />
 </Figure>
