@@ -1,0 +1,28 @@
+questions:
+  - id: step-quarter
+    type: ox
+    prompt: 같은 6시간 그래프의 step을 15초에서 60초로 늘리면, 질의가 읽는 샘플 수도 대략 4분의 1로 줄어드나요?
+    answer: true
+    explain: 점 수가 1,440개에서 360개로 4분의 1이 되고, 점마다 읽는 샘플 수는 그대로라서 읽는 양도 4분의 1쯤이 돼요.
+  - id: max-samples-total
+    type: ox
+    prompt: Prometheus의 --query.max-samples는 질의가 끝날 때까지 읽은 샘플의 총합을 세서 질의를 막나요?
+    answer: false
+    explain: 한꺼번에 메모리에 올리는 샘플 수를 봐요. 실험에서 총합이 6,300만 개인 질의도 한꺼번에 올린 수가 적어서 기본 한도 5천만에 걸리지 않았어요.
+  - id: resolution-error
+    type: choice
+    prompt: 패널의 시간 범위를 30일로 늘리자 'exceeded maximum resolution of 11,000 points' 에러가 났어요. 먼저 할 일은?
+    choices: [step을 늘려요, 시계열 수를 줄여요, 질의 시간 한도를 늘려요, 기록 규칙을 지워요]
+    answer: 0
+    explain: 시계열 하나의 점 수가 11,000개를 넘어서 난 에러예요. 30일을 15초 간격으로 그리면 17만 점이 넘으니, step이나 Min interval을 키워요.
+  - id: all-value
+    type: choice
+    prompt: Grafana 변수 instance에서 All을 고르면 질의가 수천 자로 길어지고 느려져요. 무엇을 바꿀까요?
+    choices: [All 값을 .+로 정하기, Max data points 늘리기, Min interval 줄이기, 새로고침 주기 늘리기]
+    answer: 0
+    explain: Custom all value가 비어 있으면 값을 모두 |로 이어 붙인 정규식이 돼요. .+를 적으면 All일 때 짧은 정규식 하나로 바뀌어요.
+  - id: recording-rule
+    type: input
+    prompt: 질의 결과를 정해진 간격마다 미리 계산해 새 시계열로 저장하는 Prometheus 기능은?
+    answer: [기록 규칙, recording rule, recording rules, 레코딩 룰]
+    explain: 기록 규칙을 쓰면 대시보드는 미리 계산한 시계열만 읽어서, 같은 계산을 새로고침마다 되풀이하지 않아요.

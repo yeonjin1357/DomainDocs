@@ -1,0 +1,172 @@
+---
+title: 대시보드가 느리게 뜰 때
+summary: 느린 패널을 찾고, 질의가 읽는 시계열 수와 점 수를 줄여요. 자주 보는 계산은 미리 해 둬요.
+domain: foundations
+type: guide
+order: 162
+icon: timer
+keywords: [slow dashboard, 대시보드 느림, 질의 느림, Query inspector, step, Max data points, recording rule, 기록 규칙, query.max-samples, stats=all]
+related: [foundations/dashboard-design, foundations/aggregation-and-downsampling, foundations/cardinality-explosion, foundations/promql-basics, foundations/time-series-and-labels]
+sources:
+  - title: Prometheus — HTTP API (query statistics)
+    url: https://prometheus.io/docs/prometheus/latest/querying/api/
+  - title: Prometheus — Command-line flags
+    url: https://prometheus.io/docs/prometheus/latest/command-line/prometheus/
+  - title: Prometheus — Query log
+    url: https://prometheus.io/docs/guides/query-log/
+  - title: Prometheus — Recording rules
+    url: https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/
+  - title: Prometheus — Recording rules (naming)
+    url: https://prometheus.io/docs/practices/rules/
+  - title: Grafana — Panel inspect (Stats tab)
+    url: https://grafana.com/docs/grafana/latest/panels-visualizations/panel-inspector/
+  - title: Grafana — Query options (Max data points, Min interval)
+    url: https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/
+  - title: Grafana — Variables (Custom all value)
+    url: https://grafana.com/docs/grafana/latest/dashboards/variables/add-template-variables/
+  - title: Grafana — Configuration (default_preload)
+    url: https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/
+updated: 2026-11-03
+---
+
+<Situation>
+  대시보드를 열면 패널 몇 개가 한참 돌다가 떠요. 시간 범위를 30일로 늘리면 아예 에러가 나요.
+</Situation>
+
+<FirstLook>
+  <Item title="어느 패널이 느린가">패널마다 질의 시간과 돌려받은 시계열 수를 봐요.</Item>
+  <Item title="질의가 얼마나 읽나">시계열 수 × 점 수가 질의가 하는 일의 양이에요.</Item>
+  <Item title="같은 계산을 매번 하나">자주 보는 무거운 계산은 미리 해 둬요.</Item>
+</FirstLook>
+
+## 1. 느린 패널부터 찾으세요
+
+대시보드 전체가 느린 경우는 드물어요. 대개 무거운 질의 한두 개가 전체를 붙잡아요.
+
+Grafana에서는 패널의 Query inspector(질의를 열어 요청과 응답을 보는 창)를 열어요. Stats 탭에 질의에 걸린 시간, 보낸 질의 수, 돌려받은 행 수가 나와요.
+
+Grafana는 기본으로 화면에 들어온 패널만 질의하고, 아래 패널은 내려 볼 때 질의해요. 그래서 맨 위 줄의 무거운 패널은 대시보드를 열 때마다 모두를 기다리게 해요.
+
+**확인 방법**: Prometheus 쪽에서는 질의 로그를 켜 둬요. 설정의 `global.query_log_file`에 파일을 적으면, 질의마다 걸린 시간과 읽은 샘플 수가 한 줄씩 남아요.
+
+```text
+"query":"sum(rate(
+  http_requests_total[5m]))",
+"step":15,
+"timings":{"execTotalTime":0.07,
+  "execQueueTime":0},
+"samples":{
+  "totalQueryableSamples":5726000,
+  "peakSamples":288020}
+```
+
+Prometheus 3.5의 질의 로그에서 필요한 칸만 줄여 옮겼어요. 실제로는 JSON 한 줄이에요.
+
+## 2. 질의가 하는 일의 양을 재세요
+
+질의가 하는 일은 대략 시계열 수 × 점 수 × 점마다 읽는 샘플 수예요. 셋 중 하나만 줄여도 그만큼 줄어요.
+
+<Figure caption="시계열 200개를 6시간 동안 15초 간격으로 그린 그래프예요. 점 하나를 그릴 때마다 시계열마다 5분 구간의 샘플 20개를 읽어요.">
+  <Anatomy
+    ariaLabel="질의가 읽는 샘플 수를 시계열 수 200, 점 수 1,440, 점마다 읽는 샘플 20으로 나눈 그림. 곱하면 약 576만"
+    parts={[
+      { text: '200', label: '시계열 수', note: '인스턴스 20 × 경로 10' },
+      { text: '×', label: '', tone: 'sub' },
+      { text: '1,440', label: '점 수', note: '6시간 ÷ step 15초' },
+      { text: '×', label: '', tone: 'sub' },
+      { text: '20', label: '점마다 읽는 샘플', note: '[5m] ÷ 수집 주기 15초' },
+      { text: '≈ 576만', label: '읽는 샘플', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+Prometheus 3.5에 같은 데이터를 넣고 질의를 바꿔 가며 읽은 샘플 수를 쟀어요. 아래 단계는 이 막대를 하나씩 줄이는 방법이에요.
+
+<Figure caption="같은 '전체 요청 수' 그래프를 그리는 네 가지 질의예요. 기록 규칙을 쓰면 572만 개가 1,439개로 줄고, 그려지는 선은 같아요.">
+  <Bars
+    ariaLabel="읽은 샘플 수. 그대로 그리면 5,726,000개, step을 60초로 늘리면 1,433,000개, 경로 하나로 좁히면 572,600개, 기록 규칙을 읽으면 1,439개"
+    bars={[
+      { label: '그대로(step 15초)', value: 5726000, display: '5,726,000개', tone: 'warn' },
+      { label: 'step 60초', value: 1433000, display: '1,433,000개', note: '점 수 1/4' },
+      { label: '경로 하나로 좁힘', value: 572600, display: '572,600개', note: '시계열 수 1/10' },
+      { label: '기록 규칙을 읽음', value: 1439, display: '1,439개', tone: 'accent', note: '미리 더한 시계열 1개' },
+    ]}
+  />
+</Figure>
+
+**확인 방법**: Prometheus API로 질의할 때 `stats=all`을 붙여요. 응답에 읽은 샘플 수(`totalQueryableSamples`)가 함께 와요.
+
+## 3. 읽는 시계열을 줄이세요
+
+레이블 조건을 걸어 필요한 시계열만 골라요. `{path="/p1"}` 하나로 시계열이 200개에서 20개가 되고, 읽은 샘플도 10분의 1이 됐어요.
+
+Grafana 변수의 All 선택을 조심해요. 기본으로는 값을 모두 `|`로 이어 붙인 긴 정규식이 돼요. 값이 수백 개면 질의 글자만 수천 자가 돼요.
+
+```text
+instance=~"(i00|i01|…|i19)"
+```
+
+변수 설정의 Custom all value에 `.+`를 적으면 All일 때 이렇게 짧아져요. Grafana 문서도 긴 All 값은 느려질 수 있다고 해요.
+
+```text
+instance=~".+"
+```
+
+돌려보내는 시계열 수도 봐요. `sum` 없이 `rate(http_requests_total[5m])`를 그리면 선이 200개예요. 200개 선 × 1,440점 = 28만 8천 점을 브라우저로 보내요.
+
+같은 실험에서 질의 시간이 `sum`을 붙였을 때의 두 배쯤 걸렸어요.
+
+## 4. 점 수를 줄이세요
+
+점 수는 시간 범위 ÷ step이에요. 6시간을 step 15초로 그리면 1,440점, 60초로 그리면 360점이에요. 그림 하나에 픽셀보다 많은 점은 보이지도 않아요.
+
+Grafana는 점 수의 상한(Max data points)을 패널 폭의 픽셀 수로 두고, step을 저절로 정해요. Min interval(자동 step의 하한)은 수집 주기로 둬요. 그보다 촘촘한 점은 같은 샘플을 되풀이해 읽을 뿐이에요.
+
+Prometheus는 시계열 하나에 점이 11,000개를 넘는 질의를 받지 않아요. step을 고정해 둔 패널에서 시간 범위를 늘리면 이 에러가 나요.
+
+```text
+exceeded maximum resolution of
+11,000 points per timeseries.
+Try decreasing the query
+resolution (?step=XX)
+```
+
+점마다 읽는 구간도 길이만큼 일이 늘어요. 같은 그래프를 `[5m]` 대신 `[1h]`로 그리니 읽은 샘플이 11배가 됐어요. 구간을 고르는 법은 <Term slug="foundations/aggregation-and-downsampling">집계 구간과 다운샘플링</Term>에서 다뤄요.
+
+## 5. 자주 보는 계산은 미리 해 두세요
+
+기록 규칙(recording rule)은 질의 결과를 정해진 간격마다 미리 계산해 새 시계열로 저장해요. 대시보드는 그 시계열 하나만 읽어요. 새로고침할 때마다 같은 계산을 되풀이하는 대시보드에 특히 좋아요.
+
+```yaml
+groups:
+  - name: api
+    rules:
+      - record: >-
+          job:http_requests:rate5m
+        expr: >-
+          sum by (job) (rate(
+          http_requests_total[5m]))
+```
+
+이름은 `수준:지표:연산` 꼴로 지어요. `job`으로 묶었고, 지표는 `http_requests`, 연산은 `rate5m`이라는 뜻이에요. 이 규칙을 넣으니 앞의 그래프가 읽는 샘플이 572만 개에서 1,439개로 줄었고, 값은 같았어요.
+
+기록 규칙에도 비용이 있어요. 아무도 대시보드를 보지 않아도 정해진 간격마다 계산해요. 그리고 규칙을 만든 뒤부터 쌓여서, 그 전 기간은 비어 있어요.
+
+그래서 자주 보거나 알림에 쓰는 무거운 질의에만 만들어요.
+
+## 6. 한도 에러는 이렇게 읽으세요
+
+Prometheus는 질의 하나가 서버를 잡아먹지 않게 한도를 둬요. 아래는 Prometheus 3.5의 기본값이에요.
+
+- **점 11,000개**: 시계열 하나의 점 수 한도예요. step을 늘리거나 Min interval을 둬요.
+- **샘플 5천만 개**(`--query.max-samples`): 질의 하나가 한꺼번에 메모리에 올리는 샘플 수예요. 넘으면 `query processing would load too many samples into memory` 에러가 나요. 시계열이나 구간을 줄여요.
+- **2분**(`--query.timeout`): 이보다 오래 걸리면 질의를 끊어요.
+- **동시 질의 20개**(`--query.max-concurrency`): 넘는 질의는 줄을 서요. 질의 로그의 `execQueueTime`이 길다면 이 줄이 원인이에요.
+
+<Checkpoints>
+  <Check>시간 범위를 늘리면 에러가 나는 패널이라면, step이나 Min interval이 고정돼 있는지 보세요. 30일을 15초 간격으로 그리면 17만 점이 넘어요.</Check>
+  <Check>`sum` 없이 수백 개 선을 그리는 패널이라면 다시 보세요. 다 읽히지도 않는 선을 브라우저로 보내느라 느려져요.</Check>
+  <Check>변수의 All 선택이 느리다면 Custom all value가 비어 있는지 보세요. 비어 있으면 값을 모두 이어 붙인 정규식이 돼요.</Check>
+  <Check>샘플 한도 에러를 없애려고 `--query.max-samples`를 올리자는 제안이라면 다시 보세요. 한도는 메모리를 지키는 장치라, 올리면 무거운 질의 하나가 Prometheus를 멈출 수 있어요.</Check>
+  <Check>기록 규칙으로 바꾼 패널이라면, 원래 질의와 값이 같은지 한 번 나란히 그려 보세요. 묶는 레이블이 다르면 값이 달라져요.</Check>
+</Checkpoints>
