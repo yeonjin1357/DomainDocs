@@ -1,0 +1,36 @@
+questions:
+  - id: everyone-via-api
+    type: ox
+    prompt: kubelet, 스케줄러, 컨트롤러는 etcd에 직접 읽고 쓰나요?
+    answer: false
+    explain: etcd에 읽고 쓰는 건 API 서버뿐이에요. 다른 구성 요소는 모두 API 서버를 거쳐서, API 서버나 etcd가 느리면 함께 느려져요.
+  - id: list-only-slow
+    type: choice
+    prompt: API 서버의 GET 응답시간은 그대로인데 LIST만 몇 초로 늘었어요. 가장 먼저 찾아볼 것은?
+    choices:
+      - 큰 목록을 자주 읽는 클라이언트
+      - etcd의 리더 선출 여부
+      - 어드미션 웹훅의 시간 초과
+      - 노드의 디스크 사용량
+    answer: 0
+    explain: 한 종류만 느리면 그 요청을 많이 보내는 쪽이 원인인 경우가 많아요. 파드 수천 개를 자주 통째로 LIST하는 에이전트가 흔해요.
+  - id: apf-429
+    type: ox
+    prompt: API 서버가 받을 수 있는 요청이 넘치면, API Priority and Fairness는 줄을 세우다 넘친 요청을 HTTP 429로 거절하나요?
+    answer: true
+    explain: APF는 요청을 줄 세우고, 줄까지 넘치면 429(Too Many Requests)로 거절해요. apiserver_flowcontrol_rejected_requests_total로 세요.
+  - id: etcd-nospace
+    type: choice
+    prompt: etcd 데이터가 기본 저장 한도 2GiB를 넘었어요. 그 뒤 클러스터는 어떻게 될까요?
+    choices:
+      - 읽기와 지우기만 받아요
+      - 오래된 키를 저절로 지워요
+      - 한도를 두 배로 늘려요
+      - 쓰기만 받고 읽기를 막아요
+    answer: 0
+    explain: etcd는 NOSPACE 경보를 띄우고 읽기와 지우기만 받아요. 정리하고 조각 모으기를 한 뒤 경보를 풀어야 다시 써요.
+  - id: fsync-metric
+    type: input
+    prompt: etcd가 쓰기를 디스크에 확정하는 데 걸린 시간을 재는 지표 이름은? (p99가 10ms 아래여야 해요)
+    answer: [etcd_disk_wal_fsync_duration_seconds, wal_fsync_duration_seconds]
+    explain: etcd_disk_wal_fsync_duration_seconds예요. 백엔드 커밋 시간(etcd_disk_backend_commit_duration_seconds)도 함께 봐요.

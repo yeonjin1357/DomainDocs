@@ -1,0 +1,124 @@
+---
+title: 컨트롤 플레인이 느릴 때
+summary: kubectl이 느리고 배포가 늦게 반영되면 API 서버, 거절, 웹훅, etcd 순서로 막힌 곳을 찾아요.
+domain: kubernetes
+type: guide
+order: 175
+icon: list-checks
+keywords: [컨트롤 플레인, control plane, API 서버, kube-apiserver, etcd, '429', API Priority and Fairness, 웹훅, LIST, 원인 찾기]
+related: [kubernetes/overview, kubernetes/metrics-sources, kubernetes/node-not-ready, kubernetes/reading-events, kubernetes/rollout-stuck]
+sources:
+  - title: Kubernetes — Metrics Reference (apiserver_request_duration_seconds 등)
+    url: https://kubernetes.io/docs/reference/instrumentation/metrics/
+  - title: Kubernetes — API Priority and Fairness (429)
+    url: https://kubernetes.io/docs/concepts/cluster-administration/flow-control/
+  - title: Kubernetes — API Concepts (Efficient detection of changes, watch)
+    url: https://kubernetes.io/docs/reference/using-api/api-concepts/
+  - title: etcd — Maintenance (Space quota, NOSPACE)
+    url: https://etcd.io/docs/v3.5/op-guide/maintenance/
+  - title: etcd — System limits (2 GiB 기본, 8 GiB 권장 최대)
+    url: https://etcd.io/docs/v3.5/dev-guide/limit/
+  - title: etcd — FAQ (wal_fsync, backend_commit p99)
+    url: https://etcd.io/docs/v3.5/faq/
+updated: 2026-11-03
+---
+
+<Situation>
+  kubectl 명령이 몇 초씩 걸리고, 배포를 바꿔도 파드에 늦게 반영돼요. 때로는 "Too Many Requests"나 시간 초과 에러가 나요.
+</Situation>
+
+<FirstLook>
+  <Item title="API 서버 응답시간">요청 종류(verb)마다 느려졌는지 봐요.</Item>
+  <Item title="429 거절">API 서버가 요청을 거절하기 시작했는지 봐요.</Item>
+  <Item title="etcd 디스크">etcd의 디스크 쓰기가 느린지 봐요.</Item>
+</FirstLook>
+
+모든 구성 요소는 API 서버하고만 이야기해요. kubectl, 컨트롤러, 스케줄러, kubelet, 모니터링 에이전트가 모두 API 서버를 부르고, API 서버만 etcd에 읽고 써요. 그래서 API 서버나 etcd가 느려지면 클러스터 전체가 함께 느려져요.
+
+<Figure caption="모두가 API 서버 한 곳으로 모여요. API 서버는 요청을 받으면 웹훅에 물어보고, etcd에 읽고 써요. 이 길 어디가 막혀도 모두가 느려져요.">
+  <Flow
+    ariaLabel="kubectl, 컨트롤러, kubelet, 모니터링 에이전트가 모두 API 서버를 부르고, API 서버가 웹훅에 묻고 etcd에 읽고 쓰는 구조도"
+    nodes={[
+      { id: 'kubectl', label: 'kubectl', col: 0, row: 0 },
+      { id: 'ctrl', label: '컨트롤러', col: 0, row: 1, note: '스케줄러 포함' },
+      { id: 'kubelet', label: 'kubelet', col: 0, row: 2, note: '노드마다' },
+      { id: 'agent', label: '모니터링', col: 0, row: 3, note: '에이전트' },
+      { id: 'api', label: 'API 서버', col: 1, row: 1, tone: 'accent' },
+      { id: 'hook', label: '웹훅', col: 2, row: 0, note: '받기 전 검사' },
+      { id: 'etcd', label: 'etcd', col: 1, row: 3, note: '모든 데이터', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'kubectl', to: 'api' },
+      { from: 'ctrl', to: 'api' },
+      { from: 'kubelet', to: 'api' },
+      { from: 'agent', to: 'api' },
+      { from: 'api', to: 'hook' },
+      { from: 'api', to: 'etcd', both: true, tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+<Figure caption="앞에서부터 하나씩 지워 가요. API 서버가 느리면 거절, 웹훅, etcd 순서로 원인을 좁혀요.">
+  <Triage
+    ariaLabel="1단계 API 서버 응답시간을 요청 종류별로 보고, 2단계 429 거절이 늘었다면 누가 많이 부르는지 찾고, 3단계 웹훅이 느린지, 4단계 etcd 디스크 쓰기가 느린지, 5단계 etcd 크기가 한도에 가까운지 보는 순서"
+    steps={[
+      { label: 'API 서버 응답시간', note: '요청 종류(verb)별로', tone: 'warn', exits: [{ when: 'LIST만 느림', to: '큰 목록 조회', note: '누가 부르나' }] },
+      { label: '429 거절', exits: [{ when: '늘었음', to: '많이 부르는 쪽', note: '에이전트·컨트롤러' }] },
+      { label: '웹훅', exits: [{ when: '느림', to: '그 웹훅', note: '시간 초과 설정' }] },
+      { label: 'etcd 디스크', exits: [{ when: 'fsync p99 > 10ms', to: '디스크 바꾸기', note: '전용·빠른 디스크' }] },
+      { label: 'etcd 크기', tone: 'accent', exits: [{ when: '한도 가까움', to: '정리·조각 모으기', note: '기본 2GiB' }] },
+    ]}
+  />
+</Figure>
+
+## 1. API 서버 응답시간을 요청 종류별로 보세요
+
+API 서버는 요청마다 걸린 시간을 히스토그램으로 남겨요. 요청 종류(`verb`)와 자원(`resource`)으로 나눠 보면, 어떤 요청이 느린지 좁혀져요.
+
+```promql
+histogram_quantile(0.99,
+  sum by (verb, le) (rate(
+    apiserver_request_duration_seconds_bucket[5m]
+  ))
+)
+```
+
+GET은 빠른데 LIST만 느리다면, 누군가 큰 목록을 자주 읽는 거예요. 클러스터의 파드 수천 개를 몇 초마다 통째로 LIST하는 에이전트나 스크립트가 흔한 원인이에요.
+
+**확인 방법**: `apiserver_request_total`을 `verb`, `resource`로 나눠, 요청 수가 갑자기 는 쪽을 찾아요. API 서버의 감사 로그(audit log)가 켜져 있다면 사용자 이름으로 누가 불렀는지 봐요.
+
+## 2. 429 거절이 늘었는지 보세요
+
+API 서버는 한꺼번에 받을 수 있는 요청 수에 한도가 있어요. APF(API Priority and Fairness)가 요청을 줄 세워요. 줄까지 넘치면 HTTP 429(Too Many Requests)로 거절해요.
+
+**확인 방법**: `apiserver_flowcontrol_rejected_requests_total`이 늘었는지 봐요. 늘었다면 1단계에서 찾은, 많이 부르는 쪽을 줄여요. 같은 정보를 계속 받아야 한다면 LIST를 되풀이하지 말고 watch로 바뀐 것만 받게 해요.
+
+## 3. 웹훅이 느린지 보세요
+
+API 서버는 객체를 만들거나 바꾸기 전에 어드미션 웹훅(admission webhook)에 물어볼 수 있어요. 정책 검사나 기본값 넣기 같은 일을 하는 바깥 서버예요. 웹훅이 느리면 그 객체를 바꾸는 요청이 모두 함께 느려져요.
+
+**확인 방법**: 웹훅마다 걸린 시간은 `apiserver_admission_webhook_admission_duration_seconds`에 있어요. 웹훅 이름(`name`)으로 나눠 봐요. 웹훅 서버가 죽었다면, 설정의 실패 정책(failurePolicy)에 따라 요청이 거절되거나 검사 없이 지나가요.
+
+## 4. etcd의 디스크 쓰기가 느린지 보세요
+
+etcd는 모든 쓰기를 디스크에 확정한 뒤에 응답해요. 그래서 디스크가 느리면 API 서버의 쓰기가 모두 느려져요. etcd 문서는 WAL fsync의 p99가 10ms 아래, 백엔드 커밋의 p99가 25ms 아래여야 디스크가 충분히 빠르다고 해요.
+
+**확인 방법**: 두 값의 p99를 봐요. 지표 이름은 이래요.
+
+- `etcd_disk_wal_fsync_duration_seconds`: WAL을 디스크에 확정하는 시간이에요.
+- `etcd_disk_backend_commit_duration_seconds`: 백엔드에 커밋하는 시간이에요.
+
+느리다면 etcd에 전용 디스크나 더 빠른 디스크를 줘요. `etcd_server_has_leader`가 0이면 리더가 없어 쓰기를 못 받는 상태예요.
+
+## 5. etcd 크기가 한도에 가까운지 보세요
+
+etcd의 기본 저장 한도는 2GiB예요. 한도를 넘으면 클러스터 전체에 NOSPACE 경보를 띄우고, 읽기와 지우기만 받아요. 그때부터 API 서버에는 "database space exceeded" 에러가 나고, 새 객체를 못 만들어요.
+
+**확인 방법**: `etcd_mvcc_db_total_size_in_bytes`를 한도와 견줘 봐요. 지운 데이터의 자리는 조각 모으기(defragment)를 해야 디스크에서 돌아와요. 이벤트나 오래된 Job처럼 쌓이기만 하는 객체가 많지 않은지도 봐요.
+
+<Checkpoints>
+  <Check>모니터링 에이전트가 클러스터의 파드 목록을 몇 초마다 통째로 LIST한다면 다시 보세요. 노드가 많은 클러스터에서는 그 자체가 API 서버를 무겁게 해요. watch로 바뀐 것만 받아요.</Check>
+  <Check>kubectl이 느리다고 노드만 늘리는 대응이라면 다시 보세요. 느린 곳은 노드가 아니라 API 서버나 etcd일 수 있어요.</Check>
+  <Check>429 에러를 받는 코드가 바로 다시 보낸다면, 간격을 벌려 다시 보내는지 보세요. 바로 다시 보내면 거절이 더 늘어요.</Check>
+  <Check>관리형 쿠버네티스라 etcd는 신경 쓸 일이 없다고 봤다면, API 서버 지표만큼은 직접 보세요. 무겁게 부르는 쪽은 대개 우리 쪽 프로그램이에요.</Check>
+</Checkpoints>
