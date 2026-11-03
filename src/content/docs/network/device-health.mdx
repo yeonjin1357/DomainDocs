@@ -1,0 +1,166 @@
+---
+title: 장비 자체의 상태(CPU·온도·전원)
+summary: 장비도 CPU, 온도, 팬, 전원 상태를 SNMP로 알려요. 장비 CPU는 트래픽보다 관리 일을 재요.
+domain: network
+type: concept
+stage: basics
+order: 45
+icon: gauge
+keywords: [ENTITY-MIB, ENTITY-SENSOR-MIB, 장비 CPU, 온도, temperature, fan, 팬, power supply, 전원 공급 장치, CISCO-PROCESS-MIB]
+related: [network/snmp, network/interfaces-and-traffic, network/traps-and-syslog, network/device-unreachable, server/cpu-usage]
+sources:
+  - title: RFC 6933 — Entity MIB (Version 4)
+    url: https://www.rfc-editor.org/rfc/rfc6933.html
+  - title: RFC 3433 — Entity Sensor MIB
+    url: https://www.rfc-editor.org/rfc/rfc3433.html
+  - title: RFC 2790 — Host Resources MIB (hrProcessorLoad)
+    url: https://www.rfc-editor.org/rfc/rfc2790.html
+  - title: Cisco — How to Collect CPU Utilization on Cisco IOS Devices Using SNMP
+    url: https://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
+  - title: Cisco — Catalyst 6500/6000 Switch High CPU Utilization
+    url: https://www.cisco.com/c/en/us/support/docs/switches/catalyst-6500-series-switches/63992-6k-high-cpu.html
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="장비도 몸 상태를 알려 줘요">
+    인터페이스 말고도 CPU, 메모리, 온도, 팬, 전원 공급 장치의 상태를 SNMP로 읽어요.
+  </Point>
+  <Point title="장비 CPU는 트래픽보다 관리 일을 재요">
+    스위치와 라우터는 대부분의 트래픽을 전용 칩으로 넘겨요. CPU는 라우팅 계산, SNMP 응답 같은 관리 일을 맡아요.
+  </Point>
+  <Point title="센서 값은 단위와 자릿수를 함께 읽어요">
+    표준 센서 값은 정수예요. 같은 줄의 단위, 배율, 소수 자릿수를 함께 읽어야 실제 값이 나와요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="우체국 직원은 상자를 손으로 나르지만, 스위치에서 패킷을 나르는 건 전용 칩이에요. 그래서 상자가 많아도 장비 CPU는 그대로일 수 있어요.">
+  우체국 건물의 관리실 계기판과 비슷해요. 분류 기계(전용 칩)는 상자를 나르고, 관리실 직원(CPU)은 배송 경로를 짜고 문의에 답해요. 계기판에는 직원의 일거리, 실내 온도, 환풍기, 전기 상태가 떠요.
+</Analogy>
+
+## 무엇을 재나요
+
+<Figure caption="장비 한 대에서 읽는 상태예요. 인터페이스의 트래픽과 별개로, 장비 자체의 부품마다 값과 상태가 있어요.">
+  <Flow
+    ariaLabel="장비 한 대 안에 CPU와 메모리, 온도 센서, 팬, 전원 공급 장치가 있고, 관리 서버가 SNMP로 이 값들을 읽는 구조도"
+    nodes={[
+      { id: 'cpu', label: 'CPU·메모리', col: 0, row: 0, note: '관리 일의 양' },
+      { id: 'temp', label: '온도 센서', col: 2, row: 0, note: '℃' },
+      { id: 'fan', label: '팬', col: 0, row: 1, note: '돌고 있나' },
+      { id: 'psu', label: '전원 공급 장치', col: 2, row: 1, note: '둘 중 하나 고장?' },
+      { id: 'mgr', label: '관리 서버', col: 1, row: 2, note: 'SNMP로 읽어요', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'mgr', to: 'cpu', dashed: true },
+      { from: 'mgr', to: 'temp', dashed: true },
+      { from: 'mgr', to: 'fan', dashed: true },
+      { from: 'mgr', to: 'psu', dashed: true },
+    ]}
+    groups={[{ label: '장비 한 대', cols: [0, 2], rows: [0, 1] }]}
+  />
+</Figure>
+
+장비 안의 부품은 <Term term="network/entity-mib">ENTITY-MIB</Term>라는 표준 표로 읽어요. 표의 줄마다 부품 하나가 있고, 그 부품이 섀시인지, 모듈인지, 팬인지, 전원 공급 장치인지, 센서인지가 적혀 있어요.
+
+이 표로 장비가 어떤 부품으로 이뤄졌는지 알아요. 부품의 이름, 모델, 일련번호도 함께 있어서, 장비 목록 화면의 하드웨어 정보도 보통 여기서 와요.
+
+## 장비 CPU는 관리 일을 재요
+
+스위치와 라우터는 대부분의 패킷을 전용 칩(ASIC)으로 넘겨요. Cisco 문서도 이런 스위치는 전달할 곳을 하드웨어에서 정하고, 그 일에 CPU를 쓰지 않는다고 해요.
+
+CPU가 맡는 건 장비 자신에게 오는 일이에요. 라우팅 계산, 스패닝 트리 같은 제어 메시지, SNMP·SSH 같은 관리 요청, 칩이 처리하지 못하는 특이한 패킷이에요.
+
+<Figure caption="트래픽이 두 배로 늘어도 칩이 넘기는 몫이라 CPU는 그대로예요. 관리 요청이나 제어 메시지가 늘 때 CPU가 올라요.">
+  <Compare
+    columns={['전용 칩(ASIC)', 'CPU']}
+    rows={[
+      { label: '맡는 일', values: ['대부분의 패킷 전달', '라우팅 계산, 관리 요청'] },
+      { label: '늘면 바빠지는 것', values: ['지나가는 트래픽', 'SNMP 폴링, 제어 메시지'] },
+      { label: '나빠지면', values: ['패킷을 버려요', '관리 응답이 늦거나 끊겨요'] },
+    ]}
+  />
+</Figure>
+
+그래서 장비 CPU 사용률은 트래픽이 얼마나 많은지 알려 주지 않아요. 트래픽은 <Term slug="network/interfaces-and-traffic">인터페이스와 트래픽</Term>으로 봐요.
+
+거꾸로 CPU가 높으면 관리 일이 몰린 거예요. 여러 관리 서버가 한 장비를 아주 자주 폴링해도 CPU가 올라요.
+
+## CPU와 메모리는 제조사 MIB에 있어요
+
+CPU 사용률의 표준 OID는 장비마다 잘 갖춰져 있지 않아요. 그래서 보통 제조사가 정한 <Term term="network/mib">MIB</Term>로 읽어요. <Term slug="network/snmp">SNMP</Term> 글에서 본 것처럼 같은 값이라도 제조사마다 OID가 달라요.
+
+Cisco IOS 장비라면 CISCO-PROCESS-MIB의 `cpmCPUTotal5minRev`가 지난 5분 동안의 CPU 사용률이에요. 5초와 1분짜리도 따로 있어요. 서버형 장비는 HOST-RESOURCES-MIB의 `hrProcessorLoad`(지난 1분 평균)를 내기도 해요.
+
+<Figure caption="같은 장비의 CPU라도 어느 구간의 평균이냐에 따라 숫자가 달라요. 짧은 구간은 잠깐 튄 값을 보여 주고, 긴 구간은 그걸 고르게 펴요.">
+  <MiniLineChart
+    ariaLabel="1분마다 읽은 장비 CPU에서 5초 평균은 30%대에서 한 번 90%로 튀고, 5분 평균은 같은 시각에 40%까지만 오르는 그래프"
+    yMax={100}
+    series={[
+      { label: '5초 평균', values: [30, 32, 31, 90, 33, 30, 31, 32, 30, 31], tone: 'warn', value: '최고 90%' },
+      { label: '5분 평균', values: [31, 31, 31, 40, 40, 39, 38, 32, 31, 31], tone: 'accent', value: '최고 40%' },
+    ]}
+  />
+</Figure>
+
+## 센서 값은 단위와 자릿수를 함께 읽어요
+
+온도, 전압, 팬 속도 같은 센서는 ENTITY-SENSOR-MIB에 있어요. 센서 값(`entPhySensorValue`)은 정수라서, 같은 줄의 종류, 배율, 소수 자릿수를 함께 읽어야 해요.
+
+<Figure caption="같은 센서 줄의 칸 넷을 함께 읽은 예시예요. 값 425를 섭씨, 배율 units, 소수 한 자리로 읽어 42.5℃가 돼요.">
+  <Strip
+    ariaLabel="센서 종류 celsius, 배율 units, 소수 자릿수 1, 값 425를 함께 읽으면 42.5도가 되는 칸 띠"
+    rows={[
+      {
+        label: '온도 센서 한 줄',
+        heads: ['종류', '배율', '자릿수', '값'],
+        cells: ['celsius', 'units', '1', { label: '425', tone: 'accent' }],
+      },
+    ]}
+    ranges={[{ from: 0, to: 3, label: '읽으면 42.5℃', tone: 'accent' }]}
+  />
+</Figure>
+
+배율은 값에 곱할 10의 거듭제곱이에요. `milli`라면 1,000분의 1이라, 전압 값 3300은 3.3V예요. 센서 상태(`entPhySensorOperStatus`)가 `ok`가 아니면 값을 믿지 않아요.
+
+## 팬과 전원은 둘이 하나처럼 일해요
+
+큰 장비는 팬과 전원 공급 장치를 여럿 둬요. 하나가 고장 나도 나머지가 버티게 하려는 거예요. 그래서 하나가 멈춰도 장비는 멀쩡히 돌아요.
+
+이게 함정이에요. 두 번째가 고장 나야 장비가 꺼지니, 첫 번째 고장을 놓치면 안 돼요.
+
+부품 상태는 제조사 MIB의 상태 값이나 Trap으로 알려요. Trap은 <Term slug="network/traps-and-syslog">SNMP Trap과 Syslog</Term>에서 다뤄요.
+
+## 모니터링에서는
+
+<Figure caption="코어 스위치의 상태 예시예요. 트래픽은 평소대로인데 CPU가 높고, 전원 공급 장치 둘 중 하나가 멈췄어요.">
+  <StatTile label="CPU(5분 평균)" value="78" unit="%" tone="warn" note="평소 25%" />
+  <StatTile label="온도" value="42.5" unit="℃" />
+  <StatTile label="전원 공급 장치" value="1" unit="/ 2개" tone="warn" note="하나 멈춤" />
+</Figure>
+
+네트워크 장비 화면은 인터페이스 표 옆에 장비 자체의 상태를 함께 보여 줘요. CPU와 메모리는 그래프로, 온도는 값과 기준으로, 팬과 전원은 정상·고장 같은 상태로 보여요.
+
+장비 CPU가 오르면 트래픽보다 관리 쪽을 먼저 봐요. 폴링 주기나 관리 서버 수가 바뀌었는지, 라우팅이 흔들리고 있는지 봐요. 장비가 SNMP에 늦게 답한다면 <Term slug="network/device-unreachable">장비가 응답 없음으로 보일 때</Term>도 함께 봐요.
+
+<Checkpoints>
+  <Check>장비 CPU 사용률을 트래픽이 많은 정도로 읽었다면 다시 보세요. 대부분의 패킷은 전용 칩이 넘겨서 CPU에 잡히지 않아요.</Check>
+  <Check>센서 값을 그대로 화면에 찍고 있다면, 배율과 소수 자릿수를 적용했는지 보세요. 425가 42.5℃일 수 있어요.</Check>
+  <Check>전원 공급 장치나 팬을 '장비가 살아 있으면 정상'으로 보고 있다면 다시 보세요. 둘 중 하나만 멈추면 장비는 멀쩡히 돌아요. 부품마다 상태 알림을 거세요.</Check>
+  <Check>CPU OID를 한 제조사 기준으로 모든 장비에 쓰고 있다면 다시 보세요. CPU 사용률은 제조사 MIB마다 OID와 평균 구간이 달라요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### ENTITY-MIB의 부품 종류
+
+  `entPhysicalClass`는 부품 종류를 숫자로 적어요. 섀시는 chassis(3), 전원은 powerSupply(6), 팬은 fan(7)이에요. sensor(8), module(9), port(10), cpu(12)도 있어요.
+
+  버전 4부터는 이 목록을 IANA-ENTITY-MIB에서 관리해요.
+
+  ### 센서 자릿수가 음수일 때
+
+  센서의 자릿수(`entPhySensorPrecision`)가 1~9면 소수 자릿수예요. -8~-1이면 정확한 자릿수의 개수를 뜻하고, 0이면 고정 소수점 수가 아니에요.
+
+  ### CPU가 다루는 특이한 패킷
+
+  Cisco 문서는 IP 옵션이 붙었거나, TTL이 다 된 패킷 같은 경우 소프트웨어에서 처리한다고 해요. 이런 패킷이 몰리면 트래픽이 크지 않아도 CPU가 올라요.
+</Deeper>

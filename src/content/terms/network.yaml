@@ -152,6 +152,12 @@ terms:
     aliases: [관리 정보 베이스, IF-MIB, 벤더 MIB]
     short: 장비가 SNMP로 내놓는 값의 목록이에요. 표준 MIB와 제조사 MIB가 있어요.
     doc: network/snmp
+  - id: entity-mib
+    name: ENTITY-MIB
+    en: Entity MIB
+    aliases: [Entity MIB, 엔티티 MIB, entPhysicalTable]
+    short: 장비 안의 섀시, 모듈, 팬, 전원 같은 부품을 줄마다 적은 표준 MIB예요.
+    doc: network/device-health
   - id: oid
     name: OID
     en: Object Identifier

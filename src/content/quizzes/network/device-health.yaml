@@ -1,0 +1,36 @@
+questions:
+  - id: asic-forwards-traffic
+    type: ox
+    prompt: 스위치를 지나는 패킷은 대부분 CPU를 거치지 않고 전용 칩이 넘기나요?
+    answer: true
+    explain: 스위치와 라우터는 전달할 곳을 하드웨어에서 정해요. 그래서 트래픽이 늘어도 장비 CPU는 그대로일 수 있어요.
+  - id: snmp-uses-cpu
+    type: ox
+    prompt: 관리 서버의 SNMP 요청에 답하는 일은 장비의 전용 칩이 맡아서 CPU를 쓰지 않나요?
+    answer: false
+    explain: 장비 자신에게 오는 SNMP, SSH, 제어 메시지는 CPU가 처리해요. 폴링이 몰리면 장비 CPU가 올라요.
+  - id: sensor-precision
+    type: choice
+    prompt: 온도 센서 줄의 종류가 celsius, 배율이 units, 소수 자릿수가 1, 값이 382예요. 실제 온도는?
+    choices:
+      - 38.2℃
+      - 382℃
+      - 3.82℃
+      - 0.382℃
+    answer: 0
+    explain: 표준 센서 값은 정수예요. 소수 자릿수 1을 적용하면 382는 38.2이고, 배율 units는 그대로라 38.2℃예요.
+  - id: one-psu-down
+    type: choice
+    prompt: 전원 공급 장치를 둘 둔 장비에서 하나가 고장 났어요. 장비는 어떻게 될까요?
+    choices:
+      - 남은 하나로 계속 돌아요
+      - 곧바로 꺼져요
+      - 포트 절반만 꺼져요
+      - 트래픽을 절반만 넘겨요
+    answer: 0
+    explain: 둘을 두는 건 하나가 고장 나도 버티려고예요. 그래서 겉으론 멀쩡해 보여, 부품 상태 알림이 없으면 첫 고장을 놓쳐요.
+  - id: entity-mib-name
+    type: input
+    prompt: 장비 안의 섀시, 모듈, 팬, 전원 공급 장치 같은 부품을 줄마다 적어 두는 표준 MIB는?
+    answer: [ENTITY-MIB, Entity MIB, EntityMIB, 엔티티 MIB]
+    explain: ENTITY-MIB예요. 부품 종류와 이름, 모델, 일련번호를 담고, 센서 값은 ENTITY-SENSOR-MIB로 읽어요.
