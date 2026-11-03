@@ -1,0 +1,224 @@
+---
+title: 네트워크 계층(L2·L3·L4·L7)
+summary: 통신은 층마다 할 일을 나눠요. L2는 MAC, L3는 IP, L4는 포트, L7은 앱의 약속이에요.
+domain: network
+type: concept
+stage: basics
+order: 12
+icon: layers
+keywords: [OSI, TCP/IP, 계층, layer, L2, L3, L4, L7, 캡슐화, UDP]
+related: [network/addresses, network/switches-and-routers, network/tcp-connections, cloud/load-balancers, apm/http-basics]
+sources:
+  - title: ITU-T X.200 — OSI Basic Reference Model
+    url: https://www.itu.int/rec/T-REC-X.200-199407-I
+  - title: RFC 1122 — Requirements for Internet Hosts (계층 구조)
+    url: https://www.rfc-editor.org/rfc/rfc1122.html
+  - title: RFC 768 — User Datagram Protocol
+    url: https://www.rfc-editor.org/rfc/rfc768.html
+  - title: RFC 791 — Internet Protocol (IPv4 머리)
+    url: https://www.rfc-editor.org/rfc/rfc791.html
+  - title: RFC 9293 — Transmission Control Protocol (MSS)
+    url: https://www.rfc-editor.org/rfc/rfc9293.html
+  - title: RFC 894 — IP over Ethernet (1,500바이트)
+    url: https://www.rfc-editor.org/rfc/rfc894.html
+  - title: RFC 2863 — IF-MIB (ifInOctets)
+    url: https://www.rfc-editor.org/rfc/rfc2863.html
+  - title: AWS — What is an Application Load Balancer?
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html
+  - title: AWS — CloudWatch metrics for your Network Load Balancer
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cloudwatch-metrics.html
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="통신은 층마다 할 일을 나눠요">
+    앱끼리의 약속, 프로그램 찾기, 먼 길 찾기, 옆 장비로 넘기기를 층마다 따로 맡아요.
+  </Point>
+  <Point title="보낼 때 층마다 머리표를 붙여요">
+    위층의 데이터를 아래층이 감싸며 자기 주소를 붙여요. 받는 쪽은 거꾸로 하나씩 벗겨요.
+  </Point>
+  <Point title="장비 이름의 숫자는 읽는 층이에요">
+    L2 스위치는 MAC까지, 라우터는 IP까지, L7 로드 밸런서는 HTTP까지 읽어요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="택배 송장은 끝까지 그대로지만, 네트워크의 맨 바깥 이름표(MAC)는 라우터를 지날 때마다 새로 붙여요. 안쪽 상자의 주소(IP)는 그대로예요.">
+  편지를 부치는 일과 비슷해요. 편지(앱 데이터)를 받는 부서가 적힌 봉투(포트)에 넣고, 건물 주소가 적힌 상자(IP)에 담아요. 마지막으로 이번에 건넬 곳의 우편함 이름표(MAC)를 붙여요.
+</Analogy>
+
+## 왜 층으로 나눌까요
+
+통신에는 풀 문제가 여러 개예요. 선 위로 신호를 보내고, 옆 장비에 건네고, 먼 네트워크까지 길을 찾고, 받을 프로그램을 찾아야 해요. 이 일을 층으로 나눠 맡기면, 한 층을 바꿔도 다른 층은 그대로 써요.
+
+노트북이 유선에서 와이파이로 바뀌어도 웹 브라우저의 HTTP는 그대로예요. 아래층만 바뀌었기 때문이에요.
+
+<Figure caption="위에서부터 앱의 약속, 프로그램 찾기, 먼 길 찾기, 옆 장비로 넘기기, 신호 보내기예요. 층마다 쓰는 주소가 달라요.">
+  <Layers
+    ariaLabel="위에서부터 L7 응용(HTTP·DNS·SNMP), L4 전송(TCP·UDP, 포트), L3 네트워크(IP 주소), L2 데이터 링크(이더넷, MAC 주소), L1 물리(케이블·전파)로 쌓인 계층도"
+    layers={[
+      { label: 'L7 응용', note: 'HTTP, DNS, SNMP · 앱끼리의 약속', tone: 'accent' },
+      { label: 'L4 전송', note: 'TCP, UDP · 포트로 프로그램 찾기' },
+      { label: 'L3 네트워크', note: 'IP · 주소로 먼 길 찾기' },
+      { label: 'L2 데이터 링크', note: '이더넷 · MAC으로 옆 장비에 넘기기' },
+      { label: 'L1 물리', note: '케이블, 전파 · 비트를 신호로' },
+    ]}
+  />
+</Figure>
+
+<Term slug="network/addresses">주소: IP, MAC, 포트</Term>에서 본 세 주소가 층마다 하나씩이에요. MAC은 L2, IP는 L3, 포트는 L4에서 써요.
+
+## 번호가 4에서 7로 뛰는 이유
+
+L1부터 L7까지의 번호는 <Term term="network/osi-model">OSI 모델</Term>에서 왔어요. ITU-T와 ISO가 정한 참조 모델로, 통신을 일곱 층으로 나눠요.
+
+인터넷에서 실제로 쓰는 TCP/IP는 층을 넷으로 나눠요. 링크, 인터넷, 전송, 응용이에요. 그래도 현장에서는 OSI 번호로 불러서 L2, L3, L4, L7이라고 해요.
+
+<Figure caption="OSI의 5·6층(세션, 표현)은 TCP/IP에서 따로 나누지 않고 응용층에 들어가요. 그래서 L5, L6이라는 말은 거의 쓰지 않아요.">
+  <Compare
+    columns={['OSI 일곱 층', 'TCP/IP 네 층']}
+    rows={[
+      { label: '7·6·5층', values: ['응용, 표현, 세션', '응용'] },
+      { label: '4층', values: ['전송', '전송'] },
+      { label: '3층', values: ['네트워크', '인터넷'] },
+      { label: '2·1층', values: ['데이터 링크, 물리', '링크'] },
+    ]}
+  />
+</Figure>
+
+## 보낼 때 층마다 감싸요
+
+앱이 HTTP 요청을 보내면, 아래층으로 내려가며 층마다 자기 머리표(헤더)를 앞에 붙여요. 이렇게 감싸는 일을 <Term term="network/encapsulation">캡슐화</Term>라고 해요.
+
+<Figure caption="선 위를 지나는 이더넷 프레임 하나를 펼쳤어요. 안쪽의 HTTP 요청을 TCP, IP, 이더넷(MAC) 머리표가 차례로 감싸요.">
+  <Strip
+    ariaLabel="MAC 머리, IP 머리, TCP 머리, HTTP 요청, 꼬리가 나란히 있고, HTTP 요청만이 L7 데이터, TCP 머리부터가 L4, IP 머리부터가 L3 패킷, 전체가 L2 프레임인 칸 띠"
+    rows={[
+      {
+        label: '이더넷 프레임 하나',
+        cells: [{ label: 'MAC', tone: 'sub' }, { label: 'IP', tone: 'sub' }, { label: 'TCP', tone: 'sub' }, { label: 'HTTP', tone: 'accent' }, { label: '꼬리', tone: 'sub' }],
+      },
+    ]}
+    ranges={[
+      { from: 3, to: 3, label: 'L7 데이터', tone: 'accent' },
+      { from: 2, to: 3, label: 'L4 세그먼트' },
+      { from: 1, to: 3, label: 'L3 패킷' },
+      { from: 0, to: 4, label: 'L2 프레임' },
+    ]}
+  />
+</Figure>
+
+받는 쪽은 거꾸로 아래층부터 머리표를 하나씩 벗기며 위층에 넘겨요. 각 층은 자기 머리표만 읽어요.
+
+층마다 덩어리를 부르는 이름도 달라요. L2는 프레임, L3는 패킷, L4의 TCP는 세그먼트라고 해요. 흔히 모두 뭉뚱그려 패킷이라고도 불러요.
+
+## 머리표만큼 실을 자리가 줄어요
+
+이더넷이 한 번에 실어 보내는 IP 패킷의 최대 크기를 <Term term="network/mtu">MTU</Term>라고 해요. 보통 1,500바이트예요.
+
+옵션 없는 IPv4 머리가 20바이트, TCP 머리가 20바이트예요. 그래서 앱 데이터는 패킷 하나에 1,460바이트까지 실어요. 이 크기를 MSS(Maximum Segment Size)라고 하고, 큰 응답은 이 크기로 잘려 나눠 가요.
+
+<Figure caption="MTU 1,500바이트짜리 IP 패킷 하나예요. 머리표 40바이트를 빼고 앱 데이터는 1,460바이트까지 실어요.">
+  <Strip
+    ariaLabel="IP 패킷 1,500바이트 안에 IPv4 머리 20바이트, TCP 머리 20바이트, 앱 데이터 1,460바이트가 들어 있는 칸 띠"
+    rows={[
+      {
+        label: 'IP 패킷 하나(MTU)',
+        heads: ['20B', '20B', '1,460B'],
+        cells: [{ label: 'IP', tone: 'sub' }, { label: 'TCP', tone: 'sub' }, { label: '앱 데이터', tone: 'accent' }],
+      },
+    ]}
+    ranges={[
+      { from: 2, to: 2, label: 'MSS', tone: 'accent' },
+      { from: 0, to: 2, label: 'MTU 1,500바이트' },
+    ]}
+  />
+</Figure>
+
+## 라우터를 지나면 맨 바깥 이름표만 바뀌어요
+
+L2 머리표의 MAC 주소는 같은 네트워크 안에서만 써요. 그래서 라우터는 패킷을 다음 네트워크로 넘길 때 L2 머리표를 떼고 새로 붙여요. 안쪽의 IP 주소는 그대로예요.
+
+<Figure caption="서버 A가 라우터 너머의 서버 B에 보낸 같은 패킷을 두 구간에서 봤어요. IP 주소는 끝까지 그대로이고, MAC 주소는 구간마다 바뀌어요.">
+  <Compare
+    columns={['A → 라우터 구간', '라우터 → B 구간']}
+    rows={[
+      { label: '보낸 MAC', values: ['서버 A의 카드', '라우터의 카드'] },
+      { label: '받는 MAC', values: ['라우터의 카드', '서버 B의 카드'] },
+      { label: '보낸 IP', values: ['서버 A', '서버 A'] },
+      { label: '받는 IP', values: ['서버 B', '서버 B'] },
+    ]}
+  />
+</Figure>
+
+서버 A는 받는 곳이 다른 네트워크라서, 받는 MAC 자리에 라우터(기본 게이트웨이)의 MAC을 적어요. 기본 게이트웨이는 <Term slug="network/switches-and-routers">스위치와 라우터</Term>에서 다뤄요.
+
+NAT 장비를 지나면 IP 주소도 바뀔 수 있어요. 이건 <Term slug="network/firewalls-and-nat">방화벽과 NAT</Term>에서 다뤄요.
+
+## L4의 두 갈래: TCP와 UDP
+
+전송층에는 규약이 둘 있어요. <Term slug="network/tcp-connections">TCP</Term>는 연결을 맺고, 받았다는 답을 확인하며 빠짐없이 순서대로 전해요. <Term term="network/udp">UDP</Term>는 연결도 확인도 없이 바로 보내요.
+
+<Figure caption="TCP는 확인하는 만큼 무겁고, UDP는 가볍지만 잃어도 몰라요. 앱이 필요에 맞는 쪽을 골라요.">
+  <Compare
+    columns={['TCP', 'UDP']}
+    rows={[
+      { label: '연결 맺기', values: ['세 번 주고받아요', '없어요'] },
+      { label: '잃으면', values: ['다시 보내요', '그대로 잃어요'] },
+      { label: '순서', values: ['맞춰 줘요', '맞추지 않아요'] },
+      { label: '머리 크기', values: ['20바이트부터', '8바이트'] },
+      { label: '쓰는 곳', values: ['HTTP, DB 연결', 'DNS 질의, SNMP, Syslog'] },
+    ]}
+  />
+</Figure>
+
+UDP로 오는 SNMP Trap과 Syslog가 중간에 사라져도 보낸 쪽이 모르는 이유예요. 자세한 건 <Term slug="network/traps-and-syslog">SNMP Trap과 Syslog</Term>에 있어요.
+
+## 장비 이름의 숫자는 읽는 층이에요
+
+- **L2 스위치**: MAC까지 읽고, 같은 네트워크 안의 포트로 넘겨요.
+- **L3 스위치와 라우터**: IP까지 읽고, 네트워크 사이로 길을 골라요.
+- **L4 로드 밸런서**: IP와 포트까지 읽고, 연결 단위로 나눠요. AWS의 Network Load Balancer가 여기예요.
+- **L7 로드 밸런서**: HTTP 요청까지 읽고, 주소나 헤더로 나눠요. AWS의 Application Load Balancer가 여기예요.
+
+장비는 자기가 읽는 층보다 위의 내용을 몰라요. 그래서 L4 로드 밸런서는 HTTP 상태 코드를 모르고, 5xx 같은 지표도 내지 않아요. 로드 밸런서는 <Term slug="cloud/load-balancers">로드 밸런서</Term>에서 다뤄요.
+
+## 모니터링에서는
+
+<Figure caption="같은 장애가 층마다 다른 숫자로 보여요. 아래층이 무너지면 위층 숫자도 함께 나빠져요.">
+  <Layers
+    ariaLabel="위에서부터 L7은 5xx와 응답시간을 APM에서, L4는 재전송과 연결 거부를 NPM에서, L3는 ping 손실과 경로를 네트워크 화면에서, L2와 L1은 링크 down과 수신 에러를 장비 화면에서 보는 계층도"
+    layers={[
+      { label: 'L7', note: '5xx, 응답시간 · APM 화면', tone: 'accent' },
+      { label: 'L4', note: '재전송, 연결 거부 · NPM 화면' },
+      { label: 'L3', note: 'ping 손실, 경로 · 네트워크 화면' },
+      { label: 'L2·L1', note: '링크 down, 수신 에러 · 장비 화면' },
+    ]}
+  />
+</Figure>
+
+모니터링 화면마다 보는 층이 달라요. 장비의 인터페이스 상태와 에러는 L1·L2, ping은 L3, 연결의 재전송은 L4, 응답시간과 5xx는 L7의 숫자예요.
+
+아래층이 무너지면 위층이 모두 나빠져요. 그래서 L7 에러가 갑자기 늘면, 같은 시각에 아래층 숫자도 나빠졌는지 봐요.
+
+반대로 링크가 멀쩡해도 L7에서 실패할 수 있어요. 아래층 숫자가 멀쩡하면 L7 숫자를 함께 봐요.
+
+<Checkpoints>
+  <Check>인터페이스 바이트 카운터(`ifInOctets`)를 앱이 보낸 데이터 양으로 읽었다면 다시 보세요. 표준은 이 값이 프레임의 머리표까지 센다고 해요. 작은 요청이 많을수록 머리표 몫이 커요.</Check>
+  <Check>로드 밸런서 화면에 5xx 지표가 없다면 L4 로드 밸런서인지 보세요. L4는 HTTP를 읽지 않아서 상태 코드를 몰라요.</Check>
+  <Check>패킷의 보낸 MAC 주소로 보낸 서버를 찾는 코드라면 다시 보세요. 라우터를 지나온 패킷의 보낸 MAC은 마지막 라우터의 것이에요.</Check>
+  <Check>UDP로 받는 Syslog, Trap, 흐름 정보가 비었다고 장비가 멈췄다고 단정했다면 다시 보세요. UDP는 사라져도 다시 보내지 않아요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### OSI의 5·6층
+
+  OSI의 세션층(5)은 대화를 열고 닫는 일을, 표현층(6)은 데이터 형식을 맞추는 일을 맡아요. 실제 프로토콜은 이 경계에 딱 맞지 않아서, TLS를 몇 층에 둘지는 설명마다 달라요.
+
+  ### MSS는 연결을 맺을 때 알려요
+
+  TCP는 연결을 맺는 SYN에 자기가 받을 수 있는 MSS를 실어 보내요. 상대가 알려 주지 않으면 IPv4에서는 536바이트로 여겨요. 576바이트에서 IP·TCP 머리 40바이트를 뺀 값이에요.
+
+  ### 1,500바이트는 IP 패킷 크기예요
+
+  RFC 894는 이더넷으로 보내는 IP 패킷의 최대 길이를 1,500바이트로 정해요. 선 위의 이더넷 프레임에는 여기에 이더넷 머리와 꼬리가 더 붙어요.
+</Deeper>

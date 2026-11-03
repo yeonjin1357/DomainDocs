@@ -1,0 +1,36 @@
+questions:
+  - id: router-rewrites-mac
+    type: ox
+    prompt: 서버 A가 라우터 너머의 서버 B에 패킷을 보냈어요. 라우터를 지난 뒤에도 받는 쪽 IP 주소는 서버 B 그대로인가요?
+    answer: true
+    explain: 라우터는 맨 바깥의 L2 머리표(MAC)만 떼고 새로 붙여요. 안쪽 L3 머리표의 IP 주소는 NAT를 지나지 않는 한 끝까지 그대로예요.
+  - id: l4-lb-blind-to-http
+    type: choice
+    prompt: L4 로드 밸런서가 요청을 나눌 때 볼 수 없는 것은?
+    choices:
+      - 요청한 HTTP 주소
+      - 받는 쪽 포트 번호
+      - 보낸 쪽 IP 주소
+      - 맺은 TCP 연결 수
+    answer: 0
+    explain: L4는 IP와 포트까지만 읽어요. HTTP 주소와 헤더, 상태 코드는 L7의 내용이라 L7 로드 밸런서만 봐요.
+  - id: mss-from-mtu
+    type: choice
+    prompt: MTU가 1,500바이트이고 옵션 없는 IPv4와 TCP 머리표가 붙어요. 패킷 하나에 실을 수 있는 앱 데이터는 최대 몇 바이트일까요?
+    choices:
+      - 1,460바이트
+      - 1,500바이트
+      - 1,480바이트
+      - 1,440바이트
+    answer: 0
+    explain: IPv4 머리 20바이트와 TCP 머리 20바이트를 빼면 1,460바이트예요. 이 크기를 MSS라고 해요.
+  - id: udp-no-resend
+    type: ox
+    prompt: UDP는 받는 쪽이 받았다고 답하지 않으면 같은 데이터를 다시 보내나요?
+    answer: false
+    explain: UDP는 연결도 확인도 없이 보내요. 사라진 데이터는 다시 보내지 않아서, UDP로 오는 Syslog나 Trap은 잃어도 보낸 쪽이 몰라요.
+  - id: encapsulation-name
+    type: input
+    prompt: 보낼 때 위층의 데이터 앞에 아래층이 자기 머리표를 붙여 감싸는 일을 무엇이라고 할까요?
+    answer: [캡슐화, encapsulation, 인캡슐레이션]
+    explain: 캡슐화예요. HTTP 요청을 TCP, IP, 이더넷 머리표가 차례로 감싸고, 받는 쪽은 거꾸로 벗겨요.
