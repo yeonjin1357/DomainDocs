@@ -105,10 +105,16 @@ DB가 잰 SQL 실행 시간이 그대로라면 문제는 DB 밖에 있어요. DB
 **확인 방법**: 아래 질의를 장애 시각에 몇 번 돌리거나, 모니터링 도구의 액티브 세션 그래프를 대기 종류별로 봐요.
 
 ```text
--- 지금 액티브 세션을 기다리는 대상별로 세기
-SELECT coalesce(wait_event_type, 'CPU') AS waiting_for, count(*)
+-- 액티브 세션을 기다리는 대상별로
+SELECT
+  coalesce(
+    wait_event_type, 'CPU'
+  ) AS waiting_for,
+  count(*)
 FROM pg_stat_activity
-WHERE state = 'active' AND backend_type = 'client backend'
+WHERE state = 'active'
+  AND backend_type =
+    'client backend'
 GROUP BY 1;
 ```
 
@@ -137,9 +143,14 @@ GROUP BY 1;
 
 ```text
 -- 막힌 세션과, 막고 있는 세션의 pid
-SELECT pid, pg_blocking_pids(pid) AS blocked_by, wait_event, query
+SELECT pid,
+  pg_blocking_pids(pid)
+    AS blocked_by,
+  wait_event, query
 FROM pg_stat_activity
-WHERE cardinality(pg_blocking_pids(pid)) > 0;
+WHERE cardinality(
+  pg_blocking_pids(pid)
+) > 0;
 ```
 
 막고 있는 세션의 `state`가 `idle in transaction`이라면, 앱이 트랜잭션을 연 채 다른 일을 하고 있어요. 잠금은 보통 트랜잭션이 끝날 때까지 남아서, 그동안 뒤의 세션이 모두 줄을 서요.

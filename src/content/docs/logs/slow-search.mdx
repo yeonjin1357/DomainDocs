@@ -116,10 +116,15 @@ Loki 문서는 정규식(`|~`)보다 단순 포함(`|=`)을 먼저 쓰라고 해
 
 ```text
 # 느린 순서
-{app="order-api"} | json | order_id="A1042"
+{app="order-api"}
+  | json
+  | order_id="A1042"
 
 # 빠른 순서
-{app="order-api"} |= "A1042" | json | order_id="A1042"
+{app="order-api"}
+  |= "A1042"
+  | json
+  | order_id="A1042"
 ```
 
 ## 4. 결과와 묶는 기준의 크기를 보세요

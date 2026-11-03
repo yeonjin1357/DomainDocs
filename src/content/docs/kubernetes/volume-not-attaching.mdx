@@ -56,11 +56,12 @@ updated: 2026-10-28
 
 PVC가 아직 묶이지 않았다면 상태가 Pending이에요. 이벤트로 이유를 가려요.
 
-| 이벤트 | 뜻 |
-| --- | --- |
-| waiting for first consumer to be created before binding | 이 PVC를 쓰는 파드가 생길 때까지 일부러 기다려요 |
-| no persistent volumes available for this claim and no storage class is set | 저장소 등급이 없고, 미리 만든 맞는 PV도 없어요 |
-| ProvisioningFailed | 저장소를 새로 만들다 실패했어요 |
+- `waiting for first consumer to be created before binding`
+  - 이 PVC를 쓰는 파드가 생길 때까지 일부러 기다려요.
+- `no persistent volumes available for this claim and no storage class is set`
+  - 저장소 등급이 없고, 미리 만든 맞는 PV도 없어요.
+- `ProvisioningFailed`
+  - 저장소를 새로 만들다 실패했어요.
 
 첫 번째는 정상이에요. <Term term="kubernetes/storage-class">StorageClass</Term>의 `volumeBindingMode`가 `WaitForFirstConsumer`이면 파드의 노드가 정해진 뒤 디스크를 만들어요. 파드가 없으면 계속 Pending이에요.
 

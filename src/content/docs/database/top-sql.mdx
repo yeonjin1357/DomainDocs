@@ -105,7 +105,9 @@ DB 부하를 줄이려면 총 시간 위쪽부터 봐요. 그림의 SQL A는 2ms
 
   ```text
   -- 실행 시간 합 상위 5개 SQL
-  SELECT queryid, calls, total_exec_time, mean_exec_time, query
+  SELECT queryid, calls,
+    total_exec_time, mean_exec_time,
+    query
   FROM pg_stat_statements
   ORDER BY total_exec_time DESC
   LIMIT 5;

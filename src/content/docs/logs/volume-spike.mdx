@@ -60,7 +60,9 @@ updated: 2026-10-29
 
 ```text
 sum by (app, level) (
-  count_over_time({env="prod"} | json [1m])
+  count_over_time(
+    {env="prod"} | json [1m]
+  )
 )
 ```
 

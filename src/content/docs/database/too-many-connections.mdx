@@ -64,9 +64,11 @@ updated: 2026-10-29
 
 ```text
 -- 연결을 쥔 곳과 상태별 연결 수
-SELECT usename, application_name, client_addr, state, count(*)
+SELECT usename, application_name,
+  client_addr, state, count(*)
 FROM pg_stat_activity
-WHERE backend_type = 'client backend'
+WHERE backend_type =
+  'client backend'
 GROUP BY 1, 2, 3, 4
 ORDER BY count(*) DESC;
 ```

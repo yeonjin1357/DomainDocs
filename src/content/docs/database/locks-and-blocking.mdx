@@ -121,7 +121,9 @@ PostgreSQL에서는 읽기와 쓰기가 서로 막지 않아요. 행의 여러 �
 
   ```text
   -- 얻지 못하고 기다리는 잠금
-  SELECT pid, locktype, relation::regclass, mode, granted
+  SELECT pid, locktype,
+    relation::regclass,
+    mode, granted
   FROM pg_locks
   WHERE NOT granted;
   ```

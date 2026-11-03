@@ -55,9 +55,15 @@ updated: 2026-10-30
 <Term term="apm/resource-error">자원 불러오기 실패</Term>는 그 요소(img, script)에서 일어나요. MDN에 따르면 이 이벤트는 위로 퍼지지(bubble) 않아요. 그래서 window.onerror에는 오지 않고, window에 캡처 단계로 등록한 리스너에서 잡혀요.
 
 ```js
-window.addEventListener('error', (e) => {
-  if (e.target !== window) report(e.target.src);
-}, true);
+window.addEventListener(
+  'error',
+  (e) => {
+    if (e.target !== window) {
+      report(e.target.src);
+    }
+  },
+  true,
+);
 ```
 
 Chromium, Firefox, WebKit에서 이미지 404를 만들어 봤어요. 세 엔진 모두 window.onerror에는 오지 않고 캡처 리스너에서만 잡혔어요.

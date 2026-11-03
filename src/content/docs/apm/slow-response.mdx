@@ -64,9 +64,11 @@ Google SRE Book도 문제를 나눠 좁혀 가는 방법을 쓸모 있는 기본
 ```text
 # order-api 서비스의 엔드포인트별 p95
 histogram_quantile(0.95,
-  sum by (le, http_route) (
-    rate(http_server_request_duration_seconds_bucket{job="order-api"}[5m])
-  )
+  sum by (le, http_route) (rate(
+    http_server_request_duration_seconds_bucket{
+      job="order-api"
+    }[5m]
+  ))
 )
 ```
 
@@ -84,10 +86,16 @@ Google SRE Book은 최근 변경을 원인 찾기를 시작하기 좋은 곳으�
 
 ```text
 # 초당 처리량
-sum(rate(http_server_request_duration_seconds_count{job="order-api"}[5m]))
+sum(rate(
+  http_server_request_duration_seconds_count{
+    job="order-api"
+  }[5m]
+))
 
 # 지금 처리 중인 요청 수(활성 트랜잭션)
-sum(http_server_active_requests{job="order-api"})
+sum(http_server_active_requests{
+  job="order-api"
+})
 ```
 
 ## 3. 느린 트레이스를 열어 보세요

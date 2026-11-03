@@ -58,13 +58,11 @@ spec:
 
 이 설정에서 `team-a` 네임스페이스의 파드는 CPU 요청을 모두 더해 4코어까지, 메모리 요청은 8Gi까지 쓸 수 있어요. 파드는 20개까지 만들 수 있어요.
 
-| 항목 | 막는 것 |
-| --- | --- |
-| `requests.cpu`, `requests.memory` | 파드들의 CPU·메모리 요청 합계 |
-| `limits.cpu`, `limits.memory` | 파드들의 CPU·메모리 한도 합계 |
-| `pods` | 파드 수 |
-| `requests.storage` | PVC들의 저장소 요청 합계 |
-| `count/deployments.apps` 같은 `count/…` | 그 종류의 객체 수 |
+- `requests.cpu`, `requests.memory`: 파드들의 CPU·메모리 요청 합계를 막아요.
+- `limits.cpu`, `limits.memory`: 파드들의 CPU·메모리 한도 합계를 막아요.
+- `pods`: 파드 수를 막아요.
+- `requests.storage`: PVC들의 저장소 요청 합계를 막아요.
+- `count/deployments.apps` 같은 `count/…`: 그 종류의 객체 수를 막아요.
 
 합계에는 끝난 파드가 빠져요. 상태가 Succeeded나 Failed인 파드는 세지 않아요.
 

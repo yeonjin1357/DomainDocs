@@ -143,11 +143,12 @@ Oracle의 `KILL SESSION`과 SQL Server의 `KILL`도 되돌릴 일이 많으면 �
 
 멈추는 일이 반복되면, 처음부터 한도를 걸어 둬요. PostgreSQL에는 세 가지가 있고, 기본값은 모두 0(꺼짐)이에요.
 
-| 설정 | 넘으면 | 재현한 에러 |
-| --- | --- | --- |
-| `statement_timeout` | SQL 하나를 멈춰요 | canceling statement due to statement timeout |
-| `lock_timeout` | 잠금을 기다리던 SQL을 멈춰요 | canceling statement due to lock timeout |
-| `idle_in_transaction_session_timeout` | 트랜잭션을 연 채 쉬는 세션을 끊어요 | terminating connection due to idle-in-transaction timeout |
+- `statement_timeout`: SQL 하나를 멈춰요. 재현한 에러는 아래와 같아요.
+  - `canceling statement due to statement timeout`
+- `lock_timeout`: 잠금을 기다리던 SQL을 멈춰요.
+  - `canceling statement due to lock timeout`
+- `idle_in_transaction_session_timeout`: 트랜잭션을 연 채 쉬는 세션을 끊어요.
+  - `terminating connection due to idle-in-transaction timeout`
 
 문서는 `statement_timeout`을 서버 설정 파일에 넣지 말라고 해요. 모든 세션에 걸리기 때문이에요. 리포트 계정이나 앱 계정처럼 역할마다, 또는 세션에서 정해요.
 

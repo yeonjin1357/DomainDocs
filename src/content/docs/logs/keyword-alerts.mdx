@@ -41,7 +41,8 @@ Loki에서는 `count_over_time`으로 구간 안의 줄 수를 세요. 아래 �
 
 ```text
 sum(count_over_time(
-  {app="order-api"} |= "ERROR" [5m]
+  {app="order-api"}
+    |= "ERROR" [5m]
 )) > 20
 ```
 
@@ -68,12 +69,10 @@ CloudWatch Logs에서는 <Term term="logs/metric-filter">지표 필터</Term>를
 
 ## 글자 일치의 함정
 
-| 조건 | 맞는 줄 | 놓치거나 잘못 맞는 줄 |
-| --- | --- | --- |
-| `\|= "error"` | `payment error` | `ERROR payment failed`를 놓쳐요 |
-| `\|~ "(?i)error"` | error, Error, ERROR 모두 | `retry_errors=0`에도 맞아요 |
-| `\|= "ERROR"` | `ERROR payment failed` | `NO_ERROR`, `ERROR_COUNT=0`에도 맞아요 |
-| 필드 `level="ERROR"` | 레벨이 ERROR인 줄 | 레벨을 잘못 적은 줄만 놓쳐요 |
+- `|= "error"`: `payment error`에는 맞지만, `ERROR payment failed`를 놓쳐요.
+- `|~ "(?i)error"`: error, Error, ERROR에 모두 맞지만, `retry_errors=0`에도 맞아요.
+- `|= "ERROR"`: `ERROR payment failed`에는 맞지만, `NO_ERROR`, `ERROR_COUNT=0`에도 맞아요.
+- 필드 조건 `level="ERROR"`: 레벨이 ERROR인 줄에 맞고, 레벨을 잘못 적은 줄만 놓쳐요.
 
 Loki 문서에 따르면 `|=`는 대소문자를 구분해요. 정규식 `|~`도 기본은 구분하고, 앞에 `(?i)`를 붙이면 구분하지 않아요.
 
@@ -81,7 +80,9 @@ Loki 문서에 따르면 `|=`는 대소문자를 구분해요. 정규식 `|~`도
 
 ```text
 sum(count_over_time(
-  {app="order-api"} | json | level="ERROR" [5m]
+  {app="order-api"}
+    | json
+    | level="ERROR" [5m]
 )) > 20
 ```
 

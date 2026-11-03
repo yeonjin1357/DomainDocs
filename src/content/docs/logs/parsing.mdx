@@ -41,8 +41,12 @@ updated: 2026-10-29
 아래 같은 텍스트 로그는 <Term term="logs/log-parsing">파싱</Term> 규칙이 있어야 필드로 쓸 수 있어요.
 
 ```text
-2026-10-29 17:22:19 ERROR [order-api] payment failed order_id=A1042
+2026-10-29 17:22:19 ERROR
+[order-api] payment failed
+order_id=A1042
 ```
+
+실제로는 한 줄인데, 길어서 나눠 적었어요.
 
 Fluent Bit에서는 파서에 정규식을 적어 나눠요. `(?<이름>…)` 모양의 이름 붙은 묶음이 필드가 돼요.
 

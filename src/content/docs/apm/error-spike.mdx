@@ -72,12 +72,22 @@ updated: 2026-10-29
   />
 </Figure>
 
-**확인 방법**: 아래 질의로 에러율을 그려요.
+**확인 방법**: 아래 질의로 에러율을 그려요. `error_type`이 붙은 요청을 전체 요청으로 나눠요.
 
 ```text
-# order-api의 에러율 (error_type이 붙은 요청 ÷ 전체 요청)
-sum(rate(http_server_request_duration_seconds_count{job="order-api", error_type!=""}[5m]))
-  / sum(rate(http_server_request_duration_seconds_count{job="order-api"}[5m]))
+# order-api의 에러율
+sum(rate(
+  http_server_request_duration_seconds_count{
+    job="order-api",
+    error_type!=""
+  }[5m]
+))
+/
+sum(rate(
+  http_server_request_duration_seconds_count{
+    job="order-api"
+  }[5m]
+))
 ```
 
 `error_type`은 OpenTelemetry(오픈소스 계측 도구)가 실패한 요청에만 붙이는 레이블이에요. 서버 쪽 지표라서 4xx 응답에는 붙지 않아요.
@@ -92,9 +102,12 @@ Google SRE Book은 최근 변경을 원인 찾기를 시작하기 좋은 곳으�
 
 ```text
 # 에러 종류별 초당 에러 수
-sum by (error_type) (
-  rate(http_server_request_duration_seconds_count{job="order-api", error_type!=""}[5m])
-)
+sum by (error_type) (rate(
+  http_server_request_duration_seconds_count{
+    job="order-api",
+    error_type!=""
+  }[5m]
+))
 ```
 
 `error_type`은 응답이 에러면 `500` 같은 상태 코드이고, 응답을 보내기 전에 실패했으면 예외 종류예요.
@@ -107,12 +120,18 @@ sum by (error_type) (
 
 ```text
 # 엔드포인트·서버별 에러율
-sum by (http_route, instance) (
-  rate(http_server_request_duration_seconds_count{job="order-api", error_type!=""}[5m])
-)
-  / sum by (http_route, instance) (
-    rate(http_server_request_duration_seconds_count{job="order-api"}[5m])
-  )
+sum by (http_route, instance) (rate(
+  http_server_request_duration_seconds_count{
+    job="order-api",
+    error_type!=""
+  }[5m]
+))
+/
+sum by (http_route, instance) (rate(
+  http_server_request_duration_seconds_count{
+    job="order-api"
+  }[5m]
+))
 ```
 
 분자와 분모를 같은 레이블로 나눠야 해요. 한쪽만 나누면 짝이 맞는 줄이 없어 빈 결과가 나와요. 에러가 없는 줄은 0이 아니라 아예 나오지 않아요.

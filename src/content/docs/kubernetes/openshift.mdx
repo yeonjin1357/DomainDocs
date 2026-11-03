@@ -46,12 +46,10 @@ updated: 2026-10-30
 
 <Term term="kubernetes/openshift">OpenShift</Term>는 Red Hat이 쿠버네티스를 바탕으로 만든 제품이에요. 아래는 쿠버네티스에는 없거나 이름이 다른 것들이에요.
 
-| OpenShift | 하는 일 | 쿠버네티스와의 관계 |
-| --- | --- | --- |
-| 프로젝트 | 팀이나 용도별로 객체를 묶어요 | 주석이 더 붙은 네임스페이스예요 |
-| Route | 바깥 요청을 서비스로 넘겨요 | 인그레스를 만들면 Route가 함께 생겨요 |
-| SCC | 파드가 쓸 UID와 권한을 정해요 | 파드를 만들 때 검사해요 |
-| DeploymentConfig | 파드를 배포하고 갱신해요 | 4.14부터 deprecated라 Deployment를 써요 |
+- **프로젝트**: 팀이나 용도별로 객체를 묶어요. 주석이 더 붙은 네임스페이스예요.
+- **Route**: 바깥 요청을 서비스로 넘겨요. 인그레스를 만들면 Route가 함께 생겨요.
+- **SCC**: 파드가 쓸 UID와 권한을 정해요. 파드를 만들 때 검사해요.
+- **DeploymentConfig**: 파드를 배포하고 갱신해요. 4.14부터 deprecated라 Deployment를 써요.
 
 <Term term="kubernetes/openshift-project">프로젝트</Term>는 `oc new-project 이름`으로 만들어요. OpenShift 문서는 프로젝트를 "주석이 더 붙은 쿠버네티스 네임스페이스"라고 설명해요. 그래서 네임스페이스 단위로 보는 화면은 그대로 써요.
 

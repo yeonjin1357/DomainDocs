@@ -110,12 +110,24 @@ updated: 2026-10-29
 <Deeper>
   ### 출력 읽기
 
-  PostgreSQL 문서의 예를 일부 줄여 옮겼어요. 들여 쓴 노드가 바로 위 노드에 행을 올려 줘요.
+  PostgreSQL 문서의 예를 일부 줄여 옮겼어요. 들여 쓴 노드가 바로 위 노드에 행을 올려 줘요. 노드 하나가 원래 한 줄인데, 길어서 괄호마다 줄을 나눴어요.
 
   ```text
-  Nested Loop  (cost=4.65..118.50 rows=10 width=488) (actual time=0.017..0.051 rows=10.00 loops=1)
-    ->  Bitmap Heap Scan on tenk1 t1  (… rows=10 …) (actual time=0.009..0.017 rows=10.00 loops=1)
-    ->  Index Scan using tenk2_unique2 on tenk2 t2  (… rows=1 …) (actual time=0.003..0.003 rows=1.00 loops=10)
+  Nested Loop
+    (cost=4.65..118.50 rows=10
+     width=488)
+    (actual time=0.017..0.051
+     rows=10.00 loops=1)
+    ->  Bitmap Heap Scan on tenk1 t1
+          (… rows=10 …)
+          (actual time=0.009..0.017
+           rows=10.00 loops=1)
+    ->  Index Scan
+          using tenk2_unique2
+          on tenk2 t2
+          (… rows=1 …)
+          (actual time=0.003..0.003
+           rows=1.00 loops=10)
   ```
 
   괄호 안 앞쪽은 예상이에요. `cost=4.65..118.50`은 첫 행을 내기까지와 끝까지의 비용, `rows`는 예상 행 수, `width`는 행 하나의 평균 바이트예요. 뒤쪽 `actual time`은 첫 행과 마지막 행까지의 실제 밀리초예요.

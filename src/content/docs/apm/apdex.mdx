@@ -128,13 +128,31 @@ Apdex(Application Performance Index)는 응답시간을 만족도 점수로 바�
   Prometheus 문서는 버킷 두 개로 Apdex를 구하는 질의를 보여 줘요. OpenTelemetry 권장 경계를 쓴다면, T를 0.25초로 잡으면 T와 4T(1초)가 모두 경계예요.
 
   ```text
-  # order-api의 Apdex (T 0.25초, 4T 1초, 에러는 만족·허용에서 뺌)
+  # order-api의 Apdex
+  # T 0.25초, 4T 1초
   (
-      sum(rate(http_server_request_duration_seconds_bucket{job="order-api", le="0.25", error_type=""}[5m]))
+    sum(rate(
+      http_server_request_duration_seconds_bucket{
+        job="order-api",
+        le="0.25",
+        error_type=""
+      }[5m]
+    ))
     +
-      sum(rate(http_server_request_duration_seconds_bucket{job="order-api", le="1.0", error_type=""}[5m]))
+    sum(rate(
+      http_server_request_duration_seconds_bucket{
+        job="order-api",
+        le="1.0",
+        error_type=""
+      }[5m]
+    ))
   ) / 2
-    / sum(rate(http_server_request_duration_seconds_count{job="order-api"}[5m]))
+  /
+  sum(rate(
+    http_server_request_duration_seconds_count{
+      job="order-api"
+    }[5m]
+  ))
   ```
 
   `le="0.25"`는 만족한 요청 수, `le="1.0"`은 만족과 허용을 더한 수예요. 둘을 더해 2로 나누면 만족 + 허용 ÷ 2예요. `error_type`은 OpenTelemetry가 실패한 요청에만 붙이는 레이블이라, `error_type=""`은 성공한 요청만 골라요.

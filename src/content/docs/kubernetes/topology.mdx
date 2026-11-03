@@ -56,13 +56,11 @@ updated: 2026-10-30
 
 ## 선은 어디서 오나요
 
-| 선 | 근거가 되는 필드 |
-| --- | --- |
-| Deployment → ReplicaSet → 파드 | 아래 객체의 `metadata.ownerReferences` |
-| 서비스 → 파드 | 서비스의 셀렉터, 그 결과를 적은 EndpointSlice |
-| 인그레스 → 서비스 | 인그레스 규칙에 적은 대상 서비스 |
-| 파드 → 노드 | 파드의 `spec.nodeName` |
-| 파드 → PVC → PV | 파드의 볼륨에 적은 PVC, PVC와 PV의 연결 |
+- **Deployment → ReplicaSet → 파드**: 아래 객체의 `metadata.ownerReferences`예요.
+- **서비스 → 파드**: 서비스의 셀렉터와, 그 결과를 적은 EndpointSlice예요.
+- **인그레스 → 서비스**: 인그레스 규칙에 적은 대상 서비스예요.
+- **파드 → 노드**: 파드의 `spec.nodeName`이에요.
+- **파드 → PVC → PV**: 파드의 볼륨에 적은 PVC와, PVC와 PV의 연결이에요.
 
 <Term term="kubernetes/owner-reference">소유 관계</Term>는 "누가 이 객체를 만들고 관리하나"예요. Deployment가 ReplicaSet을, ReplicaSet이 파드를 만들면 쿠버네티스가 이 필드를 자동으로 채워요.
 

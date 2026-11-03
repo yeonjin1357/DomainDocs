@@ -113,10 +113,16 @@ DB에 붙은 세션 대부분은 다음 명령을 기다리며 쉬어요. 액티
   `state`와 `wait_event`는 따로 움직여요. `active`이면서 `wait_event`가 있으면, 쿼리를 실행하다 어딘가에서 막혀 기다리는 중이에요. `wait_event`가 비어 있는 `active` 세션은 기다리지 않고 실행 중이라, 아래 질의는 그 몫을 CPU로 셌어요.
 
   ```text
-  -- 지금 액티브 세션을 기다리는 대상별로 세기
-  SELECT coalesce(wait_event_type, 'CPU') AS waiting_for, count(*)
+  -- 액티브 세션을 기다리는 대상별로
+  SELECT
+    coalesce(
+      wait_event_type, 'CPU'
+    ) AS waiting_for,
+    count(*)
   FROM pg_stat_activity
-  WHERE state = 'active' AND backend_type = 'client backend'
+  WHERE state = 'active'
+    AND backend_type =
+      'client backend'
   GROUP BY 1;
   ```
 

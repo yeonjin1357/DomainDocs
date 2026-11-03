@@ -73,15 +73,13 @@ import CircuitBreakerDemo from '../../../components/demos/CircuitBreakerDemo.tsx
 
 자바에서 많이 쓰는 Resilience4j의 기본값으로 보면 이래요.
 
-| 설정 | 기본값 | 뜻 |
-| --- | --- | --- |
-| `slidingWindowSize` | 100 | 최근 호출 100번으로 실패율을 세요 |
-| `minimumNumberOfCalls` | 100 | 100번은 쌓여야 실패율을 계산해요 |
-| `failureRateThreshold` | 50 | 실패율 50% 이상이면 열려요 |
-| `slowCallDurationThreshold` | 60초 | 60초보다 오래 걸린 호출은 느린 호출로 세요 |
-| `slowCallRateThreshold` | 100 | 느린 호출이 100%면 열려요 |
-| `waitDurationInOpenState` | 60초 | 열린 뒤 60초를 기다려요 |
-| `permittedNumberOfCallsInHalfOpenState` | 10 | 반열림에서 시험 호출 10번을 보내요 |
+- `slidingWindowSize`(기본 100): 최근 호출 100번으로 실패율을 세요.
+- `minimumNumberOfCalls`(기본 100): 100번은 쌓여야 실패율을 계산해요.
+- `failureRateThreshold`(기본 50): 실패율 50% 이상이면 열려요.
+- `slowCallDurationThreshold`(기본 60초): 60초보다 오래 걸린 호출은 느린 호출로 세요.
+- `slowCallRateThreshold`(기본 100): 느린 호출이 100%면 열려요.
+- `waitDurationInOpenState`(기본 60초): 열린 뒤 60초를 기다려요.
+- `permittedNumberOfCallsInHalfOpenState`(기본 10): 반열림에서 시험 호출 10번을 보내요.
 
 최소 호출 수가 중요해요. 문서의 예처럼 9번 모두 실패해도, 최소 10번으로 정했다면 열리지 않아요. 호출이 드문 API는 기본값 100번이 쌓이기까지 한참 걸려요.
 

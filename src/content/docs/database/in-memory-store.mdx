@@ -76,7 +76,8 @@ Redis는 명령을 실행하는 스레드가 하나예요. 명령이 짧아서 �
 한도에 닿으면 `maxmemory-policy`대로 움직여요. 기본값 `noeviction`은 키를 지우지 않고, 새 데이터를 넣는 명령에 아래 에러를 돌려줘요. 읽기만 하는 명령은 그대로 돼요.
 
 ```text
-OOM command not allowed when used memory > 'maxmemory'.
+OOM command not allowed when
+used memory > 'maxmemory'.
 ```
 
 캐시로만 쓴다면 `allkeys-lru`처럼 덜 쓴 키를 지우는 정책을 골라요. 이렇게 지우는 일을 <Term term="apm/eviction">축출</Term>이라고 하고, 지운 키 수는 INFO의 `evicted_keys`로 세요.
@@ -117,13 +118,11 @@ OOM command not allowed when used memory > 'maxmemory'.
 
 기본으로 보는 것은 메모리, 축출, 적중률, 연결 수예요. Redis INFO 필드와 ElastiCache 지표는 이렇게 짝지어져요.
 
-| 보는 것 | INFO 필드 | ElastiCache 지표 |
-| --- | --- | --- |
-| 메모리 사용 | `used_memory` | BytesUsedForCache, DatabaseMemoryUsagePercentage |
-| 지워진 키 | `evicted_keys` | Evictions |
-| 적중률 | `keyspace_hits`, `keyspace_misses` | CacheHitRate |
-| 연결 | `connected_clients` | CurrConnections |
-| 명령 실행 스레드의 CPU | 없음 | EngineCPUUtilization |
+- **메모리 사용**: INFO의 `used_memory`예요. ElastiCache에선 BytesUsedForCache와 DatabaseMemoryUsagePercentage예요.
+- **지워진 키**: INFO의 `evicted_keys`, ElastiCache의 Evictions예요.
+- **적중률**: INFO의 `keyspace_hits`·`keyspace_misses`, ElastiCache의 CacheHitRate예요.
+- **연결**: INFO의 `connected_clients`, ElastiCache의 CurrConnections예요.
+- **명령 실행 스레드의 CPU**: INFO에는 없고, ElastiCache의 EngineCPUUtilization이에요.
 
 명령을 실행하는 스레드가 하나라서, 서버 CPU 사용률이 낮아 보여도 그 스레드는 꽉 찼을 수 있어요. 4 vCPU 서버에서 스레드 하나가 꽉 차면 서버 전체로는 25%예요. ElastiCache는 그 스레드만 잰 EngineCPUUtilization을 따로 줘요.
 

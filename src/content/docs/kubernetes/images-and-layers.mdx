@@ -44,7 +44,8 @@ updated: 2026-10-30
 
 ```dockerfile
 FROM alpine:3.20
-RUN dd if=/dev/urandom of=/big.bin bs=1M count=50
+RUN dd if=/dev/urandom \
+    of=/big.bin bs=1M count=50
 RUN rm /big.bin
 ```
 
@@ -134,11 +135,9 @@ A /new.txt
 
 <Term term="kubernetes/image-pull-policy">imagePullPolicy</Term>를 적지 않으면 이미지를 가리킨 방식에 따라 기본값이 정해져요.
 
-| 이미지 지정 | 기본 imagePullPolicy | 뜻 |
-| --- | --- | --- |
-| `:latest`이거나 태그 없음 | Always | 띄울 때마다 레지스트리에 물어봐요 |
-| 그 밖의 태그 | IfNotPresent | 노드에 없을 때만 받아요 |
-| 다이제스트 | IfNotPresent | 노드에 없을 때만 받아요 |
+- **`:latest` 태그이거나 태그가 없으면**: Always예요. 띄울 때마다 레지스트리에 물어봐요.
+- **그 밖의 태그로 가리키면**: IfNotPresent예요. 노드에 없을 때만 받아요.
+- **다이제스트로 가리키면**: IfNotPresent예요. 노드에 없을 때만 받아요.
 
 Always여도 레이어를 매번 새로 받지는 않아요. 런타임이 레지스트리에서 지문을 확인하고, 노드에 없는 레이어만 받아요.
 

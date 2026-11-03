@@ -66,12 +66,10 @@ updated: 2026-10-29
 
 인덱스는 열의 값 그대로를 정렬해 둔 거라, 열을 바꾼 조건과는 모양이 달라요. 아래는 PGlite(PostgreSQL 17.5)에서 회원 20만 명으로 잰 계획이에요.
 
-| 조건 | 계획 |
-| --- | --- |
-| `email = 'a@x.com'` | Index Scan |
-| `lower(email) = 'a@x.com'` | Seq Scan |
-| `created_at`의 하루 범위(`>=`와 `<`) | Index Scan |
-| `date(created_at …) = '2026-03-01'` | Seq Scan |
+- `email = 'a@x.com'`: Index Scan을 써요.
+- `lower(email) = 'a@x.com'`: Seq Scan으로 바뀌어요.
+- `created_at`의 하루 범위(`>=`와 `<`): Index Scan을 써요.
+- `date(created_at …) = '2026-03-01'`: Seq Scan으로 바뀌어요.
 
 **확인 방법**: 조건에서 인덱스 열에 함수(`lower`, `date`, `substr`)나 계산(`+ 1`)이 씌워졌는지 봐요. 날짜는 범위 조건으로 바꾸고, 꼭 함수가 필요하면 그 식으로 인덱스를 만들어요. `lower(email)`로 인덱스를 만들자 위 조건도 Index Scan이 됐어요.
 

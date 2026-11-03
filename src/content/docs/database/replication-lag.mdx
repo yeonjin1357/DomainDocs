@@ -150,9 +150,11 @@ PostgreSQL 스트리밍 복제는 기본이 비동기라, 주 서버 커밋과 �
   ```text
   -- 주 서버에서: 복제 서버별 밀린 양
   SELECT application_name,
-         pg_wal_lsn_diff(pg_current_wal_lsn(), replay_lsn)
-           AS replay_bytes,
-         replay_lag
+    pg_wal_lsn_diff(
+      pg_current_wal_lsn(),
+      replay_lsn
+    ) AS replay_bytes,
+    replay_lag
   FROM pg_stat_replication;
   ```
 

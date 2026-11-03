@@ -108,10 +108,20 @@ lag을 처리 속도로 나누면, 지금 쌓인 몫을 처리하는 데 걸릴 
   `kafka-consumer-groups.sh --describe`는 파티션마다 offset 두 개와 그 차이를 보여 줘요. `CURRENT-OFFSET`은 컨슈머가 기록한 offset, `LOG-END-OFFSET`은 로그 끝 offset, `LAG`은 그 차이예요. 아래는 Kafka 문서의 예에서 열 일부만 옮겼어요.
 
   ```text
-  $ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 \
+  $ bin/kafka-consumer-groups.sh \
+      --bootstrap-server \
+      localhost:9092 \
       --describe --group my-group
-  TOPIC     PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG
-  my-topic  0          2               4               2
+  ```
+
+  결과는 파티션마다 한 줄인 표로 나와요. 열이 많아서, 첫 줄의 열 이름과 값을 세로로 옮겨 적었어요.
+
+  ```text
+  TOPIC           my-topic
+  PARTITION       0
+  CURRENT-OFFSET  2
+  LOG-END-OFFSET  4
+  LAG             2
   ```
 
   컨슈머 지표 `records-lag-max`는 컨슈머가 생산자보다 몇 건 뒤처졌는지예요. 컨슈머가 직접 내는 값이라, 컨슈머가 없으면 이 지표도 없어요.

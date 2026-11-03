@@ -41,8 +41,13 @@ updated: 2026-10-30
 JDK 9부터 <Term term="apm/gc-log">GC 로그</Term>는 통합 로깅 옵션 `-Xlog`로 켜요. 짧게는 `-Xlog:gc`, 자세히는 `-Xlog:gc*`예요.
 
 ```text
--Xlog:gc*:file=gc.log:time,uptime,level,tags:filecount=5,filesize=10m
+-Xlog:gc*
+  :file=gc.log
+  :time,uptime,level,tags
+  :filecount=5,filesize=10m
 ```
+
+옵션이 길어서 `:`마다 줄을 나눠 적었어요. 실제로는 띄어쓰기 없이 한 줄로 이어 써요.
 
 위 옵션은 gc.log 파일에 쓰고, 10MB마다 새 파일로 넘겨 5개까지 남겨요. 꾸밈 항목을 빼면 기본은 uptime, level, tags예요. 파일 돌려쓰기의 기본값은 5개, 20MB예요.
 
@@ -59,8 +64,13 @@ JDK 8의 옵션을 그대로 옮기면 안 돼요. JDK 21에서 직접 돌려 �
 ## 한 줄 읽기
 
 ```text
-[0.458s][info][gc] GC(3) Pause Young (Normal) (G1 Evacuation Pause) 83M->67M(128M) 3.486ms
+[0.458s][info][gc] GC(3)
+Pause Young (Normal)
+(G1 Evacuation Pause)
+83M->67M(128M) 3.486ms
 ```
+
+실제로는 한 줄인데, 아래 표의 부분마다 줄을 나눠 적었어요.
 
 | 부분 | 뜻 |
 | --- | --- |
@@ -77,14 +87,12 @@ JDK 8의 옵션을 그대로 옮기면 안 돼요. JDK 21에서 직접 돌려 �
 
 128MB 힙에서 쉬지 않고 할당하는 프로그램을 JDK 21로 돌려, 아래 종류가 모두 찍히는 걸 확인했어요.
 
-| 종류 | 뜻 |
-| --- | --- |
-| `Pause Young (Normal)` | 새 객체 영역만 치워요. 가장 흔해요 |
-| `Pause Young (Concurrent Start)` | young 수집을 하면서 old 영역의 표시(marking)를 시작해요 |
-| `Concurrent Mark Cycle` | 앱과 함께 돌며 old 영역의 살아 있는 객체를 표시해요 |
-| `Pause Remark`, `Pause Cleanup` | 표시를 마무리하는 짧은 멈춤이에요 |
-| `Pause Young (Prepare Mixed)`, `(Mixed)` | young과 함께 old 영역 일부도 치워요 |
-| `Pause Full (G1 Compaction Pause)` | 힙 전체를 압축해요. 가장 오래 멈춰요 |
+- `Pause Young (Normal)`: 새 객체 영역만 치워요. 가장 흔해요.
+- `Pause Young (Concurrent Start)`: young 수집을 하면서 old 영역의 표시(marking)를 시작해요.
+- `Concurrent Mark Cycle`: 앱과 함께 돌며 old 영역의 살아 있는 객체를 표시해요.
+- `Pause Remark`, `Pause Cleanup`: 표시를 마무리하는 짧은 멈춤이에요.
+- `Pause Young (Prepare Mixed)`, `(Mixed)`: young과 함께 old 영역 일부도 치워요.
+- `Pause Full (G1 Compaction Pause)`: 힙 전체를 압축해요. 가장 오래 멈춰요.
 
 <Term term="apm/young-gc">young 수집</Term>이 이어지다 old 영역이 어느 정도 차면 표시를 시작해요. 표시가 끝나면 <Term term="apm/mixed-gc">mixed 수집</Term>으로 old 영역을 조금씩 치워요.
 
@@ -93,10 +101,20 @@ JDK 8의 옵션을 그대로 옮기면 안 돼요. JDK 21에서 직접 돌려 �
 ## 경고 신호: Evacuation Failure와 Full GC
 
 ```text
-GC(11) Pause Young (Mixed) (G1 Evacuation Pause) (Evacuation Failure) 126M->126M(128M) 0.515ms
-GC(12) Pause Young (Mixed) (G1 Evacuation Pause) (Evacuation Failure) 127M->127M(128M) 0.517ms
-GC(13) Pause Full (G1 Compaction Pause) 127M->53M(128M) 7.268ms
+GC(11) Pause Young (Mixed)
+  (G1 Evacuation Pause)
+  (Evacuation Failure)
+  126M->126M(128M) 0.515ms
+GC(12) Pause Young (Mixed)
+  (G1 Evacuation Pause)
+  (Evacuation Failure)
+  127M->127M(128M) 0.517ms
+GC(13) Pause Full
+  (G1 Compaction Pause)
+  127M->53M(128M) 7.268ms
 ```
+
+GC 한 번이 로그 한 줄인데, 부분마다 줄을 나눠 적었어요.
 
 G1은 살아 있는 객체를 빈 영역으로 옮기며 치워요. 옮길 자리가 모자라면 <Term term="apm/evacuation-failure">Evacuation Failure</Term>가 찍혀요. Oracle 문서는 이 상태가 이어지면 G1이 결국 힙 전체를 압축하는 Full GC를 한다고 해요.
 

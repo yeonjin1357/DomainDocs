@@ -53,14 +53,27 @@ updated: 2026-10-30
 
 ## 구조화 로그: 값을 필드로
 
-같은 사건을 두 가지로 써 봤어요.
+같은 사건을 두 가지로 써 봤어요. 둘 다 실제로는 한 줄인데, 보기 쉽게 줄을 나눠 적었어요.
 
 ```text
-2026-10-29T08:22:19.512Z ERROR order-api payment failed order_id=A1042 user_id=88231 latency_ms=3021 trace_id=4bf92f35…
+2026-10-29T08:22:19.512Z ERROR
+order-api payment failed
+order_id=A1042 user_id=88231
+latency_ms=3021
+trace_id=4bf92f35…
 ```
 
 ```json
-{"ts":"2026-10-29T08:22:19.512Z","level":"ERROR","service":"order-api","msg":"payment failed","order_id":"A1042","user_id":88231,"latency_ms":3021,"trace_id":"4bf92f35…"}
+{
+  "ts": "2026-10-29T08:22:19.512Z",
+  "level": "ERROR",
+  "service": "order-api",
+  "msg": "payment failed",
+  "order_id": "A1042",
+  "user_id": 88231,
+  "latency_ms": 3021,
+  "trace_id": "4bf92f35…"
+}
 ```
 
 위 줄은 사람이 읽기 쉬워요. 하지만 응답시간만 꺼내려면 줄을 나누는 규칙이 따로 있어야 해요. 그 규칙은 <Term slug="logs/parsing">파싱과 필드 추출</Term>에서 다뤄요.

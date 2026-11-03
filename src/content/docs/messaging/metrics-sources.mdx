@@ -66,13 +66,11 @@ Kafka 문서는 비율로 세는 지표마다 누적값도 함께 낸다고 해�
 
 ## 0이어야 할 지표
 
-| 지표 | 평소 값 | 뜻 |
-| --- | --- | --- |
-| `UnderReplicatedPartitions` | 0 | 따라오는 복제본(ISR)이 모든 복제본보다 적은 파티션 |
-| `UnderMinIsrPartitionCount` | 0 | ISR이 `min.insync.replicas`보다 적은 파티션 |
-| `OfflinePartitionsCount` | 0 | 리더가 없어 읽고 쓸 수 없는 파티션 |
-| `ActiveControllerCount` | 클러스터 합 1 | 지금 컨트롤러 역할을 하는지 |
-| `IsrShrinksPerSec` | 0 | ISR에서 복제본이 빠지는 빈도 |
+- `UnderReplicatedPartitions`(평소 0): 따라오는 복제본(ISR)이 모든 복제본보다 적은 파티션 수예요.
+- `UnderMinIsrPartitionCount`(평소 0): ISR이 `min.insync.replicas`보다 적은 파티션 수예요.
+- `OfflinePartitionsCount`(평소 0): 리더가 없어 읽고 쓸 수 없는 파티션 수예요.
+- `ActiveControllerCount`(평소 클러스터 합 1): 지금 컨트롤러 역할을 하는지예요.
+- `IsrShrinksPerSec`(평소 0): ISR에서 복제본이 빠지는 빈도예요.
 
 복제가 모자란 파티션은 <Term slug="messaging/under-replicated">복제가 모자란 파티션이 생길 때</Term>의 순서로 봐요. `UnderMinIsrPartitionCount`가 0이 아니면, `acks=all`로 보내는 프로듀서는 그 파티션에 쓰지 못해요.
 
