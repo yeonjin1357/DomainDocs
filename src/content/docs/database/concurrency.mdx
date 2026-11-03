@@ -7,7 +7,7 @@ stage: basics
 order: 70
 icon: layers
 keywords: [MVCC, 다중 버전, concurrency, 동시성, row lock, 행 잠금, snapshot, 스냅숏, VACUUM, undo]
-related: [database/locks-and-blocking, database/transactions, database/logs-and-recovery, database/active-sessions, database/tablespaces]
+related: [database/locks-and-blocking, database/transactions, database/logs-and-recovery, database/active-sessions, database/xid-wraparound]
 sources:
   - title: PostgreSQL — Concurrency Control, Introduction (MVCC)
     url: https://www.postgresql.org/docs/current/mvcc-intro.html
@@ -89,6 +89,8 @@ SQL Server는 기본 설정(`READ_COMMITTED_SNAPSHOT` 꺼짐)에서 읽기에도
 PostgreSQL에서 행을 바꾸거나 지워도 옛 버전은 바로 사라지지 않아요. 다른 트랜잭션이 아직 볼 수 있기 때문이에요. 볼 트랜잭션이 없어지면 <Term term="database/vacuum">VACUUM</Term>이 그 자리를 치워 다시 쓰게 해요.
 
 그런데 오래 열린 트랜잭션이 하나 있으면, 그 트랜잭션이 볼 수도 있는 옛 버전은 모두 남겨 둬야 해요. 그동안 테이블과 인덱스에 치우지 못한 옛 행이 쌓여 점점 커져요.
+
+VACUUM은 오래된 행을 얼리는(freeze) 일도 해요. 이 일이 오래 막히면 트랜잭션 번호가 바닥나 쓰기가 멈출 수 있어요. 이 경우는 <Term slug="database/xid-wraparound">트랜잭션 ID가 바닥날 때</Term>에서 다뤄요.
 
 ## 모니터링에서는
 

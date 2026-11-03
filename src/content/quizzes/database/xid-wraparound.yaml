@@ -1,0 +1,28 @@
+questions:
+  - id: autovacuum-off
+    type: ox
+    prompt: autovacuum을 꺼 둔 PostgreSQL에서는, 오래된 XID를 얼리는 강제 autovacuum도 돌지 않나요?
+    answer: false
+    explain: 고갈을 막는 강제 autovacuum은 autovacuum을 꺼도 돌아요. 기본으로 XID 나이가 2억을 넘는 표에서 시작해요.
+  - id: read-only-ok
+    type: ox
+    prompt: 한계까지 3백만 개 아래로 남아 쓰기가 거부된 PostgreSQL에서도, 읽기 전용 질의는 할 수 있나요?
+    answer: true
+    explain: 새 XID가 필요한 명령만 거부해요. 이미 도는 트랜잭션은 이어 가고, 읽기 전용 트랜잭션은 새로 시작할 수 있어요.
+  - id: blocker
+    type: choice
+    prompt: VACUUM을 여러 번 돌려도 age(datfrozenxid)가 줄지 않아요. 먼저 볼 곳은?
+    choices: [pg_replication_slots, pg_stat_statements, pg_stat_bgwriter, pg_settings]
+    answer: 0
+    explain: 버려진 복제 슬롯이 얼릴 수 있는 선을 붙잡고 있을 수 있어요. 오래 열린 트랜잭션과 준비된 트랜잭션도 함께 봐요.
+  - id: warning-timing
+    type: choice
+    prompt: PostgreSQL이 'must be vacuumed within N transactions' 경고를 내기 시작하는 때는?
+    choices: [한계까지 4천만 남았을 때, XID 나이가 2억일 때, XID 나이가 16억일 때, 한계까지 3백만 남았을 때]
+    answer: 0
+    explain: 경고는 한계 4천만 전부터 나와요. 2억은 강제 autovacuum, 16억은 failsafe, 3백만 전은 쓰기 거부가 시작되는 때예요.
+  - id: freeze-name
+    type: input
+    prompt: 충분히 오래된 행을 번호와 상관없이 늘 과거의 것으로 보이게 표시하는 VACUUM의 일을 영어로 무엇이라 하나요?
+    answer: [freeze, freezing, 프리즈]
+    explain: VACUUM이 행을 얼려 두면 XID가 한 바퀴 돌아도 그 행은 미래의 것으로 보이지 않아요.
