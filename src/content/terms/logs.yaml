@@ -62,3 +62,10 @@ terms:
     aliases: [Live Tail, tail -f, 실시간 로그, kubectl logs -f]
     short: 새로 들어오는 로그를 실시간으로 흘려 보여 주는 기능이에요.
     doc: logs/live-tail
+  - id: masking
+    name: 마스킹
+    en: Masking, redaction
+    aliases: [masking, redaction, 가리기, 민감 정보 가리기, 레닥션]
+    short: 로그에 남기 전에 민감한 값을 빼거나 일부를 별표 같은 글자로 바꾸는 일이에요.
+    analogy: 택배 송장의 전화번호 가운데를 별표로 가리는 것과 같아요.
+    doc: logs/sensitive-data
