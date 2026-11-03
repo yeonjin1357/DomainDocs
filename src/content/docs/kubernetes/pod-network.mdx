@@ -1,0 +1,164 @@
+---
+title: 파드 네트워크(CNI)
+summary: 파드마다 IP가 하나씩 붙고, 노드를 넘어도 NAT 없이 바로 닿아요. 이 길은 CNI 플러그인이 깔아요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 55
+icon: network
+keywords: [파드 네트워크, pod network, CNI, Calico, Cilium, Flannel, 오버레이, VXLAN, podCIDR, NetworkPolicy]
+related: [kubernetes/pods-and-nodes, kubernetes/services-and-ingress, kubernetes/cluster-dns, network/layers, kubernetes/scheduling]
+sources:
+  - title: Kubernetes — Services, Load Balancing, and Networking (네트워크 모델)
+    url: https://kubernetes.io/docs/concepts/services-networking/
+  - title: Kubernetes — Network Policies
+    url: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  - title: Kubernetes — kube-controller-manager (--node-cidr-mask-size)
+    url: https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
+  - title: Kubernetes — kubelet (--max-pods)
+    url: https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
+  - title: Flannel — Backends (VXLAN)
+    url: https://github.com/flannel-io/flannel/blob/master/Documentation/backends.md
+  - title: AWS — amazon-vpc-cni-k8s
+    url: https://github.com/aws/amazon-vpc-cni-k8s
+  - title: cAdvisor — Prometheus metrics
+    url: https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="파드마다 IP가 하나예요">
+    파드 안의 컨테이너는 그 IP를 함께 써요. 다른 파드와는 노드가 달라도 NAT 없이 바로 통신해요.
+  </Point>
+  <Point title="길은 CNI 플러그인이 깔아요">
+    쿠버네티스는 규칙만 정해요. 실제 길은 Calico, Cilium, Flannel 같은 플러그인이 만들어요.
+  </Point>
+  <Point title="파드 IP는 바뀌어요">
+    파드가 다시 만들어지면 IP도 바뀌어요. 고정된 주소가 필요하면 서비스를 써요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="아파트 호수는 이사해도 그대로지만, 파드는 다시 만들어질 때마다 새 IP를 받아요. 그래서 파드 IP를 주소록에 적어 두면 금방 틀려요.">
+  아파트 단지와 비슷해요. 동(노드)마다 쓸 호수 범위가 정해져 있고, 단지 안 배달원(CNI 플러그인)이 다른 동의 집까지 우편을 날라 줘요.
+</Analogy>
+
+## 파드마다 IP가 하나예요
+
+쿠버네티스의 네트워크 규칙은 셋이에요.
+
+- 파드마다 클러스터 안에서 하나뿐인 IP를 받아요.
+- 모든 파드는 노드가 달라도 NAT 없이 서로 닿아요.
+- 노드의 에이전트(kubelet 등)는 그 노드의 파드에 모두 닿아요.
+
+<Figure caption="노드마다 파드 IP 범위가 따로 있어요. 파드는 자기 노드의 범위에서 IP를 받고, 다른 노드의 파드와도 그 IP로 바로 통신해요.">
+  <Nest
+    ariaLabel="클러스터 안에 노드 1과 노드 2가 있고, 노드 1은 10.244.1.0/24 범위에서 파드 A 10.244.1.5와 파드 B 10.244.1.6을, 노드 2는 10.244.2.0/24 범위에서 파드 C 10.244.2.7을 가진 그림"
+    boxes={[
+      {
+        label: '클러스터',
+        cols: 2,
+        children: [
+          { label: '노드 1', note: '10.244.1.0/24', children: [{ label: '파드 A', note: '10.244.1.5', tone: 'accent' }, { label: '파드 B', note: '10.244.1.6' }] },
+          { label: '노드 2', note: '10.244.2.0/24', children: [{ label: '파드 C', note: '10.244.2.7', tone: 'accent' }] },
+        ],
+      },
+    ]}
+  />
+</Figure>
+
+파드 안의 컨테이너들은 같은 네트워크 공간을 써서 서로 `localhost`로 불러요. 파드 하나는 <Term slug="kubernetes/pods-and-nodes">파드와 노드</Term>에서 다뤄요.
+
+노드마다 파드 IP 범위를 나눠 주는 방식이 흔해요. 컨트롤러 매니저가 나눠 줄 때 기본 크기는 /24라, 노드 하나에 주소가 256개예요. kubelet이 노드 하나에 띄우는 파드는 기본 110개까지라 범위가 넉넉해요.
+
+## 길은 CNI 플러그인이 깔아요
+
+<Term term="kubernetes/cni">CNI</Term>(Container Network Interface)는 파드 네트워크를 만드는 플러그인과 쿠버네티스 사이의 약속이에요. 파드가 뜰 때 컨테이너 런타임이 CNI 플러그인을 불러 IP를 주고 길을 이어요.
+
+노드를 넘는 길은 플러그인마다 두 방식 중 하나를 써요. 파드 패킷을 노드 주소로 한 번 더 감싸 보내는 오버레이와, 바깥 네트워크에 파드 범위로 가는 길을 알려 주는 라우팅이에요.
+
+<Figure caption="오버레이는 파드 패킷을 노드 주소로 한 번 더 감싸서 보내요. 바깥 네트워크는 노드 주소만 보고 날라요. 받는 노드가 벗겨서 파드에 넘겨요.">
+  <Stages
+    ariaLabel="파드 A가 보낸 파드 주소와 데이터를, 노드 1이 노드 주소와 VXLAN 머리표로 감싸서 보내고, 노드 2가 그 머리표를 벗겨 원래 패킷을 파드 C에 넘기는 단계 칸"
+    hint={['노드 1 → 노드 2', '']}
+    grow={3}
+    rows={[
+      { label: '파드 A가 보낸 그대로', cells: [null, null, '파드 주소', '데이터'] },
+      { label: '노드 1이 감싸서 보냄', note: '+ 노드 주소', cells: [{ label: '노드 주소', tone: 'accent' }, { label: 'VXLAN', tone: 'accent' }, '파드 주소', '데이터'] },
+      { label: '노드 2가 벗겨 넘김', cells: [null, null, '파드 주소', '데이터'] },
+    ]}
+  />
+</Figure>
+
+<Figure caption="두 방식의 차이예요. 오버레이는 바깥 네트워크를 건드리지 않는 대신 머리표만큼 실을 자리가 줄고, 라우팅은 그 손해가 없는 대신 바깥 네트워크가 파드 범위를 알아야 해요.">
+  <Compare
+    columns={['오버레이', '라우팅']}
+    rows={[
+      { label: '노드를 넘는 법', values: ['노드 주소로 감싸요', '파드 범위로 길을 알려요'] },
+      { label: '바깥 네트워크', values: ['파드 IP를 몰라도 돼요', '파드 범위를 알아야 해요'] },
+      { label: '실을 자리', values: ['감싼 만큼 줄어요', '그대로예요'] },
+      { label: '예', values: ['Flannel VXLAN', 'Calico BGP, 클라우드 VPC'] },
+    ]}
+  />
+</Figure>
+
+Flannel의 VXLAN은 머리표가 50바이트라, 선의 MTU가 1,500바이트면 파드 쪽 MTU를 1,450바이트로 잡아요. 감싸기와 MTU는 <Term slug="network/layers">네트워크 계층</Term>에서 본 것과 같은 이야기예요.
+
+AWS의 VPC CNI처럼 파드에 VPC의 실제 IP를 나눠 주는 플러그인도 있어요. 감싸지 않아서 빠르지만, 노드가 가질 수 있는 IP 수만큼만 파드를 띄울 수 있어요.
+
+## 파드 IP는 바뀌어요
+
+파드가 죽고 다시 만들어지면 새 IP를 받아요. 배포 때마다 파드가 바뀌니, 파드 IP를 설정에 적어 두면 금방 틀려요.
+
+그래서 다른 파드를 부를 때는 고정 주소를 가진 <Term slug="kubernetes/services-and-ingress">서비스</Term>를 써요. 서비스 이름을 IP로 바꾸는 일은 <Term slug="kubernetes/cluster-dns">클러스터 안의 DNS</Term>가 해요.
+
+## 막는 규칙: NetworkPolicy
+
+기본으로 모든 파드는 모든 파드와 통신할 수 있어요. <Term term="kubernetes/network-policy">NetworkPolicy</Term>는 이 길을 막는 규칙이에요. 파드가 한 정책에라도 걸리면, 그 정책이 허락한 통신만 들어올 수 있어요.
+
+<Figure caption="주문 파드에 '프런트 파드만 들어올 수 있다'는 정책을 건 예시예요. 프런트 파드는 닿고, 다른 파드는 막혀요.">
+  <Flow
+    ariaLabel="주문 파드에 정책을 걸어, 프런트 파드에서 오는 요청은 허락하고 다른 파드에서 오는 요청은 막는 구조도"
+    nodes={[
+      { id: 'front', label: '프런트 파드', col: 0, row: 0, tone: 'accent' },
+      { id: 'other', label: '다른 파드', col: 0, row: 1 },
+      { id: 'order', label: '주문 파드', col: 2, row: 0, note: '정책이 걸림', tone: 'accent' },
+    ]}
+    edges={[
+      { from: 'front', to: 'order', label: '허락', tone: 'accent' },
+      { from: 'other', to: 'order', label: '막힘', tone: 'warn', dashed: true },
+    ]}
+  />
+</Figure>
+
+정책을 실제로 지키는 건 CNI 플러그인이에요. 정책을 지원하지 않는 플러그인에서는 NetworkPolicy를 만들어도 아무 일도 일어나지 않아요.
+
+## 모니터링에서는
+
+파드마다 네트워크로 주고받은 양은 kubelet 안의 cAdvisor가 세요. 바이트 카운터라 rate로 초당 양을 봐요.
+
+- `container_network_receive_bytes_total`: 파드가 받은 바이트예요.
+- `container_network_transmit_bytes_total`: 파드가 보낸 바이트예요.
+- `container_network_receive_packets_dropped_total`: 받다가 버린 패킷이에요.
+
+파드끼리 통신이 안 될 때는 CNI 플러그인 자체의 파드부터 봐요. 플러그인은 보통 노드마다 하나씩 DaemonSet으로 떠요. 그 파드가 죽은 노드에서는 새 파드가 IP를 받지 못해 ContainerCreating에 머물러요.
+
+<Checkpoints>
+  <Check>다른 서비스의 파드 IP를 설정 파일에 적어 둔 코드라면 다시 보세요. 파드가 다시 만들어지면 IP가 바뀌어요. 서비스 이름으로 불러요.</Check>
+  <Check>NetworkPolicy를 만들었는데 막히지 않는다면, 쓰는 CNI 플러그인이 정책을 지원하는지 보세요. 지원하지 않으면 정책은 아무 효과가 없어요.</Check>
+  <Check>오버레이 네트워크에서 작은 요청은 되는데 큰 응답만 멈춘다면 MTU를 의심하세요. 감싼 머리표만큼 실을 자리가 줄어요.</Check>
+  <Check>노드에 CPU와 메모리가 남는데 새 파드가 ContainerCreating에 머문다면, CNI 플러그인 파드와 남은 IP 수를 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 파드 안의 네트워크 장치
+
+  리눅스에서 파드는 자기만의 네트워크 공간(network namespace)을 가져요. CNI 플러그인은 보통 가상 이더넷 한 쌍(veth)을 만들어 한쪽은 파드 안에, 다른 쪽은 노드에 둬요. 노드는 이 장치로 파드와 패킷을 주고받아요.
+
+  ### VPC CNI의 파드 수 한도
+
+  AWS VPC CNI는 인스턴스의 네트워크 카드(ENI)마다 IP를 붙여 파드에 나눠 줘요. 그래서 노드의 파드 수 한도는 ENI 수와 ENI당 IP 수로 정해져요. README는 max-pods를 (ENI 수 × (ENI당 IP 수 − 1)) + 2로 잡으라고 권해요.
+
+  ### 서비스와 kube-proxy
+
+  서비스 IP로 온 요청을 파드 IP로 바꾸는 일은 kube-proxy가 해요. 다만 Cilium처럼 이 일을 플러그인이 직접 하는 경우도 있어요.
+</Deeper>

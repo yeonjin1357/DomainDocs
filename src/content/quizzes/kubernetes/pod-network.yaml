@@ -1,0 +1,36 @@
+questions:
+  - id: no-nat-between-pods
+    type: ox
+    prompt: 노드가 다른 두 파드가 통신할 때, 쿠버네티스 네트워크 모델은 보낸 파드의 IP가 NAT로 바뀌어 도착하는 것을 허락하나요?
+    answer: false
+    explain: 쿠버네티스는 모든 파드가 노드와 상관없이 NAT 없이 서로 닿아야 한다고 정해요. 받는 쪽은 보낸 파드의 IP를 그대로 봐요.
+  - id: policy-without-plugin
+    type: choice
+    prompt: 주문 파드에 프런트 파드만 들어오게 하는 NetworkPolicy를 만들었는데, 다른 파드에서도 여전히 들어와요. 가장 먼저 볼 것은?
+    choices:
+      - CNI 플러그인이 정책을 지원하는지
+      - kube-proxy가 떠 있는지
+      - 서비스의 셀렉터가 맞는지
+      - 클러스터 DNS가 이름을 푸는지
+    answer: 0
+    explain: 정책을 실제로 지키는 건 CNI 플러그인이에요. 지원하지 않는 플러그인에서는 정책을 만들어도 아무 효과가 없어요.
+  - id: overlay-mtu
+    type: choice
+    prompt: 선의 MTU가 1,500바이트인 곳에서 Flannel VXLAN 오버레이를 쓰면, 파드 쪽 MTU는 보통 얼마로 잡을까요?
+    choices:
+      - 1,450바이트
+      - 1,500바이트
+      - 1,550바이트
+      - 1,460바이트
+    answer: 0
+    explain: VXLAN 머리표가 50바이트라 그만큼 빼요. 감싼 패킷이 선의 MTU를 넘지 않게 하려는 거예요.
+  - id: pod-ip-stable
+    type: ox
+    prompt: Deployment가 파드를 새로 만들어도 그 파드는 지워진 파드의 IP를 이어받나요?
+    answer: false
+    explain: 새로 만든 파드는 새 IP를 받아요. 그래서 다른 파드를 부를 때는 고정 주소를 가진 서비스를 써요.
+  - id: cni-name
+    type: input
+    prompt: 파드에 IP를 주고 노드 사이 길을 이어 주는 네트워크 플러그인과 쿠버네티스 사이의 약속을 무엇이라고 할까요(약어)?
+    answer: [CNI, Container Network Interface]
+    explain: CNI예요. Calico, Cilium, Flannel 같은 플러그인이 이 약속에 맞춰 파드 네트워크를 만들어요.
