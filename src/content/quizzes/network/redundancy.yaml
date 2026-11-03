@@ -1,0 +1,36 @@
+questions:
+  - id: loop-without-stp
+    type: ox
+    prompt: 스위치 셋을 삼각형으로 잇고 STP를 꺼 두면, 받는 쪽을 모르는 프레임이 링크를 끝없이 돌 수 있나요?
+    answer: true
+    explain: 플러딩된 프레임이 삼각형을 돌며 불어나요. 이더넷 프레임에는 TTL 같은 수명이 없어서 스스로 사라지지 않아요. 이게 브로드캐스트 폭풍이에요.
+  - id: one-flow-one-member
+    type: choice
+    prompt: 1Gbps 선 두 개를 LACP로 묶었어요. 서버 한 대가 TCP 연결 하나로 큰 파일을 보내면 최대 얼마까지 낼 수 있나요?
+    choices:
+      - 1Gbps
+      - 2Gbps
+      - 0.5Gbps
+      - 4Gbps
+    answer: 0
+    explain: 장비는 주소와 포트로 멤버 하나를 정해서, 연결 하나는 늘 같은 멤버로 가요. 그래서 흐름 하나는 멤버 하나의 속도를 넘지 못해요.
+  - id: member-down-logical-up
+    type: ox
+    prompt: 묶음 링크의 멤버 둘 중 하나가 끊기면, 논리 링크의 상태도 down이 되나요?
+    answer: false
+    explain: 남은 멤버로 이어져서 논리 링크는 up이에요. 용량만 반으로 줄어서, 멤버마다 따로 알림을 걸어야 알아요.
+  - id: vrrp-gateway
+    type: choice
+    prompt: 라우터 둘로 VRRP를 꾸몄어요. 서버의 기본 게이트웨이에는 무엇을 적어야 할까요?
+    choices:
+      - 두 라우터가 함께 맡은 가상 IP
+      - 마스터 라우터의 실제 IP
+      - 대기 라우터의 실제 IP
+      - 두 라우터의 실제 IP 둘 다
+    answer: 0
+    explain: 가상 IP를 적어야 마스터가 바뀌어도 서버는 그대로 통신해요. 한 라우터의 실제 IP를 적으면 그 라우터가 멈출 때 함께 끊겨요.
+  - id: stp-name
+    type: input
+    prompt: 스위치 사이에 길이 여럿일 때 하나만 남기고 나머지 포트를 막아 루프를 없애는 규약은?
+    answer: [STP, Spanning Tree Protocol, 스패닝 트리, 스패닝 트리 프로토콜, RSTP]
+    explain: STP예요. 쓰던 길이 끊기면 막아 둔 포트를 열어요. 옛 STP는 30초쯤 걸리고, RSTP는 훨씬 빨라요.

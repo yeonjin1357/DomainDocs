@@ -6,7 +6,7 @@ type: guide
 order: 100
 icon: network
 keywords: [link flapping, 플래핑, linkDown, linkUp, ifOperStatus, ifLastChange, ifInErrors, CRC, 케이블, 상태 변화]
-related: [network/interfaces-and-traffic, network/traps-and-syslog, network/snmp, foundations/alert-fatigue]
+related: [network/interfaces-and-traffic, network/traps-and-syslog, network/snmp, network/redundancy, foundations/alert-fatigue]
 sources:
   - title: RFC 2863 — The Interfaces Group MIB (ifOperStatus, ifLastChange, linkDown, linkUp)
     url: https://www.rfc-editor.org/rfc/rfc2863
@@ -124,4 +124,5 @@ Trap은 UDP라 중간에 사라져도 알 수 없어요. 그래서 Trap 수만 �
   <Check>Trap 수로만 플래핑 횟수를 세고 있다면 다시 보세요. Trap은 UDP라 사라질 수 있어요.</Check>
   <Check>관리자가 끈 포트까지 장애로 알린다면, ifAdminStatus가 up인 포트만 알리도록 바꾸세요.</Check>
   <Check>플래핑이 다른 알림을 묻는다면, 같은 포트의 상태 변화를 사건 하나로 묶어 보내세요.</Check>
+  <Check>스위치 사이의 링크가 플래핑한다면 STP 토폴로지 변경 횟수도 함께 보세요. 끊길 때마다 길이 바뀌어 다른 포트의 트래픽까지 흔들 수 있어요. 원리는 <Term slug="network/redundancy">링크와 장비 이중화</Term>에 있어요.</Check>
 </Checkpoints>
