@@ -1,0 +1,36 @@
+questions:
+  - id: queue-excludes-running
+    type: ox
+    prompt: 윈도우의 Processor Queue Length는 지금 CPU에서 실행 중인 스레드도 함께 세나요?
+    answer: false
+    explain: 차례를 기다리는 스레드만 세요. 모든 CPU가 함께 쓰는 줄 하나라서, 논리 CPU 수로 나눠 봐요.
+  - id: disk-sec-unit
+    type: choice
+    prompt: '`\PhysicalDisk(_Total)\Avg. Disk sec/Read` 값이 0.030이에요. 읽기 한 번에 걸린 평균 시간은?'
+    choices:
+      - 30밀리초
+      - 0.03밀리초
+      - 30초
+      - 3밀리초
+    answer: 0
+    explain: 이 카운터는 초 단위예요. 0.030초는 30밀리초예요. 밀리초로 알고 읽으면 디스크가 1,000배 빨라 보여요.
+  - id: planned-restart
+    type: choice
+    prompt: 서버가 밤사이 다시 켜졌어요. System 로그에 이벤트 1074만 있고 6008은 없어요. 가장 그럴듯한 해석은?
+    choices:
+      - 누군가 재시작을 시작했어요
+      - 전원이 갑자기 끊겼어요
+      - 서비스가 죽었다 복구됐어요
+      - 디스크가 가득 차서 멈췄어요
+    answer: 0
+    explain: 1074는 사람이나 프로세스가 재시작이나 종료를 시작한 기록이에요. 갑자기 꺼졌다면 다음 부팅 때 6008이 남아요.
+  - id: recovered-service-logged
+    type: ox
+    prompt: 서비스가 죽었다가 복구 설정으로 다시 떠서 지금 Running이에요. 죽었던 일은 System 로그에 남나요?
+    answer: true
+    explain: 서비스 제어 관리자가 7034나 7031을 남겨요. 그래서 상태가 Running이어도 이 이벤트를 함께 봐야 반복해서 죽는 걸 알아요.
+  - id: perf-counter-name
+    type: input
+    prompt: 윈도우에서 CPU, 메모리, 디스크 상태를 \객체(인스턴스)\이름 경로로 읽는 값을 무엇이라고 할까요?
+    answer: [성능 카운터, performance counter, 퍼포먼스 카운터, 퍼프 카운터]
+    explain: 성능 카운터예요. PowerShell의 Get-Counter나 windows_exporter가 이 값을 읽어요.

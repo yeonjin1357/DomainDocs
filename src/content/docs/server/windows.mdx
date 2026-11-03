@@ -1,0 +1,172 @@
+---
+title: 윈도우 서버는 무엇이 다를까
+summary: 윈도우는 숫자를 성능 카운터로, 서비스를 SCM으로, 기록을 이벤트 로그로 다뤄요.
+domain: server
+type: concept
+stage: basics
+order: 65
+icon: server
+keywords: [Windows, 윈도우, performance counter, 성능 카운터, Get-Counter, 이벤트 로그, Event ID, windows_exporter, Processor Queue Length, 서비스 제어 관리자]
+related: [server/overview, server/cpu-usage, server/memory, server/services-and-logs, server/metrics-sources]
+sources:
+  - title: Microsoft — Get-Counter (PowerShell)
+    url: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-counter
+  - title: Microsoft — Get-WinEvent (PowerShell)
+    url: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent
+  - title: Microsoft — Get-Service (PowerShell)
+    url: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-service
+  - title: windows_exporter README (포트 9182, 기본 수집기)
+    url: https://github.com/prometheus-community/windows_exporter
+  - title: windows_exporter — cpu 수집기 (windows_cpu_time_seconds_total)
+    url: https://github.com/prometheus-community/windows_exporter/blob/master/docs/collector.cpu.md
+  - title: windows_exporter — service 수집기 (windows_service_state)
+    url: https://github.com/prometheus-community/windows_exporter/blob/master/docs/collector.service.md
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="숫자는 성능 카운터로 읽어요">
+    리눅스의 `/proc` 대신 `\Processor(_Total)\% Processor Time` 같은 카운터 경로로 읽어요.
+  </Point>
+  <Point title="이름이 비슷해도 뜻이 달라요">
+    프로세서 큐 길이는 실행 중인 스레드를 빼고 세요. 디스크 시간은 밀리초가 아니라 초 단위예요.
+  </Point>
+  <Point title="기록은 이벤트 로그에 모여요">
+    서비스가 죽거나 서버가 갑자기 꺼지면, 시스템 로그에 정해진 이벤트 ID로 남아요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="다른 회사 사무실도 결국 직원과 책상과 캐비닛이 있지만, 윈도우는 숫자의 뜻까지 리눅스와 다른 곳이 있어요. 이름이 비슷하다고 같은 기준으로 읽으면 틀려요.">
+  같은 일을 하는 다른 회사의 사무실과 비슷해요. 직원(CPU), 책상(메모리), 캐비닛(디스크)은 같은데, 계기판의 이름과 업무 일지를 쓰는 장부가 달라요.
+</Analogy>
+
+## 리눅스와 견줘 보면
+
+<Figure caption="서버가 하는 일은 같지만 숫자를 읽는 곳, 서비스를 관리하는 곳, 기록이 모이는 곳이 달라요.">
+  <Compare
+    columns={['리눅스', '윈도우']}
+    rows={[
+      { label: '숫자를 읽는 곳', values: ['/proc 같은 가상 파일', '성능 카운터'] },
+      { label: '서비스 관리', values: ['systemd', '서비스 제어 관리자(SCM)'] },
+      { label: '기록', values: ['journald, 커널 로그', '이벤트 로그'] },
+      { label: 'Prometheus 에이전트', values: ['node_exporter', 'windows_exporter'] },
+    ]}
+  />
+</Figure>
+
+CPU, 메모리, 디스크가 하는 일은 같아요. 그래서 <Term slug="server/cpu-usage">CPU 사용률과 부하</Term>, <Term slug="server/memory">메모리</Term> 글의 생각은 그대로 써요. 다만 숫자를 꺼내는 길과 몇몇 숫자의 뜻이 달라요.
+
+## 성능 카운터 읽기
+
+윈도우는 시스템 상태를 <Term term="server/performance-counter">성능 카운터</Term>로 내놓아요. 경로는 `\객체(인스턴스)\카운터` 꼴이고, `_Total`은 인스턴스를 모두 합친 값이에요. PowerShell의 `Get-Counter`로 읽어요.
+
+먼저 볼 카운터는 이래요.
+
+- `\Processor(_Total)\% Processor Time`: 모든 논리 CPU를 합친 사용률이에요.
+- `\System\Processor Queue Length`: CPU를 기다리는 스레드 수예요.
+- `\Memory\Available MBytes`: 프로세스에 바로 내줄 수 있는 메모리(MB)예요.
+- `\Memory\Committed Bytes`, `\Memory\Commit Limit`: 약속해 둔 가상 메모리와 그 한도예요.
+- `\LogicalDisk(C:)\% Free Space`: C 드라이브의 남은 공간 비율이에요.
+- `\PhysicalDisk(_Total)\Avg. Disk sec/Read`: 읽기 한 번에 걸린 평균 시간이에요.
+
+## 리눅스와 뜻이 다른 숫자
+
+이름이 비슷해도 세는 법이 다른 숫자가 있어요. 리눅스 기준으로 읽으면 판단이 틀려요.
+
+<Figure caption="둘 다 CPU가 밀렸는지 보는 숫자지만, 세는 대상이 달라요. 윈도우 값은 실행 중인 스레드와 디스크를 기다리는 일을 세지 않아요.">
+  <Compare
+    columns={['리눅스 부하', '윈도우 프로세서 큐 길이']}
+    rows={[
+      { label: '세는 것', values: ['실행 중 + 차례 대기 + 디스크 대기', '차례를 기다리는 스레드만'] },
+      { label: '줄의 수', values: ['평균값(1·5·15분)', '모든 CPU가 함께 쓰는 줄 하나'] },
+      { label: '읽는 법', values: ['코어 수와 견줘요', '논리 CPU 수로 나눠 봐요'] },
+    ]}
+  />
+</Figure>
+
+Processor Queue Length는 모든 CPU가 함께 쓰는 줄 하나의 길이예요. 그래서 논리 CPU 수로 나눠 봐요. 윈도우 설명은 CPU 하나에 10개 이하라면 대개 괜찮다고 해요.
+
+`Avg. Disk sec/Read`는 초 단위예요. 0.020이면 20밀리초예요. 단위를 밀리초로 알고 읽으면 디스크가 1,000배 빨라 보여요.
+
+`Available MBytes`는 비어 있는 메모리에 캐시처럼 곧 비울 수 있는 몫까지 더한 값이에요. 리눅스의 available과 비슷하게 읽어요. Committed Bytes가 Commit Limit에 가까워지면 약속할 수 있는 메모리가 바닥나는 중이에요.
+
+## 서비스는 SCM이 관리해요
+
+윈도우의 서비스는 서비스 제어 관리자(SCM)가 띄우고 멈춰요. 서비스마다 상태(Running, Stopped)와 시작 방식(Automatic, Manual, Disabled)이 있어요. `Get-Service`로 둘 다 볼 수 있어요.
+
+서비스가 죽었을 때 다시 띄울지는 서비스의 복구 설정으로 정해요. 리눅스 systemd의 `Restart=`와 같은 일이에요.
+
+그래서 상태가 Running이어도 몇 번 죽었다 살아났을 수 있어요. systemd 쪽은 <Term slug="server/services-and-logs">서비스와 시스템 로그</Term>에서 다뤄요.
+
+## 기록은 이벤트 로그에 모여요
+
+윈도우의 기록은 <Term term="server/event-log">이벤트 로그</Term>에 모여요. 운영체제 기록은 System, 앱 기록은 Application, 보안 기록은 Security 로그예요. 기록마다 수준(Critical, Error, Warning, Information)과 이벤트 ID가 붙어요.
+
+<Figure caption="서버가 다시 켜진 이유와 서비스가 죽은 기록을 가를 때 먼저 보는 System 로그의 이벤트예요.">
+  <Strip
+    ariaLabel="System 로그의 이벤트 ID 6008은 예기치 않은 종료, 1074는 사람이나 프로세스가 시작한 재시작, 7034는 서비스가 예기치 않게 끝남, 7031은 서비스가 끝나 복구 동작을 함을 뜻하는 칸 띠"
+    rows={[
+      {
+        label: 'System 로그 이벤트 ID',
+        heads: ['6008', '1074', '7034', '7031'],
+        cells: [{ label: '갑자기 꺼짐', tone: 'warn' }, '계획된 재시작', { label: '서비스 죽음', tone: 'warn' }, '죽고 복구'],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 1, label: '서버 재시작' },
+      { from: 2, to: 3, label: '서비스' },
+    ]}
+  />
+</Figure>
+
+- **6008**(EventLog): 직전 종료가 예기치 않았다는 기록이에요. 전원이 끊기거나 시스템이 멈췄을 때 남아요.
+- **1074**(User32): 사람이나 프로세스가 재시작이나 종료를 시작했다는 기록이에요. 누가 시작했는지도 적혀요.
+- **7034**(Service Control Manager): 서비스가 예기치 않게 끝났고, 몇 번째인지 적혀요.
+- **7031**(Service Control Manager): 서비스가 끝나서 정해 둔 복구 동작을 한다는 기록이에요.
+
+PowerShell에서는 `Get-WinEvent`로 이벤트 ID를 골라 읽어요.
+
+```powershell
+Get-WinEvent -FilterHashtable @{
+  LogName = 'System'
+  Id = 6008, 1074
+} -MaxEvents 5
+```
+
+## 모니터링에서는
+
+<Figure caption="윈도우 서버의 예시예요. CPU 사용률은 높지 않은데, 서비스가 하루에 네 번 죽었다 복구됐고 읽기 지연이 0.045초(45ms)예요.">
+  <StatTile label="CPU 사용률" value="38" unit="%" />
+  <StatTile label="서비스 복구(7031)" value="4" unit="회/일" tone="warn" />
+  <StatTile label="Avg. Disk sec/Read" value="0.045" unit="초" tone="warn" note="45ms" />
+</Figure>
+
+Prometheus로 모은다면 windows_exporter를 써요. 기본으로 9182번 포트에서 지표를 보여 주고, cpu, memory, logical_disk, service 수집기가 기본으로 켜져 있어요. 리눅스의 node_exporter와 지표 이름이 달라요.
+
+CPU 시간은 `windows_cpu_time_seconds_total`이에요. `mode` 레이블에 user, privileged, idle 같은 쓰임새가 들어가요. privileged는 커널 코드를 실행한 시간이라 리눅스의 sy에 가까워요.
+
+서비스 상태는 `windows_service_state`가 지금 상태에만 1을 내요.
+
+리눅스 서버와 같은 화면에 놓을 때는 지표마다 짝을 맞춰야 해요. 서버 지표가 화면까지 오는 길은 <Term slug="server/metrics-sources">서버 지표는 어디서 오나</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>Processor Queue Length를 리눅스 부하처럼 코어 수와 견줬다면 다시 보세요. 실행 중인 스레드와 디스크 대기를 빼고 센 줄 하나라, 논리 CPU 수로 나눠 봐야 해요.</Check>
+  <Check>`Avg. Disk sec/Read` 값을 밀리초로 읽었다면 다시 보세요. 초 단위라 0.045는 45밀리초예요.</Check>
+  <Check>리눅스용 대시보드 질의를 윈도우 서버에 그대로 쓴다면 다시 보세요. node_exporter와 windows_exporter는 지표 이름이 달라서 패널이 비어요.</Check>
+  <Check>서버가 다시 켜진 이유를 볼 때 6008과 1074를 나눠 보세요. 6008은 갑자기 꺼진 것이고, 1074는 누군가 시작한 재시작이에요.</Check>
+  <Check>서비스 상태가 Running이라서 정상으로 보여 준다면, 7034·7031 이벤트도 함께 보세요. 복구 설정이 다시 띄운 서비스도 Running이에요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 한국어 윈도우의 카운터 이름
+
+  한국어 윈도우에서는 화면에 카운터 이름이 한국어로 보이기도 해요. 그래도 `Get-Counter`에 영어 경로를 넘기면 읽혀요. 이 글의 경로는 한국어 윈도우에서 읽어 확인했어요.
+
+  ### 이벤트 로그도 덮어써요
+
+  이벤트 로그는 정한 크기가 차면 오래된 기록부터 덮어써요. System 로그의 기본 방식이 이래서, 오래전 재시작 기록은 남아 있지 않을 수 있어요.
+
+  ### 한 번에 여러 번 읽기
+
+  `Get-Counter`에 `-SampleInterval`과 `-MaxSamples`를 주면 정한 간격으로 여러 번 읽어요. `\Processor(_Total)\% Processor Time`을 2초 간격으로 세 번 읽는 식이에요.
+</Deeper>
