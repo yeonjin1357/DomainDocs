@@ -102,6 +102,17 @@ import Sample from '../../figures/sample.svg';
   />
 </Figure>
 
+<Figure caption="위에서부터 차례로 봐요.">
+  <Triage
+    ariaLabel="1단계 available이 넉넉하면 알림 기준을, 바닥에 가까우면 2단계 스왑으로 가는 점검 순서"
+    steps={[
+      { label: 'available', tone: 'warn', next: '바닥 가까움', exits: [{ when: '넉넉함', to: '알림 기준', note: 'free?' }, { when: '급하면', to: 3 }] },
+      { label: '스왑', next: false },
+      { label: 'OOM 기록', when: '급할 때', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
 <Figure caption="직접 그린 SVG 그림이에요.">
   <Sample aria-label="테스트용 SVG 그림" />
 </Figure>

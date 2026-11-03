@@ -27,21 +27,14 @@ updated: 2026-10-29
   <Item title="되돌릴지 정하기">급하면 이전 버전으로 돌려요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 급하면 원인을 찾기 전에 3단계로 먼저 되돌려요. 새 파드가 Running인데 준비되지 않았다면 4단계에서 readiness 프로브를 봐요.">
-  <Flow
+<Figure caption="급하면 원인을 찾기 전에 3단계로 먼저 되돌려요. 새 파드가 Running인데 준비되지 않았다면 4단계에서 readiness 프로브를 봐요.">
+  <Triage
     ariaLabel="1단계 멈춤 표시를 보고 급하면 3단계 되돌리기로 가요. 2단계 새 파드 상태가 Pending 같은 다른 상태면 표의 다음 곳으로, Running인데 준비 안 됨이면 4단계 readiness 프로브로 가는 흐름도"
-    nodes={[
-      { id: 's1', label: '멈춤 표시', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 's3', label: '되돌리기', col: 2, row: 0, note: '3단계' },
-      { id: 's2', label: '새 파드 상태', col: 0, row: 1, note: '2단계' },
-      { id: 'e2', label: '표의 다음 곳', col: 2, row: 1, note: 'Pending·재시작' },
-      { id: 's4', label: 'readiness', col: 0, row: 2, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 's3', label: '급하면' },
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 'e2', label: '다른 상태' },
-      { from: 's2', to: 's4', label: '준비 안 됨' },
+    steps={[
+      { label: '멈춤 표시', tone: 'warn', exits: [{ when: '급하면', to: 3 }] },
+      { label: '새 파드 상태', next: false, exits: [{ when: '다른 상태', to: '표의 다음 곳', note: 'Pending·재시작' }, { when: '준비 안 됨', to: 4 }] },
+      { label: '되돌리기', when: '급할 때', tone: 'accent', next: false },
+      { label: 'readiness', when: 'Running인데 준비 안 될 때', tone: 'accent' },
     ]}
   />
 </Figure>

@@ -30,24 +30,13 @@ updated: 2026-10-29
 </FirstLook>
 
 <Figure caption="1단계에서 ping과 SNMP의 결과를 짝지어 갈래를 골라요. 하나라도 되면 장비는 살아 있어요. 둘 다 안 되다 다시 살아났다면 4단계에서 재시작했는지 봐요.">
-  <Flow
+  <Triage
     ariaLabel="1단계에서 ping과 SNMP가 둘 다 안 되면 장비가 꺼졌거나 길이 끊긴 것이고 다시 살아나면 4단계 가동 시간으로, SNMP만 안 되면 2단계 설정과 길로, ping만 안 되면 3단계 ICMP 막힘으로 가는 흐름도"
-    nodes={[
-      { id: 'start', label: 'ping·SNMP', col: 1, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'both', label: '둘 다 안 됨', col: 0, row: 1, note: '꺼짐·길 끊김' },
-      { id: 'snmp', label: 'SNMP 안 됨', col: 1, row: 1, note: 'ping은 됨' },
-      { id: 'ping', label: 'ping 안 됨', col: 2, row: 1, note: 'SNMP는 됨' },
-      { id: 's4', label: '가동 시간', col: 0, row: 2, note: '4단계', tone: 'accent' },
-      { id: 's2', label: '설정과 길', col: 1, row: 2, note: '2단계', tone: 'accent' },
-      { id: 's3', label: 'ICMP 막힘', col: 2, row: 2, note: '3단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'start', to: 'both' },
-      { from: 'start', to: 'snmp' },
-      { from: 'start', to: 'ping' },
-      { from: 'both', to: 's4', label: '살아나면' },
-      { from: 'snmp', to: 's2' },
-      { from: 'ping', to: 's3' },
+    steps={[
+      { label: 'ping·SNMP', tone: 'warn', next: false, exits: [{ when: 'SNMP만 안 됨 (ping은 됨)', to: 2 }, { when: 'ping만 안 됨 (SNMP는 됨)', to: 3 }, { when: '둘 다 안 됨 (꺼짐·길 끊김)', to: 4 }] },
+      { label: '설정과 길', when: 'SNMP만 안 될 때', tone: 'accent', next: false },
+      { label: 'ICMP 막힘', when: 'ping만 안 될 때', tone: 'accent', next: false },
+      { label: '가동 시간', when: '둘 다 안 되다 살아났을 때', tone: 'accent' },
     ]}
   />
 </Figure>

@@ -36,28 +36,14 @@ updated: 2026-10-30
 </FirstLook>
 
 <Figure caption="1단계 메시지가 갈래를 정해요. 노드 메모리가 모자라면 3단계로, 노드 디스크가 모자라거나 파드가 자기 한도를 넘었으면 4단계로 가요. OOMKilled와 헷갈리면 2단계를 봐요.">
-  <Flow
+  <Triage
     ariaLabel="축출 메시지가 노드 메모리 부족이면 3단계 기준과 순서로, 노드 디스크 부족이나 파드 자기 한도 초과면 4단계 무엇이 찼나로 가고, 둘 다 5단계 파드 정리로 이어지며, OOMKilled와 헷갈리면 2단계로 가는 흐름도"
-    nodes={[
-      { id: 's1', label: '축출 메시지', col: 1, row: 0, note: '1단계', tone: 'warn' },
-      { id: 's2', label: 'OOMKilled', col: 2, row: 0, note: '2단계' },
-      { id: 'mem', label: '메모리 부족', col: 0, row: 1, note: '노드 전체' },
-      { id: 'disk', label: '디스크 부족', col: 1, row: 1, note: '노드 전체' },
-      { id: 'lim', label: '한도 넘음', col: 2, row: 1, note: '파드 자기 한도' },
-      { id: 's3', label: '기준·순서', col: 0, row: 2, note: '3단계', tone: 'accent' },
-      { id: 's4', label: '무엇이 찼나', col: 1, row: 2, note: '4단계', tone: 'accent' },
-      { id: 's5', label: '파드 정리', col: 1, row: 3, note: '5단계' },
-    ]}
-    edges={[
-      { from: 's1', to: 's2', dashed: true },
-      { from: 's1', to: 'mem' },
-      { from: 's1', to: 'disk' },
-      { from: 's1', to: 'lim' },
-      { from: 'mem', to: 's3' },
-      { from: 'disk', to: 's4' },
-      { from: 'lim', to: 's4' },
-      { from: 's3', to: 's5' },
-      { from: 's4', to: 's5' },
+    steps={[
+      { label: '축출 메시지', tone: 'warn', next: false, exits: [{ when: 'OOMKilled와 헷갈림', to: 2 }, { when: '메모리 부족 (노드 전체)', to: 3 }, { when: '디스크 부족 (노드 전체)', to: 4 }, { when: '한도 넘음 (파드 자기 한도)', to: 4 }] },
+      { label: 'OOMKilled', note: '축출과 다른 것', when: '헷갈릴 때', next: false },
+      { label: '기준·순서', when: '메모리 부족일 때', tone: 'accent', next: false, exits: [{ when: '그다음', to: 5 }] },
+      { label: '무엇이 찼나', when: '디스크·한도일 때', tone: 'accent' },
+      { label: '파드 정리' },
     ]}
   />
 </Figure>

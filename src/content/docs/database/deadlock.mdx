@@ -41,25 +41,15 @@ updated: 2026-10-29
   <Item title="잠그는 순서">두 코드가 같은 순서로 잠그는지 봐요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 오른쪽은 그 단계에서 조건에 맞을 때 볼 곳이에요. 배포 뒤 교착이 늘었다면 새 코드가 잠그는 순서를 봐요.">
-  <Flow
+<Figure caption="배포 뒤 교착이 늘었다면 새 코드가 잠그는 순서를 봐요.">
+  <Triage
     ariaLabel="1단계 에러 번호로 교착인지 확인하고, 2단계 서버 로그에서 두 SQL을 찾되 다른 DB라면 그 DB의 기록을 봐요. 3단계 잠금 순서를 맞추고, 4단계 다시 시도하게 한 뒤, 5단계 교착 횟수를 세고, 배포 뒤 늘었다면 새 코드의 잠금 순서를 보는 흐름도"
-    nodes={[
-      { id: 's1', label: '에러 번호', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 's2', label: '서버 로그', col: 0, row: 1, note: '2단계' },
-      { id: 'e2', label: 'DB별 기록', col: 2, row: 1, note: 'MySQL 등' },
-      { id: 's3', label: '잠금 순서', col: 0, row: 2, note: '3단계' },
-      { id: 's4', label: '다시 시도', col: 0, row: 3, note: '4단계' },
-      { id: 's5', label: '교착 횟수', col: 0, row: 4, note: '5단계', tone: 'accent' },
-      { id: 'e5', label: '새 코드', col: 2, row: 4, note: '잠그는 순서' },
-    ]}
-    edges={[
-      { from: 's1', to: 's2', label: '교착 맞음' },
-      { from: 's2', to: 'e2', label: '다른 DB' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 's4' },
-      { from: 's4', to: 's5' },
-      { from: 's5', to: 'e5', label: '배포 뒤 늘음' },
+    steps={[
+      { label: '에러 번호', tone: 'warn', next: '교착 맞음' },
+      { label: '서버 로그', exits: [{ when: '다른 DB', to: 'DB별 기록', note: 'MySQL 등' }] },
+      { label: '잠금 순서' },
+      { label: '다시 시도' },
+      { label: '교착 횟수', tone: 'accent', exits: [{ when: '배포 뒤 늘음', to: '새 코드', note: '잠그는 순서' }] },
     ]}
   />
 </Figure>

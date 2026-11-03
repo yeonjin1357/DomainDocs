@@ -1,0 +1,199 @@
+---
+import { layoutTriage, type TriageStep } from '../../lib/viz/triage';
+
+interface Props {
+  /** 위에서부터 차례로 볼 단계 */
+  steps: TriageStep[];
+  ariaLabel: string;
+}
+
+const { steps, ariaLabel } = Astro.props;
+const layout = layoutTriage(steps);
+---
+<ol class="triage" data-triage aria-label={ariaLabel}>
+  {
+    layout.steps.map((s) => (
+      <li class={`triage-step${s.next !== null ? ' has-next' : ''}`}>
+        <span class={`triage-badge tone-${s.tone ?? 'plain'}`} aria-hidden="true">
+          {s.number}
+        </span>
+        <div class="triage-body">
+          <p class="triage-head">
+            <span class="visually-hidden">{s.number}단계 </span>
+            <span class="triage-label">{s.label}</span>
+            {s.when && <span class="triage-when">{s.when}</span>}
+          </p>
+          {s.note && <p class="triage-note">{s.note}</p>}
+          {s.exits.length > 0 && (
+            <ul class="triage-exits">
+              {s.exits.map((e) => (
+                <li class={`triage-exit${e.toStep ? ' to-step' : ''} tone-${e.tone ?? 'plain'}`}>
+                  {e.when && <span class="triage-cond">{e.when}</span>}
+                  <span class="triage-arrow" aria-hidden="true">
+                    →
+                  </span>
+                  <span class="visually-hidden">, 갈 곳: </span>
+                  <span class="triage-to">{e.to}</span>
+                  {e.note && <span class="triage-to-note">{e.note}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+          {s.next && (
+            <p class="triage-next">
+              <span aria-hidden="true">↓ </span>
+              <span class="visually-hidden">다음 단계로 가는 조건: </span>
+              {s.next}
+            </p>
+          )}
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .triage {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* 번호 칸과 내용 칸. 다음 단계로 이어지면 번호 아래로 세로선을 내린다 */
+  .triage-step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr);
+    column-gap: 10px;
+  }
+
+  .triage-step.has-next {
+    padding-bottom: 6px;
+  }
+
+  .triage-step.has-next::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    bottom: -8px;
+    left: 12px;
+    width: 2px;
+    border-radius: 1px;
+    background: var(--color-line);
+  }
+
+  .triage-badge {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 1.5px solid var(--color-line);
+    border-radius: 50%;
+    background: var(--color-card);
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .triage-badge.tone-warn {
+    border-color: var(--color-warn);
+    background: var(--color-warn);
+    color: #fff;
+  }
+
+  .triage-badge.tone-accent {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  .triage-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    padding-top: 2px;
+  }
+
+  .triage-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 8px;
+    margin: 0;
+  }
+
+  .triage-label {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  /* 갈래로 들어온 단계의 조건 */
+  .triage-when {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--color-card);
+    font-size: 12px;
+    color: var(--color-text-sub);
+  }
+
+  .triage-note {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-sub);
+  }
+
+  .triage-exits {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .triage-exit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 6px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: var(--color-card);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .triage-cond {
+    color: var(--color-text-sub);
+  }
+
+  .triage-arrow {
+    color: var(--color-text-weak);
+  }
+
+  .triage-to {
+    font-weight: 600;
+  }
+
+  .triage-exit.to-step .triage-to,
+  .triage-exit.tone-accent .triage-to {
+    color: var(--color-accent);
+  }
+
+  .triage-exit.tone-warn .triage-to {
+    color: var(--color-warn);
+  }
+
+  .triage-to-note {
+    font-size: 12px;
+    color: var(--color-text-weak);
+  }
+
+  .triage-next {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-weak);
+  }
+</style>

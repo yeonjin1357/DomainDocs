@@ -86,6 +86,18 @@ test('나란한 기둥은 여러 줄에 걸친 칸을 옆 기둥의 그 줄들�
   expect(Math.abs(span!.y + span!.height - (b!.y + b!.height))).toBeLessThan(1);
 });
 
+test('점검 순서는 단계 번호, 옆길, 다음 단계로 잇는 선을 보여 준다', async ({ page }) => {
+  const triage = page.getByRole('list', { name: '1단계 available이 넉넉하면 알림 기준을, 바닥에 가까우면 2단계 스왑으로 가는 점검 순서' });
+  await expect(triage.locator('.triage-label')).toHaveText(['available', '스왑', 'OOM 기록']);
+  await expect(triage.locator('.triage-badge')).toHaveText(['1', '2', '3']);
+  await expect(triage.locator('.triage-exit').first()).toContainText('넉넉함');
+  await expect(triage.locator('.triage-exit.to-step .triage-to')).toHaveText('3단계');
+  await expect(triage.locator('.triage-next')).toContainText('바닥 가까움');
+  await expect(triage.locator('.triage-when')).toHaveText('급할 때');
+  // 1단계만 다음 단계와 이어지고, 갈래 끝인 2단계와 마지막 3단계는 선이 없다
+  await expect(triage.locator('.triage-step.has-next')).toHaveCount(1);
+});
+
 test('SVG 그림은 이름 붙은 그림이다', async ({ page }) => {
   await expect(page.getByRole('img', { name: '테스트용 SVG 그림' })).toBeVisible();
 });

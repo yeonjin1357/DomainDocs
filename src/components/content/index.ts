@@ -23,6 +23,7 @@ import Timeline from '../viz/Timeline.astro';
 import Strip from '../viz/Strip.astro';
 import Stages from '../viz/Stages.astro';
 import Stacks from '../viz/Stacks.astro';
+import Triage from '../viz/Triage.astro';
 
 /** MDX에서 import 없이 쓰는 컴포넌트. React 데모는 여기 넣지 않는다(client 지시어를 쓸 수 없다). */
-export const mdxComponents = { OnDashboard, KeyPoints, Point, Analogy, Figure, Checkpoints, Check, Deeper, Situation, FirstLook, Item, Term, MiniLineChart, StatTile, Waterfall, Scatter, ServiceMap, Flow, Sequence, Layers, Compare, Timeline, Strip, Stages, Stacks };
+export const mdxComponents = { OnDashboard, KeyPoints, Point, Analogy, Figure, Checkpoints, Check, Deeper, Situation, FirstLook, Item, Term, MiniLineChart, StatTile, Waterfall, Scatter, ServiceMap, Flow, Sequence, Layers, Compare, Timeline, Strip, Stages, Stacks, Triage };

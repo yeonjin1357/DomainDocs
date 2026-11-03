@@ -49,25 +49,14 @@ updated: 2026-10-29
   <Item title="언제부터 늘었는지">늘기 시작한 시각이 배포 시각과 맞는지 봐요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 지표와 레이블을 찾아 계측 코드를 고치고, 마지막에 수집 한도를 둬요. 오른쪽은 단계마다 조건에 맞을 때 볼 곳이에요.">
-  <Flow
+<Figure caption="지표와 레이블을 찾아 계측 코드를 고치고, 마지막에 수집 한도를 둬요.">
+  <Triage
     ariaLabel="1단계 시계열이 많은 지표를 찾고, 배포 시각부터 늘었다면 그 배포의 계측 코드를 의심해요. 2단계 값이 늘어나는 레이블을 찾고, 3단계 계측 코드를 고쳐요. 급하면 배포를 되돌리고 안 되면 그 지표를 버려요. 4단계 수집 한도를 두고, up이 0이 되면 평소 값에 걸린 것이라 한도를 올리는 흐름도"
-    nodes={[
-      { id: 's1', label: '많은 지표', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'e1', label: '배포한 코드', col: 2, row: 0, note: '원인 후보' },
-      { id: 's2', label: '레이블 값', col: 0, row: 1, note: '2단계' },
-      { id: 's3', label: '계측 코드', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '배포 되돌림', col: 2, row: 2, note: '안 되면 버림' },
-      { id: 's4', label: '수집 한도', col: 0, row: 3, note: '4단계', tone: 'accent' },
-      { id: 'e4', label: '한도 올리기', col: 2, row: 3, note: '평소 값에 걸림' },
-    ]}
-    edges={[
-      { from: 's1', to: 'e1', label: '배포 때부터' },
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '급하면' },
-      { from: 's3', to: 's4' },
-      { from: 's4', to: 'e4', label: 'up이 0' },
+    steps={[
+      { label: '많은 지표', tone: 'warn', exits: [{ when: '배포 때부터', to: '배포한 코드', note: '원인 후보' }] },
+      { label: '레이블 값' },
+      { label: '계측 코드', exits: [{ when: '급하면', to: '배포 되돌림', note: '안 되면 버림' }] },
+      { label: '수집 한도', tone: 'accent', exits: [{ when: 'up이 0', to: '한도 올리기', note: '평소 값에 걸림' }] },
     ]}
   />
 </Figure>

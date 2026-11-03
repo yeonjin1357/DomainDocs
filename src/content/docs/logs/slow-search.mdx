@@ -27,27 +27,14 @@ updated: 2026-10-29
   <Item title="결과 크기">돌려받는 줄 수와 묶는 기준의 수를 봐요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 고쳐요. 범위만 15분으로 줄여 바로 끝난다면 1단계에서 원인을 찾은 거예요.">
-  <Flow
+<Figure caption="범위만 15분으로 줄여 바로 끝난다면 1단계에서 원인을 찾은 거예요.">
+  <Triage
     ariaLabel="1단계 시간 범위에서 15분으로 줄여 빨라지면 범위를 좁히고, 2단계 레이블과 필드에서 넓게 골랐다면 구체적인 레이블이나 keyword 필드로 바꾸고, 3단계 검색어 모양에서 정규식이나 파서가 앞에 있다면 줄 필터를 먼저 두고, 4단계 결과 크기에서 수백만 줄을 돌려준다면 줄 수를 제한하는 흐름도"
-    nodes={[
-      { id: 's1', label: '시간 범위', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'e1', label: '범위 좁히기', col: 2, row: 0, note: '앞뒤 몇 분' },
-      { id: 's2', label: '레이블·필드', col: 0, row: 1, note: '2단계' },
-      { id: 'e2', label: '구체적 레이블', col: 2, row: 1, note: 'keyword 필드' },
-      { id: 's3', label: '검색어 모양', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '줄 필터 먼저', col: 2, row: 2, note: '파서는 뒤로' },
-      { id: 's4', label: '결과 크기', col: 0, row: 3, note: '4단계', tone: 'accent' },
-      { id: 'e4', label: '줄 수 제한', col: 2, row: 3, note: '필요한 필드만' },
-    ]}
-    edges={[
-      { from: 's1', to: 'e1', label: '15분은 빠름' },
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 'e2', label: '넓게 고름' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '정규식·파서' },
-      { from: 's3', to: 's4' },
-      { from: 's4', to: 'e4', label: '수백만 줄' },
+    steps={[
+      { label: '시간 범위', tone: 'warn', exits: [{ when: '15분은 빠름', to: '범위 좁히기', note: '앞뒤 몇 분' }] },
+      { label: '레이블·필드', exits: [{ when: '넓게 고름', to: '구체적 레이블', note: 'keyword 필드' }] },
+      { label: '검색어 모양', exits: [{ when: '정규식·파서', to: '줄 필터 먼저', note: '파서는 뒤로' }] },
+      { label: '결과 크기', tone: 'accent', exits: [{ when: '수백만 줄', to: '줄 수 제한', note: '필요한 필드만' }] },
     ]}
   />
 </Figure>

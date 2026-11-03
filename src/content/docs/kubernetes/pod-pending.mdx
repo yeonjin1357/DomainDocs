@@ -34,24 +34,13 @@ updated: 2026-10-21
 </FirstLook>
 
 <Figure caption="FailedScheduling 메시지의 이유가 갈래를 정해요. 자리가 모자라면 요청 합계를, 조건이 안 맞으면 taint와 레이블을, 저장소를 기다리면 PVC를 봐요.">
-  <Flow
+  <Triage
     ariaLabel="Pending 파드의 이벤트 메시지가 자리 부족이면 2단계 요청 합계로, 조건 불일치면 3단계 taint와 레이블로, PVC 대기면 4단계 PVC와 PV로 가는 흐름도"
-    nodes={[
-      { id: 'p', label: 'Pending 파드', col: 1, row: 0, note: '이벤트 메시지', tone: 'warn' },
-      { id: 'cap', label: '자리 부족', col: 0, row: 1, note: 'insufficient' },
-      { id: 'match', label: '조건 불일치', col: 1, row: 1, note: 'taint·selector' },
-      { id: 'pvc', label: 'PVC 대기', col: 2, row: 1, note: 'unbound' },
-      { id: 's2', label: '요청 합계', col: 0, row: 2, note: '2단계', tone: 'accent' },
-      { id: 's3', label: 'taint·레이블', col: 1, row: 2, note: '3단계', tone: 'accent' },
-      { id: 's4', label: 'PVC·PV', col: 2, row: 2, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'p', to: 'cap' },
-      { from: 'p', to: 'match' },
-      { from: 'p', to: 'pvc' },
-      { from: 'cap', to: 's2' },
-      { from: 'match', to: 's3' },
-      { from: 'pvc', to: 's4' },
+    steps={[
+      { label: 'Pending 파드', note: '이벤트 메시지', tone: 'warn', next: false, exits: [{ when: '자리 부족 (insufficient)', to: 2 }, { when: '조건 불일치 (taint·selector)', to: 3 }, { when: 'PVC 대기 (unbound)', to: 4 }] },
+      { label: '요청 합계', when: '자리 부족일 때', tone: 'accent', next: false },
+      { label: 'taint·레이블', when: '조건 불일치일 때', tone: 'accent', next: false },
+      { label: 'PVC·PV', when: 'PVC 대기일 때', tone: 'accent' },
     ]}
   />
 </Figure>

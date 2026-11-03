@@ -33,21 +33,15 @@ updated: 2026-10-29
   <Item title="GC 직후 바닥">치운 뒤에도 남는 양이 오르는지 봐요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 2단계에서 힙 바닥이 함께 오르면 3·4단계로 내려가고, 힙 바닥은 평평한데 프로세스 메모리(RSS)만 오르면 오른쪽 5단계로 가요.">
-  <Flow
+<Figure caption="2단계에서 힙 바닥이 함께 오르면 3·4단계로 내려가고, 힙 바닥은 평평한데 프로세스 메모리(RSS)만 오르면 5단계로 가요.">
+  <Triage
     ariaLabel="1단계에서 끝난 방식을 보고, 2단계에서 어느 메모리가 느는지 가려, 힙의 GC 직후 바닥이 오르면 3단계 GC 직후 바닥과 4단계 힙 덤프로, RSS만 오르면 5단계 힙 밖 칸 나누기로 가는 흐름도"
-    nodes={[
-      { id: 's1', label: '끝난 방식', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 's2', label: '어느 메모리', col: 0, row: 1, note: '2단계' },
-      { id: 's5', label: '힙 밖 칸', col: 2, row: 1, note: '5단계', tone: 'accent' },
-      { id: 's3', label: 'GC 직후 바닥', col: 0, row: 2, note: '3단계', tone: 'accent' },
-      { id: 's4', label: '힙 덤프', col: 0, row: 3, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 's5', label: 'RSS만 오름' },
-      { from: 's2', to: 's3', label: '힙 바닥 오름' },
-      { from: 's3', to: 's4' },
+    steps={[
+      { label: '끝난 방식', tone: 'warn' },
+      { label: '어느 메모리', next: '힙 바닥 오름', exits: [{ when: 'RSS만 오름', to: 5 }] },
+      { label: 'GC 직후 바닥', tone: 'accent' },
+      { label: '힙 덤프', tone: 'accent', next: false },
+      { label: '힙 밖 칸', when: 'RSS만 오를 때', tone: 'accent' },
     ]}
   />
 </Figure>

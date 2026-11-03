@@ -36,26 +36,13 @@ updated: 2026-10-29
 </FirstLook>
 
 <Figure caption="그래프 모양이 첫 단계를 정해요. 2.5초에 붙었다면 1단계, 비었다면 2단계, 새벽에 튄다면 3단계예요. 경계를 더하는 배포 중이라면 1단계에서 4단계로 가요.">
-  <Flow
+  <Triage
     ariaLabel="p99가 이상할 때 2.5초에 붙었다면 1단계 버킷 경계로, 그래프가 비었다면 2단계 질의 순서로, 새벽에 튄다면 3단계 요청 수로 가요. 1단계에서 경계를 더하는 배포 중이라면 4단계 서버별 버킷으로 가는 흐름도"
-    nodes={[
-      { id: 'p', label: 'p99가 이상함', col: 1, row: 0, note: '그래프 모양', tone: 'warn' },
-      { id: 'stuck', label: '2.5초에 붙음', col: 0, row: 1 },
-      { id: 'empty', label: '그래프가 빔', col: 1, row: 1 },
-      { id: 'dawn', label: '새벽에 튐', col: 2, row: 1 },
-      { id: 's1', label: '버킷 경계', col: 0, row: 2, note: '1단계', tone: 'accent' },
-      { id: 's2', label: '질의 순서', col: 1, row: 2, note: '2단계', tone: 'accent' },
-      { id: 's3', label: '요청 수', col: 2, row: 2, note: '3단계', tone: 'accent' },
-      { id: 's4', label: '서버별 버킷', col: 0, row: 3, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'p', to: 'stuck' },
-      { from: 'p', to: 'empty' },
-      { from: 'p', to: 'dawn' },
-      { from: 'stuck', to: 's1' },
-      { from: 'empty', to: 's2' },
-      { from: 'dawn', to: 's3' },
-      { from: 's1', to: 's4', label: '배포 중' },
+    steps={[
+      { label: '버킷 경계', when: '2.5초에 붙었을 때', tone: 'accent', next: false, exits: [{ when: '경계 더하는 배포 중', to: 4 }] },
+      { label: '질의 순서', when: '그래프가 빌 때', tone: 'accent', next: false },
+      { label: '요청 수', when: '새벽에 튈 때', tone: 'accent', next: false },
+      { label: '서버별 버킷', when: '배포 중일 때', tone: 'accent' },
     ]}
   />
 </Figure>

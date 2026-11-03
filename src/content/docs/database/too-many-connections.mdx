@@ -35,23 +35,14 @@ updated: 2026-10-29
   <Item title="앱 풀 설정이 바뀌었는지">배포로 풀 크기나 서버 수가 늘었는지 봐요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 쉬는 연결이 대부분이고 액티브가 적다면 연결 수를 줄이고, 줄이기 어려울 때 커넥션 풀러로 가요. idle in transaction이 많다면 잠금까지 쥔 다른 문제예요.">
-  <Flow
+<Figure caption="쉬는 연결이 대부분이고 액티브가 적다면 연결 수를 줄이고, 줄이기 어려울 때 커넥션 풀러로 가요. idle in transaction이 많다면 잠금까지 쥔 다른 문제예요.">
+  <Triage
     ariaLabel="1단계 연결을 쥔 곳을 세고, 2단계 연결 상태가 idle in transaction이 많으면 잠금도 쥔 다른 문제로, idle이 대부분이면 3단계 한도를 따져요. 액티브가 적으면 연결 수를 줄이고, 줄이기 어려우면 4단계 커넥션 풀러를 보는 흐름도"
-    nodes={[
-      { id: 's1', label: '연결 쥔 곳', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 's2', label: '연결 상태', col: 0, row: 1, note: '2단계' },
-      { id: 'e2', label: '잠금도 쥠', col: 2, row: 1, note: '트랜잭션 연 채' },
-      { id: 's3', label: '한도 따지기', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '연결 줄이기', col: 2, row: 2, note: '풀 크기 낮춤' },
-      { id: 's4', label: '커넥션 풀러', col: 0, row: 3, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 'e2', label: 'idle in tx' },
-      { from: 's2', to: 's3', label: 'idle 대부분' },
-      { from: 's3', to: 'e3', label: '액티브 적음' },
-      { from: 's3', to: 's4', label: '줄이기 어려움' },
+    steps={[
+      { label: '연결 쥔 곳', tone: 'warn' },
+      { label: '연결 상태', next: 'idle 대부분', exits: [{ when: 'idle in tx', to: '잠금도 쥠', note: '트랜잭션 연 채' }] },
+      { label: '한도 따지기', next: '줄이기 어려움', exits: [{ when: '액티브 적음', to: '연결 줄이기', note: '풀 크기 낮춤' }] },
+      { label: '커넥션 풀러', tone: 'accent' },
     ]}
   />
 </Figure>

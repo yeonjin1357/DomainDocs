@@ -32,26 +32,13 @@ updated: 2026-10-29
 </FirstLook>
 
 <Figure caption="1단계에서 ping과 서비스 응답으로 갈래를 나눠요. ping은 되는데 수집만 없을 때 2단계부터 차례로 내려가요. 에이전트 프로세스가 사라졌다면 OOM도 확인해요.">
-  <Flow
+  <Triage
     ariaLabel="1단계에서 ping과 서비스가 둘 다 안 되면 서버 꺼짐이나 네트워크를, ping만 안 되면 방화벽을 의심하고, ping은 되는데 수집만 없으면 2단계 재부팅, 재부팅이 없으면 3단계 에이전트를 봐요. 에이전트 프로세스가 사라졌다면 OOM을 확인하고, 4단계에서 빈 구간을 다루는 흐름도"
-    nodes={[
-      { id: 's1', label: 'ping·서비스', col: 1, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'down', label: '둘 다 안 됨', col: 0, row: 1, note: '꺼짐·네트워크' },
-      { id: 'up', label: 'ping은 됨', col: 1, row: 1, note: '수집만 없음' },
-      { id: 'fw', label: 'ping만 안 됨', col: 2, row: 1, note: '방화벽 의심' },
-      { id: 's2', label: '재부팅', col: 1, row: 2, note: '2단계' },
-      { id: 's3', label: '에이전트', col: 1, row: 3, note: '3단계' },
-      { id: 'oom', label: 'OOM 확인', col: 2, row: 3, note: '사라졌다면' },
-      { id: 's4', label: '빈 구간', col: 1, row: 4, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 'down' },
-      { from: 's1', to: 'up' },
-      { from: 's1', to: 'fw' },
-      { from: 'up', to: 's2' },
-      { from: 's2', to: 's3', label: '재부팅 없음' },
-      { from: 's3', to: 'oom' },
-      { from: 's3', to: 's4' },
+    steps={[
+      { label: 'ping·서비스', tone: 'warn', next: false, exits: [{ when: '둘 다 안 됨', to: '꺼짐·네트워크' }, { when: 'ping만 안 됨', to: '방화벽 의심' }, { when: 'ping은 됨 (수집만 없음)', to: 2 }] },
+      { label: '재부팅', when: 'ping은 될 때', next: '재부팅 없음' },
+      { label: '에이전트', exits: [{ when: '프로세스가 사라짐', to: 'OOM 확인' }] },
+      { label: '빈 구간', tone: 'accent' },
     ]}
   />
 </Figure>

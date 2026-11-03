@@ -33,19 +33,14 @@ updated: 2026-10-29
   <Item title="프로브가 죽였나">liveness 실패로 끝났는지 이벤트를 봐요.</Item>
 </FirstLook>
 
-<Figure caption="1단계 종료 이유가 갈래를 정해요. OOMKilled면 아래 2단계로, Error나 Completed면 오른쪽 3단계로 가요. 로그로 보아 앱이 멀쩡하다면 4단계에서 프로브를 봐요.">
-  <Flow
+<Figure caption="1단계 종료 이유가 갈래를 정해요. OOMKilled면 2단계로, Error나 Completed면 3단계로 가요. 로그로 보아 앱이 멀쩡하다면 4단계에서 프로브를 봐요.">
+  <Triage
     ariaLabel="1단계 마지막 종료 이유가 OOMKilled면 2단계 메모리 한도와 사용량으로, Error나 Completed면 3단계 이전 실행의 로그로 가고, 로그로 보아 앱이 멀쩡하다면 4단계 프로브를 보는 흐름도"
-    nodes={[
-      { id: 's1', label: '종료 이유', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 's3', label: '이전 로그', col: 2, row: 0, note: '3단계' },
-      { id: 's2', label: '한도·사용량', col: 0, row: 1, note: '2단계', tone: 'accent' },
-      { id: 's4', label: '프로브', col: 2, row: 1, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 's3', label: 'Error·Completed' },
-      { from: 's1', to: 's2', label: 'OOMKilled' },
-      { from: 's3', to: 's4', label: '앱은 멀쩡' },
+    steps={[
+      { label: '종료 이유', tone: 'warn', next: 'OOMKilled', exits: [{ when: 'Error·Completed', to: 3 }] },
+      { label: '한도·사용량', tone: 'accent', next: false },
+      { label: '이전 로그', when: 'Error·Completed일 때', next: '앱은 멀쩡' },
+      { label: '프로브', tone: 'accent' },
     ]}
   />
 </Figure>

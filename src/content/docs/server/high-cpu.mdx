@@ -31,27 +31,14 @@ updated: 2026-10-29
   <Item title="일이 밀렸나">부하(run queue)가 코어 수를 넘는지 봐요.</Item>
 </FirstLook>
 
-<Figure caption="1단계에서 늘어난 몫이 갈래를 정해요. us가 늘었다면 2~4단계를 차례로 내려가요. sy, st, wa는 상자 아래 글자가 가리키는 쪽을 봐요.">
-  <Flow
+<Figure caption="1단계에서 늘어난 몫이 갈래를 정해요. us가 늘었다면 2~4단계를 차례로 내려가요. sy, st, wa가 늘었다면 화살표가 가리키는 쪽을 봐요.">
+  <Triage
     ariaLabel="1단계에서 CPU 시간을 종류별로 나눠, wa만 늘었으면 디스크 입출력을, sy가 늘었으면 잦은 커널 호출을, st가 늘었으면 호스트와 클라우드를 보고, us가 늘었으면 2단계 프로세스, 3단계 일 밀림, 4단계 언제부터를 차례로 보는 흐름도"
-    nodes={[
-      { id: 's1', label: 'CPU 시간 종류', col: 1, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'wa', label: 'wa만 늘음', col: 2, row: 0, note: '디스크 입출력' },
-      { id: 'us', label: 'us 늘음', col: 0, row: 1, note: '앱 코드' },
-      { id: 'sy', label: 'sy 늘음', col: 1, row: 1, note: '커널 자주 부름' },
-      { id: 'st', label: 'st 늘음', col: 2, row: 1, note: '호스트·클라우드' },
-      { id: 's2', label: '어느 프로세스', col: 0, row: 2, note: '2단계' },
-      { id: 's3', label: '일이 밀리나', col: 0, row: 3, note: '3단계' },
-      { id: 's4', label: '언제부터', col: 0, row: 4, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 'wa' },
-      { from: 's1', to: 'us' },
-      { from: 's1', to: 'sy' },
-      { from: 's1', to: 'st' },
-      { from: 'us', to: 's2' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 's4' },
+    steps={[
+      { label: 'CPU 시간 종류', tone: 'warn', next: false, exits: [{ when: 'us 늘음 (앱 코드)', to: 2 }, { when: 'sy 늘음', to: '커널 자주 부름' }, { when: 'st 늘음', to: '호스트·클라우드' }, { when: 'wa만 늘음', to: '디스크 입출력' }] },
+      { label: '어느 프로세스', when: 'us가 늘었을 때' },
+      { label: '일이 밀리나' },
+      { label: '언제부터', tone: 'accent' },
     ]}
   />
 </Figure>

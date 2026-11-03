@@ -115,6 +115,7 @@ p99, rate, span 같은 말은 영어 그대로 써요. 처음 나올 때 한 번
 | 부품이 이어지고 무엇이 어디로 가요 | `Flow` |
 | 둘 이상이 시간 순서로 주고받아요 | `Sequence` |
 | 위층이 아래층에 기대요 | `Layers` |
+| 문제를 찾아 차례로 내려가고, 단계마다 옆길이 있어요(원인 찾기 순서) | `Triage` |
 | 단계마다 무엇이 붙거나 바뀌어요(감싸기, 주소 바꾸기) | `Stages` |
 | 한쪽 칸이 다른 쪽 여러 칸에 걸쳐요(대응, 나눠 맡기) | `Stacks` |
 | 두 방식이 항목마다 달라요 | `Compare` |
@@ -323,6 +324,7 @@ updated: 2026-10-13
 | `Strip` | `rows`, `ariaLabel`, `marks?`, `ranges?` | 칸 띠. `rows`는 `{ label?, cells, heads? }` 배열이고, `cells`는 글자나 `{ label, tone? }`예요. `heads`는 칸마다 위에 붙는 작은 글자(예: 버킷 경계)로, 칸 수와 같아야 해요. 칸은 12개까지예요. `marks`(`{ row?, at, label, tone? }`)는 칸 하나를 위에서 가리키고, `ranges`(`{ row?, from, to, label, tone? }`)는 여러 칸을 아래에서 묶어요. 번호는 모두 0부터예요. 칸 `tone: 'sub'`는 지나간 칸이나 빈자리처럼 흐리게 그려요 |
 | `Stages` | `rows`, `ariaLabel`, `grow?`, `hint?` | 단계 칸. 단계마다 같은 열에 칸을 맞춰, 단계를 지날 때 무엇이 붙거나 바뀌는지 보여 줘요(감싸기, 주소 바꾸기). `rows`는 `{ label, note?, end?, cells }` 배열이고, `cells`는 글자, `{ label, tone? }`, 빈자리 `null`이에요. 단계마다 칸 수가 같아야 하고 6열까지예요. 칸 `tone: 'accent'`는 이 단계에서 새로 붙거나 바뀐 칸이에요. `note`는 이름 옆 파란 글자, `end`는 이름 줄 오른쪽 끝의 흐린 글자예요. `grow`는 남는 폭을 차지할 열(0부터), `hint`는 그림 위 양 끝의 짧은 안내 두 개까지예요 |
 | `Stacks` | `columns`, `ariaLabel` | 나란한 기둥. 기둥마다 칸을 위에서부터 쌓고, 칸 하나가 여러 줄에 걸칠 수 있어서 한쪽 칸이 옆 기둥의 어느 칸들과 맞닿는지 보여 줘요(OSI와 TCP/IP, 파티션과 컨슈머). `columns`는 `{ title, blocks }` 배열이고, `blocks`는 글자, `{ label, span?, tone?, tag? }`, 한 줄 빈자리 `null`이에요. 기둥은 2~4개, 기둥마다 줄 수의 합이 같아야 하고 12줄까지예요. `tag`는 이름 앞 작은 글자(예: 층 번호), `tone: 'sub'`는 흐린 칸이에요 |
+| `Triage` | `steps`, `ariaLabel` | 점검 순서. 원인을 찾아 위에서부터 차례로 내려가는 단계와, 단계마다 옆으로 빠지는 길을 보여 줘요. `steps`는 위에서부터 `{ label, note?, when?, next?, exits?, tone? }` 배열이고 2~8개예요. 번호는 1부터 저절로 붙어요. `exits`는 `{ when, to, note?, tone? }`이고, `to`가 숫자면 그 단계(예: 3이면 '3단계'), 글자면 단계 밖에서 볼 곳이에요. `next`는 다음 단계로 내려가는 조건이고, `false`면 다음 단계와 잇지 않아요(갈래의 끝). `when`은 갈래로 들어온 단계의 조건이에요. 출발점은 `tone: 'warn'`, 갈래 끝은 `tone: 'accent'`로 둬요. 그림이 읽는 법을 보여 주니, `caption`에 '왼쪽 줄을 따라가요' 같은 읽는 법은 쓰지 않아요 |
 | SVG 그림 | `aria-label` | 위 그림으로 안 되는 그림은 `src/assets/figures/{domain}/{name}.svg`에 그려 default import해요. `Figure` 안에 두고 `aria-label`을 꼭 붙여요. 색은 `currentColor`나 `var(--color-…)`만 써야 다크 모드에서도 보여요 |
 | `src/components/demos/`의 데모(`PercentileDemo`, `HistogramQuantileDemo`, `CircuitBreakerDemo` 등 22개) | 없음 | 직접 만져 보는 데모. default import 후 `client:visible`로 써요. 계산은 `src/lib/demo-models.ts`에 두고 단위 테스트로 확인해요. 데모는 값을 바꿔 봐야 보이는 관계(공식, 문턱, 직관과 다른 결과)에만 넣어요. 목록이나 그림 하나로 충분한 곳에는 넣지 않아요 |
 

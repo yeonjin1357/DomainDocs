@@ -42,22 +42,13 @@ updated: 2026-10-29
 </FirstLook>
 
 <Figure caption="1단계에서 본 끊긴 모양이 갈래를 정해요. 뒷단에 새 트레이스가 따로 있다면 헤더와 스레드를 보고, 뒷단 span이 어디에도 없다면 샘플링 결정을 봐요.">
-  <Flow
+  <Triage
     ariaLabel="1단계에서 끊긴 모양을 보고, 뒷단에 같은 시각의 새 트레이스가 있으면 2단계 헤더 전달과 3단계 스레드 넘김으로, 뒷단 span이 어느 트레이스에도 없으면 4단계 샘플링 결정으로 가는 흐름도"
-    nodes={[
-      { id: 's1', label: '끊긴 모양', col: 1, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'new', label: '새 트레이스', col: 0, row: 1, note: '뒷단에 따로' },
-      { id: 'none', label: 'span 없음', col: 2, row: 1, note: '뒷단 어디에도' },
-      { id: 's2', label: '헤더 전달', col: 0, row: 2, note: '2단계', tone: 'accent' },
-      { id: 's3', label: '스레드 넘김', col: 1, row: 2, note: '3단계', tone: 'accent' },
-      { id: 's4', label: '샘플링 결정', col: 2, row: 2, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 'new' },
-      { from: 's1', to: 'none' },
-      { from: 'new', to: 's2' },
-      { from: 'new', to: 's3' },
-      { from: 'none', to: 's4' },
+    steps={[
+      { label: '끊긴 모양', tone: 'warn', next: false, exits: [{ when: '새 트레이스 (뒷단에 따로)', to: 2 }, { when: 'span 없음 (뒷단 어디에도)', to: 4 }] },
+      { label: '헤더 전달', when: '새 트레이스일 때', tone: 'accent', next: false },
+      { label: '스레드 넘김', when: '새 트레이스일 때', tone: 'accent', next: false },
+      { label: '샘플링 결정', when: 'span이 없을 때', tone: 'accent' },
     ]}
   />
 </Figure>

@@ -31,31 +31,15 @@ updated: 2026-10-29
   <Item title="같은 대상을 가리키나">차원 값이 바뀌지 않았는지 봐요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 차례로 의심해요. 단계마다 오른쪽 조건에 맞으면 그쪽이 비는 이유예요. 0이면 점을 안 찍는 지표라면 고장이 아니에요.">
-  <Flow
+<Figure caption="위에서부터 차례로 의심해요. 0이면 점을 안 찍는 지표라면 고장이 아니에요.">
+  <Triage
     ariaLabel="1단계 보고 기준에서 0이면 점을 안 찍는 지표라면 고장이 아니라 경보를 notBreaching으로, 2단계 간격에서 5분 간격이면 상세 모니터링으로, 3단계 같은 대상에서 인스턴스 ID가 바뀌었다면 그룹 단위로, 4단계 에이전트 지표만 비었다면 에이전트의 권한과 네트워크로, 5단계 가져오는 쪽에서 제품 화면만 비었다면 API 한도와 스로틀링으로 가는 흐름도"
-    nodes={[
-      { id: 's1', label: '보고 기준', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'e1', label: '고장 아님', col: 2, row: 0, note: 'notBreaching' },
-      { id: 's2', label: '간격', col: 0, row: 1, note: '2단계' },
-      { id: 'e2', label: '상세 모니터링', col: 2, row: 1, note: '1분 간격' },
-      { id: 's3', label: '같은 대상', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '그룹 단위', col: 2, row: 2, note: '오토스케일링' },
-      { id: 's4', label: '에이전트 지표', col: 0, row: 3, note: '4단계' },
-      { id: 'e4', label: '에이전트', col: 2, row: 3, note: '권한·네트워크' },
-      { id: 's5', label: '가져오는 쪽', col: 0, row: 4, note: '5단계', tone: 'accent' },
-      { id: 'e5', label: 'API 한도', col: 2, row: 4, note: '스로틀링' },
-    ]}
-    edges={[
-      { from: 's1', to: 'e1', label: '0이면 빔' },
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 'e2', label: '5분 간격' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: 'ID 바뀜' },
-      { from: 's3', to: 's4' },
-      { from: 's4', to: 'e4', label: '이것만 빔' },
-      { from: 's4', to: 's5' },
-      { from: 's5', to: 'e5', label: '제품만 빔' },
+    steps={[
+      { label: '보고 기준', tone: 'warn', exits: [{ when: '0이면 빔', to: '고장 아님', note: 'notBreaching' }] },
+      { label: '간격', exits: [{ when: '5분 간격', to: '상세 모니터링', note: '1분 간격' }] },
+      { label: '같은 대상', exits: [{ when: 'ID 바뀜', to: '그룹 단위', note: '오토스케일링' }] },
+      { label: '에이전트 지표', exits: [{ when: '이것만 빔', to: '에이전트', note: '권한·네트워크' }] },
+      { label: '가져오는 쪽', tone: 'accent', exits: [{ when: '제품만 빔', to: 'API 한도', note: '스로틀링' }] },
     ]}
   />
 </Figure>

@@ -37,25 +37,15 @@ updated: 2026-10-29
   <Item title="연관 객체 읽기">목록을 돌며 연관 객체를 읽는 코드를 찾아요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 코드에 SQL이 안 보이면 지연 로딩을 찾고, 고칠 때는 조인을 먼저 쓰되 결과가 너무 커지면 묶어서 가져와요.">
-  <Flow
+<Figure caption="코드에 SQL이 안 보이면 지연 로딩을 찾고, 고칠 때는 조인을 먼저 쓰되 결과가 너무 커지면 묶어서 가져와요.">
+  <Triage
     ariaLabel="1단계 트레이스의 반복 막대와 2단계 SQL 호출 수로 N+1을 확인하고, 3단계에서 부르는 코드를 찾되 코드에 SQL이 없으면 지연 로딩을 보며, 4단계에서 조인으로 고치되 결과가 너무 크면 묶어서 가져오고, 5단계에서 요청당 SQL 수로 지켜보는 흐름도"
-    nodes={[
-      { id: 's1', label: '반복 막대', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 's2', label: 'SQL 호출 수', col: 0, row: 1, note: '2단계' },
-      { id: 's3', label: '부르는 코드', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '지연 로딩', col: 2, row: 2, note: '반복문 속 읽기' },
-      { id: 's4', label: '조인', col: 0, row: 3, note: '4단계', tone: 'accent' },
-      { id: 'e4', label: '묶어서', col: 2, row: 3, note: 'IN·배치' },
-      { id: 's5', label: '요청당 SQL', col: 0, row: 4, note: '5단계' },
-    ]}
-    edges={[
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '코드에 SQL 없음' },
-      { from: 's3', to: 's4' },
-      { from: 's4', to: 'e4', label: '결과가 너무 큼' },
-      { from: 's4', to: 's5' },
+    steps={[
+      { label: '반복 막대', tone: 'warn' },
+      { label: 'SQL 호출 수' },
+      { label: '부르는 코드', exits: [{ when: '코드에 SQL 없음', to: '지연 로딩', note: '반복문 속 읽기' }] },
+      { label: '조인', tone: 'accent', exits: [{ when: '결과가 너무 큼', to: '묶어서', note: 'IN·배치' }] },
+      { label: '요청당 SQL' },
     ]}
   />
 </Figure>

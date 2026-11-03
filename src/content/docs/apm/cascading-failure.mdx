@@ -29,23 +29,14 @@ updated: 2026-10-29
   <Item title="기다리는 자원이 바닥났는지">스레드 풀과 커넥션 풀이 상한에 붙었는지 봐요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 부른 쪽 시간만 늘었다면 둘 사이를 보고, 뒷단 요청만 늘었다면 늘어난 몫은 재시도예요. 끝에는 부하를 크게 줄여 번짐을 멈춰요.">
-  <Flow
+<Figure caption="부른 쪽 시간만 늘었다면 둘 사이를 보고, 뒷단 요청만 늘었다면 늘어난 몫은 재시도예요. 끝에는 부하를 크게 줄여 번짐을 멈춰요.">
+  <Triage
     ariaLabel="1단계에서 출발점을 찾되 부른 쪽 시간만 늘었다면 둘 사이를 보고, 2단계에서 뒷단 요청만 늘었다면 늘어난 몫을 재시도로 보며, 3단계에서 기다리는 자원이 바닥났는지 본 뒤, 4단계에서 부하를 크게 줄이는 흐름도"
-    nodes={[
-      { id: 's1', label: '출발점 찾기', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'e1', label: '둘 사이', col: 2, row: 0, note: '받은 쪽 밖' },
-      { id: 's2', label: '재시도', col: 0, row: 1, note: '2단계' },
-      { id: 'e2', label: '재시도 몫', col: 2, row: 1, note: '늘어난 요청' },
-      { id: 's3', label: '자원 고갈', col: 0, row: 2, note: '3단계' },
-      { id: 's4', label: '부하 줄이기', col: 0, row: 3, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 'e1', label: '부른 쪽만 늘어남' },
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 'e2', label: '뒷단만 늘어남' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 's4' },
+    steps={[
+      { label: '출발점 찾기', tone: 'warn', exits: [{ when: '부른 쪽만 늘어남', to: '둘 사이', note: '받은 쪽 밖' }] },
+      { label: '재시도', exits: [{ when: '뒷단만 늘어남', to: '재시도 몫', note: '늘어난 요청' }] },
+      { label: '자원 고갈' },
+      { label: '부하 줄이기', tone: 'accent' },
     ]}
   />
 </Figure>

@@ -31,25 +31,14 @@ updated: 2026-10-29
   <Item title="한 곳에서만 나는지">엔드포인트와 서버별로 나눠 봐요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 먼저 봐요. 에러율이 그대로면 요청이 왜 늘었는지가 먼저예요.">
-  <Flow
+<Figure caption="에러율이 그대로면 요청이 왜 늘었는지가 먼저예요.">
+  <Triage
     ariaLabel="1단계 에러율이 그대로면 요청 증가 원인으로, 올랐다면 2단계 에러 종류로 가요. 새 종류면 최근 변경을, 아니면 3단계 나는 곳으로 가요. 한 곳에 몰렸다면 그 서버나 기능을 보고, 4단계 에러 트레이스에서 처음 실패한 span을 찾는 흐름도"
-    nodes={[
-      { id: 's1', label: '에러율', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'e1', label: '요청 증가', col: 2, row: 0, note: '왜 늘었나' },
-      { id: 's2', label: '에러 종류', col: 0, row: 1, note: '2단계' },
-      { id: 'e2', label: '최근 변경', col: 2, row: 1, note: '배포·설정' },
-      { id: 's3', label: '나는 곳', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '그 서버·기능', col: 2, row: 2, note: '버전·코드' },
-      { id: 's4', label: '에러 트레이스', col: 0, row: 3, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 'e1', label: '그대로' },
-      { from: 's1', to: 's2', label: '올랐음' },
-      { from: 's2', to: 'e2', label: '새 종류' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '몰림' },
-      { from: 's3', to: 's4' },
+    steps={[
+      { label: '에러율', tone: 'warn', next: '올랐음', exits: [{ when: '그대로', to: '요청 증가', note: '왜 늘었나' }] },
+      { label: '에러 종류', exits: [{ when: '새 종류', to: '최근 변경', note: '배포·설정' }] },
+      { label: '나는 곳', exits: [{ when: '몰림', to: '그 서버·기능', note: '버전·코드' }] },
+      { label: '에러 트레이스', tone: 'accent' },
     ]}
   />
 </Figure>

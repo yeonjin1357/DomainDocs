@@ -53,28 +53,14 @@ updated: 2026-10-29
   <Item title="같은 장애로 여러 알림이 울리는지">장애 하나에 알림이 몇 개 왔는지 세 봐요.</Item>
 </FirstLook>
 
-<Figure caption="위 세 줄은 지난 알림을 받은 사람이 한 일로 나눠요. 할 일이 없었다면 원인에 걸었는지, 에러·지연에 걸었는지로 2단계나 3단계를 골라요. 맨 아래 줄은 장애 하나에 알림이 여러 개 왔을 때 4단계로 가는 길이에요.">
-  <Flow
+<Figure caption="지난 알림을 받은 사람이 한 일로 나눠요. 할 일이 없었다면 원인에 걸었는지, 에러·지연에 걸었는지로 2단계나 3단계를 골라요. 장애 하나에 알림이 여러 개 왔다면 4단계로 가요.">
+  <Triage
     ariaLabel="1단계에서 지난 알림을 나눠, 할 일이 없던 원인 알림은 2단계 증상 알림으로 바꾸고, 할 일이 없던 에러·지연 알림은 3단계 지속 시간과 임계값으로, 조치했지만 미뤄도 됐거나 같은 손동작이던 알림은 티켓이나 자동화로 보내요. 지난 장애 하나에 알림이 여러 개 왔다면 4단계 알림 묶기로 가는 흐름도"
-    nodes={[
-      { id: 's1', label: '지난 알림', col: 1, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'cause', label: '원인 알림', col: 0, row: 1, note: '할 일 없음' },
-      { id: 'symptom', label: '에러·지연', col: 1, row: 1, note: '할 일 없음' },
-      { id: 'acted', label: '조치한 알림', col: 2, row: 1, note: '미룸·반복' },
-      { id: 's2', label: '증상 알림', col: 0, row: 2, note: '2단계', tone: 'accent' },
-      { id: 's3', label: '지속·임계값', col: 1, row: 2, note: '3단계', tone: 'accent' },
-      { id: 'ticket', label: '티켓·자동화', col: 2, row: 2, note: '부르지 않음' },
-      { id: 'incident', label: '지난 장애', col: 0, row: 3, note: '알림 세기', tone: 'warn' },
-      { id: 's4', label: '알림 묶기', col: 2, row: 3, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 'cause' },
-      { from: 's1', to: 'symptom' },
-      { from: 's1', to: 'acted' },
-      { from: 'cause', to: 's2' },
-      { from: 'symptom', to: 's3' },
-      { from: 'acted', to: 'ticket' },
-      { from: 'incident', to: 's4', label: '여러 개 옴' },
+    steps={[
+      { label: '지난 알림', tone: 'warn', next: false, exits: [{ when: '원인 알림 (할 일 없음)', to: 2 }, { when: '에러·지연 (할 일 없음)', to: 3 }, { when: '조치한 알림 (미뤄도 됐거나 같은 손동작)', to: '티켓·자동화' }] },
+      { label: '증상 알림', when: '원인 알림일 때', tone: 'accent', next: false },
+      { label: '지속·임계값', when: '에러·지연일 때', tone: 'accent', next: false },
+      { label: '알림 묶기', when: '장애 하나에 알림 여러 개', tone: 'accent' },
     ]}
   />
 </Figure>

@@ -32,24 +32,13 @@ updated: 2026-10-29
 </FirstLook>
 
 <Figure caption="1단계에서 리밸런스 시각을 맞춰 본 뒤 갈래를 골라요. 컨슈머가 죽지 않았는데 빠진다면 처리 시간을, 죽거나 멈췄다면 하트비트를, 배포와 겹치면 고정 멤버십을 봐요.">
-  <Flow
+  <Triage
     ariaLabel="1단계에서 리밸런스 시각을 맞춰 보고, 컨슈머가 살아 있는데 빠지면 2단계 처리 시간으로, 죽거나 멈췄다면 3단계 하트비트로, 배포와 겹치면 4단계 고정 멤버십으로 가는 흐름도"
-    nodes={[
-      { id: 'start', label: '리밸런스 시각', col: 1, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'alive', label: '살아 있는데', col: 0, row: 1, note: '스스로 떠남' },
-      { id: 'dead', label: '죽거나 멈춤', col: 1, row: 1, note: '재시작·GC' },
-      { id: 'deploy', label: '배포와 겹침', col: 2, row: 1, note: '하나씩 재시작' },
-      { id: 's2', label: '처리 시간', col: 0, row: 2, note: '2단계 · 5분', tone: 'accent' },
-      { id: 's3', label: '하트비트', col: 1, row: 2, note: '3단계 · 45초', tone: 'accent' },
-      { id: 's4', label: '고정 멤버십', col: 2, row: 2, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'start', to: 'alive' },
-      { from: 'start', to: 'dead' },
-      { from: 'start', to: 'deploy' },
-      { from: 'alive', to: 's2' },
-      { from: 'dead', to: 's3' },
-      { from: 'deploy', to: 's4' },
+    steps={[
+      { label: '리밸런스 시각', tone: 'warn', next: false, exits: [{ when: '살아 있는데 (스스로 떠남)', to: 2 }, { when: '죽거나 멈춤 (재시작·GC)', to: 3 }, { when: '배포와 겹침 (하나씩 재시작)', to: 4 }] },
+      { label: '처리 시간', note: '기본 5분 안에 다음 가져가기', when: '살아 있는데 빠질 때', tone: 'accent', next: false },
+      { label: '하트비트', note: '기본 45초 동안 없으면 빠짐', when: '죽거나 멈췄을 때', tone: 'accent', next: false },
+      { label: '고정 멤버십', when: '배포와 겹칠 때', tone: 'accent' },
     ]}
   />
 </Figure>

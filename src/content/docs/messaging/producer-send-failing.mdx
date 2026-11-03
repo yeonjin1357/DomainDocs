@@ -31,26 +31,16 @@ updated: 2026-10-30
   <Item title="브로커가 건강한가">복제와 요청 지연을 봐요.</Item>
 </FirstLook>
 
-<Figure caption="1단계에서 에러 종류를 읽고, 같은 줄 오른쪽의 단계로 가요. 시간 초과와 버퍼 부족은 둘 다 브로커가 느려졌는지부터 봐요.">
-  <Flow
+<Figure caption="1단계에서 에러 종류를 읽고 맞는 단계로 가요. 시간 초과와 버퍼 부족은 둘 다 브로커가 느려졌는지부터 봐요.">
+  <Triage
     ariaLabel="1단계에서 읽은 에러가 시간 초과면 2단계 재시도와 브로커로, 복제 부족이면 3단계 복제 상태로, 크기 초과면 4단계 이벤트 크기로, 버퍼 부족이면 5단계 보내는 속도로 가는 흐름도"
-    nodes={[
-      { id: 'timeout', label: '시간 초과', col: 0, row: 0, note: '재시도도 실패', tone: 'warn' },
-      { id: 'replica', label: '복제 부족', col: 0, row: 1, note: 'ISR 모자람', tone: 'warn' },
-      { id: 'size', label: '크기 초과', col: 0, row: 2, note: '한도 넘음', tone: 'warn' },
-      { id: 'buffer', label: '버퍼 부족', col: 0, row: 3, note: '버퍼가 참', tone: 'warn' },
-      { id: 's2', label: '재시도·브로커', col: 2, row: 0, note: '2단계', tone: 'accent' },
-      { id: 's3', label: '복제 상태', col: 2, row: 1, note: '3단계', tone: 'accent' },
-      { id: 's4', label: '이벤트 크기', col: 2, row: 2, note: '4단계', tone: 'accent' },
-      { id: 's5', label: '보내는 속도', col: 2, row: 3, note: '5단계', tone: 'accent' },
+    steps={[
+      { label: '에러 종류', tone: 'warn', next: false, exits: [{ when: '시간 초과 (재시도도 실패)', to: 2 }, { when: '복제 부족 (ISR 모자람)', to: 3 }, { when: '크기 초과 (한도 넘음)', to: 4 }, { when: '버퍼 부족 (버퍼가 참)', to: 5 }] },
+      { label: '재시도·브로커', when: '시간 초과일 때', tone: 'accent', next: false },
+      { label: '복제 상태', when: '복제 부족일 때', tone: 'accent', next: false },
+      { label: '이벤트 크기', when: '크기 초과일 때', tone: 'accent', next: false },
+      { label: '보내는 속도', when: '버퍼 부족일 때', tone: 'accent' },
     ]}
-    edges={[
-      { from: 'timeout', to: 's2' },
-      { from: 'replica', to: 's3' },
-      { from: 'size', to: 's4' },
-      { from: 'buffer', to: 's5' },
-    ]}
-    groups={[{ label: '1단계 에러 종류', cols: [0, 0], rows: [0, 3] }]}
   />
 </Figure>
 

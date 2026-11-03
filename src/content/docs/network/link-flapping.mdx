@@ -27,23 +27,14 @@ updated: 2026-10-29
   <Item title="양쪽 끝 기록">스위치와 서버의 기록을 함께 봐요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 관리자가 끈 포트라면 장애가 아니에요. 받은 에러도 함께 늘었다면 물리 쪽일 가능성이 더 커서, 케이블과 광 모듈부터 봐요.">
-  <Flow
+<Figure caption="관리자가 끈 포트라면 장애가 아니에요. 받은 에러도 함께 늘었다면 물리 쪽일 가능성이 더 커서, 케이블과 광 모듈부터 봐요.">
+  <Triage
     ariaLabel="1단계에서 관리자가 끈 포트면 장애가 아니고, 상태가 정말 바뀌었다면 2단계 Trap과 Syslog로 횟수와 시각을 모은 뒤, 3단계 물리 문제에서 받은 에러도 늘었다면 케이블과 광 모듈을 바꿔 보고, 4단계에서 알림을 묶는 흐름도"
-    nodes={[
-      { id: 's1', label: '상태 변화', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'e1', label: '장애 아님', col: 2, row: 0, note: '의도한 상태' },
-      { id: 's2', label: 'Trap·Syslog', col: 0, row: 1, note: '2단계' },
-      { id: 's3', label: '물리 문제', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '케이블·SFP', col: 2, row: 2, note: '바꿔 보기' },
-      { id: 's4', label: '알림 묶기', col: 0, row: 3, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 'e1', label: '관리자가 끔' },
-      { from: 's1', to: 's2', label: '정말 바뀜' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '에러도 늘음' },
-      { from: 's3', to: 's4' },
+    steps={[
+      { label: '상태 변화', tone: 'warn', next: '정말 바뀜', exits: [{ when: '관리자가 끔', to: '장애 아님', note: '의도한 상태' }] },
+      { label: 'Trap·Syslog' },
+      { label: '물리 문제', exits: [{ when: '에러도 늘음', to: '케이블·SFP', note: '바꿔 보기' }] },
+      { label: '알림 묶기', tone: 'accent' },
     ]}
   />
 </Figure>

@@ -29,29 +29,15 @@ updated: 2026-10-29
   <Item title="멈춘 컨슈머가 있나">위치가 움직이지 않는 컨슈머를 찾아요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 먼저 봐요. 들어오는 양 자체가 늘었다면 4단계에서 처리 능력을 늘려요.">
-  <Flow
+<Figure caption="들어오는 양 자체가 늘었다면 4단계에서 처리 능력을 늘려요.">
+  <Triage
     ariaLabel="1단계에서 처리 속도가 줄었다면 DB와 바깥 API를, 2단계 파티션별 지연에서 한 파티션만 밀리면 키 쏠림을, 3단계 멈춘 컨슈머에서 리밸런스가 잦으면 리밸런스 가이드를, 4단계 처리 능력에서 컨슈머가 이미 파티션 수만큼이면 파티션 늘리기를 보고, 5단계에서 따라잡는 시간을 계산하는 흐름도"
-    nodes={[
-      { id: 's1', label: '들어옴·처리', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'e1', label: 'DB·바깥 API', col: 2, row: 0, note: '느려졌나' },
-      { id: 's2', label: '파티션별 지연', col: 0, row: 1, note: '2단계' },
-      { id: 'e2', label: '키 쏠림', col: 2, row: 1, note: '키 설명 보기' },
-      { id: 's3', label: '멈춘 컨슈머', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '리밸런스 반복', col: 2, row: 2, note: '별도 가이드' },
-      { id: 's4', label: '처리 능력', col: 0, row: 3, note: '4단계' },
-      { id: 'e4', label: '파티션 늘리기', col: 2, row: 3, note: '처리 시간 단축' },
-      { id: 's5', label: '따라잡는 시간', col: 0, row: 4, note: '5단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 'e1', label: '처리 줄음' },
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 'e2', label: '한 파티션만' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '리밸런스 잦음' },
-      { from: 's3', to: 's4' },
-      { from: 's4', to: 'e4', label: '파티션 수만큼' },
-      { from: 's4', to: 's5' },
+    steps={[
+      { label: '들어옴·처리', tone: 'warn', exits: [{ when: '처리 줄음', to: 'DB·바깥 API', note: '느려졌나' }] },
+      { label: '파티션별 지연', exits: [{ when: '한 파티션만', to: '키 쏠림', note: '키 설명 보기' }] },
+      { label: '멈춘 컨슈머', exits: [{ when: '리밸런스 잦음', to: '리밸런스 반복', note: '별도 가이드' }] },
+      { label: '처리 능력', exits: [{ when: '파티션 수만큼', to: '파티션 늘리기', note: '처리 시간 단축' }] },
+      { label: '따라잡는 시간', tone: 'accent' },
     ]}
   />
 </Figure>

@@ -47,27 +47,15 @@ updated: 2026-10-29
   <Item title="계속 느는가">줄지 않고 늘기만 하면 새는 거예요.</Item>
 </FirstLook>
 
-<Figure caption="에러 메시지로 먼저 갈라요. in system이 붙은 ENFILE이면 5단계로 가요. EMFILE이면 왼쪽 줄을 따라 내려가며, 단계마다 오른쪽 조건에 맞으면 그쪽을 봐요.">
-  <Flow
+<Figure caption="에러 메시지로 먼저 갈라요. in system이 붙은 ENFILE이면 5단계로 가고, EMFILE이면 1단계부터 내려가요.">
+  <Triage
     ariaLabel="에러가 ENFILE이면 5단계 서버 전체 한도를, EMFILE이면 1단계 열린 수와 한도로 가요. 2단계에서 같은 파일을 여러 번 열었다면 닫지 않는 코드를, 소켓이면 3단계로 가요. 3단계에서 늘기만 하면 CLOSE-WAIT 연결을, 오르내리면 4단계 한도 올리기로 가는 흐름도"
-    nodes={[
-      { id: 'err', label: '에러 메시지', col: 0, row: 0, tone: 'warn' },
-      { id: 's5', label: '서버 전체', col: 2, row: 0, note: '5단계' },
-      { id: 's1', label: '열린 수·한도', col: 0, row: 1, note: '1단계' },
-      { id: 's2', label: '무엇을 열었나', col: 0, row: 2, note: '2단계' },
-      { id: 'e2', label: '닫지 않는 코드', col: 2, row: 2, note: '파일' },
-      { id: 's3', label: '계속 느나', col: 0, row: 3, note: '3단계' },
-      { id: 'e3', label: 'CLOSE-WAIT', col: 2, row: 3, note: '연결 닫는 곳' },
-      { id: 's4', label: '한도 올리기', col: 0, row: 4, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'err', to: 's5', label: 'ENFILE' },
-      { from: 'err', to: 's1', label: 'EMFILE' },
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 'e2', label: '같은 파일' },
-      { from: 's2', to: 's3', label: '소켓' },
-      { from: 's3', to: 'e3', label: '늘기만 함' },
-      { from: 's3', to: 's4', label: '오르내림' },
+    steps={[
+      { label: '열린 수·한도', when: 'EMFILE일 때', tone: 'warn' },
+      { label: '무엇을 열었나', next: '소켓', exits: [{ when: '같은 파일', to: '닫지 않는 코드', note: '파일' }] },
+      { label: '계속 느나', next: '오르내림', exits: [{ when: '늘기만 함', to: 'CLOSE-WAIT', note: '연결 닫는 곳' }] },
+      { label: '한도 올리기', tone: 'accent', next: false },
+      { label: '서버 전체', when: 'ENFILE일 때', tone: 'accent' },
     ]}
   />
 </Figure>

@@ -42,25 +42,14 @@ updated: 2026-10-29
   />
 </Figure>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 먼저 봐요. 정확히 몇 시간씩 어긋난다면 시계가 아니라 시간대예요.">
-  <Flow
+<Figure caption="정확히 몇 시간씩 어긋난다면 시계가 아니라 시간대예요.">
+  <Triage
     ariaLabel="1단계 시간 동기화가 꺼져 있으면 동기화를 켜고, 켜져 있으면 2단계 오프셋으로 가요. 오프셋이 안 맞으면 닿는 시간 서버를 보고, 3단계에서 몇 시간 단위로 어긋나면 시간대 설정을 보며, 4단계에서 크게 어긋난 시계를 조심해서 맞추는 흐름도"
-    nodes={[
-      { id: 's1', label: '시간 동기화', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'e1', label: '동기화 켜기', col: 2, row: 0, note: '바로 켜요' },
-      { id: 's2', label: '오프셋', col: 0, row: 1, note: '2단계' },
-      { id: 'e2', label: '시간 서버', col: 2, row: 1, note: '닿는지 봐요' },
-      { id: 's3', label: '어긋난 단위', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '시간대 설정', col: 2, row: 2, note: 'Time zone' },
-      { id: 's4', label: '조심해서 맞춤', col: 0, row: 3, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 'e1', label: '꺼짐' },
-      { from: 's1', to: 's2', label: '켜짐' },
-      { from: 's2', to: 'e2', label: '안 맞음' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '몇 시간 단위' },
-      { from: 's3', to: 's4' },
+    steps={[
+      { label: '시간 동기화', tone: 'warn', next: '켜짐', exits: [{ when: '꺼짐', to: '동기화 켜기', note: '바로 켜요' }] },
+      { label: '오프셋', exits: [{ when: '안 맞음', to: '시간 서버', note: '닿는지 봐요' }] },
+      { label: '어긋난 단위', exits: [{ when: '몇 시간 단위', to: '시간대 설정', note: 'Time zone' }] },
+      { label: '조심해서 맞춤', tone: 'accent' },
     ]}
   />
 </Figure>

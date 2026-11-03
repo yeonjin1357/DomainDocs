@@ -35,21 +35,15 @@ updated: 2026-10-29
   <Item title="시간대">새벽 2시가 어느 나라의 2시인지 봐요.</Item>
 </FirstLook>
 
-<Figure caption="1단계에서 Job이 생겼는지로 갈라요. 생겼으면 왼쪽 줄로 실패 이유와 파드 로그를, 안 생겼으면 오른쪽 줄로 일정과 겹침 설정을 봐요.">
-  <Flow
+<Figure caption="1단계에서 Job이 생겼는지로 갈라요. 생겼으면 실패 이유와 파드 로그를, 안 생겼으면 일정과 겹침 설정을 봐요.">
+  <Triage
     ariaLabel="1단계에서 Job이 생겼으면 2단계 실패 이유로 가서 재시도를 다 썼다면 3단계 파드 로그를 보고, 안 생겼으면 4단계 일정과 시간대로 가서 앞 실행이 돌고 있었다면 5단계 겹침 설정을 보는 흐름도"
-    nodes={[
-      { id: 's1', label: 'Job 생겼나', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 's4', label: '일정·시간대', col: 2, row: 0, note: '4단계' },
-      { id: 's2', label: '실패 이유', col: 0, row: 1, note: '2단계' },
-      { id: 's5', label: '겹침 설정', col: 2, row: 1, note: '5단계', tone: 'accent' },
-      { id: 's3', label: '파드 로그', col: 0, row: 2, note: '3단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 's4', label: '안 생김' },
-      { from: 's1', to: 's2', label: '생김' },
-      { from: 's4', to: 's5', label: '앞 실행 중' },
-      { from: 's2', to: 's3', label: '재시도 소진' },
+    steps={[
+      { label: 'Job 생겼나', tone: 'warn', next: '생김', exits: [{ when: '안 생김', to: 4 }] },
+      { label: '실패 이유', next: '재시도 소진' },
+      { label: '파드 로그', tone: 'accent', next: false },
+      { label: '일정·시간대', when: 'Job이 안 생겼을 때', next: '앞 실행 중' },
+      { label: '겹침 설정', tone: 'accent' },
     ]}
   />
 </Figure>

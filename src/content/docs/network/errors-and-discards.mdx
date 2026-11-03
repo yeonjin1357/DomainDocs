@@ -27,23 +27,14 @@ updated: 2026-10-29
   <Item title="양쪽 설정이 같은가">속도와 이중 통신 설정을 견줘요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 보낼 때 버림이 늘었다면 넘침이라 인터페이스가 꽉 찼을 때를 봐요. 받은 에러라면 비율을 확인하고, 물리 부품과 이중 통신 설정을 차례로 봐요.">
-  <Flow
+<Figure caption="보낼 때 버림이 늘었다면 넘침이라 인터페이스가 꽉 찼을 때를 봐요. 받은 에러라면 비율을 확인하고, 물리 부품과 이중 통신 설정을 차례로 봐요.">
+  <Triage
     ariaLabel="1단계에서 보낼 때 버림이 늘었다면 인터페이스가 꽉 찼을 때 가이드로, 받은 에러라면 2단계 에러 비율과 3단계 물리 부품으로 가서 링크도 끊겼다 붙으면 링크 플래핑 가이드를 함께 보고, 4단계에서 양쪽 이중 통신 설정을 견주는 흐름도"
-    nodes={[
-      { id: 's1', label: '에러·버림', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'e1', label: '꽉 찼을 때', col: 2, row: 0, note: '별도 가이드' },
-      { id: 's2', label: '에러 비율', col: 0, row: 1, note: '2단계' },
-      { id: 's3', label: '물리 부품', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '링크 플래핑', col: 2, row: 2, note: '별도 가이드' },
-      { id: 's4', label: '이중 통신', col: 0, row: 3, note: '4단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 'e1', label: '보낼 때 버림' },
-      { from: 's1', to: 's2', label: '받은 에러' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '끊겼다 붙음' },
-      { from: 's3', to: 's4' },
+    steps={[
+      { label: '에러·버림', tone: 'warn', next: '받은 에러', exits: [{ when: '보낼 때 버림', to: '꽉 찼을 때', note: '별도 가이드' }] },
+      { label: '에러 비율' },
+      { label: '물리 부품', exits: [{ when: '끊겼다 붙음', to: '링크 플래핑', note: '별도 가이드' }] },
+      { label: '이중 통신', tone: 'accent' },
     ]}
   />
 </Figure>

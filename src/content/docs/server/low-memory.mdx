@@ -33,25 +33,14 @@ updated: 2026-10-29
   <Item title="누가 늘었나">RSS가 계속 오르는 프로세스를 찾아요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 단계마다 오른쪽 조건에 맞으면 그쪽을 봐요. available이 넉넉하면 메모리보다 알림 기준을 먼저 고쳐요.">
-  <Flow
+<Figure caption="available이 넉넉하면 메모리보다 알림 기준을 먼저 고쳐요. 프로세스가 사라졌다면 4단계에서 OOM 기록을 봐요.">
+  <Triage
     ariaLabel="1단계 available이 넉넉하면 알림 기준을 고치고, 바닥에 가까우면 2단계 스왑이 오가는 양을 봐요. 3단계 RSS 추세에서 힙은 여유로우면 힙 밖 메모리를 보고, 프로세스가 사라졌다면 4단계 OOM 기록을, 컨테이너라면 컨테이너 한도를 보는 흐름도"
-    nodes={[
-      { id: 's1', label: 'available', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 'e1', label: '알림 기준', col: 2, row: 0, note: 'free로 계산?' },
-      { id: 's2', label: '스왑 오가는 양', col: 0, row: 1, note: '2단계' },
-      { id: 's3', label: 'RSS 추세', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '힙 밖 메모리', col: 2, row: 2, note: '자바 앱' },
-      { id: 's4', label: 'OOM 기록', col: 0, row: 3, note: '4단계', tone: 'accent' },
-      { id: 'e4', label: '컨테이너 한도', col: 2, row: 3, note: 'OOMKilled' },
-    ]}
-    edges={[
-      { from: 's1', to: 'e1', label: '넉넉함' },
-      { from: 's1', to: 's2', label: '바닥 가까움' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '힙은 여유' },
-      { from: 's3', to: 's4', label: '사라졌다면' },
-      { from: 's4', to: 'e4', label: '컨테이너' },
+    steps={[
+      { label: 'available', tone: 'warn', next: '바닥 가까움', exits: [{ when: '넉넉함', to: '알림 기준', note: 'free로 계산?' }] },
+      { label: '스왑 오가는 양' },
+      { label: 'RSS 추세', next: '사라졌다면', exits: [{ when: '힙은 여유', to: '힙 밖 메모리', note: '자바 앱' }] },
+      { label: 'OOM 기록', tone: 'accent', exits: [{ when: '컨테이너', to: '컨테이너 한도', note: 'OOMKilled' }] },
     ]}
   />
 </Figure>

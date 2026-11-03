@@ -31,23 +31,14 @@ updated: 2026-10-29
   <Item title="사라지기 전에 모으기">기본 1시간 뒤 지워져요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 일이 1시간보다 오래전이면 kubectl 대신 모아 둔 곳에서 찾아요. 여러 객체에 같은 이유가 쏟아지면 공통 원인을 먼저 봐요.">
-  <Flow
+<Figure caption="일이 1시간보다 오래전이면 kubectl 대신 모아 둔 곳에서 찾아요. 여러 객체에 같은 이유가 쏟아지면 공통 원인을 먼저 봐요.">
+  <Triage
     ariaLabel="1단계 이벤트의 칸을 알고, 2단계 Warning만 골라 보되 1시간이 지났다면 4단계 모아 둔 곳에서 찾고, 3단계 이유로 다음에 볼 곳을 정하되 여러 객체에서 같은 이유가 나오면 공통 원인을 보는 흐름도"
-    nodes={[
-      { id: 's1', label: '이벤트 칸', col: 0, row: 0, note: '1단계' },
-      { id: 's2', label: 'Warning만', col: 0, row: 1, note: '2단계', tone: 'warn' },
-      { id: 's4', label: '모아 둔 곳', col: 2, row: 1, note: '4단계' },
-      { id: 's3', label: '이유(reason)', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '공통 원인', col: 2, row: 2, note: 'DB·네트워크' },
-      { id: 'next', label: '다음 볼 곳', col: 0, row: 3, note: '표 오른쪽 칸', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 's2' },
-      { from: 's2', to: 's4', label: '1시간 지남' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '여러 객체' },
-      { from: 's3', to: 'next' },
+    steps={[
+      { label: '이벤트 칸' },
+      { label: 'Warning만', tone: 'warn', exits: [{ when: '1시간 지남', to: 4 }] },
+      { label: '이유(reason)', next: false, exits: [{ when: '여러 객체', to: '공통 원인', note: 'DB·네트워크' }, { when: '이유마다', to: '다음 볼 곳', note: '표의 오른쪽 칸', tone: 'accent' }] },
+      { label: '모아 둔 곳', when: '1시간이 지났을 때', tone: 'accent' },
     ]}
   />
 </Figure>

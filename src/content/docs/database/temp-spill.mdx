@@ -39,25 +39,15 @@ updated: 2026-10-29
   <Item title="정말 느린지">넘친 것과 느린 것은 따로 봐요.</Item>
 </FirstLook>
 
-<Figure caption="왼쪽 줄을 위에서 아래로 따라가요. 3단계에서 넘침이 문제가 안 된다면 고칠 일이 아니에요. 문제라면 work_mem을 좁은 범위에서 올리고, 디스크 한도도 걸어요.">
-  <Flow
+<Figure caption="3단계에서 넘침이 문제가 안 된다면 고칠 일이 아니에요. 문제라면 work_mem을 좁은 범위에서 올리고, 디스크 한도도 걸어요.">
+  <Triage
     ariaLabel="1단계 임시 파일이 생기면 2단계 계획에서 넘친 단계를 찾고, 3단계 정말 느린지 봐서 문제가 없으면 고칠 일이 아니에요. 문제라면 4단계 work_mem을 전체 대신 계정이나 세션 범위로 올리고, 5단계 디스크 한도를 거는 흐름도"
-    nodes={[
-      { id: 's1', label: '임시 파일', col: 0, row: 0, note: '1단계', tone: 'warn' },
-      { id: 's2', label: '넘친 단계', col: 0, row: 1, note: '2단계' },
-      { id: 's3', label: '정말 느린지', col: 0, row: 2, note: '3단계' },
-      { id: 'e3', label: '고칠 일 아님', col: 2, row: 2, note: '넘침만으론' },
-      { id: 's4', label: 'work_mem', col: 0, row: 3, note: '4단계' },
-      { id: 'e4', label: '범위 좁히기', col: 2, row: 3, note: '계정·세션' },
-      { id: 's5', label: '디스크 한도', col: 0, row: 4, note: '5단계', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 's1', to: 's2', label: '생김' },
-      { from: 's2', to: 's3' },
-      { from: 's3', to: 'e3', label: '문제 없음' },
-      { from: 's3', to: 's4', label: '문제 됨' },
-      { from: 's4', to: 'e4', label: '전체 대신' },
-      { from: 's4', to: 's5' },
+    steps={[
+      { label: '임시 파일', tone: 'warn', next: '생김' },
+      { label: '넘친 단계' },
+      { label: '정말 느린지', next: '문제 됨', exits: [{ when: '문제 없음', to: '고칠 일 아님', note: '넘침만으론' }] },
+      { label: 'work_mem', exits: [{ when: '전체 대신', to: '범위 좁히기', note: '계정·세션' }] },
+      { label: '디스크 한도', tone: 'accent' },
     ]}
   />
 </Figure>

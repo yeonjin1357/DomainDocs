@@ -55,5 +55,6 @@ export const LINT_CONFIG = {
     'Strip',
     'Stages',
     'Stacks',
+    'Triage',
   ],
 } as const;
