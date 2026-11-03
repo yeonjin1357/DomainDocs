@@ -36,6 +36,17 @@ describe('layoutStrip', () => {
     expect(() => layoutStrip([{ cells: ['700', '200'], heads: ['~0.1'] }])).toThrow(/머리글\(1개\)과 칸\(2개\)/);
   });
 
+  it('막대 값은 줄의 가장 큰 값에 대한 %로 바꾸고, 칸 수와 같아야 한다', () => {
+    expect(layoutStrip([{ cells: ['98', '0', '2'], bars: [98, 0, 2] }]).rows[0].bars).toEqual([100, 0, 2.04]);
+    expect(() => layoutStrip([{ cells: ['1', '2'], bars: [1] }])).toThrow(/막대\(1개\)와 칸\(2개\)/);
+    expect(() => layoutStrip([{ cells: ['1'], bars: [0] }])).toThrow(/하나는 0보다/);
+  });
+
+  it('heat는 0~1이어야 한다', () => {
+    expect(layoutStrip([{ cells: [{ label: '110', heat: 0.88 }] }]).rows[0].cells[0]).toEqual({ label: '110', heat: 0.88 });
+    expect(() => layoutStrip([{ cells: [{ label: 'x', heat: 1.2 }] }])).toThrow(/heat\(1.2\)/);
+  });
+
   it('칸이 12개를 넘으면 빌드를 멈춘다', () => {
     expect(() => layoutStrip([{ cells: Array.from({ length: 13 }, (_, i) => String(i)) }])).toThrow(/12개까지만/);
   });

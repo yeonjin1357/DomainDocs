@@ -3,6 +3,8 @@ import type { FigureTone } from './flow';
 export interface StripCell {
   label: string;
   tone?: FigureTone;
+  /** 0~1. 히트맵처럼 값이 클수록 진하게 칠한다(tone 대신) */
+  heat?: number;
 }
 
 export interface StripRow {
@@ -11,6 +13,8 @@ export interface StripRow {
   cells: (string | StripCell)[];
   /** 칸마다 위에 붙일 작은 글자(예: 버킷 경계). 빈 글자는 비워 둔다 */
   heads?: string[];
+  /** 칸마다 위에 세울 막대의 값. 줄에서 가장 큰 값이 막대 높이 끝이다(예: 구간별 요청 수) */
+  bars?: number[];
 }
 
 /** 칸 하나를 위에서 가리키는 표시(예: 커밋 위치) */
@@ -37,8 +41,10 @@ export interface StripLayout {
   columns: number;
   rows: {
     label?: string;
-    cells: { label: string; tone?: FigureTone }[];
+    cells: { label: string; tone?: FigureTone; heat?: number }[];
     heads?: string[];
+    /** 막대 높이(줄의 가장 큰 값에 대한 %) */
+    bars?: number[];
     marks: { column: number; label: string; tone: FigureTone }[];
     ranges: { column: number; span: number; label: string; tone: FigureTone }[];
   }[];
@@ -72,10 +78,17 @@ export function layoutStrip(
 
   const out: StripLayout['rows'] = rows.map((r, i) => {
     if (r.heads && r.heads.length !== r.cells.length) throw new Error(`Strip: 줄 ${i}의 머리글(${r.heads.length}개)과 칸(${r.cells.length}개) 수가 달라요`);
+    if (r.bars && r.bars.length !== r.cells.length) throw new Error(`Strip: 줄 ${i}의 막대(${r.bars.length}개)와 칸(${r.cells.length}개) 수가 달라요`);
+    if (r.bars && (r.bars.some((v) => !(v >= 0)) || Math.max(...r.bars) <= 0)) throw new Error(`Strip: 줄 ${i}의 막대 값은 0 이상이고 하나는 0보다 커야 해요`);
+    for (const c of r.cells) {
+      if (typeof c !== 'string' && c.heat !== undefined && !(c.heat >= 0 && c.heat <= 1)) throw new Error(`Strip: 칸 '${c.label}'의 heat(${c.heat})는 0~1이어야 해요`);
+    }
+    const top = r.bars ? Math.max(...r.bars) : 0;
     return {
       label: r.label,
       cells: r.cells.map((c) => (typeof c === 'string' ? { label: c } : c)),
       heads: r.heads,
+      bars: r.bars?.map((v) => Math.round((v / top) * 10000) / 100),
       marks: [],
       ranges: [],
     };

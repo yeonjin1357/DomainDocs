@@ -121,12 +121,12 @@ updated: 2026-10-29
       {
         label: '1초 넘음',
         heads: ['14:00', '14:01', '14:02', '14:03', '14:04', '14:05'],
-        cells: [{ label: '0', tone: 'sub' }, { label: '1', tone: 'sub' }, { label: '0', tone: 'sub' }, { label: '2', tone: 'sub' }, { label: '110', tone: 'accent' }, { label: '1', tone: 'sub' }],
+        cells: [{ label: '0', heat: 0 }, { label: '1', heat: 0.01 }, { label: '0', heat: 0 }, { label: '2', heat: 0.02 }, { label: '110', heat: 0.88 }, { label: '1', heat: 0.01 }],
       },
-      { label: '0.5~1초', cells: ['8', '10', '7', '9', '12', '8'] },
+      { label: '0.5~1초', cells: [{ label: '8', heat: 0.06 }, { label: '10', heat: 0.08 }, { label: '7', heat: 0.06 }, { label: '9', heat: 0.07 }, { label: '12', heat: 0.1 }, { label: '8', heat: 0.06 }] },
       {
         label: '0.5초 아래',
-        cells: [{ label: '120', tone: 'accent' }, { label: '125', tone: 'accent' }, { label: '118', tone: 'accent' }, { label: '122', tone: 'accent' }, '30', { label: '121', tone: 'accent' }],
+        cells: [{ label: '120', heat: 0.96 }, { label: '125', heat: 1 }, { label: '118', heat: 0.94 }, { label: '122', heat: 0.98 }, { label: '30', heat: 0.24 }, { label: '121', heat: 0.97 }],
       },
     ]}
   />

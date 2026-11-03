@@ -21,6 +21,15 @@ const alignOf = (column: number) => (column === 1 ? 'start' : column === layout.
     layout.rows.map((r) => (
       <div class="strip-row">
         {r.label && <span class="strip-row-label">{r.label}</span>}
+        {r.bars && (
+          <div class="strip-grid strip-bars" aria-hidden="true">
+            {r.bars.map((h, k) => (
+              <span class="strip-bar-slot">
+                <span class={`strip-bar tone-${r.cells[k].tone ?? 'plain'}${h === 0 ? ' zero' : ''}`} style={`height:${h}%`} />
+              </span>
+            ))}
+          </div>
+        )}
         {r.marks.length > 0 && (
           <div class="strip-grid">
             {r.marks.map((m) => (
@@ -40,7 +49,12 @@ const alignOf = (column: number) => (column === 1 ? 'start' : column === layout.
         )}
         <div class="strip-grid">
           {r.cells.map((c) => (
-            <span class={`strip-cell tone-${c.tone ?? 'plain'}`}>{c.label}</span>
+            <span
+              class={`strip-cell tone-${c.tone ?? 'plain'}${c.heat !== undefined ? ' heat' : ''}${(c.heat ?? 0) > 0.55 ? ' heat-strong' : ''}`}
+              style={c.heat !== undefined ? `--heat:${c.heat * 100}%` : undefined}
+            >
+              {c.label}
+            </span>
           ))}
         </div>
         {r.ranges.length > 0 && (
@@ -123,6 +137,48 @@ const alignOf = (column: number) => (column === 1 ? 'start' : column === layout.
     border-style: dashed;
     background: transparent;
     color: var(--color-text-weak);
+  }
+
+  /* 히트맵 칸: 값이 클수록 파랗게 진해진다 */
+  .strip-cell.heat {
+    border-color: transparent;
+    background: color-mix(in srgb, var(--color-accent) var(--heat), var(--color-card));
+  }
+
+  .strip-cell.heat-strong {
+    font-weight: 600;
+    color: #fff;
+  }
+
+  /* 칸 위 막대: 칸마다 값에 비례한 높이로 세운다(히스토그램 모양) */
+  .strip-bars {
+    height: 44px;
+  }
+
+  .strip-bar-slot {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .strip-bar {
+    width: 70%;
+    min-height: 2px;
+    border-radius: 3px 3px 0 0;
+    background: var(--color-text-weak);
+  }
+
+  .strip-bar.zero {
+    min-height: 0;
+  }
+
+  .strip-bar.tone-accent {
+    background: var(--color-accent);
+  }
+
+  .strip-bar.tone-warn {
+    background: var(--color-warn);
   }
 
   .strip-mark {
