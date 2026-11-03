@@ -1,0 +1,36 @@
+questions:
+  - id: for-resets
+    type: ox
+    prompt: for 5m인 알림 규칙의 조건이 4분 동안 참이었다가 1분 거짓, 다시 4분 참이었어요. 이 사이에 알림이 firing이 되나요?
+    answer: false
+    explain: 조건이 중간에 한 번 거짓이 되면 pending은 처음부터 다시 세요. 두 번 모두 5분을 채우지 못해 firing이 되지 않아요.
+  - id: label-case-route
+    type: choice
+    prompt: 경로 조건은 team="payment"인데 알림의 레이블은 team="Payment"예요. 이 알림은 어디로 갈까요?
+    choices:
+      - 맨 위 기본 경로의 받는 곳
+      - 결제 경로의 받는 곳
+      - 기본 경로와 결제 경로 둘 다
+      - 어디로도 보내지 않고 버려요
+    answer: 0
+    explain: 레이블 값은 대소문자까지 같아야 맞아요. 맞는 하위 경로가 없으면 맨 위 기본 경로로 가요.
+  - id: resolved-before-wait
+    type: ox
+    prompt: 새 묶음의 알림이 group_wait(기본 30초)가 끝나기 전에 풀렸어요. 이때 풀렸다는 알림은 한 번 가나요?
+    answer: false
+    explain: group_wait가 끝나기 전에 풀린 알림은 아예 보내지 않아요. 짧게 튀었다 풀리는 알림의 소음을 줄이려는 동작이에요.
+  - id: suppressed-metric
+    type: choice
+    prompt: 사일런스나 억제 때문에 막힌 알림이 늘었는지 보려면 Alertmanager의 어떤 지표를 볼까요?
+    choices:
+      - alertmanager_notifications_suppressed_total
+      - alertmanager_notifications_failed_total
+      - prometheus_notifications_dropped_total
+      - ALERTS의 alertstate 레이블
+    answer: 0
+    explain: suppressed_total은 사일런스, 억제, 점검 시간 때문에 보내지 않은 알림을 세요. failed_total은 보내다 실패한 것이에요.
+  - id: route-test-tool
+    type: input
+    prompt: 실제로 보내지 않고 레이블만 넣어, Alertmanager 설정의 어느 받는 곳으로 가는지 시험하는 명령줄 도구의 이름은?
+    answer: [amtool]
+    explain: amtool이에요. amtool config routes test에 레이블을 넣으면 받는 곳 이름이 나와요.

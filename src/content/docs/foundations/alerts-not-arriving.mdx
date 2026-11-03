@@ -1,0 +1,168 @@
+---
+title: 알림이 와야 하는데 안 올 때
+summary: 알림이 안 왔을 때 규칙, 데이터, 전달, 잠재우기, 경로, 보내기, 묶음 순서로 막힌 곳을 찾아요.
+domain: foundations
+type: guide
+order: 129
+icon: list-checks
+keywords: [알림 안 옴, alert not firing, pending, for, absent, Alertmanager, amtool, group_wait, notifications_failed, 원인 찾기]
+related: [foundations/alert-conditions, foundations/alert-routing, foundations/alert-silencing, foundations/empty-graph, foundations/no-data-vs-zero]
+sources:
+  - title: Prometheus — Alerting rules (for, pending·firing, ALERTS)
+    url: https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+  - title: Prometheus — Query functions (absent)
+    url: https://prometheus.io/docs/prometheus/latest/querying/functions/
+  - title: Alertmanager — Configuration (route, group_wait·group_interval·repeat_interval, inhibition, time intervals)
+    url: https://prometheus.io/docs/alerting/latest/configuration/
+  - title: Alertmanager 소스 — notify/metrics.go (notifications_failed_total, notifications_suppressed_total)
+    url: https://github.com/prometheus/alertmanager/blob/main/notify/metrics.go
+  - title: Prometheus 소스 — notifier/metric.go (notifications_dropped_total)
+    url: https://github.com/prometheus/prometheus/blob/main/notifier/metric.go
+  - title: Alertmanager — amtool
+    url: https://github.com/prometheus/alertmanager#amtool
+updated: 2026-11-03
+---
+
+<Situation>
+  분명 장애가 났는데 알림이 오지 않았어요. 장애는 사용자 문의로 먼저 알았어요.
+</Situation>
+
+<FirstLook>
+  <Item title="규칙의 상태">알림 규칙이 firing까지 갔는지 봐요.</Item>
+  <Item title="Alertmanager에 있나">알림이 Alertmanager 화면에 떠 있는지 봐요.</Item>
+  <Item title="보내기 실패">보내기 실패 지표가 늘었는지 봐요.</Item>
+</FirstLook>
+
+<Figure caption="알림은 규칙에서 채널까지 일곱 군데에서 멈출 수 있어요. 앞에서부터 하나씩 지워 가요.">
+  <Triage
+    ariaLabel="1단계 규칙이 firing까지 갔는지, 2단계 질의가 비어 있지 않은지, 3단계 Alertmanager까지 닿았는지, 4단계 사일런스나 억제로 잠재우지 않았는지, 5단계 맞는 경로로 갔는지, 6단계 보내기가 실패하지 않았는지, 7단계 묶여서 기다리는지 차례로 보는 순서"
+    steps={[
+      { label: '규칙의 상태', note: 'pending에 머물렀나', tone: 'warn', exits: [{ when: 'pending', to: '지속 시간(for)' }] },
+      { label: '질의 결과', exits: [{ when: '비어 있음', to: '레이블 바뀜', note: 'absent로 따로' }] },
+      { label: 'Alertmanager 도착', exits: [{ when: '버려짐', to: 'Prometheus 쪽', note: 'dropped_total' }] },
+      { label: '잠재우기', exits: [{ when: '막힘', to: '사일런스·억제', note: 'suppressed_total' }] },
+      { label: '경로', exits: [{ when: '엉뚱한 곳', to: '레이블 값', note: 'amtool로 시험' }] },
+      { label: '보내기', exits: [{ when: '실패', to: '채널 쪽', note: 'failed_total' }] },
+      { label: '묶음 대기', tone: 'accent', exits: [{ when: '금방 풀림', to: '알림 없음', note: 'group_wait' }] },
+    ]}
+  />
+</Figure>
+
+## 1. 규칙이 firing까지 갔는지 보세요
+
+알림 규칙은 조건이 참이 되면 바로 울리지 않아요. `for`로 정한 시간 동안 조건이 이어져야 pending에서 firing이 되고, 그때 Alertmanager로 보내요. 중간에 한 번이라도 거짓이 되면 pending은 처음부터 다시 세요.
+
+<Figure caption="for: 5m 규칙의 예시예요. 처음에는 4분 만에 조건이 풀려 다시 셌고, 두 번째에 5분을 채운 10분에야 firing이 됐어요.">
+  <Timeline
+    ariaLabel="for 5분 규칙에서 0분부터 4분까지 조건이 참이라 pending이었다가 4분에 풀려 처음부터 다시 세고, 5분부터 다시 참이 되어 5분을 채운 10분에 firing이 되는 시간 띠"
+    end={13}
+    lanes={[
+      { label: '조건', segments: [{ start: 0, end: 4, label: '참' }, { start: 5, end: 13, label: '참' }] },
+      { label: '상태', segments: [{ start: 0, end: 4, label: 'pending' }, { start: 5, end: 10, label: 'pending' }, { start: 10, end: 13, label: 'firing', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 10, label: '알림 보냄', tone: 'warn' }]}
+    ticks={[{ at: 0, label: '0분' }, { at: 5, label: '5분' }, { at: 10, label: '10분' }]}
+  />
+</Figure>
+
+장애가 짧게 끊겼다 이어지면, 조건이 `for`를 한 번도 채우지 못해 알림이 오지 않아요. 지속 시간을 정하는 법은 <Term slug="foundations/alert-conditions">알림 조건</Term>에서 다뤄요.
+
+**확인 방법**: Prometheus의 Alerts 화면에서 규칙의 상태를 봐요. 지난 시각은 `ALERTS{alertname="규칙 이름"}`으로 질의하면 `alertstate`가 pending이었는지 firing이었는지 보여요.
+
+## 2. 질의가 비어 있지 않은지 보세요
+
+알림 질의의 결과가 비면 규칙은 아무것도 울리지 않아요. 값이 0인 것과 결과가 없는 것은 달라요. 배포로 레이블 이름이 바뀌면, 질의가 아무 시계열도 못 찾아 조용해져요.
+
+데이터가 사라진 것 자체를 알리려면 `absent()`로 규칙을 따로 만들어요. 그 시계열이 하나도 없을 때 1을 돌려줘요.
+
+```promql
+absent(
+  http_requests_total{job="orders"}
+)
+```
+
+**확인 방법**: 알림 질의를 그대로 Explore 같은 질의 화면에서 돌려 봐요. 비어 있다면 <Term slug="foundations/empty-graph">그래프가 비어 있을 때</Term>의 순서로 찾아요.
+
+## 3. Alertmanager까지 닿았는지 보세요
+
+firing이 됐는데 Alertmanager 화면에 없다면, Prometheus가 보내지 못한 거예요. Prometheus는 보내다 실패해 버린 알림을 세어 둬요.
+
+```promql
+rate(
+  prometheus_notifications_dropped_total[5m]
+) > 0
+```
+
+**확인 방법**: 이 값이 0보다 크면 Prometheus 설정의 Alertmanager 주소와 그 사이 네트워크를 봐요. `prometheus_notifications_errors_total`도 함께 늘어요.
+
+## 4. 잠재운 건 아닌지 보세요
+
+Alertmanager에 알림이 있는데 안 왔다면, 일부러 잠재웠을 수 있어요. 사일런스, 억제(inhibition), 점검 시간(mute time interval)이 알림을 막아요.
+
+<Term slug="foundations/alert-silencing">알림 잠재우기</Term>에서 본 것처럼, 점검 때 건 사일런스가 끝나지 않고 남아 있기도 해요. 억제는 큰 알림이 울리는 동안 레이블이 같은 작은 알림을 막아요.
+
+**확인 방법**: Alertmanager 화면에서 그 알림이 silenced나 inhibited로 표시되는지 봐요. `alertmanager_notifications_suppressed_total`이 늘었다면 무언가가 막고 있어요.
+
+## 5. 맞는 경로로 갔는지 보세요
+
+Alertmanager는 레이블로 <Term slug="foundations/alert-routing">경로 나무</Term>를 내려가 받는 곳을 정해요. 레이블 값은 대소문자까지 똑같아야 맞아요. 맞는 경로가 없으면 맨 위 기본 경로로 가요.
+
+<Figure caption="경로 나무예요. 알림의 레이블이 team=Payment처럼 대문자 하나만 달라도 결제 경로에 맞지 않아요. 그러면 맨 위 기본 경로의 운영 채팅방으로 가요.">
+  <Tree
+    ariaLabel="기본 경로(운영 채팅방) 아래 team이 payment인 결제 경로(결제 채팅방), 그 아래 severity가 critical인 결제 당직 경로가 있는 나무"
+    root={{
+      label: '기본 경로',
+      note: 'ops-chat',
+      tag: '맞는 곳이 없으면',
+      children: [{ label: '결제 경로', note: 'pay-chat', tag: 'team="payment"', children: [{ label: '결제 당직', note: 'pay-oncall', tag: 'severity="critical"', tone: 'accent' }] }],
+    }}
+  />
+</Figure>
+
+**확인 방법**: `amtool`로 레이블만 넣어 어느 받는 곳으로 가는지 시험해요. 실제로 보내지 않아요. 위 나무에 `team=Payment`를 넣으면 `ops-chat`이 나와요.
+
+```bash
+amtool config routes test \
+  --config.file=am.yml \
+  team=Payment severity=critical
+```
+
+## 6. 보내기가 실패했는지 보세요
+
+경로까지 맞았는데 안 왔다면, 채팅방이나 메일로 보내다 실패했을 수 있어요. 웹훅 주소가 바뀌었거나, 토큰이 만료됐거나, 받는 쪽이 에러를 돌려준 경우예요.
+
+```promql
+sum by (integration) (
+  rate(alertmanager_notifications_failed_total[5m])
+) > 0
+```
+
+**확인 방법**: 채널 종류(`integration`)마다 실패가 늘었는지 보고, Alertmanager 로그에서 그 채널의 에러 메시지를 읽어요.
+
+## 7. 묶여서 기다리는지 보세요
+
+Alertmanager는 같은 묶음의 알림을 모아 한 번에 보내려고 기다려요. 새 묶음은 `group_wait`(기본 30초), 이미 보낸 묶음의 새 알림은 `group_interval`(기본 5분)만큼 기다려요. 같은 알림을 다시 보내는 건 `repeat_interval`(기본 4시간)마다예요.
+
+`group_wait`가 지나기 전에 풀린 알림은 아예 보내지 않아요. 그래서 20초쯤 튀었다 풀린 장애는 알림 없이 지나가요.
+
+<Figure caption="새 묶음의 알림이 20초 만에 풀린 예시예요. group_wait 30초가 끝났을 때는 이미 풀려 있어서, 알림을 하나도 보내지 않아요.">
+  <Timeline
+    ariaLabel="0초에 firing이 된 알림이 20초에 풀리고, 30초에 group_wait가 끝났을 때는 보낼 알림이 없어 아무것도 보내지 않는 시간 띠"
+    end={60}
+    lanes={[
+      { label: '알림', segments: [{ start: 0, end: 20, label: 'firing', tone: 'warn' }] },
+      { label: '묶음', segments: [{ start: 0, end: 30, label: 'group_wait' }, { start: 30, end: 60, label: '보낼 것 없음' }] },
+    ]}
+    marks={[{ at: 30, label: '보내는 때', tone: 'accent' }]}
+    ticks={[{ at: 0, label: '0초' }, { at: 30, label: '30초' }, { at: 60, label: '60초' }]}
+  />
+</Figure>
+
+**확인 방법**: 그 경로의 `group_wait`, `group_interval` 값과 알림이 firing이었던 시간을 견줘 봐요. 짧은 장애도 알려야 한다면 규칙의 `for`와 함께 다시 정해요.
+
+<Checkpoints>
+  <Check>알림이 안 온 원인을 Alertmanager 설정에서만 찾았다면, 먼저 규칙이 firing까지 갔는지 ALERTS로 보세요. pending에 머물렀다면 Alertmanager는 받은 적이 없어요.</Check>
+  <Check>배포 뒤부터 특정 알림이 조용하다면, 지표나 레이블 이름이 바뀌어 질의가 비지 않았는지 보세요. 비어도 에러는 나지 않아요.</Check>
+  <Check>경로 설정을 고쳤다면 amtool로 실제 레이블 값을 넣어 시험하세요. 대소문자 하나가 달라도 기본 경로로 가요.</Check>
+  <Check>알림 파이프라인 전체가 멈춘 걸 알아챌 장치가 없다면, 늘 울리는 Watchdog 알림을 다른 곳에서 지켜보게 하세요.</Check>
+</Checkpoints>
