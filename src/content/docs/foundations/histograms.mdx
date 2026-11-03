@@ -54,6 +54,10 @@ import HistogramQuantileDemo from '../../../components/demos/HistogramQuantileDe
   </Point>
 </KeyPoints>
 
+<Analogy limit="칸으로만 세서 칸 안의 실제 값은 몰라요. 그래서 99번째 학생의 키도 그 칸 안 어딘가로만 어림하고, 칸이 넓을수록 어림이 틀려요.">
+  학생들의 키를 "150 이하, 160 이하, 170 이하" 칸에 바를 정(正) 자로만 세는 것과 같아요. 정확한 키는 몰라도, 대략 몇 명이 어디쯤인지는 알아요.
+</Analogy>
+
 ## 버킷은 그 경계 이하를 모두 세요
 
 히스토그램(histogram)은 값을 미리 정한 범위, 곧 버킷(bucket)마다 세요. Prometheus 클래식(기존 형식) 히스토그램은 `_bucket`(경계 이하 개수), `_sum`(값의 합), `_count`(전체 개수)를 내요. 버킷에는 `le="0.5"`처럼 위 경계가 붙고, `le`는 less or equal(그 값 이하)이에요.

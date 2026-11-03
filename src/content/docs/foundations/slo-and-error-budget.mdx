@@ -55,6 +55,10 @@ import SloBudgetDemo from '../../../components/demos/SloBudgetDemo.tsx';
   </Point>
 </KeyPoints>
 
+<Analogy limit="휴가는 내가 정해서 쓰지만, 에러 버짓은 장애가 알아서 써 버려요. 그래서 남은 양과 함께 쓰는 속도를 지켜봐요.">
+  SLO는 "한 해에 이만큼은 출근하자"는 목표이고, 에러 버짓은 그 안에서 쓸 수 있는 휴가 일수와 같아요. 휴가가 남으면 새 일(배포)을 벌이고, 다 쓰면 몸을 사려요.
+</Analogy>
+
 ## SLI는 좋은 요청의 비율로 두면 좋아요
 
 SLI(service level indicator, 서비스 수준 지표)는 사용자가 겪는 서비스 품질을 잰 숫자예요. Google SRE Workbook은 SLI를 '좋은 이벤트 수 ÷ 전체 이벤트 수'로 두라고 권해요. 예를 들면 '300ms 안에 성공한 요청 ÷ 전체 요청'이에요.

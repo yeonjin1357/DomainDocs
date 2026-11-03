@@ -66,6 +66,10 @@ import DownsamplingDemo from '../../../components/demos/DownsamplingDemo.tsx';
   </Point>
 </KeyPoints>
 
+<Analogy limit="사진은 사람이 장면을 골라 뽑지만, 그래프는 정해 둔 규칙(최근 값, 평균, 최댓값)으로 기계적으로 골라요. 규칙에 따라 같은 피크가 다르게 보여요.">
+  한 시간짜리 영상을 사진 12장으로 줄이는 것과 같아요. 30초만 나온 장면은 사진에 안 걸리거나, 여러 장면을 겹친 사진에서 흐려져요.
+</Analogy>
+
 ## 점 하나만 고르면 짧은 피크가 빠져요
 
 10초마다 수집하면 값이 1시간에 360개, 7일이면 60,480개예요. 7일 치는 그래프 폭의 픽셀 수보다 많아서, 점 사이 간격(Prometheus의 step, Grafana의 interval)을 벌려 그려요. 이렇게 점 수를 줄이는 일을 다운샘플링(downsampling)이라고 해요.

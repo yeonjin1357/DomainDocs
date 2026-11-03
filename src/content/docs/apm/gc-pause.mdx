@@ -130,7 +130,7 @@ GC에는 앱을 세우는 시간과, 앱과 함께 도는 시간이 있어요. �
   Prometheus로 내보내면 `jvm_gc_pause_seconds_count`, `_sum`, `_max`가 돼요. `_sum`의 rate는 1초에 멈춘 초라서, 그대로 멈춘 시간의 비율이에요.
 
   ```text
-  # 서버마다 1초 중 GC로 멈춘 시간의 비율
+  # 서버별 1초 중 GC로 멈춘 비율
   sum by (instance) (
     rate(
       jvm_gc_pause_seconds_sum[5m]

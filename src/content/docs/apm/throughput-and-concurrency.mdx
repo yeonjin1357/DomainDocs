@@ -38,6 +38,10 @@ import LittlesLawDemo from '../../../components/demos/LittlesLawDemo.tsx';
   </Point>
 </KeyPoints>
 
+<Analogy limit="창구 수는 눈에 보이지만, 앱이 동시에 처리할 수 있는 한도는 스레드 풀, 커넥션 풀처럼 여러 곳에 숨어 있어요.">
+  은행 지점에서 처리량은 1분에 창구를 떠난 손님 수, 동시성은 지금 창구에 앉아 있는 손님 수예요. 손님마다 오래 걸리면, 떠나는 손님 수가 같아도 창구가 꽉 차요.
+</Analogy>
+
 ## 처리량은 초당 끝낸 요청 수예요
 
 처리량(throughput)은 초당 처리한 트랜잭션 수로, TPS(transactions per second)라고도 불러요. 보통 요청이 끝날 때 늘어나는 요청 수 카운터의 <Term slug="foundations/counters-and-rate">rate</Term>로 구해요. 그래서 요청이 밀리면 들어온 수보다 끝낸 수가 먼저 줄어요.
