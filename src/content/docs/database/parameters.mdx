@@ -1,0 +1,175 @@
+---
+title: DB 설정값과 바뀐 이력
+summary: DB 설정값은 고쳐도 바로 쓰이지 않을 수 있어요. 적용 시점과 바뀐 이력을 함께 봐요.
+domain: database
+type: concept
+stage: basics
+order: 47
+icon: list-checks
+keywords: [파라미터, parameter, 설정값, postgresql.conf, ALTER SYSTEM, pg_settings, pending_restart, SET PERSIST, spfile, sp_configure]
+related: [database/memory-and-disk, database/temp-spill, database/too-many-connections, database/db-names, database/plan-changed]
+sources:
+  - title: PostgreSQL — Setting Parameters (postgresql.auto.conf, pg_reload_conf, ALTER DATABASE·ROLE)
+    url: https://www.postgresql.org/docs/current/config-setting.html
+  - title: PostgreSQL — pg_settings (context, pending_restart)
+    url: https://www.postgresql.org/docs/current/view-pg-settings.html
+  - title: MySQL 8.4 — SET Syntax for Variable Assignment
+    url: https://dev.mysql.com/doc/refman/8.4/en/set-variable.html
+  - title: MySQL 8.4 — Persisted System Variables
+    url: https://dev.mysql.com/doc/refman/8.4/en/persisted-system-variables.html
+  - title: MySQL 8.4 — InnoDB Startup Options and System Variables
+    url: https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html
+  - title: Oracle Database 19c — ALTER SYSTEM (SCOPE)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/ALTER-SYSTEM.html
+  - title: Oracle Database 19c — V$PARAMETER (ISSYS_MODIFIABLE)
+    url: https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/V-PARAMETER.html
+  - title: SQL Server — sys.configurations (value, value_in_use, is_dynamic)
+    url: https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-configurations-transact-sql
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="고쳐도 바로 쓰이지 않을 수 있어요">
+    설정마다 적용되는 때가 달라요. 다시 읽기만 하면 되는 값도 있고, DB를 다시 시작해야 쓰이는 값도 있어요.
+  </Point>
+  <Point title="적은 값과 지금 쓰는 값은 따로 봐요">
+    설정 파일에 적힌 값과 DB가 지금 쓰는 값이 다를 수 있어요. 지금 값은 DB에 물어서 확인해요.
+  </Point>
+  <Point title="성능이 바뀌면 설정 이력부터 맞춰 봐요">
+    같은 시각에 설정이 바뀌었는지 보면 원인을 빨리 좁혀요. 그래서 모니터링 도구는 설정이 바뀐 기록을 남겨요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="회사와 달리 DB는 세션마다 자기 값을 따로 둘 수 있어요. 그래서 같은 시각에도 세션마다 다른 설정으로 돌 수 있어요.">
+  회사 규정집과 비슷해요. 규정집을 고쳐도 공지해야 직원들이 따르고, 사무실 배치 같은 규정은 이사를 해야 바뀌어요.
+</Analogy>
+
+## 설정값은 무엇인가요
+
+<Term term="database/db-parameter">설정값</Term>(파라미터)은 DB가 어떻게 움직일지 정하는 이름과 값의 쌍이에요. 연결을 몇 개까지 받을지, 공유 메모리를 얼마나 잡을지, 정렬에 메모리를 얼마나 쓸지 같은 것들이에요.
+
+DB마다 설정값이 수백 개 있어요. 대부분은 기본값 그대로 두고, 서비스에 맞춰 몇십 개를 고쳐 써요.
+
+## 값이 정해지는 차례
+
+PostgreSQL에서 한 설정의 값은 여러 곳에서 올 수 있어요. 위에 있는 쪽이 아래를 덮어써요.
+
+<Figure caption="PostgreSQL에서 값이 정해지는 차례예요. 위층이 아래층을 덮어써요. 그래서 세션에서 SET으로 바꾼 값은 파일에 적힌 값보다 먼저 쓰여요.">
+  <Layers
+    ariaLabel="위에서부터 세션의 SET, 사용자·DB별 기본값(ALTER ROLE·ALTER DATABASE), ALTER SYSTEM이 적는 postgresql.auto.conf, postgresql.conf, 기본값 순서로 쌓여 위층이 아래층을 덮어쓰는 계층도"
+    layers={[
+      { label: '세션의 SET', note: '그 세션에서만 · 가장 먼저 쓰여요', tone: 'accent' },
+      { label: '사용자·DB별 기본값', note: 'ALTER ROLE, ALTER DATABASE · 새 세션부터' },
+      { label: 'postgresql.auto.conf', note: 'ALTER SYSTEM이 적는 파일' },
+      { label: 'postgresql.conf', note: '사람이 고치는 설정 파일' },
+      { label: '기본값', note: '아무도 정하지 않았을 때' },
+    ]}
+  />
+</Figure>
+
+`ALTER SYSTEM`은 SQL로 설정 파일을 고치는 명령이에요. 실행해도 파일만 바뀌고, 지금 쓰는 값은 그대로예요. DB가 파일을 다시 읽어야 쓰여요.
+
+## 바로, 다시 읽기, 다시 시작
+
+설정마다 언제 쓰이기 시작하는지가 정해져 있어요. PostgreSQL은 이걸 `pg_settings`의 `context`로 알려 줘요.
+
+- **세션에서 바로**(`user` 등): `work_mem`처럼 세션에서 `SET`으로 바로 바꿀 수 있어요.
+- **다시 읽기**(`sighup`): `checkpoint_timeout`처럼 파일을 고치고 <Term term="database/config-reload">다시 읽기</Term>(reload)를 하면 쓰여요.
+- **다시 시작**(`postmaster`): `shared_buffers`, `max_connections`처럼 DB를 다시 시작해야 쓰여요.
+
+<Figure caption="PostgreSQL 18에서 체크포인트 간격(checkpoint_timeout)과 공유 버퍼(shared_buffers)를 함께 고친 결과예요. 앞의 것은 다시 읽기 뒤 바로 바뀌었지만, 뒤의 것은 다시 시작할 때까지 옛 값이에요.">
+  <Timeline
+    ariaLabel="ALTER SYSTEM으로 파일을 고친 뒤에도 두 설정 모두 옛 값이고, 다시 읽기 뒤 checkpoint_timeout은 5분에서 10분으로 바뀌지만 shared_buffers는 128MB에 머물다가 다시 시작한 뒤에야 256MB가 되는 시간 띠"
+    end={17}
+    lanes={[
+      { label: '체크포인트', segments: [{ start: 0, end: 6, label: '5분' }, { start: 6, end: 17, label: '10분', tone: 'accent' }] },
+      { label: '공유 버퍼', segments: [{ start: 0, end: 6, label: '128MB' }, { start: 6, end: 13, label: '그대로' }, { start: 13, end: 17, label: '256MB', tone: 'accent' }] },
+    ]}
+    marks={[
+      { at: 1, label: '파일 고침' },
+      { at: 6, label: '다시 읽기', tone: 'accent' },
+      { at: 13, label: '다시 시작', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+다시 읽기를 해도 바뀌지 않은 설정은 `pending_restart`가 true로 바뀌어요. 다시 시작해야 쓰일 값이 남아 있다는 표시예요.
+
+```sql
+SELECT name, setting
+FROM pg_settings
+WHERE pending_restart;
+```
+
+## DB마다 같은 구조예요
+
+이름은 달라도 다른 DB도 같은 구조예요. 설정값이 지금 쓰는 값(메모리)과 다음 시작 때 읽을 값(파일) 두 곳에 있어요. 바꾸는 명령마다 어느 쪽을 고치는지가 달라요.
+
+<Figure caption="MySQL의 SET과 Oracle의 SCOPE는 같은 세 갈래예요. 지금 값만 바꾸면 다시 시작할 때 사라지고, 파일만 바꾸면 다시 시작해야 쓰여요.">
+  <Compare
+    columns={['지금 쓰는 값', '다시 시작한 뒤']}
+    rows={[
+      { label: 'MySQL SET GLOBAL · Oracle SCOPE=MEMORY', values: ['바뀌어요', '옛 값으로 돌아가요'] },
+      { label: 'MySQL SET PERSIST · Oracle SCOPE=BOTH', values: ['바뀌어요', '바뀐 값이에요'] },
+      { label: 'MySQL SET PERSIST_ONLY · Oracle SCOPE=SPFILE', values: ['그대로예요', '바뀐 값이에요'] },
+    ]}
+  />
+</Figure>
+
+지금 쓰는 값은 DB마다 다른 곳에서 확인해요.
+
+- **PostgreSQL**: `pg_settings`의 `setting`이 지금 값이에요. `pending_restart`로 다시 시작이 필요한지 봐요.
+- **MySQL**: `SHOW GLOBAL VARIABLES`가 지금 값이에요. `SET PERSIST`로 남긴 값은 `mysqld-auto.cnf`에 있어요.
+- **Oracle**: `V$PARAMETER`가 지금 값이에요. `ISSYS_MODIFIABLE`이 언제 쓰이는지 알려 줘요.
+- **SQL Server**: `sys.configurations`의 `value`는 적은 값, `value_in_use`는 지금 쓰는 값이에요. `sp_configure`로 고친 뒤 `RECONFIGURE`를 해야 쓰여요.
+
+## 모니터링에서는
+
+DB 모니터링 도구는 설정값을 정해진 간격으로 읽어 두고, 값이 바뀌면 이력으로 남겨요. 성능이 갑자기 바뀐 시각에 설정이 바뀌었는지 맞춰 보면 원인을 빨리 찾아요.
+
+<Figure caption="정렬 메모리(work_mem)를 64MB에서 4MB로 줄인 예시예요. 바뀐 시각부터 정렬이 메모리에 들어가지 않아 임시 파일이 늘었어요.">
+  <Timeline
+    ariaLabel="14시에 work_mem이 64MB에서 4MB로 바뀐 뒤부터 정렬이 디스크로 넘쳐 임시 파일이 늘어나는 시간 띠"
+    start={12}
+    end={16}
+    lanes={[
+      { label: 'work_mem', segments: [{ start: 12, end: 14, label: '64MB' }, { start: 14, end: 16, label: '4MB', tone: 'warn' }] },
+      { label: '임시 파일', segments: [{ start: 14, end: 16, label: '늘어나요', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 14, label: '설정 바뀜', tone: 'warn' }]}
+    ticks={[{ at: 12, label: '12시' }, { at: 14, label: '14시' }, { at: 16, label: '16시' }]}
+  />
+</Figure>
+
+정렬이 디스크로 넘치는 일은 <Term slug="database/temp-spill">정렬·해시가 디스크로 넘칠 때</Term>에서 다뤄요. 연결 수 한도(`max_connections`)는 <Term slug="database/too-many-connections">DB 연결이 한도에 닿았을 때</Term>에서 다뤄요.
+
+서버끼리 설정을 견줄 때는 기본값과 다른 값만 골라 봐요. 막 설치한 PostgreSQL 18에서 기본값이 아닌 설정은 18개뿐이었어요. 수백 개를 다 보는 것보다 차이가 빨리 보여요.
+
+<Checkpoints>
+  <Check>설정 파일을 고쳤다는 말만 듣고 적용됐다고 봤다면, 지금 쓰는 값을 DB에 물어 확인하세요. PostgreSQL은 pending_restart, SQL Server는 value_in_use를 봐요.</Check>
+  <Check>MySQL을 다시 시작한 뒤 성능이 예전으로 돌아갔다면, 그 설정을 SET GLOBAL로만 바꿨는지 보세요. 파일에 남기지 않은 값은 다시 시작하면 사라져요.</Check>
+  <Check>한 세션에서 SHOW로 본 값을 서버 전체 값으로 읽었다면 다시 보세요. 그 세션이 SET으로 바꾼 값일 수 있어요.</Check>
+  <Check>배포도 없는데 성능이 갑자기 바뀌었다면, 같은 시각의 설정 변경 이력을 먼저 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### PostgreSQL의 context 종류
+
+  `context`는 일곱 가지예요. 가장 바꾸기 어려운 internal은 빌드나 설치 때 정해져서 바꿀 수 없어요. 그다음이 postmaster, sighup, superuser-backend, backend 순서예요.
+
+  superuser는 슈퍼유저나 권한을 받은 사용자만 세션에서 바꿀 수 있어요. 가장 쉬운 user는 누구나 세션에서 바꿔요.
+
+  `ALTER DATABASE`와 `ALTER ROLE`로 정한 값은 새 세션이 열릴 때만 적용돼요. 이미 열린 세션은 옛 값 그대로예요.
+
+  ### 다시 읽기에서 생기는 일
+
+  다시 읽기를 해도 다시 시작이 필요한 값은 바꾸지 않아요. 대신 서버 로그에 "cannot be changed without restarting the server"를 남겨요. 이미 도는 세션은 하던 명령을 마친 뒤 새 값을 받아요.
+
+  ### MySQL의 동적 변수
+
+  MySQL은 변수마다 Dynamic 여부가 문서에 적혀 있어요. `innodb_buffer_pool_size`도 Dynamic이라 다시 시작하지 않고 바꿀 수 있어요. 다만 크기를 바꾸는 동안 버퍼 풀을 조금씩 옮겨요.
+
+  ### Oracle과 SQL Server
+
+  Oracle의 `ISSYS_MODIFIABLE`은 세 가지예요. IMMEDIATE는 바로, DEFERRED는 다음 세션부터, FALSE는 spfile에 적고 다시 시작해야 쓰여요. SQL Server의 `is_dynamic`이 1이면 RECONFIGURE만으로 쓰이고, 0이면 다시 시작해야 해요.
+</Deeper>

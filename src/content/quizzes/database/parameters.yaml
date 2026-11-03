@@ -1,0 +1,36 @@
+questions:
+  - id: alter-system-not-live
+    type: ox
+    prompt: PostgreSQL에서 ALTER SYSTEM SET checkpoint_timeout = '10min'을 실행했어요. 다른 일을 하지 않아도 지금 쓰는 값이 바로 10분으로 바뀌나요?
+    answer: false
+    explain: ALTER SYSTEM은 postgresql.auto.conf 파일만 고쳐요. 다시 읽기(pg_reload_conf)를 해야 쓰여요.
+  - id: pending-restart-after-reload
+    type: choice
+    prompt: shared_buffers를 고치고 다시 읽기를 했어요. pg_settings에서 이 설정은 어떻게 보일까요?
+    choices:
+      - 옛 값 그대로이고 pending_restart가 true예요
+      - 새 값으로 바뀌고 pending_restart가 false예요
+      - 새 값으로 바뀌고 pending_restart가 true예요
+      - 옛 값 그대로이고 pending_restart가 false예요
+    answer: 0
+    explain: shared_buffers는 다시 시작해야 쓰이는 설정이에요. 다시 읽기로는 바뀌지 않고, 다시 시작이 필요하다는 표시만 켜져요.
+  - id: mysql-set-global-restart
+    type: choice
+    prompt: MySQL에서 SET GLOBAL max_connections = 500만 실행한 뒤 서버를 다시 시작했어요. max_connections는 어떻게 될까요?
+    choices:
+      - 설정 파일에 있던 옛 값으로 돌아가요
+      - 500 그대로 남아요
+      - 다시 시작이 막혀요
+      - 기본값 대신 500이 파일에 적혀요
+    answer: 0
+    explain: SET GLOBAL은 지금 쓰는 값만 바꿔요. 다시 시작한 뒤에도 남기려면 SET PERSIST를 쓰거나 설정 파일에 적어요.
+  - id: session-set-scope
+    type: ox
+    prompt: 한 세션에서 SET work_mem = '64MB'를 실행하면, 그 뒤 새로 연결한 다른 세션의 work_mem도 64MB가 되나요?
+    answer: false
+    explain: 세션의 SET은 그 세션에서만 쓰여요. 다른 세션은 파일이나 ALTER ROLE·DATABASE로 정한 값을 받아요.
+  - id: in-use-column
+    type: input
+    prompt: SQL Server의 sys.configurations에서 적어 둔 값(value)과 달리, 지금 실제로 쓰고 있는 값을 보여 주는 열의 이름은?
+    answer: [value_in_use, valueinuse]
+    explain: value_in_use예요. sp_configure로 고친 값은 RECONFIGURE를 해야 이 열에 반영돼요.
