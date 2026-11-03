@@ -1,0 +1,134 @@
+---
+import { layoutStages, type StagesRow } from '../../lib/viz/stages';
+
+interface Props {
+  /** 위에서부터 그릴 단계. 단계마다 같은 열에 칸을 맞춘다 */
+  rows: StagesRow[];
+  ariaLabel: string;
+  /** 남는 폭을 모두 차지할 열(0부터). 없으면 열들이 폭을 고르게 나눈다 */
+  grow?: number;
+  /** 그림 위 양 끝에 둘 짧은 안내(예: 보낼 때 ↓, 받을 때 ↑). 두 개까지 */
+  hint?: string[];
+}
+
+const { rows, ariaLabel, grow, hint } = Astro.props;
+const layout = layoutStages(rows, grow);
+if (hint && hint.length > 2) throw new Error('Stages: 안내는 두 개까지 써요');
+---
+<div class="stages" role="img" aria-label={ariaLabel} data-stages>
+  {
+    hint && hint.length > 0 && (
+      <div class="stages-hint">
+        {hint.map((h) => (
+          <span>{h}</span>
+        ))}
+      </div>
+    )
+  }
+  <div class="stages-grid" style={`grid-template-columns:${layout.template}`}>
+    {
+      layout.rows.map((r) => (
+        <Fragment>
+          <div class="stages-label">
+            <span class="stages-name">{r.label}</span>
+            {r.note && <span class="stages-note">{r.note}</span>}
+            {r.end && <span class="stages-end">{r.end}</span>}
+          </div>
+          {r.cells.map((c) => (c ? <span class={`stages-cell tone-${c.tone ?? 'plain'}`}>{c.label}</span> : <span class="stages-empty" />))}
+        </Fragment>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .stages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .stages-hint {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2px 12px;
+    font-size: 12px;
+    color: var(--color-text-weak);
+  }
+
+  /* 모든 단계를 한 grid에 놓아서, 단계가 달라도 같은 열의 칸이 위아래로 맞는다 */
+  .stages-grid {
+    display: grid;
+    gap: 4px;
+  }
+
+  /* 단계 이름은 한 줄을 다 쓰되, 열 폭 계산에는 끼지 않는다(긴 이름이 칸을 넓히지 않게) */
+  .stages-label {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 8px;
+    margin-top: 8px;
+    font-size: 13px;
+    contain: inline-size;
+  }
+
+  .stages-label:first-child {
+    margin-top: 0;
+  }
+
+  .stages-name {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .stages-note {
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .stages-end {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--color-text-weak);
+  }
+
+  /* 이전 단계에서 내려온 칸 */
+  .stages-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    background: var(--color-card);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text-sub);
+    white-space: nowrap;
+  }
+
+  /* 이 단계에서 새로 붙거나 바뀐 칸 */
+  .stages-cell.tone-accent {
+    border: 1.5px solid var(--color-accent);
+    background: var(--color-accent-weak);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .stages-cell.tone-warn {
+    border: 1.5px solid var(--color-warn);
+    background: var(--color-warn-weak);
+    font-weight: 700;
+    color: var(--color-warn);
+  }
+
+  .stages-cell.tone-sub {
+    border-style: dashed;
+    background: transparent;
+    color: var(--color-text-weak);
+  }
+</style>

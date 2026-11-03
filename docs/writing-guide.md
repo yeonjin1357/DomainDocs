@@ -108,6 +108,23 @@ p99, rate, span 같은 말은 영어 그대로 써요. 처음 나올 때 한 번
 
 여러 부품이 이어진 모습, 주고받는 순서, 쌓인 층, 두 방식의 차이는 글보다 그림이 빨라요. 그림을 먼저 두고, 글은 그림을 읽는 법을 알려 줘요. 그림 컴포넌트는 5장에 있어요.
 
+그림을 고를 때는 내용이 어떤 모양인지부터 정해요. 있는 컴포넌트에 내용을 끼워 맞추지 않아요. 아래 표에 맞는 모양이 없으면 새 그림 컴포넌트를 만들거나 SVG로 그려요. 새 컴포넌트는 `src/components/viz/`에 두고 5장 표와 검사 규칙에 더해요.
+
+| 내용의 모양 | 그림 |
+| --- | --- |
+| 부품이 이어지고 무엇이 어디로 가요 | `Flow` |
+| 둘 이상이 시간 순서로 주고받아요 | `Sequence` |
+| 위층이 아래층에 기대요 | `Layers` |
+| 단계마다 무엇이 붙거나 바뀌어요(감싸기, 주소 바꾸기) | `Stages` |
+| 한쪽 칸이 다른 쪽 여러 칸에 걸쳐요(대응, 나눠 맡기) | `Stacks` |
+| 두 방식이 항목마다 달라요 | `Compare` |
+| 시간에 따라 구간이 겹치고 기다려요 | `Timeline` |
+| 번호 붙은 칸의 위치를 짚어요(오프셋, 버킷, 단위 칸) | `Strip` |
+| 위 어디에도 맞지 않아요 | 새 컴포넌트나 SVG |
+
+- 나쁜 예: OSI 일곱 층과 TCP/IP 네 층의 대응을 `Compare`의 두 열에 넣고, 줄 이름을 '7·6·5층'처럼 써요.
+- 좋은 예: 오른쪽 칸이 왼쪽 여러 층에 걸치는 `Stacks`로 그려요. 무엇이 무엇에 합쳐지는지 줄 이름 없이 보여요.
+
 - 나쁜 예: 관리 서버가 장비에 요청을 보내고, 장비가 응답하고, 장비에 일이 생기면 장비가 먼저 알림을 보내요.
 - 좋은 예: `<Sequence>`로 요청·응답·알림을 그리고, "위 두 줄은 관리 서버가 묻는 쪽, 마지막 줄은 장비가 먼저 알리는 쪽이에요."라고 써요.
 
@@ -304,6 +321,8 @@ updated: 2026-10-13
 | `Compare` | `columns`, `rows` | 두 가지 비교. `columns`는 두 열 이름, `rows`는 `{ label, values: [왼쪽, 오른쪽] }` 배열이에요 |
 | `Timeline` | `lanes`, `ariaLabel`, `start?`, `end?`, `marks?`, `ticks?` | 시간 띠. `lanes`는 `{ label, segments: [{ start, end, label?, tone? }] }` 배열이고, 줄마다 시간에 비례한 구간을 그려요. `marks`(`{ at, label, tone? }`)는 모든 줄을 가로지르는 세로선, `ticks`(`{ at, label }`)는 아래 시간축 눈금이에요. 줄 이름은 6자 안팎, 구간 글자는 띠 안에 들어갈 만큼 짧게 써요. 같은 줄 이름이나 눈금 글자가 360px에서 겹치지 않는지 확인해요 |
 | `Strip` | `rows`, `ariaLabel`, `marks?`, `ranges?` | 칸 띠. `rows`는 `{ label?, cells, heads? }` 배열이고, `cells`는 글자나 `{ label, tone? }`예요. `heads`는 칸마다 위에 붙는 작은 글자(예: 버킷 경계)로, 칸 수와 같아야 해요. 칸은 12개까지예요. `marks`(`{ row?, at, label, tone? }`)는 칸 하나를 위에서 가리키고, `ranges`(`{ row?, from, to, label, tone? }`)는 여러 칸을 아래에서 묶어요. 번호는 모두 0부터예요. 칸 `tone: 'sub'`는 지나간 칸이나 빈자리처럼 흐리게 그려요 |
+| `Stages` | `rows`, `ariaLabel`, `grow?`, `hint?` | 단계 칸. 단계마다 같은 열에 칸을 맞춰, 단계를 지날 때 무엇이 붙거나 바뀌는지 보여 줘요(감싸기, 주소 바꾸기). `rows`는 `{ label, note?, end?, cells }` 배열이고, `cells`는 글자, `{ label, tone? }`, 빈자리 `null`이에요. 단계마다 칸 수가 같아야 하고 6열까지예요. 칸 `tone: 'accent'`는 이 단계에서 새로 붙거나 바뀐 칸이에요. `note`는 이름 옆 파란 글자, `end`는 이름 줄 오른쪽 끝의 흐린 글자예요. `grow`는 남는 폭을 차지할 열(0부터), `hint`는 그림 위 양 끝의 짧은 안내 두 개까지예요 |
+| `Stacks` | `columns`, `ariaLabel` | 나란한 기둥. 기둥마다 칸을 위에서부터 쌓고, 칸 하나가 여러 줄에 걸칠 수 있어서 한쪽 칸이 옆 기둥의 어느 칸들과 맞닿는지 보여 줘요(OSI와 TCP/IP, 파티션과 컨슈머). `columns`는 `{ title, blocks }` 배열이고, `blocks`는 글자, `{ label, span?, tone?, tag? }`, 한 줄 빈자리 `null`이에요. 기둥은 2~4개, 기둥마다 줄 수의 합이 같아야 하고 12줄까지예요. `tag`는 이름 앞 작은 글자(예: 층 번호), `tone: 'sub'`는 흐린 칸이에요 |
 | SVG 그림 | `aria-label` | 위 그림으로 안 되는 그림은 `src/assets/figures/{domain}/{name}.svg`에 그려 default import해요. `Figure` 안에 두고 `aria-label`을 꼭 붙여요. 색은 `currentColor`나 `var(--color-…)`만 써야 다크 모드에서도 보여요 |
 | `src/components/demos/`의 데모(`PercentileDemo`, `HistogramQuantileDemo`, `CircuitBreakerDemo` 등 22개) | 없음 | 직접 만져 보는 데모. default import 후 `client:visible`로 써요. 계산은 `src/lib/demo-models.ts`에 두고 단위 테스트로 확인해요. 데모는 값을 바꿔 봐야 보이는 관계(공식, 문턱, 직관과 다른 결과)에만 넣어요. 목록이나 그림 하나로 충분한 곳에는 넣지 않아요 |
 

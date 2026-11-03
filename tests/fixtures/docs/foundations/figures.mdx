@@ -80,6 +80,28 @@ import Sample from '../../figures/sample.svg';
   />
 </Figure>
 
+<Figure caption="층을 내려갈 때마다 머리표가 붙어요.">
+  <Stages
+    ariaLabel="L7의 HTTP 앞에 L4가 TCP를 붙이는 단계 칸"
+    hint={['보낼 때', '받을 때']}
+    grow={1}
+    rows={[
+      { label: 'L7', note: '앱의 말', cells: [null, { label: 'HTTP', tone: 'accent' }] },
+      { label: 'L4', note: '+ 포트', end: '세그먼트', cells: [{ label: 'TCP', tone: 'accent' }, 'HTTP'] },
+    ]}
+  />
+</Figure>
+
+<Figure caption="오른쪽 칸이 왼쪽 두 층에 걸쳐요.">
+  <Stacks
+    ariaLabel="왼쪽 세 층 중 위 두 층에 오른쪽 응용이 걸친 기둥"
+    columns={[
+      { title: 'OSI', blocks: [{ tag: '7', label: '응용' }, { tag: '6', label: '표현', tone: 'sub' }, { tag: '4', label: '전송' }] },
+      { title: 'TCP/IP', blocks: [{ label: '응용', span: 2, tone: 'accent' }, '전송'] },
+    ]}
+  />
+</Figure>
+
 <Figure caption="직접 그린 SVG 그림이에요.">
   <Sample aria-label="테스트용 SVG 그림" />
 </Figure>

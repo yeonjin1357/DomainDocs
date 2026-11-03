@@ -63,6 +63,29 @@ test('칸 띠는 칸을 같은 폭으로 놓고, 표시와 괄호를 가리킨 �
   await expect(strip.locator('.strip-range-text')).toHaveText('지연 3건');
 });
 
+test('단계 칸은 단계가 달라도 같은 열의 칸을 위아래로 맞춘다', async ({ page }) => {
+  const stages = page.getByRole('img', { name: 'L7의 HTTP 앞에 L4가 TCP를 붙이는 단계 칸' });
+  await expect(stages.locator('.stages-name')).toHaveText(['L7', 'L4']);
+  await expect(stages.locator('.stages-cell.tone-accent')).toHaveText(['HTTP', 'TCP']);
+  await expect(stages.locator('.stages-end')).toHaveText('세그먼트');
+  const top = await stages.locator('.stages-cell').nth(0).boundingBox();
+  const bottom = await stages.locator('.stages-cell').nth(2).boundingBox();
+  expect(Math.abs(top!.x - bottom!.x)).toBeLessThan(1);
+  expect(Math.abs(top!.width - bottom!.width)).toBeLessThan(1);
+});
+
+test('나란한 기둥은 여러 줄에 걸친 칸을 옆 기둥의 그 줄들과 맞춘다', async ({ page }) => {
+  const stacks = page.getByRole('img', { name: '왼쪽 세 층 중 위 두 층에 오른쪽 응용이 걸친 기둥' });
+  await expect(stacks.locator('.stacks-title')).toHaveText(['OSI', 'TCP/IP']);
+  const left = stacks.locator('.stacks-block').filter({ hasText: /^7/ });
+  const second = stacks.locator('.stacks-block').filter({ hasText: '표현' });
+  const span = await stacks.locator('.stacks-block.tone-accent').filter({ hasText: '응용' }).boundingBox();
+  const a = await left.boundingBox();
+  const b = await second.boundingBox();
+  expect(Math.abs(span!.y - a!.y)).toBeLessThan(1);
+  expect(Math.abs(span!.y + span!.height - (b!.y + b!.height))).toBeLessThan(1);
+});
+
 test('SVG 그림은 이름 붙은 그림이다', async ({ page }) => {
   await expect(page.getByRole('img', { name: '테스트용 SVG 그림' })).toBeVisible();
 });

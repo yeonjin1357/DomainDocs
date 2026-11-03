@@ -1,0 +1,97 @@
+---
+import { layoutStacks, type StacksColumn } from '../../lib/viz/stacks';
+
+interface Props {
+  /** 왼쪽부터 놓을 기둥. 기둥마다 줄 수의 합이 같아야 한다 */
+  columns: StacksColumn[];
+  ariaLabel: string;
+}
+
+const { columns, ariaLabel } = Astro.props;
+const layout = layoutStacks(columns);
+---
+<div class="stacks" role="img" aria-label={ariaLabel} data-stacks style={`--cols:${layout.columns.length};--rows:${layout.rows}`}>
+  {
+    layout.columns.map((c, i) => (
+      <span class="stacks-title" style={`grid-column:${i + 1};grid-row:1`}>
+        {c.title}
+      </span>
+    ))
+  }
+  {
+    layout.columns.map((c, i) =>
+      c.blocks.map((b) => (
+        <span class={`stacks-block tone-${b.tone ?? 'plain'}${b.tag ? ' has-tag' : ''}`} style={`grid-column:${i + 1};grid-row:${b.row} / span ${b.span}`}>
+          {b.tag && <span class="stacks-tag">{b.tag}</span>}
+          <span class="stacks-label">{b.label}</span>
+        </span>
+      )),
+    )
+  }
+</div>
+
+<style>
+  /* 기둥들이 같은 줄 눈금을 나눠 써서, 여러 줄에 걸친 칸이 옆 기둥의 어느 칸들과 맞닿는지 보인다 */
+  .stacks {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    grid-template-rows: auto repeat(var(--rows), minmax(30px, auto));
+    gap: 5px 8px;
+  }
+
+  .stacks-title {
+    padding-bottom: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .stacks-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: var(--color-card);
+    font-size: 13px;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .stacks-block.has-tag {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .stacks-tag {
+    flex: none;
+    min-width: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-text-weak);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stacks-block.tone-accent {
+    border: 1.5px solid var(--color-accent);
+    background: var(--color-accent-weak);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .stacks-block.tone-warn {
+    border: 1.5px solid var(--color-warn);
+    background: var(--color-warn-weak);
+    font-weight: 700;
+    color: var(--color-warn);
+  }
+
+  /* 따로 부를 일이 적은 칸, 빠진 칸처럼 흐리게 둘 칸 */
+  .stacks-block.tone-sub {
+    border: 1px dashed var(--color-line);
+    background: transparent;
+    color: var(--color-text-weak);
+  }
+</style>

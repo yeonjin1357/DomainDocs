@@ -53,5 +53,7 @@ export const LINT_CONFIG = {
     'Compare',
     'Timeline',
     'Strip',
+    'Stages',
+    'Stacks',
   ],
 } as const;

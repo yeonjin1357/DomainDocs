@@ -52,15 +52,16 @@ updated: 2026-11-03
 
 노트북이 유선에서 와이파이로 바뀌어도 웹 브라우저의 HTTP는 그대로예요. 아래층만 바뀌었기 때문이에요.
 
-<Figure caption="위에서부터 앱의 약속, 프로그램 찾기, 먼 길 찾기, 옆 장비로 넘기기, 신호 보내기예요. 층마다 쓰는 주소가 달라요.">
-  <Layers
-    ariaLabel="위에서부터 L7 응용(HTTP·DNS·SNMP), L4 전송(TCP·UDP, 포트), L3 네트워크(IP 주소), L2 데이터 링크(이더넷, MAC 주소), L1 물리(케이블·전파)로 쌓인 계층도"
-    layers={[
-      { label: 'L7 응용', note: 'HTTP, DNS, SNMP · 앱끼리의 약속', tone: 'accent' },
-      { label: 'L4 전송', note: 'TCP, UDP · 포트로 프로그램 찾기' },
-      { label: 'L3 네트워크', note: 'IP · 주소로 먼 길 찾기' },
-      { label: 'L2 데이터 링크', note: '이더넷 · MAC으로 옆 장비에 넘기기' },
-      { label: 'L1 물리', note: '케이블, 전파 · 비트를 신호로' },
+<Figure caption="층을 내려갈 때마다 새 머리표가 앞에 붙어요(파란 칸). 줄이 길어지는 모양이 곧 감싸기예요. 맨 아래 L1은 이 줄을 신호로 바꿔 선에 실어요.">
+  <Stages
+    ariaLabel="L7 응용의 HTTP 요청 앞에 L4 전송이 TCP 머리(포트)를, L3 네트워크가 IP 머리(IP 주소)를, L2 데이터 링크가 MAC 머리(MAC 주소)와 꼬리를 붙여 감싸는 계단 그림. 받을 때는 거꾸로 벗겨요"
+    hint={['보낼 때 ↓ 아래층이 감싸요', '받을 때 ↑ 벗겨요']}
+    grow={3}
+    rows={[
+      { label: 'L7 응용', note: '앱의 말', end: '데이터', cells: [null, null, null, { label: 'HTTP 요청', tone: 'accent' }, null] },
+      { label: 'L4 전송', note: '+ 포트', end: '세그먼트', cells: [null, null, { label: 'TCP', tone: 'accent' }, 'HTTP 요청', null] },
+      { label: 'L3 네트워크', note: '+ IP 주소', end: '패킷', cells: [null, { label: 'IP', tone: 'accent' }, 'TCP', 'HTTP 요청', null] },
+      { label: 'L2 데이터 링크', note: '+ MAC 주소', end: '프레임', cells: [{ label: 'MAC', tone: 'accent' }, 'IP', 'TCP', 'HTTP 요청', { label: '꼬리', tone: 'accent' }] },
     ]}
   />
 </Figure>
@@ -73,39 +74,40 @@ L1부터 L7까지의 번호는 <Term term="network/osi-model">OSI 모델</Term>�
 
 인터넷에서 실제로 쓰는 TCP/IP는 층을 넷으로 나눠요. 링크, 인터넷, 전송, 응용이에요. 그래도 현장에서는 OSI 번호로 불러서 L2, L3, L4, L7이라고 해요.
 
-<Figure caption="OSI의 5·6층(세션, 표현)은 TCP/IP에서 따로 나누지 않고 응용층에 들어가요. 그래서 L5, L6이라는 말은 거의 쓰지 않아요.">
-  <Compare
-    columns={['OSI 일곱 층', 'TCP/IP 네 층']}
-    rows={[
-      { label: '7·6·5층', values: ['응용, 표현, 세션', '응용'] },
-      { label: '4층', values: ['전송', '전송'] },
-      { label: '3층', values: ['네트워크', '인터넷'] },
-      { label: '2·1층', values: ['데이터 링크, 물리', '링크'] },
+<Figure caption="오른쪽 칸이 왼쪽 여러 층에 걸쳐 있어요. 흐린 5·6층(세션, 표현)은 TCP/IP의 응용층에 들어가서, L5, L6이라는 말은 거의 쓰지 않아요.">
+  <Stacks
+    ariaLabel="OSI 일곱 층과 TCP/IP 네 층을 나란히 놓은 그림. TCP/IP 응용층은 OSI 7·6·5층에, 전송층은 4층에, 인터넷층은 3층에, 링크층은 2·1층에 걸쳐 있어요"
+    columns={[
+      {
+        title: 'OSI 일곱 층',
+        blocks: [
+          { tag: '7', label: '응용' },
+          { tag: '6', label: '표현', tone: 'sub' },
+          { tag: '5', label: '세션', tone: 'sub' },
+          { tag: '4', label: '전송' },
+          { tag: '3', label: '네트워크' },
+          { tag: '2', label: '데이터 링크' },
+          { tag: '1', label: '물리' },
+        ],
+      },
+      {
+        title: 'TCP/IP 네 층',
+        blocks: [
+          { label: '응용', span: 3, tone: 'accent' },
+          { label: '전송', tone: 'accent' },
+          { label: '인터넷', tone: 'accent' },
+          { label: '링크', span: 2, tone: 'accent' },
+        ],
+      },
     ]}
   />
 </Figure>
 
 ## 보낼 때 층마다 감싸요
 
-앱이 HTTP 요청을 보내면, 아래층으로 내려가며 층마다 자기 머리표(헤더)를 앞에 붙여요. 이렇게 감싸는 일을 <Term term="network/encapsulation">캡슐화</Term>라고 해요.
+앱이 HTTP 요청을 보내면, 아래층으로 내려가며 층마다 자기 머리표(헤더)를 앞에 붙여요. 이렇게 감싸는 일을 <Term term="network/encapsulation">캡슐화</Term>라고 해요. 맨 위 계단 그림의 파란 칸이 층마다 붙는 머리표예요.
 
-<Figure caption="선 위를 지나는 이더넷 프레임 하나를 펼쳤어요. 안쪽의 HTTP 요청을 TCP, IP, 이더넷(MAC) 머리표가 차례로 감싸요.">
-  <Strip
-    ariaLabel="MAC 머리, IP 머리, TCP 머리, HTTP 요청, 꼬리가 나란히 있고, HTTP 요청만이 L7 데이터, TCP 머리부터가 L4, IP 머리부터가 L3 패킷, 전체가 L2 프레임인 칸 띠"
-    rows={[
-      {
-        label: '이더넷 프레임 하나',
-        cells: [{ label: 'MAC', tone: 'sub' }, { label: 'IP', tone: 'sub' }, { label: 'TCP', tone: 'sub' }, { label: 'HTTP', tone: 'accent' }, { label: '꼬리', tone: 'sub' }],
-      },
-    ]}
-    ranges={[
-      { from: 3, to: 3, label: 'L7 데이터', tone: 'accent' },
-      { from: 2, to: 3, label: 'L4 세그먼트' },
-      { from: 1, to: 3, label: 'L3 패킷' },
-      { from: 0, to: 4, label: 'L2 프레임' },
-    ]}
-  />
-</Figure>
+선 위를 지나는 이더넷 프레임은 그 계단의 맨 아래 줄이에요. MAC 머리, IP 머리, TCP 머리, HTTP 요청, 꼬리가 차례로 이어져요.
 
 받는 쪽은 거꾸로 아래층부터 머리표를 하나씩 벗기며 위층에 넘겨요. 각 층은 자기 머리표만 읽어요.
 
