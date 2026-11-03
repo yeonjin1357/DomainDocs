@@ -1,0 +1,179 @@
+---
+title: 노드 비우기와 PDB
+summary: 노드 점검 전에 새 파드를 막고 파드를 내보내요. PDB가 한 번에 빠지는 수를 지켜요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 83
+icon: container
+keywords: [drain, cordon, uncordon, PodDisruptionBudget, PDB, 노드 점검, 노드 업그레이드, Eviction API, SchedulingDisabled, minAvailable]
+related: [kubernetes/pods-and-nodes, kubernetes/scheduling, kubernetes/workloads, kubernetes/pod-evicted, kubernetes/node-not-ready]
+sources:
+  - title: Kubernetes — Disruptions
+    url: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  - title: Kubernetes — Safely Drain a Node
+    url: https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/
+  - title: Kubernetes — Specifying a Disruption Budget for your Application
+    url: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  - title: Kubernetes — API-initiated Eviction
+    url: https://kubernetes.io/docs/concepts/scheduling-eviction/api-eviction/
+  - title: kubectl drain
+    url: https://kubernetes.io/docs/reference/kubectl/generated/kubectl_drain/
+  - title: kubectl cordon
+    url: https://kubernetes.io/docs/reference/kubectl/generated/kubectl_cordon/
+  - title: kube-state-metrics — PodDisruptionBudget metrics
+    url: https://github.com/kubernetes/kube-state-metrics/blob/main/docs/metrics/policy/poddisruptionbudget-metrics.md
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="막고, 비우고, 돌려놔요">
+    cordon으로 새 파드를 막고, drain으로 파드를 내보내요. 점검이 끝나면 uncordon으로 다시 받아요.
+  </Point>
+  <Point title="drain은 PDB가 허락할 때만 내보내요">
+    drain은 파드를 바로 지우지 않고 축출을 요청해요. 한 번에 몇 개까지 빠져도 되는지는 PDB가 정해요.
+  </Point>
+  <Point title="PDB가 0이면 drain이 끝나지 않아요">
+    복제본 1개에 minAvailable 1을 두면 하나도 내보낼 수 없어요. drain은 끝없이 기다려요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="손님은 다른 계산대로 걸어가지만, 파드는 옮겨 가지 않아요. 지워지고 다른 노드에 새로 만들어져서, 메모리 안의 상태와 emptyDir 데이터는 사라져요.">
+  마트가 계산대 하나를 고치기 전에 '이 줄 마감' 팻말을 세우고, 줄 선 손님을 다른 계산대로 보내는 것과 같아요. '계산대는 늘 두 개 이상 열어 둔다'는 규칙이 PDB예요.
+</Analogy>
+
+## 계획된 중단과 뜻밖의 중단
+
+파드는 누가 지우거나, 하드웨어나 시스템이 고장 나야 사라져요. 쿠버네티스는 이 둘을 나눠 불러요. 고장처럼 피할 수 없는 쪽은 뜻밖의 중단, 사람이 일부러 하는 쪽은 계획된 중단이에요.
+
+<Figure caption="두 중단의 차이예요. PDB는 계획된 중단 가운데 축출 요청을 거치는 것만 막아요.">
+  <Compare
+    columns={['계획된 중단(voluntary)', '뜻밖의 중단(involuntary)']}
+    rows={[
+      { label: '예', values: ['노드 점검·업그레이드, 노드 줄이기', '하드웨어 고장, 커널 패닉, 노드 압박 축출'] },
+      { label: 'PDB가 막나', values: ['축출 요청을 거치면 막아요', '못 막아요'] },
+      { label: '대비', values: ['PDB, 한 노드씩 비우기', '복제본 여러 개, 노드에 나눠 두기'] },
+    ]}
+  />
+</Figure>
+
+노드 점검이나 쿠버네티스 버전 업그레이드는 계획된 중단이에요. 노드를 하나씩 비우고, 고치고, 다시 받는 일을 되풀이해요.
+
+## 막고, 비우고, 돌려놔요
+
+먼저 `kubectl cordon <노드>`로 노드에 새 파드가 오지 않게 막아요. 이미 도는 파드는 그대로예요. `kubectl get nodes`에서 그 노드의 상태에 `SchedulingDisabled`가 붙어요.
+
+다음으로 `kubectl drain <노드>`로 파드를 내보내요. 이 일을 <Term term="kubernetes/drain">drain</Term>이라고 해요. drain은 cordon까지 함께 하고, 노드의 파드마다 축출(eviction)을 요청해요.
+
+<Figure caption="drain이 파드 하나를 내보내는 순서예요. API 서버가 PDB를 보고 지금은 안 된다고 하면, drain은 잠시 뒤 다시 요청해요.">
+  <Sequence
+    ariaLabel="drain이 API 서버에 파드 축출을 요청하고, PDB 여유가 없어 429로 거절되자 잠시 뒤 다시 요청하며, 허용되면 API 서버가 파드에 종료를 알리는 순서"
+    participants={['drain', 'API 서버', '파드']}
+    messages={[
+      { from: 'drain', to: 'API 서버', label: '파드 축출 요청' },
+      { from: 'API 서버', to: 'drain', label: '429 거절(PDB 여유 0)', dashed: true, tone: 'warn' },
+      { from: 'drain', to: 'API 서버', label: '잠시 뒤 다시 요청' },
+      { from: 'API 서버', to: 'drain', label: '허용', dashed: true, tone: 'accent' },
+      { from: 'API 서버', to: '파드', label: '종료 신호(유예 시간)' },
+    ]}
+  />
+</Figure>
+
+허용된 파드는 정해진 유예 시간 안에 정리하고 끝나요. 그 파드를 만든 Deployment나 StatefulSet이 빈자리를 보고 새 파드를 만들고, 스케줄러가 다른 노드에 놓아요.
+
+점검을 마치고 노드를 다시 쓰려면 `kubectl uncordon <노드>`를 해요. 이걸 잊으면 노드는 멀쩡한데 새 파드를 받지 않아요.
+
+## PDB는 한 번에 빠지는 수를 정해요
+
+<Term term="kubernetes/pdb">PDB</Term>(PodDisruptionBudget)는 앱 하나에서 계획된 중단으로 동시에 빠져도 되는 파드 수를 정해요. `minAvailable`(적어도 남을 수)이나 `maxUnavailable`(한 번에 빠져도 되는 수) 가운데 하나로 적어요.
+
+<Figure caption="복제본 3개에 maxUnavailable 1인 앱에서, 파드 1·2가 있는 노드를 비우는 예시예요. 파드 1을 대신할 새 파드가 Ready가 되어야 파드 2를 내보내요.">
+  <Timeline
+    ariaLabel="파드 1을 먼저 내보내고, 대신할 새 파드가 Ready가 되면 그때 파드 2를 내보내는 시간 띠. 그동안 파드 2의 축출은 거절돼요"
+    end={6.5}
+    lanes={[
+      { label: '파드 1', segments: [{ start: 0, end: 1, label: '종료', tone: 'sub' }] },
+      { label: '새 파드 1', segments: [{ start: 1, end: 2.5, label: '준비 중', tone: 'sub' }, { start: 2.5, end: 6.5, label: 'Ready', tone: 'accent' }] },
+      { label: '파드 2', segments: [{ start: 0, end: 2.5, label: '거절됨', tone: 'warn' }, { start: 2.5, end: 3.5, label: '종료', tone: 'sub' }] },
+      { label: '새 파드 2', segments: [{ start: 3.5, end: 5, label: '준비 중', tone: 'sub' }, { start: 5, end: 6.5, label: 'Ready', tone: 'accent' }] },
+    ]}
+    marks={[{ at: 2.5, label: '새 파드 1 Ready', tone: 'accent' }]}
+  />
+</Figure>
+
+PDB는 Ready인 파드만 세요. 대신할 파드가 다른 노드에 자리가 없어 Pending이면, 다음 축출은 계속 거절돼요.
+
+PDB가 지키는 건 축출 요청뿐이에요. 파드나 Deployment를 직접 지우면 PDB를 거치지 않아요. 롤링 업데이트로 빠진 파드도 PDB의 셈에는 들어가지만, 롤링 업데이트 자체는 PDB에 막히지 않아요.
+
+## PDB는 앱 모양에 맞춰요
+
+<Figure caption="쿠버네티스 문서가 드는 앱별 PDB 예시예요. 복제본이 하나뿐이면 PDB로 지킬 수 없어서, 점검 때 잠깐 멈추는 것을 받아들이거나 미리 상의해요.">
+  <Tree
+    ariaLabel="앱 모양에 따른 PDB. 상태 없는 웹은 minAvailable 90%, 쿼럼이 있는 저장소는 쿼럼 크기, 복제본 하나는 PDB 없이 두거나 maxUnavailable 0, 다시 돌릴 수 있는 Job은 PDB를 두지 않아요"
+    root={{
+      label: '앱 모양',
+      children: [
+        { label: '상태 없는 웹 서버', note: '처리량을 10% 넘게 줄이지 않기', tag: 'minAvailable 90%' },
+        { label: '쿼럼이 있는 저장소(5개)', note: '과반이 늘 살아 있기', tag: 'minAvailable 3' },
+        { label: '복제본 하나', note: '0이면 drain이 멈춰요', tag: 'PDB 없음 / 0', tone: 'warn' },
+        { label: '다시 돌릴 수 있는 Job', note: '새 파드가 이어서 해요', tag: 'PDB 없음' },
+      ],
+    }}
+  />
+</Figure>
+
+`maxUnavailable: 0`이나, `minAvailable`을 복제본 수와 같게 두면 계획된 축출을 하나도 허락하지 않아요. 그 파드가 있는 노드는 drain이 끝나지 않아요. 쿠버네티스 문서도 이 경우 drain이 끝나지 않는다고 적어 두었어요.
+
+## drain이 멈추는 다른 까닭
+
+PDB 말고도 drain이 멈추거나 시작하지 않는 경우가 있어요. 대개 옵션 하나로 넘어가지만, 옵션마다 대가가 있어요.
+
+- **DaemonSet 파드**: 지워도 DaemonSet이 바로 다시 만들어서, 그냥은 drain이 멈춰요. `--ignore-daemonsets`로 남겨 두고 넘어가요.
+- **emptyDir을 쓰는 파드**: `--delete-emptydir-data`를 줘야 넘어가요. 그 노드의 emptyDir 데이터는 지워져요.
+- **컨트롤러 없는 파드**: 혼자 만든 파드는 `--force`를 줘야 지워요. 다시 만들어 줄 주인이 없어서 그대로 사라져요.
+- **Ready가 아닌 파드**: 기본 정책에서는 앱이 이미 모자란 상태면 Ready가 아닌 파드도 내보내지 않아요. 쿠버네티스 문서는 PDB에 `unhealthyPodEvictionPolicy: AlwaysAllow`를 권해요.
+
+drain의 `--timeout` 기본값은 0이고, 0은 끝없이 기다린다는 뜻이에요. `--disable-eviction`은 축출 대신 바로 지워서 PDB를 건너뛰니, 앱이 멈춰도 될 때만 써요.
+
+## 모니터링에서는
+
+<Figure caption="노드 점검 중인 클러스터의 예시예요. 예약을 막은 노드가 하나, PDB 여유가 0인 앱이 둘이라, 다음 노드를 비우면 거기서 멈춰요.">
+  <StatTile label="예약 막힌 노드" value="1" unit="개" note="새 파드를 안 받아요" />
+  <StatTile label="PDB 여유 0인 앱" value="2" unit="개" tone="warn" note="drain하면 멈춰요" />
+  <StatTile label="Pending 파드" value="3" unit="개" tone="warn" note="옮겨 갈 자리 부족" />
+</Figure>
+
+노드와 PDB의 상태는 kube-state-metrics(쿠버네티스 오브젝트 상태를 지표로 내는 도구)가 내놓아요. 예약을 막은 노드는 `kube_node_spec_unschedulable`이 1이에요. 하루 넘게 1이라면 uncordon을 잊었는지 봐요.
+
+PDB가 지금 허락하는 축출 수는 `kube_poddisruptionbudget_status_pod_disruptions_allowed`예요. 이 값이 오래 0인 앱은 노드 점검이나 업그레이드를 막아요.
+
+```text
+kube_poddisruptionbudget_status_pod_disruptions_allowed
+  == 0
+```
+
+노드를 비우는 동안 Pending 파드가 늘면, 남은 노드에 옮겨 갈 자리가 모자란 거예요. 비우기 전에 남은 노드의 여유부터 봐요.
+
+<Checkpoints>
+  <Check>복제본이 하나인 앱에 `minAvailable: 1`인 PDB가 있다면 다시 보세요. 그 노드는 drain이 끝나지 않아요.</Check>
+  <Check>PDB의 레이블 선택이 실제 파드와 맞는지 보세요. 아무 파드도 고르지 않는 PDB는 아무것도 지키지 않아요.</Check>
+  <Check>점검 스크립트가 drain에 `--disable-eviction`이나 `--force`를 늘 붙인다면 다시 보세요. PDB를 건너뛰거나, 다시 만들어지지 않는 파드를 지워요.</Check>
+  <Check>점검이 끝난 노드에 uncordon을 했는지 보세요. 잊으면 용량이 준 채로 남아요.</Check>
+  <Check>여러 노드를 한꺼번에 비우는 계획이라면, 같은 앱의 파드가 그 노드들에 모여 있지 않은지 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 축출 요청의 응답
+
+  축출을 허락하면 API 서버는 200을 돌려주고 파드를 지워요. PDB 여유가 없으면 429(Too Many Requests)로 거절하고, 나중에 다시 요청할 수 있어요.
+
+  한 파드를 여러 PDB가 고르는 것처럼 설정이 잘못되면 500을 돌려줘요. PDB가 없는 파드는 늘 허락해요.
+
+  ### 비율로 적을 때
+
+  `minAvailable`과 `maxUnavailable`은 `90%`처럼 비율로도 적어요. 비율은 파드 수로 바꿀 때 올림해요. 그래서 복제본 7개에 `minAvailable: 90%`면 7 × 0.9 = 6.3을 올려 7개가 남아야 해서, 하나도 못 내보내요.
+
+  ### 다른 도구도 같은 길을 써요
+
+  쿠버네티스 문서는 클러스터 운영 도구가 파드를 직접 지우지 말고 축출 요청을 쓰라고 해요. 그래서 노드 업그레이드나 노드 줄이기 도구도 대개 PDB를 지켜요.
+</Deeper>

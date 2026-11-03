@@ -393,3 +393,17 @@ terms:
     aliases: [네트워크 정책, network policy, 넷폴]
     short: 파드 사이의 통신 가운데 무엇을 허락할지 정하는 규칙이에요.
     doc: kubernetes/pod-network
+  - id: pdb
+    name: PDB
+    en: PodDisruptionBudget
+    aliases: [PodDisruptionBudget, Pod Disruption Budget, 파드 중단 예산, minAvailable, maxUnavailable]
+    short: 계획된 중단으로 한 앱에서 동시에 빠져도 되는 파드 수를 정한 규칙이에요.
+    analogy: 계산대는 늘 두 개 이상 열어 둔다는 마트 규칙과 같아요.
+    doc: kubernetes/node-drain
+  - id: drain
+    name: drain
+    en: Node drain
+    aliases: [kubectl drain, 노드 비우기, 드레인]
+    short: 노드에 새 파드를 막고, 있던 파드를 축출 요청으로 내보내는 일이에요.
+    analogy: 고칠 계산대에 마감 팻말을 세우고 손님을 옆 줄로 보내는 것과 같아요.
+    doc: kubernetes/node-drain
