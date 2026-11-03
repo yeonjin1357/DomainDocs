@@ -6,7 +6,7 @@ type: guide
 order: 70
 icon: messages-square
 keywords: [consumer lag, 지연 증가, lag 쌓임, kafka-consumer-groups, LOG-END-OFFSET, 처리 속도, 파티션 쏠림, 컨슈머 늘리기, STALLED, 원인 찾기]
-related: [apm/consumer-lag, messaging/consumers-and-groups, messaging/topics-and-partitions, messaging/rebalance-storm]
+related: [apm/consumer-lag, messaging/consumers-and-groups, messaging/topics-and-partitions, messaging/rebalance-storm, messaging/failed-messages]
 sources:
   - title: Apache Kafka 4.3 — Basic Kafka Operations (checking consumer position)
     url: https://kafka.apache.org/43/operations/basic-kafka-operations/
@@ -91,6 +91,8 @@ CURRENT-OFFSET은 처리 위치, LOG-END-OFFSET은 끝, LAG는 그 차이예요.
 ## 3. 멈춘 컨슈머가 있는지 보세요
 
 처리 위치(CURRENT-OFFSET)가 몇 분째 그대로인 파티션이 있다면, 그 컨슈머는 멈췄어요. 같은 이벤트를 처리하다 계속 실패하거나, 바깥 호출에서 끝없이 기다리는 경우가 흔해요.
+
+계속 실패하는 이벤트라면 몇 번 다시 해 보고 따로 빼 두게 바꿔요. 방법은 <Term slug="messaging/failed-messages">처리에 실패한 메시지와 DLQ</Term>에서 다뤄요.
 
 컨슈머 그룹이 계속 리밸런스 중이어도 처리가 멈춰요. 리밸런스가 잦다면 <Term slug="messaging/rebalance-storm">리밸런스가 반복될 때</Term>를 봐요.
 

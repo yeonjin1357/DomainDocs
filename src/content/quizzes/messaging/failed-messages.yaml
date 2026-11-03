@@ -1,0 +1,29 @@
+questions:
+  - id: broker-moves-to-dlq
+    type: ox
+    prompt: Kafka 브로커는 컨슈머가 처리에 실패한 횟수를 세다가, 한도를 넘으면 그 메시지를 DLQ 토픽으로 옮겨 주나요?
+    answer: false
+    explain: Kafka는 처리가 성공했는지 몰라요. DLQ 토픽으로 보내는 일은 앱이나 Spring Kafka 같은 프레임워크가 해요. 횟수를 세어 옮겨 주는 건 SQS나 RabbitMQ 같은 큐 서비스예요.
+  - id: spring-default-skip
+    type: ox
+    prompt: Spring Kafka의 기본 에러 처리는 10번 모두 실패한 메시지를 로그로 남기고 다음 메시지로 넘어가나요?
+    answer: true
+    explain: 기본 설정은 쉬지 않고 9번 더 해 본 뒤 로그만 남기고 건너뛰어요. DLQ로 보내려면 DeadLetterPublishingRecoverer를 따로 붙여요.
+  - id: stuck-partition
+    type: choice
+    prompt: 파티션 2의 처리 위치가 30분째 오프셋 43에 멈춰 있고, 그 파티션의 지연만 자라요. 먼저 의심할 것은?
+    choices: [43번 메시지 처리 실패, 프로듀서 전송 지연, 브로커 디스크 부족, 리밸런스 반복]
+    answer: 0
+    explain: 한 파티션만 처리 위치가 그대로라면 그 위치의 메시지에서 처리가 계속 실패하고 있을 수 있어요. 앞 메시지가 끝나지 않으면 뒤 메시지도 기다려요.
+  - id: sqs-retention
+    type: choice
+    prompt: 보관 기간이 4일인 SQS 표준 큐에서 하루를 머문 메시지가 DLQ로 갔어요. DLQ의 보관 기간도 4일이면, DLQ에서 언제 사라지나요?
+    choices: [DLQ에 온 지 3일 뒤, DLQ에 온 지 4일 뒤, DLQ에 온 지 5일 뒤, 지울 때까지 남아요]
+    answer: 0
+    explain: SQS 표준 큐는 원래 큐에 들어온 시각부터 보관 기간을 세요. 하루를 이미 썼으니 DLQ에서는 3일 뒤에 사라져요. 그래서 DLQ의 보관 기간을 더 길게 둬요.
+  - id: dlq-name
+    type: input
+    prompt: 처리하지 못한 메시지를 따로 모아 두는 곳을 세 글자 영어 약자로 쓰면?
+    answer: [DLQ, DLT]
+    term: messaging/dead-letter-queue
+    explain: DLQ(dead letter queue)는 계속 실패한 메시지를 따로 남겨 두는 곳이에요. Kafka에서는 토픽으로 만들어 DLT라고도 해요.

@@ -1,0 +1,187 @@
+---
+title: 처리에 실패한 메시지와 DLQ
+summary: 계속 실패하는 메시지는 몇 번 다시 해 보고 DLQ에 따로 빼 둬요. 그냥 두면 파티션이 멈춰요.
+domain: messaging
+type: concept
+stage: basics
+order: 63
+icon: messages-square
+keywords: [DLQ, dead letter queue, DLT, 독 메시지, poison message, 재시도, retry topic, DefaultErrorHandler, maxReceiveCount, 메시지 유실]
+related: [messaging/consumers-and-groups, messaging/delivery-guarantees, messaging/lag-growing, apm/timeouts-and-retries, apm/consumer-lag]
+sources:
+  - title: Apache Kafka 4.3 — KafkaConsumer
+    url: https://kafka.apache.org/43/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html
+  - title: Spring for Apache Kafka — Handling Exceptions
+    url: https://docs.spring.io/spring-kafka/reference/kafka/annotation-error-handling.html
+  - title: Spring for Apache Kafka — Non-Blocking Retries
+    url: https://docs.spring.io/spring-kafka/reference/retrytopic.html
+  - title: Apache Kafka 4.3 — Kafka Connect user guide
+    url: https://kafka.apache.org/43/kafka-connect/user-guide/
+  - title: Amazon SQS — Using dead-letter queues
+    url: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html
+  - title: RabbitMQ — Dead Letter Exchanges
+    url: https://www.rabbitmq.com/docs/dlx
+  - title: RabbitMQ — Quorum Queues (poison message handling)
+    url: https://www.rabbitmq.com/docs/quorum-queues
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="실패한 메시지는 앱이 처리해요">
+    Kafka는 처리가 성공했는지 몰라요. 앱이 계속 다시 하면 파티션이 멈추고, 그냥 넘어가면 메시지를 잃어요.
+  </Point>
+  <Point title="몇 번 다시 해 보고 DLQ로 빼 둬요">
+    잠깐 실패는 다시 하면 풀려요. 그래도 안 되면 DLQ에 따로 남기고 다음 메시지로 넘어가요.
+  </Point>
+  <Point title="DLQ는 들어온 수를 지켜봐요">
+    DLQ로 빼면 지연 그래프는 조용해요. 1건이라도 들어오면 알리고, 원인을 고친 뒤 다시 넣어요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="보관소의 가방은 주인이 찾으러 오지만, DLQ의 메시지는 아무도 찾으러 오지 않아요. 사람이 원인을 고쳐 다시 넣지 않으면 보관 기간이 지나 사라져요.">
+  공항 수하물 벨트에 걸린 가방 하나가 안 빠지면 뒤 가방이 모두 멈춰요. 그래서 걸린 가방은 벨트에서 내려 보관소로 옮기고, 벨트는 계속 돌려요.
+</Analogy>
+
+## 계속 실패하는 메시지가 있어요
+
+어떤 메시지는 몇 번을 다시 해도 실패해요. 형식이 깨졌거나, 코드가 예상 못 한 값이 들었거나, 가리키는 데이터가 없는 경우예요. 이런 메시지를 <Term term="messaging/poison-message">독 메시지</Term>(poison message)라고 불러요.
+
+잠깐 실패와는 달라요. 바깥 API가 잠깐 느리거나 DB 연결이 끊긴 실패는, 조금 뒤 다시 하면 풀려요. 다시 해서 풀리는 실패인지가 처리 방법을 정해요.
+
+## Kafka는 처리 결과를 몰라요
+
+Kafka 컨슈머는 파티션의 이벤트를 차례로 읽고, 어디까지 처리했는지 <Term term="messaging/offset-commit">커밋</Term>으로 남겨요. 처리가 성공했는지는 Kafka가 아니라 앱이 알아요. 그래서 실패한 메시지를 어떻게 할지도 앱이 정해요.
+
+<Figure caption="처리에 실패한 메시지가 갈 수 있는 세 갈래예요. 앞의 두 갈래는 대개 일부러 고른 게 아니라, 실패를 따로 다루지 않아서 생겨요.">
+  <Tree
+    ariaLabel="처리에 실패한 메시지의 세 갈래. 제자리에서 계속 다시 하면 그 파티션이 멈추고, 건너뛰면 메시지를 잃고, 몇 번 다시 해 보고 DLQ로 빼 두면 다음으로 넘어가요"
+    root={{
+      label: '처리에 실패한 메시지',
+      children: [
+        { label: '제자리에서 계속 다시 해요', note: '그 파티션 전체가 멈춰요', tag: '멈춤', tone: 'warn' },
+        { label: '건너뛰어요', note: '메시지를 잃어요', tag: '잃음', tone: 'warn' },
+        { label: '몇 번 다시 해 보고 따로 빼 둬요', note: 'DLQ에 남기고 다음으로 넘어가요', tag: 'DLQ', tone: 'accent' },
+      ],
+    }}
+  />
+</Figure>
+
+예외로 컨슈머가 죽으면 첫 갈래가 돼요. 다시 뜬 컨슈머는 마지막 커밋 위치부터 읽어서, 같은 메시지에서 또 죽어요.
+
+예외를 잡아 로그만 남기면 둘째 갈래가 돼요. 컨슈머는 이미 받은 다음 위치부터 이어 읽고, 자동 커밋(기본값)이면 그 위치가 곧 커밋돼요. 실패한 메시지는 로그 한 줄로만 남아요.
+
+Spring Kafka의 기본 설정은 둘을 섞어요. 실패하면 쉬지 않고 9번 더 해 보고(모두 10번), 그래도 안 되면 로그만 남기고 건너뛰어요. DLQ로 보내려면 따로 설정해야 해요.
+
+## 계속 다시 하면 파티션이 멈춰요
+
+파티션 안에서는 순서대로 처리해요. 앞 메시지가 끝나지 않으면 뒤 메시지는 차례를 기다려요.
+
+<Figure caption="파티션 2의 오프셋 43에서 처리가 계속 실패하는 예시예요. 44부터는 멀쩡한 메시지인데도 처리되지 못하고 쌓여요.">
+  <Strip
+    ariaLabel="파티션 2의 오프셋 40, 41, 42는 처리했고, 43에서 계속 실패해 처리 위치가 멈춰서, 44부터 47까지는 차례를 기다리는 칸 띠"
+    rows={[
+      {
+        label: '파티션 2의 오프셋',
+        cells: [{ label: '40', tone: 'sub' }, { label: '41', tone: 'sub' }, { label: '42', tone: 'sub' }, { label: '43', tone: 'warn' }, '44', '45', '46', '47'],
+      },
+    ]}
+    marks={[{ at: 3, label: '계속 실패', tone: 'warn' }]}
+    ranges={[{ from: 0, to: 2, label: '처리함' }, { from: 4, to: 7, label: '차례를 기다려요', tone: 'warn' }]}
+  />
+</Figure>
+
+그 파티션의 지연만 계속 자라고, 다른 파티션은 멀쩡해요. 처리 위치가 몇 분째 그대로라면 <Term slug="messaging/lag-growing">컨슈머 지연이 쌓일 때</Term>의 3단계처럼 그 위치의 메시지를 컨슈머 로그에서 찾아요.
+
+## 몇 번 다시 해 보고 따로 빼 둬요
+
+<Term term="messaging/dead-letter-queue">DLQ</Term>(dead letter queue)는 처리하지 못한 메시지를 따로 모아 두는 곳이에요. Kafka에서는 토픽 하나를 DLQ로 써서 DLT(dead letter topic)라고도 불러요.
+
+<Figure caption="세 번 실패한 메시지는 DLQ 토픽으로 가고, 컨슈머는 다음 메시지를 처리해요. 원인을 고친 뒤에 DLQ의 메시지를 원래 토픽에 다시 넣어요.">
+  <Flow
+    ariaLabel="주문 토픽에서 컨슈머가 읽고, 세 번 실패한 메시지는 DLQ 토픽으로 보내고, 원인을 고친 뒤 DLQ의 메시지를 다시 넣기로 원래 토픽에 돌려보내는 구조도"
+    nodes={[
+      { id: 'topic', label: '주문 토픽', col: 0, row: 0 },
+      { id: 'consumer', label: '컨슈머', col: 2, row: 0, note: '3번까지 다시' },
+      { id: 'dlq', label: 'DLQ 토픽', col: 2, row: 1, note: '실패 이유와 함께', tone: 'warn' },
+      { id: 'replay', label: '다시 넣기', col: 0, row: 1, note: '원인을 고친 뒤' },
+    ]}
+    edges={[
+      { from: 'topic', to: 'consumer', label: '읽기' },
+      { from: 'consumer', to: 'dlq', label: '3번 실패', tone: 'warn' },
+      { from: 'dlq', to: 'replay', dashed: true },
+      { from: 'replay', to: 'topic', dashed: true },
+    ]}
+  />
+</Figure>
+
+빼 둘 때는 원래 메시지에 실패 이유를 붙여요. Spring Kafka는 에러 종류와 메시지, 원래 토픽·파티션·오프셋을 헤더에 넣어 보내요. 그래야 나중에 무엇이 왜 실패했는지 알 수 있어요.
+
+다시 해도 소용없는 실패는 바로 빼요. 형식이 깨져 읽을 수조차 없는 메시지가 그래요. Spring Kafka도 역직렬화 에러(바이트를 객체로 못 바꿈) 같은 것은 다시 하지 않고 바로 넘겨요.
+
+DLQ의 메시지를 다시 넣으면 같은 메시지가 두 번 처리될 수 있어요. 그래서 처리가 두 번 해도 결과가 같아야 해요. 이 성질은 <Term slug="messaging/delivery-guarantees">전달 보장</Term>에서 다뤄요.
+
+## 다시 하는 동안 뒤 메시지는 기다려요
+
+제자리에서 다시 하는 동안 그 파티션은 서 있어요. 1분씩 쉬며 5번 다시 하면, 그 파티션은 5분 동안 멈춰요. 오래 멈추면 컨슈머가 그룹에서 빠지고 <Term term="messaging/rebalance">리밸런스</Term>가 일어날 수도 있어요.
+
+그래서 기다림이 긴 재시도는 재시도 토픽으로 넘겨요. 실패한 메시지를 재시도 토픽에 넣고 바로 다음 메시지로 가요. 재시도 토픽을 읽는 컨슈머가 정한 시간이 지난 뒤 다시 해요.
+
+<Figure caption="두 재시도 방식이에요. 몇 초면 풀리는 실패는 제자리에서, 몇 분 걸리는 실패는 재시도 토픽으로 넘겨요. 대신 같은 키의 순서가 깨질 수 있어요.">
+  <Compare
+    columns={['제자리에서 다시 하기', '재시도 토픽으로 넘기기']}
+    rows={[
+      { label: '뒤 메시지', values: ['다시 하는 동안 기다려요', '바로 처리돼요'] },
+      { label: '같은 키의 순서', values: ['지켜져요', '깨질 수 있어요'] },
+      { label: '맞는 실패', values: ['몇 초면 풀리는 실패', '몇 분 걸리는 실패'] },
+      { label: '더 만드는 것', values: ['없어요', '토픽과 컨슈머'] },
+    ]}
+  />
+</Figure>
+
+순서가 깨진다는 건 이런 뜻이에요. '주문 생성'이 재시도 토픽에 간 사이, 같은 주문의 '주문 취소'가 먼저 처리될 수 있어요. 순서가 중요한 메시지라면 재시도 토픽을 쓰기 전에 이 경우를 따져요.
+
+## 큐 서비스는 DLQ를 갖고 있어요
+
+Kafka에는 컨슈머가 실패한 메시지를 옮겨 주는 기능이 없어요. 그래서 앱이나 프레임워크가 DLQ 토픽으로 보내요. 큐 서비스는 받아 간 횟수를 세다가, 한도를 넘으면 DLQ로 옮겨 줘요.
+
+- **Amazon SQS**: 큐의 redrive 정책에 한도(`maxReceiveCount`)를 적어요. 받아 간 메시지를 지우지 않으면 30초(기본값) 뒤 다시 보이고, 받은 횟수가 한도를 넘으면 DLQ로 가요.
+- **RabbitMQ**: dead letter exchange를 정해 두면, 컨슈머가 거절한 메시지를 그리로 보내요. 4.0부터 quorum 큐는 20번 넘게 다시 전달된 메시지를 DLQ로 보내고, DLQ가 없으면 버려요.
+- **Kafka Connect**: 싱크 커넥터는 `errors.deadletterqueue.topic.name`으로 DLQ 토픽을 정할 수 있어요. 기본은 DLQ 없이 첫 에러에서 커넥터 작업이 멈춰요.
+
+## 모니터링에서는
+
+<Figure caption="배포 뒤 형식이 바뀐 메시지가 DLQ로 빠지는 예시예요. 지연은 0 근처라 멀쩡해 보이지만, DLQ에는 2시간 동안 1,200건이 쌓였어요.">
+  <MiniLineChart ariaLabel="2시간 동안 컨슈머 지연은 0에서 30건 사이로 조용하고, DLQ에 쌓인 메시지는 배포 뒤 0건에서 1,200건까지 꾸준히 늘어난 그래프" series={[{ label: 'DLQ에 쌓인 메시지', values: [0, 0, 0, 150, 300, 450, 600, 750, 900, 1050, 1200], tone: 'warn', value: '1,200건' }, { label: '컨슈머 지연', values: [10, 20, 15, 30, 20, 10, 25, 15, 20, 10, 15], tone: 'sub', value: '15건' }]} />
+</Figure>
+
+DLQ로 빼면 파티션이 멈추지 않아서 지연 그래프가 조용해요. 그래서 DLQ에 들어온 수를 따로 봐요. 평소 0이 정상이라, 늘어나면 바로 알려요.
+
+SQS는 DLQ 큐의 `ApproximateNumberOfMessagesVisible`로 봐요. Kafka는 DLQ 토픽에 들어오는 메시지 수, 곧 끝 오프셋이 느는지로 봐요.
+
+DLQ의 메시지도 보관 기간이 지나면 사라져요. SQS 표준 큐는 원래 큐에 들어온 시각부터 기간을 세요. 그래서 DLQ의 보관 기간을 원래 큐보다 길게 둬요.
+
+재시도 횟수도 지표로 남겨요. DLQ로 가기 전에 재시도가 늘면, 바깥 서비스가 흔들린다는 신호예요.
+
+<Checkpoints>
+  <Check>컨슈머가 예외를 잡아 로그만 남기는 코드라면 다시 보세요. 실패한 메시지가 커밋과 함께 사라져요.</Check>
+  <Check>재시도 횟수에 끝이 없는 설정이라면 다시 보세요. 독 메시지 하나가 그 파티션을 계속 멈춰 둬요.</Check>
+  <Check>DLQ는 있는데 들어온 수에 알림이 없다면 다시 보세요. 아무도 모른 채 쌓였다가 보관 기간이 지나 사라져요.</Check>
+  <Check>DLQ의 메시지를 원래 토픽에 다시 넣는 기능이라면, 처리를 두 번 해도 결과가 같은지 먼저 보세요.</Check>
+  <Check>순서가 중요한 메시지에 재시도 토픽을 쓰자는 제안이라면, 같은 키의 뒤 메시지가 먼저 처리돼도 괜찮은지 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### Spring Kafka 기본값
+
+  `DefaultErrorHandler`의 기본 재시도는 `FixedBackOff(0L, 9)`예요. 쉬지 않고 9번 더 해 보고, 다 실패하면 로그만 남겨요. DLQ로 보내려면 `DeadLetterPublishingRecoverer`를 붙여요.
+
+  `DeadLetterPublishingRecoverer`는 원래 토픽 이름에 꼬리를 붙인 토픽의 같은 파티션으로 보내요. 꼬리는 3.3부터 `-dlt`이고, 그 전에는 `.DLT`예요. 같은 파티션으로 보내서, DLQ 토픽의 파티션 수가 원래 토픽보다 적으면 안 돼요.
+
+  재시도 토픽은 `@RetryableTopic`으로 만들어요. 재시도 토픽과 DLQ 토픽, 그 토픽들을 읽는 컨슈머를 대신 만들어 줘요.
+
+  ### 큐 서비스 세부
+
+  SQS 문서는 `maxReceiveCount`를 너무 낮게 두지 말라고 해요. 1이면 한 번만 실패해도 DLQ로 가요. FIFO 큐에 DLQ를 쓰면 메시지 순서가 깨질 수 있어요.
+
+  RabbitMQ는 메시지가 만료되거나, 큐 길이 한도를 넘어 밀려날 때도 dead letter exchange로 보내요. 큐 자체가 만료되면 그 안의 메시지는 보내지 않아요.
+</Deeper>

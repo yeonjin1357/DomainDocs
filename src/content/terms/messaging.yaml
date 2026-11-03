@@ -108,3 +108,17 @@ terms:
     aliases: [at-least-once, at-most-once, exactly-once, 최소 한 번, 최대 한 번, 정확히 한 번, EOS]
     short: 이벤트를 잃을 수 있는지, 두 번 처리될 수 있는지의 약속이에요. Kafka 기본은 최소 한 번이에요.
     doc: messaging/delivery-guarantees
+  - id: poison-message
+    name: 독 메시지
+    en: Poison message
+    aliases: [poison message, poison pill, 포이즌 메시지]
+    short: 몇 번을 다시 처리해도 계속 실패하는 메시지예요.
+    analogy: 벨트에 걸려 뒤 가방까지 멈춰 세우는 가방과 같아요.
+    doc: messaging/failed-messages
+  - id: dead-letter-queue
+    name: DLQ
+    en: Dead letter queue
+    aliases: [dead letter queue, DLT, dead letter topic, 데드 레터 큐, 데드 레터 토픽, dead letter exchange]
+    short: 처리하지 못한 메시지를 따로 모아 두는 큐나 토픽이에요.
+    analogy: 공항에서 걸린 가방을 옮겨 두는 보관소와 같아요.
+    doc: messaging/failed-messages
