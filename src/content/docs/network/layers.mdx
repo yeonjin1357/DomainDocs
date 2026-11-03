@@ -119,20 +119,21 @@ L1부터 L7까지의 번호는 <Term term="network/osi-model">OSI 모델</Term>�
 
 옵션 없는 IPv4 머리가 20바이트, TCP 머리가 20바이트예요. 그래서 앱 데이터는 패킷 하나에 1,460바이트까지 실어요. 이 크기를 MSS(Maximum Segment Size)라고 하고, 큰 응답은 이 크기로 잘려 나눠 가요.
 
-<Figure caption="MTU 1,500바이트짜리 IP 패킷 하나예요. 머리표 40바이트를 빼고 앱 데이터는 1,460바이트까지 실어요.">
-  <Strip
-    ariaLabel="IP 패킷 1,500바이트 안에 IPv4 머리 20바이트, TCP 머리 20바이트, 앱 데이터 1,460바이트가 들어 있는 칸 띠"
+<Figure caption="MTU 1,500바이트짜리 IP 패킷 하나를 크기대로 그렸어요. 머리표 40바이트는 왼쪽 끝의 가는 두 칸이고, 앱 데이터는 1,460바이트까지 실어요.">
+  <Parts
+    ariaLabel="1,500바이트 IP 패킷을 크기대로 나눈 비율 막대. IPv4 머리 20바이트와 TCP 머리 20바이트는 아주 가늘고, 앱 데이터 1,460바이트(MSS)가 거의 다 차지해요"
     rows={[
       {
-        label: 'IP 패킷 하나(MTU)',
-        heads: ['20B', '20B', '1,460B'],
-        cells: [{ label: 'IP', tone: 'sub' }, { label: 'TCP', tone: 'sub' }, { label: '앱 데이터', tone: 'accent' }],
+        label: 'IP 패킷 하나',
+        total: 'MTU 1,500바이트',
+        segments: [
+          { label: 'IP 머리', value: 20, display: '20B', tone: 'warn' },
+          { label: 'TCP 머리', value: 20, display: '20B', tone: 'sub' },
+          { label: '앱 데이터', value: 1460, display: '1,460B', tone: 'accent' },
+        ],
       },
     ]}
-    ranges={[
-      { from: 2, to: 2, label: 'MSS', tone: 'accent' },
-      { from: 0, to: 2, label: 'MTU 1,500바이트' },
-    ]}
+    ranges={[{ from: 40, to: 1500, label: 'MSS 1,460바이트', tone: 'accent' }]}
   />
 </Figure>
 

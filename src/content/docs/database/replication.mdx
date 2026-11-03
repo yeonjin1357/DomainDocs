@@ -89,13 +89,27 @@ updated: 2026-10-30
 
 복제에서 가장 중요한 선택은 커밋을 언제 끝내느냐예요. PostgreSQL과 MySQL의 복제는 기본이 비동기예요.
 
-<Figure caption="동기는 잃지 않는 대신 커밋이 느려지고, 비동기는 빠른 대신 주 서버가 죽으면 최근 커밋을 잃을 수 있어요.">
-  <Compare
-    columns={['동기 복제', '비동기 복제']}
-    rows={[
-      { label: '커밋 응답', values: ['복제 서버가 로그를 디스크에 적었다고 하면', '주 서버가 적으면 바로'] },
-      { label: '커밋 속도', values: ['복제 서버를 다녀오는 만큼 느려요', '빨라요'] },
-      { label: '주 서버가 죽으면', values: ['커밋한 데이터가 복제 서버에 있어요', '최근 커밋이 사라질 수 있어요'] },
+<Figure caption="동기 복제예요. 주 서버는 복제 서버가 로그를 디스크에 적었다는 답을 받은 뒤에야 커밋 완료를 돌려줘요. 잃지 않는 대신, 복제 서버를 다녀오는 만큼 커밋이 느려요.">
+  <Sequence
+    ariaLabel="동기 복제의 순서. 앱이 주 서버에 COMMIT을 보내면 주 서버가 복제 서버에 로그를 보내고, 복제 서버가 디스크에 적었다고 답한 뒤에야 주 서버가 앱에 커밋 완료를 돌려줘요"
+    participants={['앱', '주 서버', '복제 서버']}
+    messages={[
+      { from: '앱', to: '주 서버', label: 'COMMIT' },
+      { from: '주 서버', to: '복제 서버', label: '로그' },
+      { from: '복제 서버', to: '주 서버', label: '적었어요', dashed: true },
+      { from: '주 서버', to: '앱', label: '커밋 완료', dashed: true, tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+<Figure caption="비동기 복제예요. 주 서버는 자기만 적으면 바로 커밋 완료를 돌려주고, 로그는 뒤따라 보내요. 빠르지만, 로그를 보내기 전에 주 서버가 죽으면 이 커밋은 복제 서버에 없어요.">
+  <Sequence
+    ariaLabel="비동기 복제의 순서. 앱이 주 서버에 COMMIT을 보내면 주 서버가 바로 커밋 완료를 돌려주고, 복제 서버에는 로그를 뒤따라 보내요"
+    participants={['앱', '주 서버', '복제 서버']}
+    messages={[
+      { from: '앱', to: '주 서버', label: 'COMMIT' },
+      { from: '주 서버', to: '앱', label: '커밋 완료', dashed: true, tone: 'accent' },
+      { from: '주 서버', to: '복제 서버', label: '로그(뒤따라)', tone: 'warn' },
     ]}
   />
 </Figure>

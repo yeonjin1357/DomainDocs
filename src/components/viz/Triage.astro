@@ -5,21 +5,23 @@ interface Props {
   /** 위에서부터 차례로 볼 단계 */
   steps: TriageStep[];
   ariaLabel: string;
+  /** false면 번호 대신 점으로 그린다(상태가 바뀌는 고리, 커널이 하는 일처럼 '점검'이 아닌 흐름) */
+  numbered?: boolean;
 }
 
-const { steps, ariaLabel } = Astro.props;
-const layout = layoutTriage(steps);
+const { steps, ariaLabel, numbered = true } = Astro.props;
+const layout = layoutTriage(steps, numbered);
 ---
 <ol class="triage" data-triage aria-label={ariaLabel}>
   {
     layout.steps.map((s) => (
       <li class={`triage-step${s.next !== null ? ' has-next' : ''}`}>
-        <span class={`triage-badge tone-${s.tone ?? 'plain'}`} aria-hidden="true">
-          {s.number}
+        <span class={`triage-badge tone-${s.tone ?? 'plain'}${numbered ? '' : ' is-dot'}`} aria-hidden="true">
+          {numbered ? s.number : ''}
         </span>
         <div class="triage-body">
           <p class="triage-head">
-            <span class="visually-hidden">{s.number}단계 </span>
+            {numbered && <span class="visually-hidden">{s.number}단계 </span>}
             <span class="triage-label">{s.label}</span>
             {s.when && <span class="triage-when">{s.when}</span>}
           </p>
@@ -95,6 +97,14 @@ const layout = layoutTriage(steps);
     font-size: 13px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+  }
+
+  /* 번호 없는 흐름: 작은 점을 번호 자리 가운데에 둔다 */
+  .triage-badge.is-dot {
+    width: 14px;
+    height: 14px;
+    margin: 6px;
+    border: 2px solid var(--color-text-weak);
   }
 
   .triage-badge.tone-warn {

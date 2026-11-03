@@ -37,17 +37,13 @@ updated: 2026-10-28
   <Item title="디스크의 영역">노드와 같은 영역에 있는지 봐요.</Item>
 </FirstLook>
 
-<Figure caption="볼륨이 파드에 붙는 세 단계예요. 단계마다 남는 흔적이 달라서, 이벤트의 이유로 어디서 멈췄는지 알 수 있어요.">
-  <Flow
-    ariaLabel="PVC가 PV에 묶이고, 디스크가 노드에 붙고, 노드가 디스크를 파드에 연결하는 세 단계"
-    nodes={[
-      { id: 'bind', label: '1. 묶기', col: 0, row: 0, note: 'PVC ↔ PV' },
-      { id: 'attach', label: '2. 붙이기', col: 1, row: 0, note: '디스크 ↔ 노드' },
-      { id: 'mount', label: '3. 연결', col: 2, row: 0, note: '노드 ↔ 파드' },
-    ]}
-    edges={[
-      { from: 'bind', to: 'attach' },
-      { from: 'attach', to: 'mount' },
+<Figure caption="볼륨이 파드에 붙는 세 단계예요. 단계마다 멈췄을 때 남는 흔적이 달라서, 이벤트로 어디서 멈췄는지 알 수 있어요.">
+  <Triage
+    ariaLabel="1단계 PVC를 PV에 묶고, 2단계 디스크를 노드에 붙이고, 3단계 노드가 디스크를 파드에 연결하는 순서. 1단계에서 멈추면 PVC가 Pending, 2단계는 FailedAttachVolume, 3단계는 FailedMount 이벤트가 남아요"
+    steps={[
+      { label: '묶기', note: 'PVC ↔ PV', exits: [{ when: '여기서 멈추면', to: 'PVC가 Pending', tone: 'warn' }] },
+      { label: '붙이기', note: '디스크 ↔ 노드', exits: [{ when: '여기서 멈추면', to: 'FailedAttachVolume', tone: 'warn' }] },
+      { label: '연결', note: '노드 ↔ 파드', tone: 'accent', exits: [{ when: '여기서 멈추면', to: 'FailedMount', tone: 'warn' }] },
     ]}
   />
 </Figure>

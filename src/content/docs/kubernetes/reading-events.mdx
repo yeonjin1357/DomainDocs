@@ -93,15 +93,17 @@ BackOff라는 이유는 두 곳에서 함께 써요. 메시지에 `restarting fa
 
 이벤트는 오래 남지 않아요. API 서버의 `--event-ttl` 기본값은 1시간이라, 1시간이 지난 이벤트는 지워져요. 그래서 새벽 장애의 이벤트를 아침에 찾으면 이미 없어요.
 
-<Figure caption="새벽 2시 장애의 이벤트는 3시쯤 지워져요. 아침 9시에 kubectl로 찾으면 남은 게 없고, 따로 모아 둔 곳에서만 찾을 수 있어요.">
-  <Waterfall
-    ariaLabel="새벽 2시에 이벤트가 생기고 3시에 지워지며, 아침 9시에 확인할 때는 따로 모아 둔 기록만 남아 있는 타임라인"
-    unit="시간"
-    spans={[
-      { label: '이벤트가 클러스터에 남는 시간', start: 2, duration: 1, tone: 'warn' },
-      { label: '따로 모아 둔 기록', start: 2, duration: 7, tone: 'accent' },
-      { label: '아침 9시에 확인', start: 9, duration: 0.2 },
+<Figure caption="새벽 2시 장애의 이벤트는 클러스터에 1시간만 남아 3시쯤 지워져요. 아침 9시에 kubectl로 찾으면 남은 게 없고, 따로 모아 둔 곳에서만 찾을 수 있어요.">
+  <Timeline
+    ariaLabel="새벽 2시에 장애가 나서 이벤트가 생기고, 클러스터의 이벤트는 1시간 뒤인 3시에 지워지며, 따로 모아 둔 기록은 계속 남아 있어서 아침 9시에 확인할 때는 모아 둔 기록에서만 찾을 수 있는 시간 띠"
+    start={1}
+    end={10}
+    lanes={[
+      { label: '클러스터', segments: [{ start: 2, end: 3, tone: 'warn' }] },
+      { label: '모아 둔 곳', segments: [{ start: 2, end: 10, label: '남아 있어요', tone: 'accent' }] },
     ]}
+    marks={[{ at: 2, label: '장애', tone: 'warn' }, { at: 9, label: '확인', tone: 'accent' }]}
+    ticks={[{ at: 2, label: '2시' }, { at: 6, label: '6시' }, { at: 9, label: '9시' }]}
   />
 </Figure>
 

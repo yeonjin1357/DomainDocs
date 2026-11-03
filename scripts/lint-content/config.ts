@@ -60,5 +60,6 @@ export const LINT_CONFIG = {
     'Nest',
     'Anatomy',
     'Bars',
+    'Parts',
   ],
 } as const;

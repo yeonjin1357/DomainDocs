@@ -44,22 +44,25 @@ updated: 2026-10-30
 
 ## 세 가지 저장소
 
-<Figure caption="세 저장소는 붙는 곳과 쓰는 방법이 달라요. 서버 안에서 보면 블록은 디스크, 파일은 공유 폴더, 오브젝트는 HTTP 주소로 보여요.">
+<Figure caption="세 저장소는 붙는 곳과 쓰는 방법이 달라요. 블록은 서버 한 대의 디스크, 파일은 여러 서버가 함께 붙이는 공유 폴더, 오브젝트는 어디서나 HTTP로 넣고 꺼내는 곳이에요.">
   <Flow
-    ariaLabel="서버에 블록 디스크가 붙어 있고, 서버 두 대가 같은 공유 파일 저장소를 붙이며, 서버가 HTTP로 오브젝트 저장소에 파일을 넣고 꺼내는 구조도"
+    ariaLabel="세로 세 줄로 견준 구조도. 블록 디스크에는 서버 한 대만 붙고, 파일 저장소에는 서버 두 대가 함께 붙으며, 오브젝트 저장소에는 서버와 바깥 앱이 HTTP로 넣고 꺼내요"
     nodes={[
-      { id: 'blk', label: '블록 디스크', col: 0, row: 0, note: '서버 한 대에' },
-      { id: 's1', label: '서버 1', col: 0, row: 1, tone: 'accent' },
-      { id: 's2', label: '서버 2', col: 2, row: 1, tone: 'accent' },
-      { id: 'file', label: '파일 저장소', col: 1, row: 0, note: '함께 붙여요' },
-      { id: 'obj', label: '오브젝트', col: 1, row: 2, note: 'HTTP로' },
+      { id: 'b1', label: '서버', col: 0, row: 0 },
+      { id: 'blk', label: '블록 디스크', col: 0, row: 1, note: '서버 한 대에', tone: 'accent' },
+      { id: 'f1', label: '서버', col: 1, row: 0 },
+      { id: 'file', label: '파일 저장소', col: 1, row: 1, note: '여럿이 함께', tone: 'accent' },
+      { id: 'f2', label: '서버', col: 1, row: 2 },
+      { id: 'o1', label: '서버', col: 2, row: 0 },
+      { id: 'obj', label: '오브젝트', col: 2, row: 1, note: 'HTTP로', tone: 'accent' },
+      { id: 'o2', label: '바깥 앱', col: 2, row: 2, note: '어디서나' },
     ]}
     edges={[
-      { from: 's1', to: 'blk', both: true },
-      { from: 's1', to: 'file', both: true },
-      { from: 's2', to: 'file', both: true },
-      { from: 's1', to: 'obj', dashed: true },
-      { from: 's2', to: 'obj', dashed: true },
+      { from: 'b1', to: 'blk', both: true },
+      { from: 'f1', to: 'file', both: true },
+      { from: 'f2', to: 'file', both: true },
+      { from: 'o1', to: 'obj', dashed: true },
+      { from: 'o2', to: 'obj', dashed: true },
     ]}
   />
 </Figure>

@@ -30,6 +30,21 @@ describe('layoutTriage', () => {
     expect(layout.steps[2].when).toBe('연결 거부일 때');
   });
 
+  it('번호 없이 그리면 다른 단계를 가리키는 길을 그 단계 이름으로 쓴다', () => {
+    const layout = layoutTriage(
+      [
+        { label: '닫힘', next: '실패율 초과' },
+        { label: '열림', next: '기다린 뒤' },
+        { label: '반열림', exits: [{ when: '성공', to: 1 }, { when: '실패', to: 2 }] },
+      ],
+      false,
+    );
+    expect(layout.steps[2].exits.map((e) => [e.to, e.toStep])).toEqual([
+      ['닫힘', 1],
+      ['열림', 2],
+    ]);
+  });
+
   it('없는 단계나 자기 단계를 가리키면 빌드를 멈춘다', () => {
     expect(() => layoutTriage([{ label: 'a', exits: [{ when: 'x', to: 3 }] }, { label: 'b' }])).toThrow(/없는 단계\(3\)/);
     expect(() => layoutTriage([{ label: 'a', exits: [{ when: 'x', to: 1 }] }, { label: 'b' }])).toThrow(/자기 단계/);

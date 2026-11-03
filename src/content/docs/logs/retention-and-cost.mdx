@@ -62,15 +62,26 @@ CloudWatch Logs는 보관 기간이 지나도 바로 지우지 않아요. 문서
 
 ## 단계별로 옮겨요
 
-<Figure caption="Elasticsearch의 인덱스 수명 주기 단계예요. 아래로 갈수록 덜 보고, 더 싼 곳에 둬요.">
-  <Layers
-    ariaLabel="위에서부터 hot, warm, cold, frozen, delete 단계가 쌓인 계층도"
-    layers={[
-      { label: 'hot', note: '계속 쓰고 자주 찾아요', tone: 'accent' },
-      { label: 'warm', note: '거의 안 쓰지만 아직 찾아요' },
-      { label: 'cold', note: '거의 안 쓰고 가끔 찾아요' },
-      { label: 'frozen', note: '쓰지 않고 아주 드물게 찾아요' },
-      { label: 'delete', note: '필요 없어 지워요' },
+<Figure caption="Elasticsearch의 인덱스 수명 주기 단계예요. 위 작은 글자는 얼마나 자주 찾는지예요. 오른쪽으로 갈수록 덜 찾고, 더 싼 곳에 둬요.">
+  <Strip
+    ariaLabel="인덱스가 시간이 지나며 hot, warm, cold, frozen을 거쳐 delete로 옮겨 가는 칸 띠. 왼쪽일수록 자주 찾아 진하고, 오른쪽으로 갈수록 덜 찾고 더 싼 곳에 둬요"
+    rows={[
+      {
+        label: '인덱스 하나의 일생(왼쪽이 새것)',
+        heads: ['자주', '아직', '가끔', '드물게', ''],
+        cells: [
+          { label: 'hot', heat: 1 },
+          { label: 'warm', heat: 0.6 },
+          { label: 'cold', heat: 0.3 },
+          { label: 'frozen', heat: 0.12 },
+          { label: 'delete', tone: 'sub' },
+        ],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 0, label: '계속 써요', tone: 'accent' },
+      { from: 1, to: 3, label: '쓰지 않고 찾기만 해요' },
+      { from: 4, to: 4, label: '지워요', tone: 'warn' },
     ]}
   />
 </Figure>

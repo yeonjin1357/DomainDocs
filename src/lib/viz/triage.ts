@@ -43,8 +43,9 @@ export const TRIAGE_MAX_STEPS = 8;
 /**
  * 단계에 번호(1부터)를 매기고, 다른 단계로 가는 길을 '3단계'처럼 바꾼다.
  * 없는 단계나 자기 자신을 가리키면 글을 고치도록 빌드를 멈춘다.
+ * numbered가 false면 상태도처럼 번호 없이 그린다. 이때 다른 단계를 가리키는 길은 '3단계' 대신 그 단계 이름으로 쓴다.
  */
-export function layoutTriage(steps: readonly TriageStep[]): TriageLayout {
+export function layoutTriage(steps: readonly TriageStep[], numbered = true): TriageLayout {
   if (steps.length < 2) throw new Error('Triage: 단계가 둘 이상이어야 해요');
   if (steps.length > TRIAGE_MAX_STEPS) throw new Error(`Triage: 단계가 ${steps.length}개예요. ${TRIAGE_MAX_STEPS}개까지만 그려요`);
   return {
@@ -63,7 +64,7 @@ export function layoutTriage(steps: readonly TriageStep[]): TriageLayout {
           if (typeof e.to === 'number') {
             if (!Number.isInteger(e.to) || e.to < 1 || e.to > steps.length) throw new Error(`Triage: '${s.label}'의 길 '${e.when}'이 없는 단계(${e.to})를 가리켜요`);
             if (e.to === number) throw new Error(`Triage: '${s.label}'의 길 '${e.when}'이 자기 단계를 가리켜요`);
-            return { when: e.when, to: `${e.to}단계`, toStep: e.to, note: e.note, tone: e.tone };
+            return { when: e.when, to: numbered ? `${e.to}단계` : steps[e.to - 1].label, toStep: e.to, note: e.note, tone: e.tone };
           }
           return { when: e.when, to: e.to, note: e.note, tone: e.tone };
         }),

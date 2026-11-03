@@ -141,6 +141,14 @@ import Sample from '../../figures/sample.svg';
   />
 </Figure>
 
+<Figure caption="에러가 전체의 4분의 1이에요.">
+  <Parts
+    ariaLabel="에러 1과 정상 3으로 나눈 비율 막대"
+    rows={[{ label: '요청', total: '4건', segments: [{ label: '에러', value: 1, tone: 'warn' }, { label: '정상', value: 3 }] }]}
+    ranges={[{ from: 1, to: 4, label: '정상 3건', tone: 'accent' }]}
+  />
+</Figure>
+
 <Figure caption="직접 그린 SVG 그림이에요.">
   <Sample aria-label="테스트용 SVG 그림" />
 </Figure>

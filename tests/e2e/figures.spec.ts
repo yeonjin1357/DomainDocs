@@ -133,6 +133,17 @@ test('막대는 값에 비례한 길이로 그린다', async ({ page }) => {
   expect(Math.abs(short!.width * 4 - long!.width)).toBeLessThan(2);
 });
 
+test('비율 막대는 칸 폭을 값의 비율로 나누고, 괄호를 값 위치에 맞춘다', async ({ page }) => {
+  const parts = page.getByRole('img', { name: '에러 1과 정상 3으로 나눈 비율 막대' });
+  await expect(parts.locator('.parts-legend-label')).toHaveText(['에러', '정상']);
+  const bar = await parts.locator('.parts-bar').boundingBox();
+  const err = await parts.locator('.parts-seg').nth(0).boundingBox();
+  const ok = await parts.locator('.parts-seg').nth(1).boundingBox();
+  expect(Math.abs(ok!.width - err!.width * 3)).toBeLessThan(4);
+  const range = await parts.locator('.parts-range').boundingBox();
+  expect(Math.abs(range!.x - (bar!.x + bar!.width * 0.25))).toBeLessThan(2);
+});
+
 test('SVG 그림은 이름 붙은 그림이다', async ({ page }) => {
   await expect(page.getByRole('img', { name: '테스트용 SVG 그림' })).toBeVisible();
 });

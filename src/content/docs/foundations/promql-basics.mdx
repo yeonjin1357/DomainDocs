@@ -49,19 +49,16 @@ updated: 2026-10-30
 
 ## 질의 하나를 뜯어 보면
 
-<Figure caption="KeyPoints의 질의를 안쪽부터 한 단계씩 풀었어요. 단계마다 시계열 수와 값의 뜻이 바뀌어요.">
-  <Flow
-    ariaLabel="시계열 고르기, 5분 구간 잡기, rate로 초당 증가량 계산, sum by job으로 서비스마다 더하기 순서의 구조도"
-    nodes={[
-      { id: 'sel', label: '고르기', col: 0, row: 0, note: '5xx 시계열 3개' },
-      { id: 'range', label: '[5m] 구간', col: 1, row: 0, note: '5분 치 값들' },
-      { id: 'rate', label: 'rate', col: 2, row: 0, note: '초당 증가량' },
-      { id: 'sum', label: 'sum by (job)', col: 2, row: 1, note: '서비스마다 1개', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'sel', to: 'range' },
-      { from: 'range', to: 'rate' },
-      { from: 'rate', to: 'sum', tone: 'accent' },
+<Figure caption="KeyPoints의 질의를 안쪽부터 한 단계씩 쌓았어요. 바깥 함수가 안쪽 결과를 감싸며, 단계마다 시계열 수와 값의 뜻이 바뀌어요.">
+  <Stages
+    ariaLabel="질의를 안쪽부터 쌓는 계단. 먼저 지표에 5xx 조건을 걸어 시계열 3개를 고르고, [5m]으로 5분 치 값을 잡고, rate로 감싸 초당 증가량 3개를 만들고, 마지막에 sum by (job)으로 감싸 서비스마다 하나씩 2개로 줄여요"
+    hint={['안쪽부터 ↓', '바깥 함수가 감싸요']}
+    grow={2}
+    rows={[
+      { label: '고르기', note: '{status=~"5.."}', end: '시계열 3개', cells: [null, null, { label: '지표{…}', tone: 'accent' }, null] },
+      { label: '구간 잡기', note: '+ [5m]', end: '5분 치 값들', cells: [null, null, '지표{…}', { label: '[5m]', tone: 'accent' }] },
+      { label: '초당 증가량', note: '+ rate', end: '시계열 3개', cells: [null, { label: 'rate', tone: 'accent' }, '지표{…}', '[5m]'] },
+      { label: '서비스마다 더하기', note: '+ sum by (job)', end: '시계열 2개', cells: [{ label: 'sum by (job)', tone: 'accent' }, 'rate', '지표{…}', '[5m]'] },
     ]}
   />
 </Figure>

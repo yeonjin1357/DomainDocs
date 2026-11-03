@@ -67,19 +67,14 @@ Amazon은 받아들일 헛 타임아웃 비율(예: 0.1%)을 먼저 정해요. �
 
 재시도는 잠깐의 실패를 덮어 주지만, 실패한 만큼 요청을 더 보내요. 계층마다 따로 재시도하면 그 수가 곱해져요. 그림처럼 세 계층이 3번씩 다시 시도하면(4번 시도) 4 × 4 × 4 = 64번이에요.
 
-<Figure caption="브라우저, 프런트 서버, 백엔드가 저마다 처음 1번에 다시 시도 3번, 모두 4번까지 보내요. 화살표를 하나 지날 때마다 4배가 돼서, 사용자 동작 한 번이 DB에서는 64번이에요.">
-  <Flow
-    ariaLabel="사용자 동작 1번이 브라우저에서 프런트 서버로 4번, 프런트 서버에서 백엔드로 16번, 백엔드에서 DB로 64번이 되어, 화살표마다 4배씩 늘어나는 구조도"
-    nodes={[
-      { id: 'browser', label: '브라우저', col: 0, row: 0, note: '동작 1번' },
-      { id: 'front', label: '프런트 서버', col: 2, row: 0, note: '4번 받음' },
-      { id: 'back', label: '백엔드', col: 2, row: 1, note: '16번 받음' },
-      { id: 'db', label: 'DB', col: 0, row: 1, note: '64번 받음', tone: 'warn' },
-    ]}
-    edges={[
-      { from: 'browser', to: 'front', label: '×4' },
-      { from: 'front', to: 'back', label: '×4' },
-      { from: 'back', to: 'db', label: '×4', tone: 'warn' },
+<Figure caption="브라우저, 프런트 서버, 백엔드가 저마다 처음 1번에 다시 시도 3번, 모두 4번까지 보내요. 계층을 하나 지날 때마다 4배가 돼서, 사용자 동작 한 번이 DB에서는 64번이에요.">
+  <Bars
+    ariaLabel="사용자 동작 1번이 계층을 하나 지날 때마다 4배가 되어, 프런트 서버 4번, 백엔드 16번, DB 64번을 받는 막대"
+    bars={[
+      { label: '브라우저: 사용자 동작', value: 1, display: '1번' },
+      { label: '프런트 서버가 받음', value: 4, display: '4번', note: '×4' },
+      { label: '백엔드가 받음', value: 16, display: '16번', note: '×4' },
+      { label: 'DB가 받음', value: 64, display: '64번', note: '×4', tone: 'warn' },
     ]}
   />
 </Figure>

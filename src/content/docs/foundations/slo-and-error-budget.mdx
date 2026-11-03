@@ -63,21 +63,20 @@ import SloBudgetDemo from '../../../components/demos/SloBudgetDemo.tsx';
 
 SLI(service level indicator, 서비스 수준 지표)는 사용자가 겪는 서비스 품질을 잰 숫자예요. Google SRE Workbook은 SLI를 '좋은 이벤트 수 ÷ 전체 이벤트 수'로 두라고 권해요. 예를 들면 '300ms 안에 성공한 요청 ÷ 전체 요청'이에요.
 
-<Figure caption="전체 요청을 좋은 요청과 나머지로 나눠요. SLI는 좋은 요청 수를 전체 요청 수로 나눈 비율이에요.">
-  <Flow
-    ariaLabel="전체 요청이 300ms 안에 성공한 좋은 요청과, 느리거나 실패한 나머지로 갈리고, 좋은 요청 수와 전체 요청 수로 SLI를 구하는 구조도"
-    nodes={[
-      { id: 'all', label: '전체 요청', col: 1, row: 0 },
-      { id: 'good', label: '좋은 요청', col: 0, row: 1, note: '300ms 안 성공', tone: 'accent' },
-      { id: 'rest', label: '나머지', col: 2, row: 1, note: '느리거나 실패' },
-      { id: 'sli', label: 'SLI', col: 1, row: 2, note: '좋은 ÷ 전체', tone: 'accent' },
+<Figure caption="전체 요청을 좋은 요청과 나머지로 나눠요. SLI는 좋은 요청 수를 전체 요청 수로 나눈 비율이에요. 1,000건 중 990건이 좋은 요청이면 99%예요.">
+  <Parts
+    ariaLabel="요청 1,000건을 300ms 안에 성공한 좋은 요청 990건과 느리거나 실패한 나머지 10건으로 나눈 비율 막대. SLI는 990 나누기 1,000으로 99%예요"
+    rows={[
+      {
+        label: '전체 요청 1,000건(예시)',
+        total: 'SLI 99%',
+        segments: [
+          { label: '좋은 요청', value: 990, display: '990건 · 300ms 안 성공', tone: 'accent' },
+          { label: '나머지', value: 10, display: '10건 · 느리거나 실패', tone: 'warn' },
+        ],
+      },
     ]}
-    edges={[
-      { from: 'all', to: 'good' },
-      { from: 'all', to: 'rest' },
-      { from: 'good', to: 'sli', tone: 'accent' },
-      { from: 'all', to: 'sli' },
-    ]}
+    ranges={[{ from: 0, to: 990, label: 'SLI = 990 ÷ 1,000 = 99%', tone: 'accent' }]}
   />
 </Figure>
 

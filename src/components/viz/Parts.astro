@@ -1,0 +1,236 @@
+---
+import { layoutParts, type PartRange, type PartRow } from '../../lib/viz/parts';
+
+interface Props {
+  /** 위에서부터 그릴 줄. 줄마다 칸 값의 비율대로 막대 하나를 나눈다 */
+  rows: PartRow[];
+  ariaLabel: string;
+  /** 막대 아래 괄호(값 단위) */
+  ranges?: PartRange[];
+  /** display가 없는 칸의 값 뒤에 붙일 단위 */
+  unit?: string;
+}
+
+const { rows, ariaLabel, ranges, unit } = Astro.props;
+const layout = layoutParts(rows, ranges, unit);
+---
+<div class="parts" data-parts role="img" aria-label={ariaLabel}>
+  {
+    layout.rows.map((r) => (
+      <div class="parts-row">
+        {(r.label || r.total) && (
+          <div class="parts-head">
+            {r.label && <span class="parts-label">{r.label}</span>}
+            {r.total && <span class="parts-total">{r.total}</span>}
+          </div>
+        )}
+        <div class="parts-bar">
+          {r.segments.map((s) => (
+            <span class={`parts-seg tone-${s.tone}`} style={`flex-basis:${s.percent}%`}>
+              {s.inside && <span class="parts-seg-text">{s.label}</span>}
+            </span>
+          ))}
+        </div>
+        {r.ranges.length > 0 && (
+          <div class="parts-ranges">
+            {r.ranges.map((g) => (
+              <span class={`parts-range tone-${g.tone} align-${g.align}`} style={`left:${g.left}%;width:${g.width}%`}>
+                <span class="parts-range-bracket" />
+                <span class="parts-range-text">{g.label}</span>
+              </span>
+            ))}
+          </div>
+        )}
+        <ul class="parts-legend">
+          {r.segments.map((s) => (
+            <li>
+              <span class={`parts-chip tone-${s.tone}`} />
+              <span class="parts-legend-label">{s.label}</span>
+              <span class="parts-legend-value">{s.display}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .parts {
+    display: grid;
+    gap: 20px;
+  }
+
+  .parts-row {
+    display: grid;
+    gap: 6px;
+  }
+
+  .parts-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 12px;
+  }
+
+  .parts-label {
+    font-size: 13px;
+    color: var(--color-text-sub);
+  }
+
+  .parts-total {
+    margin-left: auto;
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 칸 폭이 값의 비율이다. 아무리 작아도 3px은 보이게 한다 */
+  .parts-bar {
+    display: flex;
+    gap: 2px;
+    height: 34px;
+  }
+
+  .parts-seg {
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 1;
+    align-items: center;
+    justify-content: center;
+    min-width: 3px;
+    overflow: hidden;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .parts-seg.tone-accent {
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  .parts-seg.tone-weak {
+    border: 1.5px solid var(--color-accent);
+    background: var(--color-accent-weak);
+    color: var(--color-accent);
+  }
+
+  .parts-seg.tone-warn {
+    background: var(--color-warn);
+    color: #fff;
+  }
+
+  .parts-seg.tone-sub {
+    background: var(--color-text-weak);
+    color: #fff;
+  }
+
+  .parts-seg.tone-plain {
+    border: 1.5px solid var(--color-line);
+    background: var(--color-card);
+    color: var(--color-text-sub);
+  }
+
+  .parts-ranges {
+    position: relative;
+    height: 30px;
+  }
+
+  .parts-range {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--color-text-sub);
+  }
+
+  .parts-range.tone-accent {
+    color: var(--color-accent);
+  }
+
+  .parts-range.tone-warn {
+    color: var(--color-warn);
+  }
+
+  .parts-range-bracket {
+    align-self: stretch;
+    height: 7px;
+    border: 1.5px solid currentColor;
+    border-top: 0;
+    border-radius: 0 0 4px 4px;
+  }
+
+  /* 괄호보다 긴 글자는 넘쳐도 되되, 끝에 붙은 괄호는 그림 밖으로 나가지 않게 안쪽으로 붙인다 */
+  .parts-range-text {
+    margin-top: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .parts-range.align-start {
+    align-items: flex-start;
+  }
+
+  .parts-range.align-end {
+    align-items: flex-end;
+  }
+
+  .parts-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+  }
+
+  .parts-legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .parts-chip {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  .parts-chip.tone-accent {
+    background: var(--color-accent);
+  }
+
+  .parts-chip.tone-weak {
+    border: 1.5px solid var(--color-accent);
+    background: var(--color-accent-weak);
+  }
+
+  .parts-chip.tone-warn {
+    background: var(--color-warn);
+  }
+
+  .parts-chip.tone-sub {
+    background: var(--color-text-weak);
+  }
+
+  .parts-chip.tone-plain {
+    border: 1.5px solid var(--color-line);
+    background: var(--color-card);
+  }
+
+  .parts-legend-label {
+    color: var(--color-text-sub);
+  }
+
+  .parts-legend-value {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

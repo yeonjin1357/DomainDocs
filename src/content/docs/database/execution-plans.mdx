@@ -51,18 +51,18 @@ updated: 2026-10-29
 
 그 위 노드는 아래에서 올라온 행을 합치거나(Join) 정렬해요.
 
-<Figure caption="낡은 통계로 고른 계획이에요. 아래 노드가 위 노드로 행을 올려 줘요. 바깥 Seq Scan은 8행을 예상했지만 12,000행을 올렸고, 안쪽 Index Scan은 그 행마다 한 번씩 12,000번 돌았어요.">
-  <Flow
-    ariaLabel="맨 위 Nested Loop 아래에 바깥 Seq Scan과 안쪽 Index Scan이 있고, 바깥은 8행 예상에 12,000행을 올리며, 안쪽은 12,000번 반복하는 실행 계획 나무"
-    nodes={[
-      { id: 'nl', label: 'Nested Loop', col: 1, row: 0, tone: 'warn' },
-      { id: 'outer', label: 'Seq Scan', col: 0, row: 1, note: 'VIP 고객 · 예상 8' },
-      { id: 'inner', label: 'Index Scan', col: 2, row: 1, note: '주문' },
-    ]}
-    edges={[
-      { from: 'outer', to: 'nl', label: '실제 12,000행', tone: 'warn' },
-      { from: 'inner', to: 'nl', label: 'loops 12,000', tone: 'warn' },
-    ]}
+<Figure caption="낡은 통계로 고른 계획이에요. EXPLAIN 출력처럼 아래 노드가 위 노드로 행을 올려 줘요. 바깥 Seq Scan은 8행을 예상했지만 12,000행을 올렸고, 안쪽 Index Scan은 그 행마다 한 번씩 12,000번 돌았어요.">
+  <Tree
+    ariaLabel="맨 위 Nested Loop 아래에 바깥 Seq Scan과 안쪽 Index Scan이 있는 실행 계획 나무. 바깥은 8행을 예상했지만 12,000행을 올렸고, 안쪽은 그 행마다 한 번씩 12,000번 돌았어요"
+    root={{
+      label: 'Nested Loop',
+      note: '두 쪽 행을 짝지어요',
+      tone: 'warn',
+      children: [
+        { label: 'Seq Scan', note: 'VIP 고객 · 바깥', tag: '예상 8 · 실제 12,000행', tone: 'warn' },
+        { label: 'Index Scan', note: '주문 · 안쪽', tag: 'loops 12,000', tone: 'warn' },
+      ],
+    }}
   />
 </Figure>
 
