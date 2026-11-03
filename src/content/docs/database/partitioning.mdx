@@ -99,8 +99,13 @@ create table events_2026_03
 ## 오래된 데이터는 칸째 지워요
 
 <Figure caption="같은 데이터를 나누지 않은 표와 나눈 표에 넣고, 1월 데이터 약 10만 행을 지운 시간이에요.">
-  <StatTile label="DELETE로 지우기" value="135" unit="ms" tone="warn" note="죽은 행 10만 개 남음" />
-  <StatTile label="1월 칸 DROP" value="6" unit="ms" note="뒷정리 없음" />
+  <Bars
+    ariaLabel="DELETE로 지우기 135ms, 1월 칸 DROP 6ms를 막대 길이로 견준 그림"
+    bars={[
+      { label: 'DELETE로 지우기', value: 135, display: '135ms', note: '죽은 행 10만 개 남음', tone: 'warn' },
+      { label: '1월 칸 DROP', value: 6, display: '6ms', note: '뒷정리 없음' },
+    ]}
+  />
 </Figure>
 
 DELETE는 행을 하나씩 지우고, 지운 행은 VACUUM이 치울 때까지 자리를 차지해요. 칸을 `DROP TABLE`로 지우거나 `DETACH PARTITION`으로 떼면 이 뒷정리가 없어요. PostgreSQL 문서도 이 방법이 대량 DELETE보다 훨씬 빠르다고 해요.

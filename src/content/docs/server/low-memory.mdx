@@ -50,8 +50,14 @@ updated: 2026-10-29
 리눅스는 남는 메모리를 파일 캐시로 써서, free는 늘 작게 보여요. 사용률을 전체에서 free를 빼서 계산하면 캐시까지 사용으로 잡혀요. 진짜 여유는 <Term term="server/available-memory">available</Term>로 봐요.
 
 <Figure caption="같은 서버를 두 방식으로 계산했어요. free 기준으로는 97%이지만, available 기준으로는 38%예요. 캐시는 앱이 원하면 비워 줘요.">
-  <StatTile label="(전체 − free) 기준" value="97" unit="%" tone="warn" />
-  <StatTile label="(전체 − available) 기준" value="38" unit="%" tone="accent" />
+  <Bars
+    ariaLabel="(전체 − free) 기준 97%, (전체 − available) 기준 38%를 막대 길이로 견준 그림"
+    max={100}
+    bars={[
+      { label: '(전체 − free) 기준', value: 97, display: '97%', tone: 'warn' },
+      { label: '(전체 − available) 기준', value: 38, display: '38%', tone: 'accent' },
+    ]}
+  />
 </Figure>
 
 available이 넉넉하다면 지금 메모리 부족은 아니에요. 알림 기준이 free로 계산된 건 아닌지 먼저 고쳐요. 숫자 읽는 법은 <Term slug="server/memory">메모리</Term>에 있어요.

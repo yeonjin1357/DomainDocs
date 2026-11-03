@@ -116,8 +116,13 @@ key=value를 공백으로 이어 쓰는 logfmt도 흔해요. Loki에는 이 형�
 ## 모니터링에서는
 
 <Figure caption="같은 사건을 텍스트와 JSON으로 쓴 크기예요. 필드 이름이 줄마다 되풀이돼 JSON이 36% 더 커요.">
-  <StatTile label="텍스트 한 줄" value="142" unit="B" />
-  <StatTile label="JSON 한 줄" value="193" unit="B" tone="warn" note="+36%" />
+  <Bars
+    ariaLabel="텍스트 한 줄 142B, JSON 한 줄 193B를 막대 길이로 견준 그림"
+    bars={[
+      { label: '텍스트 한 줄', value: 142, display: '142B' },
+      { label: 'JSON 한 줄', value: 193, display: '193B', note: '+36%', tone: 'warn' },
+    ]}
+  />
 </Figure>
 
 초당 2,000줄이면 압축 전 기준으로 하루에 텍스트는 24.5GB, JSON은 33.4GB예요. 구조화는 찾기 쉬운 대신 그만큼 저장량이 늘어요.

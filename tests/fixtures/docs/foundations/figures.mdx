@@ -134,6 +134,13 @@ import Sample from '../../figures/sample.svg';
   />
 </Figure>
 
+<Figure caption="조인이 N+1보다 훨씬 짧아요.">
+  <Bars
+    ariaLabel="N+1 20ms와 조인 5ms를 견준 막대"
+    bars={[{ label: 'N+1', value: 20, display: '20ms', tone: 'warn' }, { label: '조인', value: 5, display: '5ms', note: 'SQL 1번' }]}
+  />
+</Figure>
+
 <Figure caption="직접 그린 SVG 그림이에요.">
   <Sample aria-label="테스트용 SVG 그림" />
 </Figure>

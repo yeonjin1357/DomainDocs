@@ -1,0 +1,104 @@
+---
+import { layoutBars, type BarItem } from '../../lib/viz/bars';
+
+interface Props {
+  bars: BarItem[];
+  ariaLabel: string;
+  /** 막대 끝값(예: 백분율이면 100). 없으면 가장 큰 값 */
+  max?: number;
+  /** display가 없는 막대의 값 뒤에 붙일 단위 */
+  unit?: string;
+}
+
+const { bars, ariaLabel, max, unit } = Astro.props;
+const layout = layoutBars(bars, max, unit);
+---
+<div class="bars" data-bars role="img" aria-label={ariaLabel}>
+  {
+    layout.bars.map((b) => (
+      <div class={`bar tone-${b.tone ?? 'sub'}`}>
+        <div class="bar-head">
+          <span class="bar-label">{b.label}</span>
+          <span class="bar-value">{b.display}</span>
+        </div>
+        <div class="bar-track">
+          <span class="bar-fill" style={`width:${b.percent}%`} />
+        </div>
+        {b.note && <span class="bar-note">{b.note}</span>}
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .bars {
+    display: grid;
+    gap: 12px;
+  }
+
+  .bar {
+    display: grid;
+    gap: 5px;
+  }
+
+  .bar-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 12px;
+  }
+
+  .bar-label {
+    font-size: 14px;
+    word-break: keep-all;
+  }
+
+  .bar-value {
+    margin-left: auto;
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bar.tone-accent .bar-value {
+    color: var(--color-accent);
+  }
+
+  .bar.tone-warn .bar-value {
+    color: var(--color-warn);
+  }
+
+  /* 0보다 큰 값은 아무리 작아도 점 하나만큼은 보이게 한다 */
+  .bar-track {
+    height: 12px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--color-card);
+  }
+
+  .bar-fill {
+    display: block;
+    min-width: 4px;
+    height: 100%;
+    border-radius: 6px;
+    background: var(--color-text-weak);
+  }
+
+  .bar-fill[style='width:0%'] {
+    min-width: 0;
+  }
+
+  .bar.tone-accent .bar-fill {
+    background: var(--color-accent);
+  }
+
+  .bar.tone-warn .bar-fill {
+    background: var(--color-warn);
+  }
+
+  .bar-note {
+    font-size: 12.5px;
+    color: var(--color-text-sub);
+  }
+</style>

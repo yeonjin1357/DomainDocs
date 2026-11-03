@@ -129,9 +129,14 @@ PostgreSQL 18로 재현한 로그예요. 크기는 바이트이고, 바로 아�
 예를 들어 `work_mem`을 64MB로 올리고, 정렬 2개가 든 SQL을 연결 100개가 함께 돌리면 12.8GB까지 쓸 수 있어요. 해시 단계는 여기에 `hash_mem_multiplier`(기본 2.0)를 곱한 만큼까지 써요.
 
 <Figure caption="앞 문단의 예를 곱셈으로 따라가요. 한도는 정렬 단계 하나에 걸려서, 정렬 2개가 든 SQL 하나는 128MB를 써요. 그 SQL을 연결 100개가 함께 돌리면 12.8GB예요.">
-  <StatTile label="정렬 단계 하나" value="64" unit="MB" note="work_mem" />
-  <StatTile label="SQL 하나" value="128" unit="MB" note="정렬 2개" />
-  <StatTile label="연결 100개" value="12.8" unit="GB" tone="warn" note="128MB × 100" />
+  <Bars
+    ariaLabel="정렬 단계 하나 64MB, SQL 하나 128MB, 연결 100개 12.8GB를 막대 길이로 견준 그림"
+    bars={[
+      { label: '정렬 단계 하나', value: 64, display: '64MB', note: 'work_mem' },
+      { label: 'SQL 하나', value: 128, display: '128MB', note: '정렬 2개' },
+      { label: '연결 100개', value: 12.8, display: '12.8GB', note: '128MB × 100', tone: 'warn' },
+    ]}
+  />
 </Figure>
 
 그래서 전체 기본값을 올리기보다 범위를 좁혀요.

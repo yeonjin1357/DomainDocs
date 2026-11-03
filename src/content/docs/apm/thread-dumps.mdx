@@ -87,9 +87,14 @@ RUNNABLE이 많다고 CPU가 바쁘다고 읽으면 안 돼요. 스택 맨 위�
 ## 모니터링에서는
 
 <Figure caption="응답이 느려졌을 때 5초 간격으로 세 번 뜬 덤프 예시예요. 요청 스레드 30개가 세 번 모두 같은 잠금에서 BLOCKED였어요.">
-  <StatTile label="요청 스레드" value="200" unit="개" />
-  <StatTile label="같은 잠금에서 BLOCKED" value="30" unit="개" tone="warn" />
-  <StatTile label="소켓 읽기 RUNNABLE" value="120" unit="개" />
+  <Bars
+    ariaLabel="요청 스레드 200개, 같은 잠금에서 BLOCKED 30개, 소켓 읽기 RUNNABLE 120개를 막대 길이로 견준 그림"
+    bars={[
+      { label: '요청 스레드', value: 200, display: '200개' },
+      { label: '같은 잠금에서 BLOCKED', value: 30, display: '30개', tone: 'warn' },
+      { label: '소켓 읽기 RUNNABLE', value: 120, display: '120개' },
+    ]}
+  />
 </Figure>
 
 APM 화면의 스레드 덤프 기능은 버튼 하나로 이 사진을 떠 줘요. 응답이 느려졌을 때 여러 번 떠서, 상태별로 묶고 같은 스택끼리 세어 봐요.

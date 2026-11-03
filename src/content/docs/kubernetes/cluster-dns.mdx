@@ -121,9 +121,14 @@ import DnsSearchDemo from '../../../components/demos/DnsSearchDemo.tsx';
 앱은 보통 IPv4(A)와 IPv6(AAAA) 주소를 함께 찾아요. 그래서 위의 4번이 종류마다 한 번씩, 모두 8번 나가요.
 
 <Figure caption="파드와 같은 DNS 설정으로 이름을 찾고, DNS 서버가 받은 질의를 센 결과예요. 앱은 보통 IPv4(A)와 IPv6(AAAA) 주소를 함께 찾아서 이름 하나에 질의가 2개씩 나가요. 바깥 이름의 8번 중 6번은 '없음'이었어요.">
-  <StatTile label="짧은 이름" value="2" unit="번" note="pay" />
-  <StatTile label="바깥 이름" value="8" unit="번" tone="warn" note="api.example.com" />
-  <StatTile label="끝에 점을 붙이면" value="2" unit="번" note="api.example.com." />
+  <Bars
+    ariaLabel="짧은 이름 2번, 바깥 이름 8번, 끝에 점을 붙이면 2번를 막대 길이로 견준 그림"
+    bars={[
+      { label: '짧은 이름', value: 2, display: '2번', note: 'pay' },
+      { label: '바깥 이름', value: 8, display: '8번', note: 'api.example.com', tone: 'warn' },
+      { label: '끝에 점을 붙이면', value: 2, display: '2번', note: 'api.example.com.' },
+    ]}
+  />
 </Figure>
 
 이름 끝에 점을 붙이면 '이미 완전한 이름'이라는 뜻이라, 검색 도메인을 붙이지 않아요. 바깥 API를 자주 부르는 파드라면 `dnsConfig`로 그 파드의 `ndots`를 낮추는 방법도 있어요. 둘 다 쿠버네티스 문서가 다루는 방법이에요.
@@ -148,9 +153,15 @@ import DnsSearchDemo from '../../../components/demos/DnsSearchDemo.tsx';
 ## 모니터링에서는
 
 <Figure caption="CoreDNS의 응답 코드별 비율 예시예요. 검색 도메인을 붙여 본 질의는 대부분 '없음'으로 끝나서, NXDOMAIN 비율이 높게 나와요.">
-  <StatTile label="NOERROR" value="31" unit="%" />
-  <StatTile label="NXDOMAIN" value="68" unit="%" note="대부분 검색 도메인" />
-  <StatTile label="SERVFAIL" value="1" unit="%" tone="warn" />
+  <Bars
+    ariaLabel="NOERROR 31%, NXDOMAIN 68%, SERVFAIL 1%를 막대 길이로 견준 그림"
+    max={100}
+    bars={[
+      { label: 'NOERROR', value: 31, display: '31%' },
+      { label: 'NXDOMAIN', value: 68, display: '68%', note: '대부분 검색 도메인' },
+      { label: 'SERVFAIL', value: 1, display: '1%', tone: 'warn' },
+    ]}
+  />
 </Figure>
 
 CoreDNS는 이런 지표를 내요.

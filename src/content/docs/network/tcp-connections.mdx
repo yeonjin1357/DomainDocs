@@ -124,9 +124,14 @@ TIME-WAIT는 정상적인 상태예요. 표준은 최대 세그먼트 수명(MSL
 ## 모니터링에서는
 
 <Figure caption="API 서버의 연결 상태 예시예요. CLOSE-WAIT가 3,200개 쌓였어요. 앱이 다 쓴 연결을 닫지 않고 있어요.">
-  <StatTile label="ESTABLISHED" value="420" unit="개" />
-  <StatTile label="TIME-WAIT" value="1,150" unit="개" />
-  <StatTile label="CLOSE-WAIT" value="3,200" unit="개" tone="warn" />
+  <Bars
+    ariaLabel="ESTABLISHED 420개, TIME-WAIT 1,150개, CLOSE-WAIT 3,200개를 막대 길이로 견준 그림"
+    bars={[
+      { label: 'ESTABLISHED', value: 420, display: '420개' },
+      { label: 'TIME-WAIT', value: 1150, display: '1,150개' },
+      { label: 'CLOSE-WAIT', value: 3200, display: '3,200개', tone: 'warn' },
+    ]}
+  />
 </Figure>
 
 네트워크 성능 화면은 서버끼리 맺은 연결 수와 상태, 재전송 비율, 왕복 시간을 보여 줘요. 재전송 비율이 오르면 그 사이 경로에서 패킷이 사라지고 있어요.

@@ -58,8 +58,13 @@ updated: 2026-10-30
 요청 기록 100만 행을 행 단위 파일(CSV)과 열 단위 파일(Parquet)로 저장해 크기를 쟀어요. Parquet는 열 지향 DB처럼 열마다 값을 모아 압축하는 파일 형식이에요.
 
 <Figure caption="같은 요청 기록 100만 행을 두 형식으로 저장한 크기예요. 열마다 모아 압축하니 13분의 1쯤이 됐어요.">
-  <StatTile label="CSV(행 단위)" value="48.2" unit="MB" />
-  <StatTile label="Parquet(열 단위)" value="3.8" unit="MB" tone="accent" />
+  <Bars
+    ariaLabel="CSV(행 단위) 48.2MB, Parquet(열 단위) 3.8MB를 막대 길이로 견준 그림"
+    bars={[
+      { label: 'CSV(행 단위)', value: 48.2, display: '48.2MB' },
+      { label: 'Parquet(열 단위)', value: 3.8, display: '3.8MB', tone: 'accent' },
+    ]}
+  />
 </Figure>
 
 한 열에는 같은 종류의 값이 모여 있어서 잘 줄어요. 값의 종류가 적을수록 더 줄어요.

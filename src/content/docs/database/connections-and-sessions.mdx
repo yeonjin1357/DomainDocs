@@ -107,8 +107,13 @@ MySQL은 연결마다 그 연결 전용 스레드를 붙여요. SQL Server는 <T
 ## 모니터링에서는
 
 <Figure caption="주문 DB의 세션 현황 예시예요. 연결은 100개지만 지금 SQL을 실행하는 세션은 6개이고, 나머지 94개는 쉬고 있어요.">
-  <StatTile label="연결 수" value="100" unit="개" />
-  <StatTile label="액티브 세션" value="6" unit="개" tone="accent" />
+  <Bars
+    ariaLabel="연결 수 100개, 액티브 세션 6개를 막대 길이로 견준 그림"
+    bars={[
+      { label: '연결 수', value: 100, display: '100개' },
+      { label: '액티브 세션', value: 6, display: '6개', tone: 'accent' },
+    ]}
+  />
 </Figure>
 
 세션 화면에서 가장 먼저 만나는 숫자는 연결 수와 <Term term="database/active-session">액티브 세션</Term> 수예요. 둘은 다른 숫자예요. 연결 수는 열려 있는 통로의 수이고, 액티브 세션은 지금 일하는 세션의 수예요.

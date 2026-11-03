@@ -122,8 +122,13 @@ updated: 2026-10-30
 ## 모니터링에서는
 
 <Figure caption="주문 조회 SQL의 실행 계획 예시예요. 행 1개를 돌려주려고 100만 행을 읽었어요. 조건에 맞는 인덱스가 없거나 쓰이지 않을 때 이렇게 보여요.">
-  <StatTile label="읽은 행" value="1,000,000" unit="행" tone="warn" />
-  <StatTile label="돌려준 행" value="1" unit="행" />
+  <Bars
+    ariaLabel="읽은 행 1,000,000행, 돌려준 행 1행를 막대 길이로 견준 그림"
+    bars={[
+      { label: '읽은 행', value: 1e+06, display: '1,000,000행', tone: 'warn' },
+      { label: '돌려준 행', value: 1, display: '1행' },
+    ]}
+  />
 </Figure>
 
 인덱스 문제는 <Term slug="database/execution-plans">실행 계획</Term>에서 드러나요. 읽은 행이 돌려준 행보다 훨씬 많다면, 인덱스가 없거나 쓰이지 않는지 봐요. 그런 SQL은 <Term slug="database/top-sql">SQL별 부하 순위</Term> 위쪽에 자주 올라와요.

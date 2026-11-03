@@ -126,8 +126,14 @@ StorageClass로 자동으로 만든 PV는 StorageClass의 정책을 따르고, �
 ## 모니터링에서는
 
 <Figure caption="한 PVC의 사용량 예시예요. 노드 디스크는 여유가 있지만, 데이터베이스가 쓰는 PVC는 거의 가득 찼어요.">
-  <StatTile label="노드 디스크" value="41" unit="%" />
-  <StatTile label="DB PVC 사용률" value="93" unit="%" tone="warn" note="10Gi 중 9.3Gi" />
+  <Bars
+    ariaLabel="노드 디스크 41%, DB PVC 사용률 93%를 막대 길이로 견준 그림"
+    max={100}
+    bars={[
+      { label: '노드 디스크', value: 41, display: '41%' },
+      { label: 'DB PVC 사용률', value: 93, display: '93%', note: '10Gi 중 9.3Gi', tone: 'warn' },
+    ]}
+  />
 </Figure>
 
 PVC의 용량은 노드 디스크와 따로 봐요. 노드 디스크가 한가해도 PVC가 가득 차면 그 앱은 더 쓰지 못해요. 디스크 용량 읽는 법은 서버·OS의 <Term slug="server/filesystem-and-capacity">파일 시스템과 용량</Term>과 같아요.

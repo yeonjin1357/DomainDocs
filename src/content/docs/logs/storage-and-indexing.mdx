@@ -97,8 +97,13 @@ Loki는 본문을 색인하지 않고, 로그 스트림마다 붙은 <Term term=
 ## 모니터링에서는
 
 <Figure caption="Loki 예시예요. user_id를 레이블로 추가한 배포 뒤, 활성 스트림이 사용자 수만큼 늘었어요.">
-  <StatTile label="배포 전 활성 스트림" value="120" unit="개" />
-  <StatTile label="배포 뒤 활성 스트림" value="48,000" unit="개" tone="warn" note="user_id 레이블" />
+  <Bars
+    ariaLabel="배포 전 활성 스트림 120개, 배포 뒤 활성 스트림 48,000개를 막대 길이로 견준 그림"
+    bars={[
+      { label: '배포 전 활성 스트림', value: 120, display: '120개' },
+      { label: '배포 뒤 활성 스트림', value: 48000, display: '48,000개', note: 'user_id 레이블', tone: 'warn' },
+    ]}
+  />
 </Figure>
 
 저장 방식에 따라 지켜볼 숫자가 달라요. 모든 단어를 색인하는 저장소는 색인 크기와 디스크를 봐요. 레이블만 색인하는 저장소는 스트림 수가 갑자기 늘지 않는지 봐요.

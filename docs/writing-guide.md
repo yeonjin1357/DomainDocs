@@ -124,6 +124,7 @@ p99, rate, span 같은 말은 영어 그대로 써요. 처음 나올 때 한 번
 | 위아래로 갈라지는 갈래(분류, OID, 알림 경로) | `Tree` |
 | 무엇이 무엇 안에 들어 있어요(포함, 부분집합) | `Nest` |
 | 이름 하나를 조각마다 읽어요(인스턴스 유형, 주소) | `Anatomy` |
+| 같은 단위의 크기를 견줘요(30배 차이, 한도 대비) | `Bars` |
 | 위 어디에도 맞지 않아요 | 새 컴포넌트나 SVG |
 
 - 나쁜 예: OSI 일곱 층과 TCP/IP 네 층의 대응을 `Compare`의 두 열에 넣고, 줄 이름을 '7·6·5층'처럼 써요.
@@ -331,6 +332,7 @@ updated: 2026-10-13
 | `Tree` | `root`, `ariaLabel` | 나무. 위에서 아래로 갈라지는 갈래를 들여쓰기와 이음선으로 보여 줘요(분류, OID, 알림 경로). `root`는 `{ label, note?, tag?, tone?, children? }`이고 `children`도 같은 모양이에요. 4단, 16마디까지예요. `tag`는 오른쪽 고정폭 글자(예: OID, 맞춤 조건)예요. 갈래가 다시 합쳐지면 `Flow`로 그려요 |
 | `Nest` | `boxes`, `ariaLabel` | 포함 상자. 무엇이 무엇 안에 들어 있는지 보여 줘요(프로세스 메모리의 구성, 스위치 안의 VLAN, 줄어드는 부분집합). `boxes`는 `{ label, note?, tone?, children?, wide?, dashed? }` 배열이고, `children`이 있으면 상자, 없으면 맨 안쪽 칸이에요. 4겹까지예요. `wide`는 한 줄을 다 차지하고, `dashed`는 실제 경계가 아닌 묶음이에요. 화살표가 필요하면 `Flow`의 `groups`로 그려요 |
 | `Anatomy` | `parts`, `ariaLabel` | 이름 뜯어보기. 이름 하나를 조각으로 나눠 조각마다 번호와 뜻을 달아요(예: `c7gn.4xlarge`). `parts`는 앞에서부터 `{ text, label, note?, tone? }`이고, 조각을 이으면 전체 이름이 돼요. 점 같은 구분 기호는 `tone: 'sub'`로 두면 번호 없이 흐리게 보여요. 뜻 있는 조각은 6개까지예요 |
+| `Bars` | `bars`, `ariaLabel`, `max?`, `unit?` | 막대. 같은 단위의 크기를 막대 길이로 견줘요(N+1과 조인의 시간, 정리 전후 표 크기, 한도 대비 사용률). `bars`는 `{ label, value, display?, note?, tone? }` 배열이고 2~8개예요. `value`가 길이, `display`가 막대 위에 쓸 글자예요. `max`가 없으면 가장 큰 값이 끝이고, 사용률은 `max={100}`으로 둬요. 단위가 서로 다른 숫자는 `StatTile`로 둬요 |
 | SVG 그림 | `aria-label` | 위 그림으로 안 되는 그림은 `src/assets/figures/{domain}/{name}.svg`에 그려 default import해요. `Figure` 안에 두고 `aria-label`을 꼭 붙여요. 색은 `currentColor`나 `var(--color-…)`만 써야 다크 모드에서도 보여요 |
 | `src/components/demos/`의 데모(`PercentileDemo`, `HistogramQuantileDemo`, `CircuitBreakerDemo` 등 22개) | 없음 | 직접 만져 보는 데모. default import 후 `client:visible`로 써요. 계산은 `src/lib/demo-models.ts`에 두고 단위 테스트로 확인해요. 데모는 값을 바꿔 봐야 보이는 관계(공식, 문턱, 직관과 다른 결과)에만 넣어요. 목록이나 그림 하나로 충분한 곳에는 넣지 않아요 |
 

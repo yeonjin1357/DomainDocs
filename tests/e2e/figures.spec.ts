@@ -125,6 +125,14 @@ test('이름 뜯어보기는 뜻 있는 조각에만 번호를 붙여 목록과 
   await expect(anatomy.locator('.anatomy-legend .anatomy-label')).toHaveText(['시리즈', '세대', '크기']);
 });
 
+test('막대는 값에 비례한 길이로 그린다', async ({ page }) => {
+  const bars = page.getByRole('img', { name: 'N+1 20ms와 조인 5ms를 견준 막대' });
+  await expect(bars.locator('.bar-value')).toHaveText(['20ms', '5ms']);
+  const long = await bars.locator('.bar-fill').nth(0).boundingBox();
+  const short = await bars.locator('.bar-fill').nth(1).boundingBox();
+  expect(Math.abs(short!.width * 4 - long!.width)).toBeLessThan(2);
+});
+
 test('SVG 그림은 이름 붙은 그림이다', async ({ page }) => {
   await expect(page.getByRole('img', { name: '테스트용 SVG 그림' })).toBeVisible();
 });

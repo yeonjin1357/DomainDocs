@@ -111,8 +111,14 @@ PostgreSQL에서 테이블스페이스는 데이터를 둘 디렉터리 위치�
 ## 모니터링에서는
 
 <Figure caption="Oracle 테이블스페이스 사용률 예시예요. 지금 파일 크기 대비로는 96%지만, 자동 확장할 수 있는 최대 크기 대비로는 48%예요.">
-  <StatTile label="지금 크기 대비" value="96" unit="%" tone="warn" note="곧 자동으로 커져요" />
-  <StatTile label="최대 크기 대비" value="48" unit="%" />
+  <Bars
+    ariaLabel="지금 크기 대비 96%, 최대 크기 대비 48%를 막대 길이로 견준 그림"
+    max={100}
+    bars={[
+      { label: '지금 크기 대비', value: 96, display: '96%', note: '곧 자동으로 커져요', tone: 'warn' },
+      { label: '최대 크기 대비', value: 48, display: '48%' },
+    ]}
+  />
 </Figure>
 
 자동 확장이 켜진 테이블스페이스는 지금 크기만 보면 늘 가득 차 보여요. `DBA_TABLESPACE_USAGE_METRICS`의 `TABLESPACE_SIZE`는 자동 확장으로 커질 수 있는 최대 크기예요. 이 값 대비 사용률로 봐야 진짜 남은 공간이 보여요.

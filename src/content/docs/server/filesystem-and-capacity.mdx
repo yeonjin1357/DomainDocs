@@ -91,8 +91,14 @@ ext4 같은 파일 시스템은 기본으로 전체 블록의 5%를 관리자(ro
 ## 모니터링에서는
 
 <Figure caption="한 서버의 /var 파일 시스템 예시예요. 용량은 78%로 여유가 있어 보이지만 inode는 100% 찼어요. 새 파일을 만들 수 없어요.">
-  <StatTile label="/var 용량" value="78" unit="%" />
-  <StatTile label="/var inode" value="100" unit="%" tone="warn" />
+  <Bars
+    ariaLabel="/var 용량 78%, /var inode 100%를 막대 길이로 견준 그림"
+    max={100}
+    bars={[
+      { label: '/var 용량', value: 78, display: '78%' },
+      { label: '/var inode', value: 100, display: '100%', tone: 'warn' },
+    ]}
+  />
 </Figure>
 
 디스크 화면은 파일 시스템(마운트 위치)마다 용량과 inode를 함께 보여 줘야 해요. 한 서버에도 `/`, `/var`, `/data`처럼 여러 파일 시스템이 있고, 저마다 따로 차요.

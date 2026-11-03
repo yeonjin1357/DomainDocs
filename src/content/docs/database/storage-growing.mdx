@@ -190,9 +190,14 @@ WHERE idx_scan = 0;
 ## 공간을 돌려받으려면
 
 <Figure caption="PGlite(PostgreSQL 17.5)에서 행 2만 개 중 1만 5천 개를 바꾸고 2천 개를 지운 뒤 잰 표 크기예요. VACUUM 뒤에도 그대로이고, VACUUM FULL로 새로 쓴 뒤에야 줄었어요.">
-  <StatTile label="정리 전" value="8,488" unit="kB" />
-  <StatTile label="VACUUM 뒤" value="8,488" unit="kB" note="그대로예요" />
-  <StatTile label="VACUUM FULL 뒤" value="4,368" unit="kB" tone="accent" />
+  <Bars
+    ariaLabel="정리 전 8,488kB, VACUUM 뒤 8,488kB, VACUUM FULL 뒤 4,368kB를 막대 길이로 견준 그림"
+    bars={[
+      { label: '정리 전', value: 8488, display: '8,488kB' },
+      { label: 'VACUUM 뒤', value: 8488, display: '8,488kB', note: '그대로예요' },
+      { label: 'VACUUM FULL 뒤', value: 4368, display: '4,368kB', tone: 'accent' },
+    ]}
+  />
 </Figure>
 
 보통의 VACUUM은 죽은 행 자리를 다시 쓸 수 있게 표시할 뿐, 대개 디스크에 돌려주지 않아요. 표 맨 끝의 페이지가 통째로 비었을 때만 예외로 줄어요. 그래서 큰 DELETE 뒤에도 디스크 사용량이 그대로인 게 정상이에요.

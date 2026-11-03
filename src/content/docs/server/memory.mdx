@@ -41,10 +41,15 @@ updated: 2026-10-30
 ## 메모리 숫자 읽기
 
 <Figure caption="16GB 서버의 예시예요. free는 1.2GB뿐이지만, 캐시 대부분은 필요하면 비워 줄 수 있어서 available은 10.1GB예요.">
-  <StatTile label="전체" value="16" unit="GB" />
-  <StatTile label="free" value="1.2" unit="GB" />
-  <StatTile label="buff/cache" value="9.8" unit="GB" />
-  <StatTile label="available" value="10.1" unit="GB" tone="accent" />
+  <Bars
+    ariaLabel="전체 16GB, free 1.2GB, buff/cache 9.8GB, available 10.1GB를 막대 길이로 견준 그림"
+    bars={[
+      { label: '전체', value: 16, display: '16GB' },
+      { label: 'free', value: 1.2, display: '1.2GB' },
+      { label: 'buff/cache', value: 9.8, display: '9.8GB' },
+      { label: 'available', value: 10.1, display: '10.1GB', tone: 'accent' },
+    ]}
+  />
 </Figure>
 
 `free` 명령이나 서버 화면에서 보는 메모리 숫자는 대부분 커널의 `/proc/meminfo`에서 와요.

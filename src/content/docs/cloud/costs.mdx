@@ -109,8 +109,13 @@ AWS Cost Explorer는 비용 자료를 적어도 24시간마다 새로 고쳐요.
 ## 모니터링에서는
 
 <Figure caption="us-east-1 CloudWatch 사용자 지정 지표의 예시예요. 파드 30개의 이름을 차원으로 더했더니, 조합마다 지표가 생겨 지표 수와 요금이 30배가 됐어요.">
-  <StatTile label="차원 추가 전" value="200" unit="개" note="월 60달러" />
-  <StatTile label="차원 추가 뒤" value="6,000" unit="개" tone="warn" note="월 1,800달러" />
+  <Bars
+    ariaLabel="차원 추가 전 200개, 차원 추가 뒤 6,000개를 막대 길이로 견준 그림"
+    bars={[
+      { label: '차원 추가 전', value: 200, display: '200개', note: '월 60달러' },
+      { label: '차원 추가 뒤', value: 6000, display: '6,000개', note: '월 1,800달러', tone: 'warn' },
+    ]}
+  />
 </Figure>
 
 모니터링도 요금이 들어요. CloudWatch는 차원(지표를 나누는 이름과 값)의 조합마다 지표 하나로 세어요. us-east-1에서 사용자 지정 지표는 첫 1만 개까지 지표당 한 달 0.30달러예요.

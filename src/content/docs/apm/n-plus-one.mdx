@@ -120,9 +120,14 @@ N+1은 손으로 짠 코드에서도 생기지만, ORM에서 특히 잘 숨어�
 ## 4. 한 번에 가져오게 고치세요
 
 <Figure caption="주문 100건과 각 주문의 고객 이름을 세 방식으로 가져와, PGlite(PostgreSQL 17.5)에서 30번씩 잰 중앙값이에요. DB가 같은 프로세스 안에 있어 네트워크 왕복이 없는데도 차이가 30배가 넘어요.">
-  <StatTile label="N+1" value="23.9" unit="ms" tone="warn" note="SQL 101번" />
-  <StatTile label="묶어서 가져오기" value="1.1" unit="ms" note="SQL 2번" />
-  <StatTile label="조인" value="0.7" unit="ms" note="SQL 1번" />
+  <Bars
+    ariaLabel="N+1 23.9ms, 묶어서 가져오기 1.1ms, 조인 0.7ms를 막대 길이로 견준 그림"
+    bars={[
+      { label: 'N+1', value: 23.9, display: '23.9ms', note: 'SQL 101번', tone: 'warn' },
+      { label: '묶어서 가져오기', value: 1.1, display: '1.1ms', note: 'SQL 2번' },
+      { label: '조인', value: 0.7, display: '0.7ms', note: 'SQL 1번' },
+    ]}
+  />
 </Figure>
 
 실제 DB는 네트워크 너머에 있어서, SQL마다 왕복 시간이 더 붙어요. 왕복이 1ms라면 N+1은 101ms가 더 붙고, 조인은 1ms만 더 붙어요.
