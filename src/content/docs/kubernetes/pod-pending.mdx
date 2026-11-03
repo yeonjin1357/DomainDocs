@@ -109,7 +109,7 @@ Message: 0/42 nodes available:
 - **nodeSelector와 affinity**: 파드가 특정 레이블의 노드만 원하면, 그 레이블이 있는 노드에만 놓여요. 레이블 오타 하나로 갈 곳이 없어지기도 해요.
 - **hostPort**: 파드가 노드의 포트를 직접 쓰면, 그 포트가 빈 노드에만 놓일 수 있어요.
 
-**확인 방법**: `kubectl describe node`의 Taints와 Labels를 봐요. 그걸 파드 명세의 tolerations, nodeSelector와 견줘요.
+**확인 방법**: `kubectl describe node`의 Taints와 Labels를 봐요. 그걸 파드 명세의 tolerations, nodeSelector와 견줘요. 이 조건들은 <Term slug="kubernetes/scheduling">파드를 놓을 노드 고르기</Term>에서 다뤄요.
 
 ## 4. 저장소를 기다리는지 보세요
 

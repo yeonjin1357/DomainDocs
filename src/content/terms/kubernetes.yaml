@@ -37,7 +37,27 @@ terms:
     aliases: [kube-scheduler, scheduler, 스케줄링]
     short: 아직 노드가 정해지지 않은 파드를 찾아, 알맞은 노드에 배정하는 구성 요소예요.
     analogy: 화물 묶음을 어느 배에 실을지 정하는 배정 담당과 같아요.
-    doc: kubernetes/pods-and-nodes
+    doc: kubernetes/scheduling
+  - id: node-affinity
+    name: 노드 어피니티
+    en: Node affinity
+    aliases: [node affinity, nodeAffinity, 노드 선호도]
+    short: 파드가 놓일 노드를 노드 레이블로 고르는 조건이에요. 꼭 지킬 조건과 되도록 지킬 조건이 있어요.
+    doc: kubernetes/scheduling
+  - id: taint
+    name: taint
+    en: Taint
+    aliases: [테인트, 노드 taint]
+    short: 노드에 붙여 그 taint를 견디지 못하는 파드를 밀어내는 표지예요.
+    analogy: 배에 붙은 '위험물 전용' 표지와 같아요.
+    doc: kubernetes/scheduling
+  - id: toleration
+    name: toleration
+    en: Toleration
+    aliases: [톨러레이션, 견딤]
+    short: 파드가 특정 taint가 붙은 노드에 놓여도 된다는 허락이에요. 그 노드로 가라는 지시는 아니에요.
+    analogy: 위험물 전용 배에 실어도 된다는 허가증과 같아요.
+    doc: kubernetes/scheduling
   - id: kubelet
     name: kubelet
     en: kubelet

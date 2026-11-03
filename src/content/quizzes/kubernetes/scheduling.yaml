@@ -1,0 +1,36 @@
+questions:
+  - id: noschedule-keeps-running
+    type: ox
+    prompt: 노드에 NoSchedule taint를 붙이면, 그 노드에서 이미 돌던 toleration 없는 파드도 내보내나요?
+    answer: false
+    explain: NoSchedule은 새 파드만 막고, 이미 있던 파드는 그대로 둬요. 있던 파드까지 내보내는 건 NoExecute예요.
+  - id: toleration-is-not-attraction
+    type: choice
+    prompt: GPU 노드에 taint를 붙이고, ML 팀 파드에는 그 taint의 toleration만 줬어요. ML 팀 파드는 어디에 놓일 수 있나요?
+    choices:
+      - GPU 노드를 포함한 아무 노드
+      - GPU 노드에만
+      - GPU 노드가 아닌 노드에만
+      - 어느 노드에도 못 놓여요
+    answer: 0
+    explain: toleration은 그 노드에 놓여도 된다는 허락일 뿐이에요. GPU 노드로만 보내려면 레이블과 노드 어피니티로 끌어와야 해요.
+  - id: required-affinity-no-match
+    type: choice
+    prompt: 파드의 required 노드 어피니티와 맞는 레이블을 가진 노드가 하나도 없어요. 이 파드는 어떻게 되나요?
+    choices:
+      - Pending에 머물러요
+      - 아무 노드에나 놓여요
+      - 점수가 낮은 노드에 놓여요
+      - 맞는 노드가 새로 생겨요
+    answer: 0
+    explain: required 조건은 필터에서 쓰여서, 맞는 노드가 없으면 놓을 곳이 없어요. 되도록 지킬 조건(preferred)이라면 다른 노드에라도 놓여요.
+  - id: ignored-during-execution
+    type: ox
+    prompt: 노드 어피니티로 놓인 파드가 돌던 중에 그 노드의 레이블이 바뀌었어요. 파드는 그 노드에서 계속 도나요?
+    answer: true
+    explain: 이름 끝의 IgnoredDuringExecution이 이 뜻이에요. 이미 놓인 파드에는 어피니티를 다시 따지지 않아요.
+  - id: taint-name
+    type: input
+    prompt: 노드에 붙여서, 견디는 허락이 없는 파드를 그 노드에 놓지 못하게 하는 표지를 무엇이라고 할까요?
+    answer: [taint, 테인트]
+    explain: taint예요. 파드는 맞는 toleration이 있어야 taint가 붙은 노드에 놓여요.
