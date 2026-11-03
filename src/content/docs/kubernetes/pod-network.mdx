@@ -7,7 +7,7 @@ stage: basics
 order: 55
 icon: network
 keywords: [파드 네트워크, pod network, CNI, Calico, Cilium, Flannel, 오버레이, VXLAN, podCIDR, NetworkPolicy]
-related: [kubernetes/pods-and-nodes, kubernetes/services-and-ingress, kubernetes/cluster-dns, network/layers, kubernetes/scheduling]
+related: [kubernetes/pods-and-nodes, kubernetes/services-and-ingress, kubernetes/cluster-dns, network/tunnels, kubernetes/scheduling]
 sources:
   - title: Kubernetes — Services, Load Balancing, and Networking (네트워크 모델)
     url: https://kubernetes.io/docs/concepts/services-networking/
@@ -101,7 +101,7 @@ updated: 2026-11-03
   />
 </Figure>
 
-Flannel의 VXLAN은 머리표가 50바이트라, 선의 MTU가 1,500바이트면 파드 쪽 MTU를 1,450바이트로 잡아요. 감싸기와 MTU는 <Term slug="network/layers">네트워크 계층</Term>에서 본 것과 같은 이야기예요.
+Flannel의 VXLAN은 머리표가 50바이트라, 선의 MTU가 1,500바이트면 파드 쪽 MTU를 1,450바이트로 잡아요. 감싸기와 MTU, 큰 패킷만 사라지는 문제는 <Term slug="network/tunnels">터널과 오버레이</Term>에서 다뤄요.
 
 AWS의 VPC CNI처럼 파드에 VPC의 실제 IP를 나눠 주는 플러그인도 있어요. 감싸지 않아서 빠르지만, 노드가 가질 수 있는 IP 수만큼만 파드를 띄울 수 있어요.
 

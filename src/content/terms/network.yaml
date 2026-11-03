@@ -436,3 +436,22 @@ terms:
     aliases: [BPF, 이비피에프]
     short: 커널 소스를 고치지 않고 커널 안에서 작은 프로그램을 안전하게 돌리는 기능이에요.
     doc: network/network-performance
+  - id: tunnel
+    name: 터널
+    en: Tunnel
+    aliases: [tunnel, 터널링, tunneling, 캡슐화 터널]
+    short: 패킷을 다른 패킷 안에 넣어, 바깥 주소만 보고 나르게 하는 방법이에요.
+    analogy: 상자를 더 큰 상자에 넣어 다른 택배사로 보내는 이중 포장과 같아요.
+    doc: network/tunnels
+  - id: overlay
+    name: 오버레이
+    en: Overlay network
+    aliases: [overlay, 오버레이 네트워크, overlay network, VXLAN]
+    short: 실제 네트워크 위에 터널로 엮은 가상 네트워크예요.
+    doc: network/tunnels
+  - id: mtu-black-hole
+    name: MTU 블랙홀
+    en: PMTUD black hole
+    aliases: [PMTUD 블랙홀, black hole, PMTU black hole, 경로 MTU 블랙홀]
+    short: ICMP가 막혀 큰 패킷만 소리 없이 사라지는 현상이에요.
+    doc: network/tunnels

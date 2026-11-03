@@ -1,0 +1,36 @@
+questions:
+  - id: vxlan-inner-mtu
+    type: choice
+    prompt: 선의 MTU가 1,500바이트인 곳에 VXLAN 오버레이를 깔았어요. 선의 MTU를 바꾸지 않는다면, 안쪽 패킷은 최대 몇 바이트일까요?
+    choices:
+      - 1,450바이트
+      - 1,500바이트
+      - 1,476바이트
+      - 1,460바이트
+    answer: 0
+    explain: VXLAN은 바깥 IP, UDP, VXLAN 머리, 안쪽 이더넷 머리로 50바이트를 더 붙여요. 1,500에서 50을 빼면 1,450이에요.
+  - id: black-hole-symptom
+    type: choice
+    prompt: VPN 너머 서버와 연결은 맺어지고 작은 요청도 오가는데, 큰 파일을 받는 요청만 시간 초과로 끝나요. 가장 먼저 의심할 것은?
+    choices:
+      - 경로의 MTU와 ICMP 차단
+      - 서버의 스레드 풀이 바닥남
+      - DNS가 다른 주소를 돌려줌
+      - TLS 인증서가 만료됨
+    answer: 0
+    explain: 큰 패킷만 터널 구간에서 버려지고, "너무 커요" ICMP가 막혀 보내는 쪽이 줄일 줄 모르는 MTU 블랙홀의 모습이에요.
+  - id: icmp-needed
+    type: ox
+    prompt: 경로 MTU 찾기(PMTUD)는 ICMP 메시지가 막혀도 보내는 쪽이 알아서 패킷 크기를 줄여 문제가 없나요?
+    answer: false
+    explain: PMTUD는 중간 장비가 보내는 "너무 커요" ICMP를 받아야 크기를 줄여요. 못 받으면 같은 크기로 계속 보내 패킷이 사라져요.
+  - id: ping-size
+    type: ox
+    prompt: 리눅스에서 ping -M do -s 1472로 보내면, 쪼개지 않은 1,500바이트 IP 패킷을 보내는 셈인가요?
+    answer: true
+    explain: -s는 데이터 크기예요. ICMP 머리 8바이트와 IP 머리 20바이트를 더하면 1,500바이트예요.
+  - id: black-hole-name
+    type: input
+    prompt: ICMP가 막혀 보내는 쪽이 줄여야 할 크기를 모른 채, 큰 패킷만 소리 없이 사라지는 현상을 무엇이라고 할까요?
+    answer: [MTU 블랙홀, PMTUD 블랙홀, 블랙홀, black hole, PMTU 블랙홀]
+    explain: MTU 블랙홀이에요. ICMP를 허락하거나, 터널 안쪽 MTU를 줄이거나, MSS를 줄여 적어 고쳐요.
