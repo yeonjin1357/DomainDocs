@@ -253,3 +253,22 @@ terms:
     aliases: [evacuation failure, to-space exhausted, 옮기기 실패]
     short: G1이 살아 있는 객체를 옮길 빈 자리를 찾지 못한 상태예요.
     doc: apm/gc-logs
+  - id: java-agent
+    name: 자바 에이전트
+    en: Java agent
+    aliases: [javaagent, Java agent, APM 에이전트, 에이전트 JAR]
+    short: JVM이 시작할 때 함께 떠서 앱의 바이트코드를 고치는 프로그램이에요.
+    analogy: 공장 라인 곳곳에 다는 출퇴근 기록기와 같아요.
+    doc: apm/agents
+  - id: bytecode
+    name: 바이트코드
+    en: Bytecode
+    aliases: [bytecode, 자바 바이트코드, 클래스 파일]
+    short: 자바 코드를 JVM이 읽을 수 있게 바꾼 명령이에요.
+    doc: apm/agents
+  - id: agent-overhead
+    name: 에이전트 부하
+    en: Agent overhead
+    aliases: [오버헤드, overhead, 에이전트 오버헤드, performance overhead]
+    short: 에이전트가 앱과 함께 돌며 쓰는 CPU, 메모리, 네트워크 몫이에요.
+    doc: apm/agents
