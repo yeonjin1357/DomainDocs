@@ -192,13 +192,11 @@ Fluent Bit은 재시도 한도(`Retry_Limit`)를 넘긴 묶음을 버려요. 기
 
 에이전트도 자기 지표를 내요. Fluent Bit은 HTTP 서버를 켜면 `/api/v2/metrics/prometheus`에서 지표를 내보내요.
 
-| 지표 | 뜻 |
-| --- | --- |
-| `fluentbit_input_bytes_total` | 입력이 읽어 들인 바이트 |
-| `fluentbit_output_proc_records_total` | 보내는 데 성공한 로그 수 |
-| `fluentbit_output_retries_total` | 다시 보내기를 요청한 횟수 |
-| `fluentbit_output_retries_failed_total` | 재시도 한도를 넘겨 버린 묶음 수 |
-| `fluentbit_output_dropped_records_total` | 버린 로그 수 |
+- `fluentbit_input_bytes_total`: 입력이 읽어 들인 바이트예요.
+- `fluentbit_output_proc_records_total`: 보내는 데 성공한 로그 수예요.
+- `fluentbit_output_retries_total`: 다시 보내기를 요청한 횟수예요.
+- `fluentbit_output_retries_failed_total`: 재시도 한도를 넘겨 버린 묶음 수예요.
+- `fluentbit_output_dropped_records_total`: 버린 로그 수예요.
 
 이 숫자들은 카운터라서 <Term slug="foundations/counters-and-rate">rate</Term>로 봐요. 버린 로그 수가 0보다 커지면, 그 시각의 로그는 검색해도 나오지 않아요.
 

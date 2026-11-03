@@ -80,12 +80,22 @@ p99가 `+Inf` 바로 앞 경계(가장 큰 유한 경계)에 붙어 움직이지
 **확인 방법**: `+Inf`를 뺀 가장 큰 `le`를 찾아요. 4단계의 `count by (le)` 질의로 경계 목록을 볼 수 있어요. 그 경계를 넘은 요청의 비율이 0.01(1%)을 넘으면, p99는 그 경계에 붙어 있어요.
 
 ```text
-# 2.5초를 넘은 요청의 비율 (2.5는 +Inf 바로 앞 경계로 바꾸고, 정수 경계는 "10.0"처럼 써요)
-1 - sum(rate(http_server_request_duration_seconds_bucket{job="payment", le="2.5"}[5m]))
-  / sum(rate(http_server_request_duration_seconds_bucket{job="payment", le="+Inf"}[5m]))
+# 2.5초를 넘은 요청의 비율
+1 - sum(rate(
+  http_server_request_duration_seconds_bucket{
+    job="payment", le="2.5"
+  }[5m]
+))
+/ sum(rate(
+  http_server_request_duration_seconds_bucket{
+    job="payment", le="+Inf"
+  }[5m]
+))
 ```
 
 `le="2.5"`는 2.5초 이하 요청 수, `le="+Inf"`는 전체 요청 수예요. 1에서 둘의 비를 빼면 2.5초를 넘은 비율이에요. 앞의 예라면 0.02예요.
+
+2.5 자리엔 `+Inf` 바로 앞 경계를 넣어요.
 
 Prometheus 3은 수집할 때 정수 경계를 `10.0`처럼 저장해요. 그래서 가장 큰 경계가 10초면 `le="10.0"`으로 써야 하고, `le="10"`은 빈 결과예요. 헷갈리면 `count by (le)` 결과에 보이는 그대로 써요.
 
@@ -97,9 +107,11 @@ p99 질의는 안쪽부터 rate → `sum by (le)` → `histogram_quantile` 순�
 
 ```text
 histogram_quantile(0.99,
-  sum by (le) (
-    rate(http_server_request_duration_seconds_bucket{job="payment"}[5m])
-  )
+  sum by (le) (rate(
+    http_server_request_duration_seconds_bucket{
+      job="payment"
+    }[5m]
+  ))
 )
 ```
 
@@ -124,7 +136,11 @@ histogram_quantile(0.99,
 
 ```text
 # p99와 같은 5분 동안 들어온 요청 수
-sum(increase(http_server_request_duration_seconds_count{job="payment"}[5m]))
+sum(increase(
+  http_server_request_duration_seconds_count{
+    job="payment"
+  }[5m]
+))
 ```
 
 ## 4. 서버마다 버킷이 같은지 보세요
@@ -153,13 +169,23 @@ Prometheus 3은 이때 `needed to be fixed for monotonicity`라는 정보 주석
 
 ```text
 # 경계마다 시계열 수: 모든 줄이 같아야 해요
-count by (le) (http_server_request_duration_seconds_bucket{job="payment"})
+count by (le) (
+  http_server_request_duration_seconds_bucket{
+    job="payment"
+  }
+)
 
-# 5초 경계가 있는 서버 (정수 경계는 "5.0"처럼 소수점을 붙여 써요)
-group by (instance) (http_server_request_duration_seconds_bucket{job="payment", le="5.0"})
+# 5초 경계가 있는 서버
+group by (instance) (
+  http_server_request_duration_seconds_bucket{
+    job="payment", le="5.0"
+  }
+)
 ```
 
-둘째 식의 `group by (instance)`는 5초 경계가 있는 서버(`instance`)를 한 줄씩 보여 줘요. `le="5"`라고 쓰면 Prometheus 3에서는 아무것도 고르지 못해요. 배포가 끝날 때까지는 `sum by (instance, le)`로 서버마다 p99를 따로 봐요.
+둘째 식의 `group by (instance)`는 5초 경계가 있는 서버(`instance`)를 한 줄씩 보여 줘요. 정수 경계는 `"5.0"`처럼 소수점을 붙여 써요. `le="5"`라고 쓰면 Prometheus 3에서는 아무것도 고르지 못해요.
+
+배포가 끝날 때까지는 `sum by (instance, le)`로 서버마다 p99를 따로 봐요.
 
 <Checkpoints>
   <Check>`histogram_quantile`에 `_bucket`을 rate 없이 넣은 질의는 고치세요. 프로세스가 뜬 뒤 전체의 p99라서, 1시간 내내 0.1초 이하였다가 최근 5분 요청의 5%가 1~2.5초 걸려도 0.1초 아래로 나와요. rate를 쓰면 2.2초예요.</Check>

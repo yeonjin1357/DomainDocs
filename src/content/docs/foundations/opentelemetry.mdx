@@ -160,13 +160,11 @@ OTLP는 OpenTelemetry의 전송 규약이에요. gRPC로 보내면 기본 포트
 
 Collector도 자기 지표를 내요. 기본으로 8888번 포트에서 Prometheus 형식으로 보여 줘요. 먼저 볼 지표는 아래와 같아요.
 
-| 지표 | 뜻 |
-| --- | --- |
-| `otelcol_receiver_accepted_spans` | 받은 span 수 |
-| `otelcol_receiver_refused_spans` | 받기를 거절한 span 수 |
-| `otelcol_exporter_send_failed_spans` | 보내기에 실패한 span 수 |
-| `otelcol_exporter_queue_size` | 보내기 대기열에 쌓인 양 |
-| `otelcol_exporter_queue_capacity` | 보내기 대기열의 용량 |
+- `otelcol_receiver_accepted_spans`: 받은 span 수예요.
+- `otelcol_receiver_refused_spans`: 받기를 거절한 span 수예요.
+- `otelcol_exporter_send_failed_spans`: 보내기에 실패한 span 수예요.
+- `otelcol_exporter_queue_size`: 보내기 대기열에 쌓인 양이에요.
+- `otelcol_exporter_queue_capacity`: 보내기 대기열의 용량이에요.
 
 대기열이 용량에 닿으면 새 데이터를 넣지 못해 버려요. 백엔드가 느리거나 막혔다는 신호예요.
 

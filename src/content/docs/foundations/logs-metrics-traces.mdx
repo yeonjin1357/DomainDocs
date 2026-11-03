@@ -149,8 +149,13 @@ span들은 같은 trace id(트레이스마다 붙는 고유 ID)를 가져서 한
 
   `traceparent`는 버전, trace id, 부모 id(부른 쪽 span의 ID), 플래그를 `-`로 이은 값이에요. trace id는 16진수 32자, 부모 id는 16자예요.
 
+  아래는 W3C 문서의 예시 값을 `-`마다 줄을 나눠 적은 거예요. 위에서부터 버전, trace id, 부모 id, 플래그예요. 실제 헤더에서는 `-`로 이어 한 줄로 보내요.
+
   ```text
-  traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01
+  00
+  0af7651916cd43dd8448eb211c80319c
+  b7ad6b7169203331
+  01
   ```
 
   끝의 `01`은 sampled 플래그가 켜진 값이에요. 부른 쪽이 이 트레이스를 기록했을 수 있다는 뜻이에요.
@@ -171,10 +176,14 @@ span들은 같은 trace id(트레이스마다 붙는 고유 ID)를 가져서 한
 
   exemplar는 메트릭에 붙여 둔 실제 측정값 하나예요. 값을 잰 요청의 trace id를 함께 달아 두면, 그래프에서 그 요청의 트레이스로 건너갈 수 있어요. Grafana는 exemplar를 그래프 위 작은 마름모로 보여 주고, 트레이스 데이터 소스를 연결해 두면 거기서 열어요.
 
-  지표를 내보내는 표준 형식인 OpenMetrics 1.0은 카운터의 `_total`과 히스토그램 버킷에 exemplar를 달 수 있어요. 값 뒤 `#` 다음이 exemplar예요. 아래 줄은 2.5초 이하 버킷에 2.3초 걸린 요청의 trace id를 단 예예요.
+  지표를 내보내는 표준 형식인 OpenMetrics 1.0은 카운터의 `_total`과 히스토그램 버킷에 exemplar를 달 수 있어요. 값 뒤 `#` 다음이 exemplar예요.
+
+  아래 줄은 2.5초 이하 버킷에 2.3초 걸린 요청의 trace id를 단 예예요. 실제로는 한 줄인데, 보기 쉽게 나누고 trace id는 앞부분만 적었어요.
 
   ```text
-  request_duration_seconds_bucket{le="2.5"} 950 # {trace_id="0af7651916cd43dd8448eb211c80319c"} 2.3
+  request_duration_seconds_bucket
+    {le="2.5"} 950
+    # {trace_id="0af76519…"} 2.3
   ```
 
   Prometheus 텍스트 형식 0.0.4는 exemplar를 싣지 못하고, OpenMetrics나 protobuf(바이너리 형식)여야 해요. Prometheus 3 서버도 `--enable-feature=exemplar-storage`를 켜야 수집한 exemplar를 저장해요.

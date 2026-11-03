@@ -10,3 +10,11 @@
 | 부하 = R + D 상태의 1·5·15분 평균, 넷째 칸 | https://man7.org/linux/man-pages/man5/proc_loadavg.5.html |
 | 멀티스레드 프로세스는 100%를 넘을 수 있음, us·sy·ni·id·wa·hi·si·st 뜻 | https://man7.org/linux/man-pages/man1/top.1.html |
 | 예시 계산 | 4 × 10 × 100 = 4,000, (4,000 − 1,000) ÷ 4,000 = 75%. 코어 8개 중 1개가 100%면 평균 12.5% |
+
+## 2026-11-03 보강: 코어는 운영체제가 보는 CPU 수로 세요
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| SMT는 코어 하나에서 여러 스레드를 함께 돌리고, 스레드 하나가 vCPU 하나로 보임. m5.xlarge는 코어 2개 × 코어당 스레드 2개 = vCPU 4개 | https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-optimize-cpu.html |
+| nproc은 현재 프로세스가 쓸 수 있는 처리 단위 수를 출력 | https://man7.org/linux/man-pages/man1/nproc.1.html |
+| lscpu가 CPU·스레드·코어·소켓 수를 보여 줌, 필드 이름 `Thread(s) per core` | https://man7.org/linux/man-pages/man1/lscpu.1.html, WSL Ubuntu에서 실행해 확인(Thread(s) per core: 2) |

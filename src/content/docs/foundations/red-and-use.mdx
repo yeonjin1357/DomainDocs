@@ -145,9 +145,30 @@ Errors는 디스크 I/O 에러처럼 자원이 낸 에러 횟수예요. USE는 �
   RED의 Rate와 Errors는 요청 수 카운터(counter, 계속 더하기만 하는 값)의 <Term slug="foundations/counters-and-rate">rate</Term>(초당 증가량)예요. Wilkie의 발표 자료처럼 요청 시간 히스토그램(요청 시간을 구간별로 센 지표) 하나로 RED 셋을 모두 구해요. Prometheus 클래식 히스토그램(기존 형식)의 `_count`가 요청 수를 세는 카운터라서예요.
 
   ```text
-  Rate:     sum(rate(request_duration_seconds_count{job="order-api"}[5m]))
-  Errors:   sum(rate(request_duration_seconds_count{job="order-api", status_code=~"5.."}[5m]))
-  Duration: histogram_quantile(0.99, sum by (le) (rate(request_duration_seconds_bucket{job="order-api", status_code!~"5.."}[5m])))
+  # Rate
+  sum(rate(
+    request_duration_seconds_count{
+      job="order-api"
+    }[5m]
+  ))
+
+  # Errors
+  sum(rate(
+    request_duration_seconds_count{
+      job="order-api",
+      status_code=~"5.."
+    }[5m]
+  ))
+
+  # Duration
+  histogram_quantile(0.99,
+    sum by (le) (rate(
+      request_duration_seconds_bucket{
+        job="order-api",
+        status_code!~"5.."
+      }[5m]
+    ))
+  )
   ```
 
   세 식은 `job="order-api"`로 주문 API만 골라요. `job` 조건을 빼면 모든 서비스의 요청이 한 숫자로 섞여요.
@@ -163,7 +184,14 @@ Errors는 디스크 I/O 에러처럼 자원이 낸 에러 횟수예요. USE는 �
   네이티브 히스토그램(Prometheus의 새 히스토그램 형식)에는 `_count`·`_bucket` 시계열이 없어요. 요청 수는 `histogram_count()`로 세고, p99는 `le` 없이 이렇게 구해요.
 
   ```text
-  histogram_quantile(0.99, sum(rate(request_duration_seconds{job="order-api", status_code!~"5.."}[5m])))
+  histogram_quantile(0.99,
+    sum(rate(
+      request_duration_seconds{
+        job="order-api",
+        status_code!~"5.."
+      }[5m]
+    ))
+  )
   ```
 
   에러율은 Errors ÷ Rate예요.

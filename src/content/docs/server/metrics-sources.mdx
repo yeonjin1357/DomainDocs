@@ -69,13 +69,11 @@ Prometheus 생태계의 서버 에이전트는 node_exporter예요. 기본으로
 
 ## node_exporter가 내는 이름
 
-| 지표 | 뜻 |
-| --- | --- |
-| `node_cpu_seconds_total` | 코어(`cpu`)와 쓰임새(`mode`)마다 쓴 CPU 시간의 누적(초) |
-| `node_memory_MemAvailable_bytes` | 새 프로그램이 쓸 수 있는 메모리 |
-| `node_filesystem_avail_bytes` | 파일 시스템(`mountpoint`)마다 일반 사용자가 쓸 수 있는 공간 |
-| `node_disk_io_time_seconds_total` | 디스크가 입출력으로 바빴던 시간의 누적 |
-| `node_network_receive_bytes_total` | 인터페이스마다 받은 바이트의 누적 |
+- `node_cpu_seconds_total`: 코어(`cpu`)와 쓰임새(`mode`)마다 쓴 CPU 시간의 누적(초)이에요.
+- `node_memory_MemAvailable_bytes`: 새 프로그램이 쓸 수 있는 메모리예요.
+- `node_filesystem_avail_bytes`: 파일 시스템(`mountpoint`)마다 일반 사용자가 쓸 수 있는 공간이에요.
+- `node_disk_io_time_seconds_total`: 디스크가 입출력으로 바빴던 시간의 누적이에요.
+- `node_network_receive_bytes_total`: 인터페이스마다 받은 바이트의 누적이에요.
 
 `/proc/stat`의 CPU 시간은 틱 단위(보통 초당 100)인데, node_exporter는 이를 초로 바꿔 내요. 그래서 CPU 사용률은 쉬는 시간(`idle`)의 초당 증가량을 1에서 빼서 구해요.
 

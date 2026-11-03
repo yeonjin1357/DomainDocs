@@ -26,6 +26,13 @@ terms:
     short: 운영체제의 핵심이에요. CPU·메모리·입출력을 프로세스들에게 나눠 줘요.
     analogy: 누가 언제 어느 책상을 쓸지 정하는 사무실 관리자와 같아요.
     doc: server/overview
+  - id: logical-cpu
+    name: 논리 CPU
+    en: Logical CPU
+    aliases: [logical CPU, 논리 코어, logical core, 하드웨어 스레드, hardware thread]
+    short: 운영체제가 CPU 하나로 보는 실행 흐름이에요. SMT를 쓰면 물리 코어 하나가 둘로 보여요.
+    analogy: 직원 한 명이 두 가지 일을 틈틈이 번갈아 붙잡는 것과 같아요.
+    doc: server/cpu-usage
   - id: system-call
     name: 시스템 콜
     en: System call

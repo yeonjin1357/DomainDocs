@@ -124,7 +124,12 @@ Grafana의 `$__rate_interval`을 쓰면 질의가 같아도 기간이 길수록 
 Prometheus 클래식 <Term slug="foundations/histograms">히스토그램</Term>이라면 서버마다 버킷 카운터의 rate를 먼저 구해요. 그다음 같은 `le`(버킷 경계)끼리 더하고 p99를 계산해요. 이때 서버마다 버킷 경계가 같아야 해요.
 
 ```text
-histogram_quantile(0.99, sum by (le) (rate(http_server_request_duration_seconds_bucket[5m])))
+histogram_quantile(0.99,
+  sum by (le) (rate(
+    http_server_request_duration_seconds_bucket
+    [5m]
+  ))
+)
 ```
 
 ## 4. 그래도 다르면 데이터를 확인하세요

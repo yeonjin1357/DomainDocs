@@ -90,9 +90,16 @@ updated: 2026-10-29
 ```yaml
 - alert: HighErrorRate
   expr: |
-    sum by (job) (rate(http_requests_total{status=~"5.."}[1m]))
-      / sum by (job) (rate(http_requests_total[1m]))
-      > 0.02
+    sum by (job) (rate(
+      http_requests_total{
+        status=~"5.."
+      }[1m]
+    ))
+    /
+    sum by (job) (rate(
+      http_requests_total[1m]
+    ))
+    > 0.02
   for: 3m
 ```
 
