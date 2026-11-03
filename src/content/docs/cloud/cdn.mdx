@@ -1,0 +1,165 @@
+---
+title: CDN(콘텐츠 전송 네트워크)
+summary: 사용자 가까운 엣지 서버가 원본의 응답을 캐시해 대신 줘요. 적중률이 원본 부담을 정해요.
+domain: cloud
+type: concept
+stage: basics
+order: 45
+icon: cloud
+keywords: [CDN, CloudFront, 엣지, edge, PoP, 캐시 적중률, CacheHitRate, X-Cache, Cache-Control, 원본]
+related: [cloud/load-balancers, cloud/storage, apm/cache, apm/page-load, apm/http-basics]
+sources:
+  - title: Amazon CloudFront — CloudWatch metrics
+    url: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/viewing-cloudfront-metrics.html
+  - title: Amazon CloudFront — Managed cache policies
+    url: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html
+  - title: Amazon CloudFront — Standard log fields (x-edge-result-type)
+    url: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/standard-logs-reference.html
+  - title: Amazon CloudFront — HTTP 502 and 504
+    url: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/http-504-gateway-timeout.html
+  - title: RFC 9111 — HTTP Caching
+    url: https://www.rfc-editor.org/rfc/rfc9111
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="가까운 엣지가 대신 답해요">
+    처음 요청은 원본에서 받아 와 엣지에 담고, 다음부터는 엣지가 바로 줘요. 사용자는 가까운 곳에서 빨리 받아요.
+  </Point>
+  <Point title="캐시 키와 TTL이 적중률을 정해요">
+    무엇을 같은 요청으로 볼지와 얼마나 둘지를 잘못 정하면, 요청마다 원본까지 가요.
+  </Point>
+  <Point title="에러가 어디서 났는지 갈라 봐요">
+    CDN의 5xx는 원본이 낸 에러일 수도, 원본에 닿지 못한 CDN이 낸 에러일 수도 있어요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="편의점 물건은 팔리면 줄지만, 엣지는 같은 파일을 몇 번이든 내줘요. 대신 유통기한(TTL)이 지나면 창고에 아직 같은 물건인지 다시 물어봐요.">
+  자주 찾는 물건은 동네 편의점(엣지)에 미리 두고, 없는 물건만 본사 창고(원본)에서 가져오는 것과 같아요.
+</Analogy>
+
+## 엣지가 대신 답해요
+
+<Term term="cloud/cdn">CDN</Term>(Content Delivery Network)은 세계 곳곳의 엣지 서버가 원본의 응답을 담아 두었다가 대신 주는 서비스예요. 원본은 웹 서버나 S3 같은 저장소예요. 엣지가 모인 곳을 PoP(Point of Presence)라고 불러요.
+
+<Figure caption="같은 파일을 두 사용자가 요청한 순서예요. 첫 요청은 엣지에 없어 원본까지 가고(Miss), 다음 요청은 엣지가 바로 답해요(Hit).">
+  <Sequence
+    ariaLabel="첫 사용자의 요청은 엣지에 없어 원본에서 가져와 담은 뒤 답하고, 두 번째 요청은 엣지가 담아 둔 것으로 바로 답하는 순서"
+    participants={['사용자', '엣지', '원본']}
+    messages={[
+      { from: '사용자', to: '엣지', label: 'GET /logo.png' },
+      { from: '엣지', to: '원본', label: '없어서 가져오기', tone: 'warn' },
+      { from: '원본', to: '엣지', label: '파일 + Cache-Control', dashed: true },
+      { from: '엣지', to: '사용자', label: '응답(Miss)', dashed: true },
+      { from: '사용자', to: '엣지', label: '같은 요청(다른 사용자)' },
+      { from: '엣지', to: '사용자', label: '담아 둔 것(Hit)', dashed: true, tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+엣지가 답하면 원본은 그 요청을 아예 받지 않아요. 그래서 CDN은 사용자 쪽 응답시간을 줄이고, 원본의 부담도 줄여요.
+
+## 응답 헤더로 확인해요
+
+CDN을 거친 응답에는 CDN이 붙인 헤더가 있어요. 아래는 AWS의 정적 파일을 서울에서 실제로 받은 응답이에요.
+
+```text
+X-Cache: Hit from cloudfront
+X-Amz-Cf-Pop: ICN80-P2
+Age: 15492907
+Cache-Control: max-age=31536000
+```
+
+- `X-Cache`: 엣지에 있어서 바로 줬는지예요. CloudFront는 Hit, Miss, RefreshHit(기간이 지나 원본에 확인한 뒤 줌)로 보여 줘요.
+- `X-Amz-Cf-Pop`: 응답한 엣지 위치예요. ICN은 인천 공항 코드라, 서울 근처 엣지가 답했어요.
+- `Age`: 엣지에 담긴 지 몇 초인지예요. 15,492,907초는 179일쯤이에요.
+- `Cache-Control`: 원본이 정한 보관 기간이에요. `max-age=31536000`은 1년이에요.
+
+CDN마다 헤더 이름은 달라요. Cloudflare는 `CF-Cache-Status: HIT`처럼 보여 줘요.
+
+## 캐시 키가 같은 요청을 정해요
+
+엣지는 캐시 키가 같은 요청을 같은 요청으로 봐요. 캐시 키는 기본으로 주소의 경로이고, 설정에 따라 쿼리 문자열, 헤더, 쿠키를 더해요.
+
+<Figure caption="같은 파일에 광고 추적용 쿼리(?utm=…)가 달린 요청 세 개예요. 쿼리를 캐시 키에 넣으면 세 번 모두 원본까지 가고, 넣지 않으면 처음 한 번만 가요.">
+  <Strip
+    ariaLabel="쿼리를 캐시 키에 넣으면 세 요청이 모두 Miss, 넣지 않으면 첫 요청만 Miss이고 나머지 둘은 Hit인 칸 띠"
+    rows={[
+      { label: '쿼리를 캐시 키에 넣으면', heads: ['?utm=a', '?utm=b', '?utm=c'], cells: [{ label: 'Miss', tone: 'warn' }, { label: 'Miss', tone: 'warn' }, { label: 'Miss', tone: 'warn' }] },
+      { label: '넣지 않으면', heads: ['?utm=a', '?utm=b', '?utm=c'], cells: [{ label: 'Miss', tone: 'warn' }, { label: 'Hit', tone: 'accent' }, { label: 'Hit', tone: 'accent' }] },
+    ]}
+  />
+</Figure>
+
+앞의 실제 응답도 같아요. 그 주소 뒤에 아무 쿼리(`?nocache=…`)를 붙여 다시 받아도 Hit이었어요.
+
+그 배포는 쿼리 문자열을 캐시 키에 넣지 않게 설정돼 있어요. 다만 쿼리에 따라 내용이 달라지는 응답이라면 넣어야 해요.
+
+얼마나 둘지는 TTL(보관 기간)이 정해요. 원본이 `Cache-Control: max-age=…`로 알려 주고, CDN 설정이 그 범위를 묶어요. CloudFront의 기본 정책(CachingOptimized)은 원본이 알려 주지 않으면 24시간 둬요.
+
+## 개인화 응답은 담으면 안 돼요
+
+로그인한 사용자마다 다른 응답을 엣지가 담으면, 다른 사용자에게 그대로 나갈 수 있어요. 그래서 원본은 이런 응답에 `Cache-Control: private`이나 `no-store`를 붙여요. HTTP 캐시 표준은 private 응답을 CDN 같은 공유 캐시가 저장하지 말라고 해요.
+
+파일 이름에 내용의 해시를 넣으면 TTL을 길게 잡아도 안전해요. 앞의 실제 파일도 이름에 긴 해시가 있고, 보관 기간이 1년이었어요. 내용이 바뀌면 이름이 바뀌어 새 파일로 받아요.
+
+## 적중률이 원본 부담을 정해요
+
+캐시 적중률은 캐시할 수 있는 요청 가운데 엣지가 바로 준 비율이에요. 원본으로 가는 요청은 (1 − 적중률)만큼이라, 적중률이 조금만 떨어져도 원본 부담은 크게 늘어요.
+
+<Figure caption="사용자 요청 1만 건일 때 원본까지 가는 요청 수예요. 적중률 99%와 95%는 원본 입장에서 5배 차이예요.">
+  <Bars
+    ariaLabel="원본까지 가는 요청 수. 적중률 99%면 100건, 95%면 500건, 80%면 2,000건"
+    bars={[
+      { label: '적중률 99%', value: 100, display: '100건', tone: 'accent' },
+      { label: '적중률 95%', value: 500, display: '500건' },
+      { label: '적중률 80%', value: 2000, display: '2,000건', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+그래서 배포나 설정 변경 뒤 적중률이 떨어지면, 원본 서버의 부하와 응답시간을 함께 봐요. 많은 파일의 TTL이 한꺼번에 끝나도 요청이 원본으로 몰려요.
+
+## 에러는 어디서 났나요
+
+CDN이 돌려준 5xx는 두 갈래예요. 원본이 낸 에러를 그대로 전한 것일 수도 있고, 원본에 닿지 못한 CDN이 직접 낸 것일 수도 있어요.
+
+<Figure caption="CloudFront 문서가 드는 502·504의 까닭과, 원본이 낸 에러를 견줬어요. 원본 로그에 그 요청이 남았는지가 가장 빠른 구별법이에요.">
+  <Compare
+    columns={['원본이 낸 에러', 'CDN이 낸 에러']}
+    rows={[
+      { label: '예', values: ['원본 앱의 500, 503', '원본과 TLS 실패 502, 원본이 늦어 504'] },
+      { label: '원본의 접근 로그', values: ['남아요', '없거나 늦게 끝난 기록만'] },
+      { label: '먼저 볼 곳', values: ['원본 앱의 에러 로그', '원본 주소·포트·인증서·방화벽'] },
+    ]}
+  />
+</Figure>
+
+## 모니터링에서는
+
+<Figure caption="한 배포의 캐시 적중률 예시예요. 링크에 추적용 쿼리를 붙인 배포 뒤에 96%에서 70%로 떨어졌어요. 같은 때 원본 요청은 7배쯤 늘어요.">
+  <MiniLineChart ariaLabel="캐시 적중률이 96% 안팎이다가 배포 뒤 70%로 떨어진 그래프" yMax={100} series={[{ label: '캐시 적중률(%)', values: [96, 97, 96, 96, 95, 71, 70, 70, 69, 70, 70], tone: 'warn', value: '70%' }]} />
+</Figure>
+
+CloudFront는 지표를 CloudWatch에 보내요. 요청 수, 내려받은 바이트, 4xx·5xx 에러율은 기본으로 1분마다 나와요. 캐시 적중률과 원본 지연은 배포마다 추가 지표를 켜야 나오고, 따로 비용이 들어요.
+
+CloudFront 지표는 배포가 어디 있든 미국 동부 버지니아 리전(us-east-1)에 쌓여요. 다른 리전에서 지표를 찾으면 비어 보여요.
+
+사용자 쪽 응답시간은 CDN 지표에 다 담기지 않아요. 지역마다 실제로 받는 시간은 <Term slug="apm/synthetic-monitoring">합성 모니터링</Term>이나 <Term slug="apm/rum">실사용자 모니터링</Term>으로 봐요.
+
+<Checkpoints>
+  <Check>CloudFront 지표를 서비스가 있는 리전에서 모으는 설정이라면 다시 보세요. CloudFront 지표는 us-east-1에 있어요.</Check>
+  <Check>캐시 적중률 그래프가 비어 있다면, 그 배포에 추가 지표를 켰는지 보세요.</Check>
+  <Check>쿼리 문자열과 쿠키를 모두 캐시 키에 넣는 설정이라면 다시 보세요. 내용과 상관없는 값마다 원본까지 가요.</Check>
+  <Check>로그인 사용자의 응답에 `Cache-Control: private`이 없다면 다시 보세요. 다른 사용자에게 그 응답이 나갈 수 있어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 최소 TTL의 함정
+
+  CloudFront의 CachingOptimized 정책은 최소 TTL이 1초예요. 문서는 최소 TTL이 0보다 크면, 원본이 `no-cache`, `no-store`, `private`를 보내도 그 시간만큼은 담는다고 경고해요. 개인화 응답 경로에는 캐시를 끄는 정책(CachingDisabled)을 따로 걸어요.
+
+  ### 결과 종류
+
+  CloudFront 표준 로그의 `x-edge-result-type`은 Hit, RefreshHit, Miss 말고도 다른 값을 남겨요. Error, LimitExceeded(할당량 초과), CapacityExceeded(엣지 용량이 모자라 503) 같은 값이에요. 에러가 CDN 쪽인지 가를 때 이 칸을 봐요.
+</Deeper>

@@ -1,0 +1,28 @@
+questions:
+  - id: hit-no-origin
+    type: ox
+    prompt: CDN 엣지가 담아 둔 것으로 답한(Hit) 요청은 원본 서버의 접근 로그에도 남나요?
+    answer: false
+    explain: 엣지가 바로 답하면 원본은 그 요청을 받지 않아요. 그래서 원본 로그만 보면 실제 사용자 요청보다 적게 보여요.
+  - id: metrics-region
+    type: ox
+    prompt: CloudFront의 CloudWatch 지표는 배포가 어느 리전 서비스를 앞에 두든 us-east-1에 쌓이나요?
+    answer: true
+    explain: CloudFront 지표는 미국 동부 버지니아 리전(us-east-1)에 있어요. 다른 리전에서 찾으면 비어 보여요.
+  - id: hit-rate-origin
+    type: choice
+    prompt: 캐시 적중률이 99%에서 95%로 떨어지면, 원본으로 가는 요청은 대략 몇 배가 되나요?
+    choices: [5배, 1.04배, 2배, 그대로]
+    answer: 0
+    explain: 원본으로 가는 몫은 1%에서 5%로 늘어요. 적중률이 몇 %만 떨어져도 원본 부담은 몇 배가 돼요.
+  - id: private-response
+    type: choice
+    prompt: 로그인한 사용자마다 다른 응답을 CDN이 담지 않게 하려면 원본이 붙일 헤더는?
+    choices: ['Cache-Control: private', 'Cache-Control: max-age=86400', 'Age: 0', 'X-Cache: Miss']
+    answer: 0
+    explain: private는 CDN 같은 공유 캐시가 저장하지 말라는 뜻이에요. 다만 CloudFront는 최소 TTL이 0보다 크면 그만큼은 담으니 정책도 함께 봐요.
+  - id: cdn-name
+    type: input
+    prompt: 사용자 가까운 엣지 서버들이 원본의 응답을 담아 두었다가 대신 주는 서비스를 세 글자 약자로 쓰면?
+    answer: [CDN, 씨디엔]
+    explain: CDN(Content Delivery Network)은 응답시간을 줄이고 원본의 부담도 줄여요.

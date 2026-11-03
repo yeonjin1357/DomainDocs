@@ -177,3 +177,10 @@ terms:
     aliases: [managed identity, 관리 아이디, 관리되는 ID]
     short: Azure 자원에 붙여, 앱이 자격 증명을 따로 두지 않고 토큰을 받게 하는 ID예요.
     doc: cloud/iam
+  - id: cdn
+    name: CDN
+    en: Content Delivery Network
+    aliases: [콘텐츠 전송 네트워크, CloudFront, 엣지, edge, PoP]
+    short: 세계 곳곳의 엣지 서버가 원본의 응답을 담아 두었다가 대신 주는 서비스예요.
+    analogy: 자주 찾는 물건을 미리 둔 동네 편의점과 같아요.
+    doc: cloud/cdn
