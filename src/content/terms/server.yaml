@@ -247,3 +247,17 @@ terms:
     aliases: [Xid 에러, XID 에러]
     short: NVIDIA 드라이버가 GPU 에러를 커널 로그에 남기는 번호 붙은 메시지예요.
     doc: server/gpu
+  - id: smart
+    name: SMART
+    en: Self-Monitoring, Analysis and Reporting Technology
+    aliases: [S.M.A.R.T., smartctl, 스마트]
+    short: 디스크가 스스로 상태와 에러 수를 세어 두는 기능이에요.
+    analogy: 엔진이 멈추기 전에 켜지는 자동차 계기판의 경고등과 같아요.
+    doc: server/disk-health
+  - id: raid
+    name: RAID
+    en: Redundant Array of Independent Disks
+    aliases: [레이드, mdadm, 소프트웨어 RAID]
+    short: 디스크 여러 개를 하나처럼 묶어, 하나가 고장 나도 데이터를 지키는 방식이에요.
+    analogy: 예비 타이어를 달고 다니는 것과 같아요.
+    doc: server/disk-health

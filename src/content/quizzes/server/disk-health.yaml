@@ -1,0 +1,28 @@
+questions:
+  - id: prefail-type
+    type: ox
+    prompt: smartctl 항목의 TYPE 칸에 Pre-fail이라고 적혀 있으면, 그 디스크는 고장 직전이라는 뜻인가요?
+    answer: false
+    explain: Pre-fail은 항목의 종류일 뿐이에요. 그 항목의 VALUE가 THRESH 이하로 내려갔을 때만 고장이 가깝다는 뜻이에요.
+  - id: raid-not-backup
+    type: ox
+    prompt: RAID 1로 묶은 서버에서 파일을 실수로 지우면, 거울 디스크에서도 그 파일이 함께 지워지나요?
+    answer: true
+    explain: RAID는 쓰는 일을 모든 디스크에 똑같이 해요. 지우기도 마찬가지라, 되돌리려면 따로 둔 백업이 있어야 해요.
+  - id: which-value
+    type: choice
+    prompt: 하드디스크의 Reallocated_Sector_Ct가 나빠지는지 지켜보려면 무엇을 볼까요?
+    choices: [RAW_VALUE가 늘어나는지, VALUE가 100인지, TYPE이 Pre-fail인지, 항목 번호가 5인지]
+    answer: 0
+    explain: RAW_VALUE는 디스크가 실제로 다시 배치한 섹터 수예요. VALUE는 제조사가 바꾼 값이라 고장 직전까지 멀쩡해 보일 수 있어요.
+  - id: raid5-capacity
+    type: choice
+    prompt: 4TB 디스크 4개로 RAID 5를 만들면 쓸 수 있는 용량은 대략?
+    choices: [12TB, 16TB, 8TB, 4TB]
+    answer: 0
+    explain: RAID 5는 디스크 하나만큼을 패리티에 써요. 4TB × (4 − 1) = 12TB이고, 디스크 1개 고장까지 견뎌요.
+  - id: rebuild-name
+    type: input
+    prompt: RAID에서 고장 난 디스크를 새 디스크로 바꾼 뒤, 나머지 디스크를 읽어 새 디스크를 다시 채우는 일을 무엇이라 하나요?
+    answer: [리빌드, rebuild, 재구성, resync]
+    explain: 리빌드 중에는 남은 디스크가 바쁘게 읽혀요. 이때 하나가 더 고장 나면 RAID 5는 데이터를 잃어요.

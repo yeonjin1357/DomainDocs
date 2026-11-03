@@ -1,0 +1,178 @@
+---
+title: 디스크 건강(SMART)과 RAID
+summary: 디스크는 고장 전에 SMART 숫자로 신호를 남겨요. RAID는 고장을 견디게 하지만 백업은 아니에요.
+domain: server
+type: concept
+stage: basics
+order: 52
+icon: server
+keywords: [SMART, smartctl, Reallocated_Sector_Ct, Current_Pending_Sector, NVMe, Percentage Used, RAID, mdadm, degraded, rebuild]
+related: [server/disk-io, server/filesystem-and-capacity, server/slow-disk, database/backup-and-restore, network/redundancy]
+sources:
+  - title: smartmontools — smartctl man page
+    url: https://www.smartmontools.org/browser/trunk/smartmontools/smartctl.8.in
+  - title: Backblaze — What SMART Stats Tell Us About Hard Drives
+    url: https://www.backblaze.com/blog/what-smart-stats-indicate-hard-drive-failures/
+  - title: nvme-cli — nvme_smart_log (percent_used)
+    url: https://github.com/linux-nvme/nvme-cli/blob/master/libnvme/doc/man/nvme_smart_log-libnvme3.2
+  - title: Linux — drivers/md/raid5.c (mdstat의 U와 _)
+    url: https://github.com/torvalds/linux/blob/master/drivers/md/raid5.c
+  - title: node_exporter — mdadm collector
+    url: https://github.com/prometheus/node_exporter/blob/master/collector/mdadm_linux.go
+  - title: smartctl_exporter — metrics
+    url: https://github.com/prometheus-community/smartctl_exporter/blob/master/metrics.go
+  - title: Amazon EBS — Volume status checks
+    url: https://docs.aws.amazon.com/ebs/latest/userguide/monitoring-volume-checks.html
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="고장 전에 SMART 숫자가 늘어요">
+    디스크는 다시 배치한 섹터와 읽지 못한 섹터를 세어 둬요. 0이던 값이 늘기 시작하면 바꿀 준비를 해요.
+  </Point>
+  <Point title="SSD는 닳은 정도를 봐요">
+    NVMe의 Percentage Used는 제조사가 예상한 수명 가운데 쓴 몫이에요. 100%에 가까우면 교체를 계획해요.
+  </Point>
+  <Point title="RAID는 고장을 견디지만 백업은 아니에요">
+    디스크 하나가 죽어도 서비스는 돌아요. 하지만 지운 파일은 모든 디스크에서 함께 지워져요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="자동차 계기판은 대개 고장 전에 불이 들어오지만, 디스크의 SMART는 고장 난 디스크 4개 가운데 1개쯤은 아무 신호도 남기지 않았어요.">
+  SMART는 자동차 계기판의 경고등과 같아요. 엔진이 멈추기 전에 경고등이 먼저 켜지는 일이 많아요. RAID는 예비 타이어를 달고 다니는 것과 같아요.
+</Analogy>
+
+## SMART: 디스크가 세어 두는 숫자
+
+<Term term="server/smart">SMART</Term>는 디스크가 스스로 상태를 세어 두는 기능이에요. 리눅스에서는 smartmontools의 `smartctl -A /dev/sda`로 읽어요. 하드디스크(SATA)는 아래처럼 항목마다 한 줄씩 보여 줘요.
+
+<Figure caption="smartctl이 보여 주는 하드디스크 항목 한 줄이에요. 정규화 값은 100으로 멀쩡해 보이지만, 실제 수(RAW_VALUE)는 이미 섹터 8개를 다시 배치했다고 알려요.">
+  <Anatomy
+    ariaLabel="smartctl 항목 한 줄을 조각으로 나눈 그림. 번호 5, 이름 Reallocated_Sector_Ct, 정규화 값 100, 문턱 010, 종류 Pre-fail, 실제 수 8"
+    parts={[
+      { text: '5', label: '항목 번호' },
+      { text: 'Reallocated_Sector_Ct', label: '이름', note: '다시 배치한 섹터 수' },
+      { text: '0x0033', label: '', tone: 'sub' },
+      { text: '100', label: 'VALUE', note: '제조사가 바꾼 정규화 값' },
+      { text: '100', label: '', tone: 'sub' },
+      { text: '010', label: 'THRESH', note: 'VALUE가 이 아래로 가면 실패' },
+      { text: 'Pre-fail', label: 'TYPE', note: '고장 직전이라는 뜻이 아니에요' },
+      { text: '- 8', label: 'RAW_VALUE', note: '실제로 센 수', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+VALUE와 RAW_VALUE는 다른 숫자예요. RAW_VALUE는 디스크가 실제로 센 수이고, VALUE는 제조사가 그 수를 1~254 범위로 바꾼 값이에요. VALUE가 THRESH 아래로 내려가야 smartctl이 실패로 표시해서, 그때는 이미 늦은 편이에요.
+
+TYPE의 Pre-fail은 그 항목의 종류일 뿐, 디스크가 고장 직전이라는 뜻이 아니에요. smartctl 문서도 이 점을 따로 짚어요.
+
+## 무엇을 볼까
+
+Backblaze는 하드디스크 수만 개를 운영하며 다섯 항목의 RAW_VALUE를 봐요. 하나라도 0보다 크면 살펴볼 이유로 삼아요.
+
+- **5 Reallocated_Sector_Ct**: 망가져서 다른 자리로 옮긴 섹터 수예요.
+- **187 Reported_Uncorrect**: 고치지 못한 읽기 에러 수예요.
+- **188 Command_Timeout**: 명령이 시간 안에 끝나지 않은 수예요.
+- **197 Current_Pending_Sector**: 읽기 어려워 옮길 차례를 기다리는 섹터 수예요.
+- **198 Offline_Uncorrectable**: 점검 중에 고치지 못한 섹터 수예요.
+
+<Figure caption="Backblaze가 다섯 항목 가운데 하나라도 0보다 큰 디스크의 비율을 센 결과예요. 고장 난 디스크의 23.3%는 아무 신호 없이 고장 났어요.">
+  <Bars
+    ariaLabel="다섯 항목 가운데 하나라도 0보다 큰 비율. 고장 난 디스크 76.7%, 멀쩡히 도는 디스크 4.2%"
+    max={100}
+    bars={[
+      { label: '고장 난 디스크', value: 76.7, display: '76.7%', tone: 'warn' },
+      { label: '멀쩡히 도는 디스크', value: 4.2, display: '4.2%' },
+    ]}
+  />
+</Figure>
+
+그래서 SMART는 좋은 신호지만 전부는 아니에요. 0보다 크다는 것보다, 얼마나 빨리 느는지가 더 중요해요. Backblaze도 하루 만에 0에서 20이 된 디스크와, 5년에 걸쳐 60이 된 디스크를 견주는 예를 들어요.
+
+## SSD는 닳는 정도를 봐요
+
+SSD는 셀을 쓸 때마다 조금씩 닳아요. NVMe SSD는 항목 표 대신 정해진 칸을 보여 줘요.
+
+- **Percentage Used**: 제조사가 예상한 수명 가운데 쓴 몫이에요. 100%는 예상 수명을 다 썼다는 뜻일 뿐 고장은 아니고, 100을 넘을 수도 있어요.
+- **Available Spare**: 망가진 셀을 대신할 예비 공간이 얼마나 남았는지예요. Available Spare Threshold 아래로 내려가면 디스크가 경고를 보낼 수 있어요.
+- **Media and Data Integrity Errors**: 고치지 못한 데이터 에러 수예요. 0이어야 해요.
+
+## RAID: 여러 디스크로 고장을 견뎌요
+
+<Term term="server/raid">RAID</Term>는 디스크 여러 개를 하나처럼 묶어, 디스크 하나가 고장 나도 데이터를 잃지 않게 해요. 리눅스에서는 소프트웨어 RAID(mdadm)나 RAID 컨트롤러 카드로 만들어요.
+
+RAID 5는 데이터를 디스크마다 나눠 쓰고, 그 데이터로 계산한 패리티(되살리는 데 쓰는 값)를 한 칸 더 써요. 패리티 칸은 디스크마다 돌아가며 놓여요.
+
+<Figure caption="디스크 4개로 만든 RAID 5예요. 줄마다 데이터 세 칸과 패리티 한 칸이 있고, 패리티 자리가 디스크마다 돌아가요. 어느 디스크가 죽어도 나머지 셋으로 그 칸을 다시 계산해요.">
+  <Stacks
+    ariaLabel="디스크 4개의 RAID 5. 첫 줄은 디스크 4에, 둘째 줄은 디스크 3에, 셋째 줄은 디스크 2에, 넷째 줄은 디스크 1에 패리티가 있고 나머지 칸은 데이터인 나란한 기둥"
+    columns={[
+      { title: '디스크 1', blocks: ['A1', 'B1', 'C1', { label: 'D 패리티', tone: 'accent' }] },
+      { title: '디스크 2', blocks: ['A2', 'B2', { label: 'C 패리티', tone: 'accent' }, 'D1'] },
+      { title: '디스크 3', blocks: ['A3', { label: 'B 패리티', tone: 'accent' }, 'C2', 'D2'] },
+      { title: '디스크 4', blocks: [{ label: 'A 패리티', tone: 'accent' }, 'B3', 'C3', 'D3'] },
+    ]}
+  />
+</Figure>
+
+방식마다 쓸 수 있는 용량과 견디는 고장 수가 달라요. 아래는 4TB 디스크 4개로 만들었을 때예요.
+
+<Figure caption="4TB 디스크 4개(모두 16TB)로 만든 RAID의 쓸 수 있는 용량이에요. 용량을 많이 쓸수록 견디는 고장 수가 줄어요.">
+  <Bars
+    ariaLabel="쓸 수 있는 용량. RAID 0은 16TB이고 고장을 못 견뎌요. RAID 5는 12TB이고 1개를 견뎌요. RAID 6은 8TB이고 2개를 견뎌요. RAID 10은 8TB이고 거울 쌍마다 1개를 견뎌요"
+    max={16}
+    bars={[
+      { label: 'RAID 0', value: 16, display: '16TB', note: '고장 0개', tone: 'warn' },
+      { label: 'RAID 5', value: 12, display: '12TB', note: '1개까지' },
+      { label: 'RAID 6', value: 8, display: '8TB', note: '2개까지' },
+      { label: 'RAID 10', value: 8, display: '8TB', note: '거울 쌍마다 1개', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+## 다시 채우는 동안이 가장 위험해요
+
+디스크 하나가 고장 나면 RAID는 빠진 채로(degraded) 계속 돌아요. 새 디스크를 넣으면 나머지 디스크를 모두 읽어 빈 디스크를 다시 채워요. 이걸 리빌드(rebuild)라고 해요.
+
+<Figure caption="4TB 디스크를 초당 100MB로 다시 채운다고 친 예시예요. 4,000,000MB ÷ 100MB/s = 40,000초, 11시간쯤이에요. 그동안 디스크가 하나 더 고장 나면 RAID 5는 데이터를 잃어요.">
+  <Timeline
+    ariaLabel="RAID 5에서 2시간에 디스크가 고장 나 빠진 채로 돌다가, 4시간에 새 디스크를 넣고 11시간 동안 리빌드한 뒤 15시간에 정상으로 돌아오는 시간 띠"
+    end={17}
+    lanes={[
+      {
+        label: 'RAID 5',
+        segments: [
+          { start: 0, end: 2, label: '정상', tone: 'accent' },
+          { start: 2, end: 4, label: '빠짐', tone: 'warn' },
+          { start: 4, end: 15, label: '새 디스크로 리빌드 11시간', tone: 'warn' },
+          { start: 15, end: 17, label: '정상', tone: 'accent' },
+        ],
+      },
+    ]}
+    marks={[{ at: 2, label: '디스크 고장', tone: 'warn' }]}
+    ticks={[{ at: 0, label: '0시간' }, { at: 15, label: '15시간' }]}
+  />
+</Figure>
+
+리빌드 중에는 남은 디스크가 평소보다 훨씬 바쁘게 읽혀요. 같은 때 산 디스크는 비슷하게 닳아 있을 수 있어서, 하나가 고장 나면 다른 것도 의심해요. 디스크가 클수록 리빌드가 길어져서, 큰 디스크에는 두 개를 견디는 RAID 6이나 RAID 10을 써요.
+
+RAID는 백업이 아니에요. 실수로 지운 파일, 랜섬웨어가 암호화한 파일은 모든 디스크에 똑같이 기록돼요. 되돌리려면 따로 둔 <Term slug="database/backup-and-restore">백업</Term>이 있어야 해요.
+
+## 모니터링에서는
+
+<Figure caption="한 디스크의 Reallocated_Sector_Ct 실제 수를 하루마다 그린 예시예요. 몇 주 동안 0이다가 늘기 시작했어요. 이때가 바꿀 때예요.">
+  <MiniLineChart ariaLabel="재배치된 섹터 수가 0으로 머물다 9일째부터 8, 30, 74, 150으로 빠르게 늘어난 그래프" series={[{ label: '재배치된 섹터 수(RAW)', values: [0, 0, 0, 0, 0, 0, 0, 0, 8, 30, 74, 150], tone: 'warn', value: '150' }]} />
+</Figure>
+
+node_exporter는 SMART를 모으지 않아서, smartctl_exporter 같은 도구를 따로 둬요. 이 도구는 항목마다 `smartctl_device_attribute`를 내놓고, `attribute_value_type="raw"`가 실제 수예요.
+
+리눅스 소프트웨어 RAID는 `/proc/mdstat`에서 디스크마다 `U`(정상)나 `_`(빠짐)로 보여요. 디스크 둘이 정상이면 `[UU]`, 하나가 빠지면 `[U_]`예요. node_exporter는 빠진 디스크 수를 `node_md_degraded`로 내놓아요.
+
+클라우드의 가상 디스크는 SMART가 보이지 않아요. 디스크 고장은 클라우드가 대신 처리하고, 상태는 따로 알려 줘요. Amazon EBS는 볼륨 상태 확인을 5분마다 돌려요.
+
+<Checkpoints>
+  <Check>SMART의 VALUE만 보는 알림이라면 다시 보세요. VALUE는 고장 직전까지 멀쩡해 보여요. 5·187·197·198 같은 항목은 RAW_VALUE가 늘어나는지를 보세요.</Check>
+  <Check>TYPE이 Pre-fail인 항목을 위험으로 세는 화면이라면 다시 보세요. 항목의 종류일 뿐이에요.</Check>
+  <Check>RAID가 빠진 채로 돌고 있는데 알림이 없다면 더하세요. 그동안 디스크 하나만 더 고장 나도 데이터를 잃을 수 있어요.</Check>
+  <Check>RAID가 있으니 백업은 없어도 된다는 설계라면 다시 보세요. 지운 파일과 망가진 파일은 모든 디스크에 함께 남아요.</Check>
+</Checkpoints>
