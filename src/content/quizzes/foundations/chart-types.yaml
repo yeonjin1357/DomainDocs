@@ -1,0 +1,36 @@
+questions:
+  - id: stacked-p99-top
+    type: ox
+    prompt: 서버 다섯 대의 p99 응답시간을 누적 영역으로 쌓아 그렸어요. 맨 위 선이 서비스 전체의 p99인가요?
+    answer: false
+    explain: 맨 위 선은 다섯 p99를 더한 값이에요. 백분위수는 더해도 뜻이 없어서, 쌓지 않고 선을 겹쳐 그려요.
+  - id: spread-over-time
+    type: choice
+    prompt: 지난 한 시간 동안 응답시간이 어떻게 퍼져 있었고, 언제 느린 쪽으로 몰렸는지 보고 싶어요. 가장 알맞은 차트는?
+    choices:
+      - 히트맵
+      - 평균 응답시간 선 그래프
+      - 서비스별 막대
+      - 숫자 카드
+    answer: 0
+    explain: 히트맵은 시간마다 값의 구간별 개수를 진하기로 칠해서, 퍼진 모양과 그 변화를 함께 보여 줘요.
+  - id: truncated-axis
+    type: choice
+    prompt: 두 서버의 가용성 96%와 98%를 막대로 그렸더니 98% 막대가 세 배 길어 보여요. 가장 그럴듯한 까닭은?
+    choices:
+      - 축이 95% 근처에서 시작해요
+      - 막대를 큰 순서로 늘어놓았어요
+      - 두 값의 단위가 서로 달라요
+      - 막대를 가로로 눕혀 그렸어요
+    answer: 0
+    explain: 축을 95%에서 자르면 막대는 1과 3만큼만 그려져요. 막대는 길이가 값이라 0에서 시작해야 해요.
+  - id: pie-vs-bar-order
+    type: ox
+    prompt: 비슷한 크기의 값 다섯 개 중 무엇이 두 번째로 큰지 찾을 때, 파이 차트보다 같은 바닥에서 시작한 막대가 더 빨리 읽히나요?
+    answer: true
+    explain: 사람은 각도나 넓이보다 같은 바닥에서 시작한 길이를 더 정확히 견줘요. 그래서 비슷한 값의 순서는 막대에서 잘 보여요.
+  - id: stacked-name
+    type: input
+    prompt: 여러 시리즈를 위로 차곡차곡 얹어, 맨 위 선이 합계가 되게 그린 시계열 차트를 무엇이라고 할까요?
+    answer: [누적 영역, 누적 영역 그래프, stacked area, stacked area chart, 스택 영역]
+    explain: 누적 영역 그래프예요. 더하면 전체가 되는 값에만 써요.

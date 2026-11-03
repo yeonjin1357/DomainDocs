@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 190" width="300" height="190">
+  <line x1="40" y1="14" x2="290" y2="14" stroke-width="1" stroke-dasharray="3 3" style="stroke:var(--color-line)" />
+  <line x1="40" y1="74.0" x2="290" y2="74.0" stroke-width="1" stroke-dasharray="3 3" style="stroke:var(--color-line)" />
+  <line x1="40" y1="134" x2="290" y2="134" stroke-width="1.5" style="stroke:var(--color-text-weak)" />
+  <text x="34" y="18" text-anchor="end" font-size="12" style="fill:var(--color-text-sub)">100%</text>
+  <text x="34" y="78.0" text-anchor="end" font-size="12" style="fill:var(--color-text-sub)">50%</text>
+  <text x="34" y="138" text-anchor="end" font-size="12" style="fill:var(--color-text-sub)">0%</text>
+  <polygon points="40.0,110.0 75.7,107.6 111.4,104.0 147.1,98.0 182.9,80.0 218.6,86.0 254.3,100.4 290.0,105.2 290.0,134.0 254.3,134.0 218.6,134.0 182.9,134.0 147.1,134.0 111.4,134.0 75.7,134.0 40.0,134.0" style="fill:var(--color-accent)" />
+  <polygon points="40.0,100.4 75.7,98.0 111.4,93.2 147.1,86.0 182.9,65.6 218.6,72.8 254.3,89.6 290.0,95.6 290.0,105.2 254.3,100.4 218.6,86.0 182.9,80.0 147.1,98.0 111.4,104.0 75.7,107.6 40.0,110.0" style="fill:var(--color-text-weak)" />
+  <polygon points="40.0,98.0 75.7,94.4 111.4,90.8 147.1,81.2 182.9,47.6 218.6,58.4 254.3,83.6 290.0,92.0 290.0,95.6 254.3,89.6 218.6,72.8 182.9,65.6 147.1,86.0 111.4,93.2 75.7,98.0 40.0,100.4" style="fill:var(--color-warn)" />
+  <polyline points="40.0,98.0 75.7,94.4 111.4,90.8 147.1,81.2 182.9,47.6 218.6,58.4 254.3,83.6 290.0,92.0" fill="none" stroke-width="2" style="stroke:var(--color-text)" />
+  <text x="182.9" y="39.6" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--color-text)">합계 72%</text>
+  <rect x="40" y="160" width="12" height="12" rx="3" style="fill:var(--color-accent)" />
+  <text x="58" y="171" font-size="13" style="fill:var(--color-text)">user</text>
+  <rect x="110" y="160" width="12" height="12" rx="3" style="fill:var(--color-text-weak)" />
+  <text x="128" y="171" font-size="13" style="fill:var(--color-text)">system</text>
+  <rect x="196" y="160" width="12" height="12" rx="3" style="fill:var(--color-warn)" />
+  <text x="214" y="171" font-size="13" style="fill:var(--color-text)">iowait</text>
+</svg>

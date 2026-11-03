@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 184" width="300" height="184">
+  <path d="M150,92 L150.0,10.0 A82,82 0 0 1 231.4,81.7 Z" style="fill:var(--color-accent)" />
+  <text x="183.6" y="58.9" text-anchor="middle" font-size="15" font-weight="700" style="fill:#fff">A</text>
+  <path d="M150,92 L231.4,81.7 A82,82 0 0 1 180.2,168.2 Z" style="fill:var(--color-warn)" />
+  <text x="193.8" y="122.9" text-anchor="middle" font-size="15" font-weight="700" style="fill:#fff">B</text>
+  <path d="M150,92 L180.2,168.2 A82,82 0 0 1 86.8,144.3 Z" style="fill:var(--color-text-weak)" />
+  <text x="137.4" y="146.2" text-anchor="middle" font-size="15" font-weight="700" style="fill:#fff">C</text>
+  <path d="M150,92 L86.8,144.3 A82,82 0 0 1 78.1,52.5 Z" style="fill:var(--color-accent-weak);stroke:var(--color-accent);stroke-width:1.5" />
+  <text x="99.4" y="101.8" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-accent)">D</text>
+  <path d="M150,92 L78.1,52.5 A82,82 0 0 1 150.0,10.0 Z" style="fill:var(--color-card);stroke:var(--color-text-weak);stroke-width:1.5" />
+  <text x="124.1" y="53.2" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">E</text>
+</svg>

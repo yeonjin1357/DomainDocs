@@ -1,0 +1,213 @@
+---
+title: 차트 고르기
+summary: 같은 데이터도 무엇을 물을지에 따라 맞는 차트가 달라요. 질문부터 정해요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 107
+icon: chart-column
+keywords: [차트, chart, 시각화, visualization, 선 그래프, 누적 영역, stacked, 막대, 히트맵, 파이 차트]
+related: [foundations/dashboard-design, foundations/histograms, apm/response-time-distribution, foundations/units-and-notation, foundations/aggregation-and-downsampling]
+sources:
+  - title: Grafana — Time series (Stack series, 누적은 오해를 부를 수 있음)
+    url: https://grafana.com/docs/grafana/latest/visualizations/panels-visualizations/visualizations/time-series/
+  - title: Grafana — Heatmap (시간에 따른 히스토그램)
+    url: https://grafana.com/docs/grafana/latest/visualizations/panels-visualizations/visualizations/heatmap/
+  - title: Cleveland & McGill (1984) — Graphical Perception, Journal of the American Statistical Association
+    url: https://doi.org/10.1080/01621459.1984.10478080
+  - title: Stephen Few — Save the Pies for Dessert
+    url: http://www.perceptualedge.com/articles/08-21-07.pdf
+updated: 2026-11-03
+---
+import CpuStacked from '../../../assets/figures/foundations/cpu-stacked.svg';
+import PieFive from '../../../assets/figures/foundations/pie-five.svg';
+
+<KeyPoints>
+  <Point title="질문이 차트를 정해요">
+    바뀌는 모습은 선, 크기 견주기는 막대, 퍼진 모습은 히트맵, 지금 값은 숫자 카드로 그려요.
+  </Point>
+  <Point title="더해서 뜻이 있을 때만 쌓아요">
+    누적 영역은 맨 위가 합계예요. 서버별 p99처럼 더해도 뜻이 없는 값을 쌓으면 엉뚱한 숫자가 생겨요.
+  </Point>
+  <Point title="길이로 견주게 그려요">
+    사람은 각도나 넓이보다 같은 바닥에서 선 길이를 더 정확히 견줘요. 그래서 막대는 0에서 시작해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="노선도는 정해진 한 용도만 있지만, 대시보드 패널은 한 그래프로 여러 질문에 답하려다 아무것도 못 보여 주기 쉬워요. 패널 하나에는 질문 하나를 둬요.">
+  지하철 노선도와 지도의 차이와 비슷해요. 노선도는 거리와 모양을 버리고 순서와 환승만 보여 줘서, 갈아탈 곳을 찾을 때는 지도보다 빨라요.
+</Analogy>
+
+## 질문이 차트를 정해요
+
+차트를 고르기 전에 이 패널이 답할 질문을 정해요. 질문의 모양이 차트의 모양이에요.
+
+<Figure caption="패널이 답할 질문과 그에 맞는 차트예요. 오른쪽 글자가 그 질문에 맞는 차트예요.">
+  <Tree
+    ariaLabel="이 패널이 답할 질문에서, 시간에 따라 어떻게 바뀌나는 선 그래프, 전체가 무엇으로 나뉘나는 누적 영역이나 비율 막대, 무엇이 가장 큰가는 막대, 값이 어떻게 퍼져 있나는 히트맵, 지금 얼마인가는 숫자 카드, 정확한 값을 찾아야 하나는 표로 갈라지는 나무"
+    root={{
+      label: '이 패널이 답할 질문',
+      children: [
+        { label: '시간에 따라 어떻게 바뀌나', tag: '선 그래프', tone: 'accent' },
+        { label: '전체가 무엇으로 나뉘나', tag: '누적 영역' },
+        { label: '무엇이 가장 큰가', tag: '막대' },
+        { label: '값이 어떻게 퍼져 있나', tag: '히트맵' },
+        { label: '지금 얼마인가', tag: '숫자 카드' },
+        { label: '정확한 값을 찾나', tag: '표' },
+      ],
+    }}
+  />
+</Figure>
+
+## 바뀌는 모습은 선 그래프
+
+모니터링 화면에서 가장 많이 쓰는 차트예요. 가로축은 시간, 세로축은 값이라 언제 오르고 내렸는지가 보여요.
+
+<Figure caption="서비스 셋의 분당 요청 수예요. 선이 셋이라 각자의 오르내림이 한눈에 보여요. 주문 서비스만 중간에 크게 올랐어요.">
+  <MiniLineChart
+    ariaLabel="주문, 결제, 회원 서비스의 분당 요청 수 선 그래프. 주문 서비스만 가운데에서 크게 오르고, 나머지 둘은 평평해요"
+    series={[
+      { label: '주문', values: [120, 125, 130, 210, 260, 240, 140, 130], tone: 'warn', value: '최고 260' },
+      { label: '결제', values: [80, 82, 78, 85, 88, 84, 80, 79], tone: 'accent', value: '80 안팎' },
+      { label: '회원', values: [40, 42, 41, 43, 40, 42, 41, 40], tone: 'sub', value: '40 안팎' },
+    ]}
+  />
+</Figure>
+
+선이 많아지면 서로 엉켜서 읽히지 않아요. 한 패널에 다섯 개 안팎까지만 두고, 더 많으면 위 몇 개만 고르거나 패널을 나눠요.
+
+한 축에는 같은 단위만 둬요. 요청 수와 응답시간을 한 축에 그리면 작은 쪽이 바닥에 깔려 안 보여요. 단위는 <Term slug="foundations/units-and-notation">단위와 숫자 표기</Term>에서 다뤄요.
+
+## 더해서 뜻이 있을 때만 쌓아요
+
+누적 영역은 선을 위로 차곡차곡 쌓은 그래프예요. 맨 위 선이 합계라서, 전체가 얼마이고 무엇으로 이뤄졌는지를 함께 보여요.
+
+<Figure caption="CPU 시간을 종류별로 쌓았어요. 맨 위 선이 합계이고, 합계가 72%로 오른 때 iowait(빨간 층)이 함께 두꺼워졌어요.">
+  <CpuStacked aria-label="user, system, iowait 세 층을 쌓은 누적 영역 그래프. 합계가 30%대에서 가운데 72%까지 오르고, 그때 iowait 층이 두꺼워져요" />
+</Figure>
+
+쌓아도 되는 건 더하면 전체가 되는 값뿐이에요. 서버별 p99 응답시간을 쌓으면 맨 위 선이 p99를 더한 숫자가 돼요. 어디에도 없는 응답시간이에요.
+
+<Figure caption="더하면 전체가 되는지가 기준이에요. 백분위수, 사용률(%), 온도처럼 더해도 뜻이 없는 값은 쌓지 않고 선을 겹쳐 그려요.">
+  <Compare
+    columns={['쌓아도 돼요', '쌓으면 안 돼요']}
+    rows={[
+      { label: '더하면', values: ['전체가 돼요', '뜻 없는 숫자가 돼요'] },
+      { label: '예 1', values: ['상태 코드별 요청 수', '서버별 p99 응답시간'] },
+      { label: '예 2', values: ['CPU 시간의 종류별 몫', '서버별 CPU 사용률(%)'] },
+    ]}
+  />
+</Figure>
+
+쌓은 그래프는 맨 아래 층만 바닥이 평평해요. 위층은 아래층 위에 얹혀 있어서, 위층 하나가 늘었는지 줄었는지 읽기 어려워요. Grafana 문서도 누적은 오해를 부를 수 있으니 조심해서 쓰라고 해요.
+
+## 크기를 견줄 땐 막대
+
+서비스별 에러 수처럼 무엇이 가장 큰지 견줄 때는 막대를 써요. 막대는 모두 같은 바닥에서 시작해서, 길이만 보면 돼요.
+
+<Figure caption="같은 다섯 값을 파이와 막대로 그렸어요. 파이에서는 B와 C 중 무엇이 큰지 알기 어렵지만, 막대에서는 바로 보여요.">
+  <PieFive aria-label="A 23, B 21, C 20, D 19, E 17을 조각으로 나눈 파이 차트. 조각 크기가 비슷해 순서를 알기 어려워요" />
+  <Bars
+    ariaLabel="같은 값 A 23, B 21, C 20, D 19, E 17을 막대 길이로 견준 그림. 큰 순서가 바로 보여요"
+    bars={[
+      { label: 'A', value: 23, display: '23' },
+      { label: 'B', value: 21, display: '21' },
+      { label: 'C', value: 20, display: '20' },
+      { label: 'D', value: 19, display: '19' },
+      { label: 'E', value: 17, display: '17' },
+    ]}
+  />
+</Figure>
+
+파이 차트는 각도와 넓이로 크기를 보여 줘요. 사람은 각도와 넓이를 길이보다 덜 정확하게 견줘요. 비슷한 크기의 조각이 여럿이면 순서를 알기 어려워요.
+
+막대는 큰 순서로 늘어놓으면 더 빨리 읽혀요. 이름이 길면 막대를 가로로 눕혀 이름을 왼쪽에 둬요.
+
+## 막대는 0에서 시작해요
+
+막대는 길이가 곧 값이에요. 축을 0이 아닌 곳에서 자르면, 길이가 값의 차이를 부풀려요.
+
+<Figure caption="같은 두 값 96%와 98%예요. 위는 축을 95%에서 잘라 세 배 차이처럼 보이고, 아래는 0부터 그려 거의 같아 보여요.">
+  <Bars
+    ariaLabel="축을 95%에서 자른 막대에서는 96%가 1칸, 98%가 3칸이라 세 배 차이처럼 보이는 그림"
+    bars={[
+      { label: '서버 A · 축을 95%에서 자르면', value: 1, display: '96%' },
+      { label: '서버 B · 축을 95%에서 자르면', value: 3, display: '98%', tone: 'warn' },
+    ]}
+  />
+  <Bars
+    ariaLabel="축을 0부터 그린 막대에서는 96%와 98%가 거의 같은 길이인 그림"
+    max={100}
+    bars={[
+      { label: '서버 A · 0부터', value: 96, display: '96%' },
+      { label: '서버 B · 0부터', value: 98, display: '98%', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+선 그래프는 다르게 봐요. 선은 높이가 아니라 오르내림을 보여 주는 거라, 축을 값 근처로 좁혀 작은 변화를 키워 봐도 돼요. 대신 축의 숫자를 꼭 같이 보여 줘요.
+
+## 퍼진 모습은 히트맵
+
+응답시간처럼 같은 시각에도 값이 넓게 퍼지는 숫자는 평균 선 하나로는 모양이 안 보여요. 히트맵은 시간마다 값의 구간별 개수를 칸의 진하기로 칠해요.
+
+<Figure caption="1분마다 응답시간 구간별 요청 수를 칠했어요. 진할수록 요청이 많아요. 14:04에는 요청이 1초 넘는 칸으로 몰렸어요.">
+  <Strip
+    ariaLabel="14시부터 14시 5분까지 1분마다 응답시간 세 구간의 요청 수를 진하기로 칠한 히트맵. 평소에는 0.5초 아래 칸이 진하지만 14시 4분에는 1초 넘는 칸이 진해져요"
+    rows={[
+      { label: '1초 넘음', heads: ['14:00', '14:01', '14:02', '14:03', '14:04', '14:05'], cells: [{ label: '', heat: 0 }, { label: '', heat: 0.02 }, { label: '', heat: 0 }, { label: '', heat: 0.03 }, { label: '', heat: 0.9 }, { label: '', heat: 0.02 }] },
+      { label: '0.5~1초', cells: [{ label: '', heat: 0.08 }, { label: '', heat: 0.1 }, { label: '', heat: 0.07 }, { label: '', heat: 0.09 }, { label: '', heat: 0.12 }, { label: '', heat: 0.08 }] },
+      { label: '0.5초 아래', cells: [{ label: '', heat: 1 }, { label: '', heat: 0.97 }, { label: '', heat: 0.95 }, { label: '', heat: 0.98 }, { label: '', heat: 0.25 }, { label: '', heat: 0.96 }] },
+    ]}
+  />
+</Figure>
+
+히트맵의 칸은 <Term slug="foundations/histograms">히스토그램</Term>의 버킷이에요. 점마다 요청을 찍는 분포도는 <Term slug="apm/response-time-distribution">응답시간 분포도</Term>에서 다뤄요.
+
+## 지금 값 하나는 숫자 카드
+
+"지금 괜찮은가"에 답하는 값 하나는 숫자를 크게 보여 줘요. 숫자 옆에 기준이나 평소 값을 함께 두면 좋고 나쁨이 바로 보여요.
+
+<Figure caption="숫자 카드 두 장이에요. 숫자만 있으면 높은지 낮은지 모르지만, 아래 작은 글자의 기준을 보면 바로 알아요.">
+  <StatTile label="에러율" value="2.1" unit="%" tone="warn" note="기준 1%" />
+  <StatTile label="p99 응답시간" value="420" unit="ms" note="기준 800ms" />
+</Figure>
+
+끝이 정해진 값(0~100%, 한도 대비)이라면 게이지도 써요. 끝이 없는 값을 게이지로 그리면 바늘 위치가 뜻이 없어요.
+
+## 정확한 값은 표
+
+많은 항목의 정확한 값을 찾거나 정렬해야 할 때는 표가 나아요. 차트는 모양을 보여 주고, 표는 숫자를 보여 줘요.
+
+| SQL | 호출 | 총 시간 |
+| --- | --- | --- |
+| 주문 조회 | 100만 번 | 2,000초 |
+| 월 정산 | 10번 | 50초 |
+
+이런 순위는 <Term slug="database/top-sql">SQL별 부하 순위</Term>처럼 표로 보여 주고, 행을 누르면 그 항목의 선 그래프로 들어가게 하는 게 흔해요.
+
+## 모니터링에서는
+
+대시보드 편집 화면은 패널마다 차트 종류를 고르게 해요. 기본값이 늘 맞지는 않아서, 패널의 질문에 맞게 바꿔요. 패널 배치는 <Term slug="foundations/dashboard-design">대시보드는 어떻게 짤까</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>서버별 p99 응답시간이나 사용률(%)을 누적 영역으로 그린 패널이라면 다시 보세요. 맨 위 선이 더해서 뜻이 없는 숫자예요.</Check>
+  <Check>막대 그래프의 축이 0에서 시작하지 않는다면, 작은 차이가 크게 부풀려 보이지 않는지 보세요.</Check>
+  <Check>선이 열 개 넘게 겹친 패널이라면, 위 몇 개만 고르거나 패널을 나누는 게 나은지 보세요.</Check>
+  <Check>비슷한 크기의 항목을 파이 차트로 견주게 한 화면이라면, 큰 순서로 늘어놓은 막대가 나은지 보세요.</Check>
+  <Check>단위가 다른 두 값을 한 축에 그렸다면, 작은 쪽이 바닥에 깔려 안 보이지 않는지 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 사람은 무엇을 정확히 견주나
+
+  Cleveland와 McGill(1984)은 사람이 그래프를 읽는 정확도를 실험으로 쟀어요. 같은 바닥에서 시작한 위치와 길이를 가장 정확히 읽고, 각도와 넓이는 그보다 덜 정확했어요. 막대가 파이보다 견주기 쉬운 까닭이에요.
+
+  ### 축이 두 개인 그래프
+
+  왼쪽과 오른쪽에 서로 다른 단위의 축을 둔 그래프는 두 축의 범위를 어떻게 잡느냐에 따라 선이 겹쳐 보이기도, 떨어져 보이기도 해요. 둘 사이 관계를 보려 했다면 패널 두 개를 위아래로 두고 시간축을 맞추는 게 덜 헷갈려요.
+
+  ### 로그 축
+
+  값이 1부터 10,000까지 넓게 퍼지면 로그 축을 써요. 눈금이 10배씩 늘어서, 작은 값과 큰 값을 함께 볼 수 있어요. 대신 같은 높이 차이가 같은 비율 차이라는 점을 읽는 사람이 알아야 해요.
+</Deeper>
