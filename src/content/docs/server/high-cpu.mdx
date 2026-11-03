@@ -64,7 +64,7 @@ updated: 2026-10-29
   <StatTile label="1분 부하" value="14.3" note="코어 8개" />
 </Figure>
 
-범인 프로세스를 찾았다면, 그 안의 어느 스레드가 바쁜지까지 내려가요. 자바라면 <Term slug="apm/thread-dumps">스레드 덤프</Term>를 몇 번 떠서 바쁜 스레드가 무슨 코드를 실행하는지 봐요.
+범인 프로세스를 찾았다면, 그 안의 어느 스레드가 바쁜지까지 내려가요. 자바라면 `top -H`로 찾은 스레드 번호를 <Term slug="apm/thread-dumps">스레드 덤프</Term>의 nid와 맞춰, 그 스레드가 무슨 코드를 실행하는지 봐요.
 
 **확인 방법**: `pidstat -u 5`로 프로세스별 %usr, %system을 봐요. `top`에서 `H`를 누르면 스레드 단위로 보여 줘요.
 

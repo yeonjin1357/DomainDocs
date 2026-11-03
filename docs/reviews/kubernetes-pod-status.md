@@ -17,3 +17,12 @@
 | `kubectl logs --previous` = 이전 컨테이너 실행의 로그 | https://kubernetes.io/docs/reference/kubectl/generated/kubectl_logs/ |
 
 - 메모: 노드마다 최대 대기를 바꾸는 설정은 Pod Lifecycle 문서의 KubeletCrashLoopBackOffMax(베타) 항목이에요.
+
+## 2026-11-03 더한 절: init 컨테이너와 Init: 상태
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| init 컨테이너는 앱 컨테이너보다 먼저, 하나씩 순서대로 끝까지 돌고, 실패하면 성공할 때까지 다시 띄움(restartPolicy Never면 파드 실패) | https://kubernetes.io/docs/concepts/workloads/pods/init-containers/ |
+| 초기화 중인 파드 단계는 Pending, 파드가 다시 시작되면 init 컨테이너도 모두 다시 돎 | 같은 문서 |
+| STATUS 값: Init:N/M, Init:Error, Init:CrashLoopBackOff, Pending, PodInitializing 또는 Running | https://kubernetes.io/docs/tasks/debug/debug-application/debug-init-containers/ |
+| 사이드카 컨테이너(restartPolicy: Always인 init 컨테이너)는 v1.33부터 stable | https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/ |

@@ -6,7 +6,7 @@ type: concept
 stage: basics
 order: 50
 icon: layers
-keywords: [thread dump, 스레드 덤프, jstack, jcmd, Thread.State, RUNNABLE, BLOCKED, WAITING, stack trace, 스택 트레이스]
+keywords: [thread dump, 스레드 덤프, jstack, jcmd, Thread.State, RUNNABLE, BLOCKED, top -H, nid, 스택 트레이스]
 related: [apm/thread-pools, apm/jvm-memory, apm/slow-response, database/locks-and-blocking]
 sources:
   - title: Java SE 21 — Thread.State
@@ -42,7 +42,7 @@ daemon prio=5
   java.lang.Thread.State:
   BLOCKED (on object monitor)
   at com.example.OrderService
-    .reserve(OrderService.java:88)
+   .reserve(OrderService.java:88)
   - waiting to lock
     <0x000000076b1c2a10>
   at com.example.OrderController
@@ -84,6 +84,44 @@ RUNNABLE이 많다고 CPU가 바쁘다고 읽으면 안 돼요. 스택 맨 위�
 
 스레드 풀의 쉬는 스레드는 새 일이 오기를 기다리며 WAITING이나 TIMED_WAITING으로 보여요. 그래서 WAITING이 많다는 것만으로는 문제가 아니에요. 문제는 요청을 처리하던 스레드가 무언가에 막혀 기다릴 때예요.
 
+## CPU를 쓰는 스레드 찾기
+
+덤프의 스택만 봐서는 RUNNABLE 가운데 누가 정말 CPU를 쓰는지 알 수 없어요. 운영체제가 보는 스레드별 CPU와 덤프를 이어야 해요.
+
+리눅스에서 `top -H -p <PID>`를 쓰면 그 프로세스의 스레드마다 CPU 사용률이 나와요. 맨 앞 PID 칸이 스레드 번호예요. 자바는 스레드 이름 앞 15자를 운영체제에도 알려 줘서, 맨 끝 칸에 이름 앞부분이 보여요.
+
+```text
+  PID  S  %CPU  COMMAND
+  612  R  99.9  busy-wo+
+  586  S   0.0  java
+```
+
+이 번호를 덤프에서 찾으면 그 스레드의 스택이 나와요. 그런데 덤프가 번호를 적는 방식이 JDK 버전마다 달라요.
+
+<Figure caption="JDK 11·17·21·25에서 같은 실험을 한 결과예요. top -H의 스레드 번호를 JDK 17까지는 16진수로 바꿔 찾고, JDK 21부터는 그대로 찾아요. 숫자는 JDK 21 실험의 612로 맞췄어요.">
+  <Compare
+    columns={['JDK 11·17', 'JDK 21·25']}
+    rows={[
+      { label: 'top -H의 번호', values: ['612', '612'] },
+      { label: '바꾸기', values: ['16진수로 바꿔요(264)', '그대로 써요'] },
+      { label: '덤프에서 찾을 글자', values: ['nid=0x264', 'nid=612, 이름 옆 [612]'] },
+    ]}
+  />
+</Figure>
+
+16진수는 `printf '%x
+' 612`로 바꿔요. 아래는 JDK 21로 뜬 덤프에서 그 스레드를 찾은 모습이에요.
+
+```text
+"busy-worker" #28 [612] daemon
+ cpu=6249.82ms elapsed=6.26s
+ nid=612 runnable
+ java.lang.Thread.State: RUNNABLE
+ at Busy.lambda$main$0(Busy.java:8)
+```
+
+덤프 줄의 `cpu=`는 그 스레드가 지금까지 쓴 CPU 시간이에요. 확인한 JDK 11부터 25까지 모두 이 칸이 있었어요. 몇 초 간격으로 두 번 떠서 이 값이 크게 는 스레드가, 지금 CPU를 쓰는 스레드예요.
+
 ## 모니터링에서는
 
 <Figure caption="응답이 느려졌을 때 5초 간격으로 세 번 뜬 덤프 예시예요. 요청 스레드 30개가 세 번 모두 같은 잠금에서 BLOCKED였어요.">
@@ -106,6 +144,7 @@ APM 화면의 스레드 덤프 기능은 버튼 하나로 이 사진을 떠 줘�
   <Check>RUNNABLE 스레드가 많다고 CPU가 모자란다고 판단했다면, 스택 맨 위를 보세요. 소켓 읽기라면 상대의 응답을 기다리는 중이에요.</Check>
   <Check>WAITING 스레드가 많다고 문제로 본다면 다시 보세요. 스레드 풀의 쉬는 스레드도 WAITING이에요. 요청을 처리하던 스레드인지 먼저 보세요.</Check>
   <Check>운영 서버에서 덤프를 아주 자주 뜨는 자동화라면 다시 보세요. 스레드가 많을수록 덤프를 뜨는 부담도 커져요.</Check>
+  <Check>top -H의 스레드 번호를 16진수로 바꿔 덤프에서 찾았는데 없다면, JDK 버전을 보세요. JDK 21부터는 nid가 10진수라 그대로 찾아야 해요.</Check>
 </Checkpoints>
 
 <Deeper>

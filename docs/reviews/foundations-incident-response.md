@@ -13,3 +13,10 @@
 
 - 장애 하나의 시각(6분, 25분, 40분)과 10건의 시간(8~240분, 평균 35.2분, 중앙값 12.5분)은 설명용 예시예요.
 - '장애 시간은 대부분 짧고 몇 건만 아주 길다'는 예시로 보여 준 모양이에요. 보고서의 결론은 위 표의 문장까지만 인용했어요.
+
+## 2026-11-03 더한 절: 런북
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 미리 생각해 플레이북에 적으면 즉석 대응보다 MTTR이 약 3배 나아짐, 플레이북이 생각하는 엔지니어를 대신하지는 못함 | https://sre.google/sre-book/introduction/ |
+| kube-prometheus 알림 규칙은 `annotations.runbook_url`로 runbooks.prometheus-operator.dev를 가리켜요 | https://github.com/prometheus-operator/kube-prometheus/blob/main/manifests/kubernetesControlPlane-prometheusRule.yaml |

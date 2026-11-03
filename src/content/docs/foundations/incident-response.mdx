@@ -6,7 +6,7 @@ type: concept
 stage: monitoring
 order: 128
 icon: timer
-keywords: [장애 대응, incident, MTTR, MTTD, MTTA, 완화, mitigation, 포스트모템, postmortem, 회고]
+keywords: [장애 대응, incident, MTTR, MTTD, MTTA, 완화, 런북, runbook, postmortem, 회고]
 related: [foundations/alert-routing, foundations/slo-and-error-budget, foundations/alert-fatigue, apm/slow-after-deploy, foundations/percentiles]
 sources:
   - title: Google SRE Book — Effective Troubleshooting (Stopping the bleeding)
@@ -19,6 +19,10 @@ sources:
     url: https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/
   - title: Atlassian — MTBF, MTTR, MTTA, and MTTF
     url: https://www.atlassian.com/incident-management/kpis/common-metrics
+  - title: Google SRE Book — Introduction (playbook)
+    url: https://sre.google/sre-book/introduction/
+  - title: kube-prometheus — 알림 규칙의 runbook_url
+    url: https://github.com/prometheus-operator/kube-prometheus/blob/main/manifests/kubernetesControlPlane-prometheusRule.yaml
 updated: 2026-11-03
 ---
 
@@ -62,6 +66,33 @@ updated: 2026-11-03
 장애 중에는 원인부터 찾고 싶어져요. Google SRE 책은 가장 먼저 할 일로 피해를 멈추는 일(stopping the bleeding)을 들어요. 원인을 찾는 사이 시스템이 무너지면 사용자에게 도움이 안 되기 때문이에요.
 
 배포 직후라면 되돌리기, 한 지역이 아프면 트래픽 돌리기, 새 기능이 문제라면 그 기능 끄기가 흔한 완화예요. 이때도 나중에 원인을 찾을 수 있게 로그와 지표는 남겨 둬요.
+
+## 런북: 알림마다 첫 할 일을 적어 둬요
+
+런북(runbook)은 알림 하나가 울렸을 때 무엇을 보고 무엇을 할지 적어 둔 문서예요. 플레이북이라고도 해요. 새벽에 처음 보는 알림을 받은 당직자도 따라 할 수 있게 써요.
+
+Google SRE 책은 미리 생각해 플레이북에 적어 두면, 그때그때 대응할 때보다 MTTR이 3배쯤 나아졌다고 해요. 그래도 플레이북이 그 자리에서 생각하는 사람을 대신하지는 못한다고 덧붙여요.
+
+런북 하나에는 이런 것을 적어요.
+
+- **이 알림의 뜻**: 무엇이 깨졌고, 사용자에게 어떤 영향이 있는지 적어요.
+- **먼저 볼 곳**: 대시보드 링크와 질의를 적어요.
+- **흔한 원인**: 원인마다 확인하는 방법을 적어요.
+- **피해 멈추는 법**: 되돌리기, 트래픽 돌리기 같은 명령을 적어요.
+- **넘길 곳**: 풀리지 않으면 누구를 부를지 적어요.
+
+알림에서 바로 열 수 있게 링크를 달아요. Prometheus 알림 규칙은 `annotations`의 `runbook_url`에 적는 게 관례예요. kube-prometheus의 기본 알림들도 이렇게 런북 주소를 달고 있어요.
+
+```yaml
+- alert: OrderErrorRateHigh
+  expr: <에러율 질의> > 0.05
+  for: 5m
+  annotations:
+    summary: 주문 에러율 5% 넘음
+    runbook_url: <런북 주소>
+```
+
+런북은 장애가 끝나면 고쳐요. 회고에서 "런북대로 했는데 안 됐다"거나 "런북에 없었다"는 말이 나오면 그 자리에서 고쳐요.
 
 ## 시간을 나눠 재요
 
@@ -135,6 +166,7 @@ Google SRE 책은 회고가 누군가를 탓하지 않아야(blameless) 한다�
   <Check>MTTR 평균이 줄어 대응이 나아졌다고 본 보고서라면, 긴 장애 한두 건이 빠진 것뿐인지 중앙값과 건수를 함께 보세요.</Check>
   <Check>장애 시작 시각을 알림 시각으로 적는 기록이라면 다시 보세요. MTTD가 늘 0이 돼요.</Check>
   <Check>원인을 다 찾을 때까지 되돌리기를 미루는 절차라면 다시 보세요. 피해를 멈추는 게 먼저예요.</Check>
+  <Check>호출까지 하는 알림에 런북 링크가 없다면 더하세요. 새벽의 당직자는 그 알림을 처음 볼 수 있어요.</Check>
 </Checkpoints>
 
 <Deeper>

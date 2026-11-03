@@ -435,3 +435,10 @@ terms:
     short: 노드의 컨테이너 로그 파일에 시각, 출력 종류, 조각 표시를 붙여 적는 형식이에요.
     analogy: 녹화 영상마다 찍힌 시각과 카메라 번호가 붙는 것과 같아요.
     doc: kubernetes/container-logs
+  - id: vpa
+    name: VPA
+    en: VerticalPodAutoscaler
+    aliases: [VerticalPodAutoscaler, Vertical Pod Autoscaler, 수직 파드 자동 확장]
+    short: 파드 하나의 CPU·메모리 요청과 한도를 실제 사용량에 맞춰 바꾸는 기능이에요.
+    analogy: 짐이 늘면 트럭을 더 부르는 대신 더 큰 트럭으로 바꾸는 것과 같아요.
+    doc: kubernetes/autoscaling

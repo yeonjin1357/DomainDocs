@@ -22,3 +22,12 @@
 | `minReplicas: 0`은 object·external 지표가 하나 이상 있어야 함. `HPAScaleToZero` 기능 게이트는 1.16~1.36 알파(기본 꺼짐), 1.37부터 베타(기본 켜짐) | 같은 문서, https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/ |
 
 - 고친 것: 더 깊이 "0개까지 줄이기"에 기능 게이트와 버전을 더했어요.
+
+## 2026-11-03 더한 절: VPA
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| VPA는 요청과 한도를 사용량에 맞추는 수직 확장, CRD로 따로 설치(HPA는 기본 API) | https://kubernetes.io/docs/concepts/workloads/autoscaling/vertical-pod-autoscale/ |
+| updateMode: Off(추천만 status), Initial(생성 때만), Recreate(축출 뒤 새 파드에 적용), InPlaceOrRecreate(제자리, 안 되면 축출), InPlace(VPA 1.7.0 알파, 축출 없이 기다림), Auto는 1.4.0부터 지원 중단 예정이고 Recreate와 같음 | 같은 문서 |
+| 컨테이너 자원 제자리 변경은 v1.35부터 stable | https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/ |
+| HPA와 같은 자원 지표(CPU·메모리)로 함께 쓰지 말 것, 지표를 나누면 가능(예: VPA 메모리, HPA CPU) | https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/docs/known-limitations.md |

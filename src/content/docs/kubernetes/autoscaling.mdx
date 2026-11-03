@@ -6,13 +6,19 @@ type: concept
 stage: basics
 order: 80
 icon: container
-keywords: [HPA, HorizontalPodAutoscaler, autoscaling, 자동 확장, 오토스케일링, scale out, 수평 확장, 수직 확장, Metrics Server, minReplicas]
+keywords: [HPA, HorizontalPodAutoscaler, VPA, VerticalPodAutoscaler, autoscaling, 자동 확장, 오토스케일링, 수평 확장, 수직 확장, Metrics Server]
 related: [kubernetes/workloads, kubernetes/requests-and-limits, kubernetes/pod-status, kubernetes/hpa-not-scaling]
 sources:
   - title: Kubernetes — Horizontal Pod Autoscaling
     url: https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/
   - title: Kubernetes — Node Autoscaling
     url: https://kubernetes.io/docs/concepts/cluster-administration/node-autoscaling/
+  - title: Kubernetes — Vertical Pod Autoscaling
+    url: https://kubernetes.io/docs/concepts/workloads/autoscaling/vertical-pod-autoscale/
+  - title: Kubernetes — Resize CPU and Memory Resources assigned to Containers
+    url: https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/
+  - title: VPA — Known limitations
+    url: https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/docs/known-limitations.md
 updated: 2026-10-30
 ---
 import HpaDemo from '../../../components/demos/HpaDemo.tsx';
@@ -95,6 +101,34 @@ HPA는 파드만 늘려요. 새 파드를 놓을 노드에 자리가 없으면 �
 
 이때 노드 자체를 늘리는 건 노드 자동 확장 기능이 맡아요. 놓을 곳이 없는 파드가 생기면 클라우드에 가상 머신을 더 만들어 노드로 붙여요. 그래서 새 노드가 준비될 때까지 시간이 더 걸려요.
 
+## 파드 크기를 맞추는 VPA
+
+<Term term="kubernetes/vpa">VPA</Term>(VerticalPodAutoscaler)는 파드 수 대신 파드 하나의 요청과 한도를 실제 사용량에 맞춰 바꿔요. 수직 확장을 하는 셈이에요. HPA와 달리 쿠버네티스에 기본으로 들어 있지 않아서, CRD와 구성 요소를 따로 설치해요.
+
+VPA는 사용량을 보고 추천값을 계산해요. 그 추천을 언제, 어떻게 적용할지는 `updateMode`가 정해요.
+
+<Figure caption="VPA의 적용 방식이에요. 제자리 바꾸기는 쿠버네티스 1.35부터 정식인 기능을 써요. Auto는 VPA 1.4.0부터 쓰지 않는 이름이고, Recreate와 같아요.">
+  <Tree
+    ariaLabel="VPA updateMode 다섯 가지. Off는 추천만 남기고, Initial은 새로 뜰 때만 적용하고, Recreate는 파드를 내보내고 새로 띄우며 적용하고, InPlaceOrRecreate는 제자리에서 바꾸다 안 되면 새로 띄우고, InPlace는 제자리에서만 바꾸고 안 되면 기다려요"
+    root={{
+      label: 'updateMode',
+      children: [
+        { label: 'Off', note: '추천값만 status에 남겨요', tag: '바꾸지 않음' },
+        { label: 'Initial', note: '파드가 새로 뜰 때만 적용해요', tag: '새 파드만' },
+        { label: 'Recreate', note: '파드를 내보내고 새로 띄우며 적용해요', tag: '다시 띄움', tone: 'warn' },
+        { label: 'InPlaceOrRecreate', note: '제자리에서 바꾸고, 안 되면 다시 띄워요', tag: '제자리 먼저', tone: 'accent' },
+        { label: 'InPlace', note: '제자리에서만 바꾸고, 안 되면 기다려요', tag: '알파' },
+      ],
+    }}
+  />
+</Figure>
+
+처음에는 Off로 두고 추천값만 보는 방법도 있어요. 추천값을 보며 사람이 요청을 고치면, 파드가 뜻밖에 다시 뜨는 일이 없어요.
+
+HPA와 VPA를 같은 CPU나 메모리 지표로 함께 쓰지 않아요. VPA가 요청을 키우면 요청 대비 사용률이 떨어지고, HPA는 그걸 보고 파드를 줄여요. 둘이 엇갈리게 움직여요.
+
+VPA 문서는 메모리는 VPA, CPU는 HPA처럼 지표를 나누면 괜찮다고 해요.
+
 ## 모니터링에서는
 
 <Figure caption="응답시간과 파드 수를 같은 시간축에 놓은 1분 간격의 예시예요. 응답시간이 먼저 튀고, 2분 뒤에야 파드가 늘기 시작했어요. 확장이 부하를 따라가지 못한 모습이에요.">
@@ -121,6 +155,7 @@ HPA 화면은 지금 지표와 목표, 지금 파드 수와 원하는 파드 수
   <Check>HPA가 전혀 움직이지 않는다면, 컨테이너에 CPU 요청이 적혀 있는지와 Metrics Server가 도는지부터 보세요.</Check>
   <Check>HPA가 파드를 늘렸는데 새 파드가 Pending이라면, 노드에 자리가 없는 거예요. 노드 자동 확장이 켜져 있는지 보세요.</Check>
   <Check>부하가 끝났는데 파드가 그대로라고 이상하게 여겼다면 다시 보세요. 기본 설정에서는 5분을 지켜본 뒤에 줄여요.</Check>
+  <Check>HPA와 VPA가 같은 CPU나 메모리 지표를 보는 설정이라면 다시 보세요. 크기와 개수가 서로 엇갈려 움직여요.</Check>
 </Checkpoints>
 
 <Deeper>
