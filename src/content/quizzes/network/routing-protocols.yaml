@@ -1,0 +1,36 @@
+questions:
+  - id: bgp-active-not-up
+    type: ox
+    prompt: BGP 이웃 상태가 Active라면, 그 이웃과 길을 주고받고 있나요?
+    answer: false
+    explain: 길을 주고받는 정상 상태는 Established뿐이에요. Active는 이름과 달리 아직 TCP 연결을 기다리는 상태예요.
+  - id: ospf-twoway-normal
+    type: ox
+    prompt: 이더넷 망에서 DR도 BDR도 아닌 OSPF 라우터 둘은, 서로 2-Way 상태에 머무는 게 정상인가요?
+    answer: true
+    explain: 이더넷 같은 망에서는 모든 라우터가 DR·BDR하고만 Full이 돼요. 나머지 라우터끼리는 2-Way에서 멈춰요.
+  - id: neighbor-down-routes
+    type: choice
+    prompt: 라우터 A가 이웃 B의 인사를 정한 시간 동안 듣지 못했어요. A는 무엇을 할까요?
+    choices:
+      - B에게 배운 길을 경로표에서 지워요
+      - B로 가던 트래픽을 계속 보내요
+      - B의 길을 정적 경로로 바꿔요
+      - B가 돌아올 때까지 모든 전달을 멈춰요
+    answer: 0
+    explain: 이웃이 끊기면 그 이웃을 거치는 길을 지우고, 남은 이웃에게 배운 다른 길로 바꿔요.
+  - id: bgp-hold-time
+    type: choice
+    prompt: RFC가 권하는 기본값을 쓰는 BGP 이웃이 조용히 멈췄어요. 끊긴 걸 알아채기까지 최대 얼마쯤 걸릴까요?
+    choices:
+      - 약 90초
+      - 약 3초
+      - 약 10초
+      - 약 30분
+    answer: 0
+    explain: 권장 Hold Time이 90초라, 그동안 Keepalive가 하나도 오지 않아야 끊긴 걸로 봐요. Keepalive는 그 3분의 1인 30초마다 보내요.
+  - id: bgp-name
+    type: input
+    prompt: 인터넷처럼 따로 운영되는 망(AS) 사이에서 길을 주고받고, TCP 179번 포트로 이웃을 맺는 라우팅 프로토콜은?
+    answer: [BGP, BGP-4, Border Gateway Protocol]
+    explain: BGP예요. 한 조직 안에서는 OSPF 같은 프로토콜을 흔히 써요.

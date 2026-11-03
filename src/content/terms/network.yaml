@@ -109,6 +109,25 @@ terms:
     aliases: [routing table, 라우팅 테이블, route, 경로]
     short: 받는 곳의 네트워크마다 어느 인터페이스로 어느 다음 장비에 넘길지 적은 표예요.
     doc: network/switches-and-routers
+  - id: routing-protocol
+    name: 라우팅 프로토콜
+    en: Routing protocol
+    aliases: [routing protocol, 동적 라우팅, dynamic routing]
+    short: 라우터끼리 아는 네트워크를 알려 경로표를 채우는 약속이에요. OSPF와 BGP가 대표예요.
+    analogy: 우체국끼리 동네 소식을 주고받아 배달 지도를 만드는 것과 같아요.
+    doc: network/routing-protocols
+  - id: ospf
+    name: OSPF
+    en: Open Shortest Path First
+    aliases: [ospf]
+    short: 한 조직 안에서 라우터들이 망 지도를 나눠 갖고 가장 짧은 길을 계산하는 프로토콜이에요.
+    doc: network/routing-protocols
+  - id: bgp
+    name: BGP
+    en: Border Gateway Protocol
+    aliases: [bgp, BGP-4]
+    short: 따로 운영되는 망(AS) 사이에서 길을 주고받는 프로토콜이에요. TCP 179번 포트로 이웃을 맺어요.
+    doc: network/routing-protocols
   - id: default-gateway
     name: 기본 게이트웨이
     en: Default gateway

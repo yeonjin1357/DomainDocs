@@ -1,0 +1,158 @@
+---
+title: 라우팅 프로토콜(OSPF·BGP)
+summary: 라우터끼리 이웃을 맺고 아는 길을 알려 경로표를 채워요. 이웃이 끊기면 그 너머 길도 사라져요.
+domain: network
+type: concept
+stage: basics
+order: 25
+icon: network
+keywords: [routing protocol, 라우팅 프로토콜, OSPF, BGP, neighbor, 이웃, Established, Full, AS, 동적 라우팅]
+related: [network/switches-and-routers, network/redundancy, network/latency-and-loss, network/traps-and-syslog, network/snmp]
+sources:
+  - title: RFC 2328 — OSPF Version 2
+    url: https://www.rfc-editor.org/rfc/rfc2328.html
+  - title: RFC 4750 — OSPF Version 2 MIB (ospfNbrState)
+    url: https://www.rfc-editor.org/rfc/rfc4750.html
+  - title: RFC 4271 — A Border Gateway Protocol 4 (BGP-4)
+    url: https://www.rfc-editor.org/rfc/rfc4271.html
+  - title: RFC 4273 — BGP-4 MIB (bgpPeerState)
+    url: https://www.rfc-editor.org/rfc/rfc4273.html
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="경로표를 라우터끼리 채워요">
+    라우터들이 아는 네트워크를 서로 알려 줘서, 경로표를 사람이 하나하나 적지 않아요. 길이 끊기면 다른 길로 바꿔요.
+  </Point>
+  <Point title="이웃을 맺어야 길을 받아요">
+    라우터는 이웃과 인사를 주고받아요. 인사가 정한 시간 동안 끊기면 이웃을 내리고, 그 이웃에게 배운 길도 지워요.
+  </Point>
+  <Point title="BGP의 Active는 정상이 아니에요">
+    BGP 이웃은 Established여야 정상이에요. 이름과 달리 Active는 아직 연결을 기다리는 상태예요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="우체국은 한 번 받은 배달 지도를 오래 쓰지만, 라우터는 이웃의 인사가 끊기면 그 이웃에게 받은 길을 곧바로 지워요.">
+  우체국끼리 "우리 쪽엔 이런 동네가 있어요" 하고 소식을 주고받아 배달 지도를 만드는 것과 같아요. 옆 우체국과 연락이 끊기면, 그 우체국을 거쳐 가던 동네는 다른 길을 찾아요.
+</Analogy>
+
+## 길을 적는 두 방법
+
+<Term slug="network/switches-and-routers">스위치와 라우터</Term>에서 본 경로표는 사람이 적을 수도, 라우터끼리 채울 수도 있어요. 라우터끼리 길을 알려 주는 약속을 <Term term="network/routing-protocol">라우팅 프로토콜</Term>이라고 해요.
+
+<Figure caption="사람이 적은 길은 끊겨도 그대로 남고, 라우팅 프로토콜로 배운 길은 끊기면 사라지고 다른 길로 바뀌어요.">
+  <Compare
+    columns={['정적 경로', '라우팅 프로토콜']}
+    rows={[
+      { label: '누가 적나', values: ['사람이 직접', '라우터끼리 알려 줘요'] },
+      { label: '길이 끊기면', values: ['그대로 남아요', '지우고 다른 길로 바꿔요'] },
+      { label: '흔한 곳', values: ['작은 망, 기본 경로', '큰 사내망, 인터넷'] },
+    ]}
+  />
+</Figure>
+
+사내망 안에서는 OSPF를, 조직과 조직 사이에서는 BGP를 흔히 써요. 둘 다 이웃을 먼저 맺고, 그다음 길을 주고받아요.
+
+## 이웃부터 맺어요
+
+라우터는 이웃과 정해진 간격으로 인사를 주고받아요. 정한 시간 동안 인사가 오지 않으면 이웃이 죽었다고 보고, 그 이웃에게 배운 길을 경로표에서 지워요.
+
+<Figure caption="OSPF의 흔한 값(인사 10초, 기다림 40초)으로 그린 예시예요. 라우터 B의 인사가 끊긴 뒤 40초가 지나면, A는 B를 이웃에서 내리고 B로 가던 길을 지워요.">
+  <Timeline
+    ariaLabel="라우터 B가 0초부터 30초까지 10초마다 인사를 보내다 30초 뒤 끊기고, 마지막 인사부터 40초 뒤인 70초에 라우터 A가 B를 이웃에서 내리고 길을 지우는 시간 띠"
+    end={80}
+    lanes={[
+      { label: 'B의 인사', segments: [{ start: 0, end: 1 }, { start: 10, end: 11 }, { start: 20, end: 21 }, { start: 30, end: 31 }] },
+      { label: 'A가 본 B', segments: [{ start: 0, end: 70, label: '이웃', tone: 'accent' }, { start: 70, end: 80, label: '내림', tone: 'warn' }] },
+    ]}
+    marks={[
+      { at: 30, label: '마지막 인사' },
+      { at: 70, label: '40초 지남', tone: 'warn' },
+    ]}
+    ticks={[
+      { at: 0, label: '0초' },
+      { at: 30, label: '30초' },
+      { at: 70, label: '70초' },
+    ]}
+  />
+</Figure>
+
+그래서 이웃이 끊긴 걸 알아채기까지 그만큼 시간이 걸려요. 그 사이에 죽은 이웃으로 가는 트래픽은 버려져요.
+
+## OSPF: 조직 안의 길
+
+<Term term="network/ospf">OSPF</Term>는 한 조직 안에서 쓰는 라우팅 프로토콜이에요. 라우터마다 망 전체의 연결 지도를 나눠 갖고, 그 지도로 가장 짧은 길을 스스로 계산해요.
+
+OSPF 이웃은 여러 단계를 거쳐 Full이 되면 지도를 다 주고받은 거예요. 이더넷 같은 망에서는 대표 라우터(DR)와 예비(BDR)만 모두와 Full이 돼요. 나머지 라우터끼리는 2-Way에서 멈추는 게 정상이에요.
+
+RFC가 근거리 망에 드는 예시 값은 인사 간격(HelloInterval) 10초예요. 기다리는 시간(RouterDeadInterval)은 그 몇 배, 예를 들어 4배로 잡으라고 해요. 이 두 값은 같은 망의 라우터끼리 같아야 해서, 다르면 이웃이 맺어지지 않아요.
+
+## BGP: 조직 사이의 길
+
+<Term term="network/bgp">BGP</Term>는 따로 운영되는 망(AS, 자율 시스템) 사이에서 길을 주고받아요. 인터넷의 길이 이렇게 퍼지고, 회사 망과 통신사 사이도 흔히 BGP로 이어요. 이웃끼리 TCP 179번 포트로 연결을 맺어요.
+
+<Figure caption="BGP 이웃의 여섯 상태예요. Established만 길을 주고받는 정상 상태예요. Active는 이름과 달리 아직 연결을 기다리는 중이에요.">
+  <Strip
+    ariaLabel="BGP 이웃 상태가 연결을 맺기 전 Idle, Connect, Active와 연결을 맺은 뒤 OpenSent, OpenConfirm, Established로 나뉘고, Established만 정상이며 Active는 연결을 기다리는 중인 칸 띠"
+    rows={[
+      {
+        label: '연결을 맺기 전',
+        heads: ['1', '2', '3'],
+        cells: ['Idle', 'Connect', { label: 'Active', tone: 'warn' }],
+      },
+      {
+        label: '연결을 맺은 뒤',
+        heads: ['4', '5', '6'],
+        cells: ['OpenSent', 'OpenConfirm', { label: 'Established', tone: 'accent' }],
+      },
+    ]}
+    marks={[
+      { row: 0, at: 2, label: '연결 기다림', tone: 'warn' },
+      { row: 1, at: 2, label: '정상', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+BGP는 이웃이 살아 있는지 Keepalive로 알려요. RFC가 권하는 기본값은 Hold Time 90초, Keepalive는 그 3분의 1인 30초예요. 그래서 이웃이 조용히 죽으면, 끊긴 걸 알기까지 90초 가까이 걸릴 수 있어요.
+
+## 모니터링에서는
+
+<Figure caption="라우터 한 대의 BGP 이웃 예시예요. 넷 가운데 하나가 Active에 머물러 있고, 하루에 Established로 12번 다시 들어간 이웃도 있어요.">
+  <StatTile label="Established 이웃" value="3" unit="/ 4개" tone="warn" />
+  <StatTile label="Active에 머문 이웃" value="1" unit="개" tone="warn" />
+  <StatTile label="다시 맺은 횟수" value="12" unit="회/일" note="한 이웃에서" />
+</Figure>
+
+BGP 이웃 상태는 BGP4-MIB의 `bgpPeerState`로 읽어요. 값이 6(established)이 아니면 그 이웃에게서 길을 받지 못하고 있어요. OSPF 이웃 상태는 OSPF-MIB의 `ospfNbrState`이고, 8(full)이나 DR이 아닌 라우터끼리의 4(twoWay)가 정상이에요.
+
+이웃이 끊겼다 붙기를 되풀이하면 길이 계속 바뀌어요. BGP4-MIB의 `bgpPeerFsmEstablishedTransitions`는 Established로 들어간 횟수예요. 늘어나는 속도를 보면 흔들림이 보여요.
+
+장비는 상태가 낮아질 때 Trap(`bgpBackwardTransNotification`)도 보내요.
+
+이웃이 끊긴 순간에는 길이 바뀌는 동안 지연과 손실이 잠깐 늘 수 있어요. 그 순서는 <Term slug="network/latency-and-loss">지연·손실이 늘 때</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>BGP 상태 Active를 '활성'이라 정상으로 보여 주는 화면이라면 고치세요. Established가 아닌 상태는 모두 길을 받지 못하는 상태예요.</Check>
+  <Check>OSPF 이웃이 Full이 아니면 모두 장애로 알린다면 다시 보세요. 이더넷 망에서 DR이 아닌 라우터끼리는 2-Way가 정상이에요.</Check>
+  <Check>새로 이은 OSPF 이웃이 맺어지지 않는다면 양쪽의 인사 간격과 기다리는 시간이 같은지 보세요. 다르면 이웃이 되지 않아요.</Check>
+  <Check>BGP 이웃 down을 알아채는 데 1분 넘게 걸린다면, Hold Time 기본값을 보세요. 90초 동안 Keepalive가 없어야 끊긴 걸로 봐요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### OSPF 이웃 상태
+
+  OSPF-MIB의 `ospfNbrState` 값은 여덟 가지예요.
+
+  - `down(1)`, `attempt(2)`, `init(3)`, `twoWay(4)`
+  - `exchangeStart(5)`, `exchange(6)`, `loading(7)`, `full(8)`
+
+  2-Way 다음부터는 지도를 맞추는 단계라, 오래 머물면 지도를 주고받는 데 문제가 있어요.
+
+  ### BGP의 Connect와 Active
+
+  RFC는 Active 상태를 TCP 연결을 기다리고 받아들이며 이웃을 얻으려는 상태로 설명해요. 연결 시도가 실패하면 Connect와 Active 사이를 오가요. 그래서 Active에 오래 머문다면 상대가 응답하지 않거나, 방화벽이 179번 포트를 막았을 수 있어요.
+
+  ### 상태가 낮아질 때의 Trap
+
+  `bgpBackwardTransNotification`은 BGP 상태가 높은 번호에서 낮은 번호로 바뀔 때 나가요. 이 Trap에는 이웃 주소, 마지막 에러, 지금 상태가 함께 담겨요.
+</Deeper>
