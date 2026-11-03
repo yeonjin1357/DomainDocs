@@ -1,0 +1,149 @@
+---
+title: 비즈니스 지표
+summary: 주문 수·결제 성공률처럼 서비스가 제 일을 하는지 보여 주는 숫자예요. 기술 지표가 놓친 장애가 보여요.
+domain: apm
+type: concept
+stage: monitoring
+order: 15
+icon: chart-line
+keywords: [business metrics, 비즈니스 지표, KPI, custom metric, 사용자 정의 지표, 주문 수, 결제 성공률, 퍼널, OpenTelemetry, offset]
+related: [apm/transactions-and-response-time, apm/errors-and-exceptions, foundations/anomaly-detection, foundations/cardinality-explosion, foundations/counters-and-rate]
+sources:
+  - title: OpenTelemetry — Metrics API (Counter)
+    url: https://opentelemetry.io/docs/specs/otel/metrics/api/
+  - title: OpenTelemetry — Prometheus and OpenMetrics Compatibility
+    url: https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/
+  - title: Prometheus — Querying basics (offset modifier)
+    url: https://prometheus.io/docs/prometheus/latest/querying/basics/
+updated: 2026-11-03
+---
+
+<OnDashboard title="쇼핑몰 · 지난 10분" caption="에러율과 응답시간은 평소와 같은데, 분당 주문이 평소의 4%로 줄었어요. 기술 지표만 보면 아무 일도 없어 보여요.">
+  <StatTile label="에러율" value="0.1" unit="%" note="평소와 같음" />
+  <StatTile label="p99 응답시간" value="320" unit="ms" note="평소와 같음" />
+  <StatTile label="분당 주문" value="5" unit="건" tone="warn" note="평소 120건" />
+</OnDashboard>
+
+<KeyPoints>
+  <Point title="기술 지표가 멀쩡해도 사업은 멈출 수 있어요">
+    결제 버튼이 사라지면 요청 자체가 안 와서 에러도 느림도 없어요. 주문 수에서만 티가 나요.
+  </Point>
+  <Point title="코드에서 직접 세요">
+    주문이 끝난 자리에서 카운터를 하나 올려요. 레이블은 결제 수단처럼 값의 종류가 적은 것만 달아요.
+  </Point>
+  <Point title="지난주 같은 때와 견줘요">
+    주문 수는 시간대와 요일마다 달라서, 고정 임계값보다 지난주 같은 시각과의 비율이 맞아요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="가게는 손님 수를 눈으로 보지만, 서비스는 세는 코드를 넣지 않으면 주문 수를 모르는 채로 지나가요.">
+  가게의 계산대와 냉장고가 다 멀쩡해도, 문이 잠겨 손님이 못 들어오면 매출은 0이에요. 기계 점검표만 보면 문이 잠긴 줄 몰라요.
+</Analogy>
+
+## 기술 지표만으로는 놓쳐요
+
+에러율, 응답시간, 처리량 같은 기술 지표는 요청이 들어와야 움직여요. 요청이 오지 않거나, 요청은 성공했는데 결과가 틀리면 기술 지표는 조용해요.
+
+<Figure caption="결제사가 HTTP로는 성공(200)을 돌려주면서 본문에 거절을 담은 경우예요. APM은 성공한 호출로 세고, 실패한 결제는 결제 결과를 세는 비즈니스 지표에서만 보여요.">
+  <Sequence
+    ariaLabel="앱이 결제사에 결제를 요청하고, 결제사가 HTTP 200 OK로 답하면서 본문의 결과는 거절이고, 앱은 결제 실패 카운터를 올리는 순서"
+    participants={['사용자', '앱', '결제사']}
+    messages={[
+      { from: '사용자', to: '앱', label: '결제하기' },
+      { from: '앱', to: '결제사', label: '결제 요청' },
+      { from: '결제사', to: '앱', label: '200 OK · 결과: 거절', dashed: true, tone: 'warn' },
+      { from: '앱', to: '사용자', label: '결제 실패 안내', dashed: true, tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+이런 일은 흔해요. 배포 뒤 결제 버튼이 화면에서 사라지거나, 쿠폰 계산이 틀려 결제가 막히거나, 외부 결제사가 특정 카드만 거절하는 경우예요. 모두 에러율은 그대로예요.
+
+그래서 서비스가 해야 할 일을 했는지를 따로 세요. 이런 숫자를 <Term term="apm/business-metric">비즈니스 지표</Term>라고 해요.
+
+## 무엇을 셀까
+
+먼저 서비스의 목적이 끝난 순간을 세요. 쇼핑몰이라면 완료된 주문, 결제 성공과 실패, 가입이에요. 단계가 이어지는 흐름은 단계마다 세서 어디서 빠지는지 봐요.
+
+<Figure caption="한 시간 동안 단계마다 넘어간 사용자 수 예시예요. 결제를 시작한 900명 가운데 720명(80%)이 끝냈어요. 이 비율이 평소보다 떨어지면 결제 단계를 봐요.">
+  <Bars
+    ariaLabel="단계별 사용자 수. 상품 보기 10,000명, 장바구니 담기 2,400명, 결제 시작 900명, 결제 완료 720명"
+    bars={[
+      { label: '상품 보기', value: 10000, display: '10,000명' },
+      { label: '장바구니 담기', value: 2400, display: '2,400명' },
+      { label: '결제 시작', value: 900, display: '900명' },
+      { label: '결제 완료', value: 720, display: '720명', tone: 'accent', note: '시작의 80%' },
+    ]}
+  />
+</Figure>
+
+이렇게 단계마다 줄어드는 모양을 퍼널(funnel)이라고 불러요. 단계마다 넘어가는 비율이 평소와 달라진 곳이 문제의 자리예요.
+
+## 코드에서 직접 세요
+
+비즈니스 지표는 에이전트가 저절로 모아 주지 않아요. 주문이 정말 끝난 자리, 예를 들어 DB 커밋 뒤에서 카운터를 하나 올려요. 아래는 OpenTelemetry 파이썬 API로 쓴 예시예요.
+
+```python
+orders = meter.create_counter(
+    "orders.created",
+    unit="{order}")
+
+# 주문이 끝난 자리에서
+attrs = {"payment.method": "card"}
+orders.add(1, attrs)
+```
+
+이 카운터를 Prometheus 형식으로 내보내면 이름이 바뀌어요. OpenTelemetry 파이썬 SDK 1.45로 실제로 내보낸 결과예요.
+
+```text
+orders_created_total{
+  payment_method="card"} 2.0
+orders_amount_KRW_total{
+  payment_method="card"} 32000.0
+```
+
+- 점은 밑줄로 바뀌고, 카운터라 `_total`이 붙어요.
+- `{order}`처럼 중괄호로 쓴 단위는 이름에서 빠져요.
+- `KRW` 같은 단위는 이름 뒤에 붙어요. 질의를 쓸 때 이 이름을 그대로 써야 해요.
+
+레이블은 값의 종류가 적은 것만 달아요. 결제 수단, 지역, 앱 버전 정도예요.
+
+사용자 ID나 주문 번호를 레이블로 달면 값마다 시계열이 생겨요. 자세한 건 <Term slug="foundations/cardinality-explosion">시계열이 갑자기 늘었을 때</Term>에 있어요.
+
+## 지난주 같은 때와 견줘요
+
+주문 수는 새벽엔 적고 점심과 저녁엔 많아요. 그래서 '분당 50건 아래면 알림' 같은 고정 임계값은 새벽마다 울리거나 낮에는 늦어요.
+
+<Figure caption="오늘과 지난주 같은 요일의 분당 주문이에요. 오후 3시까지는 지난주와 겹치다가, 4시부터 지난주의 절반 아래로 떨어졌어요.">
+  <MiniLineChart ariaLabel="9시부터 20시까지 분당 주문. 지난주는 40에서 170까지 올랐다 70으로 내려오고, 오늘은 15시까지 지난주와 겹치다가 16시부터 60, 45, 40, 35, 30으로 떨어진 그래프" series={[{ label: '지난주 같은 요일', values: [40, 80, 120, 150, 170, 160, 140, 150, 160, 130, 100, 70], tone: 'sub', value: '70건' }, { label: '오늘', values: [42, 78, 118, 152, 168, 158, 142, 60, 45, 40, 35, 30], tone: 'warn', value: '30건' }]} />
+</Figure>
+
+Prometheus에서는 `offset 1w`로 일주일 전 값을 함께 읽어요. 아래 식은 최근 10분의 주문 속도가 지난주 같은 시각의 절반 아래인지 봐요.
+
+```text
+sum(rate(orders_created_total[10m]))
+/
+sum(rate(orders_created_total[10m]
+  offset 1w))
+< 0.5
+```
+
+새벽처럼 주문이 아주 적으면 몇 건 차이로도 비율이 크게 흔들려요. 그래서 지난주 값이 일정 수 이상일 때만 보거나, 지속 시간을 길게 둬요. 명절이나 행사처럼 지난주와 다른 날은 <Term slug="foundations/anomaly-detection">이상 탐지와 기준선</Term>을 함께 써요.
+
+<Checkpoints>
+  <Check>에러율과 응답시간만으로 서비스가 정상이라고 보는 화면이라면, 주문이나 결제 같은 결과 지표를 함께 두세요. 요청이 안 오는 장애는 기술 지표에 안 보여요.</Check>
+  <Check>주문 카운터를 요청이 들어온 자리에서 올린다면 다시 보세요. 실패한 주문까지 세요. 주문이 정말 끝난 뒤에 올리세요.</Check>
+  <Check>비즈니스 지표에 사용자 ID나 주문 번호를 레이블로 단다면 다시 보세요. 시계열이 사용자 수만큼 늘어요.</Check>
+  <Check>주문 수에 고정 임계값으로 알림을 건다면 다시 보세요. 시간대마다 달라서 지난주 같은 때와의 비율이 맞아요.</Check>
+  <Check>OpenTelemetry로 단위를 단 카운터를 질의할 때 이름을 다시 보세요. `KRW` 같은 단위가 이름 뒤에 붙어 있어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 내보낼 때 붙는 레이블
+
+  같은 실험에서 Prometheus 형식에는 `otel_scope_name="shop"` 같은 레이블도 붙었어요. 카운터를 만든 meter의 이름이에요. 대시보드에서 묶을 때 이 레이블까지 갈라지지 않게 `sum by (payment_method)`처럼 묶을 레이블을 밝혀 줘요.
+
+  ### 금액을 셀 때
+
+  주문 금액 합계도 카운터로 세면 `rate`로 분당 매출을 그릴 수 있어요. 다만 환불은 카운터를 줄일 수 없어서 따로 세요. 금액은 회사에 따라 민감한 정보라, 대시보드를 볼 수 있는 사람을 정해 둬요.
+</Deeper>

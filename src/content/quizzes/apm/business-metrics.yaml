@@ -1,0 +1,28 @@
+questions:
+  - id: button-gone
+    type: ox
+    prompt: 배포 뒤 결제 버튼이 화면에서 사라져 아무도 결제를 누르지 못하면, 결제 API의 에러율이 올라가나요?
+    answer: false
+    explain: 요청 자체가 오지 않아서 에러도 느림도 생기지 않아요. 완료된 주문 수 같은 비즈니스 지표에서만 줄어든 게 보여요.
+  - id: unit-suffix
+    type: ox
+    prompt: OpenTelemetry 카운터를 unit="KRW"로 만들어 Prometheus 형식으로 내보내면, 지표 이름에 KRW가 붙나요?
+    answer: true
+    explain: 중괄호로 쓴 단위는 빠지지만 KRW 같은 단위는 이름 뒤에 붙어요. orders.amount는 orders_amount_KRW_total이 됐어요.
+  - id: where-to-count
+    type: choice
+    prompt: 완료된 주문 수 카운터는 어디서 올리는 게 맞나요?
+    choices: [주문이 DB에 커밋된 뒤, 주문 요청이 들어온 직후, 결제 화면을 연 직후, 장바구니에 담은 직후]
+    answer: 0
+    explain: 요청이 들어온 자리에서 세면 실패한 주문까지 세요. 주문이 정말 끝난 뒤에 올려야 실제 완료 수가 돼요.
+  - id: threshold
+    type: choice
+    prompt: 분당 주문 수에 알림을 걸 때 가장 알맞은 기준은?
+    choices: [지난주 같은 시각 대비 비율, 하루 내내 같은 고정 임계값, 어제 하루 평균, 지난 1분과의 차이]
+    answer: 0
+    explain: 주문 수는 시간대와 요일마다 달라요. 고정 임계값은 새벽마다 울리거나 낮에는 늦어서, 지난주 같은 시각과 견줘요.
+  - id: offset-word
+    type: input
+    prompt: PromQL에서 일주일 전 같은 시각의 값을 읽으려고 rate 구간 뒤에 붙이는 수식어는?
+    answer: [offset, offset 1w]
+    explain: offset 1w를 붙이면 일주일 전 시각의 값을 읽어요. 지금 값과 나누면 지난주 대비 비율이 돼요.

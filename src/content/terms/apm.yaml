@@ -272,3 +272,10 @@ terms:
     aliases: [오버헤드, overhead, 에이전트 오버헤드, performance overhead]
     short: 에이전트가 앱과 함께 돌며 쓰는 CPU, 메모리, 네트워크 몫이에요.
     doc: apm/agents
+  - id: business-metric
+    name: 비즈니스 지표
+    en: Business metric
+    aliases: [business metric, KPI, 사용자 정의 지표, custom metric, 비즈니스 KPI]
+    short: 주문 수나 결제 성공률처럼 서비스가 제 일을 했는지 세는 지표예요.
+    analogy: 가게의 기계 점검표가 아니라 그날 판 물건 수와 같아요.
+    doc: apm/business-metrics
