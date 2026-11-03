@@ -1,0 +1,28 @@
+questions:
+  - id: cr-does-nothing
+    type: ox
+    prompt: 오퍼레이터가 멈춘 클러스터에서 새 ServiceMonitor를 만들면, API 서버가 에러를 돌려주나요?
+    answer: false
+    explain: 커스텀 리소스는 API 서버에 잘 저장돼요. 다만 그것을 읽어 실제를 맞출 오퍼레이터가 없어서, 에러 없이 아무 일도 일어나지 않아요.
+  - id: crd-delete-cascade
+    type: ox
+    prompt: CRD를 지우면, 그 종류로 만든 커스텀 리소스도 모두 함께 지워지나요?
+    answer: true
+    explain: CRD를 지우면 API 서버가 그 종류의 길을 닫고, 저장된 커스텀 리소스도 모두 지워요. 다른 팀이 만든 것도 예외가 없어요.
+  - id: missing-target
+    type: choice
+    prompt: kube-prometheus-stack 차트를 기본값으로 깔고 ServiceMonitor를 만들었는데 Targets 화면에 없어요. 먼저 볼 것은?
+    choices: [release 레이블, 파드의 CPU 한도, Prometheus의 보관 기간, 노드의 taint]
+    answer: 0
+    explain: 차트는 기본으로 release 레이블이 릴리스 이름과 같은 ServiceMonitor만 골라요. 레이블이 없으면 에러 없이 빠져요.
+  - id: endpoint-port
+    type: choice
+    prompt: ServiceMonitor의 endpoints 아래 port에는 무엇을 적나요?
+    choices: [Service 포트의 이름, 컨테이너의 포트 번호, 노드의 포트 번호, 파드의 IP 주소]
+    answer: 0
+    explain: port는 Service의 spec.ports에 붙은 이름을 가리켜요. 숫자를 적으면 같은 이름의 포트가 없어 맞지 않아요.
+  - id: operator-name
+    type: input
+    prompt: 커스텀 리소스를 지켜보다 실제 상태를 거기에 맞추는 프로그램을 쿠버네티스에서 무엇이라 부르나요?
+    answer: [오퍼레이터, operator, 쿠버네티스 오퍼레이터]
+    explain: 오퍼레이터는 지켜보기, 견주기, 맞추기를 되풀이하는 컨트롤러에 그 프로그램을 운영하는 지식을 담은 거예요.

@@ -407,3 +407,24 @@ terms:
     short: 노드에 새 파드를 막고, 있던 파드를 축출 요청으로 내보내는 일이에요.
     analogy: 고칠 계산대에 마감 팻말을 세우고 손님을 옆 줄로 보내는 것과 같아요.
     doc: kubernetes/node-drain
+  - id: crd
+    name: CRD
+    en: CustomResourceDefinition
+    aliases: [CustomResourceDefinition, custom resource definition, 커스텀 리소스 정의]
+    short: 쿠버네티스 API에 새 오브젝트 종류를 더하는 정의예요.
+    analogy: 식당에 새 메뉴의 주문서 양식을 더하는 것과 같아요.
+    doc: kubernetes/crd-and-operators
+  - id: operator
+    name: 오퍼레이터
+    en: Operator
+    aliases: [operator, 쿠버네티스 오퍼레이터, controller, 컨트롤러]
+    short: 커스텀 리소스를 지켜보며 실제 상태를 거기에 맞추는 프로그램이에요.
+    analogy: 새 메뉴의 주문서를 보고 그 요리를 만드는 요리사와 같아요.
+    doc: kubernetes/crd-and-operators
+  - id: servicemonitor
+    name: ServiceMonitor
+    en: ServiceMonitor
+    aliases: [service monitor, 서비스모니터, PodMonitor]
+    short: Prometheus Operator에서 어떤 Service를 수집할지 적는 커스텀 리소스예요.
+    analogy: 이 가게도 둘러봐 달라고 순찰표에 적어 내는 쪽지와 같아요.
+    doc: kubernetes/crd-and-operators
