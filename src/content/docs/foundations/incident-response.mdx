@@ -1,0 +1,152 @@
+---
+title: 장애 대응의 흐름과 MTTR
+summary: 장애는 알아채기, 피해 줄이기, 고치기, 돌아보기 순서로 다뤄요. 시간 숫자는 정의부터 맞춰요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 128
+icon: timer
+keywords: [장애 대응, incident, MTTR, MTTD, MTTA, 완화, mitigation, 포스트모템, postmortem, 회고]
+related: [foundations/alert-routing, foundations/slo-and-error-budget, foundations/alert-fatigue, apm/slow-after-deploy, foundations/percentiles]
+sources:
+  - title: Google SRE Book — Effective Troubleshooting (Stopping the bleeding)
+    url: https://sre.google/sre-book/effective-troubleshooting/
+  - title: Google SRE Book — Managing Incidents
+    url: https://sre.google/sre-book/managing-incidents/
+  - title: 'Google SRE Book — Postmortem Culture: Learning from Failure'
+    url: https://sre.google/sre-book/postmortem-culture/
+  - title: Štěpán Davidovič — Incident Metrics in SRE
+    url: https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/
+  - title: Atlassian — MTBF, MTTR, MTTA, and MTTF
+    url: https://www.atlassian.com/incident-management/kpis/common-metrics
+updated: 2026-11-03
+---
+
+<KeyPoints>
+  <Point title="원인보다 피해 멈추기가 먼저예요">
+    되돌리기, 트래픽 돌리기로 사용자 피해부터 멈춰요. 원인은 그다음에 찾아요.
+  </Point>
+  <Point title="MTTR은 R이 무엇인지부터 정해요">
+    같은 MTTR도 팀마다 재는 끝점이 달라요. 피해를 멈춘 때인지, 다 고친 때인지 먼저 맞춰요.
+  </Point>
+  <Point title="평균 하나로 나아졌다고 보지 않아요">
+    장애 시간은 몇 건이 아주 길어서, 평균이 그 몇 건에 크게 흔들려요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="화재 조사는 책임을 묻기도 하지만, 장애 회고는 사람을 탓하지 않아요. 누가 실수했는지보다 실수가 장애로 번지게 한 시스템과 절차를 고쳐요.">
+  불이 나면 소방관은 불부터 끄고, 원인 조사는 불을 끈 뒤에 해요. 장애도 사용자 피해부터 멈추고, 원인과 재발 방지는 그다음이에요.
+</Analogy>
+
+## 장애는 이렇게 지나가요
+
+<Term slug="foundations/alert-routing">알림</Term>이 울린 순간부터 장애 대응이 시작돼요. 한 번의 장애는 대개 다섯 단계를 지나요.
+
+<Figure caption="장애 하나가 지나는 다섯 단계예요. 3단계에서는 원인을 몰라도 피해부터 멈춰요. 원인은 4단계에서 찾아요.">
+  <Triage
+    ariaLabel="1단계 알림이나 사용자 문의로 알아채고, 2단계 담당자가 모여 범위를 살피고, 3단계 되돌리기나 트래픽 돌리기로 피해를 멈추고, 4단계 원인을 찾아 고치고, 5단계 회고로 돌아보는 순서"
+    steps={[
+      { label: '알아채기', note: '알림, 사용자 문의', tone: 'warn' },
+      { label: '모이기·살피기', note: '담당자를 부르고 영향 범위를 봐요' },
+      { label: '피해 멈추기', note: '원인을 몰라도 먼저 · 되돌리기, 트래픽 돌리기, 기능 끄기', tone: 'accent' },
+      { label: '고치기', note: '원인을 찾아 제대로 고쳐요' },
+      { label: '돌아보기', note: '타임라인, 잘된 것, 고칠 것' },
+    ]}
+  />
+</Figure>
+
+여러 사람이 함께 대응할 때는 역할을 나눠요. Google SRE 책은 전체를 지휘하는 사람, 시스템을 직접 만지는 사람, 바깥에 소식을 알리는 사람을 따로 두라고 해요. 시스템은 정해진 사람만 바꿔야 서로 엉키지 않아요.
+
+## 피해 멈추기가 먼저예요
+
+장애 중에는 원인부터 찾고 싶어져요. Google SRE 책은 가장 먼저 할 일로 피해를 멈추는 일(stopping the bleeding)을 들어요. 원인을 찾는 사이 시스템이 무너지면 사용자에게 도움이 안 되기 때문이에요.
+
+배포 직후라면 되돌리기, 한 지역이 아프면 트래픽 돌리기, 새 기능이 문제라면 그 기능 끄기가 흔한 완화예요. 이때도 나중에 원인을 찾을 수 있게 로그와 지표는 남겨 둬요.
+
+## 시간을 나눠 재요
+
+장애 대응이 나아지는지 보려고 시간을 재요. 그런데 장애 하나에는 끝점이 여럿이라, 무엇을 쟀는지부터 맞춰야 해요.
+
+<Figure caption="14시에 시작한 장애 하나의 예시예요. 6분 뒤 알림이 울리고, 25분에 되돌려 피해를 멈추고, 40분에 다 고쳤어요.">
+  <Timeline
+    ariaLabel="14시에 장애가 시작되어 14시 6분에 알림, 14시 25분에 되돌려 사용자 영향이 멈추고, 14시 40분에 다 고친 시간 띠. 알아채기 6분, 살피기 9분, 피해 멈추기 10분, 고치기 15분"
+    end={40}
+    lanes={[
+      { label: '사용자 영향', segments: [{ start: 0, end: 25, label: '피해', tone: 'warn' }] },
+      { label: '대응', segments: [{ start: 0, end: 6, label: '탐지' }, { start: 6, end: 15, label: '살피기' }, { start: 15, end: 25, label: '멈추기', tone: 'accent' }, { start: 25, end: 40, label: '고치기' }] },
+    ]}
+    marks={[{ at: 6, label: '알림' }, { at: 25, label: '피해 멈춤', tone: 'accent' }]}
+    ticks={[{ at: 0, label: '14:00' }, { at: 20, label: '14:20' }, { at: 40, label: '14:40' }]}
+  />
+</Figure>
+
+- **MTTD**(mean time to detect): 시작부터 알아챌 때까지예요. 이 예시에서는 6분이에요.
+- **MTTA**(mean time to acknowledge): 알림부터 담당자가 확인할 때까지예요.
+- **MTTR**: 시작부터 끝날 때까지예요. 끝을 언제로 보느냐가 팀마다 달라요.
+
+MTTR의 R은 repair(고침), recovery(복구), resolve(종료), respond(대응) 가운데 하나예요. 이 예시를 피해가 멈춘 때까지로 재면 25분, 다 고친 때까지로 재면 40분이에요. 숫자를 견주기 전에 R의 뜻을 먼저 맞춰요.
+
+시작 시각은 알림 시각이 아니에요. 지표를 거슬러 올라가 실제로 나빠지기 시작한 때를 찾아요. 알림 시각으로 적으면 MTTD가 늘 0이 돼요.
+
+## 평균 하나로 보지 않아요
+
+MTTR은 평균이에요. 그런데 장애 시간은 대부분 짧고 몇 건만 아주 길어서, 평균이 그 몇 건에 크게 끌려가요.
+
+<Figure caption="장애 10건이 걸린 시간(분)이에요. 9건은 20분 안에 끝났고 1건이 240분이라, 평균 35분은 어느 장애와도 닮지 않았어요. 중앙값은 12.5분이에요.">
+  <Strip
+    ariaLabel="장애 10건의 걸린 시간 8, 9, 10, 11, 12, 13, 14, 15, 20, 240분 위에 시간만큼의 막대를 세운 칸 띠. 마지막 한 건만 막대가 아주 높아요"
+    rows={[
+      {
+        label: '장애 10건이 걸린 시간(분)',
+        bars: [8, 9, 10, 11, 12, 13, 14, 15, 20, 240],
+        cells: ['8', '9', '10', '11', '12', '13', '14', '15', '20', { label: '240', tone: 'warn' }],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 8, label: '9건은 20분 안' },
+      { from: 9, to: 9, label: '1건', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+이 1건이 다음 분기에 없으면 평균은 크게 줄어요. 대응이 나아지지 않았는데도 나아진 것처럼 보여요.
+
+Google의 'Incident Metrics in SRE' 보고서도 이 점을 시뮬레이션으로 보였어요. MTTR 같은 평균은 개선을 판단하는 데 잘 맞지 않는다고 해요.
+
+그래서 중앙값과 긴 장애의 건수를 함께 보거나, 장애가 <Term slug="foundations/slo-and-error-budget">에러 버짓</Term>을 얼마나 썼는지로 봐요. 평균과 중앙값의 차이는 <Term slug="foundations/percentiles">평균과 백분위수</Term>에서 다뤄요.
+
+## 돌아보기: 사람을 탓하지 않아요
+
+장애가 끝나면 회고(postmortem, 포스트모템)를 써요. 무슨 일이 언제 있었는지, 사용자에게 어떤 영향이 있었는지, 왜 번졌는지, 무엇을 고칠지를 남겨요.
+
+Google SRE 책은 회고가 누군가를 탓하지 않아야(blameless) 한다고 해요. 모두가 그때 가진 정보로 옳다고 본 일을 했다고 보고, 실수가 장애로 번지게 한 시스템과 절차를 찾아요. 탓하는 문화에서는 사람들이 문제를 숨겨요.
+
+## 모니터링에서는
+
+모니터링은 단계마다 다른 일을 해요.
+
+- **알아채기**: 알림이 사용자보다 먼저 알려 줘요. 사용자 문의로 먼저 알았다면 알림이 빠진 거예요.
+- **살피기**: 대시보드와 서비스 맵으로 어디까지 번졌는지 봐요.
+- **피해 멈추기**: 배포 표시와 지표를 겹쳐 보고, 되돌린 뒤 숫자가 돌아오는지 확인해요.
+- **돌아보기**: 알림 이력, 지표, 로그로 회고의 타임라인을 만들어요.
+
+<Checkpoints>
+  <Check>두 팀의 MTTR을 견주는 보고서라면, 두 팀이 R을 같은 뜻으로 쟀는지 보세요. 피해를 멈춘 때와 다 고친 때는 크게 달라요.</Check>
+  <Check>MTTR 평균이 줄어 대응이 나아졌다고 본 보고서라면, 긴 장애 한두 건이 빠진 것뿐인지 중앙값과 건수를 함께 보세요.</Check>
+  <Check>장애 시작 시각을 알림 시각으로 적는 기록이라면 다시 보세요. MTTD가 늘 0이 돼요.</Check>
+  <Check>원인을 다 찾을 때까지 되돌리기를 미루는 절차라면 다시 보세요. 피해를 멈추는 게 먼저예요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### MTTM
+
+  피해를 멈출 때까지의 평균을 따로 MTTM(mean time to mitigate)이라고 부르기도 해요. MTTR의 R이 헷갈리면, 이렇게 끝점마다 이름을 따로 붙여 재요.
+
+  ### 회고에 남길 것
+
+  회고에는 보통 영향(얼마나 많은 사용자가 얼마나 오래), 타임라인, 원인과 번진 까닭, 잘된 것, 운이 좋았던 것, 고칠 일과 담당자를 남겨요. 고칠 일에 담당자와 기한이 없으면 같은 장애가 되풀이돼요.
+
+  ### 장애로 볼지 정하기
+
+  무엇을 장애로 셀지도 미리 정해요. 기준이 바뀌면 건수와 MTTR이 함께 바뀌어서, 나아졌는지 알 수 없어요.
+</Deeper>
