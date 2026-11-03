@@ -26,6 +26,7 @@ describe('checkNest', () => {
     const deep = [{ label: '1', children: [{ label: '2', children: [{ label: '3', children: [{ label: '4', children: [{ label: '5' }] }] }] }] }];
     expect(() => checkNest(deep)).toThrow(/5겹이에요/);
     expect(() => checkNest([])).toThrow(/하나도/);
+    expect(() => checkNest([{ label: 'a', cols: 5, children: [{ label: 'b' }] }])).toThrow(/1~4/);
   });
 });
 

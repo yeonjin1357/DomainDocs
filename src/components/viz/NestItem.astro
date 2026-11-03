@@ -16,7 +16,7 @@ const cls = [children.length ? 'nest-box' : 'nest-leaf', `tone-${box.tone ?? 'pl
         <span class="nest-label">{box.label}</span>
         {box.note && <span class="nest-note">{box.note}</span>}
       </p>
-      <div class="nest-children">
+      <div class="nest-children" style={box.cols ? `grid-template-columns:repeat(${box.cols}, minmax(0, 1fr))` : undefined}>
         {children.map((c) => (
           <Astro.self box={c} />
         ))}

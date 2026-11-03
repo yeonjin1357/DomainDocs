@@ -11,6 +11,8 @@ export interface NestBox {
   wide?: boolean;
   /** 테두리를 점선으로(실제 경계가 아닌 묶음) */
   dashed?: boolean;
+  /** 안쪽 칸을 한 줄에 몇 개씩 놓을지(대시보드 패널 줄처럼). 없으면 폭에 맞춰 놓는다 */
+  cols?: number;
 }
 
 export const NEST_MAX_DEPTH = 4;
@@ -21,6 +23,7 @@ export function checkNest(boxes: readonly NestBox[]): number {
   const walk = (b: NestBox, d: number): number => {
     if (!b.label) throw new Error('Nest: 이름 없는 상자가 있어요');
     if (b.children && b.children.length === 0) throw new Error(`Nest: '${b.label}'의 children이 비어 있어요. 칸이면 children을 빼요`);
+    if (b.cols !== undefined && (!Number.isInteger(b.cols) || b.cols < 1 || b.cols > 4)) throw new Error(`Nest: '${b.label}'의 cols(${b.cols})는 1~4여야 해요`);
     return Math.max(d, ...(b.children ?? []).map((c) => walk(c, d + 1)));
   };
   const depth = Math.max(...boxes.map((b) => walk(b, 1)));

@@ -17,13 +17,13 @@ updated: 2026-10-30
 ---
 
 <OnDashboard title="결제 서비스 대시보드 · 위에서 아래로" caption="맨 위 한 줄만 봐도 '지금 괜찮은가'에 답해요. 아래로 내려갈수록 원인을 찾는 패널이에요.">
-  <Layers
-    ariaLabel="위에서부터 서비스 상태, 요청 흐름, 자원, 의존 서비스 순서로 쌓은 대시보드 구성"
-    layers={[
-      { label: '① 서비스 상태', note: 'SLO · 에러율 · p99 응답시간', tone: 'accent' },
-      { label: '② 요청 흐름', note: '서비스마다 요청 · 에러 · 지연 한 줄' },
-      { label: '③ 자원', note: 'CPU · 메모리 · 스레드 · 커넥션 풀' },
-      { label: '④ 의존 서비스', note: 'DB · 캐시 · 외부 API' },
+  <Nest
+    ariaLabel="대시보드를 위에서부터 서비스 상태(SLO, 에러율, p99 응답시간), 요청 흐름(서비스마다 요청, 에러, 지연), 자원(CPU, 메모리, 스레드, 커넥션 풀), 의존 서비스(DB, 캐시, 외부 API) 줄로 짠 배치"
+    boxes={[
+      { label: '① 서비스 상태', tone: 'accent', cols: 3, children: [{ label: 'SLO' }, { label: '에러율' }, { label: 'p99 응답시간' }] },
+      { label: '② 요청 흐름', note: '서비스마다 한 줄', cols: 3, children: [{ label: '요청' }, { label: '에러' }, { label: '지연' }] },
+      { label: '③ 자원', cols: 4, children: [{ label: 'CPU' }, { label: '메모리' }, { label: '스레드' }, { label: '커넥션 풀' }] },
+      { label: '④ 의존 서비스', cols: 3, children: [{ label: 'DB' }, { label: '캐시' }, { label: '외부 API' }] },
     ]}
   />
 </OnDashboard>
