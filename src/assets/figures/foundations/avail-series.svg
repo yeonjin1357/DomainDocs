@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 178" width="300" height="178">
+  <line x1="4" y1="51.0" x2="20.0" y2="51.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
+  <circle cx="4" cy="51.0" r="4" style="fill:var(--color-text-sub)" />
+  <rect x="20.0" y="22" width="74" height="58" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <text x="57.0" y="48.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">웹</text>
+  <text x="57.0" y="66.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.9%</text>
+  <line x1="94.0" y1="51.0" x2="113.0" y2="51.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
+  <rect x="113.0" y="22" width="74" height="58" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <text x="150.0" y="48.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">API</text>
+  <text x="150.0" y="66.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.9%</text>
+  <line x1="187.0" y1="51.0" x2="206.0" y2="51.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
+  <rect x="206.0" y="22" width="74" height="58" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <text x="243.0" y="48.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">DB</text>
+  <text x="243.0" y="66.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.9%</text>
+  <line x1="280.0" y1="51.0" x2="296" y2="51.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
+  <circle cx="296" cy="51.0" r="4" style="fill:var(--color-text-sub)" />
+  <text x="150" y="112" text-anchor="middle" font-size="13" style="fill:var(--color-text-sub)">셋 다 살아야 성공</text>
+  <text x="150" y="140" text-anchor="middle" font-size="15" style="fill:var(--color-text)">0.999 × 0.999 × 0.999</text>
+  <text x="150" y="166" text-anchor="middle" font-size="17" font-weight="700" style="fill:var(--color-warn)">≈ 99.7%</text>
+</svg>

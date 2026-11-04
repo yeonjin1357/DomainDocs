@@ -1,0 +1,28 @@
+questions:
+  - id: series-same
+    type: ox
+    prompt: 요청이 99.9%짜리 웹 서버, API 서버, DB를 모두 거쳐야 하면, 서비스 가용성도 99.9%인가요?
+    answer: false
+    explain: 셋이 다 살아야 성공하니 가용성을 곱해요. 0.999를 세 번 곱하면 약 99.7%예요.
+  - id: parallel-two
+    type: ox
+    prompt: 99%짜리 서버 두 대 중 하나만 살아도 되고 둘이 따로 고장 난다면, 가용성은 99.99%인가요?
+    answer: true
+    explain: 둘 다 멈출 확률은 1% × 1% = 0.01%예요. 그래서 가용성은 99.99%예요.
+  - id: shared-db
+    type: choice
+    prompt: 99.5%짜리 웹 서버 두 대가 모두 99.9%짜리 DB 하나에 기대요. 전체 가용성에 가장 가까운 값은?
+    choices: [99.9%, 99.9975%, 99.5%, 99.4%]
+    answer: 0
+    explain: 웹 서버 둘은 합쳐 99.9975%지만 DB와 곱하면 약 99.9%예요. 하나뿐인 DB가 상한이에요.
+  - id: slo-cap
+    type: choice
+    prompt: 주문 API가 99.9%짜리 결제 API와 99.95%짜리 재고 DB를 꼭 불러야 해요. 다음 중 주문 API가 지킬 수 있는 목표는?
+    choices: [99.8%, 99.9%, 99.95%, 99.99%]
+    answer: 0
+    explain: 두 의존을 곱한 약 99.85%가 상한이에요. 그보다 높은 목표는 내 코드가 멈추지 않아도 못 지켜요.
+  - id: spof-name
+    type: input
+    prompt: 하나뿐이라서, 멈추면 서비스 전체가 함께 멈추는 곳을 무엇이라 하나요?
+    answer: [단일 장애점, SPOF, single point of failure, 단일장애지점, 단일 장애 지점]
+    explain: 가용성을 올리려면 이미 둘인 곳보다 하나뿐인 곳을 먼저 둘로 만들어요.

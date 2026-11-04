@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 236" width="300" height="236">
+  <line x1="4" y1="75.0" x2="22" y2="75.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
+  <circle cx="4" cy="75.0" r="4" style="fill:var(--color-text-sub)" />
+  <polyline points="22,75.0 22,41.0 40,41.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
+  <polyline points="124,41.0 142,41.0 142,75.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
+  <rect x="40" y="16" width="84" height="50" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <text x="82.0" y="38.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">웹 서버</text>
+  <text x="82.0" y="56.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.5%</text>
+  <polyline points="22,75.0 22,109.0 40,109.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
+  <polyline points="124,109.0 142,109.0 142,75.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
+  <rect x="40" y="84" width="84" height="50" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+  <text x="82.0" y="106.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">웹 서버</text>
+  <text x="82.0" y="124.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.5%</text>
+  <line x1="142" y1="75.0" x2="194" y2="75.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
+  <rect x="194" y="50.0" width="88" height="50" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-warn)" />
+  <text x="238.0" y="72.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-warn)">DB</text>
+  <text x="238.0" y="90.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.9%</text>
+  <line x1="282" y1="75.0" x2="296" y2="75.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
+  <circle cx="296" cy="75.0" r="4" style="fill:var(--color-text-sub)" />
+  <text x="82" y="168" text-anchor="middle" font-size="13" style="fill:var(--color-text-sub)">둘이면 99.9975%</text>
+  <text x="238.0" y="168" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--color-warn)">하나뿐</text>
+  <text x="150" y="198" text-anchor="middle" font-size="15" style="fill:var(--color-text)">99.9975% × 99.9%</text>
+  <text x="150" y="224" text-anchor="middle" font-size="16" font-weight="700" style="fill:var(--color-warn)">≈ 99.9% (DB와 같아요)</text>
+</svg>

@@ -1,0 +1,188 @@
+---
+title: '가용성 계산: 의존과 중복'
+summary: 줄로 이은 부품은 가용성을 곱해 낮아지고, 나란히 둔 부품은 실패를 곱해 높아져요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 92
+icon: gauge
+keywords: [availability, 가용성, nines, 9의 개수, hard dependency, soft dependency, 이중화, redundancy, SPOF, 단일 장애점]
+related: [foundations/slo-and-error-budget, cloud/regions-and-zones, database/replication, apm/circuit-breaker, network/redundancy]
+sources:
+  - title: Google SRE Book — Availability Table
+    url: https://sre.google/sre-book/availability-table/
+  - title: Google SRE Book — Embracing Risk (시간 기준·요청 기준 가용성)
+    url: https://sre.google/sre-book/embracing-risk/
+  - title: AWS Well-Architected — Availability (의존과 중복의 계산, MTBF·MTTR)
+    url: https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/availability.html
+  - title: AWS — Amazon Compute Service Level Agreement (EC2)
+    url: https://aws.amazon.com/compute/sla/
+updated: 2026-11-04
+---
+import AvailSeries from '../../../assets/figures/foundations/avail-series.svg';
+import AvailParallel from '../../../assets/figures/foundations/avail-parallel.svg';
+import AvailMixed from '../../../assets/figures/foundations/avail-mixed.svg';
+
+<KeyPoints>
+  <Point title="줄로 이은 의존은 가용성을 곱해요">
+    요청이 웹, API, DB를 모두 거치면 셋이 다 살아야 해요. 99.9% 셋을 곱하면 약 99.7%로 내려가요.
+  </Point>
+  <Point title="나란히 두면 실패 확률을 곱해요">
+    둘 중 하나만 살아도 되면 둘 다 멈출 때만 멈춰요. 99% 둘이면 99.99%예요.
+  </Point>
+  <Point title="함께 멈추는 곳이 상한이에요">
+    서버를 늘려도 모두 DB 하나에 기대면, 전체 가용성은 그 DB를 넘지 못해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="버스 두 노선은 대개 따로 늦지만, 서버 둘은 같은 전원·DB·배포를 나눠 써서 함께 멈추기 쉬워요. 그래서 실제 효과는 계산보다 작아요.">
+  출근길에 버스를 두 번 갈아타면 두 버스가 다 제때 와야 지각하지 않아요. 집 앞에 같은 곳으로 가는 노선이 둘이면 하나만 와도 돼요.
+</Analogy>
+
+## 가용성과 9의 개수
+
+가용성(availability)은 전체 시간 중 정상으로 쓸 수 있던 시간의 비율이에요. 흔히 9의 개수로 불러요. 99.9%는 9가 셋이라 '스리 나인(three nines)'이에요.
+
+9를 하나 더할 때마다 멈춰도 되는 시간은 10분의 1이 돼요. 99%면 한 해 3.65일을 멈춰도 되지만, 99.9%면 8.76시간이에요.
+
+<Figure caption="가용성마다 한 해 동안 멈춰도 되는 시간이에요. 9가 하나 늘 때마다 10분의 1로 줄어요. 아래 작은 글자는 30일 기준이에요.">
+  <Bars
+    ariaLabel="한 해 동안 멈춰도 되는 시간 막대. 99.9%는 8.76시간, 99.95%는 4.38시간, 99.99%는 52.6분, 99.999%는 5.26분이에요"
+    bars={[
+      { label: '99.9%', value: 525.6, display: '8.76시간', note: '30일이면 43.2분' },
+      { label: '99.95%', value: 262.8, display: '4.38시간', note: '30일이면 21.6분' },
+      { label: '99.99%', value: 52.56, display: '52.6분', note: '30일이면 4.32분', tone: 'accent' },
+      { label: '99.999%', value: 5.256, display: '5.26분', note: '30일이면 약 26초', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+같은 99.9%도 기간에 따라 뜻이 달라요. 한 해 기준이면 8.76시간을 한 번에 멈춰도 목표 안이지만, 30일 기준이면 43.2분이 끝이에요. 기간은 <Term slug="foundations/slo-and-error-budget">SLI·SLO·에러 버짓</Term>에서 더 다뤄요.
+
+## 줄로 이으면 곱해요
+
+요청 하나가 웹 서버, API 서버, DB를 모두 거친다면 셋이 다 살아 있어야 성공해요. 하나만 멈춰도 요청이 실패해요. 이런 의존을 꼭 필요한 의존(hard dependency)이라고 해요.
+
+<Figure caption="셋이 따로 고장 난다면 전체 가용성은 셋을 곱한 값이에요. 99.9% 셋이면 약 99.7%로, 하나일 때보다 낮아요.">
+  <AvailSeries aria-label="요청이 99.9%짜리 웹, API, DB를 차례로 모두 거쳐요. 셋 다 살아야 성공하니 0.999 곱하기 0.999 곱하기 0.999로 약 99.7%예요" />
+</Figure>
+
+99.7%면 한 해 약 26시간을 멈춰요. 부품 하나일 때의 8.76시간보다 세 배 길어요. 셋 중 어디서든 멈춘 시간이 모두 서비스가 멈춘 시간이 되기 때문이에요.
+
+의존이 늘수록 더 떨어져요. 99.9%짜리 의존 20개를 모두 거치면 98.0%로, 한 해 7일 넘게 멈춰요.
+
+<Figure caption="99.9%짜리 꼭 필요한 의존을 더 많이 거칠수록 한 해 동안 멈추는 시간이 길어져요. 의존 20개면 한 해 173.5시간, 7일이 넘어요.">
+  <Bars
+    ariaLabel="꼭 필요한 의존 수에 따른 한 해 멈춤 시간 막대. 1개 99.9%는 8.8시간, 3개 99.7%는 26.3시간, 10개 99.0%는 87.2시간, 20개 98.0%는 173.5시간이에요"
+    bars={[
+      { label: '의존 1개 · 99.9%', value: 8.8, display: '8.8시간' },
+      { label: '의존 3개 · 99.7%', value: 26.3, display: '26.3시간' },
+      { label: '의존 10개 · 99.0%', value: 87.2, display: '87.2시간', tone: 'warn' },
+      { label: '의존 20개 · 98.0%', value: 173.5, display: '173.5시간', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+그래서 서비스는 꼭 필요한 의존들을 곱한 값보다 높은 가용성을 낼 수 없어요. 내 코드가 한 번도 멈추지 않아도 그래요.
+
+## 없어도 되는 의존은 곱하지 않아요
+
+의존이 멈춰도 다른 방법으로 메우면 곱셈에서 빠져요. 이런 의존을 없어도 되는 의존(soft dependency)이라고 해요. 예를 들어 상품 페이지는 추천 서비스가 멈추면 추천 칸만 비우고 떠요.
+
+<Figure caption="상품 DB가 멈추면 상품 페이지도 멈추니 가용성을 곱해요. 추천 서비스는 멈춰도 칸만 비우면 되니 곱하지 않아요.">
+  <Flow
+    ariaLabel="상품 페이지가 상품 DB를 꼭 필요한 의존으로 부르고, 추천 서비스는 점선으로 부르며 멈추면 추천 칸만 비우는 구조도"
+    nodes={[
+      { id: 'page', label: '상품 페이지', col: 1, row: 0, tone: 'accent' },
+      { id: 'db', label: '상품 DB', col: 0, row: 1, note: '꼭 필요 · 곱해요', tone: 'warn' },
+      { id: 'rec', label: '추천 서비스', col: 2, row: 1, note: '멈추면 칸만 비워요' },
+    ]}
+    edges={[
+      { from: 'page', to: 'db' },
+      { from: 'page', to: 'rec', dashed: true },
+    ]}
+  />
+</Figure>
+
+꼭 필요한 의존도 없어도 되게 바꿀 수 있어요. 캐시에 둔 지난 값을 보여 주거나, 큐에 넣어 나중에 처리하거나, 답이 늦으면 기본값을 써요. 멈춘 의존을 계속 부르지 않게 끊는 장치는 <Term slug="apm/circuit-breaker">서킷 브레이커</Term>에서 다뤄요.
+
+## 나란히 두면 실패를 곱해요
+
+같은 일을 하는 서버 둘 중 하나만 살아 있어도 되면, 둘 다 멈출 때만 서비스가 멈춰요. 둘이 따로 고장 난다면 둘 다 멈출 확률은 각자의 실패 확률을 곱한 값이에요.
+
+<Figure caption="99%짜리 서버는 1% 멈춰요. 둘이 따로 고장 난다면 둘 다 멈출 확률은 0.01%라서, 가용성이 99.99%로 올라가요.">
+  <AvailParallel aria-label="요청이 99%짜리 서버 두 대 중 하나로 가요. 하나만 살아도 성공하니 둘 다 멈출 확률은 1% 곱하기 1%로 0.01%이고, 가용성은 99.99%예요" />
+</Figure>
+
+한 해 3.65일이던 멈춤이 약 53분으로 줄어요. 다만 이 계산은 두 가지가 맞을 때만 성립해요.
+
+먼저 남은 한 대가 혼자 모든 요청을 받을 수 있어야 해요. 두 대가 각각 60%씩 바쁘면, 한 대가 멈출 때 남은 한 대에 120%가 몰려 함께 쓰러져요.
+
+또 멈춘 쪽을 빨리 빼야 해요. 로드 밸런서의 헬스 체크(health check, 살아 있는지 주기적으로 묻기)가 알아채기 전까지는 요청 일부가 멈춘 서버로 가서 실패해요.
+
+## 함께 멈추면 중복이 소용없어요
+
+나란히 둔 계산은 둘이 따로 고장 난다는 전제예요. 같은 가용 영역(AZ)에 있거나, 같은 설정을 한꺼번에 받거나, 같은 DB에 기대면 함께 멈춰요. 이렇게 한 원인으로 여럿이 함께 멈추는 고장을 공통 원인 고장(common-mode failure)이라고 해요.
+
+<Figure caption="웹 서버 둘은 합쳐 99.9975%지만 모두 DB 하나에 기대요. 전체는 DB 하나의 99.9%와 거의 같아요.">
+  <AvailMixed aria-label="요청이 99.5%짜리 웹 서버 두 대 중 하나를 거쳐 99.9%짜리 DB 하나로 가요. 웹 서버 둘은 합쳐 99.9975%지만, 전체는 99.9975% 곱하기 99.9%로 약 99.9%예요" />
+</Figure>
+
+웹 서버를 셋, 넷으로 늘려도 전체는 99.9%를 넘지 못해요. DB가 멈추면 웹 서버가 몇 대든 함께 실패하기 때문이에요.
+
+이렇게 하나뿐이라 멈추면 전체가 멈추는 곳을 단일 장애점(SPOF, single point of failure)이라고 해요. 가용성을 올리려면 이미 둘인 곳보다 하나뿐인 곳을 먼저 둘로 만들어요.
+
+AWS도 EC2 인스턴스 한 대에는 한 달 99.5%를 약속해요. 둘 이상의 가용 영역에 나눠 둔 인스턴스에는 리전 기준 99.99%를 약속해요. 나눠 두는 법은 <Term slug="cloud/regions-and-zones">리전과 가용 영역</Term>에서, DB를 둘로 두는 법은 <Term slug="database/replication">복제</Term>에서 다뤄요.
+
+## 모니터링에서는
+
+SLO를 정하기 전에 꼭 필요한 의존의 가용성을 곱해 봐요. 그 값이 내 서비스가 낼 수 있는 상한이에요.
+
+<Figure caption="주문 API가 결제 API와 재고 DB를 꼭 불러야 하는 예시예요. 의존 둘만으로 30일에 약 64.8분을 멈춰서, 목표 99.95%가 허용하는 21.6분의 세 배예요.">
+  <Bars
+    ariaLabel="30일 동안 멈춰도 되는 시간 막대. 주문 API 목표 99.95%는 21.6분인데, 결제 API 99.9%는 43.2분, 재고 DB 99.95%는 21.6분, 둘을 곱한 99.85%는 약 64.8분이에요"
+    bars={[
+      { label: '주문 API 목표 99.95%', value: 21.6, display: '21.6분', note: '내가 멈춰도 되는 시간', tone: 'accent' },
+      { label: '결제 API 실측 99.9%', value: 43.2, display: '43.2분' },
+      { label: '재고 DB 실측 99.95%', value: 21.6, display: '21.6분' },
+      { label: '둘을 곱한 99.85%', value: 64.8, display: '약 64.8분', note: '의존만으로 목표를 넘어요', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+이럴 때는 목표를 낮추거나, 의존을 없어도 되게 바꾸거나, 의존의 가용성을 올려요. 곱한 숫자를 보고 셋 중 무엇을 할지 고르는 게 판단이에요.
+
+의존의 가용성은 의존이 내건 숫자보다 내 서비스가 부른 결과로 재요. 그 사이의 네트워크나 <Term slug="apm/connection-pool">커넥션 풀</Term>에서 난 실패도 내 사용자는 겪기 때문이에요.
+
+<Checkpoints>
+  <Check>서비스 목표가 꼭 필요한 의존들을 곱한 값보다 높다면 다시 보세요. 99.9% 의존과 99.95% 의존에 함께 기대면 상한이 약 99.85%라서, 99.95%를 지킬 수 없어요.</Check>
+  <Check>'서버가 두 대라 99.99%'라는 계산이 있다면, 둘이 함께 멈추는 곳부터 찾으세요. 같은 AZ, 같은 DB, 두 대에 한꺼번에 나가는 배포가 있으면 계산이 맞지 않아요.</Check>
+  <Check>부품 가용성의 평균을 서비스 가용성으로 보여 준다면 고치세요. 99.9% 셋의 평균은 99.9%지만, 줄로 이어졌다면 실제로는 약 99.7%예요.</Check>
+  <Check>가상 머신 한 대로 99.9%를 약속한다면 다시 보세요. AWS가 EC2 인스턴스 한 대에 약속하는 한 달 가용성은 99.5%예요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 식으로 쓰면
+
+  줄로 이은 부품 n개의 가용성은 A₁ × A₂ × … × Aₙ이에요. 나란히 두고 하나만 살면 되는 부품 n개는 1 − (1 − A₁) × … × (1 − Aₙ)이에요.
+
+  9로만 된 가용성 둘을 나란히 두면 9의 개수를 더하면 돼요. 99.9% 둘이면 99.9999%예요.
+
+  실패 확률이 작으면, 줄로 이은 부품의 실패 확률은 각자를 더한 값과 거의 같아요. 0.1%짜리 셋을 이으면 약 0.3%예요. 그래서 멈춘 시간도 거의 더해져요.
+
+  ### 멈춘 시간으로 바꾸기
+
+  한 해는 8,760시간, 30일은 43,200분이에요. (1 − 가용성)에 이 값을 곱하면 멈춰도 되는 시간이에요. 99.9%면 한 해 8.76시간, 30일 43.2분이에요.
+
+  ### MTBF와 MTTR로 어림하기
+
+  가용성을 알려 주지 않는 부품은 MTBF(평균 고장 간격)와 MTTR(평균 복구 시간)로 어림해요. 가용성은 MTBF ÷ (MTBF + MTTR)이에요.
+
+  MTBF가 150일, MTTR이 1시간이면 3,600 ÷ 3,601로 약 99.97%예요. 같은 고장 횟수에서도 빨리 복구하면 가용성이 올라요.
+
+  ### 약속과 실제
+
+  클라우드의 SLA는 그만큼 못 지키면 크레딧을 돌려준다는 약속이에요. 실제로 그만큼만 멈춘다는 뜻은 아니에요. 계산에 쓸 때는 직접 잰 값과 함께 봐요.
+
+  요청 기준으로 재면 숫자가 또 달라요. 요청이 몰린 시간의 10분 장애는 한밤의 10분 장애보다 실패 요청이 많아요. 요청 기준과 시간 기준은 SLO 글의 Deeper에서 다뤄요.
+</Deeper>
