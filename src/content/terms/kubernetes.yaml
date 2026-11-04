@@ -449,3 +449,37 @@ terms:
     short: 클라우드가 컨트롤 플레인을 대신 띄우고 관리해 주는 쿠버네티스 서비스예요.
     analogy: 승강기와 전기는 관리실이 맡는 오피스텔과 같아요.
     doc: kubernetes/managed-kubernetes
+  - id: service-mesh
+    name: 서비스 메시
+    en: Service mesh
+    aliases: [service mesh, 메시, Istio, 이스티오, Linkerd]
+    short: 서비스 사이의 통신을 앱 대신 프록시가 맡게 하는 층이에요.
+    analogy: 직원마다 붙은 비서가 전화를 대신 걸고 기록을 남기는 것과 같아요.
+    doc: kubernetes/service-mesh
+  - id: sidecar
+    name: 사이드카
+    en: Sidecar container
+    aliases: [sidecar, 사이드카 컨테이너, 사이드카 프록시, istio-proxy]
+    short: 앱 컨테이너 옆에 붙어 함께 도는 보조 컨테이너예요.
+    analogy: 오토바이 옆에 붙은 사이드카처럼 늘 같이 다녀요.
+    doc: kubernetes/service-mesh
+  - id: envoy
+    name: Envoy
+    aliases: [엔보이, envoy proxy]
+    short: Istio가 사이드카와 게이트웨이로 쓰는 프록시예요.
+    analogy: 요청이 지나가는 길목의 검문소와 같아요.
+    doc: kubernetes/service-mesh
+  - id: mtls
+    name: mTLS
+    en: Mutual TLS
+    aliases: [mutual TLS, 상호 TLS, 상호 인증 TLS]
+    short: 서버와 클라이언트가 서로의 인증서를 확인하는 TLS예요.
+    analogy: 양쪽이 서로 신분증을 보여 주고서야 이야기를 시작하는 것과 같아요.
+    doc: kubernetes/service-mesh
+  - id: response-flags
+    name: 응답 플래그
+    en: Envoy response flags
+    aliases: [response flags, response_flags, RESPONSE_FLAGS, UF, UO, URX]
+    short: Envoy가 응답에 붙이는 짧은 표시로, 프록시가 낸 실패의 까닭을 알려 줘요.
+    analogy: 반송된 우편에 찍힌 '수취인 불명' 도장과 같아요.
+    doc: kubernetes/service-mesh

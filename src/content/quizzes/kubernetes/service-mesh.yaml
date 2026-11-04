@@ -1,0 +1,28 @@
+questions:
+  - id: reporter-double
+    type: ox
+    prompt: 사이드카가 붙은 주문 서비스가 결제 서비스를 한 번 부르면, istio_requests_total에는 이 요청이 한 번만 기록되나요?
+    answer: false
+    explain: 보내는 쪽 프록시(reporter="source")와 받는 쪽 프록시(reporter="destination")가 모두 세요. 합칠 때는 한쪽만 골라요.
+  - id: trace-headers
+    type: ox
+    prompt: Istio를 깔아도 앱이 traceparent 같은 헤더를 다음 요청에 넘겨야 트레이스가 하나로 이어지나요?
+    answer: true
+    explain: 프록시는 구간을 남기지만 서로 잇지는 못해요. 들어온 요청의 헤더를 나가는 요청에 옮기는 건 앱의 일이에요.
+  - id: retry-multiply
+    type: choice
+    prompt: 앱이 결제 API를 최대 3번 시도하고, 메시도 503에 두 번 더 시도하게 설정했어요. 결제가 계속 503이면 결제 앱은 최대 몇 번 받나요?
+    choices: [9번, 3번, 5번, 6번]
+    answer: 0
+    explain: 앱의 시도 3번마다 메시가 3번씩 보내서 3 × 3 = 9번이에요. 재시도는 한 층에서만 걸어요.
+  - id: flag-uo
+    type: choice
+    prompt: 503이 늘었는데 결제 앱 로그에는 에러가 없고, Istio 지표의 response_flags가 UO예요. 무슨 일인가요?
+    choices: [서킷 브레이커가 막았어요, 앱이 503을 직접 냈어요, 맞는 경로가 없었어요, 재시도를 모두 다 썼어요]
+    answer: 0
+    explain: UO는 upstream overflow로, 서킷 브레이커가 막아 프록시가 503을 낸 거예요. 앱까지 가지 않아서 앱 로그에 없어요.
+  - id: mesh-name
+    type: input
+    prompt: 서비스 사이의 재시도·암호화·지표를 앱 대신 프록시가 맡게 하는 층을 무엇이라 하나요?
+    answer: [서비스 메시, service mesh, 서비스메시]
+    explain: Istio가 대표적이고, 파드마다 붙는 Envoy 프록시와 설정을 내려주는 istiod로 이뤄져요.

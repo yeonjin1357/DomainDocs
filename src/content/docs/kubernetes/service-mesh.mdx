@@ -1,0 +1,219 @@
+---
+title: 서비스 메시(Istio·Envoy)
+summary: 서비스 사이의 통신을 앱 대신 프록시가 맡아, 재시도·암호화·지표를 한곳에서 다뤄요.
+domain: kubernetes
+type: concept
+stage: basics
+order: 62
+icon: network
+keywords: [service mesh, 서비스 메시, Istio, Envoy, sidecar, 사이드카, mTLS, ambient, istio_requests_total, response flags]
+related: [kubernetes/services-and-ingress, kubernetes/pod-network, apm/timeouts-and-retries, apm/circuit-breaker, apm/service-map]
+sources:
+  - title: Istio — Architecture (데이터 플레인과 컨트롤 플레인)
+    url: https://istio.io/latest/docs/ops/deployment/architecture/
+  - title: Istio — Traffic Management (기본 재시도 두 번, 타임아웃 꺼짐)
+    url: https://istio.io/latest/docs/concepts/traffic-management/
+  - title: Istio — Security (자동 mTLS, PERMISSIVE)
+    url: https://istio.io/latest/docs/concepts/security/
+  - title: Istio — Standard Metrics (reporter, response_flags)
+    url: https://istio.io/latest/docs/reference/config/metrics/
+  - title: Istio — Distributed Tracing Overview (헤더 전달)
+    url: https://istio.io/latest/docs/tasks/observability/distributed-tracing/overview/
+  - title: Istio — Ambient mode overview
+    url: https://istio.io/latest/docs/ambient/overview/
+  - title: Istio 1.24 발표 (앰비언트 모드 GA)
+    url: https://istio.io/latest/news/releases/1.24.x/announcing-1.24/
+  - title: Istio — Performance and Scalability (1.24, 1,000 rps)
+    url: https://istio.io/latest/docs/ops/deployment/performance-and-scalability/
+  - title: Envoy — Access logging의 응답 플래그(UF, UO, NR, URX)
+    url: https://www.envoyproxy.io/docs/envoy/latest/configuration/advanced/substitution_formatter
+updated: 2026-11-04
+---
+
+<KeyPoints>
+  <Point title="통신 일을 앱 밖의 프록시가 맡아요">
+    파드마다 붙은 프록시(Envoy)가 재시도, 암호화, 지표를 맡고, istiod가 설정과 인증서를 내려줘요.
+  </Point>
+  <Point title="요청 하나를 프록시 둘이 세요">
+    보내는 쪽과 받는 쪽 프록시가 모두 기록해요. 합칠 때는 한쪽만 골라요.
+  </Point>
+  <Point title="재시도는 겹치면 곱해져요">
+    앱이 3번, 메시가 3번 시도하면 뒤쪽 서비스는 최대 9번 받아요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="비서는 전화를 대신 걸 뿐, 여러 통화를 하나의 일로 이어 주지는 못해요. 요청 사이의 트레이스는 앱이 헤더를 넘겨야 이어져요.">
+  직원(앱)마다 비서(프록시)가 붙어 있어요. 다른 부서에 전화하면 비서가 대신 걸고, 안 받으면 다시 걸고, 통화 기록을 남겨요. 본사 총무(istiod)는 비서들에게 규칙을 내려보내요.
+</Analogy>
+
+## 서비스 메시는 무엇인가요
+
+<Term term="kubernetes/service-mesh">서비스 메시</Term>(service mesh)는 서비스 사이의 통신을 앱 대신 프록시가 맡게 하는 층이에요. 메시가 없으면 재시도, 타임아웃, 암호화, 지표를 서비스마다 코드로 넣어야 해요. 언어가 다르면 라이브러리도 달라서 동작이 제각각이 돼요.
+
+가장 널리 쓰는 Istio는 두 부분으로 나뉘어요. 파드마다 붙는 프록시 <Term term="kubernetes/envoy">Envoy</Term>가 데이터 플레인이고, 이 프록시들에 설정과 인증서를 내려주는 istiod가 컨트롤 플레인이에요.
+
+<Figure caption="주문 앱이 결제 서비스를 부르면 요청은 주문 파드의 사이드카를 거쳐 결제 파드의 사이드카로 가요. 사이드카끼리는 mTLS로 주고받고, istiod는 둘에게 설정과 인증서를 내려줘요.">
+  <Flow
+    ariaLabel="istiod가 주문 파드와 결제 파드의 사이드카 프록시에 설정을 내려주고, 주문 앱의 요청이 주문 사이드카, 결제 사이드카를 거쳐 결제 앱에 닿는 구조도"
+    nodes={[
+      { id: 'istiod', label: 'istiod', col: 1, row: 0, note: '설정·인증서', tone: 'accent' },
+      { id: 'app1', label: '주문 앱', col: 0, row: 1 },
+      { id: 'px1', label: '사이드카', col: 0, row: 2, note: 'Envoy' },
+      { id: 'app2', label: '결제 앱', col: 2, row: 1 },
+      { id: 'px2', label: '사이드카', col: 2, row: 2, note: 'Envoy' },
+    ]}
+    edges={[
+      { from: 'istiod', to: 'px1', dashed: true },
+      { from: 'istiod', to: 'px2', dashed: true },
+      { from: 'app1', to: 'px1' },
+      { from: 'px1', to: 'px2', tone: 'accent' },
+      { from: 'px2', to: 'app2' },
+    ]}
+    groups={[
+      { label: '주문 파드', cols: [0, 0], rows: [1, 2] },
+      { label: '결제 파드', cols: [2, 2], rows: [1, 2] },
+    ]}
+  />
+</Figure>
+
+앱은 평소처럼 결제 서비스 주소로 요청을 보내요. 파드 안의 네트워크 규칙이 이 요청을 같은 파드의 사이드카로 돌려서, 앱 코드는 바꾸지 않아도 돼요. <Term term="kubernetes/sidecar">사이드카</Term>(sidecar)는 앱 컨테이너 옆에 붙어 함께 도는 컨테이너예요.
+
+## 메시가 맡는 일
+
+통신에 필요한 일을 프록시 설정 하나로 모든 서비스에 똑같이 걸 수 있어요. 앱 코드에서 할 때와 견주면 이래요.
+
+<Figure caption="앱마다 코드로 하던 통신 일을 메시는 프록시 설정으로 해요. 다만 트레이스를 잇는 헤더 전달은 여전히 앱의 일이에요.">
+  <Compare
+    columns={['앱 코드에서', '서비스 메시에서']}
+    rows={[
+      { label: '재시도·타임아웃', values: ['언어마다 라이브러리로', '설정 하나로 모든 서비스에'] },
+      { label: '암호화', values: ['서비스마다 인증서 관리', '프록시끼리 자동 mTLS'] },
+      { label: '트래픽 나누기', values: ['배포 도구나 로드 밸런서', '비율로 나눠 보내기'] },
+      { label: '지표', values: ['앱마다 따로 계측', '프록시가 같은 이름으로'] },
+      { label: '트레이스 잇기', values: ['앱이 헤더를 넘겨요', '그래도 앱이 넘겨요'] },
+    ]}
+  />
+</Figure>
+
+<Term term="kubernetes/mtls">mTLS</Term>(mutual TLS)는 양쪽이 서로의 인증서를 확인하는 TLS예요. Istio는 프록시가 붙은 두 서비스 사이의 통신을 자동으로 mTLS로 올리고, 인증서는 istiod가 서명해 줘요.
+
+Istio의 기본값은 알아 둬요. 연결이 실패하거나 거절되면 두 번 다시 시도하고, HTTP 타임아웃은 꺼져 있어요. 앱이 낸 503에도 다시 시도하려면 VirtualService의 `retryOn`에 넣어요.
+
+카나리 배포처럼 트래픽을 비율로 나누는 법은 <Term slug="foundations/deployments">배포 방식과 지켜보기</Term>에서 다뤄요.
+
+## 사이드카 없는 앰비언트 모드
+
+사이드카는 파드마다 프록시가 하나씩 붙어서 그만큼 CPU와 메모리를 써요. Istio 1.24부터 정식이 된 앰비언트(ambient) 모드는 사이드카 없이 메시를 만들어요.
+
+<Figure caption="사이드카 모드는 파드마다 Envoy를 붙이고, 앰비언트 모드는 노드마다 ztunnel을 두고 HTTP 기능이 필요한 곳에만 waypoint를 둬요. 자원은 Istio 1.24를 1,000 요청/초로 잰 값이에요.">
+  <Compare
+    columns={['사이드카 모드', '앰비언트 모드']}
+    rows={[
+      { label: '프록시 자리', values: ['파드마다 Envoy', '노드마다 ztunnel'] },
+      { label: 'HTTP 재시도·지표', values: ['사이드카가 해요', 'waypoint를 둬야 해요'] },
+      { label: '프록시 자원', values: ['약 0.20 vCPU, 60MB', 'ztunnel 약 0.06 vCPU, 12MB'] },
+      { label: '앱 파드', values: ['사이드카가 붙어요', '그대로예요'] },
+    ]}
+  />
+</Figure>
+
+ztunnel은 노드마다 하나씩 돌며 mTLS와 연결 단위 일(L4)을 맡아요. HTTP 요청 단위의 일(L7)은 waypoint라는 Envoy 프록시를 따로 둬야 해요.
+
+## 모니터링에서는
+
+메시를 쓰면 모든 서비스의 요청 수, 에러, 응답시간이 같은 이름으로 모여요. Istio 프록시는 요청 수를 `istio_requests_total`로 내보내요. 응답시간은 `istio_request_duration_milliseconds`예요.
+
+### 요청 하나를 두 프록시가 세요
+
+주문이 결제를 한 번 부르면, 주문 쪽 프록시와 결제 쪽 프록시가 모두 그 요청을 세요. 보내는 쪽은 `reporter="source"`, 받는 쪽은 `reporter="destination"` 레이블이 붙어요.
+
+<Figure caption="결제 요청 한 건을 두 프록시가 각자 세요. reporter를 고르지 않고 더하면 요청 수가 두 배로 나와요.">
+  <Flow
+    ariaLabel="주문 사이드카가 reporter source로, 결제 사이드카가 reporter destination으로 같은 요청 한 건을 각각 세는 구조도"
+    nodes={[
+      { id: 'src', label: '주문 사이드카', col: 0, row: 0, note: 'source +1' },
+      { id: 'dst', label: '결제 사이드카', col: 2, row: 0, note: 'destination +1' },
+    ]}
+    edges={[{ from: 'src', to: 'dst', label: '요청 1건', tone: 'accent' }]}
+  />
+</Figure>
+
+그래서 서비스가 받은 요청을 셀 때는 받는 쪽 기록만 골라요.
+
+```text
+sum(rate(
+  istio_requests_total{
+    reporter="destination"
+  }[5m]
+))
+```
+
+### 503이 어디서 났나
+
+메시에서는 앱이 아니라 프록시가 503을 내기도 해요. Envoy는 그 까닭을 <Term term="kubernetes/response-flags">응답 플래그</Term>(response flags)로 남기고, Istio 지표의 `response_flags` 레이블에도 붙어요.
+
+<Figure caption="'-'면 앱이 낸 응답이고, 나머지는 프록시가 까닭을 붙인 응답이에요. UH 말고는 Envoy 1.40으로 직접 재현해 봤어요.">
+  <Tree
+    ariaLabel="응답 플래그가 대시면 앱이 낸 응답, URX면 재시도를 다 쓴 경우, UF면 연결 실패, UO면 서킷 브레이커가 막음, NR이면 경로 없음, UH면 건강한 대상 없음으로 나뉘는 나무"
+    root={{
+      label: '응답 플래그',
+      children: [
+        { label: '앱이 낸 응답 그대로', tag: '-' },
+        { label: '앱이 실패를 거듭해 재시도를 다 씀', tag: 'URX', tone: 'warn' },
+        {
+          label: '프록시가 앱에 닿지 못함',
+          tone: 'accent',
+          children: [
+            { label: '연결 실패(503)', tag: 'UF' },
+            { label: '건강한 대상이 없음(503)', tag: 'UH' },
+            { label: '서킷 브레이커가 막음(503)', tag: 'UO' },
+            { label: '맞는 경로가 없음(404)', tag: 'NR' },
+          ],
+        },
+      ],
+    }}
+  />
+</Figure>
+
+503이 늘었는데 결제 앱의 로그에 에러가 없다면 플래그부터 봐요. UF나 UH면 앱이 죽었거나 아직 안 떴고, UO면 서킷 브레이커 한도에 걸린 거예요.
+
+### 재시도는 겹치면 곱해져요
+
+메시의 재시도와 앱의 재시도는 따로 돌아요. 둘 다 있으면 뒤쪽 서비스가 받는 요청이 곱으로 늘어요.
+
+<Figure caption="결제 앱이 늘 503을 내게 하고, 503에 두 번 다시 시도하도록 Envoy 1.40을 설정해 잰 결과예요. 앱도 3번 시도하면 결제 앱은 9번 받았어요.">
+  <Bars
+    ariaLabel="한 번의 요청에 결제 앱이 받은 횟수 막대. 재시도가 없으면 1번, 메시 재시도 두 번이면 3번, 앱 3번 곱하기 메시 3번이면 9번이에요"
+    bars={[
+      { label: '재시도 없음', value: 1, display: '1번' },
+      { label: '메시만 재시도(2번 더)', value: 3, display: '3번' },
+      { label: '앱 3번 × 메시 3번', value: 9, display: '9번', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+결제가 이미 힘들 때 이 9배가 몰리면 회복을 막아요. 재시도는 한 층에서만 걸어요. 재시도가 장애를 키우는 길은 <Term slug="apm/timeouts-and-retries">타임아웃과 재시도</Term>에서 다뤄요.
+
+<Checkpoints>
+  <Check>`istio_requests_total`을 `reporter` 없이 더한 화면이라면 다시 보세요. 프록시가 붙은 서비스끼리의 요청은 두 번 세져서, 요청 수와 에러 수가 두 배로 나와요.</Check>
+  <Check>앱에도 재시도가 있는데 메시를 깔았다면 재시도가 겹치는지 보세요. Istio는 따로 정하지 않아도 연결 실패에는 두 번 다시 시도해요. VirtualService에 503 재시도까지 걸면 앱 재시도와 곱해져요.</Check>
+  <Check>메시를 깔면 트레이스가 저절로 이어진다고 한다면 다시 보세요. 프록시는 구간을 남기지만, 앱이 `traceparent` 같은 헤더를 받아서 다음 요청에 넘겨야 하나로 이어져요.</Check>
+  <Check>파드의 CPU·메모리를 앱 컨테이너만 보고 정했다면, 사이드카 몫을 더하세요. Istio 1.24 측정에서 사이드카 하나가 1,000 요청/초에 약 0.20 vCPU와 60MB를 썼어요.</Check>
+  <Check>응답시간 그래프에서 `istio_request_duration_milliseconds`를 초 단위 지표와 한 축에 그렸다면 단위를 맞추세요. 이 지표는 이름대로 밀리초라 1,000배 차이가 나요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### Envoy로 재현한 방법
+
+  WSL에 Envoy 1.40.2를 받아 사이드카처럼 앞에 두고, 뒤에 늘 503을 내는 Python 서버를 뒀어요. 경로마다 재시도(`num_retries: 2`), 서킷 브레이커(`max_pending_requests: 1`), 없는 포트를 걸었어요. 접근 로그에 `%RESPONSE_FLAGS%`를 찍어 플래그를 봤어요.
+
+  1초 걸리는 요청 5개를 한꺼번에 보내니 3개는 바로 503(UO)이었어요. 이때 Envoy 통계 `upstream_rq_pending_overflow`가 3이었어요. 응답시간이 정해진 시간을 넘으면 UT(504), 뒤쪽과의 연결이 끊기면 UC(503)가 붙어요.
+
+  ### 앰비언트 모드의 지표
+
+  ztunnel은 연결 단위(L4)의 지표만 남겨요. HTTP 요청 수와 응답 코드 같은 지표가 필요하면 waypoint를 둬요. 사이드카 모드에서 앰비언트로 옮길 때 HTTP 대시보드가 비면 이것부터 봐요.
+
+  ### 사이드카가 늦게 뜨면
+
+  앱이 사이드카보다 먼저 떠서 요청을 보내면, 프록시가 아직 받지 못해 연결이 실패할 수 있어요. 쿠버네티스의 정식 사이드카(`restartPolicy: Always`인 init 컨테이너)는 앱보다 먼저 뜨고 늦게 끝나서 이 순서를 지켜요. <Term slug="kubernetes/pod-status">파드 상태</Term>의 Deeper에서 다뤄요.
+</Deeper>

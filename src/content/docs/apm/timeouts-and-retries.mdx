@@ -7,7 +7,7 @@ stage: monitoring
 order: 140
 icon: timer
 keywords: [timeout, 타임아웃, retry, 재시도, backoff, 백오프, jitter, deadline, 재시도 폭주, retry storm]
-related: [apm/connection-pool, apm/throughput-and-concurrency, apm/service-map, apm/circuit-breaker]
+related: [apm/connection-pool, apm/throughput-and-concurrency, apm/service-map, apm/circuit-breaker, kubernetes/service-mesh]
 sources:
   - title: Amazon Builders' Library — Timeouts, retries, and backoff with jitter
     url: https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
@@ -84,6 +84,8 @@ Amazon은 받아들일 헛 타임아웃 비율(예: 0.1%)을 먼저 정해요. �
 아래에서 계층 수와 보내는 횟수를 바꿔 보세요. 계층을 하나 늘릴 때마다 맨 아래가 받는 수가 곱으로 커져요.
 
 <RetryFanoutDemo client:visible />
+
+서비스 메시를 쓰면 프록시도 한 계층이에요. 앱의 재시도와 프록시의 재시도가 겹치는 일은 <Term slug="kubernetes/service-mesh">서비스 메시</Term>에서 다뤄요.
 
 ## 다시 보낼 땐 간격을 벌리고 흩뜨려요
 
