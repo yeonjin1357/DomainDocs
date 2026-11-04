@@ -1,0 +1,266 @@
+---
+title: 리눅스 사용자와 권한
+summary: 프로세스는 사용자의 권한으로 돌고, 파일마다 주인·그룹·나머지가 할 수 있는 일이 정해져 있어요.
+domain: server
+type: concept
+stage: basics
+order: 62
+icon: server
+keywords: [사용자, user, UID, 그룹, group, 파일 권한, chmod, root, sudo, capability]
+related: [server/services-and-logs, server/processes-and-threads, server/server-not-reporting, foundations/logs-missing, network/packet-capture]
+sources:
+  - title: man7 — path_resolution(7) (권한 검사 순서, 디렉터리 검색 권한)
+    url: https://man7.org/linux/man-pages/man7/path_resolution.7.html
+  - title: man7 — capabilities(7)
+    url: https://man7.org/linux/man-pages/man7/capabilities.7.html
+  - title: man7 — proc_pid_fd(5) (/proc/PID/fd 접근 검사)
+    url: https://man7.org/linux/man-pages/man5/proc_pid_fd.5.html
+  - title: systemd.exec — User=, SupplementaryGroups=, AmbientCapabilities=
+    url: https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html
+  - title: journalctl — 시스템 저널을 읽을 수 있는 그룹
+    url: https://www.freedesktop.org/software/systemd/man/latest/journalctl.html
+  - title: sudo manual
+    url: https://www.sudo.ws/docs/man/sudo.man/
+updated: 2026-11-04
+---
+
+<KeyPoints>
+  <Point title="프로세스는 실행한 사용자의 권한으로 돌아요">
+    에이전트가 읽을 수 있는 파일은 에이전트를 돌리는 사용자가 정해요.
+  </Point>
+  <Point title="파일 권한은 주인·그룹·나머지에 따로 줘요">
+    `rw-r-----`처럼 세 칸씩 읽기(r)·쓰기(w)·실행(x)을 정해요.
+  </Point>
+  <Point title="root 대신 필요한 권한만 줘요">
+    그룹에 넣거나 capability 하나만 주면, 에이전트가 뚫려도 피해가 작아요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="출입증 하나가 여러 팀에 속할 수 있어요. 또 팀에 새로 넣어도, 이미 건물에 들어와 있는 사람(실행 중인 프로세스)에겐 바로 적용되지 않아요.">
+  회사 출입증마다 열 수 있는 문이 달라요. 문마다 '방 주인, 같은 팀, 나머지'가 할 수 있는 일이 붙어 있고, root는 모든 문을 여는 마스터키예요.
+</Analogy>
+
+## 사용자와 그룹
+
+리눅스는 사용자(user)를 <Term term="server/uid">UID</Term>라는 번호로 구별해요. 사람만 사용자가 아니에요. `postgres`, `node_exporter`처럼 서비스 하나를 돌리려고 만든 시스템 사용자도 있어요.
+
+그룹(group)은 사용자의 묶음이고, GID라는 번호로 구별해요. 한 사용자가 여러 그룹에 속할 수 있어요. `id` 명령으로 확인해요.
+
+<Figure caption="에이전트용 사용자 agent의 id 결과예요. 자기 이름의 그룹에 더해 adm 그룹에도 속해 있어요.">
+  <Anatomy
+    ariaLabel="id 명령 결과 uid=999(agent) gid=989(agent) groups=989(agent),4(adm)를 사용자, 기본 그룹, 속한 그룹 모두로 나눠 읽는 그림"
+    parts={[
+      { text: 'uid=999(agent)', label: '사용자', note: 'UID 999, 이름 agent' },
+      { text: ' ', label: '', tone: 'sub' },
+      { text: 'gid=989(agent)', label: '기본 그룹', note: '새로 만드는 파일이 받는 그룹' },
+      { text: ' groups=', label: '', tone: 'sub' },
+      { text: '989(agent),4(adm)', label: '속한 그룹 모두', note: '권한 검사에 쓰는 그룹', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+프로세스는 실행한 사용자의 UID와 그룹을 그대로 가져요. 그래서 같은 프로그램도 누가 돌리느냐에 따라 읽을 수 있는 파일이 달라요. <Term term="server/systemd">systemd</Term> 서비스는 설정의 `User=`로 어느 사용자로 돌지 정해요.
+
+## 파일 권한 읽기
+
+`ls -l`을 치면 파일마다 <Term term="server/file-permission">권한</Term>과 주인, 그룹이 나와요. 맨 앞 10글자가 권한이에요.
+
+<Figure caption="Ubuntu의 /var/log/syslog를 ls -l로 본 예예요. 주인 syslog는 읽고 쓰고, adm 그룹은 읽기만, 나머지는 아무것도 못 해요.">
+  <Anatomy
+    ariaLabel="ls -l 결과 -rw-r----- 1 syslog adm을 종류, 주인 권한 rw-, 그룹 권한 r--, 나머지 권한 ---, 주인 syslog, 그룹 adm으로 나눠 읽는 그림"
+    parts={[
+      { text: '-', label: '종류', note: '-는 보통 파일, d는 디렉터리' },
+      { text: 'rw-', label: '주인 권한', note: '읽기, 쓰기', tone: 'accent' },
+      { text: 'r--', label: '그룹 권한', note: '읽기만' },
+      { text: '---', label: '나머지 권한', note: '아무것도 못 해요', tone: 'warn' },
+      { text: ' 1 ', label: '', tone: 'sub' },
+      { text: 'syslog', label: '주인' },
+      { text: ' ', label: '', tone: 'sub' },
+      { text: 'adm', label: '그룹' },
+    ]}
+  />
+</Figure>
+
+r는 읽기, w는 쓰기, x는 실행이에요. 숫자로는 r=4, w=2, x=1을 더해 칸마다 한 자리로 써요. 그래서 `rw-r-----`는 640이고, `chmod 640 파일`로 이렇게 바꿔요.
+
+<Figure caption="권한 9칸을 세 칸씩 묶어 숫자 한 자리로 써요. rw-는 4+2=6, r--는 4, ---는 0이라 640이에요.">
+  <Strip
+    ariaLabel="권한 9칸 r w - r - - - - -를 주인 세 칸, 그룹 세 칸, 나머지 세 칸으로 묶고, 각각 숫자 6, 4, 0으로 읽는 칸 띠"
+    rows={[
+      {
+        heads: ['4', '2', '1', '4', '2', '1', '4', '2', '1'],
+        cells: [
+          { label: 'r', tone: 'accent' },
+          { label: 'w', tone: 'accent' },
+          { label: '-', tone: 'sub' },
+          { label: 'r', tone: 'accent' },
+          { label: '-', tone: 'sub' },
+          { label: '-', tone: 'sub' },
+          { label: '-', tone: 'sub' },
+          { label: '-', tone: 'sub' },
+          { label: '-', tone: 'sub' },
+        ],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 2, label: '주인 6', tone: 'accent' },
+      { from: 3, to: 5, label: '그룹 4', tone: 'accent' },
+      { from: 6, to: 8, label: '나머지 0' },
+    ]}
+  />
+</Figure>
+
+## 권한은 한 칸만 봐요
+
+커널은 세 칸을 다 보지 않아요. 내가 파일 주인이면 주인 칸만, 아니고 파일 그룹에 속하면 그룹 칸만, 둘 다 아니면 나머지 칸만 봐요.
+
+<Figure caption="커널이 어느 칸을 볼지 고르는 순서예요. 앞에서 맞는 칸이 있으면 뒤의 칸은 보지 않아요.">
+  <Triage
+    numbered={false}
+    ariaLabel="파일 주인이면 주인 칸만 보고, 아니면 파일 그룹에 속하는지 보고 그룹 칸만 보고, 둘 다 아니면 나머지 칸을 보는 순서"
+    steps={[
+      { label: '파일 주인인가요?', exits: [{ when: '예', to: '주인 칸만 봐요', tone: 'accent' }], next: '아니요' },
+      { label: '파일 그룹에 속하나요?', exits: [{ when: '예', to: '그룹 칸만 봐요', tone: 'accent' }], next: '아니요' },
+      { label: '나머지 칸을 봐요', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+그래서 권한이 `-------r--`인 파일은 나머지는 읽어도, 정작 주인은 못 읽어요. 주인 칸이 비어 있기 때문이에요. root는 이 검사를 거의 건너뛰어서, 읽기와 쓰기를 막을 수 없어요.
+
+## 디렉터리의 x는 지나갈 권한이에요
+
+디렉터리의 r은 안의 이름 목록을 보는 권한이고, x는 그 디렉터리를 지나 안의 파일에 닿는 권한이에요. 파일을 읽으려면 경로의 모든 디렉터리에 x가 있어야 해요.
+
+<Figure caption="app.log는 누구나 읽을 수 있는 644인데, 중간의 app 디렉터리가 700이라 다른 사용자는 지나가지 못해요.">
+  <Strip
+    ariaLabel="경로 /, srv, app, logs, app.log 중 app 디렉터리의 나머지 권한이 ---라서 다른 사용자가 거기서 막히는 칸 띠"
+    rows={[
+      {
+        label: '경로와 나머지 칸 권한',
+        heads: ['r-x', 'r-x', '---', 'r-x', 'r--'],
+        cells: ['/', 'srv', { label: 'app', tone: 'warn' }, 'logs', 'app.log'],
+      },
+    ]}
+    marks={[{ at: 2, label: 'x 없음, 여기서 막혀요', tone: 'warn' }]}
+  />
+</Figure>
+
+경로의 권한은 `namei -l`로 한꺼번에 봐요. 디렉터리마다 권한, 주인, 그룹이 한 줄씩 나와요.
+
+```text
+$ namei -l /srv/app/logs/app.log
+f: /srv/app/logs/app.log
+drwxr-xr-x root root /
+drwxr-xr-x root root srv
+drwx------ root root app
+drwxr-xr-x root root logs
+-rw-r--r-- root root app.log
+```
+
+app을 711(`rwx--x--x`)로 바꾸면 다른 사용자도 app.log를 읽어요. 다만 r이 없어서 `ls /srv/app`으로 안의 목록은 못 봐요.
+
+## root와 sudo
+
+<Term term="server/root">root</Term>는 UID 0인 사용자예요. 커널의 권한 검사를 거의 건너뛰어서, 어떤 파일이든 읽고 쓰고 어떤 프로세스든 멈출 수 있어요. 그래서 root로 도는 프로그램 하나가 뚫리면 서버 전체가 넘어가요.
+
+<Term term="server/sudo">sudo</Term>는 허락받은 사용자가 명령 하나를 root나 다른 사용자로 실행하게 해 줘요. 누가 무엇을 할 수 있는지는 `/etc/sudoers`에 적어요. Ubuntu는 sudo를 쓴 사용자와 명령을 `/var/log/auth.log`에 남겨요.
+
+## 필요한 권한만 주기
+
+에이전트를 root로 돌리면 설정이 쉽지만, 에이전트가 뚫리면 서버 전체가 위험해요. 그래서 전용 사용자로 돌리고 필요한 권한만 더해요. 방법은 두 가지예요.
+
+첫째는 그룹에 넣는 거예요. Ubuntu의 `/var/log/syslog`는 adm 그룹이 읽을 수 있어서, 에이전트 사용자를 adm에 넣으면 읽혀요. 시스템 <Term term="server/journald">저널</Term>은 systemd-journal이나 adm 그룹이면 읽어요.
+
+둘째는 <Term term="server/capability">capability</Term>를 주는 거예요. 리눅스는 root의 힘을 capability라는 조각으로 나눠 두고, 조각을 하나씩 줄 수 있어요. 이 글을 쓸 때 쓴 커널(6.18)에는 41개가 있어요.
+
+<Figure caption="root의 힘을 조각낸 capability 중 모니터링에서 자주 만나는 다섯 개예요. 패킷을 잡는 에이전트에는 CAP_NET_RAW 하나만 주면 돼요.">
+  <Nest
+    ariaLabel="root의 힘 상자 안에 CAP_NET_RAW, CAP_NET_BIND_SERVICE, CAP_DAC_READ_SEARCH, CAP_DAC_OVERRIDE, CAP_SYS_PTRACE와 그 밖의 조각이 들어 있고, CAP_NET_RAW만 강조한 그림"
+    boxes={[
+      {
+        label: 'root의 힘(41조각)',
+        children: [
+          { label: 'CAP_NET_RAW', note: '패킷을 직접 보내고 받기', tone: 'accent', wide: true },
+          { label: 'CAP_NET_BIND_SERVICE', note: '1024 아래 포트 열기', wide: true },
+          { label: 'CAP_DAC_READ_SEARCH', note: '모든 파일 읽기', wide: true },
+          { label: 'CAP_DAC_OVERRIDE', note: '모든 파일 읽고 쓰기', wide: true },
+          { label: 'CAP_SYS_PTRACE', note: '다른 프로세스 들여다보기', wide: true },
+          { label: '그 밖의 조각', note: '시각 바꾸기, 모듈 올리기 등', wide: true, dashed: true },
+        ],
+      },
+    ]}
+  />
+</Figure>
+
+capability는 `setcap`으로 실행 파일에 붙이거나, systemd의 `AmbientCapabilities=`로 줘요. 파일에 붙일 때는 `setcap cap_net_raw+ep 파일`처럼 써요. 이렇게 주면 일반 사용자로 도는 프로세스도 그 일 하나만 root처럼 해요.
+
+## 모니터링에서는
+
+에이전트를 일반 사용자로 돌려도 시스템 지표는 대부분 읽혀요. CPU와 메모리 숫자가 든 `/proc/stat`, `/proc/meminfo`는 누구나 읽을 수 있어요. 막히는 건 다른 사용자 프로세스의 세부예요.
+
+<Figure caption="일반 사용자 agent로 PID 1(systemd)의 /proc 파일을 읽어 본 결과예요. 명령줄은 보이지만, 열린 파일 목록과 입출력 양은 막혀요.">
+  <Compare
+    columns={['일반 사용자', 'root']}
+    rows={[
+      { label: '/proc/stat, /proc/meminfo', values: ['읽어요', '읽어요'] },
+      { label: '/proc/1/cmdline (명령줄)', values: ['읽어요', '읽어요'] },
+      { label: '/proc/1/fd (열린 파일)', values: ['막혀요', '읽어요'] },
+      { label: '/proc/1/io (입출력 양)', values: ['막혀요', '읽어요'] },
+    ]}
+  />
+</Figure>
+
+그래서 프로세스마다 열린 <Term term="server/file-descriptor">파일 디스크립터</Term> 수를 보는 에이전트는, 다른 사용자의 프로세스에서 값이 빠져요. 화면에 일부 프로세스만 0이나 빈칸이면 권한부터 의심해요.
+
+에이전트 로그에 `Permission denied`가 보이면 이 순서로 봐요.
+
+<Figure caption="에이전트가 파일을 못 읽을 때 보는 순서예요. 그룹에 넣었다면 재시작했는지까지 확인해요.">
+  <Triage
+    ariaLabel="에이전트가 Permission denied로 파일을 못 읽을 때, 도는 사용자, 경로의 x 권한, 파일의 그룹과 그룹 소속, 재시작 여부를 차례로 보고, 모두 맞으면 SELinux나 AppArmor를 보는 점검 순서"
+    steps={[
+      { label: '에이전트가 도는 사용자', note: 'ps -o user= -p PID', tone: 'warn' },
+      { label: '경로의 디렉터리마다 x', note: 'namei -l 경로', exits: [{ when: 'x가 없으면', to: '디렉터리에 x 주기' }] },
+      { label: '파일 그룹 칸과 그룹 소속', note: 'ls -l, id 사용자', exits: [{ when: '그룹에 없으면', to: '그룹에 넣기' }] },
+      { label: '그룹에 넣은 뒤 재시작', note: '/proc/PID/status의 Groups', exits: [{ when: '그룹이 안 보이면', to: '에이전트 재시작' }] },
+      { label: '권한이 다 맞는데 막혀요', note: 'SELinux·AppArmor 기록', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+그룹은 프로세스가 뜰 때 정해져요. 에이전트가 도는 중에 사용자를 adm에 넣어도, 그 프로세스의 그룹 목록은 그대로예요. 재시작해야 새 그룹으로 읽어요.
+
+<Checkpoints>
+  <Check>설치 문서가 에이전트를 root로 돌리라고만 한다면 다시 보세요. 필요한 게 로그 읽기라면 그룹을, 패킷 잡기라면 CAP_NET_RAW 하나를 주는 쪽이 피해 범위가 작아요.</Check>
+  <Check>파일 권한이 644인데도 못 읽는다고 하면 경로를 보세요. 중간 디렉터리 하나에 x가 없으면 그 안의 파일은 권한과 상관없이 막혀요.</Check>
+  <Check>그룹에 넣었는데도 그대로라면 재시작했는지 보세요. 실행 중인 프로세스는 뜰 때의 그룹 목록을 계속 써요.</Check>
+  <Check>권한 문제를 `chmod 777`로 풀었다면 되돌리세요. 아무나 그 파일을 고치거나 지울 수 있게 돼요. 필요한 사용자나 그룹에만 권한을 주세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 권한 검사에 쓰는 사용자
+
+  커널은 프로세스의 실제 UID가 아니라 유효 UID(effective UID)로 권한을 검사해요. 리눅스는 파일 검사에 따로 파일 시스템 UID(fsuid)를 쓰는데, 보통은 유효 UID와 같아요. sudo나 setuid 프로그램은 이 유효 UID를 바꿔요.
+
+  ### root도 막히는 곳
+
+  root의 힘도 capability에서 나와요. CAP_DAC_OVERRIDE는 읽기·쓰기·실행 검사를 건너뛰지만, 실행은 세 칸 중 하나에라도 x가 있을 때만 허락해요.
+
+  Docker 컨테이너 안의 root는 기본으로 capability 14개만 가져요. 그래서 시각 바꾸기(CAP_SYS_TIME)나 ptrace는 막혀요.
+
+  ### capability를 확인하는 법
+
+  실행 파일에 붙은 capability는 `getcap 파일`로, 실행 중인 프로세스의 것은 `/proc/PID/status`의 `CapEff` 줄로 봐요. 이 값은 16진수라 `capsh --decode=값`으로 이름을 풀어요. 예를 들어 `0000000000000400`은 cap_net_bind_service예요.
+
+  `setcap`은 붙어 있던 capability를 바꿔 끼워요. CAP_NET_RAW를 붙인 파일에 `setcap cap_net_bind_service+ep`를 다시 하면 CAP_NET_RAW는 빠져요. 둘 다 주려면 한 번에 `cap_net_raw,cap_net_bind_service+ep`로 써요.
+
+  ### 다른 프로세스의 /proc
+
+  `/proc/PID/fd`를 읽으려면 그 프로세스를 들여다볼 자격(ptrace 접근 검사)이 있어야 해요. 같은 사용자의 프로세스거나 CAP_SYS_PTRACE가 있으면 통과해요.
+
+  그래서 프로세스별 지표를 모으는 에이전트에 CAP_SYS_PTRACE를 주기도 해요. 다만 다른 프로세스의 메모리까지 볼 수 있는 큰 권한이에요.
+
+  ### SELinux와 AppArmor
+
+  일반 권한이 다 맞는데도 막히면 SELinux(Red Hat 계열)나 AppArmor(Ubuntu 계열) 같은 추가 보안 장치일 수 있어요. 이들은 사용자 권한과 따로, 프로그램마다 닿을 수 있는 파일을 정해요. 막힌 기록은 감사 로그나 커널 로그에 남아요.
+</Deeper>

@@ -1,0 +1,28 @@
+questions:
+  - id: owner-slot-first
+    type: ox
+    prompt: 주인이 agent이고 권한이 `-------r--`인 파일을, agent 사용자가 읽을 수 있나요?
+    answer: false
+    explain: 주인이면 주인 칸만 봐요. 주인 칸이 비어 있어서, 나머지 칸의 r은 agent에게 쓰이지 않아요.
+  - id: dir-execute
+    type: ox
+    prompt: 파일 권한이 644여도 경로 중간 디렉터리가 700이면, 다른 사용자는 그 파일을 못 읽나요?
+    answer: true
+    explain: 파일에 닿으려면 경로의 모든 디렉터리에 x가 있어야 해요. 700은 나머지 칸에 x가 없어요.
+  - id: group-needs-restart
+    type: ox
+    prompt: 에이전트가 도는 중에 그 사용자를 adm 그룹에 넣으면, 에이전트가 바로 adm 그룹의 파일을 읽나요?
+    answer: false
+    explain: 그룹 목록은 프로세스가 뜰 때 정해져요. 에이전트를 다시 띄워야 adm으로 읽어요.
+  - id: packet-capability
+    type: choice
+    prompt: 패킷을 직접 잡는 에이전트를 root 없이 돌리려면 어떤 capability를 주나요?
+    choices: [CAP_NET_RAW, CAP_DAC_READ_SEARCH, CAP_NET_BIND_SERVICE, CAP_SYS_PTRACE]
+    answer: 0
+    explain: CAP_NET_RAW는 RAW·PACKET 소켓을 쓰게 해 줘요. 1024 아래 포트를 여는 건 CAP_NET_BIND_SERVICE예요.
+  - id: sudo-name
+    type: input
+    prompt: 허락받은 사용자가 명령 하나를 root 권한으로 실행하게 해 주는 명령은?
+    answer: [sudo]
+    term: server/sudo
+    explain: 누가 무엇을 할 수 있는지는 /etc/sudoers에 적고, 쓴 기록은 로그에 남아요.

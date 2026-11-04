@@ -261,3 +261,36 @@ terms:
     short: 디스크 여러 개를 하나처럼 묶어, 하나가 고장 나도 데이터를 지키는 방식이에요.
     analogy: 예비 타이어를 달고 다니는 것과 같아요.
     doc: server/disk-health
+  - id: uid
+    name: UID
+    en: User ID
+    aliases: [사용자 ID, user ID, 사용자 번호]
+    short: 리눅스가 사용자를 구별하는 번호예요. root는 0이에요.
+    analogy: 사원 번호와 같아요. 이름이 아니라 번호로 출입을 검사해요.
+    doc: server/users-and-permissions
+  - id: file-permission
+    name: 파일 권한
+    en: File permission
+    aliases: [권한, permission, rwx, chmod, 퍼미션, 파일 모드]
+    short: 파일마다 주인·그룹·나머지가 읽고 쓰고 실행할 수 있는지 정한 값이에요.
+    analogy: 방문마다 붙은 '주인, 같은 팀, 나머지'의 출입 규칙과 같아요.
+    doc: server/users-and-permissions
+  - id: root
+    name: root
+    aliases: [루트, superuser, 슈퍼유저, UID 0]
+    short: UID가 0인 사용자예요. 커널의 권한 검사를 거의 건너뛰어요.
+    analogy: 모든 문을 여는 마스터키를 가진 사람과 같아요.
+    doc: server/users-and-permissions
+  - id: sudo
+    name: sudo
+    aliases: [수도, sudoers]
+    short: 허락받은 사용자가 명령 하나를 root나 다른 사용자로 실행하게 해 줘요.
+    analogy: 필요할 때만 마스터키를 빌려 쓰고, 빌린 기록을 대장에 남기는 것과 같아요.
+    doc: server/users-and-permissions
+  - id: capability
+    name: capability
+    en: Linux capabilities
+    aliases: [케이퍼빌리티, 리눅스 capability, setcap, CAP_NET_RAW]
+    short: root의 힘을 조각으로 나눠, 프로세스에 하나씩 줄 수 있게 한 거예요.
+    analogy: 마스터키 대신 필요한 문의 열쇠 하나만 주는 것과 같아요.
+    doc: server/users-and-permissions
