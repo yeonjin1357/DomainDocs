@@ -96,6 +96,8 @@ API는 '이 구간을 span으로 기록해'처럼 계측 코드가 부르는 이
 
 데이터에는 어느 앱에서 왔는지 알리는 속성(resource)이 붙어요. 그중 `service.name`이 가장 중요하고, 정하지 않으면 SDK가 `unknown_service:` 뒤에 실행 파일 이름을 붙여 넣어요. 보통 환경 변수 `OTEL_SERVICE_NAME`으로 정해요.
 
+서비스 이름과 함께 환경, 버전도 붙여요. 세 이름표를 모든 신호에 맞추는 법은 <Term slug="foundations/service-tags">공통 태그와 서비스 카탈로그</Term>에서 다뤄요.
+
 ## 이름을 맞추는 약속
 
 OpenTelemetry는 속성 이름도 정해 둬요. 이 약속을 semantic conventions라고 해요. 예를 들어 HTTP 요청 메서드는 `http.request.method`, 응답 코드는 `http.response.status_code`예요.

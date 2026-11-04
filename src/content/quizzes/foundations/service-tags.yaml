@@ -1,0 +1,28 @@
+questions:
+  - id: env-not-identity
+    type: ox
+    prompt: OpenTelemetry 규약에서 service.name이 frontend로 같고 환경 이름만 production과 staging으로 다르면, 서로 다른 서비스로 치나요?
+    answer: false
+    explain: 환경 이름은 서비스를 가르는 값이 아니에요. 그래서 환경으로 따로 나눠 보지 않으면 두 환경의 숫자가 한 서비스로 섞여요.
+  - id: prom-env-where
+    type: choice
+    prompt: Prometheus가 OTLP로 지표를 받아요. 따로 설정하지 않았다면, 앱이 보낸 deployment.environment.name은 어디에 남나요?
+    choices: [target_info 지표의 레이블, 모든 지표의 job 레이블, 모든 지표의 instance 레이블, 어디에도 남지 않음]
+    answer: 0
+    explain: service.name은 job, service.instance.id는 instance가 되고, 나머지 속성은 target_info에 모여요. 지표마다 붙이려면 promote_resource_attributes에 적어요.
+  - id: k8s-name-order
+    type: choice
+    prompt: 쿠버네티스에서 앱이 service.name을 정하지 않았을 때, OpenTelemetry가 권하는 순서에서 가장 먼저 보는 것은?
+    choices: [파드 애노테이션의 서비스 이름, app.kubernetes.io/name 레이블, Deployment의 이름, 파드의 이름]
+    answer: 0
+    explain: resource.opentelemetry.io/service.name 애노테이션이 먼저예요. 그다음 app.kubernetes.io/instance와 name 레이블, 워크로드 이름, 파드 이름 순이에요.
+  - id: version-per-deploy
+    type: ox
+    prompt: 코드가 바뀐 두 배포에 같은 버전 값을 붙이면, 화면에서 버전으로 나눌 때 두 배포가 한 줄로 합쳐지나요?
+    answer: true
+    explain: 화면은 이름표 값이 같으면 하나로 묶어요. 그래서 버전은 배포마다 달라야 배포 전과 뒤를 견줄 수 있어요.
+  - id: catalog-name
+    type: input
+    prompt: 서비스마다 주인 팀, 당직 연락처, 저장소, 의존을 적어 두고 알림이 오면 서비스 이름으로 찾아보는 목록을 무엇이라 하나요?
+    answer: [서비스 카탈로그, service catalog, 소프트웨어 카탈로그, software catalog, 카탈로그]
+    explain: 이름표가 어느 서비스인지 알려 주면, 카탈로그는 누구에게 연락할지 알려 줘요. Backstage는 저장소의 파일 하나로 적어요.
