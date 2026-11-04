@@ -1,0 +1,28 @@
+questions:
+  - id: alert-order
+    type: ox
+    prompt: 여러 알림이 함께 울렸을 때, 알림이 울린 순서는 늘 지표가 나빠진 순서와 같나요?
+    answer: false
+    explain: 알림마다 지속 시간과 수집 주기가 달라서 순서가 바뀌어요. 원인을 고를 때는 지표가 꺾인 시각을 같은 시간축에서 견줘요.
+  - id: alone-bad
+    type: ox
+    prompt: 증상에서 의존을 따라 내려갔을 때, 그 아래 의존은 멀쩡한데 혼자 나빠진 서비스가 원인 후보인가요?
+    answer: true
+    explain: 아래가 멀쩡한데 혼자 나빠졌다면 문제가 그곳에서 시작했을 가능성이 커요. 다만 그 후보로 위의 증상이 모두 설명되는지 확인해요.
+  - id: candidate
+    type: choice
+    prompt: 웹 에러율, 주문 API p99, 주문 DB 활성 세션 알림이 함께 울렸고 결제 API와 DB 디스크는 정상이에요. 원인 후보는?
+    choices: [주문 DB, 웹, 주문 API, 결제 API]
+    answer: 0
+    explain: 웹과 주문 API는 아래가 나빠져 함께 나빠진 쪽이에요. 주문 DB는 그 아래 디스크가 멀쩡한데 혼자 나빠졌어요.
+  - id: common-cause
+    type: choice
+    prompt: 장애 동안 CPU와 p99의 상관계수가 0.95였어요. CPU가 원인이라고 하기 전에 먼저 볼 것은?
+    choices: [둘을 함께 움직인 트래픽, 상관계수의 소수점 자리, 서버의 CPU 코어 수, 두 알림의 심각도]
+    answer: 0
+    explain: 트래픽이 늘면 CPU와 p99가 함께 올라요. 둘은 같이 움직였을 뿐 서로의 원인이 아닐 수 있어요.
+  - id: coefficient-name
+    type: input
+    prompt: 두 지표가 함께 움직이는 정도를 -1에서 1 사이 값으로 나타낸 것은?
+    answer: [상관계수, correlation coefficient, 피어슨 상관계수, 상관 계수]
+    explain: 상관계수가 높아도 원인이라는 뜻은 아니에요. 공통 원인이나 우연일 수 있어요.
