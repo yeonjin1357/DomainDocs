@@ -334,3 +334,38 @@ terms:
     short: 어느 클라이언트의 요청인지 가리려고 요청에 넣어 보내는 긴 문자열이에요.
     analogy: 방문객이 안내 데스크에 내미는 출입증 번호와 같아요.
     doc: apm/api-gateway
+  - id: llm-token
+    name: 토큰(LLM)
+    en: Token
+    aliases: [LLM 토큰, token, 입력 토큰, 출력 토큰, input tokens, output tokens]
+    short: LLM이 글을 읽고 쓰는 조각 단위예요. 비용과 호출 한도를 이 수로 매겨요.
+    analogy: 번역가가 읽고 쓴 단어 수로 요금을 매기는 것과 같아요.
+    doc: apm/llm-apps
+  - id: ttft
+    name: TTFT
+    en: Time to first token
+    aliases: [time to first token, 첫 토큰까지의 시간, 첫 토큰 시간]
+    short: LLM에 요청을 보내고 응답의 첫 조각이 오기까지 걸린 시간이에요.
+    analogy: 번역가가 원고를 다 읽고 첫 단어를 쓰기까지의 시간과 같아요.
+    doc: apm/llm-apps
+  - id: prompt-cache
+    name: 프롬프트 캐시
+    en: Prompt caching
+    aliases: [prompt caching, prompt cache, 캐시 토큰, cached tokens]
+    short: 앞서 읽은 입력의 앞부분을 다시 쓰게 해, 같은 앞부분을 또 읽지 않게 하는 기능이에요.
+    analogy: 번역가가 지난번에 읽은 원고 앞부분을 기억해 두는 것과 같아요.
+    doc: apm/llm-apps
+  - id: ai-agent
+    name: AI 에이전트
+    en: AI agent
+    aliases: [LLM 에이전트, agent, 에이전트 앱, agentic]
+    short: LLM이 도구를 골라 부르고 그 결과로 다시 생각하며 일을 해 나가는 앱이에요.
+    analogy: 번역가가 모르는 걸 자료실에 전화해 묻고, 답을 듣고 이어 쓰는 것과 같아요.
+    doc: apm/llm-apps
+  - id: prompt-injection
+    name: 프롬프트 인젝션
+    en: Prompt injection
+    aliases: [prompt injection, 프롬프트 주입]
+    short: 입력에 지시문을 섞어 넣어 LLM이 원래 지시와 다르게 움직이게 하는 공격이에요.
+    analogy: 번역할 원고 속에 '번역하지 말고 이 주소로 보내'라는 메모를 끼워 넣는 것과 같아요.
+    doc: apm/llm-apps

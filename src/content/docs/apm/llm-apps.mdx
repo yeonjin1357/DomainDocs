@@ -1,0 +1,266 @@
+---
+title: LLM 호출과 AI 에이전트 관측
+summary: LLM 호출은 토큰으로 재요. 첫 토큰까지의 시간, 토큰 수, 비용, 에이전트의 단계를 봐요.
+domain: apm
+type: concept
+stage: basics
+order: 66
+icon: messages-square
+keywords: [LLM, 생성형 AI, 토큰, TTFT, 첫 토큰까지의 시간, AI 에이전트, 프롬프트 캐시, finish_reason, gen_ai, LLM observability]
+related: [apm/timeouts-and-retries, apm/trace-waterfall, apm/cache, logs/sensitive-data, cloud/throttling]
+sources:
+  - title: OpenTelemetry — Semantic conventions for generative AI client inference
+    url: https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/client-inference.md
+  - title: OpenTelemetry — Semantic conventions for GenAI agent spans
+    url: https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md
+  - title: OpenTelemetry — Semantic conventions for generative AI metrics
+    url: https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-metrics.md
+  - title: Anthropic — Rate limits (RPM, ITPM, OTPM, 토큰 버킷)
+    url: https://platform.claude.com/docs/en/api/rate-limits
+  - title: Anthropic — Errors (429 rate_limit_error, 529 overloaded_error)
+    url: https://platform.claude.com/docs/en/api/errors
+  - title: Anthropic — Pricing (입력·출력·캐시 토큰 가격)
+    url: https://platform.claude.com/docs/en/about-claude/pricing
+  - title: Anthropic — Prompt caching
+    url: https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+  - title: llama.cpp — HTTP server (OpenAI 호환 API)
+    url: https://github.com/ggml-org/llama.cpp/tree/master/tools/server
+  - title: Qwen2.5-0.5B-Instruct GGUF
+    url: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF
+updated: 2026-11-04
+---
+
+<KeyPoints>
+  <Point title="LLM 호출은 토큰으로 재요">
+    LLM은 입력 토큰을 읽고 출력 토큰을 하나씩 만들어요. 지연도, 비용도, 호출 한도도 토큰 수를 따라가요.
+  </Point>
+  <Point title="첫 토큰까지와 그 뒤를 나눠 봐요">
+    첫 토큰까지의 시간은 입력 길이와 대기열이, 그 뒤는 출력 길이가 정해요. 응답시간 하나로는 어느 쪽인지 안 갈려요.
+  </Point>
+  <Point title="에이전트는 호출 여러 번의 묶음이에요">
+    질문 하나에 LLM 호출과 도구 실행이 번갈아 돌아요. 단계마다 트레이스로 나누고, 단계마다 늘어나는 토큰을 세요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="실제 모델은 단어가 아니라 토큰이라는 조각으로 읽고 써요. 앞에서 읽은 원고를 기억해 두면(캐시) 다시 읽는 시간이 거의 들지 않아요.">
+  LLM은 원고를 끝까지 읽은 뒤 답을 한 단어씩 쓰는 번역가와 같아요. 읽은 단어와 쓴 단어 수로 요금을 매기고, 원고가 길수록 첫 단어가 늦게 나와요.
+</Analogy>
+
+## LLM 호출 하나는 이렇게 생겼어요
+
+앱은 LLM에 HTTP로 요청을 보내요. 요청에는 대화(시스템 지시, 사용자 말)와 모델 이름, 출력 토큰 상한(`max_tokens`)이 들어가요. 응답에는 만든 글과 끝난 까닭, 쓴 토큰 수가 와요.
+
+<Term term="apm/llm-token">토큰</Term>은 모델이 글을 자르는 단위예요. 단어 하나가 토큰 하나일 때도, 여러 개일 때도 있어요. 자르는 법은 모델마다 달라요.
+
+<Figure caption="Qwen2.5 0.5B 모델로 같은 뜻의 문장을 세어 봤어요. 이 모델에서 한국어는 영어보다 토큰이 1.6~2.3배 많았어요.">
+  <Bars
+    ariaLabel="같은 뜻 문장의 토큰 수 막대. 영어 The order was paid successfully는 6토큰, 한국어 주문 결제가 정상적으로 끝났어요는 14토큰, 영어 Error rate is above the threshold는 7토큰, 한국어 에러율이 기준을 넘었어요는 11토큰이에요"
+    bars={[
+      { label: 'The order was paid successfully.', value: 6, display: '6토큰' },
+      { label: '주문 결제가 정상적으로 끝났어요.', value: 14, display: '14토큰', tone: 'accent' },
+      { label: 'Error rate is above the threshold.', value: 7, display: '7토큰' },
+      { label: '에러율이 기준을 넘었어요.', value: 11, display: '11토큰', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+응답은 보통 스트리밍으로 와요. 토큰이 만들어지는 대로 조각조각 보내서, 사용자는 끝까지 기다리지 않고 첫 글자부터 봐요.
+
+## 첫 토큰까지와 그 뒤
+
+직접 재 봤어요. WSL에서 llama.cpp 서버(CPU 스레드 4개)에 Qwen2.5 0.5B 모델을 띄웠어요. 그리고 OpenAI 호환 API로 스트리밍 요청을 보냈어요.
+
+<Figure caption="입력 68토큰, 출력 32토큰인 요청 하나예요. 0.22초 동안 입력을 읽은 뒤 첫 토큰이 나왔고, 남은 0.36초 동안 토큰 32개를 하나씩 보냈어요.">
+  <Timeline
+    ariaLabel="요청 하나의 시간 띠. 0ms부터 215ms까지 입력 68토큰을 읽고, 215ms에 첫 토큰이 나오고, 579ms까지 출력 토큰 32개를 보내요"
+    end={579}
+    lanes={[
+      {
+        label: '요청',
+        segments: [
+          { start: 0, end: 215, label: '입력 읽기', tone: 'sub' },
+          { start: 215, end: 579, label: '토큰 32개 쓰기', tone: 'accent' },
+        ],
+      },
+    ]}
+    marks={[{ at: 215, label: '첫 토큰' }]}
+    ticks={[{ at: 0, label: '0ms' }, { at: 215, label: '215ms' }, { at: 579, label: '579ms' }]}
+  />
+</Figure>
+
+요청을 보내고 첫 조각이 오기까지를 <Term term="apm/ttft">TTFT</Term>(time to first token, 첫 토큰까지의 시간)라고 해요. 채팅 화면에서 사용자가 느끼는 기다림이 이 시간이에요. 그 뒤는 출력 토큰 하나를 만드는 시간(이 실험에서 약 11~13ms)에 토큰 수를 곱한 만큼 걸려요.
+
+입력이 길면 TTFT가 늘어요. 모델은 첫 토큰을 쓰기 전에 입력을 모두 읽기 때문이에요. 서버 캐시를 끄고 입력 길이만 바꿔 봤어요.
+
+<Figure caption="출력은 30토큰 안팎으로 같고 입력만 늘렸어요. 입력 토큰 하나에 약 2.5ms씩 첫 토큰이 늦어졌어요.">
+  <Bars
+    ariaLabel="입력 길이에 따른 첫 토큰까지의 시간 막대. 입력 68토큰은 215ms, 600토큰은 1,503ms, 1,720토큰은 4,418ms예요"
+    bars={[
+      { label: '입력 68토큰', value: 215, display: '0.22초' },
+      { label: '입력 600토큰', value: 1503, display: '1.50초' },
+      { label: '입력 1,720토큰', value: 4418, display: '4.42초', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+출력이 길면 전체 시간이 늘어요. 같은 질문에 `max_tokens`만 16, 64, 256으로 바꾸자 전체 시간이 0.25초, 0.72초, 2.91초였어요. TTFT는 거의 그대로였어요.
+
+세 응답의 끝난 까닭(`finish_reason`)은 모두 `length`였어요. 상한에 닿아 답이 중간에 잘렸다는 뜻이에요. 그래도 HTTP 상태는 200이라 에러율에는 잡히지 않아요.
+
+## 줄을 서면 첫 토큰이 늦어요
+
+LLM 서버는 한 번에 처리할 요청 수가 정해져 있어요. 그보다 많이 오면 줄을 서요. 한 번에 하나만 처리하는 서버에 같은 요청 4개를 동시에 보냈어요.
+
+<Figure caption="네 요청은 같은 일인데 TTFT가 0.09초에서 2.23초까지 벌어졌어요. 늦은 요청은 앞 요청이 끝나기를 기다렸어요.">
+  <Timeline
+    ariaLabel="동시에 보낸 요청 4개의 시간 띠. 요청 1은 92ms에 첫 토큰이 나와 803ms에 끝나고, 요청 2는 815ms, 요청 3은 1,540ms, 요청 4는 2,229ms까지 기다린 뒤 토큰을 써요"
+    end={2912}
+    lanes={[
+      { label: '요청 1', segments: [{ start: 0, end: 92, tone: 'sub' }, { start: 92, end: 803, label: '쓰기', tone: 'accent' }] },
+      { label: '요청 2', segments: [{ start: 0, end: 815, label: '대기', tone: 'sub' }, { start: 815, end: 1527, label: '쓰기', tone: 'accent' }] },
+      { label: '요청 3', segments: [{ start: 0, end: 1540, label: '대기', tone: 'sub' }, { start: 1540, end: 2218, label: '쓰기', tone: 'accent' }] },
+      { label: '요청 4', segments: [{ start: 0, end: 2229, label: '대기', tone: 'warn' }, { start: 2229, end: 2912, label: '쓰기', tone: 'accent' }] },
+    ]}
+    ticks={[{ at: 0, label: '0초' }, { at: 1456, label: '1.5초' }, { at: 2912, label: '2.9초' }]}
+  />
+</Figure>
+
+동시에 넷을 처리하게 바꾸자 넷 다 TTFT가 0.34초였어요. 대신 하나하나는 느려져서 넷 다 1.55초에 끝났어요. 혼자 돌 때(0.7초)의 두 배쯤이에요.
+
+그래서 TTFT가 늘었다면 입력이 길어졌는지, 줄이 생겼는지를 먼저 갈라요. 입력 토큰 수가 그대로인데 TTFT만 늘었다면 대기열을 의심해요.
+
+## 프롬프트 캐시
+
+같은 앞부분을 다시 보내면 서버가 읽어 둔 결과를 다시 써요. 이걸 <Term term="apm/prompt-cache">프롬프트 캐시</Term>라고 해요. 같은 1,160토큰 입력을 두 번 보내 봤어요.
+
+<Figure caption="처음에는 1,136토큰을 새로 읽느라 2.9초가 걸렸어요. 두 번째는 1,159토큰을 캐시에서 읽어 0.02초였고, 앞부분이 같고 질문만 다르면 0.07초였어요.">
+  <Bars
+    ariaLabel="첫 토큰까지의 시간 막대. 처음 보낸 1,160토큰 입력은 2,881ms, 같은 입력을 다시 보내면 18ms, 앞부분이 같고 질문만 다르면 70ms예요"
+    bars={[
+      { label: '처음 보낸 입력', value: 2881, display: '2.88초', tone: 'warn' },
+      { label: '같은 입력 다시', value: 18, display: '0.02초', tone: 'accent' },
+      { label: '앞부분 같고 질문만 다름', value: 70, display: '0.07초', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+응답의 사용량에는 캐시에서 읽은 토큰 수가 따로 와요. 이 서버는 `cached_tokens`로, Anthropic API는 `cache_read_input_tokens`로 알려 줘요. 입력 중 캐시 몫이 줄면 TTFT와 비용이 함께 늘어요.
+
+캐시는 앞에서부터 같은 만큼만 맞아요. 시스템 지시 맨 앞에 현재 시각처럼 매번 바뀌는 값을 넣으면 그 뒤가 모두 새로 읽혀요.
+
+## 비용과 호출 한도
+
+비용은 토큰 수에 가격을 곱한 값이에요. 입력과 출력의 가격이 달라요. Anthropic 가격표에서는 출력 토큰이 입력 토큰의 5배이고, 캐시에서 읽은 입력은 기본 입력 가격의 0.1배 이하예요.
+
+예를 들어 입력 100만 토큰에 2달러, 출력 100만 토큰에 10달러인 모델이라고 쳐요. 입력 460토큰, 출력 57토큰인 질문 하나는 약 0.0015달러예요. 하루 10만 번이면 하루 149달러예요.
+
+호출 한도도 토큰으로 걸려요. Anthropic API는 분당 요청 수(RPM)와 분당 입력 토큰(ITPM), 분당 출력 토큰(OTPM)을 따로 재요. 어느 하나라도 넘으면 429 `rate_limit_error`가 와요.
+
+요청 수가 적어도 입력이 길면 토큰 한도에 먼저 닿아요. 공급자 쪽이 붐빌 때는 다른 에러가 와요. Anthropic은 529 `overloaded_error`로 알려요.
+
+둘 다 다시 보내면 토큰을 또 쓰니, 재시도도 비용으로 세요.
+
+## 에이전트는 호출 여러 번의 묶음이에요
+
+<Term term="apm/ai-agent">AI 에이전트</Term>는 LLM이 도구를 골라 부르며 일을 나눠 하는 앱이에요. LLM이 "주문 조회 도구를 이 값으로 불러"라고 답하면, 앱이 도구를 실행하고 결과를 대화에 붙여 LLM을 다시 불러요.
+
+같은 서버로 주문 조회 도구 하나를 가진 에이전트를 돌려 봤어요. "주문 A-1042는 어디 있나요?"라는 질문 하나에 이렇게 돌았어요. 도구는 0.3초 걸리는 DB 조회를 흉내 냈어요.
+
+<Figure caption="질문 하나가 LLM 호출 두 번과 도구 실행 한 번이 됐어요. 첫 호출은 도구를 고르고(finish_reason: tool_calls), 둘째 호출이 도구 결과로 답을 썼어요.">
+  <Waterfall
+    ariaLabel="에이전트 실행 1,590ms 워터폴. 첫 LLM 호출이 0부터 774ms, 주문 조회 도구가 774부터 1,074ms, 둘째 LLM 호출이 1,075부터 1,590ms예요"
+    unit="ms"
+    spans={[
+      { label: 'invoke_agent 주문 상담', start: 0, duration: 1590 },
+      { label: 'chat · 입력 191 · 출력 27', start: 0, duration: 774, depth: 1, tone: 'accent' },
+      { label: 'execute_tool get_order_status', start: 774, duration: 300, depth: 1 },
+      { label: 'chat · 입력 269 · 출력 30', start: 1075, duration: 515, depth: 1, tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+둘째 호출의 입력은 191토큰에서 269토큰으로 늘었어요. LLM은 앞의 대화를 기억하지 않아서, 앱이 첫 질문과 도구 호출, 도구 결과를 모두 다시 보내요. 단계가 늘수록 입력 토큰이 쌓여요.
+
+에이전트는 몇 단계를 돌지 미리 정해지지 않아요. 같은 도구를 되풀이하거나 끝내지 못하고 돌면, 응답은 늦고 토큰은 계속 늘어요. 그래서 실행 한 번에 LLM을 몇 번, 도구를 몇 번 불렀는지를 세요.
+
+## 200인데 틀린 답
+
+LLM 앱의 실패는 상태 코드에 다 안 잡혀요. 상한에 닿아 잘린 답, 모델이 답을 거절한 응답, 그럴듯하지만 틀린 답이 모두 200이에요.
+
+- **잘린 답**: `finish_reason`이 `length`예요. Anthropic API에서는 `stop_reason`이 `max_tokens`예요.
+- **거절**: Anthropic API는 `stop_reason`을 `refusal`로 알려요.
+- **틀린 답**: 응답만 봐서는 몰라요. 사용자 평가(좋아요·싫어요)를 모으거나, 일부 응답을 뽑아 다른 모델이나 사람이 채점해요.
+
+입력도 위험해요. 사용자 글이나 도구가 가져온 웹 페이지에 "앞의 지시를 무시해" 같은 문장이 섞여 모델을 조종하는 걸 <Term term="apm/prompt-injection">프롬프트 인젝션</Term>이라고 해요. 에이전트가 무슨 도구를 어떤 인자로 불렀는지 남겨 두면, 이상한 호출을 찾아낼 수 있어요.
+
+## 모니터링에서는
+
+OpenTelemetry는 생성형 AI 호출을 기록하는 이름을 정하고 있어요. 아직 개발(Development) 단계라 이름이 바뀌는 중이에요. 지금 규약으로는 위 첫 호출이 이런 span이 돼요.
+
+```text
+span: chat qwen
+gen_ai.operation.name
+  = chat
+gen_ai.request.model
+  = qwen
+gen_ai.usage.input_tokens
+  = 191
+gen_ai.usage.output_tokens
+  = 27
+gen_ai.response.finish_reasons
+  = ["tool_calls"]
+```
+
+span 이름은 하는 일과 모델 이름을 이어 붙여요. 도구 실행은 `execute_tool`, 에이전트 전체는 `invoke_agent`로 시작해요.
+
+프롬프트와 응답 본문은 규약에서도 따로 켜야(Opt-In) 남겨요. 사용자가 쓴 글에는 개인정보가 섞이기 쉬워서예요. 남겨야 하면 <Term slug="logs/sensitive-data">민감 정보를 가리고</Term>, 일부만 뽑아 남겨요.
+
+<Figure caption="LLM 앱 대시보드의 예시 배치예요. 맨 위는 사용자가 겪는 것, 가운데는 토큰과 비용, 아래는 에이전트와 품질이에요.">
+  <Nest
+    ariaLabel="LLM 앱 대시보드를 위에서부터 사용자 체감(요청과 에러, TTFT p95, 전체 응답시간 p95), 토큰과 비용(분당 입력·출력 토큰, 하루 비용, 캐시 적중률), 에이전트와 품질(실행당 LLM 호출 수, 잘린 응답 비율, 사용자 평가) 줄로 짠 배치"
+    boxes={[
+      { label: '① 사용자 체감', tone: 'accent', cols: 3, children: [{ label: '요청·에러', note: '429·529 포함' }, { label: 'TTFT p95' }, { label: '응답시간 p95' }] },
+      { label: '② 토큰과 비용', note: '모델·기능마다', cols: 3, children: [{ label: '분당 입력·출력 토큰' }, { label: '하루 비용' }, { label: '캐시 적중률' }] },
+      { label: '③ 에이전트와 품질', cols: 3, children: [{ label: '실행당 LLM 호출' }, { label: '잘린 응답 비율' }, { label: '사용자 평가' }] },
+    ]}
+  />
+</Figure>
+
+비용과 토큰은 모델마다, 기능마다 나눠 봐요. 어느 기능이 돈을 쓰는지 알려면 호출마다 서비스와 기능 <Term slug="foundations/service-tags">이름표</Term>가 붙어 있어야 해요.
+
+<Checkpoints>
+  <Check>LLM 호출의 응답시간만 있고 TTFT가 없다면, 입력이 길어서인지, 출력이 길어서인지, 줄을 서서인지 가를 수 없어요. 둘을 따로 재세요.</Check>
+  <Check>에러율이 낮아도 `finish_reason`이 `length`인 비율을 따로 세세요. 잘린 답은 200으로 와요.</Check>
+  <Check>429가 늘었다면 요청 수뿐 아니라 분당 입력·출력 토큰도 보세요. 긴 입력 몇 개가 토큰 한도를 먼저 채워요.</Check>
+  <Check>에이전트는 실행 한 번에 몇 단계를 돌았는지 세고, 최대 단계를 정해 두세요. 단계마다 앞의 대화를 다시 보내서 입력 토큰이 쌓여요.</Check>
+  <Check>프롬프트와 응답을 통째로 로그에 남기고 있다면, 개인정보가 섞여 있는지 확인하세요. 기본은 남기지 않고, 필요하면 가리고 뽑아서 남겨요.</Check>
+  <Check>캐시 적중률이 갑자기 떨어졌다면 시스템 지시나 도구 목록의 앞부분이 바뀌었는지 보세요. 앞부분이 한 글자만 달라도 그 뒤가 모두 새로 읽혀요.</Check>
+</Checkpoints>
+
+<Deeper>
+  실험 조건이에요. 서버는 llama.cpp b12099, 모델은 Qwen2.5-0.5B-Instruct Q4_K_M이에요. CPU 스레드 4개, temperature 0으로 WSL에서 돌렸어요.
+
+  숫자는 이 조건의 것이에요. 큰 모델이나 GPU 서버에서는 몇 배씩 달라요. 그래도 입력이 길수록 TTFT가, 출력이 길수록 전체 시간이 는다는 모양은 같아요.
+
+  이 서버는 OpenAI 호환 형식으로 사용량을 알려요. 입력은 `prompt_tokens`, 출력은 `completion_tokens`예요. 캐시에서 읽은 입력은 `prompt_tokens_details.cached_tokens`예요.
+
+  Anthropic API는 입력을 `input_tokens`, 출력을 `output_tokens`로 알려요. 캐시 쪽은 읽은 `cache_read_input_tokens`와 새로 적은 `cache_creation_input_tokens`로 나눠요.
+
+  Anthropic API의 `stop_reason`에는 이런 값이 있어요.
+
+  - `end_turn`: 답을 다 썼어요.
+  - `max_tokens`: 상한에 닿아 잘렸어요.
+  - `tool_use`: 도구를 불러 달래요.
+  - `refusal`: 답을 거절했어요.
+  - `stop_sequence`, `pause_turn`: 정한 멈춤 글자를 만났거나, 긴 작업을 잠시 멈췄어요.
+
+  스트리밍은 `message_start`로 시작해 글 조각(`content_block_delta`)이 이어져요. 끝에는 `message_delta`에 끝난 까닭과 출력 토큰 수가 오고, `message_stop`으로 끝나요.
+
+  Anthropic의 호출 한도는 토큰 버킷 방식이라 정해진 시각에 한꺼번에 차지 않고 계속 조금씩 차요. 분당 60번이라도 1초에 1번처럼 짧게 나눠 재기도 해서, 짧은 몰림에도 429가 날 수 있어요. 대부분 모델에서 캐시에서 읽은 입력 토큰은 ITPM에 세지 않아요.
+
+  OpenTelemetry의 생성형 AI 규약은 의미 규약 1.42.0부터 별도 저장소로 옮겨졌어요. 저장소 이름은 semantic-conventions-genai예요.
+
+  지금 규약에는 TTFT를 담는 속성 `gen_ai.response.time_to_first_chunk`가 있어요. 에이전트 한 번의 LLM 호출 수를 세는 지표 `gen_ai.invoke_agent.inference_calls`도 있어요. 개발 단계라 이름이 바뀔 수 있으니, 쓰는 SDK의 버전과 함께 확인해요.
+
+  비용 예시는 캐시 할인을 빼고 셈한 거예요. 실험의 둘째 호출은 입력 269토큰 중 217토큰이 캐시에서 읽혀서, 실제 비용은 더 낮아요.
+</Deeper>

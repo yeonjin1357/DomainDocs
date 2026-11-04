@@ -1,0 +1,28 @@
+questions:
+  - id: truncated-status
+    type: ox
+    prompt: LLM 응답이 max_tokens 상한에 닿아 중간에 잘리면, HTTP 상태 코드가 에러(4xx·5xx)로 오나요?
+    answer: false
+    explain: 잘린 응답도 200으로 와요. 끝난 까닭이 finish_reason length(Anthropic은 stop_reason max_tokens)로만 남아서 따로 세야 해요.
+  - id: ttft-cause
+    type: choice
+    prompt: 출력 길이는 그대로인데 LLM 호출의 첫 토큰까지의 시간(TTFT)만 3배가 됐어요. 먼저 갈라 볼 것은?
+    choices: [입력 길이와 대기열, 출력 토큰의 수, 응답 압축 설정, 클라이언트의 DNS 조회]
+    answer: 0
+    explain: 모델은 입력을 다 읽은 뒤 첫 토큰을 써서, 입력이 길거나 앞 요청에 밀려 기다리면 TTFT가 늘어요. 출력 길이는 첫 토큰 뒤의 시간을 늘려요.
+  - id: agent-input-grows
+    type: ox
+    prompt: 에이전트가 도구를 실행한 뒤 LLM을 다시 부를 때, 앞의 대화와 도구 결과를 함께 보내서 입력 토큰이 앞 호출보다 늘어나나요?
+    answer: true
+    explain: LLM은 앞의 대화를 기억하지 않아서 앱이 모두 다시 보내요. 실험에서도 191토큰이 269토큰으로 늘었어요.
+  - id: cache-ttft
+    type: choice
+    prompt: 같은 1,160토큰 입력을 두 번 보냈더니 첫 토큰까지의 시간이 2.9초에서 0.02초가 됐어요. 무엇 덕분인가요?
+    choices: [프롬프트 캐시, 출력 토큰 상한, 스트리밍 응답, 병렬 처리 슬롯]
+    answer: 0
+    explain: 서버가 읽어 둔 앞부분을 다시 써서 새로 읽을 입력이 1토큰뿐이었어요. 사용량에도 캐시에서 읽은 토큰 수가 따로 와요.
+  - id: rate-limit-tokens
+    type: ox
+    prompt: Anthropic API는 호출 한도를 분당 요청 수(RPM) 하나로만 재나요?
+    answer: false
+    explain: 한도는 분당 요청 수(RPM)와 함께 분당 입력·출력 토큰(ITPM·OTPM)으로도 걸려요. 그래서 요청이 적어도 입력이 긴 요청 몇 개가 429를 부를 수 있어요.
