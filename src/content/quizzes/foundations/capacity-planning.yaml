@@ -1,0 +1,27 @@
+questions:
+  - id: plan-peak
+    type: ox
+    prompt: 하루 평균 800 요청/초, 저녁 피크 1,500 요청/초인 서비스의 서버 대수는 800을 기준으로 세나요?
+    answer: false
+    explain: 서버는 가장 바쁜 때를 받아야 해요. 평균으로 세면 저녁 피크에 모자라요.
+  - id: utilization-double
+    type: ox
+    prompt: 일꾼이 하나인 서버에서 사용률이 45%에서 90%로 두 배가 되면, 평균 응답시간도 두 배쯤 되나요?
+    answer: false
+    explain: 응답시간은 처리 시간 ÷ (1 − 사용률)이라 약 1.8배에서 10배로, 5배 넘게 늘어요.
+  - id: closed-model
+    type: ox
+    prompt: 앞 요청이 끝나야 다음 요청을 보내는 부하 테스트에서는, 서버가 느려지면 보내는 양도 줄어드나요?
+    answer: true
+    explain: 응답을 기다리느라 다음 요청이 늦어져요. 그래서 느린 순간이 덜 재져 결과가 실제보다 좋게 나와요.
+  - id: one-server-capacity
+    type: choice
+    prompt: 부하 테스트에서 p99가 320 요청/초까지 70ms, 360에서 126ms였고, 400에서 처리량이 멈췄어요. p99 목표가 100ms라면 한 대의 용량은?
+    choices: [320 요청/초, 400 요청/초, 360 요청/초, 200 요청/초]
+    answer: 0
+    explain: 처리량이 멈추는 400은 이미 응답이 치솟은 곳이에요. 목표를 지키는 가장 큰 양인 320을 용량으로 써요.
+  - id: lead-time-name
+    type: input
+    prompt: 서버를 주문해서 실제로 쓸 수 있을 때까지 걸리는 시간을 무엇이라 하나요?
+    answer: [리드 타임, lead time, 리드타임]
+    explain: 예측은 이 시간보다 멀리 봐야 해요. 늘리기로 정한 뒤에도 그만큼 기다려야 하니까요.
