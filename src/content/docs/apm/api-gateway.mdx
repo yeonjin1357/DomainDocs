@@ -1,0 +1,215 @@
+---
+title: API 게이트웨이
+summary: 바깥 요청이 들어오는 입구 하나에서 경로 나누기·인증·호출 제한을 맡는 서버예요.
+domain: apm
+type: concept
+stage: basics
+order: 22
+icon: network
+keywords: [API gateway, API 게이트웨이, Kong, AWS API Gateway, rate limit, '429', IntegrationLatency, upstream latency, 라우팅, API 키]
+related: [apm/web-server-and-was, apm/gateway-errors, cloud/throttling, apm/timeouts-and-retries, kubernetes/service-mesh]
+sources:
+  - title: AWS — API Gateway metrics (Latency, IntegrationLatency, 4XXError)
+    url: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-metrics-and-dimensions.html
+  - title: AWS — Quotas for REST APIs (integration timeout 50ms~29s)
+    url: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-execution-service-limits-table.html
+  - title: Kong — Prometheus plugin (kong_upstream_latency_ms, latency_metrics)
+    url: https://developer.konghq.com/plugins/prometheus/
+  - title: Envoy — Local rate limit filter
+    url: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/local_rate_limit_filter
+  - title: Kong — Rate Limiting plugin (local·cluster·redis 정책)
+    url: https://developer.konghq.com/plugins/rate-limiting/
+  - title: RFC 6585 — 429 Too Many Requests
+    url: https://www.rfc-editor.org/rfc/rfc6585
+updated: 2026-11-04
+---
+
+<KeyPoints>
+  <Point title="바깥 요청이 들어오는 입구 하나예요">
+    클라이언트는 게이트웨이 주소 하나만 알고, 게이트웨이가 경로를 보고 뒤쪽 서비스로 나눠 보내요.
+  </Point>
+  <Point title="인증과 호출 제한을 앞에서 걸러요">
+    걸러진 요청(401, 429)은 뒤쪽 서비스에 닿지 않아요.
+  </Point>
+  <Point title="응답시간은 게이트웨이 몫과 뒤쪽 몫으로 나눠요">
+    전체가 느릴 때 게이트웨이가 느린지, 뒤쪽 서비스가 느린지 갈라 봐요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="안내 데스크는 방문객을 층으로 보내기만 하지만, 게이트웨이는 요청을 대신 들고 가서 답을 받아 돌려줘요. 그래서 뒤쪽이 느리면 게이트웨이도 그만큼 붙잡혀요.">
+  큰 건물 1층의 안내 데스크와 같아요. 방문객은 모두 여기로 와서 신분을 확인받고, 하루 방문 횟수를 넘지 않았는지 검사받고, 맞는 층으로 안내받아요.
+</Analogy>
+
+## API 게이트웨이는 무엇인가요
+
+<Term term="apm/api-gateway">API 게이트웨이</Term>(API gateway)는 바깥 클라이언트의 요청을 먼저 받아 뒤쪽 서비스로 보내는 서버예요. 서비스가 여러 개로 나뉘어도 클라이언트는 게이트웨이 주소 하나만 알면 돼요.
+
+<Figure caption="모바일 앱과 웹은 게이트웨이 하나로 요청을 보내요. 게이트웨이는 경로를 보고 주문, 회원, 결제 서비스로 나눠 보내요.">
+  <Flow
+    ariaLabel="모바일 앱과 웹이 API 게이트웨이로 요청을 보내고, 게이트웨이가 경로 /orders는 주문 서비스로, /users는 회원 서비스로, /payments는 결제 서비스로 나눠 보내는 구조도"
+    nodes={[
+      { id: 'mobile', label: '모바일 앱', col: 0, row: 0 },
+      { id: 'web', label: '웹', col: 2, row: 0 },
+      { id: 'gw', label: 'API 게이트웨이', col: 1, row: 1, note: '인증·제한·경로', tone: 'accent' },
+      { id: 'order', label: '주문 서비스', col: 0, row: 2, note: '/orders' },
+      { id: 'user', label: '회원 서비스', col: 1, row: 2, note: '/users' },
+      { id: 'pay', label: '결제 서비스', col: 2, row: 2, note: '/payments' },
+    ]}
+    edges={[
+      { from: 'mobile', to: 'gw' },
+      { from: 'web', to: 'gw' },
+      { from: 'gw', to: 'order', tone: 'accent' },
+      { from: 'gw', to: 'user', tone: 'accent' },
+      { from: 'gw', to: 'pay', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+Kong, AWS API Gateway, Spring Cloud Gateway 같은 제품이 있어요. NGINX나 Envoy 같은 프록시에 규칙을 걸어 쓰기도 해요. 이름은 달라도 하는 일은 비슷해요.
+
+## 게이트웨이가 하는 일
+
+게이트웨이는 요청 하나에 몇 가지 검사를 차례로 해요. 어느 단계에서든 걸리면 뒤쪽 서비스에 보내지 않고 바로 답해요.
+
+<Figure caption="게이트웨이가 요청 하나를 처리하는 순서예요. 앞 단계에서 걸러진 요청은 뒤쪽 서비스에 닿지 않아요.">
+  <Triage
+    numbered={false}
+    ariaLabel="경로를 찾지 못하면 404, 인증이 틀리면 401이나 403, 호출 한도를 넘으면 429로 바로 답하고, 통과한 요청만 뒤쪽으로 보내며, 뒤쪽이 정한 시간을 넘기면 504, 연결이 안 되면 502나 503으로 답하는 흐름"
+    steps={[
+      { label: '경로 찾기', note: '/orders → 주문 서비스', exits: [{ when: '맞는 경로 없음', to: '404' }] },
+      { label: '인증 확인', note: 'API 키, 토큰', exits: [{ when: '없거나 틀림', to: '401·403', tone: 'warn' }] },
+      { label: '호출 제한', note: '키마다 초당 몇 번', exits: [{ when: '한도를 넘음', to: '429', tone: 'warn' }] },
+      { label: '뒤쪽으로 전달', note: '정한 시간까지 기다려요', exits: [{ when: '시간을 넘김', to: '504' }, { when: '연결 실패', to: '502·503' }] },
+      { label: '응답 돌려주기', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+인증은 요청에 든 API 키나 토큰을 확인하는 일이에요. <Term term="apm/api-key">API 키</Term>는 어느 클라이언트의 요청인지 가리는 긴 문자열이에요. 서비스마다 인증 코드를 넣지 않아도 입구에서 한 번에 걸러요.
+
+호출 제한(rate limit)은 정해진 시간에 받을 요청 수를 묶어 두는 일이에요. 한도를 넘은 요청에는 429 Too Many Requests로 답해요. 토큰 버킷처럼 한도를 세는 법은 <Term slug="cloud/throttling">스로틀링</Term>에서 다뤄요.
+
+<Figure caption="Envoy 1.40을 게이트웨이로 두고 초당 5개로 제한한 뒤, 요청 10개를 한꺼번에 보낸 결과예요. 5개는 통과하고 5개는 0ms 만에 429를 받았어요. 뒤쪽 서비스는 5번만 받았어요.">
+  <Strip
+    ariaLabel="요청 10개 중 앞의 5개는 토큰이 있어 200으로 통과하고, 뒤의 5개는 토큰이 없어 429를 받는 칸 띠"
+    rows={[
+      {
+        label: '한꺼번에 보낸 요청 10개',
+        cells: [
+          { label: '200', tone: 'accent' },
+          { label: '200', tone: 'accent' },
+          { label: '200', tone: 'accent' },
+          { label: '200', tone: 'accent' },
+          { label: '200', tone: 'accent' },
+          { label: '429', tone: 'warn' },
+          { label: '429', tone: 'warn' },
+          { label: '429', tone: 'warn' },
+          { label: '429', tone: 'warn' },
+          { label: '429', tone: 'warn' },
+        ],
+      },
+    ]}
+    ranges={[
+      { from: 0, to: 4, label: '토큰 5개로 통과', tone: 'accent' },
+      { from: 5, to: 9, label: '토큰이 없어 거절', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+이 밖에도 요청과 응답의 머리말 바꾸기, 자주 쓰는 응답 캐시, 여러 서비스의 응답을 하나로 묶기도 해요. 다만 일을 많이 맡길수록 게이트웨이가 느려지고, 게이트웨이 장애가 모든 API의 장애가 돼요.
+
+## 로드 밸런서·서비스 메시와 무엇이 다른가요
+
+셋 다 요청을 넘겨주는 프록시지만, 서 있는 자리와 보는 것이 달라요.
+
+<Figure caption="로드 밸런서는 연결을 서버 여럿에 나누고, API 게이트웨이는 요청의 경로와 키를 보고 규칙을 걸어요. 서비스 메시는 안쪽 서비스끼리 주고받는 통신을 맡아요.">
+  <Flow
+    ariaLabel="클라이언트의 요청이 로드 밸런서, API 게이트웨이를 거쳐 주문 서비스로 가고, 주문 서비스가 서비스 메시를 거쳐 결제 서비스를 부르는 구조도"
+    nodes={[
+      { id: 'c', label: '클라이언트', col: 1, row: 0 },
+      { id: 'lb', label: '로드 밸런서', col: 1, row: 1, note: '연결 나누기' },
+      { id: 'gw', label: 'API 게이트웨이', col: 1, row: 2, note: '경로·키·한도', tone: 'accent' },
+      { id: 'o', label: '주문 서비스', col: 0, row: 3 },
+      { id: 'p', label: '결제 서비스', col: 2, row: 3 },
+    ]}
+    edges={[
+      { from: 'c', to: 'lb' },
+      { from: 'lb', to: 'gw' },
+      { from: 'gw', to: 'o', tone: 'accent' },
+      { from: 'o', to: 'p', label: '메시', dashed: true },
+    ]}
+  />
+</Figure>
+
+쿠버네티스의 인그레스도 경로로 나눠 보내는 입구예요. 인그레스 컨트롤러에 따라 인증이나 호출 제한까지 해서 게이트웨이처럼 쓰기도 해요. 안쪽 통신은 <Term slug="kubernetes/service-mesh">서비스 메시</Term>에서 다뤄요.
+
+## 모니터링에서는
+
+게이트웨이는 모든 요청이 지나가서, 서비스 전체의 요청 수·에러·응답시간을 한곳에서 보기 좋아요. 대신 숫자를 나눠 읽어야 해요.
+
+### 응답시간을 둘로 나눠요
+
+게이트웨이가 재는 응답시간은 뒤쪽 서비스의 시간에 게이트웨이 자신의 시간을 더한 값이에요. AWS API Gateway는 전체를 `Latency`, 뒤쪽 몫을 `IntegrationLatency`로 따로 내보내요. Kong은 `kong_upstream_latency_ms`(뒤쪽)와 `kong_kong_latency_ms`(Kong 자신)로 나눠요.
+
+<Figure caption="게이트웨이의 응답시간 120ms를 나눈 예시예요. 뒤쪽이 105ms, 인증 확인과 플러그인 같은 게이트웨이 몫이 15ms예요.">
+  <Parts
+    ariaLabel="전체 응답시간 120ms가 뒤쪽 서비스 105ms와 게이트웨이 15ms로 나뉜 비율 막대"
+    unit="ms"
+    rows={[
+      {
+        label: '게이트웨이가 잰 응답시간',
+        total: '120ms',
+        segments: [
+          { label: '뒤쪽 서비스', value: 105, display: '105ms', tone: 'accent' },
+          { label: '게이트웨이', value: 15, display: '15ms', tone: 'warn' },
+        ],
+      },
+    ]}
+  />
+</Figure>
+
+전체가 늘었는데 뒤쪽 몫이 그대로면 게이트웨이 쪽이 느린 거예요. 토큰을 확인하려 인증 서버를 부르는 플러그인이 흔한 범인이에요.
+
+### 504 뒤에도 뒤쪽은 일해요
+
+게이트웨이는 정한 시간까지만 뒤쪽을 기다려요. 시간을 넘기면 클라이언트에 504를 주지만, 뒤쪽 서비스는 그 사실을 모르고 하던 일을 끝까지 해요.
+
+<Figure caption="Envoy 게이트웨이의 타임아웃을 1초로 두고, 2초 걸리는 요청을 보낸 결과예요. 클라이언트는 1초에 504를 받았지만, 뒤쪽은 2초까지 일을 마쳤어요.">
+  <Timeline
+    ariaLabel="게이트웨이가 0에서 1초까지 기다리다 1초에 504로 답하고, 뒤쪽 서비스는 0에서 2초까지 처리를 계속하는 시간 띠"
+    end={2.2}
+    lanes={[
+      { label: '게이트웨이', segments: [{ start: 0, end: 1, label: '기다려요', tone: 'sub' }, { start: 1, end: 1.5, label: '504', tone: 'warn' }] },
+      { label: '뒤쪽 서비스', segments: [{ start: 0, end: 2, label: '처리를 계속해요', tone: 'accent' }] },
+    ]}
+    ticks={[{ at: 0, label: '0' }, { at: 1, label: '1초' }, { at: 2, label: '2초' }]}
+  />
+</Figure>
+
+504를 받은 사용자가 주문 버튼을 다시 누르면 같은 주문이 두 번 처리될 수 있어요. 그래서 타임아웃은 클라이언트, 게이트웨이, 뒤쪽 순으로 길게 두고, 다시 보내도 되는 요청인지(<Term term="apm/idempotent">멱등</Term>) 따져요. AWS API Gateway의 REST API는 뒤쪽을 기본으로 최대 29초까지 기다려요.
+
+<Checkpoints>
+  <Check>게이트웨이의 응답시간만 보고 뒤쪽 서비스를 의심했다면 다시 보세요. 뒤쪽 몫(`IntegrationLatency`, `kong_upstream_latency_ms`)과 나눠 봐요. 둘의 차이가 늘었다면 게이트웨이 쪽이 느린 거예요.</Check>
+  <Check>게이트웨이의 4XX가 늘었다면 상태 코드를 나눠 보세요. 429면 호출 제한에 걸린 거라 어느 API 키가 걸렸는지, 401이면 인증이 왜 실패했는지 봐요. AWS의 `4XXError`는 이 둘을 한 숫자로 세요.</Check>
+  <Check>경로 레이블에 `/users/123` 같은 실제 경로를 넣었다면 `/users/{id}` 같은 경로 틀로 바꾸세요. 사용자 수만큼 시계열이 생겨요.</Check>
+  <Check>Kong의 지연 지표가 비어 있다면 Prometheus 플러그인의 `latency_metrics` 설정을 보세요. 기본으로 꺼져 있어요.</Check>
+  <Check>AWS API Gateway 뒤에 30초 넘게 걸리는 API가 있다면 다시 보세요. REST API의 기본 한도는 29초라 504가 나요. 리전·비공개 API는 한도를 올릴 수 있지만, 오래 걸리는 일은 비동기로 바꾸는 편이 안전해요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### Envoy로 재현한 방법
+
+  WSL에 Envoy 1.40.2를 받아 게이트웨이로 두고, 뒤에 0.1초나 2초 뒤 답하는 Python 서버를 뒀어요. `/orders` 경로에 local rate limit 필터(토큰 5개, 1초마다 5개 채움)를 걸고 요청 10개를 한꺼번에 보냈어요.
+
+  거절된 5개는 접근 로그의 응답 플래그가 `RL`이었고, 본문은 `local_rate_limited`였어요. 1초 뒤에는 토큰이 다시 차서 200이 났어요.
+
+  `/slow` 경로는 타임아웃을 1초로 뒀어요. 클라이언트는 1.0초에 504(응답 플래그 `UT`)를 받았고, 뒤쪽 서버의 기록에는 2.00초 동안 일하고 응답을 보낸 줄이 남았어요.
+
+  ### 호출 제한을 어디서 세나
+
+  게이트웨이가 여러 대면 한도를 각자 셀 수도, 모두가 함께 쓰는 저장소(Redis 같은)에서 셀 수도 있어요. 각자 세면 게이트웨이 3대가 초당 5개씩, 합쳐 15개까지 통과시켜요. 한도가 계약이라면 함께 세는 방식인지 확인해요.
+
+  ### AWS API Gateway의 지표
+
+  `Count`는 요청 수, `4XXError`와 `5XXError`는 에러 수예요. `Average` 통계로 보면 에러율이 돼요. 메서드·경로마다 보려면 스테이지의 상세 지표(detailed metrics)를 켜야 하고, 따로 요금이 붙어요.
+</Deeper>

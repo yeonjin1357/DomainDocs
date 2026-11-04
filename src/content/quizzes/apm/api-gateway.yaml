@@ -1,0 +1,28 @@
+questions:
+  - id: rejected-not-forwarded
+    type: ox
+    prompt: 게이트웨이가 호출 한도를 넘은 요청에 429로 답하면, 그 요청도 뒤쪽 서비스까지 전달되나요?
+    answer: false
+    explain: 호출 제한은 뒤쪽으로 보내기 전에 걸러요. 실험에서도 429는 0ms에 돌아왔고 뒤쪽은 통과한 요청만 받았어요.
+  - id: backend-keeps-working
+    type: ox
+    prompt: 게이트웨이가 타임아웃으로 504를 준 뒤에도, 뒤쪽 서비스는 그 요청을 끝까지 처리할 수 있나요?
+    answer: true
+    explain: 뒤쪽은 게이트웨이가 포기한 줄 몰라요. 사용자가 다시 보내면 같은 일이 두 번 될 수 있어요.
+  - id: latency-split
+    type: choice
+    prompt: AWS API Gateway의 Latency는 300ms에서 500ms로 늘었는데 IntegrationLatency는 280ms 그대로예요. 먼저 볼 곳은?
+    choices: [게이트웨이의 인증·플러그인, 뒤쪽 서비스의 DB 쿼리, 뒤쪽 서비스의 스레드 풀, 클라이언트의 네트워크]
+    answer: 0
+    explain: Latency는 IntegrationLatency에 게이트웨이 몫을 더한 값이에요. 뒤쪽 몫이 그대로니 늘어난 건 게이트웨이 쪽이에요.
+  - id: path-label
+    type: choice
+    prompt: 게이트웨이 지표의 경로 레이블로 가장 알맞은 값은?
+    choices: ['/users/{id}', '/users/123', '전체 URL과 쿼리 문자열', '요청한 클라이언트의 IP']
+    answer: 0
+    explain: 실제 경로나 IP를 레이블에 넣으면 값마다 시계열이 생겨요. 경로 틀로 묶어야 시계열 수가 경로 수만큼으로 머물러요.
+  - id: gateway-name
+    type: input
+    prompt: 바깥 클라이언트의 요청을 먼저 받아 인증·호출 제한을 하고, 경로를 보고 뒤쪽 서비스로 나눠 보내는 서버는?
+    answer: [API 게이트웨이, API gateway, 게이트웨이, api게이트웨이]
+    explain: 클라이언트는 게이트웨이 주소 하나만 알면 돼요. Kong, AWS API Gateway가 대표적이에요.

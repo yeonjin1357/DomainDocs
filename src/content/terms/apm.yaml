@@ -320,3 +320,17 @@ terms:
     short: 한순간에 Go 코드를 실행하는 스레드 수의 상한이에요.
     analogy: 주방에서 동시에 일하는 요리사 수와 같아요.
     doc: apm/runtimes
+  - id: api-gateway
+    name: API 게이트웨이
+    en: API gateway
+    aliases: [API gateway, api 게이트웨이, Kong, AWS API Gateway, Spring Cloud Gateway]
+    short: 바깥 요청을 먼저 받아 인증·호출 제한을 하고 뒤쪽 서비스로 나눠 보내는 서버예요.
+    analogy: 큰 건물 1층의 안내 데스크와 같아요.
+    doc: apm/api-gateway
+  - id: api-key
+    name: API 키
+    en: API key
+    aliases: [API key, api key, 접근 키]
+    short: 어느 클라이언트의 요청인지 가리려고 요청에 넣어 보내는 긴 문자열이에요.
+    analogy: 방문객이 안내 데스크에 내미는 출입증 번호와 같아요.
+    doc: apm/api-gateway
