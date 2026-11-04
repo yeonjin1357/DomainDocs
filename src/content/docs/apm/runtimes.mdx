@@ -1,0 +1,252 @@
+---
+title: 'JVM 밖의 런타임: Node.js·Python·Go'
+summary: Node.js는 이벤트 루프 하나, Python은 GIL, Go는 고루틴으로 요청을 나눠 받아요.
+domain: apm
+type: concept
+stage: basics
+order: 45
+icon: layers
+keywords: [Node.js, event loop, 이벤트 루프, Python, GIL, Gunicorn, Go, goroutine, 고루틴, GOMAXPROCS]
+related: [apm/thread-pools, apm/jvm-memory, apm/throughput-and-concurrency, kubernetes/requests-and-limits, apm/continuous-profiling]
+sources:
+  - title: Node.js — Don't Block the Event Loop (or the Worker Pool)
+    url: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
+  - title: libuv — Thread pool work scheduling (기본 4개, UV_THREADPOOL_SIZE)
+    url: https://docs.libuv.org/en/v1.x/threadpool.html
+  - title: Node.js — Performance measurement APIs (monitorEventLoopDelay)
+    url: https://nodejs.org/api/perf_hooks.html
+  - title: prom-client — 기본 지표(eventLoopMonitoringPrecision 기본 10ms)
+    url: https://github.com/siimon/prom-client
+  - title: Python — Glossary (global interpreter lock)
+    url: https://docs.python.org/3/glossary.html
+  - title: Python — Free-threaded CPython HOWTO
+    url: https://docs.python.org/3/howto/free-threading-python.html
+  - title: Python 3.14 — What's New (PEP 779)
+    url: https://docs.python.org/3/whatsnew/3.14.html
+  - title: Python — Developing with asyncio (Running Blocking Code)
+    url: https://docs.python.org/3/library/asyncio-dev.html
+  - title: Gunicorn — Design (워커 수)
+    url: https://gunicorn.org/design/
+  - title: Prometheus client_python — Multiprocess Mode
+    url: https://prometheus.github.io/client_python/multiprocess/
+  - title: Go FAQ — Why goroutines instead of threads?
+    url: https://go.dev/doc/faq
+  - title: Go 1.25 Release Notes (container-aware GOMAXPROCS)
+    url: https://go.dev/doc/go1.25
+  - title: client_golang — Go collector (go_goroutines, go_sched_gomaxprocs_threads)
+    url: https://github.com/prometheus/client_golang/blob/main/prometheus/go_collector.go
+updated: 2026-11-04
+---
+
+<KeyPoints>
+  <Point title="Node.js는 스레드 하나가 요청을 돌려요">
+    CPU를 오래 쓰는 코드 하나가 모든 요청을 세워요. 그래서 이벤트 루프 지연을 봐요.
+  </Point>
+  <Point title="Python은 한 번에 한 스레드만 계산해요">
+    GIL 때문에 계산은 프로세스를 여러 개 띄워 나눠요. 지표도 프로세스마다 따로 생겨요.
+  </Point>
+  <Point title="Go는 고루틴 수를 봐요">
+    고루틴은 가벼워 수만 개도 돌지만, 끝나지 않고 쌓이면 메모리가 새요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="실제 Node.js는 파일 읽기나 암호화 같은 일부 일을 뒤의 스레드 4개에 맡겨요. 그래서 직원이 완전히 혼자는 아니에요.">
+  Node.js는 주문받는 직원이 한 명인 식당이에요. 요리는 오븐에 맡기고 다음 주문을 받지만, 직원이 채소를 오래 썰면 그동안 아무도 주문하지 못해요.
+</Analogy>
+
+## 런타임마다 요청을 나눠 받는 법이 달라요
+
+Java는 <Term term="apm/thread-pool">스레드 풀</Term>의 스레드가 요청을 하나씩 맡아요. Node.js, Python, Go는 방식이 달라서, 느릴 때 먼저 볼 숫자도 달라요.
+
+- **Java**: 스레드 풀의 스레드가 요청을 맡아요. 스레드 상태와 힙, GC를 먼저 봐요.
+- **Node.js**: 이벤트 루프 하나가 모든 요청을 돌려요. 이벤트 루프 지연을 먼저 봐요.
+- **Python**: 워커 프로세스 여러 개가 나눠 받아요. 워커 수와 프로세스마다의 지표를 봐요.
+- **Go**: 요청마다 고루틴을 띄워요. 고루틴 수를 먼저 봐요.
+
+## Node.js: 이벤트 루프 하나가 모두를 돌려요
+
+Node.js의 JavaScript 코드는 <Term term="apm/event-loop">이벤트 루프</Term>(event loop)라는 스레드 하나에서 돌아요. DB나 다른 서비스의 답을 기다리는 동안 다른 요청의 일을 처리해서, 스레드 하나로도 많은 요청을 받아요.
+
+대신 한 요청이 CPU를 오래 쓰면 그동안 다른 요청이 모두 멈춰요. 큰 JSON을 한 번에 파싱하거나, 긴 배열을 정렬하거나, 동기 함수로 암호화하는 코드가 그래요.
+
+<Figure caption="Node.js 22로 재 본 예예요. 혼자 오면 9ms인 요청 C가, 요청 B가 300ms 계산하는 중에 오자 270ms가 걸렸어요.">
+  <Timeline
+    ariaLabel="이벤트 루프가 0에서 300ms까지 요청 B의 계산을 하는 동안, 50ms에 온 요청 C가 300ms까지 기다렸다가 처리되는 시간 띠"
+    end={330}
+    lanes={[
+      { label: '이벤트 루프', segments: [{ start: 0, end: 300, label: '요청 B 계산', tone: 'warn' }, { start: 300, end: 330, label: 'C', tone: 'accent' }] },
+      { label: '요청 C', segments: [{ start: 50, end: 300, label: '기다려요', tone: 'sub' }, { start: 300, end: 330, tone: 'accent' }] },
+    ]}
+    ticks={[{ at: 0, label: '0' }, { at: 100, label: '100ms' }, { at: 200, label: '200ms' }, { at: 300, label: '300ms' }]}
+  />
+</Figure>
+
+파일 읽기, DNS 조회, `crypto.pbkdf2()` 같은 일부 암호화, 압축은 이벤트 루프가 아니라 뒤의 스레드 풀(libuv)이 맡아요. 이 풀은 기본 4개라서, 다섯 번째 일부터는 줄을 서요.
+
+<Figure caption="pbkdf2 8개를 한꺼번에 부른 예예요. 스레드 4개가 4개를 먼저 끝내고(32ms), 나머지 4개는 기다렸다가 63ms에 끝나요.">
+  <Timeline
+    ariaLabel="libuv 스레드 4개가 각각 작업 1에서 4를 0에서 32ms까지, 작업 5에서 8을 32에서 63ms까지 차례로 처리하는 시간 띠"
+    end={63}
+    lanes={[
+      { label: '스레드 1', segments: [{ start: 0, end: 32, label: '1', tone: 'accent' }, { start: 32, end: 63, label: '5', tone: 'warn' }] },
+      { label: '스레드 2', segments: [{ start: 0, end: 32, label: '2', tone: 'accent' }, { start: 32, end: 63, label: '6', tone: 'warn' }] },
+      { label: '스레드 3', segments: [{ start: 0, end: 32, label: '3', tone: 'accent' }, { start: 32, end: 63, label: '7', tone: 'warn' }] },
+      { label: '스레드 4', segments: [{ start: 0, end: 32, label: '4', tone: 'accent' }, { start: 32, end: 63, label: '8', tone: 'warn' }] },
+    ]}
+    ticks={[{ at: 0, label: '0' }, { at: 32, label: '32ms' }, { at: 63, label: '63ms' }]}
+  />
+</Figure>
+
+Node.js 프로세스 하나는 JavaScript를 코어 하나로만 돌려요. CPU를 여러 개 쓰려면 cluster 모듈이나 컨테이너로 프로세스를 코어 수만큼 띄워요.
+
+## Python: 한 번에 한 스레드만 계산해요
+
+가장 널리 쓰는 Python인 CPython에는 <Term term="apm/gil">GIL</Term>(global interpreter lock)이 있어요. 한 프로세스 안에서는 한 번에 한 스레드만 Python 코드를 실행해요. 스레드를 늘려도 계산은 빨라지지 않아요.
+
+<Figure caption="Python 3.12에서 같은 계산 4개를 돌린 시간이에요. 스레드 4개는 차례로 할 때보다 빠르지 않고, 프로세스 4개로 나눠야 빨라져요.">
+  <Bars
+    ariaLabel="같은 계산 4개를 돌린 시간 막대. 스레드 하나로 차례로 3.11초, 스레드 4개 3.41초, 프로세스 4개 0.95초예요"
+    bars={[
+      { label: '스레드 하나로 차례로', value: 3.11, display: '3.11초' },
+      { label: '스레드 4개', value: 3.41, display: '3.41초', tone: 'warn' },
+      { label: '프로세스 4개', value: 0.95, display: '0.95초', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+다만 I/O를 기다릴 때는 GIL을 내려놓아요. 그래서 DB나 다른 서비스의 답을 기다리는 일은 스레드로 나누면 빨라져요. 같은 실험에서 1초씩 기다리는 일 4개를 스레드 4개로 돌리니 1.00초였어요.
+
+그래서 Python 웹 서버는 워커 프로세스를 여러 개 띄워요. Gunicorn은 워커 수의 출발점으로 (2 × CPU 코어 수) + 1을 권해요. 기본 sync 워커는 한 번에 요청 하나만 처리해요.
+
+<Figure caption="Gunicorn은 마스터 프로세스가 워커 프로세스를 띄우고 지켜봐요. 워커마다 GIL과 메모리가 따로라, 지표도 워커마다 따로 생겨요.">
+  <Nest
+    ariaLabel="서버 안의 Gunicorn이 마스터 프로세스 하나와 워커 프로세스 다섯으로 이뤄지고, 워커마다 GIL과 지표가 따로 있는 그림"
+    boxes={[
+      {
+        label: 'Gunicorn(코어 2개 서버, 워커 5개)',
+        children: [
+          { label: '마스터', note: '워커를 띄우고, 죽으면 다시 띄워요', wide: true, tone: 'accent' },
+          { label: '워커 1', note: 'GIL·지표 따로' },
+          { label: '워커 2', note: 'GIL·지표 따로' },
+          { label: '워커 3', note: 'GIL·지표 따로' },
+          { label: '워커 4', note: 'GIL·지표 따로' },
+          { label: '워커 5', note: 'GIL·지표 따로', wide: true },
+        ],
+      },
+    ]}
+  />
+</Figure>
+
+Python 3.13부터 GIL을 끈 빌드(free-threaded)가 있고, 3.14부터 공식 지원해요. 다만 따로 설치하는 빌드라, 기본 Python에는 아직 GIL이 있어요.
+
+## Go: 고루틴을 스레드 몇 개에 나눠 돌려요
+
+<Term term="apm/goroutine">고루틴</Term>(goroutine)은 Go 런타임이 관리하는 가벼운 실행 단위예요. 처음 받는 스택이 몇 KB뿐이라 수십만 개도 띄울 수 있어요. 리눅스에서 10만 개를 띄워 보니 하나에 2KB, 모두 약 196MB였어요.
+
+Go 런타임은 고루틴을 OS 스레드 몇 개에 나눠 돌려요. 한순간에 Go 코드를 돌리는 스레드 수가 <Term term="apm/gomaxprocs">GOMAXPROCS</Term>예요. 기본은 CPU 수이고, Go 1.25부터 리눅스에서는 컨테이너의 CPU 제한(쿠버네티스 CPU limit)도 따라요.
+
+<Figure caption="GOMAXPROCS가 2면 고루틴이 아무리 많아도 한순간에 둘만 Go 코드를 돌려요. 나머지는 차례를 기다리거나 I/O를 기다려요.">
+  <Stacks
+    ariaLabel="고루틴 8개 중 고루틴 1과 5만 실행 중이고, 고루틴 1에서 4는 첫 번째 실행 칸에, 5에서 8은 두 번째 실행 칸에 걸쳐 차례를 기다리는 그림"
+    columns={[
+      {
+        title: '고루틴',
+        blocks: [
+          { label: '고루틴 1', tag: '실행', tone: 'accent' },
+          { label: '고루틴 2', tag: '대기', tone: 'sub' },
+          { label: '고루틴 3', tag: '대기', tone: 'sub' },
+          { label: '고루틴 4', tag: '대기', tone: 'sub' },
+          { label: '고루틴 5', tag: '실행', tone: 'accent' },
+          { label: '고루틴 6', tag: '대기', tone: 'sub' },
+          { label: '고루틴 7', tag: '대기', tone: 'sub' },
+          { label: '고루틴 8', tag: '대기', tone: 'sub' },
+        ],
+      },
+      {
+        title: 'GOMAXPROCS = 2',
+        blocks: [
+          { label: '실행 칸 1(스레드)', span: 4, tone: 'accent' },
+          { label: '실행 칸 2(스레드)', span: 4, tone: 'accent' },
+        ],
+      },
+    ]}
+  />
+</Figure>
+
+고루틴은 끝나지 않으면 계속 남아요. 아무도 받지 않는 채널에 값을 보내려는 고루틴은 영원히 기다려요. 실험에서 이런 함수를 1,000번 부르니 고루틴 1,000개가 그대로 남았어요.
+
+## 모니터링에서는
+
+런타임마다 먼저 볼 지표가 달라요. Prometheus 클라이언트 라이브러리가 기본으로 내보내는 이름은 이래요.
+
+```text
+# Node.js(prom-client)
+nodejs_eventloop_lag_p99_seconds
+nodejs_eventloop_lag_max_seconds
+# Go(client_golang)
+go_goroutines
+go_sched_gomaxprocs_threads
+```
+
+Node.js의 두 지표는 이벤트 루프 지연의 p99와 최댓값이에요. 평소 0.01초 안팎이 바닥이에요. Go의 두 지표는 고루틴 수와 GOMAXPROCS예요.
+
+Python은 지표가 워커 프로세스마다 따로 생겨요. 그래서 워커의 값을 합쳐 보는 설정(client_python의 multiprocess 모드)이 필요해요.
+
+Node.js에서 모든 API가 함께 느려지고 이벤트 루프 지연도 같이 오르면, 어딘가에서 CPU를 오래 쓰는 코드예요. 한 API만 느리면 그 API가 기다리는 DB나 서비스부터 봐요.
+
+<Figure caption="Node.js 서비스의 예시예요. 이벤트 루프 지연이 오르자 모든 API의 p99도 함께 200ms 넘게 올랐어요.">
+  <MiniLineChart
+    ariaLabel="이벤트 루프 지연 p99가 10ms 안팎이다가 210에서 230ms로 오르고, 같은 때 모든 API의 응답 p99가 40ms 안팎에서 240에서 260ms로 함께 오른 뒤 둘 다 내려오는 그래프"
+    yMax={300}
+    series={[
+      { label: '응답 p99(모든 API)', values: [40, 42, 41, 45, 240, 260, 250, 48, 44, 42], tone: 'warn', value: '260ms' },
+      { label: '이벤트 루프 지연 p99', values: [10, 10, 10, 12, 210, 230, 220, 12, 10, 10], tone: 'accent', value: '230ms' },
+    ]}
+  />
+</Figure>
+
+Go에서는 요청량이 그대로인데 `go_goroutines`가 계속 오르면 고루틴 누수예요. 고루틴마다 스택과 붙잡은 객체가 남아서 메모리도 함께 늘어요. 어디서 멈춰 있는지는 고루틴 덤프(`/debug/pprof/goroutine`)로 봐요.
+
+<Figure caption="요청량이 그대로인 Go 서비스의 7일 예시예요. 고루틴이 하루 700개씩 늘기만 해요.">
+  <MiniLineChart
+    ariaLabel="7일 동안 고루틴 수가 1,200에서 5,400으로 하루 700개씩 계속 늘어나는 그래프"
+    yMax={6000}
+    series={[{ label: 'go_goroutines', values: [1200, 1900, 2600, 3300, 4000, 4700, 5400], tone: 'warn', value: '5,400' }]}
+  />
+</Figure>
+
+<Checkpoints>
+  <Check>8코어 서버에서 Node.js 서비스가 느린데 서버 CPU가 12.5%쯤에서 멈춰 있다면, 여유가 있는 게 아니에요. 프로세스 하나가 코어 하나를 다 쓰고 있어요. 프로세스별 CPU와 이벤트 루프 지연을 보세요.</Check>
+  <Check>Python 서비스에서 계산이 느려 스레드를 늘렸다면 다시 보세요. GIL 때문에 계산은 빨라지지 않아요. 워커 프로세스를 늘려요.</Check>
+  <Check>Gunicorn으로 도는 서비스의 카운터가 수집할 때마다 오르내린다면, 워커 하나의 숫자만 보고 있을 수 있어요. client_python이라면 multiprocess 모드로 워커의 값을 합쳐요.</Check>
+  <Check>CPU limit이 2인 컨테이너의 Go 서비스에서 `go_sched_gomaxprocs_threads`를 보세요. 노드의 CPU 수(예: 16)라면 Go 1.25보다 옛 버전이에요. 쓸 수 있는 CPU보다 많은 스레드가 돌다 <Term slug="kubernetes/requests-and-limits">스로틀링</Term>되기 쉬워요.</Check>
+  <Check>Node.js 이벤트 루프 지연이 평소 0.01초라고 문제 삼았다면 다시 보세요. prom-client는 10ms 간격 타이머로 재서, 막힘이 없어도 그 간격이 바닥으로 나와요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 이벤트 루프 지연을 재는 법
+
+  Node.js의 `monitorEventLoopDelay()`는 정해진 간격의 타이머를 걸어요. 그리고 그 타이머가 실제로 불린 간격을 히스토그램으로 모아요. prom-client는 이 간격을 10ms로 두고, 수집할 때마다 히스토그램을 비워요.
+
+  Node.js 22에서 막힘 없이 재면 간격 1ms에선 p50 1.1ms, 10ms에선 10.1ms, 20ms에선 20.1ms였어요. 그래서 평소 값은 간격과 비교해 읽어요.
+
+  1초에 한 번 100ms씩 막히게 하고 5초를 재면 p99는 10.6ms, max는 110ms였어요. 10ms마다 하나씩 잰 값 중 막힌 순간은 1%쯤이라, p99에는 잘 안 잡혀요. 짧고 드문 막힘은 max로 봐요.
+
+  ### libuv 스레드 풀 크기
+
+  libuv 스레드 풀은 기본 4개이고, 프로세스가 뜰 때 `UV_THREADPOOL_SIZE` 환경 변수로 바꿔요. 최대 1024개까지예요.
+
+  앞의 pbkdf2 실험에서 8로 늘리니 8개가 모두 32~38ms에 끝났어요. 파일과 DNS 조회가 많은 서비스가 CPU는 낮은데 느리다면 이 줄을 의심해요.
+
+  ### Python의 asyncio
+
+  FastAPI처럼 asyncio로 도는 앱은 Node.js처럼 이벤트 루프 하나로 요청을 돌려요. Python 문서도 1초 걸리는 계산을 그대로 부르면 모든 작업이 1초씩 늦는다고 해요. 그래서 async 함수 안의 오래 걸리는 계산은 따로 떼어 내요.
+
+  GIL을 끈 빌드는 Python 3.14 기준으로 한 스레드만 쓰는 코드가 5~10% 느려요. 확인은 `sys._is_gil_enabled()`로 해요.
+
+  ### Go의 GOMAXPROCS를 직접 정하면
+
+  `GOMAXPROCS` 환경 변수나 `runtime.GOMAXPROCS()`로 직접 정하면, Go 1.25의 자동 맞춤이 꺼져요. 리눅스에서 CPU를 2개로 제한한 cgroup 안에서 Go 1.27 프로그램을 띄우니 GOMAXPROCS가 2였어요. 같은 프로그램을 제한 없이 띄우면 16이었어요.
+
+  Go 1.25부터는 CPU 제한이 바뀌어도 GOMAXPROCS를 다시 맞춰요. 쿠버네티스의 CPU request는 보지 않고 CPU limit만 봐요.
+</Deeper>

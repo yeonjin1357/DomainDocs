@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 338" width="300" height="338">
+  <text x="0" y="28" font-size="15" font-weight="700" style="fill:var(--color-text)">평균 부하</text>
+  <text x="0" y="50" font-size="13" style="fill:var(--color-text-sub)">평소에 목표를 지키나</text>
+  <line x1="176" y1="48" x2="296" y2="48" stroke-width="1.5" style="stroke:var(--color-text-weak)" />
+  <line x1="176" y1="30.0" x2="296" y2="30.0" stroke-width="1" stroke-dasharray="2 3" style="stroke:var(--color-line)" />
+  <polyline points="176.0,48.0 194.0,30.0 278.0,30.0 296.0,48.0" fill="none" stroke-width="2.5" stroke-linejoin="round" style="stroke:var(--color-accent)" />
+  <text x="296" y="66" text-anchor="end" font-size="13" style="fill:var(--color-text-sub)">수십 분</text>
+  <line x1="0" y1="70" x2="300" y2="70" stroke-width="1" style="stroke:var(--color-line)" />
+  <text x="0" y="94" font-size="15" font-weight="700" style="fill:var(--color-text)">스트레스</text>
+  <text x="0" y="116" font-size="13" style="fill:var(--color-text-sub)">피크·행사에 버티나</text>
+  <line x1="176" y1="114" x2="296" y2="114" stroke-width="1.5" style="stroke:var(--color-text-weak)" />
+  <line x1="176" y1="96.0" x2="296" y2="96.0" stroke-width="1" stroke-dasharray="2 3" style="stroke:var(--color-line)" />
+  <polyline points="176.0,114.0 194.0,83.4 278.0,83.4 296.0,114.0" fill="none" stroke-width="2.5" stroke-linejoin="round" style="stroke:var(--color-accent)" />
+  <text x="296" y="132" text-anchor="end" font-size="13" style="fill:var(--color-text-sub)">수십 분</text>
+  <line x1="0" y1="136" x2="300" y2="136" stroke-width="1" style="stroke:var(--color-line)" />
+  <text x="0" y="160" font-size="15" font-weight="700" style="fill:var(--color-text)">소크(soak)</text>
+  <text x="0" y="182" font-size="13" style="fill:var(--color-text-sub)">천천히 쌓이는 문제</text>
+  <line x1="176" y1="180" x2="296" y2="180" stroke-width="1.5" style="stroke:var(--color-text-weak)" />
+  <line x1="176" y1="162.0" x2="296" y2="162.0" stroke-width="1" stroke-dasharray="2 3" style="stroke:var(--color-line)" />
+  <polyline points="176.0,180.0 182.0,162.0 290.0,162.0 296.0,180.0" fill="none" stroke-width="2.5" stroke-linejoin="round" style="stroke:var(--color-accent)" />
+  <text x="296" y="198" text-anchor="end" font-size="13" style="fill:var(--color-text-sub)">몇 시간</text>
+  <line x1="0" y1="202" x2="300" y2="202" stroke-width="1" style="stroke:var(--color-line)" />
+  <text x="0" y="226" font-size="15" font-weight="700" style="fill:var(--color-text)">스파이크</text>
+  <text x="0" y="248" font-size="13" style="fill:var(--color-text-sub)">갑자기 몰려도 버티나</text>
+  <line x1="176" y1="246" x2="296" y2="246" stroke-width="1.5" style="stroke:var(--color-text-weak)" />
+  <line x1="176" y1="228.0" x2="296" y2="228.0" stroke-width="1" stroke-dasharray="2 3" style="stroke:var(--color-line)" />
+  <polyline points="176.0,240.6 218.0,240.6 226.4,210.0 242.0,210.0 250.4,240.6 296.0,240.6" fill="none" stroke-width="2.5" stroke-linejoin="round" style="stroke:var(--color-accent)" />
+  <text x="296" y="264" text-anchor="end" font-size="13" style="fill:var(--color-text-sub)">몇 분</text>
+  <line x1="0" y1="268" x2="300" y2="268" stroke-width="1" style="stroke:var(--color-line)" />
+  <text x="0" y="292" font-size="15" font-weight="700" style="fill:var(--color-text)">한계</text>
+  <text x="0" y="314" font-size="13" style="fill:var(--color-text-sub)">어디서 무너지나</text>
+  <line x1="176" y1="312" x2="296" y2="312" stroke-width="1.5" style="stroke:var(--color-text-weak)" />
+  <line x1="176" y1="294.0" x2="296" y2="294.0" stroke-width="1" stroke-dasharray="2 3" style="stroke:var(--color-line)" />
+  <polyline points="176.0,312.0 286.4,277.8" fill="none" stroke-width="2.5" stroke-linejoin="round" style="stroke:var(--color-warn)" />
+  <path d="M281.4,272.8 L291.4,282.8 M291.4,272.8 L281.4,282.8" stroke-width="2.5" style="stroke:var(--color-warn)" />
+  <text x="296" y="330" text-anchor="end" font-size="13" style="fill:var(--color-text-sub)">무너질 때까지</text>
+</svg>

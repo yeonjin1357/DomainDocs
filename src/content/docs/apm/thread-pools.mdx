@@ -78,6 +78,8 @@ Tomcat의 요청 처리 스레드 풀은 순서가 달라요. 대기열에 넣�
   />
 </Figure>
 
+Node.js, Python, Go는 스레드 풀과 다른 방식으로 요청을 나눠 받아요. 차이는 <Term slug="apm/runtimes">JVM 밖의 런타임</Term>에서 다뤄요.
+
 ## 동시에 몇 개가 필요할까요
 
 동시에 처리 중인 요청 수는 처리량에 응답시간을 곱한 값과 같아요. 초당 100건이 들어오고 하나에 평균 0.5초가 걸리면, 평균 50개를 동시에 처리하고 있어요. 이 관계는 <Term slug="apm/throughput-and-concurrency">처리량과 동시성</Term>에서 다뤄요.

@@ -293,3 +293,30 @@ terms:
     short: 배포한 코드 안의 기능을 설정으로 켜고 끄게 해 주는 스위치예요.
     analogy: 공사를 다 해 두고 가림막만 걷었다 쳤다 하는 것과 같아요.
     doc: foundations/deployments
+  - id: event-loop
+    name: 이벤트 루프
+    en: Event loop
+    aliases: [event loop, 이벤트루프, 메인 스레드]
+    short: 할 일을 하나씩 꺼내 처리하는 스레드 하나예요. Node.js가 요청을 이걸로 돌려요.
+    analogy: 주문을 혼자 받는 직원과 같아요. 한 손님이 오래 붙잡으면 모두 기다려요.
+    doc: apm/runtimes
+  - id: gil
+    name: GIL
+    en: Global Interpreter Lock
+    aliases: [global interpreter lock, 전역 인터프리터 잠금]
+    short: CPython에서 한 번에 한 스레드만 Python 코드를 실행하게 하는 잠금이에요.
+    analogy: 요리사가 여럿이어도 칼이 하나뿐인 주방과 같아요.
+    doc: apm/runtimes
+  - id: goroutine
+    name: 고루틴
+    en: Goroutine
+    aliases: [goroutine, go루틴]
+    short: Go 런타임이 관리하는 가벼운 실행 단위예요. 몇 KB 스택으로 시작해요.
+    analogy: 요리사 몇 명이 돌려 가며 처리하는 주문표와 같아요.
+    doc: apm/runtimes
+  - id: gomaxprocs
+    name: GOMAXPROCS
+    aliases: [gomaxprocs, go_sched_gomaxprocs_threads]
+    short: 한순간에 Go 코드를 실행하는 스레드 수의 상한이에요.
+    analogy: 주방에서 동시에 일하는 요리사 수와 같아요.
+    doc: apm/runtimes

@@ -1,0 +1,29 @@
+questions:
+  - id: node-blocking
+    type: ox
+    prompt: Node.js 서버에서 한 요청이 CPU를 300ms 쓰는 동안 들어온 다른 요청도, 그 300ms 안에 처리되나요?
+    answer: false
+    explain: JavaScript는 이벤트 루프 하나에서 돌아요. 계산이 끝나야 다음 요청의 일을 꺼내요.
+  - id: gil-io-threads
+    type: ox
+    prompt: CPython에서 DB 답을 기다리는 일 4개를 스레드 4개로 나누면, 하나씩 할 때보다 빨리 끝나나요?
+    answer: true
+    explain: I/O를 기다릴 때는 GIL을 내려놓아서, 기다리는 시간이 겹쳐요. GIL이 막는 건 계산이에요.
+  - id: python-cpu-scale
+    type: choice
+    prompt: CPython 웹 서비스에서 계산이 많은 요청을 더 빨리, 더 많이 처리하려면?
+    choices: [워커 프로세스를 늘려요, 워커 안의 스레드를 늘려요, UV_THREADPOOL_SIZE를 늘려요, 요청 타임아웃을 늘려요]
+    answer: 0
+    explain: GIL은 프로세스마다 하나라, 프로세스를 나눠야 코어를 여럿 써요. 스레드를 늘려도 계산은 한 번에 하나예요.
+  - id: gomaxprocs-limit
+    type: choice
+    prompt: CPU가 16개인 노드에서 CPU limit이 2인 컨테이너로 도는 Go 1.25 서비스의 GOMAXPROCS 기본값은?
+    choices: ['2', '16', '1', '4']
+    answer: 0
+    explain: Go 1.25부터 리눅스에서는 cgroup의 CPU 제한이 CPU 수보다 작으면 그 값을 써요.
+  - id: goroutine-name
+    type: input
+    prompt: Go에서 `go` 키워드로 띄우는, 런타임이 관리하는 가벼운 실행 단위는?
+    answer: [고루틴]
+    term: apm/goroutine
+    explain: 몇 KB 스택으로 시작해서 수십만 개도 띄워요. 끝나지 않고 쌓이면 누수예요.
