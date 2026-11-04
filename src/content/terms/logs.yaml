@@ -69,3 +69,17 @@ terms:
     short: 로그에 남기 전에 민감한 값을 빼거나 일부를 별표 같은 글자로 바꾸는 일이에요.
     analogy: 택배 송장의 전화번호 가운데를 별표로 가리는 것과 같아요.
     doc: logs/sensitive-data
+  - id: log-sampling
+    name: 로그 샘플링
+    en: Log sampling
+    aliases: [log sampling, 로그 표본, 샘플링, sampling]
+    short: 정한 비율의 로그만 남기고 나머지는 버려 양을 줄이는 일이에요.
+    analogy: 제품 100개 중 10개만 뽑아 검사하는 것과 같아요.
+    doc: logs/sampling
+  - id: sample-rate
+    name: 샘플링 비율
+    en: Sample rate
+    aliases: [sample rate, sample_rate, 표본 비율, 샘플 비율]
+    short: 몇 개 중 하나를 남겼는지 나타내는 값이에요. 남은 수에 곱하면 원래 양이 돼요.
+    analogy: 10명 중 1명만 설문했다면 답한 수에 10을 곱해 전체를 어림하는 것과 같아요.
+    doc: logs/sampling

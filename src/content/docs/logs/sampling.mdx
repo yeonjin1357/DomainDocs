@@ -1,0 +1,182 @@
+---
+title: 로그 샘플링
+summary: 로그를 일부만 남겨 양을 줄이되, 에러는 다 남기고 요청 단위로 고르는 법이에요.
+domain: logs
+type: concept
+stage: basics
+order: 42
+icon: scroll-text
+keywords: [log sampling, 로그 샘플링, 표본, sample rate, sample_rate, trace_id, Vector, journald, RateLimitBurst, Suppressed]
+related: [logs/retention-and-cost, logs/volume-spike, logs/log-metrics, apm/sampling, logs/levels-and-structured]
+sources:
+  - title: Vector — sample transform (rate, key_field, exclude, sample_rate_key)
+    url: https://vector.dev/docs/reference/configuration/transforms/sample/
+  - title: journald.conf — RateLimitIntervalSec=, RateLimitBurst=
+    url: https://www.freedesktop.org/software/systemd/man/latest/journald.conf.html
+  - title: systemd 소스 — journald-rate-limit.c (burst_modulate)
+    url: https://github.com/systemd/systemd/blob/v255/src/journal/journald-rate-limit.c
+updated: 2026-11-04
+---
+
+<KeyPoints>
+  <Point title="에러는 다 남기고 흔한 로그만 줄여요">
+    성공한 요청의 INFO 로그처럼 많고 비슷한 것만 일부 남겨요.
+  </Point>
+  <Point title="줄이 아니라 요청 단위로 골라요">
+    trace_id로 고르면 한 요청의 로그가 함께 남거나 함께 빠져요.
+  </Point>
+  <Point title="남은 로그로 센 숫자는 되돌려 읽어요">
+    비율이 다르게 남은 로그로 에러율을 세면 틀려요. 숫자는 샘플링 전에 지표로 세요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="품질 검사는 제품을 하나씩 따로 뽑아도 되지만, 로그는 한 요청의 여러 줄이 이어져야 뜻이 있어요. 그래서 줄이 아니라 요청 단위로 뽑아요.">
+  공장은 제품 100개 중 10개만 뽑아 검사해요. 대신 불량 신고는 하나도 빼지 않고 다 받아요.
+</Analogy>
+
+## 왜 일부만 남기나요
+
+로그는 쌓이는 양만큼 돈이 들고, 많을수록 검색도 느려요. 그런데 성공한 요청의 로그는 대부분 서로 비슷해서 일부만 봐도 흐름을 알 수 있어요. 비용은 <Term slug="logs/retention-and-cost">보관 기간과 비용</Term>에서 다뤄요.
+
+<Term term="logs/log-sampling">샘플링</Term>(sampling)은 정한 비율만 남기고 나머지를 버리는 일이에요. 10개에 1개를 남기면 양이 10분의 1이 돼요. 버린 로그는 되살릴 수 없어서, 무엇을 버릴지 먼저 정해야 해요.
+
+## 그냥 고르면 에러가 사라져요
+
+비율만 정하고 아무 줄이나 고르면, 에러 줄도 같은 비율로 버려져요. 고르는 방식에 따라서는 에러가 하나도 안 남기도 해요.
+
+<Figure caption="로그 수집기 Vector 0.61에 10줄에 1줄을 남기게 한 예예요. 10번째 줄마다 남겨서, 요청 A의 다섯째 줄인 에러는 버려졌어요. 이렇게 에러 100줄이 모두 사라졌어요.">
+  <Strip
+    ariaLabel="요청 A의 로그 다섯 줄과 요청 B의 로그 다섯 줄 중 열 번째 줄인 B5만 남고, 요청 A의 에러 줄인 A5는 버려지는 칸 띠"
+    rows={[
+      {
+        label: '로그 줄 10개',
+        cells: [
+          { label: 'A1', tone: 'sub' },
+          { label: 'A2', tone: 'sub' },
+          { label: 'A3', tone: 'sub' },
+          { label: 'A4', tone: 'sub' },
+          { label: 'A5', tone: 'warn' },
+          { label: 'B1', tone: 'sub' },
+          { label: 'B2', tone: 'sub' },
+          { label: 'B3', tone: 'sub' },
+          { label: 'B4', tone: 'sub' },
+          { label: 'B5', tone: 'accent' },
+        ],
+      },
+    ]}
+    marks={[
+      { at: 4, label: '에러, 버려짐', tone: 'warn' },
+      { at: 9, label: '남김', tone: 'accent' },
+    ]}
+    ranges={[
+      { from: 0, to: 4, label: '요청 A' },
+      { from: 5, to: 9, label: '요청 B' },
+    ]}
+  />
+</Figure>
+
+그래서 에러는 샘플링에서 빼요. Vector라면 `exclude`에 에러 조건을 걸어, 그 조건에 맞는 줄은 비율과 상관없이 모두 남겨요.
+
+## 요청 단위로 골라요
+
+줄마다 따로 고르면 한 요청의 로그가 조각나요. 요청 하나를 따라가려 해도 앞뒤 줄이 빠져 있어요.
+
+그래서 요청마다 하나씩 붙는 값(trace_id나 요청 ID)으로 골라요. 그 값을 해시해서 정하면 같은 값의 줄은 늘 같은 결정을 받아, 한 요청의 로그가 함께 남거나 함께 빠져요. Vector는 이 값을 `key_field`로 정해요.
+
+<Figure caption="요청 1만 개(요청마다 5줄, 1%는 마지막 줄이 에러)를 Vector로 10%만 남긴 결과예요. trace_id로 고르고 에러를 빼면 요청이 통째로 남고 에러도 모두 남아요.">
+  <Compare
+    columns={['줄마다 10%', 'trace_id로 10%, 에러 제외']}
+    rows={[
+      { label: '남은 줄(5만 줄 중)', values: ['5,000줄', '4,963줄'] },
+      { label: '5줄이 다 남은 요청', values: ['0개', '974개'] },
+      { label: '일부만 남은 요청', values: ['5,000개', '93개'] },
+      { label: '남은 에러 줄(100줄 중)', values: ['0줄', '100줄'] },
+    ]}
+  />
+</Figure>
+
+다만 에러 줄만 남고 같은 요청의 앞 줄은 빠지기도 해요. 실험에서 실패한 요청 100개 중 앞 줄까지 다 남은 건 7개뿐이었어요.
+
+실패한 요청을 통째로 남기려면 요청이 끝날 때까지 모아 두고 정해야 해요. 트레이스의 tail 샘플링과 같은 생각으로, <Term slug="apm/sampling">샘플링과 APM 숫자</Term>에서 다뤄요.
+
+## 남은 로그로 센 숫자는 틀려요
+
+에러는 다 남기고 나머지는 10%만 남겼다면, 남은 로그 안에서 에러의 몫은 실제보다 커요. 남은 로그를 그대로 세어 에러율을 내면 안 돼요.
+
+<Figure caption="같은 실험에서 에러 줄의 비율이에요. 남은 로그로 그대로 세면 2.01%로 실제(0.20%)의 10배가 돼요. 샘플링 비율을 곱해 되돌리면 0.21%로 돌아와요.">
+  <Bars
+    ariaLabel="에러 줄 비율 막대. 실제는 0.20%, 남은 로그로 그대로 세면 2.01%, 샘플링 비율로 되돌리면 0.21%예요"
+    bars={[
+      { label: '실제(5만 줄 중 100줄)', value: 0.2, display: '0.20%' },
+      { label: '남은 로그로 그대로 세면', value: 2.01, display: '2.01%', tone: 'warn' },
+      { label: '샘플링 비율로 되돌리면', value: 0.21, display: '0.21%', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+Vector는 샘플링으로 남긴 줄에 <Term term="logs/sample-rate">샘플링 비율</Term>을 담은 `sample_rate` 필드(여기선 10)를 붙여요. 에러처럼 샘플링에서 뺀 줄에는 붙이지 않아요. 그래서 줄마다 이 값을 곱해 더하면 원래 양을 어림할 수 있어요.
+
+더 좋은 방법은 숫자를 샘플링 전에 세는 거예요. 요청 수와 에러 수는 앱이나 수집기가 지표로 세고, 로그는 사례를 보는 데 써요. 로그로 숫자를 만드는 법과 그 한계는 <Term slug="logs/log-metrics">로그에서 지표 만들기</Term>에서 다뤄요.
+
+## 속도 제한은 몰릴 때 버려요
+
+비율 대신 속도로 자르기도 해요. 정한 시간에 정한 줄 수를 넘으면 나머지를 버려요. 리눅스의 <Term term="server/journald">journald</Term>는 기본으로 서비스마다 30초에 1만 줄을 넘으면 버려요.
+
+이 1만 줄은 저널 디스크의 여유 공간에 따라 몇 배로 늘어요. 여유가 3.2GB인 실험 PC에서는 3만 7,500줄이 한도였어요.
+
+<Figure caption="서비스 하나가 로그 5만 줄을 한꺼번에 쓴 실험이에요. journald는 3만 7,500줄만 남기고 1만 2,500줄을 버렸어요.">
+  <Parts
+    ariaLabel="한꺼번에 쓴 로그 5만 줄 중 3만 7,500줄은 남고 1만 2,500줄은 버려진 비율 막대"
+    rows={[
+      {
+        label: '한꺼번에 쓴 5만 줄',
+        total: '50,000줄',
+        segments: [
+          { label: '남은 줄', value: 37500, display: '37,500줄', tone: 'accent' },
+          { label: '버린 줄', value: 12500, display: '12,500줄', tone: 'warn' },
+        ],
+      },
+    ]}
+  />
+</Figure>
+
+버린 수는 30초가 지나 그 서비스가 다시 로그를 쓸 때 `Suppressed 12500 messages from …` 한 줄로 남아요. 로그가 폭증하는 때는 대개 장애 때라, 가장 필요한 로그가 이렇게 버려질 수 있어요. 갑자기 늘어난 로그를 다루는 법은 <Term slug="logs/volume-spike">로그가 갑자기 많아질 때</Term>에서 다뤄요.
+
+## 모니터링에서는
+
+샘플링한 로그를 보는 화면에는 비율을 밝혀요. "INFO는 10%, 에러는 모두" 같은 글이 없으면, 보는 사람은 검색 건수를 실제 양으로 읽어요.
+
+수집 단계마다 들어온 줄과 나간 줄을 세면 얼마나 버렸는지 보여요. journald라면 `Suppressed` 줄에 <Term slug="logs/keyword-alerts">키워드 알림</Term>을 걸어 두면, 버려지는 순간을 알 수 있어요.
+
+<Checkpoints>
+  <Check>샘플링 설정에 에러를 빼는 조건이 없다면 넣으세요. 에러도 같은 비율로 버려지고, 고르는 방식에 따라서는 모두 사라져요.</Check>
+  <Check>샘플링한 로그의 검색 건수로 요청 수나 에러율을 냈다면 다시 보세요. 에러만 다 남긴 로그로 세면 에러율이 실제의 몇 배로 나와요. 비율로 되돌리거나 지표로 세요.</Check>
+  <Check>줄마다 따로 고르는 샘플링이라면 한 요청의 로그가 조각나요. trace_id나 요청 ID로 골라야 요청을 처음부터 끝까지 따라갈 수 있어요.</Check>
+  <Check>서비스 로그가 장애 시각에만 비어 있다면 속도 제한을 의심하세요. journald는 서비스마다 30초에 1만 줄(여유 공간에 따라 몇 배)을 넘으면 버리고, 뒤에 `Suppressed` 줄을 남겨요.</Check>
+  <Check>샘플링 비율을 바꿨다면 바꾼 시각 앞뒤의 로그 건수를 그대로 견주지 마세요. 양이 줄어든 건 서비스가 아니라 비율 때문이에요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### Vector 설정 예
+
+  실험에 쓴 설정이에요. trace_id로 10개 중 1개를 고르고, level이 error인 줄은 모두 남겨요.
+
+  ```toml
+  [transforms.samp]
+  type = "sample"
+  inputs = ["app_logs"]
+  rate = 10
+  key_field = "trace_id"
+  exclude = '.level == "error"'
+  ```
+
+  `key_field` 없이 `rate = 10`만 두면 실험에서는 정확히 10번째 줄마다 남겼어요. 요청마다 5줄이고 에러가 늘 다섯째 줄이라, 에러 줄은 한 번도 10번째 자리에 오지 않았어요.
+
+  `key_field`로 고르면 값 하나가 한 묶음이 돼요. Vector 문서는 값이 고르게 퍼져 있지 않으면 실제로 남는 비율이 정한 비율에서 벗어날 수 있다고 해요. 실험에서는 1만 개 중 974개(약 9.7%)의 요청이 통째로 남았어요.
+
+  ### journald 한도가 늘어나는 식
+
+  systemd 255의 소스에서 한도는 `RateLimitBurst × (log2(여유 바이트) − 16) ÷ 4`예요. 여유가 1MB 이하면 늘리지 않아요. 3.2GB면 log2가 31이라 10,000 × 15 ÷ 4 = 37,500줄이에요.
+
+  설정 파일은 `/etc/systemd/journald.conf`예요. 시간은 `RateLimitIntervalSec=`(기본 30초), 줄 수는 `RateLimitBurst=`(기본 1만 줄)로 정해요. 서비스마다 따로 세서, 한 서비스가 한도를 넘어도 다른 서비스의 로그는 버리지 않아요.
+</Deeper>

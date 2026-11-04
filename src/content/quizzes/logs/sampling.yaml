@@ -1,0 +1,28 @@
+questions:
+  - id: errors-dropped
+    type: ox
+    prompt: 로그를 10줄에 1줄만 남기게 했어요. 따로 조건을 걸지 않아도 에러 줄은 비율과 상관없이 남나요?
+    answer: false
+    explain: 조건이 없으면 에러도 같은 비율로 버려져요. 실험에서는 에러가 늘 버려지는 자리에 있어서 100줄이 모두 사라졌어요.
+  - id: trace-key-together
+    type: ox
+    prompt: trace_id를 해시해 남길지 정하면, 같은 요청의 로그 줄들은 함께 남거나 함께 빠지나요?
+    answer: true
+    explain: 같은 값은 늘 같은 해시라 같은 결정을 받아요. 그래서 남은 요청은 처음부터 끝까지 따라갈 수 있어요.
+  - id: naive-error-rate
+    type: choice
+    prompt: 실제 에러율이 0.2%인 서비스에서 에러 로그는 모두, 나머지는 10%만 남겼어요. 남은 로그를 그대로 세면 에러율은 대략?
+    choices: [2%, 0.2%, 0.02%, 20%]
+    answer: 0
+    explain: 에러가 아닌 줄만 10분의 1로 줄어서 에러의 몫이 약 10배가 돼요. 실험에서는 2.01%가 나왔어요.
+  - id: journald-gap
+    type: choice
+    prompt: 장애 때 한 서비스가 로그를 몰아 썼는데, 그 시각의 로그가 journal에 일부만 있어요. 먼저 의심할 것은?
+    choices: [journald의 속도 제한, 디스크의 쓰기 지연 시간, 로그 레벨 설정의 변경, 서버 시간대 설정 차이]
+    answer: 0
+    explain: journald는 서비스마다 30초에 정한 줄 수(기본 1만, 여유 공간에 따라 몇 배)를 넘으면 버려요. 뒤에 Suppressed 줄이 남아요.
+  - id: sample-rate-field
+    type: input
+    prompt: 샘플링으로 남긴 로그 줄에 붙여, 몇 개 중 하나를 남겼는지 알려 주는 값을 무엇이라 하나요?
+    answer: [샘플링 비율, sample rate, sample_rate, 샘플 비율, 표본 비율]
+    explain: 남은 줄마다 이 값을 곱해 더하면 원래 양을 어림할 수 있어요.
