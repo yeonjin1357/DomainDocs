@@ -1,0 +1,28 @@
+questions:
+  - id: tls-syscall-plaintext
+    type: ox
+    prompt: OpenSSL로 TLS를 쓰는 서버에서, write 시스템 콜에 붙인 eBPF 프로그램으로 HTTP 응답의 상태 코드를 읽을 수 있나요?
+    answer: false
+    explain: 시스템 콜에는 이미 암호화된 TLS 레코드가 지나가요. 평문은 암호화하기 전, libssl의 SSL_write_ex 같은 함수에 uprobe를 붙여야 보여요.
+  - id: go-libssl-hook
+    type: choice
+    prompt: Go로 만든 HTTPS 서버(정적 링크)가 있어요. libssl의 SSL_write_ex에 uprobe를 걸고 요청을 보내면 무엇이 잡히나요?
+    choices: [아무 호출도 안 잡혀요, 평문 HTTP 응답이 잡혀요, TLS 암호문이 잡혀요, 인증서 내용이 잡혀요]
+    answer: 0
+    explain: Go는 TLS를 언어 안의 crypto/tls로 직접 해서 libssl 함수를 부르지 않아요. 실험에서도 훅에 한 번도 걸리지 않았어요.
+  - id: verifier-loop
+    type: ox
+    prompt: 끝나지 않을 수 있는 반복이 든 eBPF 프로그램은 커널에 올리는 단계에서 거절되나요?
+    answer: true
+    explain: 검사기가 지나갈 수 있는 길을 모두 따라가 보고, 반드시 끝난다고 증명하지 못하면 거절해요. 실험에서는 infinite loop detected가 나왔어요.
+  - id: overhead-driver
+    type: choice
+    prompt: eBPF 에이전트를 켠 뒤 노드 CPU가 늘었어요. 프로그램 하나의 부담을 가장 크게 좌우하는 것은?
+    choices: [붙은 지점을 지나는 이벤트 수, 에이전트를 띄운 노드의 수, 커널에 올린 프로그램 파일의 크기, 에이전트가 맵을 읽는 주기]
+    answer: 0
+    explain: 프로그램은 붙은 지점을 지날 때마다 돌아요. 실험에서 쓰기 한 번에 30~80ns가 붙었으니, 초당 지나는 횟수가 많을수록 CPU를 더 써요.
+  - id: kprobe-name
+    type: input
+    prompt: 커널 개발자가 미리 박아 둔 지점이 아니라, 커널 함수 아무 곳에나 eBPF 프로그램을 붙이는 방법은?
+    answer: [kprobe, 케이프로브, kernel probe, kprobes]
+    explain: 함수 이름이나 인자가 커널 버전마다 바뀌면 깨질 수 있어요. 미리 박아 둔 지점은 tracepoint, 사용자 프로그램 함수는 uprobe예요.

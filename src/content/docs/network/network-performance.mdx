@@ -7,7 +7,7 @@ stage: monitoring
 order: 79
 icon: network
 keywords: [NPM, network performance monitoring, 네트워크 성능, 재전송, retransmission, RTT, eBPF, ss, RetransSegs, 서비스 간 트래픽]
-related: [network/tcp-connections, network/flows, network/latency-and-loss, network/ping-and-latency, apm/service-map]
+related: [network/tcp-connections, network/flows, network/latency-and-loss, server/ebpf, apm/service-map]
 sources:
   - title: RFC 4022 — Management Information Base for TCP (tcpRetransSegs, tcpOutSegs)
     url: https://www.rfc-editor.org/rfc/rfc4022.html
@@ -124,6 +124,8 @@ RFC 4022에 따르면 `OutSegs`는 재전송한 바이트만 담은 조각을 �
 <Term term="network/ebpf">eBPF</Term>는 리눅스 커널 안에서 작은 프로그램을 안전하게 돌리는 기능이에요. 커널 소스를 고치거나 커널 모듈을 올리지 않아도 돼요. 올리기 전에 검사기(verifier)가 안전한지 먼저 확인해요.
 
 NPM 에이전트는 eBPF 프로그램을 TCP 처리 지점에 붙여, 연결이 열리고 닫히고 다시 보낼 때마다 기록해요. 그래서 앱을 고치지 않아도 서버 사이의 연결이 모두 보여요.
+
+eBPF가 어디에 붙고 무엇을 못 보는지는 <Term slug="server/ebpf">eBPF로 코드 안 고치고 보기</Term>에서 다뤄요.
 
 ## 화면에서 읽는 법
 

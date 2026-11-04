@@ -294,3 +294,30 @@ terms:
     short: root의 힘을 조각으로 나눠, 프로세스에 하나씩 줄 수 있게 한 거예요.
     analogy: 마스터키 대신 필요한 문의 열쇠 하나만 주는 것과 같아요.
     doc: server/users-and-permissions
+  - id: ebpf-verifier
+    name: 검사기(verifier)
+    en: eBPF verifier
+    aliases: [verifier, 베리파이어, BPF verifier]
+    short: eBPF 프로그램이 반드시 끝나고 허락된 메모리만 읽는지 올리기 전에 따져 보는 커널 기능이에요.
+    analogy: 새 장비를 현장에 들이기 전에 안전 검사를 통과해야 하는 것과 같아요.
+    doc: server/ebpf
+  - id: tracepoint
+    name: tracepoint
+    aliases: [트레이스포인트, 추적점]
+    short: 커널 개발자가 코드에 미리 박아 둔 관찰 지점이에요.
+    analogy: 건물을 지을 때 미리 뚫어 둔 점검구와 같아요.
+    doc: server/ebpf
+  - id: kprobe
+    name: kprobe
+    en: Kernel probe
+    aliases: [케이프로브, kretprobe]
+    short: 커널 함수 아무 곳에나 붙여 그 함수가 불릴 때 프로그램을 돌리는 방법이에요.
+    analogy: 점검구가 없는 벽에 구멍을 내 센서를 다는 것과 같아요.
+    doc: server/ebpf
+  - id: uprobe
+    name: uprobe
+    en: User-space probe
+    aliases: [유프로브, uretprobe]
+    short: 사용자 프로그램이나 라이브러리의 함수에 붙여 그 함수가 불릴 때 프로그램을 돌리는 방법이에요.
+    analogy: 팀 사무실 문 앞에 센서를 달아 드나드는 서류를 보는 것과 같아요.
+    doc: server/ebpf

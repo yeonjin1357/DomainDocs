@@ -1,0 +1,243 @@
+---
+title: eBPF로 코드 안 고치고 보기
+summary: 커널 안에 작은 프로그램을 붙여, 앱을 고치지 않고 요청과 연결을 보는 기술이에요.
+domain: server
+type: concept
+stage: basics
+order: 58
+icon: activity
+keywords: [eBPF, BPF, bpftrace, kprobe, uprobe, tracepoint, verifier, 무계측, Universal Service Monitoring, CAP_BPF]
+related: [network/network-performance, apm/agents, apm/continuous-profiling, network/tls-certificates, server/processes-and-threads]
+sources:
+  - title: eBPF.io — What is eBPF?
+    url: https://ebpf.io/what-is-ebpf/
+  - title: Linux kernel — eBPF verifier
+    url: https://docs.kernel.org/bpf/verifier.html
+  - title: Linux kernel — BPF Type Format (BTF)
+    url: https://docs.kernel.org/bpf/btf.html
+  - title: Linux kernel — Kernel Probes (kprobes)
+    url: https://docs.kernel.org/trace/kprobes.html
+  - title: Linux kernel — Uprobe-tracer
+    url: https://docs.kernel.org/trace/uprobetracer.html
+  - title: Linux kernel — sysctl kernel (unprivileged_bpf_disabled)
+    url: https://docs.kernel.org/admin-guide/sysctl/kernel.html
+  - title: man7.org — capabilities(7) (CAP_BPF, CAP_PERFMON)
+    url: https://man7.org/linux/man-pages/man7/capabilities.7.html
+  - title: bpftrace — Reference
+    url: https://github.com/bpftrace/bpftrace/blob/master/man/adoc/bpftrace.adoc
+  - title: Datadog — Universal Service Monitoring setup
+    url: https://docs.datadoghq.com/universal_service_monitoring/setup/
+  - title: Go — crypto/tls package
+    url: https://pkg.go.dev/crypto/tls
+  - title: Oracle — JSSE Reference Guide (100% pure Java)
+    url: https://docs.oracle.com/en/java/javase/21/security/java-secure-socket-extension-jsse-reference-guide.html
+updated: 2026-11-04
+---
+
+<KeyPoints>
+  <Point title="커널의 길목에 작은 프로그램을 붙여요">
+    eBPF는 커널이 정해 둔 지점에 작은 프로그램을 붙여 돌리는 기능이에요. 검사기가 안전하다고 증명한 프로그램만 올라가요.
+  </Point>
+  <Point title="앱을 안 고쳐도 지나가는 건 보여요">
+    시스템 콜과 네트워크를 지나는 데이터는 앱을 고치지 않고 읽어요. 평문 HTTP면 요청, 상태 코드, 지연까지 나와요.
+  </Point>
+  <Point title="암호문과 앱 속 사정은 못 봐요">
+    HTTPS 내용은 암호화 라이브러리에 붙여야 보이고, 언어마다 붙일 곳이 달라요. 함수 이름이나 사용자 같은 앱 속 사정은 SDK의 몫이에요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="계수기는 길목만 봐요. 봉한 봉투(암호화)의 내용이나 팀 안에서만 오가는 일은 못 봐요. 서류가 지날 때마다 조금씩 시간도 써요.">
+  eBPF는 관리자(커널)가 허락한 길목에 규격 계수기를 다는 것과 같아요. 팀(앱)의 일하는 방식은 그대로 두고, 길목을 지나는 서류와 시간을 세요.
+</Analogy>
+
+## 무엇인가요
+
+<Term term="network/ebpf">eBPF</Term>는 리눅스 커널 안에서 작은 프로그램을 돌리는 기능이에요. 커널 소스를 고치거나 커널 모듈을 올리지 않아요. 프로그램은 정해진 지점(훅)에 붙어, 그 지점을 지날 때마다 돌아요.
+
+커널 안에서 도는 코드가 잘못되면 서버 전체가 멈출 수 있어요. 그래서 프로그램은 올리기 전에 검사를 받아요.
+
+<Figure caption="에이전트가 올린 프로그램은 검사기를 통과해야 훅에 붙어요. 붙은 뒤에는 이벤트마다 돌며 맵에 적고, 에이전트가 맵을 읽어 가요.">
+  <Triage
+    numbered={false}
+    ariaLabel="프로그램을 작성해 올리면 검사기가 반드시 끝나는지와 메모리 밖을 읽지 않는지 보고, 증명하지 못하면 거절해요. 통과하면 기계어로 바꿔 훅에 붙이고, 이벤트마다 실행해 맵에 적고, 에이전트가 맵을 읽어 모니터링 서버로 보내는 흐름"
+    steps={[
+      { label: '프로그램을 올려요', note: '에이전트나 bpftrace가 bpf() 시스템 콜로' },
+      { label: '검사기', note: '반드시 끝나나, 메모리 밖을 읽지 않나', exits: [{ when: '증명 못 하면', to: '거절', tone: 'warn' }] },
+      { label: '훅에 붙어요', note: '기계어로 바꿔(JIT) 붙여요' },
+      { label: '이벤트마다 돌아요', note: '세거나 기록해 맵에 적어요' },
+      { label: '에이전트가 맵을 읽어요', note: '모니터링 서버로 보내요', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+<Term term="server/ebpf-verifier">검사기</Term>(verifier)는 프로그램이 지나갈 수 있는 길을 모두 따라가 봐요. 끝나지 않을 수 있는 반복이 있거나, 허락 안 된 메모리를 읽으면 거절해요. 직접 끝없는 반복을 넣어 봤더니 `infinite loop detected`로 거절했어요.
+
+맵(map)은 커널 안의 프로그램과 바깥의 에이전트가 함께 쓰는 저장소예요. 프로그램이 이벤트마다 맵에 숫자를 더하고, 에이전트는 몇 초마다 맵을 읽어 가요. 이벤트를 하나하나 바깥으로 보내지 않아서 가벼워요.
+
+## 어디에 붙이나요
+
+붙이는 곳에 따라 보이는 것이 달라요. 앱 쪽에 가까울수록 뜻이 담긴 데이터가, 커널 아래로 갈수록 바이트와 패킷이 보여요.
+
+<Figure caption="앱은 라이브러리에, 라이브러리는 시스템 콜에, 시스템 콜은 커널 네트워크 처리에 기대요. 층마다 붙이는 방법과 보이는 것이 달라요.">
+  <Layers
+    ariaLabel="위에서부터 앱 코드는 uprobe로 함수 호출을, TLS 라이브러리는 uprobe로 암호화 전 평문을, 시스템 콜은 tracepoint로 주고받는 바이트를, 커널 TCP/IP는 kprobe로 연결과 재전송을, 네트워크 카드 드라이버는 XDP로 들어온 패킷을 보는 계층도"
+    layers={[
+      { label: '앱 코드', note: 'uprobe · 함수 호출, 언어마다 이름이 달라요' },
+      { label: 'TLS 라이브러리(libssl)', note: 'uprobe · 암호화하기 전 평문', tone: 'accent' },
+      { label: '시스템 콜', note: 'tracepoint · 주고받는 바이트' },
+      { label: '커널 TCP/IP', note: 'kprobe · 연결, 재전송, RTT' },
+      { label: '네트워크 카드 드라이버', note: 'XDP · 들어온 패킷' },
+    ]}
+  />
+</Figure>
+
+- **<Term term="server/tracepoint">tracepoint</Term>**: 커널 개발자가 미리 박아 둔 지점이에요. 커널 버전이 바뀌어도 잘 유지돼요.
+- **<Term term="server/kprobe">kprobe</Term>**: 커널 함수 아무 곳에나 붙여요. 함수 이름이나 인자가 바뀌면 깨질 수 있어요.
+- **<Term term="server/uprobe">uprobe</Term>**: 사용자 프로그램이나 라이브러리의 함수에 붙여요. 함수 이름을 알아야 해요.
+
+네트워크 성능 모니터링이 연결마다 재전송과 RTT를 모으는 곳이 커널 TCP/IP 층이에요. 그 이야기는 <Term slug="network/network-performance">네트워크 성능</Term>에서 다뤄요. 이 글은 그 위, 요청 단위로 보는 법을 다뤄요.
+
+## 앱을 고치지 않고 HTTP 보기
+
+직접 해 봤어요. WSL(리눅스 커널 6.18)에서 Python으로 만든 작은 HTTP 서버를 띄웠어요. 서버 코드는 한 줄도 고치지 않고, bpftrace(eBPF 프로그램을 짧은 글로 쓰는 도구)로 아래 몇 줄을 올렸어요.
+
+```text
+t:syscalls:sys_enter_sendto
+/comm == "python3"/
+{
+  printf("%s\n",
+    str(args->buff, 15));
+}
+```
+
+`t:`는 tracepoint의 줄임이에요. python3 프로세스가 `sendto` 시스템 콜로 보내는 데이터의 앞 15바이트를 찍어요. 요청 하나에 이렇게 나왔어요.
+
+```text
+HTTP/1.0 200 OK
+ok
+```
+
+첫 줄은 응답의 상태 줄, 둘째 줄은 본문이에요. 앱이 커널에 넘긴 바이트라서, 앱 밖에서도 그대로 보여요.
+
+<Figure caption="요청을 읽은 시스템 콜과 응답을 보낸 시스템 콜에 붙으면, 둘 사이가 서버 안의 처리 시간이에요. /slow는 일부러 0.2초를 쉬게 만든 경로예요.">
+  <Sequence
+    ariaLabel="클라이언트가 GET /slow를 보내면 앱이 recvfrom 시스템 콜로 요청을 읽고, 0.2초 뒤 sendto 시스템 콜로 200 OK를 보내며, eBPF 프로그램이 두 시스템 콜의 시각 차이로 지연을 재는 순서"
+    participants={['클라이언트', '커널', '앱']}
+    messages={[
+      { from: '클라이언트', to: '커널', label: 'GET /slow' },
+      { from: '커널', to: '앱', label: 'recvfrom: 요청 읽음', tone: 'accent' },
+      { from: '앱', to: '커널', label: 'sendto: 200 OK (0.2초 뒤)', tone: 'accent' },
+      { from: '커널', to: '클라이언트', label: 'HTTP/1.0 200 OK', dashed: true },
+    ]}
+  />
+</Figure>
+
+요청을 읽은 `recvfrom`과 응답을 보낸 `sendto`의 시각을 짝지으니 지연도 나왔어요.
+
+```text
+REQ  GET /fast HTTP/1
+RESP HTTP/1.0 200 OK  0 ms
+REQ  GET /slow HTTP/1
+RESP HTTP/1.0 200 OK  200 ms
+```
+
+eBPF로 계측 없이 서비스 지표를 만드는 제품도 이 원리예요. 지나가는 요청과 응답을 읽어 요청 수, 에러 수, 지연(RED)을 서비스마다 세요.
+
+## 암호화되면 어디에 붙이나요
+
+HTTPS로 바꾸면 시스템 콜에는 암호문만 지나가요. 같은 서버를 TLS로 띄우고 `write` 시스템 콜을 봤더니 첫 바이트가 `\x17\x03\x03`이었어요. TLS 레코드의 머리표이고, 뒤는 읽을 수 없는 암호문이에요.
+
+그래서 암호화하기 전, TLS 라이브러리 함수에 uprobe를 붙여요. Python은 OpenSSL의 libssl을 써서, `SSL_write_ex` 함수에 붙이자 평문이 보였어요.
+
+```text
+SSL_write_ex HTTP/1.0 200 OK
+write   \x17\x03\x03\x00\x80n
+```
+
+<Figure caption="같은 응답이 libssl 함수에서는 평문이고, write 시스템 콜에서는 TLS 레코드로 감싼 암호문이에요.">
+  <Stages
+    ariaLabel="SSL_write_ex 단계에서는 내용이 평문 HTTP/1.0 200 OK이고, write 시스템 콜 단계에서는 머리표 17 03 03이 붙고 내용이 암호문으로 바뀐 단계 칸"
+    grow={1}
+    rows={[
+      { label: 'SSL_write_ex', note: 'uprobe', cells: [null, 'HTTP/1.0 200 OK'] },
+      {
+        label: 'write 시스템 콜',
+        note: 'tracepoint',
+        cells: [
+          { label: '17 03 03', tone: 'accent' },
+          { label: '암호문', tone: 'accent' },
+        ],
+      },
+    ]}
+  />
+</Figure>
+
+붙일 함수는 라이브러리와 버전마다 달라요. Python 3.12는 `SSL_write`가 아니라 `SSL_write_ex`를 불렀어요. 앞의 것에만 붙였다면 아무것도 안 잡혔을 거예요.
+
+libssl을 쓰지 않는 언어도 있어요. Go는 TLS를 언어 안의 `crypto/tls`로 직접 해요. Go로 만든 HTTPS 서버는 libssl 훅에 한 번도 걸리지 않았고, `write`에는 암호문만 지나갔어요.
+
+자바의 기본 TLS(JSSE)도 순수 자바로 만들어져 있어요. 그래서 libssl 훅만으로는 Go나 자바 서비스의 HTTPS 내용이 보이지 않아요. Datadog 문서도 OpenSSL을 쓰는 HTTPS는 지원하고, Go의 TLS는 미리보기라고 적어요.
+
+## 권한과 부담
+
+eBPF 프로그램을 올리려면 권한이 커야 해요. root이거나, 리눅스 5.8부터 생긴 `CAP_BPF` 같은 권한이 있어야 해요. 일반 사용자로 `bpf()` 시스템 콜을 부르자 `Operation not permitted`가 났어요.
+
+실험한 WSL 커널은 `unprivileged_bpf_disabled`가 2라서 일반 사용자의 `bpf()`를 막아요. 그래서 eBPF 에이전트는 대개 높은 권한으로 돌아요. 쿠버네티스라면 노드마다 특권 컨테이너로 띄워요.
+
+부담은 이벤트마다 붙어요. 프로그램이 붙은 지점을 지날 때마다 돌기 때문이에요. 1바이트씩 100만 번 쓰는 시간을 재 봤어요.
+
+<Figure caption="WSL(커널 6.18, 논리 CPU 16개)에서 dd로 1바이트씩 100만 번 쓴 시간이에요. 쓰기마다 세기만 해도 약 30ns, 일을 더 하면 약 80ns씩 늘었어요.">
+  <Bars
+    ariaLabel="1바이트 쓰기 100만 번에 걸린 시간 막대. 프로그램 없이 0.21초, 쓰기마다 세기만 하면 0.24초, 프로세스별로 세고 크기 분포를 만들고 데이터 64바이트를 복사하면 0.29초예요"
+    bars={[
+      { label: '프로그램 없음', value: 0.21, display: '0.21초' },
+      { label: '쓰기마다 세기', value: 0.24, display: '0.24초', note: '약 15% 늘어요' },
+      { label: '세기 + 분포 + 복사', value: 0.29, display: '0.29초', note: '약 40% 늘어요', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+쓰기 한 번에 수십 ns라 작아 보여요. 하지만 초당 수십만 번 지나가는 길목이면 그만큼 CPU를 써요. 그래서 모든 시스템 콜이나 모든 패킷에 붙는 프로그램은 하는 일을 줄이고, 맵에 모아 두었다가 가끔 읽어요.
+
+## 모니터링에서는
+
+eBPF는 SDK 계측을 없애 주는 게 아니라, 계측이 닿지 않는 곳을 메워요. 둘은 보는 높이가 달라요.
+
+<Figure caption="SDK는 앱 안에서 뜻을 담아 기록하고, eBPF는 앱 밖에서 지나가는 것을 봐요. 계측하지 않은 서비스와 서드파티 프로그램은 eBPF로, 함수와 사용자 단위는 SDK로 봐요.">
+  <Compare
+    columns={['SDK·APM 에이전트', 'eBPF']}
+    rows={[
+      { label: '고칠 것', values: ['앱마다 라이브러리나 설정', '노드마다 에이전트 하나'] },
+      { label: '보이는 것', values: ['함수, 사용자, 업무 속성', '요청·응답, 연결, 지연'] },
+      { label: '암호화', values: ['상관없어요', '라이브러리 훅이 있어야 해요'] },
+      { label: '서비스 사이 잇기', values: ['traceparent 헤더로 이어요', '보기만 해서 잇기 어려워요'] },
+      { label: '필요한 것', values: ['언어마다 지원', '리눅스 커널과 높은 권한'] },
+    ]}
+  />
+</Figure>
+
+eBPF로 만든 지표는 화면에서 "계측하지 않은 서비스"로도 보여요. 서비스 맵에 SDK 없는 서비스가 나타나거나, 서비스마다 요청 수와 지연이 생겨요. 다만 함수 단위 트레이스와 사용자 정보는 없어요.
+
+<Checkpoints>
+  <Check>"eBPF라 코드 수정 없이 다 본다"는 설명을 들으면 암호화와 언어를 물어보세요. libssl 훅만 있으면 Go나 자바 서비스의 HTTPS 내용은 보이지 않아요.</Check>
+  <Check>노드의 커널 버전과 BTF(커널 자료 구조 정보) 여부를 확인하세요. `/sys/kernel/btf/vmlinux`가 없으면 에이전트가 기능을 줄이거나 커널 헤더가 더 필요해요.</Check>
+  <Check>에이전트가 높은 권한으로 도는 걸 보안 검토에 넣으세요. 노드에 특권 컨테이너를 못 띄우는 관리형 환경에서는 eBPF 기능을 못 써요.</Check>
+  <Check>eBPF가 보는 PID는 커널 기준이라, 컨테이너나 WSL 안에서 본 PID와 다를 수 있어요. 직접 거른다면 PID 대신 프로세스 이름이나 cgroup으로 걸러요.</Check>
+  <Check>에이전트를 켠 뒤 노드 CPU가 늘었다면, 자주 지나가는 길목에 무거운 프로그램이 붙었는지 보세요. 부담은 이벤트 수에 비례해요.</Check>
+</Checkpoints>
+
+<Deeper>
+  검사기는 프로그램이 지날 수 있는 길을 모두 따라가요. 끝없는 반복을 넣어 봤더니 `infinite loop detected at insn 27`로 거절했어요.
+
+  같은 기록에 `processed 40 insns (limit 1000000)`도 나왔어요. 따라갈 수 있는 명령 수에 한도가 있다는 뜻이에요.
+
+  `unprivileged_bpf_disabled`는 0, 1, 2 중 하나예요. 0은 일반 사용자도 `bpf()`를 부를 수 있고, 1과 2는 막아요. 1은 켜진 커널에서 다시 풀 수 없고, 2는 관리자가 나중에 바꿀 수 있어요.
+
+  `CAP_BPF`와 `CAP_PERFMON`은 리눅스 5.8에서 생겼어요. 그 전에는 넓은 권한인 `CAP_SYS_ADMIN`에 들어 있었어요. 커널 소스의 설명에 따르면 추적용 프로그램을 올릴 때는 두 권한이 함께 필요해요.
+
+  커널 자료 구조는 버전마다 달라요. BTF가 있으면 한 번 만든 프로그램이 여러 커널에서 자리를 맞춰 돌아요. 이 PC의 WSL 커널 6.18에는 `/sys/kernel/btf/vmlinux`가 있었어요.
+
+  Datadog의 무계측 서비스 모니터링은 리눅스 커널 4.14 이상을 요구해요. 설정 예시에는 `/lib/modules`, `/usr/src`와 함께 커널 헤더를 받는 폴더, 그 자리에서 컴파일한 결과를 두는 폴더가 있어요. BTF로 못 맞출 때를 위한 거예요.
+
+  WSL에서 실험할 때 처음에는 셸이 알려 준 PID로 걸렀다가 아무것도 안 잡혔어요. WSL 배포판은 PID 네임스페이스가 따로라, 커널이 보는 PID와 달랐어요. 프로세스 이름으로 거르자 잡혔어요.
+</Deeper>
