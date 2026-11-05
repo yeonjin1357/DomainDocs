@@ -1,0 +1,29 @@
+questions:
+  - id: grpc-http-200
+    type: ox
+    prompt: gRPC 서버가 NOT_FOUND로 실패를 돌려주면, 앞단 프록시의 접근 로그에 HTTP 상태가 4xx로 남나요?
+    answer: false
+    explain: gRPC는 실패해도 HTTP 상태가 200이고, 결과는 응답 끝의 grpc-status(NOT_FOUND는 5)에 적혀요. HTTP 상태로 세면 성공으로 보여요.
+  - id: grpc-server-error
+    type: choice
+    prompt: OpenTelemetry 규약대로라면, gRPC 서버 쪽 스팬에서 에러로 치는 grpc-status는?
+    choices: [UNAVAILABLE, NOT_FOUND, INVALID_ARGUMENT, PERMISSION_DENIED]
+    answer: 0
+    explain: 서버 쪽에서는 UNAVAILABLE, INTERNAL, UNKNOWN 같은 여섯 가지만 에러로 쳐요. 없는 주문이나 잘못된 인자는 서버가 맞게 답한 거예요.
+  - id: graphql-partial
+    type: ox
+    prompt: GraphQL 질의에서 필드 하나의 값을 구하다 실패해도, 나머지 필드 값은 함께 돌려받을 수 있나요?
+    answer: true
+    explain: 실패한 필드만 null로 두고, 실패 내용을 errors에 적어 함께 보내요. 이 부분 성공도 흔히 HTTP 200으로 와요.
+  - id: graphql-naming
+    type: choice
+    prompt: APM의 트랜잭션 목록에 GraphQL 요청이 모두 POST /graphql 하나로만 보여요. 무엇으로 나눠야 하나요?
+    choices: [operation 이름, 요청 본문의 크기, 클라이언트의 IP, 응답의 상태 코드]
+    answer: 0
+    explain: GraphQL은 모든 질의가 한 주소로 와요. 무슨 일인지는 질의의 operation 이름(query GetOrder의 GetOrder)에 적혀요.
+  - id: ws-latency
+    type: choice
+    prompt: 접근 로그에 GET /live 101이 5009ms로 찍혔어요. 이 5초는 무엇인가요?
+    choices: [WebSocket 연결이 열려 있던 시간, 서버가 첫 응답을 만드는 데 걸린 시간, 프록시가 서버에 붙는 데 걸린 시간, 클라이언트가 재시도하며 기다린 시간]
+    answer: 0
+    explain: 101은 WebSocket으로 바꿔 쓰겠다는 답이에요. 그 뒤 연결이 닫힐 때까지가 한 줄의 시간이라, 응답시간 계산에서 빼야 해요.

@@ -1,0 +1,229 @@
+---
+title: gRPC·GraphQL·WebSocket 호출
+summary: HTTP 상태 코드와 URL만으로는 실패와 지연이 안 보이는 세 가지 호출 방식을 읽는 법이에요.
+domain: apm
+type: concept
+stage: basics
+order: 14
+icon: activity
+keywords: [gRPC, grpc-status, GraphQL, operation name, WebSocket, 웹소켓, HTTP/2, trailer, 스트리밍, close code]
+related: [apm/http-basics, apm/timeouts-and-retries, apm/errors-and-exceptions, apm/transactions-and-response-time, apm/n-plus-one]
+sources:
+  - title: gRPC — gRPC over HTTP2 (PROTOCOL-HTTP2.md)
+    url: https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
+  - title: gRPC — Status codes and their use in gRPC
+    url: https://grpc.io/docs/guides/status-codes/
+  - title: OpenTelemetry — Semantic conventions for gRPC
+    url: https://opentelemetry.io/docs/specs/semconv/rpc/grpc/
+  - title: OpenTelemetry — Semantic conventions for GraphQL server spans
+    url: https://opentelemetry.io/docs/specs/semconv/graphql/graphql-spans/
+  - title: GraphQL over HTTP (Working Draft)
+    url: https://graphql.github.io/graphql-over-http/draft/
+  - title: RFC 6455 — The WebSocket Protocol
+    url: https://www.rfc-editor.org/rfc/rfc6455
+  - title: nginx — WebSocket proxying
+    url: https://nginx.org/en/docs/http/websocket.html
+  - title: Envoy — Access log format (GRPC_STATUS)
+    url: https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage
+updated: 2026-11-05
+---
+
+<KeyPoints>
+  <Point title="gRPC의 실패는 HTTP 200에 숨어요">
+    gRPC는 실패해도 HTTP 상태가 200이에요. 성공과 실패는 응답 끝의 grpc-status 숫자로 갈라요.
+  </Point>
+  <Point title="GraphQL은 한 주소로 모든 요청이 와요">
+    요청이 모두 POST /graphql이라 URL로는 무슨 일인지 몰라요. operation 이름으로 나누고, 본문의 errors를 세요.
+  </Point>
+  <Point title="WebSocket에는 응답시간이 없어요">
+    연결 하나가 몇 분, 몇 시간 열려 있어요. 응답시간 대신 열린 연결 수, 메시지 수, 닫힘 코드를 봐요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="WebSocket은 상자 하나를 주고받는 일이 아니라 계속 열려 있는 통로라서 이 비유가 맞지 않아요. 통로가 어떻게 닫혔는지가 실패의 표시예요.">
+  택배 상자 겉면에 '배송 완료' 도장이 찍혀 있어도, 상자 안에 '품절이라 못 보냄' 쪽지가 들어 있을 수 있어요. gRPC와 GraphQL의 실패는 겉면의 HTTP 상태가 아니라 이 쪽지에 적혀요.
+</Analogy>
+
+## 세 방식은 HTTP를 다르게 써요
+
+셋 다 HTTP 위에서 시작하지만, <Term slug="apm/http-basics">HTTP 요청과 응답</Term>에서 본 'URL 하나에 상태 코드 하나'와 쓰는 법이 달라요. 그래서 HTTP 상태 코드와 URL로 짠 화면은 셋을 제대로 못 보여 줘요.
+
+| 방식 | 겉의 HTTP | 실패가 적히는 곳 |
+| --- | --- | --- |
+| gRPC | POST, 늘 200 | 끝의 grpc-status |
+| GraphQL | POST /graphql, 흔히 200 | 본문의 errors |
+| WebSocket | 처음에 101 한 번 | 닫힘 코드 |
+
+WSL에 세 가지 서버를 띄우고 Envoy 1.40을 앞에 두어, 접근 로그에 무엇이 찍히는지 봤어요.
+
+## gRPC: 실패도 200이에요
+
+<Term term="apm/grpc">gRPC</Term>는 다른 서비스의 함수를 부르듯 호출하는 틀이에요. HTTP/2 위에서 `POST /shop.Orders/Get`처럼 서비스와 메서드 이름을 경로로 보내요. 메시지는 사람이 읽을 수 없는 이진 형식(protobuf)이에요.
+
+결과는 HTTP 상태가 아니라 응답 맨 끝의 트레일러(trailer, 본문 뒤에 붙는 머리말)에 적혀요. 이 값이 <Term term="apm/grpc-status">grpc-status</Term>예요. 0이 성공이고, 실패해도 HTTP 상태는 200이에요.
+
+<Figure caption="gRPC 호출 한 번의 순서예요. 성공이든 실패든 HTTP 상태는 200이고, 결과는 마지막 트레일러의 grpc-status에 적혀요.">
+  <Sequence
+    ariaLabel="클라이언트가 POST /shop.Orders/Get 머리말과 요청 메시지를 보내고, 서버가 HTTP 200 머리말, 응답 메시지, grpc-status 5 NOT_FOUND가 든 트레일러를 차례로 보내요"
+    participants={['클라이언트', '서버']}
+    messages={[
+      { from: '클라이언트', to: '서버', label: 'POST /shop.Orders/Get' },
+      { from: '클라이언트', to: '서버', label: '요청 메시지' },
+      { from: '서버', to: '클라이언트', label: ':status 200', dashed: true },
+      { from: '서버', to: '클라이언트', label: '응답 메시지(있으면)', dashed: true },
+      { from: '서버', to: '클라이언트', label: '트레일러 grpc-status: 5', dashed: true, tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+Python grpcio 1.85 서버를 Envoy 뒤에 두고 여러 결과를 만들어 봤어요. Envoy 접근 로그의 HTTP 상태와 grpc-status예요.
+
+| 호출 | HTTP | grpc-status |
+| --- | --- | --- |
+| 정상 | 200 | 0 OK |
+| 없는 주문 | 200 | 5 NOT_FOUND |
+| 처리 안 된 예외 | 200 | 2 UNKNOWN |
+| 서버가 꺼짐 | 200 | 14 UNAVAILABLE |
+
+서버가 꺼졌을 때도 200이에요. Envoy가 뒤쪽에 붙지 못하자 gRPC 꼴의 답(grpc-status 14)을 직접 만들어 보냈어요. HTTP 상태로 에러율을 세면 이 넷이 모두 성공이에요.
+
+### 어느 코드를 에러로 셀까
+
+grpc-status는 0부터 16까지 17개예요. 모두 실패지만, 서버 탓인지 부른 쪽 탓인지가 달라요. OpenTelemetry 규약은 서버 쪽 스팬에서 아래 여섯 개만 에러로 치라고 정해요.
+
+<Figure caption="grpc-status를 서버 쪽에서 나눈 그림이에요. 없는 주문(5)이나 잘못된 인자(3)는 서버가 맞게 답한 것이라, 서버 쪽 에러율에 넣지 않아요.">
+  <Tree
+    ariaLabel="grpc-status는 0 OK, 서버 쪽 에러로 치는 2 UNKNOWN, 4 DEADLINE_EXCEEDED, 12 UNIMPLEMENTED, 13 INTERNAL, 14 UNAVAILABLE, 15 DATA_LOSS, 부른 쪽 문제로 보는 3 INVALID_ARGUMENT, 5 NOT_FOUND, 7 PERMISSION_DENIED, 16 UNAUTHENTICATED 등으로 나뉘어요"
+    root={{
+      label: 'grpc-status',
+      children: [
+        { label: 'OK', tag: '0', tone: 'accent' },
+        { label: '서버 쪽 에러로 쳐요', tone: 'warn', children: [
+          { label: 'UNKNOWN', note: '처리 안 된 예외', tag: '2' },
+          { label: 'DEADLINE_EXCEEDED', tag: '4' },
+          { label: 'UNIMPLEMENTED', tag: '12' },
+          { label: 'INTERNAL', tag: '13' },
+          { label: 'UNAVAILABLE', note: '닿지 못함', tag: '14' },
+          { label: 'DATA_LOSS', tag: '15' },
+        ] },
+        { label: '부른 쪽 문제로 봐요', note: '예시', children: [
+          { label: 'INVALID_ARGUMENT', tag: '3' },
+          { label: 'NOT_FOUND', tag: '5' },
+          { label: 'PERMISSION_DENIED', tag: '7' },
+          { label: 'UNAUTHENTICATED', tag: '16' },
+        ] },
+      ],
+    }}
+  />
+</Figure>
+
+부르는 쪽 스팬은 OK가 아니면 모두 에러로 쳐요. 그래서 같은 호출이 클라이언트 화면에서는 에러, 서버 화면에서는 정상으로 보일 수 있어요.
+
+gRPC는 기본으로 마감 시각(deadline)이 없어서, 부르는 쪽이 정해야 해요. 마감 0.3초로 1초 걸리는 메서드를 불렀더니 클라이언트는 0.3초에 DEADLINE_EXCEEDED(4)로 끝냈어요. 마감은 <Term slug="apm/timeouts-and-retries">타임아웃과 재시도</Term>에서 다뤄요.
+
+### 스트리밍 호출은 길어요
+
+gRPC는 응답을 여러 번 나눠 흘려보내는 스트리밍 호출도 있어요. 1초마다 하나씩 다섯 번 보내는 호출은 Envoy 로그에 5,002ms로 찍혔어요. 이 시간은 느린 게 아니라 스트림이 열려 있던 시간이에요.
+
+## GraphQL: 한 주소로 모든 요청이 와요
+
+<Term term="apm/graphql">GraphQL</Term>은 클라이언트가 필요한 필드를 질의로 적어 보내는 API 방식이에요. 질의는 모두 한 주소(보통 `POST /graphql`)로 가요. 무엇을 하는지는 본문의 질의와 operation 이름(`query GetOrder`의 `GetOrder`)에 적혀요.
+
+그래서 URL로 트랜잭션을 묶으면 모든 요청이 `POST /graphql` 하나로 뭉쳐요. 주문 조회와 결제가 같은 이름이라, 무엇이 느린지 알 수 없어요. operation 이름으로 나눠야 해요.
+
+### 필드 하나가 실패해도 200이에요
+
+GraphQL은 필드마다 값을 따로 구해요. 하나가 실패하면 그 필드만 `null`로 두고, 실패 내용을 `errors`에 적어 함께 보내요. 이것을 부분 성공이라고 해요.
+
+graphql-http 1.23으로 띄운 서버에서 가격 필드만 실패하게 했어요. HTTP 200과 함께 이런 본문이 왔어요.
+
+```json
+{
+  "errors": [{
+    "message":
+      "price service timeout",
+    "path": ["order", "price"]
+  }],
+  "data": {
+    "order": {
+      "id": "A-2",
+      "price": null
+    }
+  }
+}
+```
+
+없는 필드를 묻는 잘못된 질의는 요청의 `Accept` 머리말에 따라 달랐어요. `application/json`이면 200, 새 형식인 `application/graphql-response+json`이면 400이었어요. 상태 코드 규칙을 정하는 GraphQL over HTTP 명세가 아직 작업 초안이라, 라이브러리마다 따르는 판이 달라요.
+
+결국 GraphQL의 에러율은 HTTP 상태가 아니라 응답 본문에 `errors`가 있는지로 세야 해요. 한 질의가 필드마다 DB를 따로 부르면 <Term slug="apm/n-plus-one">N+1</Term>이 생기기 쉬워서, 필드별 시간도 함께 봐요.
+
+## WebSocket: 연결이 계속 열려 있어요
+
+<Term term="apm/websocket">WebSocket</Term>은 HTTP로 시작해서, 같은 연결을 양쪽이 아무 때나 메시지를 보내는 통로로 바꿔 쓰는 방식이에요. 채팅, 실시간 알림, 실시간 대시보드가 써요. 처음 한 번만 HTTP 요청이고, 서버가 101(Switching Protocols)로 답하면 그 뒤로는 HTTP가 아니에요.
+
+<Figure caption="WebSocket 연결 하나의 순서예요. HTTP 응답은 처음의 101 하나뿐이고, 그 뒤로는 양쪽이 메시지를 주고받다가 닫힘 코드를 보내고 끝나요.">
+  <Sequence
+    ariaLabel="클라이언트가 GET /live Upgrade 요청을 보내고 서버가 101로 답한 뒤, 서버가 메시지를 여러 번 보내고, 클라이언트가 닫힘 코드 1000을 보내고 서버도 1000으로 답해요"
+    participants={['클라이언트', '서버']}
+    messages={[
+      { from: '클라이언트', to: '서버', label: 'GET /live (Upgrade)' },
+      { from: '서버', to: '클라이언트', label: '101 Switching Protocols', dashed: true },
+      { from: '서버', to: '클라이언트', label: '메시지 · 메시지 · …', tone: 'accent' },
+      { from: '클라이언트', to: '서버', label: '닫힘 1000' },
+      { from: '서버', to: '클라이언트', label: '닫힘 1000', dashed: true },
+    ]}
+  />
+</Figure>
+
+1초마다 메시지를 보내는 서버에 5초 동안 붙어 있다가 닫았어요. Envoy 접근 로그에는 `GET /live 101 5009ms`가 남았어요. 요청 하나가 5초 걸린 것처럼 보이지만, 이 시간은 연결이 열려 있던 시간이에요.
+
+이런 줄을 HTTP 응답시간과 함께 모으면 <Term slug="foundations/percentiles">p99</Term>가 크게 부풀어요. WebSocket과 스트리밍은 응답시간 계산에서 빼고 따로 봐요.
+
+### 어떻게 닫혔는지가 실패의 표시예요
+
+WebSocket은 닫을 때 닫힘 코드를 주고받아요. 1000은 정상 종료예요. 1006은 닫힘 신호 없이 연결이 끊겼다는 뜻으로, 실제로 오가는 코드가 아니라 받는 쪽이 스스로 붙이는 값이에요.
+
+같은 실험에서 3초 뒤에 서버 프로세스를 끄자, 클라이언트는 닫힘 코드 1006을 받았어요. 1006이 갑자기 늘면 서버가 죽었거나, 중간 장비가 연결을 끊은 것이에요.
+
+중간 프록시는 오래 조용한 연결을 끊어요. nginx는 기본으로 60초 동안 뒤쪽에서 아무 데이터가 없으면 연결을 닫아요. 그래서 WebSocket 서버는 보통 주기적으로 ping 메시지를 보내 연결을 살려 둬요.
+
+## 모니터링에서는
+
+세 방식은 HTTP 화면 하나에 섞어 그리지 말고, 방식마다 맞는 숫자로 나눠 그려요.
+
+<Figure caption="세 방식을 한 대시보드에 그린 배치 예시예요. 줄마다 그 방식의 실패가 적히는 곳을 따로 세요.">
+  <Nest
+    ariaLabel="대시보드를 gRPC 줄(메서드별 호출 수, 상태 코드별 비율, 단발 호출 p99), GraphQL 줄(operation별 호출 수, errors 있는 응답 비율, 필드별 시간), WebSocket 줄(열린 연결 수, 초당 메시지, 닫힘 코드별 수)로 짠 배치"
+    boxes={[
+      { label: 'gRPC', note: '메서드별', cols: 3, children: [{ label: '호출 수' }, { label: '상태 코드별 비율' }, { label: '단발 호출 p99' }] },
+      { label: 'GraphQL', note: 'operation별', cols: 3, children: [{ label: '호출 수' }, { label: 'errors 있는 응답' }, { label: '필드별 시간' }] },
+      { label: 'WebSocket', cols: 3, children: [{ label: '열린 연결 수' }, { label: '초당 메시지' }, { label: '닫힘 코드별 수' }] },
+    ]}
+  />
+</Figure>
+
+OpenTelemetry로 모은다면 이름표가 버전마다 달라요.
+
+gRPC 상태는 예전에 `rpc.grpc.status_code`라는 숫자였어요. 그 뒤 `rpc.response.status_code`를 거쳐, 규약 1.45에서 글자 값인 `rpc.status_code`가 됐어요. 쓰는 계측 라이브러리가 어느 이름을 내는지 먼저 봐요.
+
+<Checkpoints>
+  <Check>gRPC 서비스의 에러율을 HTTP 상태 코드로 세는 화면은 다시 보세요. 서버가 꺼져 있어도 200으로 남을 수 있어요.</Check>
+  <Check>GraphQL 트랜잭션이 POST /graphql 하나로만 보인다면 operation 이름으로 나눴는지 보세요.</Check>
+  <Check>GraphQL 에러율이 늘 0이라면 응답 본문의 errors를 세는지 보세요. 부분 성공은 200으로 와요.</Check>
+  <Check>응답시간 p99에 WebSocket이나 gRPC 스트리밍 연결이 섞였는지 보세요. 연결이 열려 있던 시간이 응답시간으로 들어가요.</Check>
+  <Check>WebSocket 닫힘 코드 1006이 늘면 서버 재시작과 중간 프록시의 유휴 시간 제한을 함께 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  gRPC 서버가 바로 실패를 돌려줄 때는 머리말과 트레일러를 한 번에 보내요. 이것을 Trailers-Only라고 해요.
+
+  이때도 `:status`는 200이고 grpc-status가 함께 들어 있어요. 응답 머리말에 grpc-status가 보이면 이 경우예요.
+
+  GraphQL over HTTP 작업 초안은 요청 에러를 4xx로 쓰게 했어요. 새 형식(`application/graphql-response+json`)을 쓰면 더 분명히 지켜요. 부분 성공에는 새 상태 코드 294를 권하지만, 실험한 graphql-http 1.23.1은 같은 경우에 200으로 답했어요.
+
+  OpenTelemetry의 GraphQL 규약은 아직 Development 단계예요.
+
+  스팬 이름은 기본으로 `query`, `mutation` 같은 operation 종류만 써요. operation 이름은 속성(`graphql.operation.name`)으로 남겨요. 이름은 클라이언트가 마음대로 붙여서 종류가 끝없이 늘 수 있기 때문이에요.
+
+  실험은 WSL에서 Envoy 1.40.2, Python grpcio 1.85.1로 했어요. Node.js 22에서는 graphql 17.1, graphql-http 1.23.1, ws 8.22를 썼어요. Envoy는 WebSocket 연결이 끝나면 정상 종료여도 응답 플래그에 `UC`를 남겼어요.
+</Deeper>
