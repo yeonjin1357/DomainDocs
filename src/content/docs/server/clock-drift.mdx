@@ -6,7 +6,7 @@ type: guide
 order: 110
 icon: clock
 keywords: [clock drift, 시계 어긋남, NTP, chrony, timedatectl, time sync, 시간 동기화, offset, 타임스탬프, 시간대]
-related: [foundations/collection-interval, foundations/empty-graph, apm/trace-waterfall, network/tls-certificates]
+related: [foundations/collection-interval, foundations/empty-graph, apm/trace-waterfall, network/tls-certificates, foundations/time-and-timezones]
 sources:
   - title: Linux man-pages — timedatectl(1)
     url: https://man7.org/linux/man-pages/man1/timedatectl.1.html
@@ -74,7 +74,7 @@ updated: 2026-10-29
 
 ## 3. 시간대 문제가 아닌지 가르세요
 
-로그의 시각이 정확히 몇 시간 단위로 어긋난다면, 시계가 아니라 시간대 문제예요. 한 서버는 UTC로, 다른 서버는 한국 시간(UTC+9)으로 적으면 정확히 9시간 차이가 나요.
+로그의 시각이 정확히 몇 시간 단위로 어긋난다면, 시계가 아니라 시간대 문제예요. 한 서버는 UTC로, 다른 서버는 한국 시간(UTC+9)으로 적으면 정확히 9시간 차이가 나요. UTC와 시간대는 <Term slug="foundations/time-and-timezones">시각과 시간대</Term>에서 다뤄요.
 
 **확인 방법**: `timedatectl`의 Time zone 줄을 서버마다 견줘요. 모니터링 화면이 어느 시간대로 보여 주는지도 함께 봐요.
 

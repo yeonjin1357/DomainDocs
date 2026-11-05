@@ -375,3 +375,17 @@ terms:
     aliases: [core dump, core file, 코어 파일]
     short: 프로세스가 비정상으로 끝나는 순간의 메모리를 그대로 담은 파일이에요.
     doc: server/process-exit
+  - id: utc
+    name: UTC
+    en: Coordinated Universal Time
+    aliases: [협정 세계시, 세계 표준시, GMT, Zulu]
+    short: 세계가 함께 쓰는 기준 시각이에요. 한국 표준시는 UTC보다 9시간 빨라요.
+    analogy: 지사가 많은 회사가 회의 시각을 적을 때 쓰는 본사 시계와 같아요.
+    doc: foundations/time-and-timezones
+  - id: epoch
+    name: epoch 시각
+    en: Unix time
+    aliases: [epoch, Unix time, 유닉스 시간, 타임스탬프, timestamp]
+    short: 1970-01-01 00:00 UTC부터 센 시간을 숫자 하나로 적은 시각이에요.
+    analogy: 회사가 문을 연 날부터 센 날수로 날짜를 적는 것과 같아요.
+    doc: foundations/time-and-timezones

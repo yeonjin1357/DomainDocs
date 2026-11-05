@@ -1,0 +1,212 @@
+---
+title: 시각과 시간대
+summary: 같은 순간도 UTC, 한국 시간, epoch 숫자로 달리 적어요. 단위와 시간대를 헷갈리지 않는 법이에요.
+domain: foundations
+type: concept
+stage: basics
+order: 17
+icon: clock
+keywords: [UTC, 시간대, timezone, KST, epoch, Unix time, ISO 8601, RFC 3339, 서머타임, DST]
+related: [foundations/units-and-notation, server/clock-drift, foundations/logs-missing, foundations/empty-graph, foundations/why-numbers-differ]
+sources:
+  - title: RFC 3339 — Date and Time on the Internet (Timestamps)
+    url: https://www.rfc-editor.org/rfc/rfc3339
+  - title: man7.org — time(2) (Epoch, 윤초)
+    url: https://man7.org/linux/man-pages/man2/time.2.html
+  - title: MDN — Date (Date time string format)
+    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+  - title: Protocol Buffers — ProtoJSON format (int64는 문자열)
+    url: https://protobuf.dev/programming-guides/json/
+  - title: OpenTelemetry — OTLP specification (JSON Protobuf Encoding)
+    url: https://opentelemetry.io/docs/specs/otlp/
+  - title: Prometheus — Query functions (hour, day_of_week는 UTC)
+    url: https://prometheus.io/docs/prometheus/latest/querying/functions/
+  - title: Prometheus — HTTP API (시각 표기)
+    url: https://prometheus.io/docs/prometheus/latest/querying/api/
+  - title: PostgreSQL — Date/Time Functions (date_trunc)
+    url: https://www.postgresql.org/docs/current/functions-datetime.html
+  - title: Grafana — Modify dashboard settings (Time zone)
+    url: https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/modify-dashboard-settings/
+  - title: IANA — Time Zone Database
+    url: https://www.iana.org/time-zones
+updated: 2026-11-05
+---
+
+<KeyPoints>
+  <Point title="저장은 UTC로, 보여 줄 때만 바꿔요">
+    시각은 UTC나 epoch 숫자로 저장하고 주고받아요. 사람에게 보여 줄 때만 그 사람의 시간대로 바꿔요.
+  </Point>
+  <Point title="epoch 숫자는 자리 수로 단위를 봐요">
+    10자리는 초, 13자리는 밀리초, 19자리는 나노초예요. 단위를 헷갈리면 1970년이나 5만 년 뒤가 찍혀요.
+  </Point>
+  <Point title="하루는 시간대마다 달라요">
+    한국의 하루는 UTC로 전날 15시에 시작해요. 일별 합계는 어느 시간대의 0시부터 셌는지 밝혀야 해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="실제 시간대는 나라가 법으로 정하고 바꿔요. 서머타임이 있는 곳은 철마다 UTC와의 차이가 달라져서, 지사 시계와 본사 시계의 차이가 늘 같지 않아요.">
+  지사가 여러 나라에 있는 회사가 회의 시각을 본사 시계(UTC) 하나로 적어 두는 것과 같아요. 지사마다 자기 시계로 바꿔 읽으면 모두 같은 순간에 모여요. "9시 회의"라고만 쓰면 지사마다 다른 9시에 모여요.
+</Analogy>
+
+## 같은 순간을 여러 시간대로 적어요
+
+<Term term="server/utc">UTC</Term>(협정 세계시)는 세계가 함께 쓰는 기준 시각이에요. 한국 표준시(KST)는 UTC보다 9시간 빨라서 UTC+9로 적어요. 같은 순간을 시간대마다 적으면 이래요.
+
+| 시간대 | 2026-11-05 00:00 UTC인 순간 |
+| --- | --- |
+| UTC | 2026-11-05 00:00 |
+| Asia/Seoul | 2026-11-05 09:00 (UTC+9) |
+| Europe/Berlin | 2026-11-05 01:00 (UTC+1) |
+| America/New_York | 2026-11-04 19:00 (UTC−5) |
+
+UTC와의 차이를 오프셋(offset)이라고 해요. `+09:00`처럼 적어요. 오프셋은 그 순간의 차이일 뿐이고, 언제 바뀌는지는 담지 않아요.
+
+`Asia/Seoul`, `America/New_York` 같은 이름은 시간대(time zone)예요. 서머타임처럼 오프셋이 언제 바뀌는지까지 담은 규칙의 묶음이에요. 뉴욕은 여름에 UTC−4, 겨울에 UTC−5라서, 오프셋 하나로는 뉴욕을 나타낼 수 없어요.
+
+## 시각을 숫자 하나로 적어요: epoch
+
+<Term term="server/epoch">epoch</Term> 시각(Unix time)은 1970-01-01 00:00 UTC부터 센 시간이에요. 숫자 하나라 시간대가 끼어들 틈이 없어서, 저장하고 주고받기에 좋아요. 2026-11-05 00:00 UTC는 1793836800초예요.
+
+같은 순간이라도 도구마다 세는 단위가 달라요. 단위가 작아질수록 뒤에 세 자리씩 붙어요.
+
+<Figure caption="2026-11-05 00:00:00.123456789 UTC를 나노초로 적은 숫자예요. 앞 10자리가 초이고, 세 자리씩 밀리초, 마이크로초, 나노초가 붙어요.">
+  <Anatomy
+    ariaLabel="19자리 나노초 숫자 1793836800123456789를 앞 10자리 초 1793836800, 밀리초 자리 123, 마이크로초 자리 456, 나노초 자리 789로 나눈 그림"
+    parts={[
+      { text: '1793836800', label: '초(10자리)', note: 'Prometheus API, PromQL time()', tone: 'accent' },
+      { text: '123', label: '밀리초까지 13자리', note: 'JavaScript Date' },
+      { text: '456', label: '마이크로초까지 16자리' },
+      { text: '789', label: '나노초까지 19자리', note: 'OpenTelemetry' },
+    ]}
+  />
+</Figure>
+
+단위를 헷갈리면 아주 엉뚱한 날짜가 나와요. 초인 1793836800을 JavaScript `Date`에 넣으면 밀리초로 읽어서 1970-01-21이 돼요. 거꾸로 밀리초에 1000을 곱하면 58814년이 돼요.
+
+### 나노초는 JavaScript 숫자에 다 안 들어가요
+
+JavaScript의 숫자는 2^53(약 9×10^15, 16자리)까지만 정수를 정확히 담아요. 19자리 나노초는 그보다 커서 끝자리가 바뀌어요. 1793836800123456789를 `Number`로 바꾸면 1793836800123456768이 돼요.
+
+그래서 OpenTelemetry의 전송 규약 OTLP는 JSON으로 보낼 때 64비트 정수를 문자열로 적어요. 받는 쪽도 문자열로 다루거나 `BigInt`로 읽어야 해요. 화면에 그릴 때만 밀리초로 줄여요.
+
+## 시각을 글로 적어요: ISO 8601
+
+사람이 읽을 수 있게 시각을 글로 적을 때는 ISO 8601 꼴을 써요. 인터넷 규약은 그중 한 모양을 RFC 3339로 정해 써요. 끝의 `Z`는 UTC, `+09:00`은 오프셋이에요.
+
+<Figure caption="한국 시간 9시를 ISO 8601로 적은 예시예요. 끝을 Z로 바꾼 2026-11-05T00:00:00Z도 같은 순간이에요.">
+  <Anatomy
+    ariaLabel="2026-11-05T09:00:00+09:00을 날짜 2026-11-05, 구분 T, 시각 09:00:00, 오프셋 +09:00으로 나눈 그림. 이것은 2026-11-05T00:00:00Z와 같은 순간이에요"
+    parts={[
+      { text: '2026-11-05', label: '날짜' },
+      { text: 'T', label: '구분', tone: 'sub' },
+      { text: '09:00:00', label: '시각' },
+      { text: '+09:00', label: 'UTC와의 차이', note: 'Z면 UTC예요', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+오프셋을 빼고 `2026-11-05 09:00:00`만 적으면 어느 9시인지 알 수 없어요. 읽는 쪽이 저마다 자기 시간대로 짐작해요.
+
+JavaScript는 이 짐작이 모양마다 달라요. 오프셋이 없을 때 날짜만 있으면 UTC로, 시각까지 있으면 실행하는 곳의 시간대로 읽어요. 한국 시간대(`TZ=Asia/Seoul`)의 Node.js 22로 돌린 결과예요.
+
+| `new Date(…)`에 넣은 글 | 읽은 순간(UTC) |
+| --- | --- |
+| `2026-11-05` | 11-05 00:00 |
+| `2026-11-05T00:00:00` | 11-04 15:00 |
+| `2026-11-05T00:00:00Z` | 11-05 00:00 |
+| `2026-11-05T00:00:00+09:00` | 11-04 15:00 |
+
+첫 줄과 둘째 줄은 같은 날 0시처럼 보여도 9시간 차이가 나요. 날짜 선택기에서 고른 `2026-11-05`를 그대로 넣으면, 한국 화면에서는 오전 9시부터를 고른 셈이 돼요.
+
+## 하루는 시간대마다 달라요
+
+'하루'의 시작은 시간대마다 달라요. 한국의 11월 5일은 UTC로 11월 4일 15시에 시작해요. 그래서 일별 합계는 어느 시간대로 나눴는지에 따라 숫자가 달라져요.
+
+PostgreSQL 18에 주문 기록을 넣고 `date_trunc('day', ts)`로 하루씩 더해 봤어요. 평소에는 한 시간에 10건이고, 한국 시간 11월 5일 아침 7~10시에만 행사로 한 시간에 500건이에요.
+
+<Figure caption="같은 주문 기록을 한국 시간과 UTC의 하루로 나눈 예시예요. 행사 세 시간이 UTC의 하루 경계(한국 9시)에 걸쳐서, UTC로 나누면 1,710건이 1,220건과 730건으로 쪼개져요.">
+  <Timeline
+    ariaLabel="한국 시간 11월 4일 0시부터 11월 7일 0시까지 72시간. 한국 시간의 하루는 11월 4일 240건, 11월 5일 1,710건, 11월 6일 240건이에요. UTC의 하루는 한국 9시에 시작해서 11월 3일 일부 90건, 11월 4일 1,220건, 11월 5일 730건, 11월 6일 일부 150건이에요. 행사는 한국 11월 5일 7시부터 10시까지예요"
+    end={72}
+    lanes={[
+      { label: 'KST 하루', segments: [{ start: 0, end: 24, label: '4일 240', tone: 'sub' }, { start: 24, end: 48, label: '5일 1,710', tone: 'accent' }, { start: 48, end: 72, label: '6일 240', tone: 'sub' }] },
+      { label: 'UTC 하루', segments: [{ start: 0, end: 9, label: '90', tone: 'sub' }, { start: 9, end: 33, label: '4일 1,220', tone: 'warn' }, { start: 33, end: 57, label: '5일 730', tone: 'warn' }, { start: 57, end: 72, label: '150', tone: 'sub' }] },
+    ]}
+    marks={[{ at: 31, label: '행사' }]}
+    ticks={[{ at: 0, label: '4일 0시' }, { at: 24, label: '5일 0시' }, { at: 48, label: '6일 0시' }]}
+  />
+</Figure>
+
+PostgreSQL의 `date_trunc`는 `timestamptz`를 그 연결의 `TimeZone` 설정으로 잘라요. 서버 기본값이 UTC라면 한국 하루로 묶으려고 시간대를 적어 줘요. `date_trunc('day', ts, 'Asia/Seoul')`처럼 시간대를 넣었더니 240, 1,710, 240이 나왔어요.
+
+PromQL의 `hour()`, `day_of_week()`도 UTC로 계산해요. 한국 업무 시간(9~18시)에만 알림을 보내려면 UTC 0~9시로 적어야 해요.
+
+```promql
+up == 0
+  and on() hour() < 9
+```
+
+promtool로 돌려 보니, UTC 2시(한국 11시)에는 결과가 나오고 UTC 10시(한국 19시)에는 비었어요.
+
+## 서머타임이 있으면 하루가 23시간, 25시간이에요
+
+서머타임(DST)은 여름에 시계를 한 시간 앞당기는 제도예요. 한국은 1988년이 마지막이라 지금은 없지만, 미국과 유럽에는 있어요. 해외 고객이나 해외 리전을 보면 만나요.
+
+시계를 앞당기는 날은 하루가 23시간이고, 되돌리는 날은 25시간이에요. 뉴욕은 2026년 3월 8일 2시 30분이 없는 시각이고, 11월 1일 1시 30분은 두 번 있어요.
+
+<Figure caption="2026년 11월 1일 뉴욕의 시계를 UTC 한 시간 간격으로 읽은 예시예요. 1시가 두 번 나와서, 뉴욕 시간으로 그린 시간별 그래프에는 1시 칸이 둘이에요.">
+  <Strip
+    ariaLabel="UTC 4시, 5시, 6시, 7시, 8시를 뉴욕 시각으로 읽으면 0시 EDT, 1시 EDT, 1시 EST, 2시 EST, 3시 EST예요. 1시가 두 번 나와요"
+    rows={[
+      {
+        heads: ['04 UTC', '05 UTC', '06 UTC', '07 UTC', '08 UTC'],
+        cells: ['00:00', { label: '01:00', tone: 'accent' }, { label: '01:00', tone: 'accent' }, '02:00', '03:00'],
+      },
+    ]}
+    ranges={[{ from: 0, to: 1, label: 'EDT(UTC−4)' }, { from: 2, to: 4, label: 'EST(UTC−5)' }]}
+  />
+</Figure>
+
+그래서 하루 합계를 날마다 견주면 서머타임이 바뀌는 날만 4% 적거나 많아요. 시각을 오프셋 없이 현지 시간으로만 저장했다면, 두 번 있는 1시 30분은 어느 쪽인지 되돌릴 수 없어요.
+
+## 모니터링에서는
+
+시각은 여러 단계를 지나며 표기가 바뀌어요. 시간대를 정하는 곳이 단계마다 다르니, 어디서 정했는지 알아야 해요.
+
+<Figure caption="시간대 없이 찍힌 로그 한 줄이 화면에 뜨기까지의 예시예요. 에이전트가 시간대를 정한 뒤로는 숫자 하나로 다니고, 화면에서 다시 시간대가 붙어요.">
+  <Stages
+    ariaLabel="앱이 시간대 없이 2026-11-05 09:00:00을 쓰고, 에이전트가 +09:00으로 정해 RFC 3339 시각을 만들고, 저장소는 epoch 1793836800으로 담고, 한국 브라우저 화면은 09:00, UTC 대시보드는 00:00으로 보여요"
+    grow={0}
+    rows={[
+      { label: '앱이 씀', cells: ['2026-11-05 09:00:00', { label: '시간대 없음', tone: 'accent' }] },
+      { label: '에이전트가 읽음', note: '시간대를 정해요', cells: ['…T09:00:00+09:00', { label: '+09:00', tone: 'accent' }] },
+      { label: '저장소', cells: ['1793836800', 'UTC 기준 초'] },
+      { label: '한국 브라우저', cells: ['11-05 09:00', '브라우저 시간대'] },
+      { label: 'UTC 대시보드', cells: ['11-05 00:00', { label: '대시보드 설정', tone: 'accent' }] },
+    ]}
+  />
+</Figure>
+
+에이전트가 시간대를 잘못 정하면 로그가 9시간 어긋난 자리에 쌓여요. 이 경우는 <Term slug="foundations/logs-missing">로그가 안 들어올 때</Term>에서 다뤄요. 서버 시계 자체가 틀린 경우는 <Term slug="server/clock-drift">서버 시계가 어긋날 때</Term>에서 다뤄요.
+
+Grafana 대시보드의 시간대는 사용자, 팀, 조직 설정을 따르고, 아무 설정이 없으면 브라우저의 시간대를 따라요. 같은 대시보드를 한국과 미국에서 열면 같은 순간이 다른 시각 글자로 보여요. 화면에 지금 어느 시간대로 보이는지 적어 두면 헷갈림이 줄어요.
+
+'지난 1시간'처럼 지금부터 거꾸로 세는 범위는 시간대와 상관이 없어요. '오늘', '어제'처럼 날짜로 끊는 범위는 대시보드 시간대의 0시부터 세요.
+
+<Checkpoints>
+  <Check>시각 숫자를 받으면 자리 수로 단위부터 확인하세요. 10자리는 초, 13자리는 밀리초, 19자리는 나노초예요.</Check>
+  <Check>나노초 시각을 JSON 숫자로 주고받는 코드는 다시 보세요. JavaScript에서 끝자리가 바뀌어 같은 시각끼리 순서가 섞일 수 있어요.</Check>
+  <Check>시간대 없는 날짜 문자열을 `new Date()`에 넣는 코드는 다시 보세요. 날짜만이면 UTC, 시각까지 있으면 브라우저 시간대로 읽어요.</Check>
+  <Check>일별 합계나 일별 리포트는 어느 시간대의 0시부터 셌는지 밝혔는지 보세요. 서버 기본값이 UTC면 한국 하루와 9시간 어긋나요.</Check>
+  <Check>PromQL의 `hour()`로 시간대를 거르는 규칙은 UTC로 적었는지 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  epoch 시각은 윤초를 세지 않아요. POSIX는 하루를 늘 86,400초로 치라고 정해서, 리눅스의 `time()`도 윤초를 빼고 세요. 윤초가 들어간 순간에는 같은 초가 두 번 오거나, 시계를 조금씩 늦춰(smear) 흡수해요.
+
+  Prometheus는 샘플 시각을 밀리초 정수로 저장해요. HTTP API에서는 초 단위 소수(예: 1793836800.123)나 RFC 3339 글자로 주고받아요. OpenTelemetry는 나노초를 써서, 둘 사이를 오가면 단위를 바꿔야 해요.
+
+  시간대 규칙은 IANA 시간대 데이터베이스(tzdata)에 모여 있어요. 나라가 서머타임이나 오프셋을 바꾸면 tzdata도 바뀌어서, 오래된 운영체제나 런타임은 바뀐 규칙을 모를 수 있어요.
+
+  실험은 WSL의 Node.js 22, Python 3.12, PostgreSQL 18.4, promtool 3.5.0으로 했어요.
+</Deeper>

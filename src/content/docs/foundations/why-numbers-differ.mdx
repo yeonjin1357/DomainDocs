@@ -6,7 +6,7 @@ type: guide
 order: 70
 icon: hash
 keywords: [숫자 불일치, 대시보드 차이, 값이 달라요, mismatch, 정합성]
-related: [foundations/aggregation-and-downsampling, foundations/histograms, foundations/p99-looks-wrong]
+related: [foundations/aggregation-and-downsampling, foundations/histograms, foundations/p99-looks-wrong, foundations/time-and-timezones]
 sources:
   - title: Prometheus — Querying basics
     url: https://prometheus.io/docs/prometheus/latest/querying/basics/
@@ -127,7 +127,7 @@ histogram_quantile(0.99,
 
 - **필터**: 한쪽 화면만 일부 서버나 경로를 빼고 있지 않은지 봐요. 질의의 레이블 조건과 화면의 필터 값을 비교해요.
 - **늦게 도착한 데이터**: 데이터가 늦게 들어오면, 먼저 그린 화면에는 그 값이 빠져 있어요. 두 화면을 새로 고친 뒤 다시 비교해요.
-- **시간대**: 한쪽은 UTC, 다른 쪽은 KST로 시각을 읽으면 같은 "오후 2시"가 9시간 어긋나요. 하루 합계도 어느 시간대의 0시부터 세는지에 따라 달라요.
+- **시간대**: 한쪽은 UTC, 다른 쪽은 KST로 시각을 읽으면 같은 "오후 2시"가 9시간 어긋나요. 하루 합계도 어느 시간대의 0시부터 세는지에 따라 달라요. 자세한 것은 <Term slug="foundations/time-and-timezones">시각과 시간대</Term>에서 다뤄요.
 
 <Checkpoints>
   <Check>두 화면이 같은 이름의 지표를 서로 다른 질의로 계산한다면, 계산식을 문서로 남기세요. 이름이 같으면 사용자는 같은 숫자를 기대해요.</Check>

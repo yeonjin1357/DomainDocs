@@ -1,0 +1,28 @@
+questions:
+  - id: epoch-digits
+    type: choice
+    prompt: API 응답의 시각 필드에 1793836800123이 들어 있어요. 이 숫자의 단위는?
+    choices: [밀리초, 초, 마이크로초, 나노초]
+    answer: 0
+    explain: epoch 숫자는 지금 무렵 초가 10자리이고, 세 자리씩 붙을 때마다 단위가 1,000분의 1로 작아져요. 13자리는 밀리초예요.
+  - id: js-datetime-local
+    type: ox
+    prompt: JavaScript에서 오프셋 없이 시각까지 적은 new Date('2026-11-05T00:00:00')는 실행하는 곳의 시간대로 읽나요?
+    answer: true
+    explain: 오프셋이 없으면 시각까지 있는 글은 실행하는 곳의 시간대로, 날짜만 있는 글은 UTC로 읽어요. 그래서 둘은 한국에서 9시간 차이가 나요.
+  - id: utc-day-boundary
+    type: choice
+    prompt: DB 연결의 TimeZone이 UTC인데 date_trunc('day', ts)로 한국 일별 주문 수를 냈어요. 한국 시간 11월 5일 아침 8시의 주문은 어느 날로 세나요?
+    choices: [11월 4일, 11월 5일, 11월 6일, 두 날에 나뉨]
+    answer: 0
+    explain: 한국 8시는 UTC로 전날 23시예요. UTC의 하루는 한국 9시에 시작해서, 아침 9시 전 주문은 전날로 들어가요.
+  - id: promql-hour-utc
+    type: ox
+    prompt: PromQL의 hour()는 Prometheus 서버가 놓인 곳의 시간대로 시를 돌려주나요?
+    answer: false
+    explain: hour()와 day_of_week()는 늘 UTC로 계산해요. 한국 업무 시간 9~18시는 hour() < 9처럼 UTC 0~9시로 적어요.
+  - id: tz-name
+    type: input
+    prompt: '+09:00 같은 UTC와의 차이만이 아니라 서머타임처럼 그 차이가 언제 바뀌는지까지 담아 Asia/Seoul처럼 부르는 것은?'
+    answer: [시간대, time zone, timezone, 타임존, 표준 시간대]
+    explain: 오프셋은 그 순간의 차이일 뿐이고, 시간대는 바뀌는 규칙까지 담아요. 뉴욕은 여름 UTC−4, 겨울 UTC−5라 오프셋 하나로 나타낼 수 없어요.
