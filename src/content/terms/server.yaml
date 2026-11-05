@@ -321,3 +321,37 @@ terms:
     short: 사용자 프로그램이나 라이브러리의 함수에 붙여 그 함수가 불릴 때 프로그램을 돌리는 방법이에요.
     analogy: 팀 사무실 문 앞에 센서를 달아 드나드는 서류를 보는 것과 같아요.
     doc: server/ebpf
+  - id: hypervisor
+    name: 하이퍼바이저
+    en: Hypervisor
+    aliases: [hypervisor, VMM, 가상 머신 모니터]
+    short: 물리 서버의 CPU·메모리·디스크를 나눠 여러 가상 머신을 돌리는 소프트웨어예요.
+    analogy: 건물의 직원과 공간을 여러 사무실에 나눠 주는 관리 회사와 같아요.
+    doc: server/virtualization
+  - id: vcpu
+    name: vCPU
+    en: Virtual CPU
+    aliases: [가상 CPU, virtual CPU]
+    short: 가상 머신이 받은 CPU 자리로, 실제로는 물리 코어를 시간으로 나눠 써요.
+    analogy: 사무실이 계약한 직원 수지만, 실제 직원은 관리 회사가 돌려 보내요.
+    doc: server/virtualization
+  - id: overcommit
+    name: 오버커밋
+    en: Overcommit
+    aliases: [overcommit, 과할당, 오버커밋먼트]
+    short: 가상 머신에 준 CPU나 메모리의 합이 호스트가 가진 것보다 많은 상태예요.
+    doc: server/virtualization
+  - id: cpu-ready
+    name: CPU Ready
+    en: CPU Ready time
+    aliases: [Ready time, "%RDY", 레디 타임]
+    short: vCPU가 일할 준비가 됐는데 물리 코어가 비지 않아 기다린 시간이에요.
+    analogy: 직원을 불렀는데 다른 사무실 일을 하느라 오지 않아 기다린 시간이에요.
+    doc: server/virtualization
+  - id: memory-balloon
+    name: 메모리 풍선
+    en: Memory ballooning
+    aliases: [balloon, ballooning, 풍선, 벌루닝, vmmemctl]
+    short: 게스트 안의 드라이버가 메모리를 잡아 두고, 그만큼을 호스트에 돌려주는 방법이에요.
+    analogy: 관리 회사가 사무실 안에 짐을 들여 그 자리만큼 공간을 돌려받는 것과 같아요.
+    doc: server/virtualization

@@ -7,7 +7,7 @@ stage: basics
 order: 20
 icon: gauge
 keywords: [CPU usage, CPU 사용률, load average, 부하, 로드 애버리지, iowait, steal, user, system, run queue]
-related: [server/processes-and-threads, server/overview, foundations/red-and-use, foundations/counters-and-rate]
+related: [server/processes-and-threads, server/overview, foundations/red-and-use, foundations/counters-and-rate, server/virtualization]
 sources:
   - title: Linux man-pages — proc_stat(5)
     url: https://man7.org/linux/man-pages/man5/proc_stat.5.html
@@ -115,7 +115,7 @@ sy가 높으면 앱이 시스템 콜을 아주 많이 부르거나 커널이 바
   <Check>프로세스 CPU 사용률이 100%를 넘는다고 에러로 보지 마세요. 여러 스레드가 여러 코어를 함께 쓰면 400%처럼 보여요.</Check>
   <Check>부하가 높다고 바로 CPU를 늘리자는 제안이라면 다시 보세요. 리눅스 부하에는 디스크를 기다리는 일(D 상태)도 들어가요. CPU 사용률과 함께 보세요.</Check>
   <Check>iowait가 높다고 CPU가 바쁘다고 읽었다면 다시 보세요. iowait는 CPU가 쉬는 동안 입출력을 기다린 시간이에요. 매뉴얼도 이 값을 믿기 어렵다고 해요.</Check>
-  <Check>가상 머신에서 st(steal)가 높다면 앱이 아니라 같은 물리 서버의 다른 가상 머신을 의심하세요.</Check>
+  <Check>가상 머신에서 st(steal)가 높다면 앱이 아니라 같은 물리 서버의 다른 가상 머신을 의심하세요. steal이 생기는 까닭은 <Term slug="server/virtualization">가상화와 하이퍼바이저</Term>에서 다뤄요.</Check>
   <Check>부하를 견줄 코어 수가 물리 코어인지 논리 CPU인지 확인하세요. SMT를 켠 서버는 둘이 두 배 차이 나서, 같은 부하도 여유로 보이거나 과부하로 보여요.</Check>
   <Check>서버 전체 평균 CPU만 보는 화면이라면 코어별로도 보세요. 스레드 하나만 쓰는 프로그램이 코어 하나를 100% 채워도, 코어 8개 평균은 12.5%로 보여요.</Check>
 </Checkpoints>

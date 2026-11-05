@@ -1,0 +1,226 @@
+---
+title: 가상화와 하이퍼바이저
+summary: 물리 서버 한 대를 여러 가상 머신으로 나눠 쓰는 방식과, 그 숫자를 읽는 법이에요.
+domain: server
+type: concept
+stage: basics
+order: 63
+icon: server
+keywords: [가상화, virtualization, 하이퍼바이저, hypervisor, VMware, KVM, CPU Ready, 메모리 풍선, balloon, 오버커밋]
+related: [server/cpu-usage, server/memory, cloud/virtual-machines, kubernetes/containers, server/disk-io]
+sources:
+  - title: Broadcom KB 306576 — Converting between CPU summation and CPU % ready values
+    url: https://knowledge.broadcom.com/external/article/306576/converting-between-cpu-summation-and-cpu.html
+  - title: VMware — Understanding Memory Resource Management in VMware ESX Server (백서)
+    url: https://web.archive.org/web/2021/https://www.vmware.com/content/dam/digitalmarketing/vmware/en/pdf/techpaper/perf-vsphere-memory_management.pdf
+  - title: Broadcom KB 318825 — Best practices for using VMware snapshots in the vSphere environment
+    url: https://knowledge.broadcom.com/external/article/318825/best-practices-for-using-vmware-snapshots.html
+  - title: Broadcom KB 408718 — Disable Memory ballooning in a VM
+    url: https://knowledge.broadcom.com/external/article/408718/disable-memory-ballooning-in-a-vm.html
+  - title: man7.org — proc_stat(5) (steal)
+    url: https://man7.org/linux/man-pages/man5/proc_stat.5.html
+  - title: Linux kernel — KVM-specific MSRs (MSR_KVM_STEAL_TIME)
+    url: https://docs.kernel.org/virt/kvm/x86/msr.html
+  - title: Linux 소스 — drivers/virtio/virtio_balloon.c
+    url: https://github.com/torvalds/linux/blob/master/drivers/virtio/virtio_balloon.c
+  - title: Linux 소스 — drivers/misc/vmw_balloon.c
+    url: https://github.com/torvalds/linux/blob/master/drivers/misc/vmw_balloon.c
+  - title: Linux 소스 — arch/x86/kernel/cpu/vmware.c (steal clock)
+    url: https://github.com/torvalds/linux/blob/master/arch/x86/kernel/cpu/vmware.c
+updated: 2026-11-05
+---
+
+<KeyPoints>
+  <Point title="VM의 CPU는 차례를 기다려요">
+    가상 머신의 CPU는 물리 코어를 시간으로 나눠 써요. 기다린 시간은 게스트 안 CPU 사용률에 잘 드러나지 않아요.
+  </Point>
+  <Point title="호스트는 VM의 메모리를 되가져가요">
+    호스트 메모리가 모자라면 풍선과 호스트 스왑으로 VM의 메모리를 되가져가요. 게스트 안에서는 까닭 없이 메모리가 찬 것처럼 보이기도 해요.
+  </Point>
+  <Point title="VM이 느리면 호스트 숫자도 봐요">
+    이웃 VM 탓인지는 게스트 안 숫자만으로 알 수 없어요. CPU Ready, 풍선, 호스트 스왑을 게스트 숫자 옆에 놓아요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="실제 하이퍼바이저는 아주 짧은 시간 단위로 코어를 번갈아 보내요. 사무실(게스트)이 직원이 늦게 온 것을 아는지는 하이퍼바이저에 따라 달라요.">
+  가상화는 건물의 직원(코어)을 관리 회사가 여러 사무실(VM)에 돌려 보내는 것과 비슷해요. 사무실이 직원을 불렀는데 다른 사무실 일을 하느라 늦게 오면, 그동안 일이 멈춰요.
+</Analogy>
+
+## 가상화는 무엇인가요
+
+가상화는 물리 서버 한 대에서 운영체제 여러 개를 따로 돌리는 기술이에요. <Term term="server/hypervisor">하이퍼바이저</Term>가 CPU, 메모리, 디스크를 나눠 주고, 나눠 받은 단위를 가상 머신(VM)이라고 불러요. VM 안의 운영체제를 게스트(guest), 바깥의 물리 서버를 호스트(host)라고 해요.
+
+<Figure caption="코어 8개, 메모리 64GB인 호스트에 VM 세 개를 올린 예시예요. VM에 준 vCPU는 16개, 메모리는 72GB라 호스트가 가진 것보다 많아요.">
+  <Nest
+    ariaLabel="물리 서버(코어 8개, 메모리 64GB) 안에 VM 1(vCPU 8, 32GB), VM 2(vCPU 4, 16GB), VM 3(vCPU 4, 24GB)이 나란히 있고, 셋 모두 아래의 하이퍼바이저 위에서 돌아요. 각 VM 안에는 앱과 게스트 OS가 따로 있어요"
+    boxes={[
+      { label: '물리 서버(호스트)', note: '코어 8개 · 64GB', cols: 3, children: [
+        { label: 'VM 1', note: 'vCPU 8 · 32GB', children: [{ label: '앱' }, { label: 'OS' }] },
+        { label: 'VM 2', note: 'vCPU 4 · 16GB', children: [{ label: '앱' }, { label: 'OS' }] },
+        { label: 'VM 3', note: 'vCPU 4 · 24GB', children: [{ label: '앱' }, { label: 'OS' }] },
+        { label: '하이퍼바이저', note: 'VMware ESXi, KVM, Hyper-V', tone: 'accent', wide: true },
+      ] },
+    ]}
+  />
+</Figure>
+
+서버에서는 하드웨어 바로 위에 하이퍼바이저를 깔아요. VMware ESXi, 리눅스의 KVM, Windows의 Hyper-V가 그렇게 써요. PC의 VirtualBox처럼 운영체제 위에 프로그램으로 까는 하이퍼바이저도 있어요.
+
+클라우드의 <Term slug="cloud/virtual-machines">가상 머신</Term>도 클라우드 회사의 하이퍼바이저 위에서 돌아요. 다만 호스트 쪽 숫자는 클라우드 회사만 봐요. 회사 안에 VMware 같은 하이퍼바이저를 두면, 호스트 숫자까지 직접 볼 수 있어요.
+
+<Term slug="kubernetes/containers">컨테이너</Term>와는 나누는 높이가 달라요. 컨테이너는 커널 하나를 여럿이 나눠 쓰고, VM은 커널까지 따로 가져요.
+
+## CPU는 시간으로 나눠 써요
+
+<Term term="server/vcpu">vCPU</Term>(가상 CPU)는 물리 코어를 빌려 쓰는 자리예요. 하이퍼바이저가 vCPU들을 물리 코어에 번갈아 앉혀요. VM에 준 vCPU의 합이 물리 코어보다 많은 것을 <Term term="server/overcommit">오버커밋</Term>(overcommit)이라고 해요.
+
+오버커밋은 흔하고, 그 자체로 나쁘지 않아요. VM들이 한꺼번에 바쁘지 않으면 코어가 노는 시간을 줄여 줘요. 한꺼번에 바빠지면 vCPU가 차례를 기다려요.
+
+<Figure caption="물리 코어 하나를 VM 두 개가 나눠 쓰는 예시예요. 일할 준비가 됐는데 코어가 비지 않아 기다린 시간이 CPU Ready예요.">
+  <Timeline
+    ariaLabel="물리 코어 하나가 VM A와 VM B를 번갈아 실행해요. VM A가 실행되는 동안 VM B는 기다리고, VM B가 실행되는 동안 VM A가 기다려요"
+    end={8}
+    lanes={[
+      { label: '물리 코어', segments: [{ start: 0, end: 2, label: 'A', tone: 'sub' }, { start: 2, end: 4, label: 'B', tone: 'sub' }, { start: 4, end: 6, label: 'A', tone: 'sub' }, { start: 6, end: 8, label: 'B', tone: 'sub' }] },
+      { label: 'VM A', segments: [{ start: 0, end: 2, label: '실행', tone: 'accent' }, { start: 2, end: 4, label: '대기', tone: 'warn' }, { start: 4, end: 6, label: '실행', tone: 'accent' }, { start: 6, end: 8, label: '대기', tone: 'warn' }] },
+      { label: 'VM B', segments: [{ start: 0, end: 2, label: '대기', tone: 'warn' }, { start: 2, end: 4, label: '실행', tone: 'accent' }, { start: 4, end: 6, label: '대기', tone: 'warn' }, { start: 6, end: 8, label: '실행', tone: 'accent' }] },
+    ]}
+  />
+</Figure>
+
+이 기다림을 VMware는 호스트 쪽에서 <Term term="server/cpu-ready">CPU Ready</Term>로 세요. KVM 위의 리눅스 게스트는 같은 시간을 <Term term="server/steal">steal</Term>로 봐요. 하이퍼바이저가 vCPU마다 못 돌린 시간을 게스트에 알려 주기 때문이에요.
+
+### 이웃이 바쁘면 일이 두 배로 걸려요
+
+WSL 안에 KVM으로 작은 리눅스 VM을 띄우고, 정해진 계산을 시켜 봤어요. VM의 vCPU는 물리 CPU 하나에만 앉게 묶었어요.
+
+<Figure caption="vCPU 하나가 같은 계산을 끝내는 데 걸린 시간이에요. 같은 코어에 바쁜 이웃이 있거나, vCPU 두 개가 코어 하나를 나누면 거의 두 배가 걸렸어요.">
+  <Bars
+    ariaLabel="혼자 4.53초, 같은 코어에 바쁜 이웃 프로세스가 있을 때 8.64초, vCPU 두 개가 코어 하나를 나눌 때 8.65초"
+    unit="초"
+    bars={[
+      { label: '혼자', value: 4.53, display: '4.53초', tone: 'accent' },
+      { label: '같은 코어에 바쁜 이웃', value: 8.64, display: '8.64초', tone: 'warn' },
+      { label: 'vCPU 2개가 코어 1개를 나눔', value: 8.65, display: '8.65초', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+<Figure caption="같은 실험을 게스트 안의 /proc/stat으로 본 CPU 시간의 몫이에요. 이웃이 있으면 절반이 steal이에요. 100에서 idle을 빼서 사용률을 세면 둘 다 거의 100%예요.">
+  <Parts
+    ariaLabel="혼자일 때 user 94%, system 3%, idle 3%이고, 바쁜 이웃이 있을 때 user 46%, system 1%, steal 51%, idle 1%예요"
+    unit="%"
+    rows={[
+      { label: '혼자', segments: [{ label: 'user', value: 94, display: '94%', tone: 'accent' }, { label: 'system', value: 3, display: '3%', tone: 'weak' }, { label: 'idle', value: 3, display: '3%', tone: 'plain' }] },
+      { label: '바쁜 이웃과', segments: [{ label: 'user', value: 46, display: '46%', tone: 'accent' }, { label: 'system', value: 1, display: '1%', tone: 'weak' }, { label: 'steal', value: 51, display: '51%', tone: 'warn' }, { label: 'idle', value: 1, display: '1%', tone: 'plain' }] },
+    ]}
+  />
+</Figure>
+
+게스트 안에서 보면 두 경우 모두 CPU가 꽉 찼어요. 차이는 steal뿐이에요. steal을 따로 그리지 않는 화면이라면 같은 100%인데 일은 절반만 한 셈이에요.
+
+### 게스트가 기다림을 못 볼 때도 있어요
+
+steal은 하이퍼바이저가 알려 줘야 보여요. WSL 2는 Windows의 Hyper-V 위에서 도는 VM이에요. Windows 쪽에 CPU 부하를 걸자 WSL 안의 같은 계산이 14.4초에서 20.2초로 늘었는데, steal은 0%였어요.
+
+리눅스 커널의 Hyper-V 코드에는 steal을 받는 부분이 없어요. VMware 위의 리눅스는 호스트가 지원한다고 답할 때만 steal을 세요. 그래서 VM이 느린데 게스트 숫자가 멀쩡하면 호스트를 봐야 해요.
+
+## 메모리는 되가져갈 수 있어요
+
+VM에 준 메모리를 더하면 호스트 메모리보다 많을 수 있어요. 게스트가 받은 메모리를 다 쓰지 않으면 문제가 없어요. 여러 VM이 한꺼번에 많이 쓰면 호스트가 VM의 메모리를 되가져가요.
+
+VMware는 호스트의 빈 메모리가 줄면 먼저 풍선을 부풀려요. 풍선으로 모자라거나 더 빨리 줄면 호스트 스왑을 함께 써요.
+
+### 풍선은 게스트 안에서 메모리를 잡아 둬요
+
+<Term term="server/memory-balloon">풍선</Term>(balloon)은 게스트 안에 깔린 드라이버예요. VMware는 VMware Tools에 들어 있어서, Tools가 없으면 풍선도 없어요. 호스트가 신호를 주면 드라이버가 게스트 메모리를 잡아 두고, 그만큼의 실제 메모리를 호스트에 돌려줘요.
+
+게스트에 빈 메모리가 넉넉하면 빈 곳을 내줘서 성능에 영향이 없어요. 넉넉하지 않으면 게스트가 덜 쓰는 페이지를 골라 자기 스왑으로 내보내요. 무엇을 내보낼지 게스트가 고르는 게 풍선의 장점이에요.
+
+같은 KVM VM으로 실험해 봤어요. 메모리 1GB인 VM에서 호스트가 풍선으로 512MiB를 되가져가게 하고, 게스트의 `/proc/meminfo`를 봤어요.
+
+<Figure caption="풍선 512MiB를 부풀린 뒤의 게스트 메모리예요. 남은 메모리는 같지만, 전체에서 빼는 방식과 쓰는 메모리로 세는 방식은 사용률이 21.5%와 63.3%로 달라요.">
+  <Parts
+    ariaLabel="풍선 전에는 전체 961MiB 중 앱과 커널이 105MiB, 남음이 856MiB예요. KVM 기본 방식은 512MiB를 전체에서 빼서 전체 449MiB 중 97MiB를 쓰고 352MiB가 남아요. 쓰는 메모리로 세는 방식은 전체 961MiB 중 앱과 커널 97MiB, 풍선 512MiB, 남음 352MiB예요"
+    unit="MiB"
+    rows={[
+      { label: '풍선 전', total: '전체 961MiB', segments: [{ label: '앱·커널', value: 105, display: '105MiB', tone: 'weak' }, { label: '남음', value: 856, display: '856MiB', tone: 'plain' }] },
+      { label: '전체에서 빼요(KVM 기본)', total: '전체가 449MiB로', segments: [{ label: '앱·커널', value: 97, display: '97MiB', tone: 'weak' }, { label: '남음', value: 352, display: '352MiB', tone: 'plain' }, { label: '전체에서 빠짐', value: 512, display: '512MiB', tone: 'sub' }] },
+      { label: '쓰는 메모리로 세요', total: '전체 961MiB', segments: [{ label: '앱·커널', value: 97, display: '97MiB', tone: 'weak' }, { label: '풍선', value: 512, display: '512MiB', tone: 'warn' }, { label: '남음', value: 352, display: '352MiB', tone: 'plain' }] },
+    ]}
+  />
+</Figure>
+
+VMware의 리눅스 풍선 드라이버는 아래쪽처럼 메모리를 잡아 두기만 하고 전체를 줄이지 않아요. 그래서 게스트 안에서는 쓰는 프로세스 없이 사용량이 오른 것처럼 보여요. 프로세스마다 쓰는 메모리(RSS)를 더해도 사용량에 한참 못 미치면 풍선을 의심해요.
+
+### 호스트 스왑은 게스트 모르게 내보내요
+
+풍선으로 모자라면 호스트가 VM의 메모리를 자기 디스크로 내보내요. 이것을 호스트 스왑이라고 해요. 게스트는 이 일을 몰라요.
+
+그래서 게스트가 절대 내보내지 않을 커널 페이지나 자주 쓰는 페이지도 나갈 수 있어요. 그 메모리에 닿을 때마다 디스크를 기다려서 VM 전체가 크게 느려져요. 게스트 안의 스왑 숫자는 0인데 느릴 수 있어요.
+
+### 메모리 한도가 있으면 호스트가 넉넉해도 되가져가요
+
+VM에 메모리 한도(limit)를 걸면, 호스트가 넉넉해도 한도를 넘는 만큼 풍선과 스왑이 일어나요. 게스트에는 16GB로 보이는데 한도가 8GB라면, 8GB를 넘게 쓰는 순간부터 되가져가요. 게스트 안에서는 한도가 보이지 않아서 찾기 어려워요.
+
+## 디스크와 스냅숏
+
+VM의 디스크는 보통 여러 호스트가 함께 쓰는 저장소 위의 파일이에요. VMware는 이 저장소를 데이터스토어라고 불러요. 같은 데이터스토어의 다른 VM이 디스크를 많이 쓰면, 내 VM의 <Term term="server/io-latency">입출력 지연</Term>도 늘어요.
+
+스냅숏(snapshot)은 VM의 한 시점을 남겨 두는 기능이에요. 그 뒤로 바뀐 내용은 따로 쌓여서, 오래 둘수록 파일이 커져요. VMware는 스냅숏 하나를 72시간 넘게 두지 말고, 백업으로 쓰지 말라고 권해요.
+
+실행 중인 VM을 다른 호스트로 옮길 수도 있어요. VMware는 이것을 vMotion이라고 불러요.
+
+옮기고 나면 이웃이 바뀌어요. 그래서 숫자가 바뀐 시점에 VM이 어느 호스트에 있었는지도 남겨야 해요.
+
+## 모니터링에서는
+
+VM의 숫자는 두 곳에서 와요. 게스트 안의 에이전트가 보는 숫자와, 하이퍼바이저가 보는 숫자예요. VMware라면 vCenter(호스트 여럿을 관리하는 서버)가 호스트와 VM의 숫자를 모아 API로 내줘요.
+
+<Figure caption="게스트 숫자와 호스트 숫자를 VM 이름으로 이어 한 화면에 놓는 구성 예시예요. 호스트 숫자는 게스트에 에이전트를 깔지 않아도 vCenter에서 가져와요.">
+  <Flow
+    ariaLabel="VM 안의 게스트 에이전트가 CPU와 메모리, steal을 모니터링 서버로 보내고, ESXi 호스트의 CPU Ready와 풍선, 호스트 스왑은 vCenter를 거쳐 모니터링 서버로 가요"
+    nodes={[
+      { id: 'agent', label: '게스트 에이전트', note: 'CPU·메모리·steal', col: 0, row: 0 },
+      { id: 'mon', label: '모니터링 서버', note: 'VM 이름으로', col: 2, row: 0, tone: 'accent' },
+      { id: 'esxi', label: 'ESXi 호스트', col: 0, row: 1 },
+      { id: 'vc', label: 'vCenter', note: 'Ready·풍선·스왑', col: 1, row: 1 },
+    ]}
+    edges={[
+      { from: 'agent', to: 'mon' },
+      { from: 'esxi', to: 'vc' },
+      { from: 'vc', to: 'mon' },
+    ]}
+  />
+</Figure>
+
+호스트 쪽에서 볼 숫자는 이래요.
+
+- CPU Ready: vCPU가 코어를 기다린 시간이에요. 같은 호스트의 다른 VM들과 함께 봐요.
+- 풍선: 풍선 드라이버가 잡아 둔 메모리의 양이에요. 0이 아니면 호스트 메모리가 모자랐다는 뜻이에요.
+- 호스트 스왑: 호스트가 디스크로 내보낸 VM 메모리의 양과 속도예요.
+- 데이터스토어 지연: 같은 저장소를 쓰는 VM들이 함께 겪는 입출력 지연이에요.
+
+vCenter의 CPU Ready는 차트 간격 동안 기다린 시간을 밀리초로 더한 값이에요. 실시간 차트는 20초 간격이라, 합계를 200으로 나누면 %가 돼요. 이 값은 vCPU를 모두 더한 것이라, vCPU 4개인 VM의 합계 4,000ms는 20%이고 vCPU 하나로는 5%예요.
+
+<Checkpoints>
+  <Check>VM이 느린데 게스트 CPU가 여유롭거나, 100%인데 처리량이 줄었다면 호스트의 CPU Ready와 같은 호스트의 다른 VM을 보세요.</Check>
+  <Check>CPU Ready를 밀리초 그대로 견주지 마세요. 차트 간격(실시간 20초, 하루 5분)과 vCPU 수로 나눠 %로 바꿔야 VM끼리 견줄 수 있어요.</Check>
+  <Check>게스트의 steal이 0이라고 호스트가 한가하다고 보지 마세요. Hyper-V처럼 steal을 알려 주지 않는 하이퍼바이저도 있어요.</Check>
+  <Check>게스트 메모리가 까닭 없이 찼다면 풍선과 VM의 메모리 한도를 확인하세요. 게스트 안에서는 둘 다 보이지 않아요.</Check>
+  <Check>며칠 넘게 남은 스냅숏이 있는지 보세요. 파일이 계속 커지며 저장 공간과 성능을 깎아요.</Check>
+</Checkpoints>
+
+<Deeper>
+  CPU Ready 합계를 %로 바꾸는 식은 합계 ÷ (차트 간격 초 × 1000) × 100이에요. Broadcom KB 306576이 드는 나눌 수는 실시간 200, 하루 3,000, 한 주 18,000이에요. 한 달은 72,000, 한 해는 864,000이에요.
+
+  vCPU별 지표는 기본으로 실시간에서만 모아요.
+
+  KVM의 steal은 vCPU가 일하려 했는데 돌지 못한 시간이에요. vCPU가 쉬던(idle) 시간은 steal로 세지 않아요. 그래서 위 실험에서 일꾼을 하나만 돌리면 vCPU 둘이 코어 하나를 나눠도 steal이 4%에 그쳤어요.
+
+  KVM의 virtio 풍선은 `deflate-on-oom`을 켜지 않으면 되가져간 만큼 MemTotal을 줄여요. 켜면 MemTotal은 그대로 두고, 게스트가 메모리 부족에 빠지면 풍선을 먼저 줄여요. 리눅스의 VMware 풍선 드라이버(vmw_balloon)는 MemTotal을 줄이지 않아요.
+
+  실험 환경은 WSL 2(커널 6.18, Hyper-V 위)예요. 그 안에서 QEMU와 KVM으로 Ubuntu 커널 6.8 게스트를 busybox만으로 띄웠어요. `taskset`으로 QEMU를 CPU 하나에 묶고, 셸에서 덧셈 400만 번을 돌렸어요.
+
+  VMware의 메모리 되가져가기는 버전마다 단계 이름과 문턱값이 달라졌어요. 숫자 기준은 쓰는 버전의 문서로 확인해요.
+</Deeper>

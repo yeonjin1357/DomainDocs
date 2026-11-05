@@ -6,7 +6,7 @@ type: guide
 order: 60
 icon: gauge
 keywords: [high CPU, CPU 높음, CPU 100%, steal, sys, load average, pidstat, mpstat, top, 원인 찾기]
-related: [server/cpu-usage, server/processes-and-threads, server/disk-io, apm/thread-dumps]
+related: [server/cpu-usage, server/processes-and-threads, server/disk-io, apm/thread-dumps, server/virtualization]
 sources:
   - title: Linux man-pages — top(1)
     url: https://man7.org/linux/man-pages/man1/top.1.html
@@ -111,6 +111,7 @@ CPU가 오른 시각을 다른 사건과 나란히 놓아요. 배포, 배치 작
 <Checkpoints>
   <Check>서버 평균 CPU가 낮다고 안심했다면 코어별로도 보세요. 스레드 하나만 쓰는 프로그램은 코어 하나를 꽉 채워도 평균을 조금만 올려요.</Check>
   <Check>가상 머신의 CPU가 높은데 프로세스 합이 그만큼 안 된다면 st(steal)를 보세요. 다른 가상 머신이 가져간 시간이에요.</Check>
+  <Check>steal이 0이어도 호스트가 한가하다는 뜻은 아니에요. Hyper-V처럼 steal을 알려 주지 않는 하이퍼바이저도 있어서, 호스트 쪽 숫자를 함께 봐요. 자세한 것은 <Term slug="server/virtualization">가상화와 하이퍼바이저</Term>에서 다뤄요.</Check>
   <Check>`vmstat`의 첫 줄을 지금 값으로 읽었다면 다시 보세요. 첫 줄은 부팅 뒤 평균이에요. 둘째 줄부터가 지정한 간격 동안의 값이에요.</Check>
   <Check>CPU를 늘리기 전에 요청 수가 함께 늘었는지 보세요. 요청은 그대로인데 CPU만 늘었다면, 서버를 늘려도 같은 일이 반복돼요.</Check>
 </Checkpoints>

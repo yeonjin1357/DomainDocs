@@ -6,7 +6,7 @@ type: guide
 order: 70
 icon: layers
 keywords: [low memory, 메모리 부족, available, swap, 스왑, OOM, Killed process, 메모리 누수, RSS, pidstat]
-related: [server/memory, server/processes-and-threads, apm/jvm-memory, kubernetes/requests-and-limits]
+related: [server/memory, server/processes-and-threads, apm/jvm-memory, kubernetes/requests-and-limits, server/virtualization]
 sources:
   - title: Linux man-pages — free(1)
     url: https://man7.org/linux/man-pages/man1/free.1.html
@@ -111,5 +111,6 @@ available이 바닥에 가까워지면 커널은 덜 쓰는 메모리를 스왑�
   <Check>메모리 알림이 늘 90%대에 붙어 있다면, 사용률을 free로 계산하는지 보세요. available로 계산하면 알림이 진짜 부족할 때만 울려요.</Check>
   <Check>스왑 사용량 알림만 걸어 두었다면, si·so처럼 지금 오가는 양으로 바꾸세요. 사용량만 높고 조용한 스왑은 당장 문제가 아니에요.</Check>
   <Check>앱이 로그도 없이 사라졌다면, 앱 로그보다 커널 로그를 먼저 보세요. OOM killer는 앱에 알리지 않고 끝내요.</Check>
+  <Check>가상 머신에서 프로세스 RSS를 다 더해도 사용량에 한참 못 미친다면 하이퍼바이저의 <Term term="server/memory-balloon">메모리 풍선</Term>을 의심하세요.</Check>
   <Check>메모리 누수를 의심할 때는 하루 이상의 RSS 추세를 보세요. 몇 분짜리 그래프에서는 정상적인 오르내림과 구분이 안 돼요.</Check>
 </Checkpoints>

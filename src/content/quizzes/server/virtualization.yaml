@@ -1,0 +1,29 @@
+questions:
+  - id: steal-share
+    type: choice
+    prompt: VM 안에서 CPU 사용률은 100%인데 처리량이 평소의 절반이에요. 게스트의 /proc/stat에서 먼저 볼 몫은?
+    choices: [steal, iowait, nice, softirq]
+    answer: 0
+    explain: 같은 코어를 이웃 VM과 나누면 vCPU가 기다린 시간이 steal로 잡혀요. 실험에서도 이웃이 있을 때 절반이 steal이었고 계산은 두 배 걸렸어요.
+  - id: idle-not-steal
+    type: ox
+    prompt: KVM 위의 리눅스 게스트에서, vCPU가 할 일 없이 쉬던 시간도 steal로 세나요?
+    answer: false
+    explain: steal은 vCPU가 일하려 했는데 돌지 못한 시간이에요. 쉬던 시간은 idle로 남아서, 일꾼이 하나뿐일 때는 vCPU 둘이 코어 하나를 나눠도 steal이 작았어요.
+  - id: ready-per-vcpu
+    type: choice
+    prompt: vCPU 4개인 VM의 vCenter 실시간 차트(20초 간격)에서 CPU Ready 합계가 4,000ms예요. vCPU 하나로 치면 몇 %인가요?
+    choices: [5%, 20%, 2%, 50%]
+    answer: 0
+    explain: 20초는 20,000ms라 합계 4,000ms는 20%예요. 이 값은 vCPU 넷을 더한 것이라, 하나로는 5%예요.
+  - id: limit-reclaim
+    type: ox
+    prompt: 호스트 메모리가 넉넉해도, VM이 자기 메모리 한도(limit)를 넘게 쓰면 하이퍼바이저가 풍선이나 스왑으로 메모리를 되가져가나요?
+    answer: true
+    explain: 한도를 넘는 만큼은 호스트 상태와 상관없이 되가져가요. 게스트 안에서는 한도가 보이지 않아서 까닭을 찾기 어려워요.
+  - id: balloon-name
+    type: input
+    prompt: 게스트 안의 드라이버가 메모리를 잡아 두고, 그만큼의 실제 메모리를 호스트에 돌려주는 방법은?
+    answer: [메모리 풍선]
+    term: server/memory-balloon
+    explain: 풍선 드라이버가 잡아 둔 메모리는 게스트가 고른 자리라, 호스트 스왑보다 성능을 덜 깎아요.
