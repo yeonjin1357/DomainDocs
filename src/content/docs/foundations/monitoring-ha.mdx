@@ -1,0 +1,201 @@
+---
+title: 모니터링 시스템의 이중화와 확장
+summary: 수집 서버를 둘 두거나 저장소가 멈출 때, 화면의 숫자가 어떻게 달라지는지 읽는 법이에요.
+domain: foundations
+type: concept
+stage: monitoring
+order: 47
+icon: layers
+keywords: [HA, 이중화, Prometheus HA, replica, 중복 제거, deduplication, remote write, federation, agent mode, sending_queue]
+related: [foundations/tsdb-storage, foundations/alerts-not-arriving, foundations/opentelemetry, foundations/slow-dashboard, foundations/alert-routing]
+sources:
+  - title: Prometheus — Remote write tuning
+    url: https://prometheus.io/docs/practices/remote_write/
+  - title: Prometheus — Configuration (external_labels, alert_relabel_configs)
+    url: https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+  - title: Prometheus — Federation
+    url: https://prometheus.io/docs/prometheus/latest/federation/
+  - title: Prometheus — Agent Mode
+    url: https://prometheus.io/docs/prometheus/latest/prometheus_agent/
+  - title: Alertmanager — High Availability
+    url: https://github.com/prometheus/alertmanager#high-availability
+  - title: Thanos — Querier (deduplication, replica-label)
+    url: https://thanos.io/tip/components/query.md/
+  - title: Grafana Mimir — Configure high-availability deduplication
+    url: https://grafana.com/docs/mimir/latest/configure/configure-high-availability-deduplication/
+  - title: OpenTelemetry Collector — exporterhelper (sending_queue)
+    url: https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/exporterhelper/README.md
+updated: 2026-11-05
+---
+
+<KeyPoints>
+  <Point title="두 대가 모으면 값도 두 배예요">
+    같은 대상을 수집 서버 두 대가 모으면 시계열이 둘이 돼요. 그냥 더하면 두 배라서, 하나만 고르는 중복 제거가 필요해요.
+  </Point>
+  <Point title="저장소가 멈추면 그래프는 늦게 채워져요">
+    수집 서버는 못 보낸 샘플을 쌓아 두었다가 다시 보내요. Prometheus는 2시간까지 버티고, 그보다 길면 잃어요.
+  </Point>
+  <Point title="알림은 모든 Alertmanager에 보내요">
+    Alertmanager 여러 대는 서로 알림을 나눠 중복을 걸러요. 그래서 로드 밸런서로 한 대에만 보내면 안 돼요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="실제 두 수집 서버는 긁는 시각이 몇 초씩 어긋나서 값이 똑같지 않아요. 그래서 둘을 합칠 때는 한쪽을 골라 쓰는 규칙이 있어야 해요.">
+  중요한 회의는 두 사람이 따로 회의록을 적어요. 한 사람이 빠져도 기록이 남아요. 다만 두 회의록을 그대로 합쳐 세면 같은 발언이 두 번 세져요.
+</Analogy>
+
+## 모니터링 시스템도 장애가 나요
+
+모니터링 시스템이 멈추면 다른 시스템의 장애도 못 봐요. 그래서 모니터링 시스템도 이중으로 두고, 한 대가 감당 못 할 만큼 커지면 나눠요. Prometheus 계열을 예로 들면 구성은 이래요.
+
+<Figure caption="같은 대상을 Prometheus 두 대(수집 A, B)가 수집하고, 둘 다 중앙 저장소와 Alertmanager 두 대에 보내는 구성 예시예요.">
+  <Flow
+    ariaLabel="수집 대상을 Prometheus A와 B가 함께 긁고, 두 대 모두 remote write로 중앙 저장소에 보내며, 두 대 모두 Alertmanager 두 대에 알림을 보내요"
+    nodes={[
+      { id: 'tgt', label: '수집 대상', col: 0, row: 1 },
+      { id: 'pa', label: '수집 A', note: 'replica=a', col: 1, row: 0 },
+      { id: 'pb', label: '수집 B', note: 'replica=b', col: 1, row: 2 },
+      { id: 'st', label: '중앙 저장소', note: 'Thanos·Mimir', col: 2, row: 0, tone: 'accent' },
+      { id: 'am', label: '알림 ×2', note: 'Alertmanager', col: 2, row: 2 },
+    ]}
+    edges={[
+      { from: 'tgt', to: 'pa' },
+      { from: 'tgt', to: 'pb' },
+      { from: 'pa', to: 'st' },
+      { from: 'pb', to: 'st' },
+      { from: 'pa', to: 'am' },
+      { from: 'pb', to: 'am' },
+    ]}
+  />
+</Figure>
+
+키우는 방법은 목적에 따라 네 가지예요.
+
+- 이중화(HA 쌍): 같은 대상을 두 대가 똑같이 수집해요. 한 대가 죽어도 그래프에 빈칸이 없어요.
+- 나누기(샤딩): 대상을 나눠 맡겨요. 시계열이 너무 많아 한 대의 메모리로 못 담을 때 써요.
+- 모으기: 여러 곳의 숫자를 한 곳으로 보내요. remote write로 샘플을 그대로 보내거나, federation으로 다른 Prometheus의 값을 긁어 와요.
+- 에이전트 모드: 수집해서 보내기만 하는 가벼운 Prometheus예요. 자기 안에서 질의하거나 알림 규칙을 돌리지는 못해요.
+
+오래 담는 일은 Thanos나 Mimir 같은 장기 저장소가 맡아요. 저장 방식은 <Term slug="foundations/tsdb-storage">시계열 DB가 저장하는 법</Term>에서 다뤄요.
+
+## HA 쌍은 값이 두 배가 돼요
+
+Prometheus 3.15 세 대를 띄워 봤어요. A와 B가 같은 대상(1초에 주문 10건씩 느는 카운터)을 5초마다 긁고, 둘 다 저장소 C로 remote write를 보냈어요. A와 B는 `external_labels`로 `replica`를 a와 b로 달았어요.
+
+C에는 같은 카운터가 replica만 다른 시계열 두 개로 쌓였어요. 화면에서 흔히 쓰는 `sum(rate(...))`는 두 배를 보여 줘요.
+
+<Figure caption="C에서 1분 rate를 질의한 결과예요. 그냥 더하면 실제(초당 10건)의 두 배가 되고, replica 중 하나만 고르면 실제와 맞아요.">
+  <Bars
+    ariaLabel="replica a 9.3, replica b 10, 그냥 더함 19.3, replica 중 큰 값 하나 9.5. 단위는 초당 주문 수"
+    unit="건/초"
+    bars={[
+      { label: 'replica a', value: 9.3, display: '9.3' },
+      { label: 'replica b', value: 10, display: '10' },
+      { label: 'sum: 그냥 더함', value: 19.3, display: '19.3', tone: 'warn' },
+      { label: 'max without(replica) 뒤 sum', value: 9.5, display: '9.5', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+a와 b의 값이 조금 다른 것은 긁은 시각이 어긋나서예요. 그래서 둘을 더하거나 평균 내지 말고, 하나를 골라 써야 해요. 이것을 중복 제거(deduplication)라고 해요.
+
+중복 제거는 두 곳에서 해요.
+
+- 질의할 때: Thanos의 질의 서버는 replica만 다른 시계열을 하나로 보여 줘요. 이 레이블 이름을 `--query.replica-label`로 알려 줘요.
+- 받을 때: Mimir는 `cluster`와 `__replica__` 레이블을 보고, 한 쌍에서 리더로 뽑힌 쪽의 샘플만 받아요. 리더가 30초(기본값) 동안 안 보내면 다른 쪽으로 넘어가요.
+
+이런 도구 없이 둘을 한 곳에 모았다면 질의에서 골라야 해요. `max without (replica) (rate(...))`처럼 replica를 빼고 하나만 남긴 뒤 더해요.
+
+```promql
+sum(
+  max without (replica) (
+    rate(orders_total[1m])
+  )
+)
+```
+
+## 저장소가 멈추면 그래프가 늦게 채워져요
+
+remote write는 바로 보내지 않고, Prometheus의 WAL(먼저 적어 두는 기록)을 읽어 큐에 담아 보내요. 받는 쪽이 멈추면 실패한 묶음을 간격을 늘려 가며 다시 보내요. 그동안 보낼 샘플은 WAL에 남아 있어요.
+
+실험에서 C를 60초 동안 껐다 켰어요. A의 `/metrics`에서 가장 최근 샘플 시각과 보내기를 마친 시각의 차이를 봤어요.
+
+<Figure caption="A가 C로 아직 보내지 못한 시간이에요. C가 꺼진 동안 끊긴 시간만큼 벌어졌다가, C가 돌아오자 15초 만에 평소로 돌아왔어요. 버린 샘플은 0개였어요.">
+  <Bars
+    ariaLabel="보내기 지연이 평소 5초, C가 꺼지고 30초 뒤 30초, 60초 뒤 65초, C가 돌아오고 15초 뒤 5초예요"
+    unit="초"
+    bars={[
+      { label: '평소', value: 5, display: '5초', tone: 'accent' },
+      { label: 'C가 꺼지고 30초', value: 30, display: '30초', tone: 'warn' },
+      { label: 'C가 꺼지고 60초', value: 65, display: '65초', tone: 'warn' },
+      { label: 'C가 돌아오고 15초', value: 5, display: '5초', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+C에서 보면 꺼졌던 60초는 처음엔 비어 있다가 나중에 채워져요. C가 돌아오고 4초 뒤에 그 구간을 질의하면 샘플이 0개였고, 30초 뒤에는 12개(5초마다 하나)가 다 들어와 있었어요.
+
+<Figure caption="C가 꺼졌던 60초를 5초 칸으로 나눠, 그 구간의 샘플이 C에 있는지 본 거예요. 같은 구간이 질의한 때에 따라 비어 보이기도, 다 차 보이기도 해요.">
+  <Strip
+    ariaLabel="C가 돌아오고 4초 뒤에는 꺼졌던 60초의 칸 12개가 모두 비어 있고, 30초 뒤에는 12개가 모두 차 있어요"
+    rows={[
+      { label: '돌아오고 4초 뒤', cells: [{ label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }, { label: '·', tone: 'sub' }] },
+      { label: '돌아오고 30초 뒤', cells: [{ label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }, { label: '●', tone: 'accent' }] },
+    ]}
+  />
+</Figure>
+
+그래서 중앙 저장소로 그린 대시보드의 최근 몇 분이 비어 있다면, 수집이 멈춘 게 아니라 아직 안 도착한 것일 수 있어요. 지난 장애를 다시 볼 때는 빈칸이 나중에 채워졌는지도 확인해요.
+
+### 버퍼에는 한도가 있어요
+
+Prometheus는 받는 쪽이 2시간 넘게 멈추면 보내지 못한 샘플을 잃어요. WAL이 2시간마다 정리되면서 오래된 기록이 지워지기 때문이에요. 에이전트 모드도 같은 2시간이에요.
+
+OpenTelemetry Collector의 내보내기는 기본으로 메모리 큐에 1,000개 묶음까지 쌓아요. 큐가 차면 새 데이터를 버리고, Collector가 다시 뜨면 메모리 큐의 내용도 사라져요. `sending_queue.storage`로 디스크 큐를 켜면 재시작해도 이어서 보내요.
+
+## 알림 경로도 이중으로 둬요
+
+Alertmanager도 두 대 이상 띄우고 서로 알게 해 둬요. 이것을 클러스터로 묶는다고 해요.
+
+같은 알림이 여러 대에 들어와도, 서로 누가 보냈는지 알려 한 번만 보내요. 그래서 Prometheus는 Alertmanager 목록 전체에 알림을 보내야 해요.
+
+Prometheus와 Alertmanager 사이에 로드 밸런서를 두면 알림이 한 대에만 가요. 그 한 대가 죽으면 알림이 사라질 수 있어요. Alertmanager 문서도 로드 밸런서를 두지 말라고 적어요.
+
+HA 쌍에는 함정이 하나 더 있어요. `external_labels`는 시계열뿐 아니라 알림에도 붙어요. 그대로 두면 A와 B의 알림이 replica만 다른 두 알림이 되어, 같은 장애로 알림이 두 번 와요.
+
+```yaml
+alerting:
+  alert_relabel_configs:
+    - action: labeldrop
+      regex: replica
+```
+
+`alert_relabel_configs`로 알림에서만 replica를 떼면 두 대가 같은 알림을 보내고, Alertmanager가 하나로 묶어요. promtool 3.15로 설정을 검사했어요.
+
+## 모니터링 시스템도 지켜봐요
+
+수집 서버 자신의 숫자도 모아 둬요. Prometheus의 remote write라면 이런 지표가 있어요.
+
+- `prometheus_remote_storage_samples_failed_total`: 끝내 보내지 못하고 버린 샘플 수예요. 늘면 데이터가 빠져요.
+- `prometheus_remote_storage_samples_pending`: 아직 보내지 못하고 쌓인 샘플 수예요.
+- 보내기 지연: 가장 최근 샘플 시각(`…_highest_timestamp_in_seconds`)에서 보내기를 마친 시각을 뺀 값이에요. 마친 시각은 `…_queue_highest_sent_timestamp_seconds`예요.
+
+보내기 지연이 몇 분을 넘으면 알림을 받아 두면 좋아요. 2시간 한도에 닿기 전에 손쓸 수 있어요. 알림 경로 자체가 살아 있는지는 <Term slug="foundations/alerts-not-arriving">알림이 와야 하는데 안 올 때</Term>의 Watchdog 알림으로 지켜봐요.
+
+<Checkpoints>
+  <Check>HA 쌍으로 모은 데이터를 replica 구분 없이 sum하는 대시보드는 다시 보세요. 숫자가 두 배예요.</Check>
+  <Check>HA 쌍에서 같은 알림이 두 번 온다면 알림에 replica 레이블이 남았는지 보세요. alert_relabel_configs로 떼요.</Check>
+  <Check>Prometheus와 Alertmanager 사이에 로드 밸런서가 있다면 목록 전체로 보내게 바꾸세요.</Check>
+  <Check>중앙 저장소 대시보드의 최근 몇 분이 비면 수집이 멈췄다고 단정하기 전에 보내기 지연을 보세요.</Check>
+  <Check>remote write의 보내기 지연과 버린 샘플 수에 알림이 걸려 있는지 보세요. 2시간이 지나면 못 보낸 샘플을 잃어요.</Check>
+</Checkpoints>
+
+<Deeper>
+  실험은 Windows에서 Prometheus 3.15.1 세 대로 했어요. A와 B는 5초마다 긁고 remote write로 C(`--web.enable-remote-write-receiver`)에 보냈어요. replica a가 9.3으로 b보다 작은 것은 rate가 구간 끝을 외삽하는 방식과 긁은 시각의 어긋남 때문이에요.
+
+  보내기를 다시 시도하는 간격은 `min_backoff`에서 시작해 실패할 때마다 두 배로 늘고, `max_backoff`에서 멈춰요. 받는 쪽이 돌아온 직후 여러 수집 서버가 한꺼번에 밀린 샘플을 보내서, 받는 쪽에 부하가 몰리기도 해요.
+
+  federation은 다른 Prometheus의 `/federate`에서 고른 시계열을 긁어 와요. 모든 원본 시계열을 옮기기보다, 기록 규칙으로 줄인 값을 위로 모으는 데 맞아요.
+
+  Mimir가 리더를 바꿀 때는 수집 한 번 정도의 데이터가 빠질 수 있어요. 그래서 Mimir 문서는 rate의 구간을 수집 주기의 네 배 이상으로 두라고 권해요.
+</Deeper>

@@ -163,6 +163,7 @@ Alertmanager는 같은 묶음의 알림을 모아 한 번에 보내려고 기다
 <Checkpoints>
   <Check>알림이 안 온 원인을 Alertmanager 설정에서만 찾았다면, 먼저 규칙이 firing까지 갔는지 ALERTS로 보세요. pending에 머물렀다면 Alertmanager는 받은 적이 없어요.</Check>
   <Check>배포 뒤부터 특정 알림이 조용하다면, 지표나 레이블 이름이 바뀌어 질의가 비지 않았는지 보세요. 비어도 에러는 나지 않아요.</Check>
+  <Check>Alertmanager 앞에 로드 밸런서가 있거나, HA 쌍의 알림이 두 번씩 온다면 <Term slug="foundations/monitoring-ha">모니터링 시스템의 이중화와 확장</Term>의 알림 경로 절을 보세요.</Check>
   <Check>경로 설정을 고쳤다면 amtool로 실제 레이블 값을 넣어 시험하세요. 대소문자 하나가 달라도 기본 경로로 가요.</Check>
   <Check>알림 파이프라인 전체가 멈춘 걸 알아챌 장치가 없다면, 늘 울리는 Watchdog 알림을 다른 곳에서 지켜보게 하세요.</Check>
 </Checkpoints>

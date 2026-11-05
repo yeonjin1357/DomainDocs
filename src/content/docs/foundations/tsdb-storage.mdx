@@ -7,7 +7,7 @@ stage: basics
 order: 45
 icon: database
 keywords: [TSDB, 시계열 DB, head block, WAL, compaction, 블록, retention, 보관 기간, remote write, 디스크 용량]
-related: [foundations/time-series-and-labels, foundations/collection-interval, foundations/aggregation-and-downsampling, foundations/cardinality-explosion, foundations/empty-graph]
+related: [foundations/time-series-and-labels, foundations/collection-interval, foundations/aggregation-and-downsampling, foundations/cardinality-explosion, foundations/monitoring-ha]
 sources:
   - title: Prometheus — Storage
     url: https://prometheus.io/docs/prometheus/latest/storage/
@@ -160,6 +160,8 @@ head에 쌓인 샘플은 2시간 단위로 잘라 블록 파일로 내려요. �
 Prometheus의 로컬 저장소는 복제되지 않아요. 그 서버의 디스크가 고장 나면 데이터도 잃어요. 그래서 오래 두거나 여러 대에서 함께 보려면 원격 저장소로 보내요.
 
 원격 쓰기(remote write)는 WAL을 읽어 원격 저장소로 샘플을 보내요. 원격 쪽이 멈추면 다시 보내기를 되풀이하며 기다려요. 문서에 따르면 2시간 넘게 멈춰 있으면, WAL이 정리되면서 아직 못 보낸 샘플을 잃어요.
+
+멈췄다 돌아오면 밀린 샘플이 나중에 채워져요. 이 모습과 수집 서버를 둘 두는 법은 <Term slug="foundations/monitoring-ha">모니터링 시스템의 이중화와 확장</Term>에서 다뤄요.
 
 Thanos나 Mimir 같은 장기 저장 도구가 이 일을 맡아요. 둘 다 블록을 오브젝트 스토리지(S3 같은 저장 서비스)에 둬요.
 

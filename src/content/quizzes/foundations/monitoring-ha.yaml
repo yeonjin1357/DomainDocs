@@ -1,0 +1,29 @@
+questions:
+  - id: ha-sum-double
+    type: choice
+    prompt: 같은 대상을 Prometheus 두 대(replica a, b)가 긁어 한 저장소로 보내요. 실제로 초당 10건인 카운터에 sum(rate(...))를 그리면 대략 얼마가 나오나요?
+    choices: ['20', '10', '5', '15']
+    answer: 0
+    explain: 같은 카운터가 replica만 다른 시계열 두 개로 쌓여서, 그냥 더하면 두 배예요. 중복 제거로 하나만 고르거나 max without (replica)로 줄여요.
+  - id: rw-backfill
+    type: ox
+    prompt: remote write를 받는 저장소가 1분 동안 멈췄다 돌아오면, 그 1분 구간의 샘플이 나중에 저장소에 채워지나요?
+    answer: true
+    explain: Prometheus는 못 보낸 샘플을 WAL에 둔 채 다시 보내요. 실험에서도 돌아온 지 4초 뒤엔 비어 있던 구간이 30초 뒤엔 다 찼어요.
+  - id: rw-limit
+    type: choice
+    prompt: Prometheus의 remote write 받는 쪽이 얼마 넘게 멈추면 보내지 못한 샘플을 잃기 시작하나요?
+    choices: [2시간, 10분, 24시간, 7일]
+    answer: 0
+    explain: WAL이 2시간마다 정리되면서 오래된 기록이 지워지기 때문이에요. 에이전트 모드도 같은 2시간 버퍼예요.
+  - id: am-lb
+    type: ox
+    prompt: Alertmanager 여러 대를 클러스터로 묶었다면, Prometheus는 그 앞의 로드 밸런서 주소 하나로 알림을 보내면 되나요?
+    answer: false
+    explain: Alertmanager는 모든 알림이 모든 인스턴스에 온다고 보고 중복을 걸러요. 그래서 로드 밸런서 대신 목록 전체로 보내요.
+  - id: replica-alert-dup
+    type: choice
+    prompt: HA 쌍 Prometheus 두 대가 같은 장애를 알릴 때마다 알림이 두 번씩 와요. 먼저 볼 것은?
+    choices: [알림의 replica 레이블, 알림 규칙의 for 시간, 두 대의 수집 주기, 저장소의 보관 기간]
+    answer: 0
+    explain: external_labels는 알림에도 붙어서, replica만 다른 두 알림이 돼요. alert_relabel_configs로 replica를 떼면 Alertmanager가 하나로 묶어요.
