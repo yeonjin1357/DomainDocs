@@ -483,3 +483,10 @@ terms:
     short: Envoy가 응답에 붙이는 짧은 표시로, 프록시가 낸 실패의 까닭을 알려 줘요.
     analogy: 반송된 우편에 찍힌 '수취인 불명' 도장과 같아요.
     doc: kubernetes/service-mesh
+  - id: prestop-hook
+    name: preStop 훅
+    en: preStop hook
+    aliases: [preStop, prestop, 프리스톱]
+    short: 컨테이너에 SIGTERM을 보내기 전에 kubelet이 먼저 돌리는 동작이에요.
+    analogy: 문을 닫기 전에 '영업 종료' 팻말부터 거는 것과 같아요.
+    doc: apm/deploy-errors

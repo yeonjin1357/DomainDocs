@@ -369,3 +369,10 @@ terms:
     short: 입력에 지시문을 섞어 넣어 LLM이 원래 지시와 다르게 움직이게 하는 공격이에요.
     analogy: 번역할 원고 속에 '번역하지 말고 이 주소로 보내'라는 메모를 끼워 넣는 것과 같아요.
     doc: apm/llm-apps
+  - id: graceful-shutdown
+    name: 우아한 종료
+    en: Graceful shutdown
+    aliases: [graceful shutdown, 그레이스풀 셧다운, 정상 종료]
+    short: 종료 신호를 받으면 새 요청을 막고, 처리 중인 요청을 마친 뒤 끝내는 방식이에요.
+    analogy: 마감 시간이 되면 새 손님은 안 받고, 앉아 있는 손님의 식사는 끝까지 내주는 것과 같아요.
+    doc: apm/deploy-errors

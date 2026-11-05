@@ -1,0 +1,28 @@
+questions:
+  - id: code-143
+    type: choice
+    prompt: 컨테이너가 종료 코드 143으로 끝났어요. 어떻게 끝난 것인가요?
+    choices: [SIGTERM을 받고 끝남, SIGKILL로 강제로 끝남, 잘못된 메모리를 건드림, 처리 안 된 에러로 끝남]
+    answer: 0
+    explain: 128을 넘는 코드는 128 + 신호 번호예요. 143은 128 + 15라 SIGTERM이고, SIGKILL은 137, SIGSEGV는 139예요.
+  - id: sigkill-handler
+    type: ox
+    prompt: 앱에 처리기를 달면 SIGKILL을 받았을 때도 정리 코드를 돌릴 수 있나요?
+    answer: false
+    explain: SIGKILL은 막거나 처리할 수 없어요. 그래서 멈추는 쪽은 SIGTERM으로 정리할 틈을 먼저 주고, 시간이 지나야 SIGKILL을 보내요.
+  - id: pid1-ignores
+    type: ox
+    prompt: SIGTERM 처리기가 없는 Python 앱을 컨테이너의 PID 1로 띄우면, SIGTERM을 받아도 계속 도나요?
+    answer: true
+    explain: 리눅스는 처리기가 없는 신호를 PID 1에게 전하지 않아요. 그래서 유예 시간이 지나 SIGKILL을 맞고 137로 끝나요.
+  - id: 137-not-always-oom
+    type: choice
+    prompt: 파드가 배포 때마다 30초씩 늦게 내려가고 종료 코드 137이 찍혀요. 커널 로그에는 OOM 줄이 없어요. 먼저 의심할 것은?
+    choices: [SIGTERM을 못 받음, 메모리 한도가 작음, 디스크가 가득 참, 크래시가 났음]
+    answer: 0
+    explain: SIGTERM에 반응하지 않으면 유예 시간 30초를 다 채운 뒤 SIGKILL을 맞아요. 셸로 감싼 시작 명령이나 처리기 없는 PID 1이 흔한 까닭이에요.
+  - id: jvm-crash-file
+    type: input
+    prompt: JVM이 SIGSEGV로 크래시하면 작업 폴더에 남기는, 어떤 신호로 어디서 멈췄는지 적힌 파일 이름의 앞부분은?
+    answer: [hs_err, hs_err_pid, hs_err_pid.log]
+    explain: JVM은 크래시 때 hs_err_pid 뒤에 PID를 붙인 .log 파일을 남겨요. 기본으로 SIGABRT로 끝나서 종료 코드는 134예요.

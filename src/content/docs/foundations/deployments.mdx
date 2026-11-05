@@ -7,7 +7,7 @@ stage: basics
 order: 65
 icon: activity
 keywords: [배포, deployment, 롤링, 블루 그린, blue-green, 카나리, canary, 기능 플래그, feature flag, 롤백]
-related: [apm/slow-after-deploy, kubernetes/rollout-stuck, foundations/incident-response, foundations/alert-silencing, apm/business-metrics]
+related: [apm/slow-after-deploy, apm/deploy-errors, kubernetes/rollout-stuck, foundations/incident-response, foundations/alert-silencing]
 sources:
   - title: Google SRE Book — Introduction (Change Management)
     url: https://sre.google/sre-book/introduction/
@@ -193,6 +193,7 @@ sum(increase(http_requests_total{
 
 <Checkpoints>
   <Check>"배포 전 1시간과 배포 후 1시간을 견줘 이상 없음"이라는 판단이라면 다시 보세요. 그사이 트래픽이 바뀌었을 수 있어요. 같은 시간의 옛 버전과 견주세요.</Check>
+  <Check>롤링 배포 때마다 에러가 잠깐 튀었다가 사라진다면, 새 코드보다 바꿔 끼우는 순서를 먼저 보세요. <Term slug="apm/deploy-errors">배포할 때마다 에러가 잠깐 튈 때</Term>에서 다뤄요.</Check>
   <Check>지표에 버전 레이블이 없는 대시보드라면 다시 보세요. 롤링이나 카나리 동안 새 버전의 문제가 전체 숫자에 묻혀요.</Check>
   <Check>카나리가 몇십 건만 받았는데 '문제없음'이나 '문제 있음'으로 결론 낸 보고라면, 요청 수부터 보세요.</Check>
   <Check>DB 스키마를 바꾸는 배포에 '문제 생기면 이전 버전으로 되돌림'이라고만 적은 계획이라면 다시 보세요. 옛 버전이 새 스키마에서 도는지 먼저 확인하세요.</Check>

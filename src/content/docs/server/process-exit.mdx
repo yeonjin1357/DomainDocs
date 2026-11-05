@@ -1,0 +1,241 @@
+---
+title: 프로세스가 끝나는 방식
+summary: 프로세스는 스스로 끝나거나 신호로 끝나요. 종료 코드로 그 까닭을 읽는 법이에요.
+domain: server
+type: concept
+stage: basics
+order: 61
+icon: activity
+keywords: [signal, 신호, SIGTERM, SIGKILL, exit code, 종료 코드, "137", graceful shutdown, core dump, hs_err]
+related: [server/processes-and-threads, server/services-and-logs, kubernetes/pod-restarting, apm/deploy-errors, server/low-memory]
+sources:
+  - title: man7.org — signal(7)
+    url: https://man7.org/linux/man-pages/man7/signal.7.html
+  - title: man7.org — pid_namespaces(7) (init 프로세스와 신호)
+    url: https://man7.org/linux/man-pages/man7/pid_namespaces.7.html
+  - title: man7.org — core(5)
+    url: https://man7.org/linux/man-pages/man5/core.5.html
+  - title: GNU Bash 매뉴얼 — Exit Status
+    url: https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html
+  - title: freedesktop.org — systemd.service (TimeoutStopSec)
+    url: https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html
+  - title: Docker — docker container stop
+    url: https://docs.docker.com/reference/cli/docker/container/stop/
+  - title: Docker — docker container run (--init)
+    url: https://docs.docker.com/reference/cli/docker/container/run/
+  - title: Kubernetes — Pod Lifecycle (Termination of Pods)
+    url: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
+  - title: Go — os/signal (기본 동작)
+    url: https://pkg.go.dev/os/signal
+  - title: Oracle — Fatal Error Log (hs_err_pid)
+    url: https://docs.oracle.com/en/java/javase/21/troubleshoot/fatal-error-log.html
+updated: 2026-11-05
+---
+
+<KeyPoints>
+  <Point title="128을 넘는 종료 코드는 신호예요">
+    셸과 컨테이너는 신호로 끝난 프로세스를 128 + 신호 번호로 보여 줘요. 137은 SIGKILL, 143은 SIGTERM이에요.
+  </Point>
+  <Point title="SIGTERM은 부탁, SIGKILL은 강제예요">
+    멈출 때는 SIGTERM을 먼저 보내고, 정한 시간 안에 안 끝나면 SIGKILL을 보내요. SIGKILL은 프로세스가 막거나 처리할 수 없어요.
+  </Point>
+  <Point title="크래시는 흔적을 남겨요">
+    잘못된 메모리를 건드리면 커널 로그에 segfault 줄이 남아요. JVM은 hs_err 파일, Go는 panic 스택을 남겨요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="실제 프로세스는 부탁(SIGTERM)을 듣지 않게 막거나 무시할 수 있어요. 끌어내기(SIGKILL)는 프로세스가 아무것도 할 수 없어서 정리할 틈도 없어요.">
+  관리자(커널)가 팀(프로세스)에게 "정리하고 나가 주세요"라고 부탁하는 것이 SIGTERM이에요. 정한 시간이 지나도 안 나가면 경비가 바로 끌어내요. 이것이 SIGKILL이에요.
+</Analogy>
+
+## 끝나는 길은 두 가지예요
+
+프로세스는 스스로 끝나거나, 신호를 받고 끝나요. 스스로 끝날 때는 <Term term="server/exit-code">종료 코드</Term>(exit code)라는 숫자 하나를 남겨요. 0은 성공이고, 1부터 255는 실패예요.
+
+<Figure caption="프로세스가 끝나는 길을 나눈 그림이에요. 오른쪽 숫자는 셸과 컨테이너가 보여 주는 종료 코드예요.">
+  <Tree
+    ariaLabel="프로세스가 끝나는 길. 스스로 끝나면 성공 0이나 실패 1~255를 남기고, 신호로 끝나면 처리할 수 있는 SIGTERM 143과 SIGHUP 129, 처리할 수 없는 SIGKILL 137, 크래시인 SIGSEGV 139와 SIGABRT 134로 나뉘어요"
+    root={{
+      label: '프로세스가 끝남',
+      children: [
+        { label: '스스로 끝냄', note: 'exit(숫자)', children: [
+          { label: '성공', tag: '0', tone: 'accent' },
+          { label: '실패', note: '뜻은 프로그램마다', tag: '1~255' },
+        ] },
+        { label: '신호를 받음', children: [
+          { label: 'SIGTERM', note: '정리하고 끝내 달라는 부탁', tag: '143' },
+          { label: 'SIGKILL', note: '처리할 수 없어요', tag: '137', tone: 'warn' },
+          { label: 'SIGSEGV', note: '잘못된 메모리 접근', tag: '139', tone: 'warn' },
+          { label: 'SIGABRT', note: '스스로 멈춤(abort)', tag: '134', tone: 'warn' },
+        ] },
+      ],
+    }}
+  />
+</Figure>
+
+<Term term="server/signal">신호</Term>(signal)는 커널이나 다른 프로세스가 보내는 짧은 알림이에요. 번호와 이름이 있고, 받은 프로세스는 신호마다 정해진 대로 움직여요. 처리기(handler)를 달아 두면 그 신호를 받았을 때 할 일을 직접 정할 수 있어요.
+
+자주 만나는 신호는 이래요.
+
+- SIGTERM(15): 정리하고 끝내 달라는 부탁이에요. `kill` 명령의 기본값이고, 서비스를 멈출 때 먼저 보내요.
+- SIGKILL(9): 바로 끝내요. 프로세스가 막거나 처리할 수 없어요.
+- SIGINT(2): 터미널에서 Ctrl+C를 누르면 가요.
+- SIGHUP(1): 터미널이 닫힐 때 가요. 설정을 다시 읽는 신호로 쓰는 프로그램도 있어요.
+- SIGSEGV(11): 잘못된 메모리 주소를 건드렸을 때 커널이 보내요. 이것으로 끝나는 것이 흔히 말하는 크래시예요.
+- SIGABRT(6): 프로그램이 스스로 멈출 때(abort) 나요.
+
+## 종료 코드는 128 + 신호 번호예요
+
+신호로 끝난 프로세스는 스스로 숫자를 남기지 못해요. 그래서 셸은 128에 신호 번호를 더해 보여 줘요. 컨테이너 런타임과 쿠버네티스도 같은 숫자를 써요.
+
+WSL의 Ubuntu에서 프로세스를 여러 방법으로 끝내고 종료 코드를 봤어요.
+
+| 끝난 방법 | 종료 코드 |
+| --- | --- |
+| 정상 종료 | 0 |
+| Python·Node.js의 처리 안 된 에러 | 1 |
+| Go의 panic | 2 |
+| SIGHUP | 129 |
+| SIGABRT (JVM 크래시의 기본) | 134 |
+| SIGKILL | 137 |
+| SIGSEGV | 139 |
+| SIGTERM | 143 |
+
+137은 누가 SIGKILL을 보냈는지 알려 주지 않아요. 커널의 <Term term="server/oom-killer">OOM killer</Term>일 수도 있고, 멈추라고 했는데 정한 시간 안에 안 끝나서 맞은 것일 수도 있어요. 쿠버네티스는 같은 137에 종료 이유로 OOMKilled나 Error를 붙여 줘요.
+
+systemd는 숫자를 다르게 적어요. 스스로 끝나면 `code=exited, status=1/FAILURE`처럼 남겨요. 신호로 끝나면 `code=killed, status=9/KILL`처럼 남겨요.
+
+## 멈출 때는 SIGTERM 다음 SIGKILL이에요
+
+서비스를 멈추는 도구는 모두 같은 순서를 따라요. SIGTERM을 보내고 기다리다가, 정한 시간이 지나도 살아 있으면 SIGKILL을 보내요. 기다리는 시간의 기본값은 도구마다 달라요.
+
+- systemd: 90초예요. 서비스마다 `TimeoutStopSec`으로 바꿔요.
+- `docker stop`: 리눅스 컨테이너는 10초예요.
+- 쿠버네티스: 30초예요. `terminationGracePeriodSeconds`로 바꾸고, <Term term="kubernetes/prestop-hook">preStop 훅</Term>이 있으면 SIGTERM보다 먼저 돌려요.
+
+<Figure caption="쿠버네티스 기본값 30초로 멈추는 예시예요. 정리하는 앱은 정리가 끝나는 대로, SIGTERM을 무시하는 앱은 30초를 다 채운 뒤 SIGKILL로 끝나요.">
+  <Timeline
+    ariaLabel="0초에 SIGTERM, 30초에 SIGKILL이 가요. 정리하는 앱은 0초부터 8초까지 정리하고 끝나요. SIGTERM을 무시하는 앱은 30초까지 계속 돌다가 SIGKILL로 끝나요"
+    end={32}
+    lanes={[
+      { label: '정리하는 앱', segments: [{ start: 0, end: 8, label: '정리', tone: 'accent' }] },
+      { label: '무시하는 앱', segments: [{ start: 0, end: 30, label: '계속 돎 → 137', tone: 'warn' }] },
+    ]}
+    marks={[{ at: 0, label: 'SIGTERM' }, { at: 30, label: 'SIGKILL', tone: 'warn' }]}
+    ticks={[{ at: 0, label: '0초' }, { at: 30, label: '30초' }]}
+  />
+</Figure>
+
+WSL에서 systemd 서비스로 SIGTERM을 무시하는 Python을 띄우고, `TimeoutStopSec=3`으로 멈춰 봤어요. 3초 뒤 저널에 아래 줄이 남았어요. 앞의 서비스 이름은 줄였어요.
+
+```text
+State 'stop-sigterm' timed out.
+  Killing.
+Killing process 625 (python3)
+  with signal SIGKILL.
+Main process exited,
+  code=killed, status=9/KILL
+Failed with result 'timeout'.
+```
+
+### 처리기가 없으면 SIGTERM에 바로 끝나요
+
+처리기를 달지 않은 프로세스는 SIGTERM을 받는 즉시 끝나요. 처리 중이던 요청도 함께 끊겨요. 실험에서 Python과 Node.js는 처리기 없이 SIGTERM을 받자 바로 143으로 끝났어요.
+
+JVM은 SIGTERM을 받으면 셧다운 훅(종료 전에 돌릴 코드)을 돌린 뒤 143으로 끝나요. Spring Boot는 3.4부터 웹 서버의 <Term term="apm/graceful-shutdown">우아한 종료</Term>가 기본으로 켜져 있어요. 새 요청은 막고, 처리 중인 요청은 마치고 끝내요.
+
+## 컨테이너의 PID 1은 SIGTERM을 무시할 수 있어요
+
+컨테이너 안에서 처음 뜬 프로세스는 PID 1이에요. 리눅스는 PID 1을 지키려고, 처리기를 달지 않은 신호를 PID 1에게 전하지 않아요. SIGKILL과 SIGSTOP만은 바깥에서 보내면 그대로 가요.
+
+그래서 처리기가 없는 앱을 PID 1로 띄우면 SIGTERM이 아무 일도 하지 않아요. 멈추는 쪽은 유예 시간을 다 기다린 뒤 SIGKILL을 보내고, 종료 코드는 137이 돼요. 배포 때마다 파드가 30초씩 늦게 끝나고 137이 찍힌다면 이 경우예요.
+
+`unshare --pid`로 새 PID 네임스페이스를 만들고, 그 안의 PID 1에게 SIGTERM을 보내 봤어요.
+
+<Figure caption="새 PID 네임스페이스의 PID 1에게 SIGTERM을 보낸 결과예요. 처리기가 없거나 셸로 감싸면 3초를 기다려도 끝나지 않아 SIGKILL로 끝냈어요.">
+  <Bars
+    ariaLabel="PID 1이 SIGTERM을 받고 끝나기까지 걸린 시간. 처리기를 단 Python 0.1초, JVM 0.1초. 처리기 없는 Python, 처리기 없는 Node.js, sh -c로 감싼 Python은 3초가 지나도 끝나지 않았어요"
+    unit="초"
+    max={3}
+    bars={[
+      { label: 'Python, 처리기 있음', value: 0.1, display: '0.1초', tone: 'accent' },
+      { label: 'JVM, 셧다운 훅', value: 0.1, display: '0.1초', tone: 'accent' },
+      { label: 'Python, 처리기 없음', value: 3, display: '안 끝남', tone: 'warn' },
+      { label: 'Node.js, 처리기 없음', value: 3, display: '안 끝남', tone: 'warn' },
+      { label: 'sh -c로 감싼 Python', value: 3, display: '안 끝남', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+셸로 감싸면 셸이 PID 1이 돼요. 셸은 받은 SIGTERM을 자식에게 넘기지 않아서, 처리기를 단 앱도 신호를 받지 못해요. 고치는 법은 세 가지예요.
+
+- 앱에 SIGTERM 처리기를 달아요.
+- 시작 스크립트의 마지막 줄을 `exec 앱`으로 써서, 셸 대신 앱이 PID 1이 되게 해요.
+- 신호를 넘겨주는 작은 init(tini 같은)을 PID 1로 둬요. `docker run --init`이 이것을 넣어 줘요.
+
+## 크래시는 흔적을 남겨요
+
+크래시는 프로세스가 스스로 고칠 수 없는 잘못으로 끝난 것이에요. 커널과 런타임이 끝난 까닭을 어딘가에 남겨요.
+
+Python으로 0번 주소를 읽어 일부러 SIGSEGV를 냈어요. 커널 로그(`dmesg`)에 이런 줄이 남았어요.
+
+<Figure caption="커널이 남긴 segfault 줄이에요. 실제로는 한 줄이고, 스택 위치(sp)와 뒤의 CPU 정보는 뺐어요.">
+  <Anatomy
+    repeatText={false}
+    ariaLabel="segfault 줄을 조각으로 나눈 그림. 프로세스 이름과 PID python3[1537], 건드린 주소 0, 멈춘 명령의 위치 ip, 에러 번호 4, 멈춘 곳이 든 파일 libc.so.6"
+    parts={[
+      { text: 'python3[1537]:', label: '프로세스 이름과 PID' },
+      { text: 'segfault at 0', label: '건드린 주소', note: '0은 빈 포인터', tone: 'warn' },
+      { text: 'ip 0000755b84d8badd', label: '멈춘 명령의 위치' },
+      { text: 'error 4', label: '에러 번호', note: '사용자 모드에서 없는 곳을 읽음' },
+      { text: 'in libc.so.6', label: '멈춘 곳이 든 파일' },
+    ]}
+  />
+</Figure>
+
+런타임마다 남기는 흔적은 이래요.
+
+- <Term term="server/core-dump">코어 덤프</Term>(core dump): 끝나는 순간의 메모리를 파일로 남긴 것이에요. `ulimit -c`가 0이면 남지 않고, 어디에 남길지는 `/proc/sys/kernel/core_pattern`이 정해요.
+- JVM: 작업 폴더에 `hs_err_pid<PID>.log`를 남기고 134로 끝나요. 첫 줄에 어떤 신호로, 어느 코드에서 멈췄는지 적혀요.
+- Go: `panic:` 줄과 고루틴마다의 스택을 표준 에러에 쓰고 2로 끝나요.
+- Python·Node.js: 처리 안 된 에러의 스택을 표준 에러에 쓰고 1로 끝나요.
+
+## 모니터링에서는
+
+프로세스가 사라졌다는 사실만으로는 다음 할 일을 못 정해요. 종료 코드와 마지막 로그를 함께 모아 두면 갈래가 바로 갈라져요.
+
+<Figure caption="종료 코드로 다음에 볼 곳을 고르는 예시예요. 137은 OOM과 유예 시간 초과를 커널 로그로 갈라요.">
+  <Tree
+    ariaLabel="종료 코드에 따라 볼 곳. 137이면 커널 로그의 OOM 줄과 멈춘 시각의 배포·축소를, 139나 134면 커널 로그의 segfault 줄과 hs_err 파일을, 143이면 누가 멈췄는지 배포 기록을, 1이나 2면 표준 에러의 마지막 줄을 봐요"
+    root={{
+      label: '프로세스가 사라졌어요',
+      children: [
+        { label: '커널 로그의 OOM 줄', note: '없으면 유예 시간 초과', tag: '137', tone: 'warn' },
+        { label: 'segfault 줄, hs_err 파일', note: '크래시', tag: '139·134', tone: 'warn' },
+        { label: '배포·축소 기록', note: '누가 멈췄나', tag: '143' },
+        { label: '표준 에러의 마지막 줄', note: '처리 안 된 에러', tag: '1·2' },
+      ],
+    }}
+  />
+</Figure>
+
+재시작 횟수 그래프에는 종료 코드나 종료 이유를 레이블로 함께 남겨요. 같은 재시작 10번이라도 137이 10번인지 139가 10번인지에 따라 볼 곳이 달라요.
+
+<Checkpoints>
+  <Check>배포 때마다 종료 코드 137이 찍히고 종료가 유예 시간만큼 늦다면, 앱이 SIGTERM을 받지 못하는지 보세요. 셸로 감싼 시작 명령과 처리기 없는 PID 1이 흔한 까닭이에요.</Check>
+  <Check>137을 모두 메모리 부족으로 묶지 마세요. 커널 로그에 OOM 줄이 없으면 유예 시간 초과로 맞은 SIGKILL이에요.</Check>
+  <Check>앱을 멈춘 뒤 처리 중이던 요청이 에러로 끝난다면 SIGTERM 처리기가 있는지 보세요. 처리기가 없으면 SIGTERM에 바로 끝나요.</Check>
+  <Check>크래시를 모은다면 코어 덤프가 어디에 남는지 확인하세요. `ulimit -c`가 0이면 덤프가 없고, 컨테이너 안이면 덤프가 호스트 쪽 설정을 따라요.</Check>
+</Checkpoints>
+
+<Deeper>
+  실험은 WSL의 Ubuntu 24.04(커널 6.18)에서 했어요. Python 3.12, Node.js 22, OpenJDK 17, Go 1.27로 만든 리눅스 실행 파일을 썼어요. 셸 스크립트 안에서 `&`로 띄운 프로세스는 SIGINT를 무시해서, 표에서 SIGINT는 뺐어요.
+
+  128을 넘는 숫자는 프로그램이 `exit(137)`처럼 직접 남길 수도 있어요. 그래서 셸의 숫자만으로는 신호인지 확실하지 않아요. systemd와 쿠버네티스는 신호로 끝났는지를 따로 적어서 이 혼동이 없어요.
+
+  커널 로그의 `error 4`는 x86 페이지 폴트 에러 코드예요. 비트 0은 보호 위반 여부, 비트 1은 쓰기 여부, 비트 2는 사용자 모드 여부예요. 4는 사용자 모드에서 없는 페이지를 읽었다는 뜻이에요.
+
+  JVM은 크래시 때 기본으로 코어 덤프를 남기려고 SIGABRT로 끝나요. `-XX:-CreateCoredumpOnCrash`로 끄면 hs_err 파일만 남기고 1로 끝났어요.
+
+  Go 프로그램은 SIGTERM에 처리기를 달지 않으면 바로 끝나요. `os/signal`의 `signal.Notify`로 받아서 정리할 수 있어요.
+</Deeper>

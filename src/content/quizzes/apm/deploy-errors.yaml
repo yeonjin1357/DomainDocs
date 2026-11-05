@@ -1,0 +1,29 @@
+questions:
+  - id: graceful-not-enough
+    type: ox
+    prompt: 앱이 SIGTERM을 받으면 새 연결을 막고 처리 중인 요청만 마치고 끝나게 하면, 롤링 배포 중의 502·503이 거의 다 없어지나요?
+    answer: false
+    explain: 실험에서 에러는 49개에서 48개로만 줄었어요. 대부분은 앱이 꺼진 뒤에도 로드 밸런서가 그 인스턴스로 보낸 새 요청이었어요.
+  - id: uc-vs-uf
+    type: choice
+    prompt: 배포 중 Envoy 접근 로그에 503 UF가 수십 개 찍혔어요. 어떤 요청인가요?
+    choices: [꺼진 인스턴스에 붙지 못한 요청, 처리 중에 앱이 끊은 요청, 앱이 503을 직접 돌려준 요청, 시간 제한에 걸린 요청]
+    answer: 0
+    explain: UF는 앞단이 뒤쪽 서버에 연결하지 못했다는 표시예요. 처리 중에 끊긴 요청은 UC로 남아요.
+  - id: prestop-before-sigterm
+    type: ox
+    prompt: 쿠버네티스에서 preStop 훅은 컨테이너에 SIGTERM을 보낸 뒤에 도나요?
+    answer: false
+    explain: preStop이 먼저 돌고, 끝나야 SIGTERM이 가요. 그래서 preStop에서 몇 초 기다리면 엔드포인트가 빠질 시간을 벌어요.
+  - id: grace-includes-prestop
+    type: choice
+    prompt: preStop에서 5초 기다리고 앱 정리에 최대 20초 걸려요. terminationGracePeriodSeconds로 알맞은 값은?
+    choices: ['30', '20', '15', '5']
+    answer: 0
+    explain: 유예 시간은 preStop을 돌기 전부터 세요. 5초와 20초를 더한 25초보다 길어야 정리 중에 SIGKILL을 맞지 않아요.
+  - id: keepalive-idle
+    type: choice
+    prompt: 유휴 시간이 60초인 AWS ALB 뒤의 앱이 평소에도 드물게 502를 내요. 앱의 keep-alive 유휴 시간으로 알맞은 것은?
+    choices: [75초, 55초, 30초, 5초]
+    answer: 0
+    explain: 앱이 연결을 먼저 닫는 순간 ALB가 그 연결로 요청을 보내면 502가 나요. 그래서 앱 쪽 유휴 시간을 ALB보다 길게 둬요.

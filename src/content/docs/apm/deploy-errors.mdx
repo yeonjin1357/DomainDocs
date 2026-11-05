@@ -1,0 +1,176 @@
+---
+title: 배포할 때마다 에러가 잠깐 튈 때
+summary: 배포 중에 잠깐 튀는 502·503을, 종료 순서와 로드 밸런서에서 빠지는 시점으로 없애요.
+domain: apm
+type: guide
+order: 47
+icon: layers
+keywords: [배포 중 에러, rolling update, graceful shutdown, 우아한 종료, preStop, SIGTERM, deregistration delay, "502", "503", connection reset]
+related: [server/process-exit, apm/gateway-errors, apm/slow-after-deploy, foundations/deployments, kubernetes/services-and-ingress]
+sources:
+  - title: Kubernetes — Pod Lifecycle (Termination of Pods)
+    url: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
+  - title: Kubernetes — Container Lifecycle Hooks (sleep)
+    url: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
+  - title: Kubernetes — Feature gate PodLifecycleSleepAction
+    url: https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
+  - title: AWS — Troubleshoot your Application Load Balancers (HTTP 502)
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-troubleshooting.html
+  - title: AWS — Target group attributes (Deregistration delay)
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/edit-target-group-attributes.html
+  - title: AWS — Load balancer attributes (Connection idle timeout)
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/edit-load-balancer-attributes.html
+  - title: Spring Boot — Graceful Shutdown
+    url: https://docs.spring.io/spring-boot/reference/web/graceful-shutdown.html
+  - title: Spring Boot 3.4 Release Notes (Graceful Shutdown)
+    url: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.4-Release-Notes
+  - title: nginx — Controlling nginx (TERM과 QUIT)
+    url: https://nginx.org/en/docs/control.html
+  - title: Envoy — Access logging (response flags UC·UF)
+    url: https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage
+updated: 2026-11-05
+---
+
+<Situation>
+  배포할 때마다 1~2초 사이에 502나 503이 몇십 개 튀고, 저절로 사라져요. 배포가 끝나면 에러율은 평소로 돌아와요.
+
+  이런 에러는 새 코드 탓보다 바꿔 끼우는 순서 탓인 경우가 많아요. 내려가는 인스턴스에 요청이 계속 가거나, 처리 중인 요청이 끊긴 것이에요.
+</Situation>
+
+<FirstLook>
+  <Item title="시각">에러가 배포 중에만 나는지 봐요.</Item>
+  <Item title="갈래">처리 중에 끊겼는지, 아예 붙지 못했는지 봐요.</Item>
+  <Item title="순서">로드 밸런서에서 빠지기 전에 앱이 꺼지는지 봐요.</Item>
+</FirstLook>
+
+<Figure caption="에러가 평소에도 나면 다른 원인을, 막 뜬 새 인스턴스에서 나면 5단계를 봐요. 내려가는 인스턴스의 에러는 3·4단계로 거의 다 없어져요.">
+  <Triage
+    ariaLabel="1단계 배포 시각과 겹치지 않으면 502·504 가이드로, 겹치면 2단계 에러 갈래로 가요. 새 인스턴스에서 나면 5단계로, 내려가는 인스턴스에서 나면 3단계 우아한 종료, 4단계 먼저 빼고 끄기, 5단계 준비된 뒤 받기, 6단계 연결 재사용 순서로 봐요"
+    steps={[
+      { label: '배포 시각', tone: 'warn', next: '배포 중에만', exits: [{ when: '평소에도', to: '502·504 가이드' }] },
+      { label: '에러 갈래', next: '내려가는 인스턴스', exits: [{ when: '막 뜬 인스턴스', to: 5 }] },
+      { label: '우아한 종료', note: '처리 중 요청 마치기', next: '그래도 남음' },
+      { label: '먼저 빼고 끄기', note: '가장 흔한 원인', next: '그래도 남음' },
+      { label: '준비된 뒤 받기', next: '그래도 남음' },
+      { label: '연결 재사용', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+## 1. 에러가 배포 중에만 나는지 봐요
+
+에러율 그래프에 배포 시각을 표시해 두면 겹치는지 한눈에 보여요. 배포마다 같은 모양으로 튀었다가 돌아온다면 이 가이드의 상황이에요. 평소에도 502가 난다면 <Term slug="apm/gateway-errors">502·504가 날 때</Term>부터 봐요.
+
+롤링 업데이트는 인스턴스를 한두 대씩 바꿔 끼워요. 그래서 에러도 배포 내내 고르게 나지 않고, 인스턴스 하나가 내려갈 때마다 짧게 튀어요.
+
+## 2. 끊긴 요청인지, 붙지 못한 요청인지 갈라요
+
+배포 중 에러는 두 갈래예요. 처리 중이던 요청이 앱이 꺼지며 끊긴 것과, 이미 꺼진 인스턴스로 새 요청이 가서 붙지 못한 것이에요. 고치는 곳이 달라서 먼저 갈라요.
+
+앞단 프록시의 로그가 둘을 갈라 줘요. 같은 원인이 프록시마다 다른 숫자로 나와요.
+
+- Envoy: 둘 다 503이고, <Term term="kubernetes/response-flags">응답 플래그</Term>가 끊김은 `UC`, 붙지 못함은 `UF`예요.
+- nginx: 둘 다 502예요. 에러 로그에 끊김은 `upstream prematurely closed`, 붙지 못함은 `Connection refused`가 남아요.
+- AWS ALB: 둘 다 502예요. 대상이 연결을 거절했거나, 처리 중에 연결을 닫은 경우예요.
+
+WSL에서 Envoy 1.40 뒤에 Python 서버 두 대(A, B)를 두고 실험했어요. 요청 하나는 0.2초 걸리고, 8개씩 쉬지 않고 보냈어요. 4초에 A에게 SIGTERM을 보내고, 새 A는 뜨는 데 1초 걸리게 했어요.
+
+<Figure caption="A가 SIGTERM에 바로 끝날 때 Envoy가 돌려준 에러를 0.5초 칸으로 센 거예요. 처리 중 끊김(UC) 3개는 직전에 시작한 요청이고, 나머지 46개는 꺼진 A로 간 새 요청(UF)이에요.">
+  <Strip
+    ariaLabel="SIGTERM 0.5초 전에 시작한 요청 3개가 끊기고, SIGTERM부터 0.5초 동안 23개, 그다음 0.5초에 20개, 1초부터 2개가 붙지 못한 에러예요. 1.5초 뒤로는 에러가 없어요"
+    rows={[
+      {
+        heads: ['−1', '−0.5', '0', '0.5', '1', '1.5', '2', '2.5'],
+        bars: [0, 3, 23, 20, 2, 0, 0, 0],
+        cells: ['0', { label: '3', tone: 'accent' }, { label: '23', tone: 'accent' }, { label: '20', tone: 'accent' }, { label: '2', tone: 'accent' }, '0', '0', '0'],
+      },
+    ]}
+    marks={[{ at: 2, label: 'SIGTERM' }]}
+  />
+</Figure>
+
+에러는 SIGTERM 뒤 1.5초 안에 몰렸어요. Envoy가 헬스 체크(1초마다, 두 번 실패하면 뺌)로 A를 뺄 때까지, 꺼진 A에도 요청을 나눠 보냈기 때문이에요.
+
+## 3. 처리 중인 요청을 마치고 끝내게 해요
+
+앱이 SIGTERM을 받자마자 끝나면 처리 중인 요청이 끊겨요. SIGTERM을 받으면 새 연결을 그만 받고, 처리 중인 요청을 마친 뒤 끝내야 해요. 이것을 <Term term="apm/graceful-shutdown">우아한 종료</Term>(graceful shutdown)라고 해요.
+
+- Spring Boot는 3.4부터 웹 서버의 우아한 종료가 기본으로 켜져 있어요. 그 전 버전은 `server.shutdown=graceful`을 넣어요.
+- Node.js, Python, Go는 SIGTERM 처리기를 직접 달아야 해요. 처리기가 없으면 SIGTERM에 바로 끝나요.
+- nginx는 SIGTERM에 빠르게 끝나고, SIGQUIT에 우아하게 끝나요. 공식 nginx 이미지는 멈출 때 SIGQUIT을 보내게 정해 뒀어요.
+
+컨테이너라면 앱이 SIGTERM을 받는지부터 봐요. 셸로 감싸 띄우면 신호가 앱까지 가지 않아요. 이 이야기는 <Term slug="server/process-exit">프로세스가 끝나는 방식</Term>에서 다뤄요.
+
+그런데 우아한 종료만으로는 에러가 거의 줄지 않았어요. 같은 실험에서 A가 처리 중인 요청을 마치고 끝나게 했더니, 에러는 49개에서 48개가 됐어요. 끊김은 3개에서 1개로 줄었지만, 꺼진 A로 간 새 요청은 그대로였어요.
+
+## 4. 로드 밸런서에서 먼저 빼고 끄세요
+
+에러 대부분은 앱이 꺼진 뒤에도 로드 밸런서가 요청을 보내서 나요. 순서를 바꿔야 해요. 로드 밸런서가 먼저 빼 가게 하고, 요청이 더 오지 않을 때 앱을 꺼요.
+
+실험에서는 A가 SIGTERM을 받으면 헬스 체크에 503으로 답하게 했어요. 요청은 그대로 3초 더 받고, 그 뒤 처리 중인 요청을 마치고 끝냈어요. 에러는 0개였어요.
+
+<Figure caption="세 가지 종료 방식에서 Envoy가 돌려준 에러 수예요. 요청은 모두 480개 안팎이었어요.">
+  <Bars
+    ariaLabel="SIGTERM에 바로 끝냄 49개, 처리 중인 요청만 마치고 끝냄 48개, 헬스 체크를 먼저 실패시키고 3초 뒤 끝냄 0개"
+    bars={[
+      { label: '바로 끝냄', value: 49, display: '49개', tone: 'warn' },
+      { label: '처리 중인 요청만 마침', value: 48, display: '48개', tone: 'warn' },
+      { label: '먼저 빠지고 3초 뒤 끝냄', value: 0, display: '0개', tone: 'accent' },
+    ]}
+  />
+</Figure>
+
+쿠버네티스에서는 파드를 지우면 두 일이 동시에 시작해요. kubelet은 컨테이너에 SIGTERM을 보내고, 컨트롤 플레인은 파드를 서비스의 엔드포인트에서 빼요. 그런데 엔드포인트가 빠진 것이 kube-proxy와 인그레스까지 퍼지는 데 시간이 걸려요.
+
+<Figure caption="preStop 없이 지운 파드의 예시예요. 서비스 경로에 반영되기 전 몇 초 동안, 이미 SIGTERM을 받은 파드로 요청이 계속 가요.">
+  <Timeline
+    ariaLabel="0초에 파드를 지우면 kubelet이 바로 SIGTERM을 보내 앱이 0초부터 1초까지 정리하고 끝나요. 같은 0초에 엔드포인트에서 빼기 시작하지만, kube-proxy와 인그레스에 반영되는 3초까지 요청이 그 파드로 가요"
+    end={6}
+    lanes={[
+      { label: '앱', segments: [{ start: 0, end: 1, label: '정리', tone: 'accent' }, { start: 1, end: 6, label: '꺼짐', tone: 'sub' }] },
+      { label: '서비스 경로', segments: [{ start: 0, end: 3, label: '아직 보냄', tone: 'warn' }, { start: 3, end: 6, label: '안 보냄', tone: 'sub' }] },
+    ]}
+    marks={[{ at: 0, label: '파드 삭제' }]}
+    ticks={[{ at: 0, label: '0초' }, { at: 3, label: '3초' }, { at: 6, label: '6초' }]}
+  />
+</Figure>
+
+그래서 <Term term="kubernetes/prestop-hook">preStop 훅</Term>으로 몇 초 기다린 뒤 SIGTERM이 가게 해요. preStop은 SIGTERM보다 먼저 돌고, 끝나야 SIGTERM이 가요.
+
+1.30부터는 이미지에 `sleep` 명령이 없어도 되는 `sleep` 동작을 쓸 수 있어요. 1.34에서 정식 기능이 됐어요.
+
+```yaml
+spec:
+  terminationGracePeriodSeconds: 40
+  containers:
+  - name: app
+    lifecycle:
+      preStop:
+        sleep:
+          seconds: 5
+```
+
+유예 시간(`terminationGracePeriodSeconds`)은 preStop을 돌기 전부터 세요. 그래서 preStop 시간과 우아한 종료 시간을 더한 것보다 길게 잡아요. 짧으면 정리 중에 SIGKILL을 맞고 137로 끝나요.
+
+AWS ALB도 대상을 뺄 때 등록 해제 지연(deregistration delay, 기본 300초) 동안 처리 중인 요청을 기다려 줘요. 그 사이 새 요청은 보내지 않아요. 다만 앱이 그보다 먼저 꺼지면 처리 중인 요청은 502로 끝나요.
+
+## 5. 새 인스턴스는 준비된 뒤에 받게 해요
+
+막 뜬 인스턴스에서 에러가 난다면 준비되기 전에 요청을 받은 것이에요. 포트는 열렸지만 DB 연결이나 캐시가 아직 준비되지 않았을 수 있어요.
+
+쿠버네티스는 readiness <Term term="kubernetes/probe">프로브</Term>가 성공해야 파드를 엔드포인트에 넣어요. 프로브가 포트만 열렸는지 보면 너무 일찍 성공해요. 앱이 요청을 처리할 준비가 됐는지 보는 경로를 프로브로 둬요.
+
+받은 뒤에 느린 것은 <Term slug="apm/slow-after-deploy">배포 뒤에 느려졌을 때</Term>에서 다뤄요.
+
+## 6. 연결을 재사용하는 틈도 봐요
+
+로드 밸런서는 앱과의 연결을 열어 두고 여러 요청에 다시 써요. 이것을 keep-alive라고 해요. 앱이 이 연결을 먼저 닫는 순간 로드 밸런서가 요청을 보내면, 그 요청은 끊겨요.
+
+평소에도 드물게 이런 502가 난다면, 앱의 keep-alive 시간이 로드 밸런서의 유휴 시간보다 짧은지 봐요. AWS는 앱의 유휴 시간을 ALB의 유휴 시간(기본 60초)보다 길게 두라고 권해요.
+
+<Checkpoints>
+  <Check>배포 때마다 에러가 튄다면 앞단 프록시 로그로 끊김과 붙지 못함을 먼저 가르세요. 고치는 곳이 달라요.</Check>
+  <Check>우아한 종료를 켰는데도 에러가 남는다면, 로드 밸런서에서 빠지기 전에 앱이 꺼지는지 보세요. preStop으로 몇 초 기다리는 것이 흔한 해결이에요.</Check>
+  <Check>preStop을 넣었다면 유예 시간이 preStop과 정리 시간을 더한 것보다 긴지 보세요. 짧으면 종료 코드 137이 찍혀요.</Check>
+  <Check>nginx를 직접 빌드한 이미지로 띄운다면 멈출 때 보내는 신호를 보세요. SIGTERM이면 처리 중인 요청을 끊고 빠르게 끝나요.</Check>
+</Checkpoints>

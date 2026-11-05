@@ -355,3 +355,23 @@ terms:
     short: 게스트 안의 드라이버가 메모리를 잡아 두고, 그만큼을 호스트에 돌려주는 방법이에요.
     analogy: 관리 회사가 사무실 안에 짐을 들여 그 자리만큼 공간을 돌려받는 것과 같아요.
     doc: server/virtualization
+  - id: signal
+    name: 신호
+    en: Signal
+    aliases: [signal, 시그널, SIGTERM, SIGKILL]
+    short: 커널이나 다른 프로세스가 프로세스에 보내는 짧은 알림으로, 번호와 이름이 있어요.
+    analogy: 관리자가 팀에 건네는 짧은 쪽지와 같아요.
+    doc: server/process-exit
+  - id: exit-code
+    name: 종료 코드
+    en: Exit code
+    aliases: [exit code, exit status, 종료 상태, 리턴 코드]
+    short: 프로세스가 끝나며 남기는 0~255의 숫자로, 0은 성공이에요.
+    analogy: 팀이 퇴근하며 문에 붙여 두는 결과 쪽지와 같아요.
+    doc: server/process-exit
+  - id: core-dump
+    name: 코어 덤프
+    en: Core dump
+    aliases: [core dump, core file, 코어 파일]
+    short: 프로세스가 비정상으로 끝나는 순간의 메모리를 그대로 담은 파일이에요.
+    doc: server/process-exit

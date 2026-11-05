@@ -6,7 +6,7 @@ type: guide
 order: 90
 icon: container
 keywords: [CrashLoopBackOff, restart, 재시작, OOMKilled, exit code, "137", Last State, kubectl logs --previous, liveness probe, 원인 찾기]
-related: [kubernetes/pod-status, kubernetes/requests-and-limits, kubernetes/pod-evicted, kubernetes/container-logs, server/low-memory]
+related: [kubernetes/pod-status, kubernetes/requests-and-limits, kubernetes/pod-evicted, kubernetes/container-logs, server/process-exit]
 sources:
   - title: Kubernetes — Pod Lifecycle
     url: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
@@ -47,7 +47,7 @@ updated: 2026-10-29
 
 ## 1. 마지막 종료 이유를 보세요
 
-지금 상태가 아니라 직전 실행이 어떻게 끝났는지가 실마리예요. `kubectl describe pod`의 Last State에 종료 이유(Reason)와 종료 코드(Exit Code)가 남아요.
+지금 상태가 아니라 직전 실행이 어떻게 끝났는지가 실마리예요. 종료 코드 읽는 법은 <Term slug="server/process-exit">프로세스가 끝나는 방식</Term>에서 다뤄요. `kubectl describe pod`의 Last State에 종료 이유(Reason)와 종료 코드(Exit Code)가 남아요.
 
 | 종료 이유 | 뜻 | 다음에 볼 곳 |
 | --- | --- | --- |
