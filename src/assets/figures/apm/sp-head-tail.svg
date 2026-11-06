@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 294" width="300" height="294">
+<text x="8" y="18" font-size="13" font-weight="700" style="fill:var(--color-text)">head 샘플링</text>
+<text x="292" y="18" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">시작할 때 확률로</text>
+<rect x="64" y="37" width="204" height="14" rx="4" stroke-width="1.3" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="72" y="48.5" font-size="13" font-weight="600" style="fill:var(--color-accent)">남김</text>
+<circle cx="50" cy="44" r="7" style="fill:var(--color-accent)" />
+<rect x="64" y="59" width="204" height="14" rx="4" stroke-width="1.3" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="72" y="70.5" font-size="13" font-weight="600" style="fill:var(--color-text-weak)">버림</text>
+<circle cx="50" cy="66" r="7" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="64" y="81" width="204" height="14" rx="4" stroke-width="1.3" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="72" y="92.5" font-size="13" font-weight="600" style="fill:var(--color-text-weak)">버림</text>
+<circle cx="50" cy="88" r="7" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="36" y="110" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">정하는 곳</text>
+<text x="8" y="132" font-size="13" font-weight="600" style="fill:var(--color-accent)">× 1/확률로 되돌려 셀 수 있어요</text>
+<line x1="8" y1="148" x2="292" y2="148" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-line)" />
+<text x="8" y="172" font-size="13" font-weight="700" style="fill:var(--color-text)">tail 샘플링</text>
+<text x="292" y="172" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">다 모은 뒤 정책으로</text>
+<rect x="64" y="191" width="204" height="14" rx="4" stroke-width="1.3" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="72" y="202.5" font-size="13" font-weight="600" style="fill:var(--color-warn)">에러 · 남김</text>
+<circle cx="282" cy="198" r="7" style="fill:var(--color-warn)" />
+<rect x="64" y="213" width="204" height="14" rx="4" stroke-width="1.3" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="72" y="224.5" font-size="13" font-weight="600" style="fill:var(--color-accent)">정상 · 버림</text>
+<circle cx="282" cy="220" r="7" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="64" y="235" width="204" height="14" rx="4" stroke-width="1.3" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="72" y="246.5" font-size="13" font-weight="600" style="fill:var(--color-accent)">정상 · 버림</text>
+<circle cx="282" cy="242" r="7" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="282" y="264" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">정하는 곳</text>
+<text x="8" y="286" font-size="13" font-weight="600" style="fill:var(--color-warn)">에러 쪽으로 쏠려 되돌릴 수 없어요</text>
+</svg>

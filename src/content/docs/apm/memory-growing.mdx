@@ -20,6 +20,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 updated: 2026-10-29
 ---
+import MgLimit from '../../../assets/figures/apm/mg-limit.svg';
 
 <Situation>
   주문 API 파드가 사흘에 한 번꼴로 다시 시작해요. 다시 시작하면 메모리가 낮았다가, 시간이 지나며 계단처럼 올라가요.
@@ -79,16 +80,7 @@ JVM이 내는 힙 사용량과, 서버가 보는 프로세스 메모리(RSS)를 
 `-Xmx`를 적지 않으면 최대 힙은 JVM이 정해요. 기본값은 쓸 수 있는 메모리의 25%(`MaxRAMPercentage`)예요. 리눅스 컨테이너에서는 컨테이너 메모리 한도를 기준으로 계산해서, 한도가 2Gi면 최대 힙은 512Mi 안팎이에요.
 
 <Figure caption="-Xmx 없이 컨테이너 한도 2Gi로 띄운 예시예요. 최대 힙은 한도의 25%인 512Mi 안팎이에요. 힙 밖 메모리까지 더한 크기가 2Gi를 넘으면 OOMKilled로 끝나요.">
-  <Strip
-    ariaLabel="컨테이너 메모리 한도 2Gi를 512Mi씩 네 칸으로 나눠, 첫 칸은 최대 힙으로 한도의 25%이고 나머지 세 칸에는 힙 밖 메모리가 들어가며, 둘을 더해 2Gi를 넘으면 OOMKilled인 칸 띠"
-    rows={[
-      { label: '컨테이너 메모리 한도 2Gi', cells: [{ label: '512Mi', tone: 'accent' }, '512Mi', '512Mi', '512Mi'] },
-    ]}
-    ranges={[
-      { from: 0, to: 0, label: '최대 힙 25%', tone: 'accent' },
-      { from: 1, to: 3, label: '힙 밖 메모리도 이 안에' },
-    ]}
-  />
+  <MgLimit aria-label="-Xmx 없이 메모리 한도 2Gi인 컨테이너에서 최대 힙은 한도의 25%인 512Mi이고, 나머지 자리에 힙 밖 메모리가 들어가요. 힙과 힙 밖을 더한 크기가 2Gi를 넘으면 OOMKilled로 끝나는 막대" />
 </Figure>
 
 ## 3. 힙이라면 GC 직후 바닥을 보세요

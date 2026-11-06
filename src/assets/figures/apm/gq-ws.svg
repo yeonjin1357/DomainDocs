@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 282" width="300" height="282">
+<text x="40" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">클라이언트</text>
+<line x1="40" y1="26" x2="40" y2="274" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="262" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">서버</text>
+<line x1="262" y1="26" x2="262" y2="274" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M40 48 L257.1 48" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M262 48 L255 43.7 L255 52.3 z" style="fill:var(--color-text-sub)" />
+<text x="151" y="42" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">GET /live (Upgrade)</text>
+<path d="M262 82 L44.9 82" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M40 82 L47 86.3 L47 77.7 z" style="fill:var(--color-text-sub)" />
+<text x="151" y="76" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">101 Switching Protocols</text>
+<path d="M262 146 L44.9 146" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M40 146 L47 150.3 L47 141.7 z" style="fill:var(--color-accent)" />
+<text x="151" y="140" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">메시지</text>
+<path d="M262 168 L44.9 168" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M40 168 L47 172.3 L47 163.7 z" style="fill:var(--color-accent)" />
+<path d="M40 190 L257.1 190" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M262 190 L255 185.7 L255 194.3 z" style="fill:var(--color-accent)" />
+<path d="M40 228 L257.1 228" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M262 228 L255 223.7 L255 232.3 z" style="fill:var(--color-text-sub)" />
+<text x="151" y="222" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">닫힘 1000</text>
+<path d="M262 262 L44.9 262" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M40 262 L47 266.3 L47 257.7 z" style="fill:var(--color-text-sub)" />
+<text x="151" y="256" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">닫힘 1000</text>
+<line x1="8" y1="100" x2="292" y2="100" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-line)" />
+<text x="150" y="118" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">여기부터 HTTP 응답 없이 메시지만</text>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 264" width="300" height="264">
+<text x="52" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">배포 전</text>
+<rect x="16" y="30" width="72" height="28" rx="6" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="52" y="49" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">v41</text>
+<rect x="16" y="64" width="72" height="28" rx="6" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="52" y="83" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">v41</text>
+<rect x="16" y="98" width="72" height="28" rx="6" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="52" y="117" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">v41</text>
+<rect x="16" y="132" width="72" height="28" rx="6" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="52" y="151" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">v41</text>
+<path d="M92 92 L105.8 92" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M110 92 L104 88.3 L104 95.7 z" style="fill:var(--color-text-sub)" />
+<text x="150" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">배포 중</text>
+<rect x="114" y="30" width="72" height="28" rx="6" style="fill:var(--color-accent)" />
+<text x="150" y="49" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">v42</text>
+<rect x="114" y="64" width="72" height="28" rx="6" style="fill:var(--color-accent)" />
+<text x="150" y="83" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">v42</text>
+<rect x="114" y="98" width="72" height="28" rx="6" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="117" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">v41</text>
+<rect x="114" y="132" width="72" height="28" rx="6" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="151" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">v41</text>
+<path d="M190 92 L203.8 92" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M208 92 L202 88.3 L202 95.7 z" style="fill:var(--color-text-sub)" />
+<text x="248" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">배포 뒤</text>
+<rect x="212" y="30" width="72" height="28" rx="6" style="fill:var(--color-accent)" />
+<text x="248" y="49" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">v42</text>
+<rect x="212" y="64" width="72" height="28" rx="6" style="fill:var(--color-accent)" />
+<text x="248" y="83" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">v42</text>
+<rect x="212" y="98" width="72" height="28" rx="6" style="fill:var(--color-accent)" />
+<text x="248" y="117" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">v42</text>
+<rect x="212" y="132" width="72" height="28" rx="6" style="fill:var(--color-accent)" />
+<text x="248" y="151" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">v42</text>
+<text x="8" y="196" font-size="13" style="fill:var(--color-text-sub)">전체 지표</text>
+<line x1="16" y1="236" x2="288" y2="236" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<path d="M16 226 H90 C 140 226, 170 206, 210 206 H288" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="150" y="256" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">한 번에 바뀌지 않고 서서히 바뀌어요</text>
+</svg>

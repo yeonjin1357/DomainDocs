@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 202" width="300" height="202">
+<text x="8" y="18" font-size="13" font-weight="700" style="fill:var(--color-text)">평소</text>
+<rect x="8" y="28" width="214" height="40" rx="8" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<rect x="14" y="36" width="16" height="24" rx="3" style="fill:var(--color-accent)" />
+<rect x="34.6" y="36" width="16" height="24" rx="3" style="fill:var(--color-accent)" />
+<rect x="55.2" y="36" width="16" height="24" rx="3" style="fill:var(--color-accent)" />
+<rect x="75.8" y="36" width="16" height="24" rx="3" style="fill:var(--color-accent)" />
+<rect x="96.4" y="36" width="16" height="24" rx="3" style="fill:var(--color-accent)" />
+<rect x="117" y="36" width="16" height="24" rx="3" style="fill:var(--color-accent)" />
+<rect x="137.6" y="36" width="16" height="24" rx="3" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="158.2" y="36" width="16" height="24" rx="3" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="178.8" y="36" width="16" height="24" rx="3" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="199.4" y="36" width="16" height="24" rx="3" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="230" y="44" font-size="13" font-weight="700" style="fill:var(--color-accent)">active 6</text>
+<text x="230" y="62" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">idle 4</text>
+<text x="8" y="100" font-size="13" font-weight="700" style="fill:var(--color-warn)">바닥났을 때</text>
+<rect x="8" y="110" width="214" height="40" rx="8" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<rect x="14" y="118" width="16" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="34.6" y="118" width="16" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="55.2" y="118" width="16" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="75.8" y="118" width="16" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="96.4" y="118" width="16" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="117" y="118" width="16" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="137.6" y="118" width="16" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="158.2" y="118" width="16" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="178.8" y="118" width="16" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="199.4" y="118" width="16" height="24" rx="3" style="fill:var(--color-warn)" />
+<text x="230" y="126" font-size="13" font-weight="700" style="fill:var(--color-warn)">active 10</text>
+<text x="230" y="144" font-size="13" font-weight="700" style="fill:var(--color-warn)">idle 0</text>
+<path d="M20 162 q5 2.8 0 5.5 q-5 2.8 0 5.5 q5 2.8 0 5.5 q-5 2.8 0 5.5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M20 192 L25 184 L15 184 z" style="fill:var(--color-text-sub)" />
+<path d="M36 162 q5 2.8 0 5.5 q-5 2.8 0 5.5 q5 2.8 0 5.5 q-5 2.8 0 5.5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M36 192 L41 184 L31 184 z" style="fill:var(--color-text-sub)" />
+<path d="M52 162 q5 2.8 0 5.5 q-5 2.8 0 5.5 q5 2.8 0 5.5 q-5 2.8 0 5.5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M52 192 L57 184 L47 184 z" style="fill:var(--color-text-sub)" />
+<path d="M68 162 q5 2.8 0 5.5 q-5 2.8 0 5.5 q5 2.8 0 5.5 q-5 2.8 0 5.5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M68 192 L73 184 L63 184 z" style="fill:var(--color-text-sub)" />
+<path d="M84 162 q5 2.8 0 5.5 q-5 2.8 0 5.5 q5 2.8 0 5.5 q-5 2.8 0 5.5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M84 192 L89 184 L79 184 z" style="fill:var(--color-text-sub)" />
+<path d="M100 162 q5 2.8 0 5.5 q-5 2.8 0 5.5 q5 2.8 0 5.5 q-5 2.8 0 5.5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M100 192 L105 184 L95 184 z" style="fill:var(--color-text-sub)" />
+<text x="118" y="184" font-size="13" style="fill:var(--color-text-sub)">스레드가 커넥션을 기다려요</text>
+</svg>

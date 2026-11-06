@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 230" width="300" height="230">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">G1</text>
+<text x="292" y="16" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">1792MB 이상이면 기본</text>
+<rect x="8" y="26" width="284" height="22" rx="4" style="fill:var(--color-accent-weak)" />
+<rect x="48" y="24" width="6" height="26" rx="2" style="fill:var(--color-warn)" />
+<rect x="128" y="24" width="12" height="26" rx="2" style="fill:var(--color-warn)" />
+<rect x="218" y="24" width="34" height="26" rx="2" style="fill:var(--color-warn)" />
+<text x="8" y="70" font-size="13" style="fill:var(--color-text-sub)">멈춤 목표</text>
+<text x="80" y="70" font-size="13" font-weight="700" style="fill:var(--color-text)">200ms · 보장은 아님</text>
+<text x="8" y="90" font-size="13" style="fill:var(--color-text-sub)">실제 멈춤</text>
+<text x="80" y="90" font-size="13" font-weight="700" style="fill:var(--color-warn)">밀리초에서 초 단위</text>
+<text x="8" y="124" font-size="13" font-weight="700" style="fill:var(--color-text)">ZGC</text>
+<text x="292" y="124" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">직접 골라요</text>
+<rect x="8" y="134" width="284" height="22" rx="4" style="fill:var(--color-accent-weak)" />
+<rect x="48" y="132" width="1.5" height="26" rx="2" style="fill:var(--color-warn)" />
+<rect x="128" y="132" width="1.5" height="26" rx="2" style="fill:var(--color-warn)" />
+<rect x="218" y="132" width="1.5" height="26" rx="2" style="fill:var(--color-warn)" />
+<text x="8" y="178" font-size="13" style="fill:var(--color-text-sub)">멈춤 목표</text>
+<text x="80" y="178" font-size="13" font-weight="700" style="fill:var(--color-text)">1ms 넘지 않기</text>
+<text x="8" y="198" font-size="13" style="fill:var(--color-text-sub)">실제 멈춤</text>
+<text x="80" y="198" font-size="13" font-weight="700" style="fill:var(--color-warn)">마이크로초 단위</text>
+<rect x="232" y="212" width="12" height="12" rx="2" style="fill:var(--color-warn)" />
+<text x="250" y="222" font-size="13" style="fill:var(--color-text-sub)">멈춤</text>
+</svg>

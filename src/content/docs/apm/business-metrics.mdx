@@ -17,6 +17,7 @@ sources:
     url: https://prometheus.io/docs/prometheus/latest/querying/basics/
 updated: 2026-11-03
 ---
+import BmDeclined from '../../../assets/figures/apm/bm-declined.svg';
 
 <OnDashboard title="쇼핑몰 · 지난 10분" caption="에러율과 응답시간은 평소와 같은데, 분당 주문이 평소의 4%로 줄었어요. 기술 지표만 보면 아무 일도 없어 보여요.">
   <StatTile label="에러율" value="0.1" unit="%" note="평소와 같음" />
@@ -45,16 +46,7 @@ updated: 2026-11-03
 에러율, 응답시간, 처리량 같은 기술 지표는 요청이 들어와야 움직여요. 요청이 오지 않거나, 요청은 성공했는데 결과가 틀리면 기술 지표는 조용해요.
 
 <Figure caption="결제사가 HTTP로는 성공(200)을 돌려주면서 본문에 거절을 담은 경우예요. APM은 성공한 호출로 세고, 실패한 결제는 결제 결과를 세는 비즈니스 지표에서만 보여요.">
-  <Sequence
-    ariaLabel="앱이 결제사에 결제를 요청하고, 결제사가 HTTP 200 OK로 답하면서 본문의 결과는 거절이고, 앱은 결제 실패 카운터를 올리는 순서"
-    participants={['사용자', '앱', '결제사']}
-    messages={[
-      { from: '사용자', to: '앱', label: '결제하기' },
-      { from: '앱', to: '결제사', label: '결제 요청' },
-      { from: '결제사', to: '앱', label: '200 OK · 결과: 거절', dashed: true, tone: 'warn' },
-      { from: '앱', to: '사용자', label: '결제 실패 안내', dashed: true, tone: 'warn' },
-    ]}
-  />
+  <BmDeclined aria-label="사용자가 결제하기를 누르면 앱이 결제사에 결제를 요청하고, 결제사가 HTTP 200 OK로 답하면서 본문의 결과는 거절이라 앱이 사용자에게 결제 실패를 안내해요. APM은 성공한 호출로 세고, 결제 결과 지표에만 결제 실패가 1 오르는 그림" />
 </Figure>
 
 이런 일은 흔해요. 배포 뒤 결제 버튼이 화면에서 사라지거나, 쿠폰 계산이 틀려 결제가 막히거나, 외부 결제사가 특정 카드만 거절하는 경우예요. 모두 에러율은 그대로예요.

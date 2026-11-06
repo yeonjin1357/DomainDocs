@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 262" width="300" height="262">
+<text x="8" y="27" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">요청 D</text>
+<rect x="64" y="14" width="220" height="18" rx="9" style="fill:var(--color-bg)" />
+<rect x="64" y="14" width="110" height="18" rx="6" stroke-width="1.4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="119" y="27.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">5초</text>
+<text x="8" y="53" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">요청 E</text>
+<rect x="64" y="40" width="220" height="18" rx="9" style="fill:var(--color-bg)" />
+<rect x="108" y="40" width="110" height="18" rx="6" stroke-width="1.4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="163" y="53.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">5초</text>
+<text x="8" y="79" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">요청 F</text>
+<rect x="64" y="66" width="220" height="18" rx="9" style="fill:var(--color-bg)" />
+<rect x="152" y="66" width="110" height="18" rx="6" stroke-width="1.4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="207" y="79.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">5초</text>
+<text x="8" y="106" font-size="13" font-weight="700" style="fill:var(--color-text)">분포도</text>
+<line x1="64" y1="112" x2="64" y2="214" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="64" y1="214" x2="284" y2="214" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="58" y="138.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">5초</text>
+<line x1="64" y1="134" x2="284" y2="134" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="4 3" style="stroke:var(--color-warn)" />
+<line x1="174" y1="32" x2="174" y2="127" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-text-weak)" />
+<circle cx="174" cy="134" r="6" style="fill:var(--color-warn)" />
+<line x1="218" y1="58" x2="218" y2="127" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-text-weak)" />
+<circle cx="218" cy="134" r="6" style="fill:var(--color-warn)" />
+<line x1="262" y1="84" x2="262" y2="127" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-text-weak)" />
+<circle cx="262" cy="134" r="6" style="fill:var(--color-warn)" />
+<text x="64" y="232" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">0초</text>
+<text x="174" y="232" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">5초</text>
+<text x="284" y="232" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">10초</text>
+<text x="70" y="196" font-size="13" font-weight="700" style="fill:var(--color-warn)">타임아웃 5초에서 가로줄</text>
+<text x="8" y="254" font-size="13" style="fill:var(--color-text-sub)">끝난 시각은 달라도 모두 5초를 기다리다 끝나요</text>
+</svg>

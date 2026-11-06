@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 274" width="300" height="274">
+<rect x="6" y="62" width="100" height="76" rx="12" stroke-width="1.6" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="42" cy="80" r="3" style="fill:var(--color-accent)" />
+<circle cx="70" cy="80" r="3" style="fill:var(--color-accent)" />
+<line x1="42" y1="80" x2="70" y2="80" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<text x="56" y="104" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">닫힘</text>
+<text x="56" y="120" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">호출하며</text>
+<text x="56" y="134" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">실패율을 세요</text>
+<rect x="194" y="62" width="100" height="76" rx="12" stroke-width="1.6" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="230" cy="80" r="3" style="fill:var(--color-warn)" />
+<circle cx="258" cy="80" r="3" style="fill:var(--color-warn)" />
+<line x1="230" y1="80" x2="254" y2="68" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="244" y="104" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">열림</text>
+<text x="244" y="120" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">부르지 않고</text>
+<text x="244" y="134" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">바로 실패</text>
+<rect x="100" y="190" width="100" height="76" rx="12" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="136" cy="208" r="3" style="fill:var(--color-text-sub)" />
+<circle cx="164" cy="208" r="3" style="fill:var(--color-text-sub)" />
+<line x1="136" y1="208" x2="163" y2="203" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 2" style="stroke:var(--color-text-sub)" />
+<text x="150" y="232" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">반열림</text>
+<text x="150" y="248" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">몇 개만</text>
+<text x="150" y="262" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">시험해요</text>
+<path d="M106 88 L187.1 88" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M192 88 L185 83.7 L185 92.3 z" style="fill:var(--color-warn)" />
+<text x="150" y="30" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">실패율이</text>
+<text x="150" y="48" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">기준을 넘으면</text>
+<path d="M226 140 L187.2 184.3" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M184 188 L191.9 185.6 L185.3 179.9 z" style="fill:var(--color-text-sub)" />
+<text x="212" y="176" font-size="13" style="fill:var(--color-text-sub)">기다린 뒤</text>
+<path d="M202 222 L262 222 L262 146.9" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M262 142 L257.7 149 L266.3 149 z" style="fill:var(--color-warn)" />
+<text x="270" y="250" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-warn)">시험 실패</text>
+<path d="M98 222 L38 222 L38 146.9" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M38 142 L33.7 149 L42.3 149 z" style="fill:var(--color-accent)" />
+<text x="30" y="250" font-size="13" font-weight="600" style="fill:var(--color-accent)">시험 성공</text>
+</svg>

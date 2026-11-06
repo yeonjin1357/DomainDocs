@@ -30,6 +30,7 @@ sources:
     url: https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage
 updated: 2026-11-05
 ---
+import DeSigterm from '../../../assets/figures/apm/de-sigterm.svg';
 
 <Situation>
   배포할 때마다 1~2초 사이에 502나 503이 몇십 개 튀고, 저절로 사라져요. 배포가 끝나면 에러율은 평소로 돌아와요.
@@ -75,18 +76,8 @@ updated: 2026-11-05
 
 WSL에서 Envoy 1.40 뒤에 Python 서버 두 대(A, B)를 두고 실험했어요. 요청 하나는 0.2초 걸리고, 8개씩 쉬지 않고 보냈어요. 4초에 A에게 SIGTERM을 보내고, 새 A는 뜨는 데 1초 걸리게 했어요.
 
-<Figure caption="A가 SIGTERM에 바로 끝날 때 Envoy가 돌려준 에러를 0.5초 칸으로 센 거예요. 처리 중 끊김(UC) 3개는 직전에 시작한 요청이고, 나머지 46개는 꺼진 A로 간 새 요청(UF)이에요.">
-  <Strip
-    ariaLabel="SIGTERM 0.5초 전에 시작한 요청 3개가 끊기고, SIGTERM부터 0.5초 동안 23개, 그다음 0.5초에 20개, 1초부터 2개가 붙지 못한 에러예요. 1.5초 뒤로는 에러가 없어요"
-    rows={[
-      {
-        heads: ['−1', '−0.5', '0', '0.5', '1', '1.5', '2', '2.5'],
-        bars: [0, 3, 23, 20, 2, 0, 0, 0],
-        cells: ['0', { label: '3', tone: 'accent' }, { label: '23', tone: 'accent' }, { label: '20', tone: 'accent' }, { label: '2', tone: 'accent' }, '0', '0', '0'],
-      },
-    ]}
-    marks={[{ at: 2, label: 'SIGTERM' }]}
-  />
+<Figure caption="A가 SIGTERM에 바로 끝날 때 Envoy가 돌려준 에러를 0.5초마다 센 거예요. 처리 중 끊김(UC) 3개는 직전에 시작한 요청이고, 나머지 46개는 꺼진 A로 간 새 요청(UF)이에요.">
+  <DeSigterm aria-label="SIGTERM 직전 0.5초에 시작한 요청 3개가 처리 중에 끊기고(UC), SIGTERM부터 0.5초 동안 23개, 그다음 0.5초에 20개, 1초부터 0.5초 동안 2개가 붙지 못한(UF) 에러인 막대 그래프. 1.5초 뒤로는 에러가 없어요" />
 </Figure>
 
 에러는 SIGTERM 뒤 1.5초 안에 몰렸어요. Envoy가 헬스 체크(1초마다, 두 번 실패하면 뺌)로 A를 뺄 때까지, 꺼진 A에도 요청을 나눠 보냈기 때문이에요.

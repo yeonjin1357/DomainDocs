@@ -27,6 +27,10 @@ sources:
     url: https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage
 updated: 2026-11-05
 ---
+import GqGrpc from '../../../assets/figures/apm/gq-grpc.svg';
+import GqStatus from '../../../assets/figures/apm/gq-status.svg';
+import GqWs from '../../../assets/figures/apm/gq-ws.svg';
+import GqDashboard from '../../../assets/figures/apm/gq-dashboard.svg';
 
 <KeyPoints>
   <Point title="gRPC의 실패는 HTTP 200에 숨어요">
@@ -63,17 +67,7 @@ WSL에 세 가지 서버를 띄우고 Envoy 1.40을 앞에 두어, 접근 로그
 결과는 HTTP 상태가 아니라 응답 맨 끝의 트레일러(trailer, 본문 뒤에 붙는 머리말)에 적혀요. 이 값이 <Term term="apm/grpc-status">grpc-status</Term>예요. 0이 성공이고, 실패해도 HTTP 상태는 200이에요.
 
 <Figure caption="gRPC 호출 한 번의 순서예요. 성공이든 실패든 HTTP 상태는 200이고, 결과는 마지막 트레일러의 grpc-status에 적혀요.">
-  <Sequence
-    ariaLabel="클라이언트가 POST /shop.Orders/Get 머리말과 요청 메시지를 보내고, 서버가 HTTP 200 머리말, 응답 메시지, grpc-status 5 NOT_FOUND가 든 트레일러를 차례로 보내요"
-    participants={['클라이언트', '서버']}
-    messages={[
-      { from: '클라이언트', to: '서버', label: 'POST /shop.Orders/Get' },
-      { from: '클라이언트', to: '서버', label: '요청 메시지' },
-      { from: '서버', to: '클라이언트', label: ':status 200', dashed: true },
-      { from: '서버', to: '클라이언트', label: '응답 메시지(있으면)', dashed: true },
-      { from: '서버', to: '클라이언트', label: '트레일러 grpc-status: 5', dashed: true, tone: 'warn' },
-    ]}
-  />
+  <GqGrpc aria-label="클라이언트가 POST /shop.Orders/Get 머리말과 요청 메시지를 보내고, 서버가 :status 200 머리말, 있으면 응답 메시지, grpc-status 5가 든 트레일러를 차례로 보내는 주고받기 그림. HTTP는 성공이어도 결과는 트레일러에 있어요" />
 </Figure>
 
 Python grpcio 1.85 서버를 Envoy 뒤에 두고 여러 결과를 만들어 봤어요. Envoy 접근 로그의 HTTP 상태와 grpc-status예요.
@@ -92,29 +86,7 @@ Python grpcio 1.85 서버를 Envoy 뒤에 두고 여러 결과를 만들어 봤�
 grpc-status는 0부터 16까지 17개예요. 모두 실패지만, 서버 탓인지 부른 쪽 탓인지가 달라요. OpenTelemetry 규약은 서버 쪽 스팬에서 아래 여섯 개만 에러로 치라고 정해요.
 
 <Figure caption="grpc-status를 서버 쪽에서 나눈 그림이에요. 없는 주문(5)이나 잘못된 인자(3)는 서버가 맞게 답한 것이라, 서버 쪽 에러율에 넣지 않아요.">
-  <Tree
-    ariaLabel="grpc-status는 0 OK, 서버 쪽 에러로 치는 2 UNKNOWN, 4 DEADLINE_EXCEEDED, 12 UNIMPLEMENTED, 13 INTERNAL, 14 UNAVAILABLE, 15 DATA_LOSS, 부른 쪽 문제로 보는 3 INVALID_ARGUMENT, 5 NOT_FOUND, 7 PERMISSION_DENIED, 16 UNAUTHENTICATED 등으로 나뉘어요"
-    root={{
-      label: 'grpc-status',
-      children: [
-        { label: 'OK', tag: '0', tone: 'accent' },
-        { label: '서버 쪽 에러로 쳐요', tone: 'warn', children: [
-          { label: 'UNKNOWN', note: '처리 안 된 예외', tag: '2' },
-          { label: 'DEADLINE_EXCEEDED', tag: '4' },
-          { label: 'UNIMPLEMENTED', tag: '12' },
-          { label: 'INTERNAL', tag: '13' },
-          { label: 'UNAVAILABLE', note: '닿지 못함', tag: '14' },
-          { label: 'DATA_LOSS', tag: '15' },
-        ] },
-        { label: '부른 쪽 문제로 봐요', note: '예시', children: [
-          { label: 'INVALID_ARGUMENT', tag: '3' },
-          { label: 'NOT_FOUND', tag: '5' },
-          { label: 'PERMISSION_DENIED', tag: '7' },
-          { label: 'UNAUTHENTICATED', tag: '16' },
-        ] },
-      ],
-    }}
-  />
+  <GqStatus aria-label="grpc-status 0은 OK예요. 서버 쪽 에러로 치는 것은 2 UNKNOWN(처리 안 된 예외), 4 DEADLINE_EXCEEDED, 12 UNIMPLEMENTED, 13 INTERNAL, 14 UNAVAILABLE(닿지 못함), 15 DATA_LOSS이고, 부른 쪽 문제로 보는 예시는 3 INVALID_ARGUMENT, 5 NOT_FOUND, 7 PERMISSION_DENIED, 16 UNAUTHENTICATED예요" />
 </Figure>
 
 부르는 쪽 스팬은 OK가 아니면 모두 에러로 쳐요. 그래서 같은 호출이 클라이언트 화면에서는 에러, 서버 화면에서는 정상으로 보일 수 있어요.
@@ -162,17 +134,7 @@ graphql-http 1.23으로 띄운 서버에서 가격 필드만 실패하게 했어
 <Term term="apm/websocket">WebSocket</Term>은 HTTP로 시작해서, 같은 연결을 양쪽이 아무 때나 메시지를 보내는 통로로 바꿔 쓰는 방식이에요. 채팅, 실시간 알림, 실시간 대시보드가 써요. 처음 한 번만 HTTP 요청이고, 서버가 101(Switching Protocols)로 답하면 그 뒤로는 HTTP가 아니에요.
 
 <Figure caption="WebSocket 연결 하나의 순서예요. HTTP 응답은 처음의 101 하나뿐이고, 그 뒤로는 양쪽이 메시지를 주고받다가 닫힘 코드를 보내고 끝나요.">
-  <Sequence
-    ariaLabel="클라이언트가 GET /live Upgrade 요청을 보내고 서버가 101로 답한 뒤, 서버가 메시지를 여러 번 보내고, 클라이언트가 닫힘 코드 1000을 보내고 서버도 1000으로 답해요"
-    participants={['클라이언트', '서버']}
-    messages={[
-      { from: '클라이언트', to: '서버', label: 'GET /live (Upgrade)' },
-      { from: '서버', to: '클라이언트', label: '101 Switching Protocols', dashed: true },
-      { from: '서버', to: '클라이언트', label: '메시지 · 메시지 · …', tone: 'accent' },
-      { from: '클라이언트', to: '서버', label: '닫힘 1000' },
-      { from: '서버', to: '클라이언트', label: '닫힘 1000', dashed: true },
-    ]}
-  />
+  <GqWs aria-label="클라이언트가 GET /live Upgrade 요청을 보내고 서버가 101 Switching Protocols로 답해요. 그 뒤로는 HTTP 응답 없이 양쪽이 메시지를 주고받다가, 클라이언트가 닫힘 코드 1000을 보내고 서버도 1000으로 답하는 주고받기 그림" />
 </Figure>
 
 1초마다 메시지를 보내는 서버에 5초 동안 붙어 있다가 닫았어요. Envoy 접근 로그에는 `GET /live 101 5009ms`가 남았어요. 요청 하나가 5초 걸린 것처럼 보이지만, 이 시간은 연결이 열려 있던 시간이에요.
@@ -192,14 +154,7 @@ WebSocket은 닫을 때 닫힘 코드를 주고받아요. 1000은 정상 종료�
 세 방식은 HTTP 화면 하나에 섞어 그리지 말고, 방식마다 맞는 숫자로 나눠 그려요.
 
 <Figure caption="세 방식을 한 대시보드에 그린 배치 예시예요. 줄마다 그 방식의 실패가 적히는 곳을 따로 세요.">
-  <Nest
-    ariaLabel="대시보드를 gRPC 줄(메서드별 호출 수, 상태 코드별 비율, 단발 호출 p99), GraphQL 줄(operation별 호출 수, errors 있는 응답 비율, 필드별 시간), WebSocket 줄(열린 연결 수, 초당 메시지, 닫힘 코드별 수)로 짠 배치"
-    boxes={[
-      { label: 'gRPC', note: '메서드별', cols: 3, children: [{ label: '호출 수' }, { label: '상태 코드별 비율' }, { label: '단발 호출 p99' }] },
-      { label: 'GraphQL', note: 'operation별', cols: 3, children: [{ label: '호출 수' }, { label: 'errors 있는 응답' }, { label: '필드별 시간' }] },
-      { label: 'WebSocket', cols: 3, children: [{ label: '열린 연결 수' }, { label: '초당 메시지' }, { label: '닫힘 코드별 수' }] },
-    ]}
-  />
+  <GqDashboard aria-label="대시보드를 gRPC 줄(메서드별 호출 수, 상태 코드별 비율, 단발 호출 p99), GraphQL 줄(operation별 호출 수, errors 있는 응답, 필드별 시간), WebSocket 줄(열린 연결 수, 초당 메시지, 닫힘 코드별 수)로 짠 배치" />
 </Figure>
 
 OpenTelemetry로 모은다면 이름표가 버전마다 달라요.

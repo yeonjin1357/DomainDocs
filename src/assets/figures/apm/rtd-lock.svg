@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 288" width="300" height="288">
+<text x="8" y="27" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">잠금</text>
+<rect x="64" y="14" width="216" height="18" rx="9" style="fill:var(--color-bg)" />
+<rect x="100" y="14" width="144" height="18" rx="6" style="fill:var(--color-warn)" />
+<text x="172" y="27.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">잠금 4초</text>
+<text x="8" y="53" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">요청 A</text>
+<rect x="64" y="40" width="216" height="18" rx="9" style="fill:var(--color-bg)" />
+<rect x="118" y="40" width="126" height="18" rx="6" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="181" y="53.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">3.5초</text>
+<text x="8" y="79" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">요청 B</text>
+<rect x="64" y="66" width="216" height="18" rx="9" style="fill:var(--color-bg)" />
+<rect x="154" y="66" width="90" height="18" rx="6" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="199" y="79.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">2.5초</text>
+<text x="8" y="105" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">요청 C</text>
+<rect x="64" y="92" width="216" height="18" rx="9" style="fill:var(--color-bg)" />
+<rect x="208" y="92" width="36" height="18" rx="6" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="8" y="132" font-size="13" font-weight="700" style="fill:var(--color-text)">분포도</text>
+<line x1="64" y1="138" x2="64" y2="240" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="64" y1="240" x2="280" y2="240" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="58" y="220.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">1초</text>
+<text x="58" y="196.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">2초</text>
+<text x="58" y="172.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">3초</text>
+<text x="58" y="148.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">4초</text>
+<line x1="244" y1="58" x2="244" y2="149" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-text-weak)" />
+<circle cx="244" cy="156" r="6" style="fill:var(--color-accent)" />
+<line x1="244" y1="84" x2="244" y2="173" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-text-weak)" />
+<circle cx="244" cy="180" r="6" style="fill:var(--color-accent)" />
+<line x1="244" y1="110" x2="244" y2="209" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-text-weak)" />
+<circle cx="244" cy="216" r="6" style="fill:var(--color-accent)" />
+<text x="64" y="258" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">0초</text>
+<text x="172" y="258" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">3초</text>
+<text x="280" y="258" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">6초</text>
+<text x="256" y="190" font-size="13" font-weight="700" style="fill:var(--color-accent)">세로줄</text>
+<text x="8" y="280" font-size="13" style="fill:var(--color-text-sub)">잠금이 풀리는 순간 함께 끝나 점이 세로로 서요</text>
+</svg>

@@ -24,6 +24,7 @@ sources:
     url: https://docs.sentry.io/product/issues/issue-details/performance-issues/n-one-queries/
 updated: 2026-10-29
 ---
+import NpSeq from '../../../assets/figures/apm/np-seq.svg';
 
 <Situation>
   주문 목록 API가 1.2초씩 걸려요. 그런데 Top SQL에 보이는 SQL은 모두 한 번에 2ms 안쪽이에요.
@@ -90,18 +91,7 @@ N+1은 손으로 짠 코드에서도 생기지만, ORM에서 특히 잘 숨어�
 흔한 모양은 이래요. 주문 목록을 가져온 뒤 목록을 돌며 `order.getCustomer().getName()`을 읽어요. 고객 정보가 아직 안 불려 있으면, 읽는 순간마다 SQL이 하나씩 나가요.
 
 <Figure caption="목록을 돌며 고객 이름을 읽는 순서예요. 코드에는 SQL이 없지만, 고객 정보가 안 불려 있으면 읽을 때마다 ORM이 SQL을 하나씩 보내요.">
-  <Sequence
-    ariaLabel="반복문이 ORM에 주문 목록을 달라고 하면 목록 SQL이 한 번 나가고, 주문 1과 주문 2의 고객을 읽을 때마다 ORM이 DB에 고객 SQL을 하나씩 더 보내는 순서"
-    participants={['반복문', 'ORM', 'DB']}
-    messages={[
-      { from: '반복문', to: 'ORM', label: '주문 목록' },
-      { from: 'ORM', to: 'DB', label: '목록 SQL 1번' },
-      { from: '반복문', to: 'ORM', label: '주문 1 고객 읽기' },
-      { from: 'ORM', to: 'DB', label: '고객 SQL', tone: 'warn' },
-      { from: '반복문', to: 'ORM', label: '주문 2 고객 읽기' },
-      { from: 'ORM', to: 'DB', label: '고객 SQL', tone: 'warn' },
-    ]}
-  />
+  <NpSeq aria-label="반복문이 ORM에 주문 목록을 달라고 하면 목록 SQL이 한 번 나가고, 주문 1과 주문 2의 고객을 읽을 때마다 ORM이 DB에 고객 SQL을 하나씩 더 보내 주문 수만큼 이어지는 주고받기 그림" />
 </Figure>
 
 이렇게 필요할 때 가져오는 방식을 <Term term="apm/lazy-loading">지연 로딩</Term>(LAZY)이라고 해요. JPA 3.2의 기본값은 연관 종류마다 달라요.

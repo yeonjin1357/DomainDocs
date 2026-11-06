@@ -21,6 +21,8 @@ sources:
     url: https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html
 updated: 2026-10-30
 ---
+import JmProcess from '../../../assets/figures/apm/jm-process.svg';
+import JmGen from '../../../assets/figures/apm/jm-gen.svg';
 
 <KeyPoints>
   <Point title="객체는 힙에 담겨요">
@@ -41,20 +43,7 @@ updated: 2026-10-30
 ## JVM이 쓰는 메모리
 
 <Figure caption="JVM 프로세스의 메모리는 힙만이 아니에요. 메타스페이스, 스레드마다의 스택, 그 밖의 네이티브 메모리를 더한 만큼 서버 메모리를 써요.">
-  <Nest
-    ariaLabel="JVM 프로세스 메모리 상자 안에 힙, 메타스페이스, 스레드 스택, 그 밖의 네이티브 메모리가 함께 들어 있는 그림"
-    boxes={[
-      {
-        label: 'JVM 프로세스 메모리',
-        children: [
-          { label: '힙', note: '객체가 담기는 곳. 최대 크기 -Xmx', tone: 'accent', wide: true },
-          { label: '메타스페이스', note: '클래스 정보. 기본으로 크기 제한 없음' },
-          { label: '스레드 스택', note: '스레드마다 하나씩(-Xss)' },
-          { label: '그 밖의 네이티브 메모리', note: 'JVM 자체, 직접 버퍼 등', wide: true },
-        ],
-      },
-    ]}
-  />
+  <JmProcess aria-label="JVM 프로세스 메모리는 객체가 담기는 힙(최대 크기 -Xmx), 클래스 정보가 담기고 기본 제한이 없는 메타스페이스, 스레드마다 하나인 스레드 스택(-Xss), JVM 자체와 직접 버퍼 같은 그 밖의 네이티브 메모리를 더한 만큼이라는 그림" />
 </Figure>
 
 <Term term="apm/jvm">JVM</Term>은 자바 코드를 실행하는 프로그램이에요. 서버 입장에서는 프로세스 하나예요.
@@ -70,21 +59,7 @@ updated: 2026-10-30
 서버에서 흔히 도는 G1은 힙을 young과 old 두 세대로 나눠요. 새 객체는 young에 담기고, young을 치울 때 살아남은 객체는 old로 옮겨요. G1은 힙을 같은 크기의 영역(region) 여러 개로 나눠 관리해요.
 
 <Figure caption="새 객체는 young에 담겨요. young을 치울 때 더는 쓰지 않는 객체는 치워지고, 살아남은 객체는 old로 옮겨요. old의 객체도 더는 쓰지 않으면 GC가 치워요.">
-  <Flow
-    ariaLabel="새 객체가 young에 담기고, young에서 쓰지 않는 객체는 GC가 치우고 살아남은 객체는 old로 옮기며, old에서도 쓰지 않는 객체는 GC가 치우는 구조도"
-    nodes={[
-      { id: 'new', label: '새 객체', col: 0, row: 0 },
-      { id: 'young', label: 'young', col: 0, row: 1, note: '새 객체 세대', tone: 'accent' },
-      { id: 'old', label: 'old', col: 0, row: 2, note: '오래 산 객체' },
-      { id: 'gone', label: 'GC가 치움', col: 2, row: 1 },
-    ]}
-    edges={[
-      { from: 'new', to: 'young', label: '담겨요', tone: 'accent' },
-      { from: 'young', to: 'old', label: '살아남으면' },
-      { from: 'young', to: 'gone', label: '안 쓰면' },
-      { from: 'old', to: 'gone' },
-    ]}
-  />
+  <JmGen aria-label="새 객체가 young에 담기고, young을 치울 때 살아남은 객체는 old로 옮겨요. 안 쓰는 객체는 young에서도 old에서도 GC가 치우는 그림" />
 </Figure>
 
 G1이 늘 기본은 아니에요. JVM은 CPU 2개 이상, 메모리 1792MB 이상일 때만 G1을 고르고, 그보다 작으면 Serial GC를 골라요. 작은 파드에서 무엇이 도는지는 <Term slug="apm/gc-logs">GC 로그 읽기</Term>에서 확인해요.

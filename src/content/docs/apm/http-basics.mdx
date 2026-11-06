@@ -17,6 +17,8 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc9113.html
 updated: 2026-11-03
 ---
+import HttpMsg from '../../../assets/figures/apm/http-msg.svg';
+import HttpVersions from '../../../assets/figures/apm/http-versions.svg';
 
 <KeyPoints>
   <Point title="요청은 메서드와 주소로 시작해요">
@@ -54,14 +56,7 @@ Content-Type: application/json
 요청의 첫 줄은 메서드(`GET`)와 주소(`/orders/42`)예요. 응답의 첫 줄에는 <Term term="apm/status-code">상태 코드</Term>(`200`)가 와요. 그 아래 줄들은 헤더이고, 빈 줄 뒤가 본문이에요.
 
 <Figure caption="위 요청과 응답을 같은 틀로 나란히 놓았어요. 첫 줄에 담기는 것만 다르고, 그 아래 헤더와 빈 줄 뒤 본문의 순서는 같아요.">
-  <Compare
-    columns={['요청', '응답']}
-    rows={[
-      { label: '첫 줄', values: ['메서드와 주소(GET /orders/42)', '상태 코드(200 OK)'] },
-      { label: '헤더', values: ['Host, Accept', 'Content-Type'] },
-      { label: '빈 줄 뒤 본문', values: ['이 예에는 없어요', '{"id": 42, …}'] },
-    ]}
-  />
+  <HttpMsg aria-label="요청은 첫 줄 GET /orders/42 HTTP/1.1, 헤더 Host: shop.example.com과 Accept: application/json, 빈 줄로 이뤄지고 이 예에는 본문이 없어요. 응답은 첫 줄 HTTP/1.1 200 OK, 헤더 Content-Type: application/json, 빈 줄, id 42와 status paid가 든 JSON 본문으로 이뤄진 그림" />
 </Figure>
 
 ## 메서드
@@ -105,14 +100,7 @@ HTTP 요청은 <Term slug="network/tcp-connections">TCP 연결</Term> 위로 오
 HTTP/2는 연결 하나 안에서 여러 요청과 응답을 잘게 나눠 섞어 보내요. 그래서 연결 하나로도 동시에 여러 요청을 처리해요.
 
 <Figure caption="같은 요청 세 개를 동시에 보낼 때예요. HTTP/1.1은 연결을 셋 열고, HTTP/2는 연결 하나에 섞어 보내요.">
-  <Compare
-    columns={['HTTP/1.1', 'HTTP/2']}
-    rows={[
-      { label: '연결 하나에서', values: ['응답이 순서대로 하나씩', '여러 요청을 섞어 함께'] },
-      { label: '요청 셋을 동시에', values: ['연결 셋', '연결 하나'] },
-      { label: '연결을 맺는 왕복', values: ['연결마다 한 번씩', '처음 한 번'] },
-    ]}
-  />
+  <HttpVersions aria-label="HTTP/1.1은 같은 요청 셋을 동시에 보내려고 연결을 셋 열고, 연결 하나에서는 응답이 순서대로 하나씩 와요. HTTP/2는 연결 하나에 요청 1, 2, 3을 잘게 나눠 섞어 보내요. 연결을 맺는 왕복은 1.1이 연결마다, 2가 처음 한 번이에요" />
 </Figure>
 
 열어 둔 연결도 한동안 쉬면 한쪽이 닫아요. 앞단 웹 서버와 WAS가 서로 다른 시간에 닫으면, 이미 닫힌 연결로 요청을 보내 502가 날 수 있어요. 이 경우는 <Term slug="apm/gateway-errors">502·504가 날 때</Term>에서 다뤄요.

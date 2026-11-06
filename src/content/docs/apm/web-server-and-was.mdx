@@ -23,6 +23,7 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc9110.html
 updated: 2026-10-30
 ---
+import WasFlow from '../../../assets/figures/apm/was-flow.svg';
 
 <KeyPoints>
   <Point title="웹 서버는 문지기예요">
@@ -51,23 +52,7 @@ updated: 2026-10-30
 <Term term="apm/was">WAS</Term>(웹 애플리케이션 서버)는 앱 코드를 실행해 응답을 만드는 서버예요. 자바에서는 Tomcat, JEUS, WebLogic 같은 제품이 이 일을 해요. Tomcat은 자바 서블릿 같은 표준을 구현한 서버예요.
 
 <Figure caption="웹 서버는 정적 파일을 바로 주고, 나머지를 WAS로 넘겨요. WAS 안에서는 스레드 하나가 요청 하나를 맡아요.">
-  <Flow
-    ariaLabel="요청이 웹 서버로 들어와 정적 파일은 바로 응답하고, 나머지는 WAS의 스레드 풀로 넘어가 스레드가 앱 코드를 실행하는 구조도"
-    nodes={[
-      { id: 'req', label: '요청', col: 0, row: 0 },
-      { id: 'web', label: '웹 서버', col: 1, row: 0, tone: 'accent' },
-      { id: 'static', label: '정적 파일', col: 2, row: 0, note: '바로 응답' },
-      { id: 'pool', label: '스레드 풀', col: 1, row: 1, note: '최대 200개' },
-      { id: 'code', label: '앱 코드', col: 1, row: 2, note: 'DB·API 호출' },
-    ]}
-    edges={[
-      { from: 'req', to: 'web', tone: 'accent' },
-      { from: 'web', to: 'static' },
-      { from: 'web', to: 'pool', tone: 'accent' },
-      { from: 'pool', to: 'code', tone: 'accent' },
-    ]}
-    groups={[{ label: 'WAS', cols: [1, 1], rows: [1, 2] }]}
-  />
+  <WasFlow aria-label="요청이 웹 서버로 들어와 정적 파일은 바로 응답하고, 나머지는 WAS로 넘어가요. WAS의 스레드 풀(최대 200개) 가운데 스레드 하나가 요청 하나를 맡아 DB와 API를 부르는 앱 코드를 실행하는 그림" />
 </Figure>
 
 WAS는 요청이 오면 스레드 묶음(<Term term="apm/thread-pool">스레드 풀</Term>)에서 하나를 꺼내 맡겨요. Tomcat은 기본으로 이 스레드를 최대 200개까지 만들어요. 그래서 동시에 처리하는 요청도 최대 200개예요.

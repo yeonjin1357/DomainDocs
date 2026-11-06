@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 258" width="300" height="258">
+<rect x="8" y="6" width="12" height="12" rx="2" style="fill:var(--color-text-sub);fill-opacity:0.6" />
+<text x="26" y="17" font-size="13" style="fill:var(--color-text-sub)">옛 버전 v41</text>
+<rect x="122" y="6" width="12" height="12" rx="2" style="fill:var(--color-warn)" />
+<text x="140" y="17" font-size="13" style="fill:var(--color-text-sub)">새 버전 v42</text>
+<text x="8" y="44" font-size="13" font-weight="700" style="fill:var(--color-text)">p99 응답시간</text>
+<rect x="8" y="54" width="89.1" height="16" rx="3" style="fill:var(--color-text-sub);fill-opacity:0.6" />
+<text x="103.1" y="67" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">410ms</text>
+<rect x="8" y="74" width="200" height="16" rx="3" style="fill:var(--color-warn);fill-opacity:1" />
+<text x="214" y="87" font-size="13" font-weight="700" style="fill:var(--color-warn)">920ms</text>
+<text x="8" y="112" font-size="13" font-weight="700" style="fill:var(--color-text)">요청당 SQL 수</text>
+<rect x="8" y="122" width="14.6" height="16" rx="3" style="fill:var(--color-text-sub);fill-opacity:0.6" />
+<text x="28.6" y="135" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">3번</text>
+<rect x="8" y="142" width="200" height="16" rx="3" style="fill:var(--color-warn);fill-opacity:1" />
+<text x="214" y="155" font-size="13" font-weight="700" style="fill:var(--color-warn)">41번</text>
+<text x="8" y="180" font-size="13" font-weight="700" style="fill:var(--color-text)">에러율</text>
+<rect x="8" y="190" width="40" height="16" rx="3" style="fill:var(--color-text-sub);fill-opacity:0.6" />
+<text x="54" y="203" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">0.2%</text>
+<rect x="8" y="210" width="40" height="16" rx="3" style="fill:var(--color-text-sub);fill-opacity:0.6" />
+<text x="54" y="223" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">0.2%</text>
+<text x="8" y="250" font-size="13" font-weight="700" style="fill:var(--color-warn)">같은 시간대에 새 버전만 느려졌어요</text>
+</svg>

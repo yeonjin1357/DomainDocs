@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 290" width="300" height="290">
+<rect x="100" y="120" width="196" height="36" rx="6" stroke-width="1" stroke-dasharray="3 3" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="36" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">사용자</text>
+<line x1="36" y1="26" x2="36" y2="282" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="150" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">웹 서버</text>
+<line x1="150" y1="26" x2="150" y2="282" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="264" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">WAS</text>
+<line x1="264" y1="26" x2="264" y2="282" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M36 48 L145.1 48" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 48 L143 43.7 L143 52.3 z" style="fill:var(--color-text-sub)" />
+<text x="93" y="42" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">요청 1</text>
+<path d="M150 74 L259.1 74" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M264 74 L257 69.7 L257 78.3 z" style="fill:var(--color-text-sub)" />
+<text x="207" y="68" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">요청 1</text>
+<path d="M264 100 L154.9 100" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 100 L157 104.3 L157 95.7 z" style="fill:var(--color-text-sub)" />
+<text x="207" y="94" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">응답</text>
+<path d="M36 178 L145.1 178" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 178 L143 173.7 L143 182.3 z" style="fill:var(--color-text-sub)" />
+<text x="93" y="172" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">요청 2</text>
+<path d="M150 208 L259.1 208" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M264 208 L257 203.7 L257 212.3 z" style="fill:var(--color-warn)" />
+<text x="207" y="202" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">쉬던 연결로</text>
+<path d="M264 238 L154.9 238" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M150 238 L157 242.3 L157 233.7 z" style="fill:var(--color-warn)" />
+<text x="207" y="232" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">그 순간 닫음</text>
+<path d="M150 268 L40.9 268" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-warn)" />
+<path d="M36 268 L43 272.3 L43 263.7 z" style="fill:var(--color-warn)" />
+<text x="93" y="262" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">502</text>
+<text x="198" y="143" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">연결이 쉬어요</text>
+</svg>

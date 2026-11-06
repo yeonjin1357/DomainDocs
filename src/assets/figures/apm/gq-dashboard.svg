@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 282" width="300" height="282">
+<rect x="4" y="4" width="292" height="274" rx="10" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="14" y="28" font-size="13" font-weight="700" style="fill:var(--color-text)">gRPC</text>
+<text x="56.5" y="28" font-size="13" style="fill:var(--color-text-sub)">메서드별</text>
+<rect x="12" y="36" width="88" height="56" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="20" y="54" font-size="13" font-weight="600" style="fill:var(--color-text)">호출 수</text>
+<path d="M20 86 l14 -6 l14 3 l14 -8 l14 4 l14 -5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="106" y="36" width="88" height="56" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="114" y="54" font-size="13" font-weight="600" style="fill:var(--color-text)">상태 코드별</text>
+<text x="114" y="70" font-size="13" font-weight="600" style="fill:var(--color-text)">비율</text>
+<path d="M114 86 l14 -6 l14 3 l14 -8 l14 4 l14 -5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<rect x="200" y="36" width="88" height="56" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="208" y="54" font-size="13" font-weight="600" style="fill:var(--color-text)">단발 호출</text>
+<text x="208" y="70" font-size="13" font-weight="600" style="fill:var(--color-text)">p99</text>
+<path d="M208 86 l14 -6 l14 3 l14 -8 l14 4 l14 -5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="14" y="116" font-size="13" font-weight="700" style="fill:var(--color-text)">GraphQL</text>
+<text x="79.6" y="116" font-size="13" style="fill:var(--color-text-sub)">operation별</text>
+<rect x="12" y="124" width="88" height="56" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="20" y="142" font-size="13" font-weight="600" style="fill:var(--color-text)">호출 수</text>
+<path d="M20 174 l14 -6 l14 3 l14 -8 l14 4 l14 -5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="106" y="124" width="88" height="56" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="114" y="142" font-size="13" font-weight="600" style="fill:var(--color-text)">errors 있는</text>
+<text x="114" y="158" font-size="13" font-weight="600" style="fill:var(--color-text)">응답</text>
+<path d="M114 174 l14 -6 l14 3 l14 -8 l14 4 l14 -5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<rect x="200" y="124" width="88" height="56" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="208" y="142" font-size="13" font-weight="600" style="fill:var(--color-text)">필드별</text>
+<text x="208" y="158" font-size="13" font-weight="600" style="fill:var(--color-text)">시간</text>
+<path d="M208 174 l14 -6 l14 3 l14 -8 l14 4 l14 -5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="14" y="204" font-size="13" font-weight="700" style="fill:var(--color-text)">WebSocket</text>
+<rect x="12" y="212" width="88" height="56" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="20" y="230" font-size="13" font-weight="600" style="fill:var(--color-text)">열린 연결 수</text>
+<path d="M20 262 l14 -6 l14 3 l14 -8 l14 4 l14 -5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="106" y="212" width="88" height="56" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="114" y="230" font-size="13" font-weight="600" style="fill:var(--color-text)">초당 메시지</text>
+<path d="M114 262 l14 -6 l14 3 l14 -8 l14 4 l14 -5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="200" y="212" width="88" height="56" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="208" y="230" font-size="13" font-weight="600" style="fill:var(--color-text)">닫힘 코드별</text>
+<text x="208" y="246" font-size="13" font-weight="600" style="fill:var(--color-text)">수</text>
+<path d="M208 262 l14 -6 l14 3 l14 -8 l14 4 l14 -5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+</svg>

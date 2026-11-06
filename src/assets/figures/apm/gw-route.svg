@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 242" width="300" height="242">
+<rect x="82" y="12" width="16" height="28" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="87" y1="36" x2="93" y2="36" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="90" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">모바일 앱</text>
+<rect x="197" y="14" width="26" height="17" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M191 35 L195 31 L225 31 L229 35 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="210" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">웹</text>
+<path d="M96 64 L132 89.2" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M136 92 L132.8 84.4 L127.8 91.5 z" style="fill:var(--color-text-sub)" />
+<path d="M204 64 L168 89.2" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M164 92 L172.2 91.5 L167.2 84.4 z" style="fill:var(--color-text-sub)" />
+<rect x="82" y="94" width="136" height="44" rx="8" style="fill:var(--color-accent)" />
+<text x="150" y="113" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">API 게이트웨이</text>
+<text x="150" y="131" font-size="13" text-anchor="middle" style="fill:var(--color-card)">인증·제한·경로</text>
+<path d="M120 138 L53.8 192.9" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M50 196 L58.2 194.9 L52.6 188.2 z" style="fill:var(--color-accent)" />
+<text x="86" y="164" font-size="13" text-anchor="end" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">/orders</text>
+<rect x="6" y="198" width="88" height="36" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="50" y="220.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">주문 서비스</text>
+<path d="M150 138 L150 191.1" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 196 L154.3 189 L145.7 189 z" style="fill:var(--color-accent)" />
+<text x="156" y="172" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">/users</text>
+<rect x="106" y="198" width="88" height="36" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="220.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">회원 서비스</text>
+<path d="M180 138 L246.2 192.9" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M250 196 L247.4 188.2 L241.8 194.9 z" style="fill:var(--color-accent)" />
+<text x="218" y="164" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">/payments</text>
+<rect x="206" y="198" width="88" height="36" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="250" y="220.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">결제 서비스</text>
+</svg>

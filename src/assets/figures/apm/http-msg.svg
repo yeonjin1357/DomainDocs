@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 306" width="300" height="306">
+<rect x="4" y="4" width="292" height="156" rx="10" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="24" font-size="13" font-weight="700" style="fill:var(--color-text)">요청</text>
+<rect x="8" y="34" width="284" height="22" rx="4" style="fill:var(--color-accent-weak)" />
+<text x="14" y="50" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">GET /orders/42 HTTP/1.1</text>
+<text x="286" y="50" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">첫 줄</text>
+<text x="14" y="74" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">Host: shop.example.com</text>
+<text x="286" y="74" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-sub)">헤더</text>
+<text x="14" y="98" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">Accept: application/json</text>
+<text x="286" y="98" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-sub)">헤더</text>
+<text x="14" y="122" font-size="13" style="fill:var(--color-text-weak)">(빈 줄)</text>
+<text x="286" y="122" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-sub)"></text>
+<text x="14" y="146" font-size="13" style="fill:var(--color-text-weak)">이 예에는 없어요</text>
+<text x="286" y="146" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-sub)">본문</text>
+<rect x="4" y="170" width="292" height="132" rx="10" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="190" font-size="13" font-weight="700" style="fill:var(--color-text)">응답</text>
+<rect x="8" y="200" width="284" height="22" rx="4" style="fill:var(--color-accent-weak)" />
+<text x="14" y="216" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">HTTP/1.1 200 OK</text>
+<text x="286" y="216" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">첫 줄</text>
+<text x="14" y="240" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">Content-Type: application/json</text>
+<text x="286" y="240" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-sub)">헤더</text>
+<text x="14" y="264" font-size="13" style="fill:var(--color-text-weak)">(빈 줄)</text>
+<text x="286" y="264" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-sub)"></text>
+<text x="14" y="288" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">{"id": 42, "status": "paid"}</text>
+<text x="286" y="288" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-sub)">본문</text>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 244" width="300" height="244">
+<text x="40" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">로그</text>
+<line x1="40" y1="26" x2="40" y2="204" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="150" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">앱</text>
+<line x1="150" y1="26" x2="150" y2="204" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="260" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">외부 API</text>
+<line x1="260" y1="26" x2="260" y2="204" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M150 50 L255.1 50" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M260 50 L253 45.7 L253 54.3 z" style="fill:var(--color-text-sub)" />
+<text x="205" y="44" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">호출</text>
+<path d="M260 84 L154.9 84" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-warn)" />
+<path d="M150 84 L157 88.3 L157 79.7 z" style="fill:var(--color-warn)" />
+<text x="205" y="78" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">실패</text>
+<path d="M150 118 L44.9 118" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M40 118 L47 122.3 L47 113.7 z" style="fill:var(--color-warn)" />
+<text x="95" y="112" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">예외 한 줄</text>
+<path d="M150 152 L255.1 152" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M260 152 L253 147.7 L253 156.3 z" style="fill:var(--color-text-sub)" />
+<text x="205" y="146" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">다시 호출</text>
+<path d="M260 186 L154.9 186" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 186 L157 190.3 L157 181.7 z" style="fill:var(--color-accent)" />
+<text x="205" y="180" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">성공</text>
+<rect x="21.1" y="217" width="257.8" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="150" y="232.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">요청은 성공 1건 · 에러율에는 안 들어가요</text>
+</svg>

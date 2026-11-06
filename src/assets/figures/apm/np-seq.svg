@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 274" width="300" height="274">
+<text x="40" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">반복문</text>
+<line x1="40" y1="26" x2="40" y2="236" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="150" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">ORM</text>
+<line x1="150" y1="26" x2="150" y2="236" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="260" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">DB</text>
+<line x1="260" y1="26" x2="260" y2="236" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M40 48 L145.1 48" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 48 L143 43.7 L143 52.3 z" style="fill:var(--color-text-sub)" />
+<text x="95" y="42" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">주문 목록</text>
+<path d="M150 78 L255.1 78" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M260 78 L253 73.7 L253 82.3 z" style="fill:var(--color-text-sub)" />
+<text x="205" y="72" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">목록 SQL 1번</text>
+<path d="M40 116 L145.1 116" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 116 L143 111.7 L143 120.3 z" style="fill:var(--color-text-sub)" />
+<text x="95" y="110" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">주문 1 고객</text>
+<path d="M150 146 L255.1 146" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M260 146 L253 141.7 L253 150.3 z" style="fill:var(--color-warn)" />
+<text x="205" y="140" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">고객 SQL</text>
+<path d="M40 184 L145.1 184" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 184 L143 179.7 L143 188.3 z" style="fill:var(--color-text-sub)" />
+<text x="95" y="178" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">주문 2 고객</text>
+<path d="M150 214 L255.1 214" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M260 214 L253 209.7 L253 218.3 z" style="fill:var(--color-warn)" />
+<text x="205" y="208" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">고객 SQL</text>
+<text x="205" y="238" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">… 주문 수만큼</text>
+<text x="8" y="266" font-size="13" style="fill:var(--color-text-sub)">코드에는 SQL이 없어요. 읽는 순간 ORM이 보내요</text>
+</svg>

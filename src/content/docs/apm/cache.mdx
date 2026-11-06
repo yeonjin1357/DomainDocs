@@ -21,6 +21,8 @@ sources:
     url: https://docs.aws.amazon.com/whitepapers/latest/database-caching-strategies-using-redis/cache-validity.html
 updated: 2026-10-30
 ---
+import CaAside from '../../../assets/figures/apm/ca-aside.svg';
+import CaLocalRemote from '../../../assets/figures/apm/ca-local-remote.svg';
 
 <KeyPoints>
   <Point title="자주 쓰는 답을 가까이 둬요">
@@ -40,18 +42,8 @@ updated: 2026-10-30
 
 ## 캐시를 읽는 순서
 
-<Figure caption="가장 흔한 방식(cache-aside)이에요. 앱이 먼저 캐시를 보고, 없으면 DB에서 가져와 캐시에 넣어 둬요. 다음 같은 요청은 첫 줄에서 끝나요.">
-  <Sequence
-    ariaLabel="앱이 캐시에 값을 물었는데 없어서, DB에서 읽어 오고 캐시에 5분 동안 저장하는 순서도"
-    participants={['앱', '캐시', 'DB']}
-    messages={[
-      { from: '앱', to: '캐시', label: '상품 42 있어요?' },
-      { from: '캐시', to: '앱', label: '없어요 (miss)', dashed: true, tone: 'warn' },
-      { from: '앱', to: 'DB', label: '상품 42 조회' },
-      { from: 'DB', to: '앱', label: '결과', dashed: true },
-      { from: '앱', to: '캐시', label: '저장 (TTL 5분)', tone: 'accent' },
-    ]}
-  />
+<Figure caption="가장 흔한 방식(cache-aside)이에요. 앱이 먼저 캐시를 보고, 없으면 DB에서 가져와 캐시에 넣어 둬요. 다음 같은 요청은 캐시에서 끝나요.">
+  <CaAside aria-label="앱이 캐시에 상품 42가 있는지 묻고 없어서(miss) DB에서 조회한 뒤, 캐시에 TTL 5분으로 저장해요. 다음 같은 요청은 캐시에 있어서(hit) DB까지 가지 않는 주고받기 그림" />
 </Figure>
 
 캐시에서 찾으면 적중(hit), 없으면 실패(miss)라고 해요. 적중이면 DB에 가지 않아서 몇 밀리초 안에 끝나요. 실패하면 DB 조회에 캐시 확인까지 더해져서 캐시가 없을 때보다 조금 더 느려요.
@@ -61,14 +53,7 @@ updated: 2026-10-30
 ## 캐시는 어디에 두나요
 
 <Figure caption="앱 프로세스 안에 두는 캐시와, Redis처럼 따로 띄운 캐시 서버예요. 빠르기와 함께 쓰기 사이에서 골라요.">
-  <Compare
-    columns={['앱 안의 캐시', '캐시 서버(Redis 등)']}
-    rows={[
-      { label: '빠르기', values: ['네트워크 없이 바로', '네트워크를 한 번 오가요'] },
-      { label: '서버끼리', values: ['서버마다 따로 가져요', '여러 서버가 함께 써요'] },
-      { label: '앱을 다시 시작하면', values: ['비어요', '그대로 남아요'] },
-    ]}
-  />
+  <CaLocalRemote aria-label="앱 안의 캐시는 앱 서버마다 따로 있어 네트워크 없이 바로 읽지만, 다시 시작하면 비어요. 캐시 서버(Redis 등)는 앱 서버 둘이 함께 쓰고 네트워크를 한 번 오가지만, 다시 시작해도 남는 그림" />
 </Figure>
 
 앱 안의 캐시는 서버가 10대면 같은 값을 10번 가져와요. 캐시 서버는 한 번 넣으면 모든 서버가 함께 써요. 그래서 서버가 많을수록 앱 안의 캐시보다 실패가 적어요.

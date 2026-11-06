@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 232" width="300" height="232">
+<text x="292" y="16" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-text)">▼ 3초 걸린 요청</text>
+<text x="8" y="44" font-size="13" font-weight="700" style="fill:var(--color-text)">명세 권장 · T 4초</text>
+<rect x="8" y="70" width="93" height="34" rx="6" stroke-width="1.3" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="54.5" y="92" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">만족</text>
+<rect x="103" y="70" width="93" height="34" rx="6" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="149.5" y="92" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">허용</text>
+<rect x="198" y="70" width="93" height="34" rx="6" stroke-width="1.3" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="244.5" y="92" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">불만</text>
+<text x="102" y="122" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">4초</text>
+<text x="197" y="122" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">16초</text>
+<path d="M54.5 66 l-7 -10 h14 z" style="fill:var(--color-text)" />
+<text x="8" y="146" font-size="13" font-weight="700" style="fill:var(--color-text)">New Relic 앱 서버 · T 0.5초</text>
+<rect x="8" y="172" width="93" height="34" rx="6" stroke-width="1.3" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="54.5" y="194" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">만족</text>
+<rect x="103" y="172" width="93" height="34" rx="6" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="149.5" y="194" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">허용</text>
+<rect x="198" y="172" width="93" height="34" rx="6" stroke-width="1.3" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="244.5" y="194" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">불만</text>
+<text x="102" y="224" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">0.5초</text>
+<text x="197" y="224" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">2초</text>
+<path d="M244.5 168 l-7 -10 h14 z" style="fill:var(--color-text)" />
+</svg>

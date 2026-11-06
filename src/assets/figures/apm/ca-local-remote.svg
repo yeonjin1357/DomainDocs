@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 276" width="300" height="276">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">앱 안의 캐시</text>
+<rect x="8" y="28" width="62" height="66" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="39" y="48" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">앱 서버</text>
+<rect x="16" y="60" width="46" height="24" rx="5" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="39" y="77" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">캐시</text>
+<rect x="78" y="28" width="62" height="66" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="109" y="48" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">앱 서버</text>
+<rect x="86" y="60" width="46" height="24" rx="5" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="109" y="77" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">캐시</text>
+<text x="150" y="46" font-size="13" font-weight="600" style="fill:var(--color-accent)">네트워크 없이</text>
+<text x="150" y="64" font-size="13" font-weight="600" style="fill:var(--color-accent)">바로 읽어요</text>
+<text x="150" y="88" font-size="13" style="fill:var(--color-text-sub)">서버마다 따로,</text>
+<text x="150" y="106" font-size="13" style="fill:var(--color-text-sub)">다시 시작하면 비어요</text>
+<line x1="8" y1="124" x2="292" y2="124" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-line)" />
+<text x="8" y="148" font-size="13" font-weight="700" style="fill:var(--color-text)">캐시 서버(Redis 등)</text>
+<rect x="8" y="160" width="62" height="66" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="39" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">앱 서버</text>
+<rect x="78" y="160" width="62" height="66" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="109" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">앱 서버</text>
+<rect x="186" y="168" width="96" height="50" rx="8" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="234" y="190" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">캐시 서버</text>
+<text x="234" y="208" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">함께 써요</text>
+<path d="M39 230.2 L39 240 L234 240 L234 224.2" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M234 220 L230.3 226 L237.7 226 z" style="fill:var(--color-text-sub)" />
+<path d="M39 226 L35.3 232 L42.7 232 z" style="fill:var(--color-text-sub)" />
+<path d="M144.2 193 L179.8 193" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M184 193 L178 189.3 L178 196.7 z" style="fill:var(--color-text-sub)" />
+<path d="M140 193 L146 196.7 L146 189.3 z" style="fill:var(--color-text-sub)" />
+<text x="8" y="268" font-size="13" style="fill:var(--color-text-sub)">네트워크를 한 번 오가지만, 다시 시작해도 남아요</text>
+</svg>

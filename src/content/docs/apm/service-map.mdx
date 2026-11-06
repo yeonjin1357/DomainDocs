@@ -19,6 +19,8 @@ sources:
     url: https://opentelemetry.io/docs/specs/otel/trace/api/
 updated: 2026-10-29
 ---
+import SmEdge from '../../../assets/figures/apm/sm-edge.svg';
+import SmVirtual from '../../../assets/figures/apm/sm-virtual.svg';
 
 <OnDashboard title="주문 서비스 · 서비스 맵 · 최근 15분" caption="왼쪽 서비스가 오른쪽 서비스를 불러요. 주문 API에서 결제 API로 가는 호출만 에러가 4.2%라, 문제는 그 선에 있어요.">
   <ServiceMap ariaLabel="웹이 주문 API를 부르고, 주문 API가 결제 API, 재고 API, orders DB를 부르는 서비스 맵. 결제 API로 가는 선만 에러 4.2%로 빨갛고, 재고 API는 35ms, orders DB는 8ms예요. orders DB는 계측되지 않아 점선이에요." nodes={[{ id: 'web', label: '웹', x: 9, y: 50 }, { id: 'order', label: '주문 API', x: 38, y: 50, tone: 'accent', note: '1,200건/초' }, { id: 'pay', label: '결제 API', x: 84, y: 16, tone: 'warn' }, { id: 'stock', label: '재고 API', x: 84, y: 50 }, { id: 'db', label: 'orders DB', x: 84, y: 84, virtual: true }]} edges={[{ from: 'web', to: 'order' }, { from: 'order', to: 'pay', label: '에러 4.2%', tone: 'warn' }, { from: 'order', to: 'stock', label: '35ms' }, { from: 'order', to: 'db', label: '8ms' }]} />
@@ -41,20 +43,7 @@ updated: 2026-10-29
 서비스 맵은 서비스를 노드(점)로, 서비스 사이 호출을 선으로 그린 그림이에요. 트레이스에서 부른 쪽의 CLIENT <Term slug="foundations/logs-metrics-traces">span</Term>과 받은 쪽의 SERVER span이 부모·자식으로 이어진 짝을 찾아 선을 그어요.
 
 <Figure caption="트레이스 하나에서 주문 API의 CLIENT span 아래에 결제 API의 SERVER span이 자식으로 붙었어요. 이 짝이 맵의 주문 API → 결제 API 선 하나가 되고, 선마다 요청 수·실패 수·응답시간을 모아요.">
-  <Flow
-    ariaLabel="트레이스 하나 안에서 주문 API의 CLIENT span과 결제 API의 SERVER span이 부모·자식으로 이어지고, 이 짝이 서비스 맵에서 요청 수·실패 수·응답시간을 모으는 선 하나가 되는 구조도"
-    groups={[{ label: '트레이스 하나', cols: [0, 2], rows: [0, 0] }]}
-    nodes={[
-      { id: 'client', label: '주문 API', col: 0, row: 0, note: 'CLIENT span' },
-      { id: 'server', label: '결제 API', col: 2, row: 0, note: 'SERVER span' },
-      { id: 'line', label: '맵의 선 하나', col: 1, row: 1, note: '요청·실패·시간', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'client', to: 'server', label: '부모·자식' },
-      { from: 'client', to: 'line' },
-      { from: 'server', to: 'line' },
-    ]}
-  />
+  <SmEdge aria-label="트레이스 하나 안에서 주문 API의 CLIENT span 아래에 결제 API의 SERVER span이 자식으로 붙고, 이 짝이 서비스 맵의 주문 API → 결제 API 선 하나가 되어 요청 수, 실패 수, 응답시간을 모으는 그림" />
 </Figure>
 
 선마다 요청 수, 실패 수, 응답시간을 모아요. 그래서 어느 호출에서 에러가 나는지 선 하나로 보여요.
@@ -65,19 +54,8 @@ DB나 바깥 결제사처럼 span을 보내지 않는 곳은 받은 쪽 span이 
 
 반대로 부른 쪽이 계측되지 않았다면, Tempo와 OpenTelemetry Collector는 부른 쪽을 `user`라는 노드로 그려요.
 
-<Figure caption="span을 보내는 곳이 주문 API 하나뿐인 예시예요. 오른쪽 orders DB는 주문 API가 남긴 db.system 속성으로 만든 가상 노드예요. 왼쪽 user는 부른 쪽이 계측되지 않아서 붙은 이름이에요.">
-  <Flow
-    ariaLabel="계측되지 않은 부른 쪽이 user 노드로, 계측된 주문 API가 가운데에, 주문 API가 부른 orders DB가 부른 쪽 span의 속성으로 만든 가상 노드로 그려진 구조도"
-    nodes={[
-      { id: 'user', label: 'user', col: 0, row: 0, note: '부른 쪽 미계측' },
-      { id: 'order', label: '주문 API', col: 1, row: 0, note: 'span을 보냄', tone: 'accent' },
-      { id: 'db', label: 'orders DB', col: 2, row: 0, note: '가상 노드' },
-    ]}
-    edges={[
-      { from: 'user', to: 'order' },
-      { from: 'order', to: 'db' },
-    ]}
-  />
+<Figure caption="span을 보내는 곳이 주문 API 하나뿐인 예시예요. orders DB는 주문 API가 남긴 db.system 속성으로 만든 가상 노드예요. user는 부른 쪽이 계측되지 않아서 붙은 이름이에요.">
+  <SmVirtual aria-label="계측되지 않은 부른 쪽 user가 span을 보내는 주문 API를 부르고, 주문 API가 orders DB를 불러요. orders DB는 span의 db.system 속성으로 그린 가상 노드이고, 양옆은 주문 API의 span으로 짐작해 그린 노드인 그림" />
 </Figure>
 
 ## 선의 응답시간은 양쪽에서 따로 재요

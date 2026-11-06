@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 210" width="300" height="210">
+<rect x="70" y="6" width="160" height="44" rx="6" stroke-width="1" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="80" y="24" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">top -H</text>
+<text x="80" y="42" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"><tspan style="fill:var(--color-text-sub)">PID </tspan><tspan font-weight="700" style="fill:var(--color-accent)">612</tspan><tspan style="fill:var(--color-text-sub)">  CPU 98%</tspan></text>
+<path d="M120 50 L81.3 81.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M78 84 L85 83.1 L80.3 77.3 z" style="fill:var(--color-text-sub)" />
+<path d="M180 50 L218.7 81.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M222 84 L219.7 77.3 L215 83.1 z" style="fill:var(--color-text-sub)" />
+<rect x="4" y="86" width="140" height="116" rx="10" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="16" y="108" font-size="13" font-weight="700" style="fill:var(--color-text)">JDK 11·17</text>
+<text x="16" y="132" font-size="13" font-weight="600" style="fill:var(--color-warn)">16진수로: 612 → 264</text>
+<text x="16" y="156" font-size="13" style="fill:var(--color-text-sub)">덤프에서 찾을 글자</text>
+<text x="16" y="176" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">nid=0x264</text>
+<rect x="156" y="86" width="140" height="116" rx="10" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="168" y="108" font-size="13" font-weight="700" style="fill:var(--color-text)">JDK 21·25</text>
+<text x="168" y="132" font-size="13" font-weight="600" style="fill:var(--color-accent)">그대로 써요</text>
+<text x="168" y="156" font-size="13" style="fill:var(--color-text-sub)">덤프에서 찾을 글자</text>
+<text x="168" y="176" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">nid=612</text>
+<text x="168" y="194" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">[612]</text>
+</svg>

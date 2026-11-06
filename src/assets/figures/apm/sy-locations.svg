@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 236" width="300" height="236">
+<path d="M50 40 c-9 -10 -9 -24 0 -24 c9 0 9 14 0 24 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="50" cy="25" r="3.5" style="fill:var(--color-accent)" />
+<text x="50" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">서울</text>
+<path d="M150 40 c-9 -10 -9 -24 0 -24 c9 0 9 14 0 24 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="150" cy="25" r="3.5" style="fill:var(--color-accent)" />
+<text x="150" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">도쿄</text>
+<path d="M250 40 c-9 -10 -9 -24 0 -24 c9 0 9 14 0 24 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="250" cy="25" r="3.5" style="fill:var(--color-accent)" />
+<text x="250" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">싱가포르</text>
+<path d="M50 64 L111.2 94.1" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M115 96 L111.3 90 L108 96.7 z" style="fill:var(--color-accent)" />
+<path d="M150 64 L150 91.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 96 L153.7 90 L146.3 90 z" style="fill:var(--color-accent)" />
+<path d="M250 64 L188.8 94.1" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M185 96 L192 96.7 L188.7 90 z" style="fill:var(--color-accent)" />
+<rect x="90" y="98" width="120" height="40" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="115" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">주문 페이지</text>
+<text x="150" y="133" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">공개 주소</text>
+<rect x="4" y="158" width="292" height="72" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="14" y="176" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">회사 안</text>
+<path d="M52 216 c-9 -10 -9 -24 0 -24 c9 0 9 14 0 24 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="52" cy="201" r="3.5" style="fill:var(--color-text-sub)" />
+<text x="70" y="204" font-size="13" font-weight="700" style="fill:var(--color-text)">안쪽 위치</text>
+<path d="M140 199 L185.8 199" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M190 199 L184 195.3 L184 202.7 z" style="fill:var(--color-accent)" />
+<rect x="192" y="182" width="94" height="36" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="239" y="204.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">사내 주소</text>
+</svg>

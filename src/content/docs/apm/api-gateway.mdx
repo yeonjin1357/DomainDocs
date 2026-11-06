@@ -23,6 +23,10 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc6585
 updated: 2026-11-04
 ---
+import GwRoute from '../../../assets/figures/apm/gw-route.svg';
+import GwPipeline from '../../../assets/figures/apm/gw-pipeline.svg';
+import GwRatelimit from '../../../assets/figures/apm/gw-ratelimit.svg';
+import GwLayers from '../../../assets/figures/apm/gw-layers.svg';
 
 <KeyPoints>
   <Point title="바깥 요청이 들어오는 입구 하나예요">
@@ -45,24 +49,7 @@ updated: 2026-11-04
 <Term term="apm/api-gateway">API 게이트웨이</Term>(API gateway)는 바깥 클라이언트의 요청을 먼저 받아 뒤쪽 서비스로 보내는 서버예요. 서비스가 여러 개로 나뉘어도 클라이언트는 게이트웨이 주소 하나만 알면 돼요.
 
 <Figure caption="모바일 앱과 웹은 게이트웨이 하나로 요청을 보내요. 게이트웨이는 경로를 보고 주문, 회원, 결제 서비스로 나눠 보내요.">
-  <Flow
-    ariaLabel="모바일 앱과 웹이 API 게이트웨이로 요청을 보내고, 게이트웨이가 경로 /orders는 주문 서비스로, /users는 회원 서비스로, /payments는 결제 서비스로 나눠 보내는 구조도"
-    nodes={[
-      { id: 'mobile', label: '모바일 앱', col: 0, row: 0 },
-      { id: 'web', label: '웹', col: 2, row: 0 },
-      { id: 'gw', label: 'API 게이트웨이', col: 1, row: 1, note: '인증·제한·경로', tone: 'accent' },
-      { id: 'order', label: '주문 서비스', col: 0, row: 2, note: '/orders' },
-      { id: 'user', label: '회원 서비스', col: 1, row: 2, note: '/users' },
-      { id: 'pay', label: '결제 서비스', col: 2, row: 2, note: '/payments' },
-    ]}
-    edges={[
-      { from: 'mobile', to: 'gw' },
-      { from: 'web', to: 'gw' },
-      { from: 'gw', to: 'order', tone: 'accent' },
-      { from: 'gw', to: 'user', tone: 'accent' },
-      { from: 'gw', to: 'pay', tone: 'accent' },
-    ]}
-  />
+  <GwRoute aria-label="모바일 앱과 웹이 인증·제한·경로를 맡는 API 게이트웨이로 요청을 보내고, 게이트웨이가 /orders는 주문 서비스로, /users는 회원 서비스로, /payments는 결제 서비스로 나눠 보내는 그림" />
 </Figure>
 
 Kong, AWS API Gateway, Spring Cloud Gateway 같은 제품이 있어요. NGINX나 Envoy 같은 프록시에 규칙을 걸어 쓰기도 해요. 이름은 달라도 하는 일은 비슷해요.
@@ -72,17 +59,7 @@ Kong, AWS API Gateway, Spring Cloud Gateway 같은 제품이 있어요. NGINX나
 게이트웨이는 요청 하나에 몇 가지 검사를 차례로 해요. 어느 단계에서든 걸리면 뒤쪽 서비스에 보내지 않고 바로 답해요.
 
 <Figure caption="게이트웨이가 요청 하나를 처리하는 순서예요. 앞 단계에서 걸러진 요청은 뒤쪽 서비스에 닿지 않아요.">
-  <Triage
-    numbered={false}
-    ariaLabel="경로를 찾지 못하면 404, 인증이 틀리면 401이나 403, 호출 한도를 넘으면 429로 바로 답하고, 통과한 요청만 뒤쪽으로 보내며, 뒤쪽이 정한 시간을 넘기면 504, 연결이 안 되면 502나 503으로 답하는 흐름"
-    steps={[
-      { label: '경로 찾기', note: '/orders → 주문 서비스', exits: [{ when: '맞는 경로 없음', to: '404' }] },
-      { label: '인증 확인', note: 'API 키, 토큰', exits: [{ when: '없거나 틀림', to: '401·403', tone: 'warn' }] },
-      { label: '호출 제한', note: '키마다 초당 몇 번', exits: [{ when: '한도를 넘음', to: '429', tone: 'warn' }] },
-      { label: '뒤쪽으로 전달', note: '정한 시간까지 기다려요', exits: [{ when: '시간을 넘김', to: '504' }, { when: '연결 실패', to: '502·503' }] },
-      { label: '응답 돌려주기', tone: 'accent' },
-    ]}
-  />
+  <GwPipeline aria-label="게이트웨이가 경로를 찾지 못하면 404, 인증이 없거나 틀리면 401·403, 호출 한도를 넘으면 429로 바로 답해요. 통과한 요청만 뒤쪽으로 전달하고, 정한 시간을 넘기면 504, 연결이 안 되면 502·503, 문제가 없으면 응답을 돌려주는 순서" />
 </Figure>
 
 인증은 요청에 든 API 키나 토큰을 확인하는 일이에요. <Term term="apm/api-key">API 키</Term>는 어느 클라이언트의 요청인지 가리는 긴 문자열이에요. 서비스마다 인증 코드를 넣지 않아도 입구에서 한 번에 걸러요.
@@ -90,30 +67,7 @@ Kong, AWS API Gateway, Spring Cloud Gateway 같은 제품이 있어요. NGINX나
 호출 제한(rate limit)은 정해진 시간에 받을 요청 수를 묶어 두는 일이에요. 한도를 넘은 요청에는 429 Too Many Requests로 답해요. 토큰 버킷처럼 한도를 세는 법은 <Term slug="cloud/throttling">스로틀링</Term>에서 다뤄요.
 
 <Figure caption="Envoy 1.40을 게이트웨이로 두고 초당 5개로 제한한 뒤, 요청 10개를 한꺼번에 보낸 결과예요. 5개는 통과하고 5개는 0ms 만에 429를 받았어요. 뒤쪽 서비스는 5번만 받았어요.">
-  <Strip
-    ariaLabel="요청 10개 중 앞의 5개는 토큰이 있어 200으로 통과하고, 뒤의 5개는 토큰이 없어 429를 받는 칸 띠"
-    rows={[
-      {
-        label: '한꺼번에 보낸 요청 10개',
-        cells: [
-          { label: '200', tone: 'accent' },
-          { label: '200', tone: 'accent' },
-          { label: '200', tone: 'accent' },
-          { label: '200', tone: 'accent' },
-          { label: '200', tone: 'accent' },
-          { label: '429', tone: 'warn' },
-          { label: '429', tone: 'warn' },
-          { label: '429', tone: 'warn' },
-          { label: '429', tone: 'warn' },
-          { label: '429', tone: 'warn' },
-        ],
-      },
-    ]}
-    ranges={[
-      { from: 0, to: 4, label: '토큰 5개로 통과', tone: 'accent' },
-      { from: 5, to: 9, label: '토큰이 없어 거절', tone: 'warn' },
-    ]}
-  />
+  <GwRatelimit aria-label="한꺼번에 보낸 요청 10개 가운데 1~5번은 초당 5개인 토큰을 하나씩 써서 통과하고, 6~10번은 토큰이 없어 0ms 만에 429를 받아요. 뒤쪽 서비스는 5번만 받은 그림" />
 </Figure>
 
 이 밖에도 요청과 응답의 머리말 바꾸기, 자주 쓰는 응답 캐시, 여러 서비스의 응답을 하나로 묶기도 해요. 다만 일을 많이 맡길수록 게이트웨이가 느려지고, 게이트웨이 장애가 모든 API의 장애가 돼요.
@@ -123,22 +77,7 @@ Kong, AWS API Gateway, Spring Cloud Gateway 같은 제품이 있어요. NGINX나
 셋 다 요청을 넘겨주는 프록시지만, 서 있는 자리와 보는 것이 달라요.
 
 <Figure caption="로드 밸런서는 연결을 서버 여럿에 나누고, API 게이트웨이는 요청의 경로와 키를 보고 규칙을 걸어요. 서비스 메시는 안쪽 서비스끼리 주고받는 통신을 맡아요.">
-  <Flow
-    ariaLabel="클라이언트의 요청이 로드 밸런서, API 게이트웨이를 거쳐 주문 서비스로 가고, 주문 서비스가 서비스 메시를 거쳐 결제 서비스를 부르는 구조도"
-    nodes={[
-      { id: 'c', label: '클라이언트', col: 1, row: 0 },
-      { id: 'lb', label: '로드 밸런서', col: 1, row: 1, note: '연결 나누기' },
-      { id: 'gw', label: 'API 게이트웨이', col: 1, row: 2, note: '경로·키·한도', tone: 'accent' },
-      { id: 'o', label: '주문 서비스', col: 0, row: 3 },
-      { id: 'p', label: '결제 서비스', col: 2, row: 3 },
-    ]}
-    edges={[
-      { from: 'c', to: 'lb' },
-      { from: 'lb', to: 'gw' },
-      { from: 'gw', to: 'o', tone: 'accent' },
-      { from: 'o', to: 'p', label: '메시', dashed: true },
-    ]}
-  />
+  <GwLayers aria-label="클라이언트의 요청이 연결을 나누는 로드 밸런서와 경로·키·한도 규칙을 거는 API 게이트웨이를 거쳐 주문 서비스로 가고, 주문 서비스가 서비스 메시를 거쳐 결제 서비스를 부르는 그림" />
 </Figure>
 
 쿠버네티스의 인그레스도 경로로 나눠 보내는 입구예요. 인그레스 컨트롤러에 따라 인증이나 호출 제한까지 해서 게이트웨이처럼 쓰기도 해요. 안쪽 통신은 <Term slug="kubernetes/service-mesh">서비스 메시</Term>에서 다뤄요.

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 286" width="300" height="286">
+<rect x="50" y="8" width="200" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="62" y="27" font-size="13" font-weight="700" style="fill:var(--color-accent)">처리 중</text>
+<text x="62" y="44" font-size="13" style="fill:var(--color-text-sub)">스레드 200개</text>
+<rect x="188" y="22" width="50" height="16" rx="3" style="fill:var(--color-accent);fill-opacity:0.85" />
+<text x="213" y="34.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">가득</text>
+<path d="M150 82 L150 58.2" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 54 L146.3 60 L153.7 60 z" style="fill:var(--color-text-sub)" />
+<text x="158" y="72" font-size="13" style="fill:var(--color-text-sub)">스레드를 기다려요</text>
+<rect x="30" y="84" width="240" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="42" y="103" font-size="13" font-weight="700" style="fill:var(--color-text)">받아 둔 연결</text>
+<text x="42" y="120" font-size="13" style="fill:var(--color-text-sub)">8,192개까지</text>
+<rect x="208" y="98" width="50" height="16" rx="3" style="fill:var(--color-text-sub);fill-opacity:0.85" />
+<text x="233" y="110.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">가득</text>
+<path d="M150 158 L150 134.2" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 130 L146.3 136 L153.7 136 z" style="fill:var(--color-text-sub)" />
+<text x="158" y="148" font-size="13" style="fill:var(--color-text-sub)">자리가 나면</text>
+<rect x="10" y="160" width="280" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="22" y="179" font-size="13" font-weight="700" style="fill:var(--color-text)">OS 대기열</text>
+<text x="22" y="196" font-size="13" style="fill:var(--color-text-sub)">100개까지</text>
+<rect x="228" y="174" width="50" height="16" rx="3" style="fill:var(--color-text-sub);fill-opacity:0.85" />
+<text x="253" y="186.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">가득</text>
+<path d="M150 234 L150 210.2" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 206 L146.3 212 L153.7 212 z" style="fill:var(--color-text-sub)" />
+<rect x="10" y="236" width="280" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="22" y="255" font-size="13" font-weight="700" style="fill:var(--color-warn)">그것도 차면</text>
+<text x="22" y="272" font-size="13" style="fill:var(--color-text-sub)">새 연결은 거절되거나 끊겨요</text>
+<line x1="266" y1="252" x2="278" y2="264" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="266" y1="264" x2="278" y2="252" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+</svg>

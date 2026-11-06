@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 272" width="300" height="272">
+<text x="150" y="16" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">활성 트랜잭션</text>
+<rect x="110" y="24" width="80" height="32" rx="6" style="fill:var(--color-accent)" />
+<text x="150" y="46" font-size="15" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-card)">3</text>
+<rect x="96" y="84" width="108" height="66" rx="10" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="100" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">처리 중</text>
+<rect x="106" y="112" width="24" height="26" rx="5" style="fill:var(--color-accent)" />
+<rect x="138" y="112" width="24" height="26" rx="5" style="fill:var(--color-accent)" />
+<rect x="170" y="112" width="24" height="26" rx="5" style="fill:var(--color-accent)" />
+<line x1="150" y1="56" x2="150" y2="84" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-accent)" />
+<rect x="14" y="106" width="24" height="26" rx="5" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M40 119 L89.1 119" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M94 119 L87 114.7 L87 123.3 z" style="fill:var(--color-text-sub)" />
+<text x="26" y="164" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">시작</text>
+<text x="26" y="182" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">활성 +1</text>
+<path d="M206 119 L253.1 119" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M258 119 L251 114.7 L251 123.3 z" style="fill:var(--color-text-sub)" />
+<rect x="262" y="106" width="24" height="26" rx="5" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M269 119 L272.5 122.5 L279 115.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="274" y="164" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">끝</text>
+<text x="274" y="182" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">활성 −1</text>
+<text x="208" y="200" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">처리량 카운터</text>
+<rect x="168" y="208" width="80" height="32" rx="6" stroke-width="1.4" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="208" y="230" font-size="15" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">+1</text>
+<line x1="274" y1="190" x2="274" y2="226" stroke-width="1.4" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<path d="M274 226 L254.2 226" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M250 226 L256 229.7 L256 222.3 z" style="fill:var(--color-text-sub)" />
+<text x="8" y="264" font-size="13" style="fill:var(--color-text-sub)">밀리면 끝나는 요청이 줄어 처리량부터 줄어요</text>
+</svg>

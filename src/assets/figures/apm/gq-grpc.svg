@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 246" width="300" height="246">
+<text x="40" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">클라이언트</text>
+<line x1="40" y1="26" x2="40" y2="214" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="262" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">서버</text>
+<line x1="262" y1="26" x2="262" y2="214" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M40 48 L257.1 48" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M262 48 L255 43.7 L255 52.3 z" style="fill:var(--color-text-sub)" />
+<text x="151" y="42" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">POST /shop.Orders/Get</text>
+<path d="M40 82 L257.1 82" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M262 82 L255 77.7 L255 86.3 z" style="fill:var(--color-text-sub)" />
+<text x="151" y="76" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">요청 메시지</text>
+<path d="M262 124 L44.9 124" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M40 124 L47 128.3 L47 119.7 z" style="fill:var(--color-text-sub)" />
+<text x="151" y="118" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">:status 200</text>
+<path d="M262 158 L44.9 158" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M40 158 L47 162.3 L47 153.7 z" style="fill:var(--color-text-sub)" />
+<text x="151" y="152" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">응답 메시지(있으면)</text>
+<path d="M262 200 L44.9 200" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-warn)" />
+<path d="M40 200 L47 204.3 L47 195.7 z" style="fill:var(--color-warn)" />
+<text x="151" y="194" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">트레일러 grpc-status: 5</text>
+<text x="150" y="238" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">HTTP는 성공이어도 결과는 트레일러에</text>
+</svg>

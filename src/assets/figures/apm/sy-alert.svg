@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 192" width="300" height="192">
+<text x="8" y="20" font-size="13" font-weight="700" style="fill:var(--color-text)">싱가포르만 막힘</text>
+<rect x="148" y="5" width="39.4" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="167.7" y="20.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">서울</text>
+<rect x="192" y="5" width="39.4" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="211.7" y="20.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">도쿄</text>
+<rect x="236" y="5" width="64.8" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="268.4" y="20.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">싱가포르</text>
+<text x="14" y="50" font-size="13" style="fill:var(--color-text-sub)">평균 &lt; 90%</text>
+<text x="150" y="50" font-size="13" font-weight="700" style="fill:var(--color-warn)">66.7%</text>
+<rect x="239.9" y="34.5" width="52.1" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="265.9" y="50.2" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">울려요</text>
+<text x="14" y="76" font-size="13" style="fill:var(--color-text-sub)">80% 아래 ≥ 2곳</text>
+<text x="150" y="76" font-size="13" font-weight="700" style="fill:var(--color-text)">1곳</text>
+<rect x="223.5" y="60.5" width="68.5" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="257.8" y="76.2" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">안 울려요</text>
+<line x1="8" y1="100" x2="292" y2="100" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-line)" />
+<text x="8" y="126" font-size="13" font-weight="700" style="fill:var(--color-text)">두 곳이 막힘</text>
+<rect x="148" y="111" width="39.4" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="167.7" y="126.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">서울</text>
+<rect x="192" y="111" width="39.4" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="211.7" y="126.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">도쿄</text>
+<rect x="236" y="111" width="64.8" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="268.4" y="126.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">싱가포르</text>
+<text x="14" y="156" font-size="13" style="fill:var(--color-text-sub)">평균 &lt; 90%</text>
+<text x="150" y="156" font-size="13" font-weight="700" style="fill:var(--color-warn)">33.3%</text>
+<rect x="239.9" y="140.5" width="52.1" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="265.9" y="156.2" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">울려요</text>
+<text x="14" y="182" font-size="13" style="fill:var(--color-text-sub)">80% 아래 ≥ 2곳</text>
+<text x="150" y="182" font-size="13" font-weight="700" style="fill:var(--color-warn)">2곳</text>
+<rect x="239.9" y="166.5" width="52.1" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="265.9" y="182.2" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">울려요</text>
+</svg>

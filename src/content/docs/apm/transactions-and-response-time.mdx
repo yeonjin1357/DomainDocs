@@ -25,6 +25,9 @@ sources:
     url: https://docs.newrelic.com/docs/browser/new-relic-browser/page-load-timing-resources/page-load-timing-process/
 updated: 2026-10-29
 ---
+import TxName from '../../../assets/figures/apm/tx-name.svg';
+import TxWait from '../../../assets/figures/apm/tx-wait.svg';
+import TxP95 from '../../../assets/figures/apm/tx-p95.svg';
 
 <OnDashboard title="주문 API · GET /orders/{id} · 최근 1시간 평균" caption="트랜잭션 하나의 평균 응답시간 600ms를 구간별로 나눈 모습이에요. 평균이라서 세 구간을 더하면 전체와 같아요.">
   <StatTile label="응답시간 평균" value="600" unit="ms" tone="accent" />
@@ -52,38 +55,15 @@ APM(애플리케이션 성능 모니터링)은 요청이 서비스에 들어와 
 트랜잭션 이름은 `GET /orders/{id}`처럼 경로 틀로 묶어요. 주문 번호마다 이름이 생기면 같은 기능의 요청을 모아 볼 수 없어요.
 
 <Figure caption="주문 번호만 다른 요청 세 개가 경로 틀 GET /orders/{id} 하나로 모여요. 그래야 같은 기능의 요청을 함께 볼 수 있어요.">
-  <Flow
-    ariaLabel="/orders/1234, /orders/5678, /orders/42로 온 요청 세 개가 모두 /orders/{id}라는 트랜잭션 이름 하나로 모이는 구조도"
-    nodes={[
-      { id: 'r1', label: '요청', col: 0, row: 0, note: '/orders/1234' },
-      { id: 'r2', label: '요청', col: 0, row: 1, note: '/orders/5678' },
-      { id: 'r3', label: '요청', col: 0, row: 2, note: '/orders/42' },
-      { id: 'name', label: '트랜잭션', col: 2, row: 1, note: '/orders/{id}', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'r1', to: 'name' },
-      { from: 'r2', to: 'name' },
-      { from: 'r3', to: 'name' },
-    ]}
-  />
+  <TxName aria-label="/orders/1234, /orders/5678, /orders/42로 온 요청 세 개가 바뀌는 번호를 {id}로 묶은 트랜잭션 이름 /orders/{id} 하나로 모이는 그림" />
 </Figure>
 
 ## 서버가 잰 시간은 사용자가 기다린 시간의 일부예요
 
 트랜잭션 시간은 앱이 요청을 받아 처리한 시간이에요. 로드밸런서 같은 앞단 서버를 거쳐 앱에 닿기까지 기다린 시간, 네트워크 시간, 브라우저가 화면을 그리는 시간은 빠져요. New Relic도 페이지 로드 시간을 이렇게 나누고, 앱 서버 시간은 그중 한 구간으로 둬요.
 
-<Figure caption="사용자가 기다린 시간을 구간별로 나눈 예시예요. 서버가 재는 트랜잭션은 앱 서버 줄의 한 구간뿐이에요. 네트워크, 앞단 대기, 브라우저가 화면을 그리는 시간은 빠져요.">
-  <Timeline
-    ariaLabel="사용자가 기다린 시간이 네트워크, 앞단 대기, 앱 서버의 트랜잭션, 다시 네트워크, 브라우저가 화면을 그리는 시간 순으로 이어지고, 그중 트랜잭션은 가운데 한 구간뿐인 시간 띠"
-    end={100}
-    lanes={[
-      { label: '사용자', segments: [{ start: 0, end: 100, label: '기다린 시간' }] },
-      { label: '네트워크', segments: [{ start: 0, end: 8 }, { start: 62, end: 70 }] },
-      { label: '앞단 대기', segments: [{ start: 8, end: 32 }] },
-      { label: '앱 서버', segments: [{ start: 32, end: 62, label: '트랜잭션', tone: 'accent' }] },
-      { label: '브라우저', segments: [{ start: 70, end: 100 }] },
-    ]}
-  />
+<Figure caption="사용자가 기다린 시간을 구간별로 나눈 예시예요. 서버가 재는 트랜잭션은 그중 한 구간뿐이에요. 네트워크, 앞단 대기, 브라우저가 화면을 그리는 시간은 빠져요.">
+  <TxWait aria-label="사용자가 기다린 시간이 네트워크, 앞단 대기, 트랜잭션, 다시 네트워크, 화면 그리기로 이어지고, APM이 재는 건 가운데 트랜잭션 구간뿐인 막대" />
 </Figure>
 
 그래서 서버 응답시간이 그대로여도 사용자는 느리다고 할 수 있어요. 이럴 땐 앞단 대기와 네트워크, 브라우저 쪽 시간을 함께 봐요.
@@ -95,15 +75,7 @@ APM(애플리케이션 성능 모니터링)은 요청이 서비스에 들어와 
 이렇게 나눠 더하는 건 평균이나 합계일 때만 맞아요. 구간별 p95를 더한 값은 전체 <Term slug="foundations/percentiles">p95</Term>가 아니에요.
 
 <Figure caption="요청 100건 중 90건은 두 구간이 100ms씩, 5건은 DB만, 다른 5건은 외부 API만 1,000ms인 예시예요. 평균은 구간을 더하면 전체와 같지만, p95는 더한 값과 실제 전체가 크게 달라요.">
-  <Compare
-    columns={['평균', 'p95']}
-    rows={[
-      { label: 'DB', values: ['145ms', '100ms'] },
-      { label: '외부 API', values: ['145ms', '100ms'] },
-      { label: '두 구간을 더하면', values: ['290ms', '200ms'] },
-      { label: '실제 전체', values: ['290ms', '1,100ms'] },
-    ]}
-  />
+  <TxP95 aria-label="요청 100건 가운데 90건은 DB 100ms와 외부 API 100ms로 200ms, 5건은 DB 1,000ms로 1,100ms, 5건은 외부 API 1,000ms로 1,100ms예요. 평균은 145 + 145 = 290ms로 실제 전체 평균 290ms와 같지만, p95는 100 + 100 = 200ms로 실제 전체 p95 1,100ms와 달라요" />
 </Figure>
 
 <Checkpoints>

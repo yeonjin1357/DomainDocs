@@ -23,6 +23,10 @@ sources:
     url: https://www.brendangregg.com/HeatMaps/latency.html
 updated: 2026-10-29
 ---
+import RtdDot from '../../../assets/figures/apm/rtd-dot.svg';
+import RtdLock from '../../../assets/figures/apm/rtd-lock.svg';
+import RtdTimeout from '../../../assets/figures/apm/rtd-timeout.svg';
+import RtdHeatmap from '../../../assets/figures/apm/rtd-heatmap.svg';
 
 <OnDashboard title="주문 API · 응답시간 분포도 · 14:00~14:10" caption="14:04의 세로줄은 잠금이 풀리며 함께 끝난 요청이에요. 14:06부터 5초 높이에 생긴 가로줄은 타임아웃 에러예요.">
   <Scatter ariaLabel="14:00부터 10분 동안의 응답시간 분포도. 요청 대부분은 1초 아래에 깔려 있어요. 14:04에는 0.3~3.8초 점이 세로로 늘어서고, 14:06부터는 5초 높이에 타임아웃 에러 점이 가로로 늘어서요." xMax={10} yMax={6000} yTicks={[1000, 3000, 5000]} xLabels={['14:00', '14:05', '14:10']} groups={[{ count: 150, x: [0, 10], y: [40, 900], skew: 2.5, label: '성공' }, { count: 22, x: [4, 4.04], y: [300, 3800] }, { count: 18, x: [6.2, 9.8], y: [5000, 5000], tone: 'warn', label: '에러(타임아웃)' }]} />
@@ -47,25 +51,7 @@ updated: 2026-10-29
 점은 요청이 끝나야 찍혀요. 그래서 끝나지 않고 멈춰 있는 요청은 보이지 않아요.
 
 <Figure caption="요청 셋의 예시예요. A와 C는 끝난 시각에 점이 찍히고, 점의 높이는 걸린 시간이에요. 아직 끝나지 않은 B는 점이 없어요.">
-  <Timeline
-    ariaLabel="요청 A는 1초에 시작해 3초에 끝나 점이 찍히고, 요청 C는 6초에 시작해 7초에 끝나 점이 찍히며, 요청 B는 2초에 시작해 지금인 10초까지 끝나지 않아 점이 없는 시간 띠"
-    end={10}
-    lanes={[
-      { label: '요청 A', segments: [{ start: 1, end: 3, label: '2초', tone: 'accent' }] },
-      { label: '요청 B', segments: [{ start: 2, end: 10, label: '아직 안 끝남', tone: 'warn' }] },
-      { label: '요청 C', segments: [{ start: 6, end: 7, tone: 'accent' }] },
-    ]}
-    marks={[
-      { at: 3, label: 'A 점' },
-      { at: 7, label: 'C 점' },
-      { at: 10, label: '지금', tone: 'warn' },
-    ]}
-    ticks={[
-      { at: 0, label: '0초' },
-      { at: 5, label: '5초' },
-      { at: 10, label: '10초' },
-    ]}
-  />
+  <RtdDot aria-label="시간 띠 아래에 분포도를 둔 그림. 요청 A는 1초에 시작해 3초에 끝나 3초 위치, 높이 2초에 점이 찍히고, 요청 C는 6초에서 7초까지라 7초 위치, 높이 1초에 점이 찍혀요. 요청 B는 2초에 시작해 지금인 10초까지 끝나지 않아 점이 없어요" />
 </Figure>
 
 ## 줄이 보이면 병목이 있어요
@@ -73,63 +59,21 @@ updated: 2026-10-29
 세로줄은 여러 요청이 같은 순간에 함께 끝난 자리예요. 잠금(lock)이나 <Term slug="apm/gc-pause">GC 멈춤</Term>처럼 잠깐 막혔던 것이 풀리면, 기다리던 요청이 한꺼번에 끝나서 생겨요.
 
 <Figure caption="잠금이 4초 이어진 예시예요. 그 사이 들어온 요청 A, B, C는 응답시간이 제각각이지만, 잠금이 풀리는 순간 함께 끝나서 점이 세로로 서요.">
-  <Timeline
-    ariaLabel="잠금이 1초부터 5초까지 이어지고, 그 사이 1.5초, 2.5초, 4초에 들어온 요청 A, B, C가 모두 5초에 함께 끝나는 시간 띠"
-    end={6}
-    lanes={[
-      { label: '잠금', segments: [{ start: 1, end: 5, label: '잠금 4초', tone: 'warn' }] },
-      { label: '요청 A', segments: [{ start: 1.5, end: 5, label: '3.5초' }] },
-      { label: '요청 B', segments: [{ start: 2.5, end: 5, label: '2.5초' }] },
-      { label: '요청 C', segments: [{ start: 4, end: 5 }] },
-    ]}
-    marks={[{ at: 5, label: '풀림' }]}
-    ticks={[
-      { at: 0, label: '0초' },
-      { at: 3, label: '3초' },
-      { at: 6, label: '6초' },
-    ]}
-  />
+  <RtdLock aria-label="잠금이 1초부터 5초까지 이어지는 동안 1.5초, 2.5초, 4초에 들어온 요청 A, B, C가 모두 5초에 함께 끝나서, 분포도의 5초 위치에 3.5초, 2.5초, 1초 높이의 점이 세로로 서는 그림" />
 </Figure>
 
 가로줄은 끝난 시각은 달라도 응답시간이 같은 요청들이에요. 자원이 모자라 타임아웃 값만큼 기다리다 에러로 끝나면 생겨서, 그 높이가 곧 타임아웃 값이에요.
 
 <Figure caption="타임아웃이 5초인 예시예요. 요청 D, E, F는 끝난 시각이 달라도 모두 5초를 기다리다 끝나서, 점이 5초 높이에 가로로 누워요.">
-  <Timeline
-    ariaLabel="요청 D, E, F가 각각 0초, 2초, 4초에 들어와 모두 5초씩 기다리다 5초, 7초, 9초에 타임아웃 에러로 끝나는 시간 띠"
-    end={10}
-    lanes={[
-      { label: '요청 D', segments: [{ start: 0, end: 5, label: '5초', tone: 'warn' }] },
-      { label: '요청 E', segments: [{ start: 2, end: 7, label: '5초', tone: 'warn' }] },
-      { label: '요청 F', segments: [{ start: 4, end: 9, label: '5초', tone: 'warn' }] },
-    ]}
-    ticks={[
-      { at: 0, label: '0초' },
-      { at: 5, label: '5초' },
-      { at: 10, label: '10초' },
-    ]}
-  />
+  <RtdTimeout aria-label="요청 D, E, F가 0초, 2초, 4초에 들어와 모두 5초씩 기다리다 5초, 7초, 9초에 타임아웃 에러로 끝나서, 분포도의 5초 높이에 점이 가로로 눕는 그림" />
 </Figure>
 
 ## 요청이 많으면 히트맵으로 봐요
 
 요청이 많으면 점이 겹쳐서, 어디에 얼마나 몰렸는지 보이지 않아요. 히트맵(heatmap)은 시각과 응답시간으로 나눈 칸마다 요청 수를 세어 색 진하기로 보여 줘요. 대신 요청 하나하나는 칸을 눌러 들어가야 보여요.
 
-<Figure caption="1분 단위와 응답시간 세 구간으로 칸을 나눈 히트맵 예시예요. 칸마다 요청 수를 세어, 많을수록 진하게 칠해요. 14:04에는 요청이 1초 넘는 칸으로 몰렸어요.">
-  <Strip
-    ariaLabel="14:00부터 14:05까지 1분마다 세 응답시간 구간의 요청 수를 센 히트맵. 평소에는 0.5초 아래 칸이 120건 안팎으로 진하고 1초 넘는 칸은 0~2건으로 흐리지만, 14:04에는 1초 넘는 칸이 110건으로 진해지고 0.5초 아래 칸은 30건으로 옅어진 칸 띠"
-    rows={[
-      {
-        label: '1초 넘음',
-        heads: ['14:00', '14:01', '14:02', '14:03', '14:04', '14:05'],
-        cells: [{ label: '0', heat: 0 }, { label: '1', heat: 0.01 }, { label: '0', heat: 0 }, { label: '2', heat: 0.02 }, { label: '110', heat: 0.88 }, { label: '1', heat: 0.01 }],
-      },
-      { label: '0.5~1초', cells: [{ label: '8', heat: 0.06 }, { label: '10', heat: 0.08 }, { label: '7', heat: 0.06 }, { label: '9', heat: 0.07 }, { label: '12', heat: 0.1 }, { label: '8', heat: 0.06 }] },
-      {
-        label: '0.5초 아래',
-        cells: [{ label: '120', heat: 0.96 }, { label: '125', heat: 1 }, { label: '118', heat: 0.94 }, { label: '122', heat: 0.98 }, { label: '30', heat: 0.24 }, { label: '121', heat: 0.97 }],
-      },
-    ]}
-  />
+<Figure caption="1분 단위와 응답시간 세 구간으로 나눈 히트맵 예시예요. 구간마다 요청 수를 세어, 많을수록 진하게 칠해요. 14:04에는 요청이 1초 넘는 구간으로 몰렸어요.">
+  <RtdHeatmap aria-label="14:00부터 14:05까지 1분마다 응답시간 0.5초 아래, 0.5~1초, 1초 넘음 세 구간의 요청 수를 센 히트맵. 평소에는 0.5초 아래가 118~125건, 1초 넘음이 0~2건이지만, 14:04에는 1초 넘음이 110건, 0.5초 아래가 30건이에요" />
 </Figure>
 
 <Checkpoints>

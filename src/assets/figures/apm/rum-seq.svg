@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 222" width="300" height="222">
+<text x="40" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">브라우저</text>
+<line x1="40" y1="26" x2="40" y2="190" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="154" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">RUM 스크립트</text>
+<line x1="154" y1="26" x2="154" y2="190" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="262" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">수집 서버</text>
+<line x1="262" y1="26" x2="262" y2="190" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M40 52 L149.1 52" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M154 52 L147 47.7 L147 56.3 z" style="fill:var(--color-text-sub)" />
+<text x="97" y="46" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">시각·지표 기록</text>
+<path d="M40 88 L149.1 88" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M154 88 L147 83.7 L147 92.3 z" style="fill:var(--color-text-sub)" />
+<text x="97" y="82" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">에러 이벤트</text>
+<path d="M154 176 L257.1 176" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M262 176 L255 171.7 L255 180.3 z" style="fill:var(--color-accent)" />
+<text x="208" y="170" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">모은 것을 전송</text>
+<rect x="118" y="104" width="72" height="30" rx="6" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="154" y="124" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">모아 둬요</text>
+<line x1="8" y1="146" x2="292" y2="146" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="4 3" style="stroke:var(--color-warn)" />
+<text x="292" y="141" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-warn);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">페이지가 숨겨질 때</text>
+<text x="8" y="214" font-size="13" style="fill:var(--color-text-sub)">탭을 옮기거나 닫으면 그때 한꺼번에 보내요</text>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 186" width="300" height="186">
+<rect x="8" y="18" width="120" height="32" rx="8" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="18" y="39" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"><tspan style="fill:var(--color-text)">/orders/</tspan><tspan font-weight="700" style="fill:var(--color-warn)">1234</tspan></text>
+<path d="M128 34 L175.4 94.7" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M178 98 L177.2 91 L171.4 95.6 z" style="fill:var(--color-text-sub)" />
+<rect x="8" y="64" width="120" height="32" rx="8" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="18" y="85" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"><tspan style="fill:var(--color-text)">/orders/</tspan><tspan font-weight="700" style="fill:var(--color-warn)">5678</tspan></text>
+<path d="M128 80 L174 96.6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M178 98 L173.6 92.5 L171.1 99.5 z" style="fill:var(--color-text-sub)" />
+<rect x="8" y="110" width="120" height="32" rx="8" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="18" y="131" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"><tspan style="fill:var(--color-text)">/orders/</tspan><tspan font-weight="700" style="fill:var(--color-warn)">42</tspan></text>
+<path d="M128 126 L174.3 100.1" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M178 98 L170.9 97.7 L174.6 104.2 z" style="fill:var(--color-text-sub)" />
+<text x="234" y="70" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">트랜잭션 이름</text>
+<rect x="180" y="80" width="112" height="36" rx="8" style="fill:var(--color-accent)" />
+<text x="236" y="103" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" text-anchor="middle"><tspan style="fill:var(--color-card)">/orders/</tspan><tspan font-weight="700" style="fill:var(--color-card)">{id}</tspan></text>
+<text x="8" y="176" font-size="13" style="fill:var(--color-text-sub)">바뀌는 번호는 {id}로 묶어 같은 기능끼리 봐요</text>
+</svg>

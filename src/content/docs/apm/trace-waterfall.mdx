@@ -19,6 +19,7 @@ sources:
     url: https://www.elastic.co/docs/solutions/observability/apm/transactions-ui
 updated: 2026-10-29
 ---
+import TwRepeat from '../../../assets/figures/apm/tw-repeat.svg';
 
 <OnDashboard title="주문 API · GET /orders/{id} · 트레이스 하나" caption="응답시간 1,200ms 중 같은 질의 8번이 600ms를 차지해요. 마지막 200ms는 하위 구간이 없는 빈칸이에요.">
   <Waterfall ariaLabel="1,200ms 요청 아래 SELECT orders 40ms, 같은 SELECT order_items 질의가 75ms씩 8번 이어지고, 결제 API 호출 300ms가 뒤따르는 워터폴" spans={[{ label: 'GET /orders/{id}', start: 0, duration: 1200, tone: 'accent' }, { label: 'SELECT orders', start: 10, duration: 40, depth: 1 }, { label: 'SELECT order_items', start: 60, duration: 75, depth: 1, tone: 'warn' }, { label: 'SELECT order_items', start: 137, duration: 75, depth: 1, tone: 'warn' }, { label: 'SELECT order_items', start: 214, duration: 75, depth: 1, tone: 'warn' }, { label: 'SELECT order_items', start: 291, duration: 75, depth: 1, tone: 'warn' }, { label: 'SELECT order_items', start: 368, duration: 75, depth: 1, tone: 'warn' }, { label: 'SELECT order_items', start: 445, duration: 75, depth: 1, tone: 'warn' }, { label: 'SELECT order_items', start: 522, duration: 75, depth: 1, tone: 'warn' }, { label: 'SELECT order_items', start: 599, duration: 75, depth: 1, tone: 'warn' }, { label: 'POST payment-api /verify', start: 700, duration: 300, depth: 1 }]} />
@@ -64,17 +65,7 @@ updated: 2026-10-29
 그림의 `SELECT order_items`는 한 번에 75ms라 빨라 보여요. 하지만 같은 질의가 8번 이어져 600ms로, 응답시간의 절반이에요. 목록을 가져온 뒤 항목마다 질의를 하나씩 보내는 N+1 질의예요.
 
 <Figure caption="맨 위 그림의 DB 질의를 차례로 놓았어요. 목록을 가져온 첫 질의 뒤에, 항목마다 같은 질의가 75ms씩 8번 이어져요. 하나하나는 짧아도 합은 600ms예요.">
-  <Strip
-    ariaLabel="목록을 가져온 SELECT orders 질의 40ms 하나 뒤에 SELECT order_items 질의가 75ms씩 8번 이어지고, 8번의 합이 600ms인 칸 띠"
-    rows={[
-      {
-        label: '질의마다 걸린 시간(ms)',
-        heads: ['목록', '1', '2', '3', '4', '5', '6', '7', '8'],
-        cells: ['40', { label: '75', tone: 'warn' }, { label: '75', tone: 'warn' }, { label: '75', tone: 'warn' }, { label: '75', tone: 'warn' }, { label: '75', tone: 'warn' }, { label: '75', tone: 'warn' }, { label: '75', tone: 'warn' }, { label: '75', tone: 'warn' }],
-      },
-    ]}
-    ranges={[{ from: 1, to: 8, label: '같은 질의 8번 · 합 600ms', tone: 'warn' }]}
-  />
+  <TwRepeat aria-label="목록을 가져온 SELECT orders 질의 40ms 뒤에 SELECT order_items 질의가 항목마다 75ms씩 8번 계단처럼 이어지고, 8번의 합이 600ms인 그림" />
 </Figure>
 
 이럴 땐 질의를 하나로 묶어 한 번에 가져와요. 찾고 고치는 순서는 <Term slug="apm/n-plus-one">N+1</Term>에 있어요.

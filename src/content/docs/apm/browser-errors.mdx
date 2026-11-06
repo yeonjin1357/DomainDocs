@@ -23,6 +23,8 @@ sources:
     url: https://docs.sentry.io/concepts/data-management/event-grouping/
 updated: 2026-10-30
 ---
+import BeFetch from '../../../assets/figures/apm/be-fetch.svg';
+import BeGroups from '../../../assets/figures/apm/be-groups.svg';
 
 <OnDashboard title="웹 에러 · 최근 24시간" caption="에러 이벤트 수만 보면 커 보여요. 같은 에러끼리 묶고, 묶음마다 겪은 사용자 수로 보면 무엇부터 고칠지 보여요.">
   <StatTile label="에러 이벤트" value="48,210" unit="번" />
@@ -71,14 +73,7 @@ Chromium, Firefox, WebKit에서 이미지 404를 만들어 봤어요. 세 엔진
 ## fetch는 404에도 성공해요
 
 <Figure caption="fetch가 실패로 끝나는 건 요청 자체가 실패할 때뿐이에요. 서버의 에러 응답은 코드가 직접 확인해야 에러로 남아요.">
-  <Compare
-    columns={['서버가 404·500을 줌', '네트워크가 끊김']}
-    rows={[
-      { label: 'fetch 결과', values: ['정상 응답, ok는 false', '거부(TypeError)'] },
-      { label: '저절로 남는 에러', values: ['없어요', '잡지 않으면 unhandledrejection'] },
-      { label: '잡는 법', values: ['ok나 status를 확인', 'catch로 잡기'] },
-    ]}
-  />
+  <BeFetch aria-label="서버가 404나 500을 주면 fetch는 정상 응답으로 끝나고 ok만 false라 저절로 남는 에러가 없어서, ok나 status를 확인해야 해요. 네트워크가 끊기면 fetch가 TypeError로 거부되어 잡지 않으면 unhandledrejection이 남으니 catch로 잡는 그림" />
 </Figure>
 
 MDN에 따르면 fetch의 Promise는 주소가 잘못됐거나 네트워크가 실패할 때만 거부돼요. 서버가 404나 504를 돌려줘도 정상 응답으로 끝나요. 세 엔진에서 돌려 봐도 404 응답은 `ok: false`, `status: 404`로 정상 반환됐어요.
@@ -129,14 +124,7 @@ MDN에 따르면 크기 감시 콜백이 크기를 다시 바꿔서, 한 프레�
 에러 수, 묶음 수, 겪은 사용자 수는 서로 다른 질문에 답해요. 에러 수는 사용자 한 명이 수백 번 낼 수 있어서 부풀기 쉬워요. 고칠 순서는 <Term term="apm/error-grouping">에러 묶음</Term>마다 겪은 사용자 수로 정해요.
 
 <Figure caption="에러 묶음 둘의 예시예요. 에러 수로 줄 세우면 A가 먼저지만, A는 3명이 되풀이해 낸 에러예요. 겪은 사용자 수로 보면 B를 먼저 고쳐요.">
-  <Compare
-    columns={['묶음 A', '묶음 B']}
-    rows={[
-      { label: '에러 수', values: ['5,000번', '400번'] },
-      { label: '겪은 사용자', values: ['3명', '350명'] },
-      { label: '고칠 순서', values: ['나중에', '먼저'] },
-    ]}
-  />
+  <BeGroups aria-label="묶음 A는 에러 5,000번을 사용자 3명이 겪어 나중에 고치고, 묶음 B는 에러 400번을 사용자 350명이 겪어 먼저 고치는 그림. A는 3명이 되풀이해 낸 에러예요" />
 </Figure>
 
 비율로 볼 때는 분모를 밝혀요. "페이지 보기 중 에러가 난 비율"과 "사용자 중 에러를 겪은 비율"은 같은 데이터로도 값이 달라요.

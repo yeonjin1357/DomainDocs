@@ -25,6 +25,9 @@ sources:
     url: https://docs.sentry.io/concepts/data-management/event-grouping/
 updated: 2026-10-29
 ---
+import EeCount from '../../../assets/figures/apm/ee-count.svg';
+import EeSides from '../../../assets/figures/apm/ee-sides.svg';
+import EeRetry from '../../../assets/figures/apm/ee-retry.svg';
 
 <OnDashboard title="주문 API · 최근 5분 · 요청 10,000건" caption="같은 5분의 숫자예요. 에러율은 5xx로 실패한 요청만 세서 0.5%이고, 4xx 응답과 에러 로그는 따로 세요.">
   <StatTile label="에러율" value="0.5" unit="%" tone="warn" note="5xx 50건" />
@@ -51,14 +54,7 @@ updated: 2026-10-29
 그래서 에러율은 요청 단위예요. 요청 하나가 실패하면, 그 안에서 예외가 몇 번 났든 한 건이에요.
 
 <Figure caption="요청 5건의 예시예요. 예외는 모두 4번 났지만 실패한 요청은 1건이라, 에러율은 1 ÷ 5 = 20%예요.">
-  <Strip
-    ariaLabel="요청 5건 중 세 번째 요청만 실패했고, 그 요청에서 예외가 3번, 성공한 두 번째 요청에서 예외가 1번 나서, 예외는 4번이지만 에러는 1건인 칸 띠"
-    rows={[
-      { label: '요청 결과', cells: ['성공', '성공', { label: '실패', tone: 'warn' }, '성공', '성공'] },
-      { label: '그 요청에서 난 예외', cells: ['0번', '1번', { label: '3번', tone: 'warn' }, '0번', '0번'] },
-    ]}
-    ranges={[{ row: 0, from: 2, to: 2, label: '에러 1건', tone: 'warn' }]}
-  />
+  <EeCount aria-label="요청 5건 가운데 요청 2는 예외가 1번 났지만 성공했고, 요청 3은 예외가 3번 나고 실패했어요. 예외는 모두 4번이지만 실패한 요청은 1건이라 에러율은 1 ÷ 5 = 20%인 그림" />
 </Figure>
 
 ## 서버는 5xx만 에러로 세요
@@ -68,13 +64,7 @@ OpenTelemetry HTTP 규약은 서버 쪽 <Term slug="foundations/logs-metrics-tra
 반대로 요청을 보낸 클라이언트 span에서는 4xx도 에러예요. 그래서 같은 404가 부른 쪽에선 에러이고, 받은 쪽에선 에러가 아니에요.
 
 <Figure caption="같은 HTTP 호출을 양쪽 span에서 본 모습이에요. 5xx는 양쪽 모두 에러지만, 4xx는 부른 쪽에서만 에러예요.">
-  <Compare
-    columns={['부른 쪽(클라이언트 span)', '받은 쪽(서버 span)']}
-    rows={[
-      { label: '5xx 응답', values: ['에러', '에러'] },
-      { label: '4xx 응답(예: 404)', values: ['에러', '에러 아님(상태를 비워 둬요)'] },
-    ]}
-  />
+  <EeSides aria-label="부른 쪽 CLIENT span과 받은 쪽 SERVER span에서 본 같은 호출. 5xx 응답은 양쪽 모두 에러이고, 4xx 응답은 부른 쪽에서만 에러이며 받은 쪽은 상태를 비워 두는 표" />
 </Figure>
 
 ## 예외 수는 실패한 요청 수가 아니에요
@@ -84,17 +74,7 @@ OpenTelemetry HTTP 규약은 서버 쪽 <Term slug="foundations/logs-metrics-tra
 하지만 앱 로그에는 처리한 예외도 남을 수 있어요. 요청 하나가 예외 로그를 여러 줄 남기기도 해서, 로그 줄 수로 낸 에러율은 부풀어요.
 
 <Figure caption="재시도로 성공한 호출의 예시예요. 첫 호출의 예외가 로그에 한 줄 남지만, 요청은 성공 한 건이라 에러율에는 들어가지 않아요.">
-  <Sequence
-    ariaLabel="앱이 외부 API를 불렀다가 실패해 예외를 잡고 로그에 한 줄 남긴 뒤, 다시 불러 성공하는 순서"
-    participants={['로그', '앱', '외부 API']}
-    messages={[
-      { from: '앱', to: '외부 API', label: '호출' },
-      { from: '외부 API', to: '앱', label: '실패', dashed: true, tone: 'warn' },
-      { from: '앱', to: '로그', label: '예외 한 줄' },
-      { from: '앱', to: '외부 API', label: '다시 호출' },
-      { from: '외부 API', to: '앱', label: '성공', dashed: true, tone: 'accent' },
-    ]}
-  />
+  <EeRetry aria-label="앱이 외부 API를 불렀다가 실패해 로그에 예외 한 줄을 남기고, 다시 불러 성공해요. 요청은 성공 1건이라 에러율에는 들어가지 않는 주고받기 그림" />
 </Figure>
 
 <Checkpoints>

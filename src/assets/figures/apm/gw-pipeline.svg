@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 328" width="300" height="328">
+<rect x="8" y="8" width="120" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="18" y="27" font-size="13" font-weight="700" style="fill:var(--color-text)">경로 찾기</text>
+<text x="18" y="44" font-size="13" style="fill:var(--color-text-sub)">/orders → 주문</text>
+<path d="M128 22 L143.8 22" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M148 22 L142 18.3 L142 25.7 z" style="fill:var(--color-warn)" />
+<text x="152" y="26.5" font-size="13" style="fill:var(--color-text-sub)">맞는 경로 없음</text>
+<rect x="254.9" y="11" width="37.1" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="273.4" y="26.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">404</text>
+<path d="M40 52 L40 61.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M40 66 L43.7 60 L36.3 60 z" style="fill:var(--color-accent)" />
+<text x="48" y="66" font-size="13" font-weight="600" style="fill:var(--color-accent)">통과</text>
+<rect x="8" y="66" width="120" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="18" y="85" font-size="13" font-weight="700" style="fill:var(--color-text)">인증 확인</text>
+<text x="18" y="102" font-size="13" style="fill:var(--color-text-sub)">API 키, 토큰</text>
+<path d="M128 80 L143.8 80" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M148 80 L142 76.3 L142 83.7 z" style="fill:var(--color-warn)" />
+<text x="152" y="84.5" font-size="13" style="fill:var(--color-text-sub)">없거나 틀림</text>
+<rect x="220.9" y="69" width="71.1" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="256.5" y="84.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">401·403</text>
+<path d="M40 110 L40 119.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M40 124 L43.7 118 L36.3 118 z" style="fill:var(--color-accent)" />
+<rect x="8" y="124" width="120" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="18" y="143" font-size="13" font-weight="700" style="fill:var(--color-text)">호출 제한</text>
+<text x="18" y="160" font-size="13" style="fill:var(--color-text-sub)">키마다 한도</text>
+<path d="M128 138 L143.8 138" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M148 138 L142 134.3 L142 141.7 z" style="fill:var(--color-warn)" />
+<text x="152" y="142.5" font-size="13" style="fill:var(--color-text-sub)">한도를 넘음</text>
+<rect x="254.9" y="127" width="37.1" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="273.4" y="142.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">429</text>
+<path d="M40 168 L40 177.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M40 182 L43.7 176 L36.3 176 z" style="fill:var(--color-accent)" />
+<rect x="8" y="182" width="120" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="18" y="201" font-size="13" font-weight="700" style="fill:var(--color-text)">뒤쪽으로 전달</text>
+<text x="18" y="218" font-size="13" style="fill:var(--color-text-sub)">정한 시간까지</text>
+<path d="M128 196 L143.8 196" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M148 196 L142 192.3 L142 199.7 z" style="fill:var(--color-warn)" />
+<text x="152" y="200.5" font-size="13" style="fill:var(--color-text-sub)">시간을 넘김</text>
+<rect x="254.9" y="185" width="37.1" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="273.4" y="200.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">504</text>
+<path d="M128 218 L143.8 218" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M148 218 L142 214.3 L142 221.7 z" style="fill:var(--color-warn)" />
+<text x="152" y="222.5" font-size="13" style="fill:var(--color-text-sub)">연결 실패</text>
+<rect x="220.9" y="207" width="71.1" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="256.5" y="222.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">502·503</text>
+<path d="M40 226 L40 249.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M40 254 L43.7 248 L36.3 248 z" style="fill:var(--color-accent)" />
+<rect x="8" y="254" width="120" height="40" rx="8" style="fill:var(--color-accent)" />
+<text x="68" y="278.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">응답 돌려주기</text>
+<text x="8" y="320" font-size="13" style="fill:var(--color-text-sub)">앞에서 걸린 요청은 뒤쪽 서비스에 닿지 않아요</text>
+</svg>

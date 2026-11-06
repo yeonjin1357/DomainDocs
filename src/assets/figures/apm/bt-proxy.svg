@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 234" width="300" height="234">
+<rect x="8" y="20" width="76" height="40" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="46" y="44.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">주문 API</text>
+<rect x="112" y="20" width="76" height="40" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="150" y="44.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">프록시</text>
+<rect x="216" y="20" width="76" height="40" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="254" y="44.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">결제 API</text>
+<path d="M84 40 L105.1 40" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M110 40 L103 35.7 L103 44.3 z" style="fill:var(--color-text-sub)" />
+<path d="M188 40 L209.1 40" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M214 40 L207 35.7 L207 44.3 z" style="fill:var(--color-text-sub)" />
+<rect x="46" y="76" width="92" height="58" rx="6" stroke-width="1" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="54" y="94" font-size="13" style="fill:var(--color-text-sub)">머리말</text>
+<rect x="52" y="102" width="80" height="22" rx="4" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="92" y="117.5" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="72" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-accent)">traceparent</text>
+<rect x="160" y="76" width="92" height="58" rx="6" stroke-width="1" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="168" y="94" font-size="13" style="fill:var(--color-text-sub)">머리말</text>
+<rect x="166" y="102" width="80" height="22" rx="4" stroke-width="1.2" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<text x="206" y="117.5" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="72" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-warn)">traceparent</text>
+<line x1="239" y1="97" x2="249" y2="107" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="239" y1="107" x2="249" y2="97" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="8" y="162" font-size="13" font-weight="700" style="fill:var(--color-text)">트레이스 둘로 나뉘어요</text>
+<rect x="8" y="174" width="200" height="22" rx="4" stroke-width="1.3" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="16" y="190" font-size="13" font-weight="600" style="fill:var(--color-accent)">trace A · 주문 API</text>
+<rect x="92" y="204" width="200" height="22" rx="4" stroke-width="1.3" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="100" y="220" font-size="13" font-weight="600" style="fill:var(--color-warn)">trace B · 결제 API(부모 모름)</text>
+</svg>

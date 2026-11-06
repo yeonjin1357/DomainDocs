@@ -21,6 +21,8 @@ sources:
     url: https://www.postgresql.org/docs/current/runtime-config-connection.html
 updated: 2026-10-29
 ---
+import CpNeed from '../../../assets/figures/apm/cp-need.svg';
+import CpSize from '../../../assets/figures/apm/cp-size.svg';
 
 <OnDashboard title="주문 API · 커넥션 풀(최대 10개) · 최근 10분" caption="쿼리가 느려지자 사용 중 커넥션이 최대 10개에 붙고, 커넥션을 기다리는 스레드가 26개로 늘었어요. 쿼리는 50ms인데 커넥션을 얻기까지 1.8초를 기다려요.">
   <MiniLineChart ariaLabel="사용 중 커넥션은 4개에서 10개로 올라 붙어 있고, 커넥션 대기 스레드는 0에서 26으로 늘어나는 그래프" yMax={30} series={[{ label: '사용 중 커넥션', values: [4, 5, 6, 8, 10, 10, 10, 10, 10, 10], tone: 'accent', value: '10/10' }, { label: '대기 스레드', values: [0, 0, 0, 1, 6, 14, 22, 25, 24, 26], tone: 'warn', value: '26' }]} />
@@ -66,13 +68,7 @@ updated: 2026-10-29
 <Term slug="apm/throughput-and-concurrency">동시 처리 수</Term>와 같은 셈이에요. 초당 400번 빌리고 한 번에 20ms 쥐면, 평균 8개를 동시에 써요. 쥐는 시간이 50ms로 늘면 20개가 필요해서, 최대 10개를 넘는 몫은 기다려요.
 
 <Figure caption="초당 400번 빌리는 풀에서 쥐는 시간만 바꿔 견줬어요. 50ms면 20개가 필요해서, 최대 10개를 넘는 몫이 기다려요.">
-  <Compare
-    columns={['쥐는 시간 20ms', '쥐는 시간 50ms']}
-    rows={[
-      { label: '동시에 쓰는 개수', values: ['400 × 0.02초 = 8개', '400 × 0.05초 = 20개'] },
-      { label: '최대 10개 풀이면', values: ['안에 들어요', '넘는 10개 몫이 기다려요'] },
-    ]}
-  />
+  <CpNeed aria-label="최대 10개 풀에서 초당 400번 빌릴 때, 쥐는 시간이 20ms면 400 × 0.02초 = 8개만 써서 안에 들고, 50ms면 400 × 0.05초 = 20개가 필요해 10개를 다 쓰고 10개 몫이 기다리는 그림" />
 </Figure>
 
 쥐는 시간은 쿼리 시간이 아니라 빌려서 돌려줄 때까지예요. 트랜잭션 안에서 다른 일을 하면 그 시간도 들어가요.
@@ -98,14 +94,7 @@ updated: 2026-10-29
 HikariCP 문서는 작은 풀을 권해요. 풀 크기는 DB가 동시에 처리할 수 있는 쿼리 수에 맞추고, 나머지 스레드는 풀에서 기다리게 해요. DB의 CPU 코어보다 동시 쿼리가 훨씬 많으면, 번갈아 처리하느라 오히려 느려져요.
 
 <Figure caption="풀 크기에 따라 요청이 기다리는 곳이 달라져요. 작은 풀은 남는 스레드를 DB 안이 아니라 풀에서 기다리게 해요.">
-  <Compare
-    columns={['큰 풀', '작은 풀']}
-    rows={[
-      { label: 'DB에 들어간 동시 쿼리', values: ['DB 코어보다 훨씬 많아요', 'DB가 처리할 수 있는 만큼'] },
-      { label: '남는 일이 기다리는 곳', values: ['DB 안에서 번갈아', '풀에서 차례로'] },
-      { label: 'DB', values: ['번갈아 처리하느라 느려져요', '처리할 만큼만 받아요'] },
-    ]}
-  />
+  <CpSize aria-label="큰 풀에서는 스레드가 모두 DB로 들어가, 코어 4개인 DB가 쿼리 24개를 번갈아 처리하느라 느려져요. 작은 풀에서는 DB가 처리할 만큼인 4개만 받고, 나머지 스레드는 풀에서 차례로 기다리는 그림" />
 </Figure>
 
 <Checkpoints>

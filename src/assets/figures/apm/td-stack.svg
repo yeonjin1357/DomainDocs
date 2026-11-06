@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 226" width="300" height="226">
+<text x="8" y="16" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">"http-nio-8080-exec-12"</text>
+<rect x="215.5" y="1" width="76.5" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="253.8" y="16.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">BLOCKED</text>
+<rect x="8" y="30" width="284" height="52" rx="8" stroke-width="1.4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="18" y="51" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"><tspan font-weight="700" style="fill:var(--color-text)">OrderService</tspan><tspan font-weight="700" style="fill:var(--color-warn)">.reserve</tspan></text>
+<text x="282" y="51" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-warn)">88번째 줄</text>
+<text x="18" y="71" font-size="13" style="fill:var(--color-warn)">맨 위 · 지금 여기서 잠금을 기다려요</text>
+<path d="M264.5 69 V65 A5.5 5.5 0 0 1 275.5 65 V69" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<rect x="262" y="69" width="16" height="12" rx="2.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="270" cy="75" r="1.8" style="fill:var(--color-warn)" />
+<path d="M40 140 L40 90.9" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M40 86 L35.7 93 L44.3 93 z" style="fill:var(--color-text-sub)" />
+<text x="50" y="118" font-size="13" style="fill:var(--color-text-sub)">불렀어요</text>
+<rect x="8" y="142" width="284" height="52" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="18" y="163" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"><tspan font-weight="700" style="fill:var(--color-text)">OrderController</tspan><tspan font-weight="700" style="fill:var(--color-accent)">.create</tspan></text>
+<text x="282" y="163" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">41번째 줄</text>
+<text x="18" y="183" font-size="13" style="fill:var(--color-text-sub)">위 메서드를 부른 곳</text>
+<text x="150" y="218" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">위로 갈수록 지금 실행 중인 곳</text>
+</svg>

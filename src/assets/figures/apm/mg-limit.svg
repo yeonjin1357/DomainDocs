@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 166" width="300" height="166">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">컨테이너 메모리 한도 2Gi · -Xmx 없음</text>
+<rect x="8" y="30" width="238.9" height="36" rx="5" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<rect x="8" y="30" width="59.7" height="36" rx="5" style="fill:var(--color-accent)" />
+<text x="37.9" y="53" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">최대 힙</text>
+<rect x="67.7" y="30" width="179.2" height="36" rx="0" style="fill:var(--color-text-sub);fill-opacity:0.25" />
+<text x="157.3" y="53" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">힙 밖 메모리도 여기에</text>
+<rect x="246.9" y="30" width="29.4" height="36" rx="0" style="fill:var(--color-warn);fill-opacity:0.85" />
+<line x1="246.9" y1="22" x2="246.9" y2="74" stroke-width="2.4" stroke-linecap="butt" style="stroke:var(--color-warn)" />
+<text x="8" y="92" font-size="13" font-weight="400" style="fill:var(--color-text-sub)">0</text>
+<text x="67.7" y="92" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">512Mi</text>
+<text x="246.9" y="92" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">2Gi</text>
+<path d="M8 104 v6 H67.73333333333333 v-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="8" y="128" font-size="13" font-weight="700" style="fill:var(--color-accent)">한도의 25%</text>
+<text x="276.3" y="128" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">넘으면 OOMKilled</text>
+<text x="8" y="158" font-size="13" style="fill:var(--color-text-sub)">힙과 힙 밖을 더한 크기가 한도를 넘으면 끝나요</text>
+</svg>

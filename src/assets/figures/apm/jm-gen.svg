@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 242" width="300" height="242">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">새 객체</text>
+<circle cx="74" cy="12" r="6" style="fill:var(--color-accent)" />
+<circle cx="92" cy="12" r="6" style="fill:var(--color-accent)" />
+<circle cx="110" cy="12" r="6" style="fill:var(--color-accent)" />
+<path d="M60 24 L60 41.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M60 46 L63.7 40 L56.3 40 z" style="fill:var(--color-accent)" />
+<rect x="8" y="48" width="124" height="110" rx="12" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="18" y="66" font-size="13" font-weight="600" style="fill:var(--color-accent)">young</text>
+<rect x="168" y="48" width="124" height="110" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="178" y="66" font-size="13" font-weight="600" style="fill:var(--color-text)">old</text>
+<circle cx="36" cy="92" r="9" style="fill:var(--color-accent)" />
+<circle cx="70" cy="92" r="9" stroke-width="1.4" stroke-dasharray="3 2" style="fill:none;stroke:var(--color-text-weak)" />
+<line x1="66" y1="88" x2="74" y2="96" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="66" y1="96" x2="74" y2="88" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="104" cy="92" r="9" stroke-width="1.4" stroke-dasharray="3 2" style="fill:none;stroke:var(--color-text-weak)" />
+<line x1="100" y1="88" x2="108" y2="96" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="100" y1="96" x2="108" y2="88" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="36" cy="128" r="9" stroke-width="1.4" stroke-dasharray="3 2" style="fill:none;stroke:var(--color-text-weak)" />
+<line x1="32" y1="124" x2="40" y2="132" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="32" y1="132" x2="40" y2="124" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="70" cy="128" r="9" style="fill:var(--color-accent)" />
+<circle cx="104" cy="128" r="9" stroke-width="1.4" stroke-dasharray="3 2" style="fill:none;stroke:var(--color-text-weak)" />
+<line x1="100" y1="124" x2="108" y2="132" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="100" y1="132" x2="108" y2="124" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="200" cy="92" r="9" style="fill:var(--color-text-sub)" />
+<circle cx="236" cy="92" r="9" style="fill:var(--color-text-sub)" />
+<circle cx="270" cy="92" r="9" style="fill:var(--color-text-sub)" />
+<circle cx="200" cy="128" r="9" style="fill:var(--color-text-sub)" />
+<circle cx="236" cy="128" r="9" stroke-width="1.4" stroke-dasharray="3 2" style="fill:none;stroke:var(--color-text-weak)" />
+<line x1="232" y1="124" x2="240" y2="132" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="232" y1="132" x2="240" y2="124" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<path d="M132 104 L161.1 104" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M166 104 L159 99.7 L159 108.3 z" style="fill:var(--color-accent)" />
+<text x="150" y="182" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">살아남으면 old로 옮겨요</text>
+<path d="M19 210 L21 231 H35 L37 210" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="16" y1="209" x2="40" y2="209" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<path d="M24 209 V205 H32 V209" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<line x1="25" y1="214" x2="25" y2="227" stroke-width="1.3" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="31" y1="214" x2="31" y2="227" stroke-width="1.3" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="48" y="214" font-size="13" style="fill:var(--color-text-sub)">안 쓰는 객체는</text>
+<text x="48" y="232" font-size="13" style="fill:var(--color-text-sub)">young에서도 old에서도 GC가 치워요</text>
+</svg>

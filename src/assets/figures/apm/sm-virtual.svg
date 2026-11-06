@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 214" width="300" height="214">
+<circle cx="40" cy="60" r="26" stroke-width="1.5" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="40" y="65" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">user</text>
+<circle cx="150" cy="60" r="30" style="fill:var(--color-accent)" />
+<text x="150" y="56" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">주문</text>
+<text x="150" y="72" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">API</text>
+<path d="M243 47 V73 A17 5.5 0 0 0 277 73 V47" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<path d="M243 60 A17 5.5 0 0 0 277 60" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<ellipse cx="260" cy="47" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-weak)" />
+<path d="M68 60 L111.1 60" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M116 60 L109 55.7 L109 64.3 z" style="fill:var(--color-text-sub)" />
+<path d="M182 60 L233.1 60" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M238 60 L231 55.7 L231 64.3 z" style="fill:var(--color-text-sub)" />
+<text x="40" y="108" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">부른 쪽</text>
+<text x="40" y="125" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">미계측</text>
+<text x="150" y="108" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">span을</text>
+<text x="150" y="125" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">보내요</text>
+<text x="260" y="108" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">orders DB</text>
+<text x="260" y="125" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">가상 노드</text>
+<rect x="8" y="146" width="284" height="30" rx="6" stroke-width="1" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="150" y="166" font-size="13" text-anchor="middle"><tspan style="fill:var(--color-text-sub)">DB 노드는 span의 </tspan><tspan font-weight="700" style="fill:var(--color-accent)">db.system</tspan><tspan style="fill:var(--color-text-sub)"> 속성으로</tspan></text>
+<text x="8" y="206" font-size="13" style="fill:var(--color-text-sub)">양옆은 주문 API의 span으로 짐작해 그린 노드예요</text>
+</svg>

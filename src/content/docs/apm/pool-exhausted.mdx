@@ -20,6 +20,7 @@ sources:
     url: https://github.com/brettwooldridge/HikariCP/blob/dev/src/main/java/com/zaxxer/hikari/metrics/micrometer/MicrometerMetricsTracker.java
 updated: 2026-10-29
 ---
+import PxPool from '../../../assets/figures/apm/px-pool.svg';
 
 <Situation>
   결제 API가 30초씩 멈췄다가 `SQLTransientConnectionException`으로 끝나요. 그런데 DB 화면을 보면 CPU도 한가하고 느린 SQL도 없어요.
@@ -67,18 +68,7 @@ active=2, idle=0, waiting=0)
 `active`가 최대 크기와 같고 `idle`이 0이면, 풀이 바닥난 거예요. 이제 커넥션이 왜 안 돌아오는지를 봐요.
 
 <Figure caption="최대 10개 풀의 예시예요. 평소엔 쉬는 커넥션이 남지만, 바닥나면 active가 최대 크기인 10과 같고 idle이 0이에요.">
-  <Strip
-    ariaLabel="최대 10개 풀에서 평소에는 커넥션 6개를 쓰고 4개가 쉬어 active 6, idle 4이고, 바닥났을 때는 10개를 모두 써서 active 10, idle 0인 칸 띠"
-    rows={[
-      { label: '평소', cells: ['사용', '사용', '사용', '사용', '사용', '사용', { label: '쉼', tone: 'sub' }, { label: '쉼', tone: 'sub' }, { label: '쉼', tone: 'sub' }, { label: '쉼', tone: 'sub' }] },
-      { label: '바닥났을 때', cells: [{ label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }, { label: '사용', tone: 'warn' }] },
-    ]}
-    ranges={[
-      { row: 0, from: 0, to: 5, label: 'active 6' },
-      { row: 0, from: 6, to: 9, label: 'idle 4' },
-      { row: 1, from: 0, to: 9, label: 'active 10 · idle 0', tone: 'warn' },
-    ]}
-  />
+  <PxPool aria-label="최대 10개 풀에서 평소에는 커넥션 6개를 쓰고 4개가 쉬어 active 6, idle 4예요. 바닥났을 때는 10개를 모두 써서 active 10, idle 0이고, 스레드가 커넥션을 기다리는 그림" />
 </Figure>
 
 **확인 방법**: Micrometer 지표로는 `hikaricp_connections_active`가 최대값에 붙었는지 봐요. 기다리는 스레드 수인 `hikaricp_connections_pending`이 느는지도 봐요. 못 빌리고 끝난 횟수는 `hikaricp_connections_timeout_total`이에요.

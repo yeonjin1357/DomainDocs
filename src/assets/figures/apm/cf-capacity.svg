@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 276" width="300" height="276">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">멀쩡할 때</text>
+<rect x="8" y="28" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="30" y="28" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="52" y="28" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="74" y="28" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="96" y="28" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="118" y="28" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="140" y="28" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="162" y="28" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="184" y="28" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="206" y="28" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="232" y="44" font-size="13" font-weight="700" style="fill:var(--color-accent)">건강 100%</text>
+<text x="8" y="73" font-size="13" style="fill:var(--color-text-sub)">받아 낼 양</text>
+<rect x="84" y="62" width="163.6" height="14" rx="3" style="fill:var(--color-accent);fill-opacity:0.85" />
+<text x="253.6" y="73" font-size="13" font-weight="700" style="fill:var(--color-accent)">10,000</text>
+<text x="8" y="93" font-size="13" style="fill:var(--color-text-sub)">들어오는 양</text>
+<rect x="84" y="82" width="147.3" height="14" rx="3" style="fill:var(--color-text-sub);fill-opacity:0.5" />
+<text x="237.3" y="93" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">9,000</text>
+<text x="8" y="116" font-size="13" font-weight="700" style="fill:var(--color-accent)">초당 9,000건이면 버텨요</text>
+<text x="8" y="146" font-size="13" font-weight="700" style="fill:var(--color-text)">무너지는 동안</text>
+<rect x="8" y="158" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="30" y="158" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="34" y1="165" x2="42" y2="173" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="34" y1="173" x2="42" y2="165" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="52" y="158" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="56" y1="165" x2="64" y2="173" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="56" y1="173" x2="64" y2="165" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="74" y="158" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="78" y1="165" x2="86" y2="173" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="78" y1="173" x2="86" y2="165" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="96" y="158" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="100" y1="165" x2="108" y2="173" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="100" y1="173" x2="108" y2="165" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="118" y="158" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="122" y1="165" x2="130" y2="173" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="122" y1="173" x2="130" y2="165" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="140" y="158" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="144" y1="165" x2="152" y2="173" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="144" y1="173" x2="152" y2="165" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="162" y="158" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="166" y1="165" x2="174" y2="173" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="166" y1="173" x2="174" y2="165" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="184" y="158" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="188" y1="165" x2="196" y2="173" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="188" y1="173" x2="196" y2="165" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="206" y="158" width="16" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="210" y1="165" x2="218" y2="173" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="210" y1="173" x2="218" y2="165" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="232" y="174" font-size="13" font-weight="700" style="fill:var(--color-warn)">건강 10%</text>
+<text x="8" y="203" font-size="13" style="fill:var(--color-text-sub)">받아 낼 양</text>
+<rect x="84" y="192" width="16.4" height="14" rx="3" style="fill:var(--color-warn);fill-opacity:0.85" />
+<text x="106.4" y="203" font-size="13" font-weight="700" style="fill:var(--color-warn)">1,000</text>
+<text x="8" y="223" font-size="13" style="fill:var(--color-text-sub)">들어오는 양</text>
+<rect x="84" y="212" width="147.3" height="14" rx="3" style="fill:var(--color-text-sub);fill-opacity:0.5" />
+<text x="237.3" y="223" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">9,000</text>
+<text x="8" y="246" font-size="13" font-weight="700" style="fill:var(--color-warn)">9,000건으로 줄여도 살아나지 않아요</text>
+<text x="8" y="268" font-size="13" style="fill:var(--color-text-sub)">초당 1,000건 정도로 크게 줄여야 안정돼요</text>
+</svg>

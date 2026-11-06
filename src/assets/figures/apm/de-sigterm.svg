@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 246" width="300" height="246">
+<rect x="70" y="156.2" width="31" height="13.8" rx="3" style="fill:var(--color-text-sub);fill-opacity:0.7" />
+<text x="85.5" y="150.2" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">3</text>
+<rect x="107" y="64.2" width="31" height="105.8" rx="3" style="fill:var(--color-warn);fill-opacity:0.9" />
+<text x="122.5" y="58.2" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">23</text>
+<rect x="144" y="78" width="31" height="92" rx="3" style="fill:var(--color-warn);fill-opacity:0.9" />
+<text x="159.5" y="72" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">20</text>
+<rect x="181" y="160.8" width="31" height="9.2" rx="3" style="fill:var(--color-warn);fill-opacity:0.9" />
+<text x="196.5" y="154.8" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">2</text>
+<line x1="30" y1="170" x2="289" y2="170" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="30" y1="170" x2="30" y2="175" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="30" y="190" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">-1초</text>
+<line x1="67" y1="170" x2="67" y2="175" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="104" y1="170" x2="104" y2="175" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="104" y="190" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">0초</text>
+<line x1="141" y1="170" x2="141" y2="175" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="178" y1="170" x2="178" y2="175" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="178" y="190" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">1초</text>
+<line x1="215" y1="170" x2="215" y2="175" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="252" y1="170" x2="252" y2="175" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="252" y="190" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">2초</text>
+<line x1="104" y1="26" x2="104" y2="170" stroke-width="2" stroke-linecap="butt" stroke-dasharray="4 3" style="stroke:var(--color-accent)" />
+<text x="104" y="18" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">SIGTERM</text>
+<rect x="8" y="206" width="12" height="12" rx="2" style="fill:var(--color-text-sub);fill-opacity:0.7" />
+<text x="26" y="217" font-size="13" style="fill:var(--color-text-sub)">처리 중 끊김(UC) 3개 · 직전에 시작한 요청</text>
+<rect x="8" y="226" width="12" height="12" rx="2" style="fill:var(--color-warn)" />
+<text x="26" y="237" font-size="13" style="fill:var(--color-text-sub)">붙지 못함(UF) 46개 · 꺼진 A로 간 새 요청</text>
+</svg>

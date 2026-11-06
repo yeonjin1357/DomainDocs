@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 244" width="300" height="244">
+<rect x="4" y="4" width="292" height="94" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="14" y="22" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">트레이스 하나</text>
+<rect x="14" y="32" width="250" height="22" rx="4" stroke-width="1.3" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="22" y="48" font-size="13" font-weight="700" style="fill:var(--color-accent)">주문 API · CLIENT span</text>
+<line x1="28" y1="54" x2="28" y2="74" stroke-width="1.3" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="28" y1="74" x2="44" y2="74" stroke-width="1.3" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<rect x="46" y="63" width="190" height="22" rx="4" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="54" y="79" font-size="13" font-weight="700" style="fill:var(--color-text)">결제 API · SERVER span</text>
+<text x="286" y="79" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">자식</text>
+<path d="M150 100 L150 123.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 128 L154.3 121 L145.7 121 z" style="fill:var(--color-accent)" />
+<text x="160" y="119" font-size="13" font-weight="600" style="fill:var(--color-accent)">이 짝이 선 하나</text>
+<circle cx="52" cy="160" r="26" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="52" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">주문</text>
+<text x="52" y="172" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">API</text>
+<circle cx="248" cy="160" r="26" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="248" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">결제</text>
+<text x="248" y="172" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">API</text>
+<path d="M80 160 L214.4 160" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M220 160 L212 155 L212 165 z" style="fill:var(--color-accent)" />
+<rect x="98" y="176" width="104" height="62" rx="6" stroke-width="1" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="150" y="196" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">요청 수</text>
+<text x="150" y="213" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">실패 수</text>
+<text x="150" y="230" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">응답시간</text>
+</svg>

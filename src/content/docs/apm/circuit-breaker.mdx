@@ -22,6 +22,7 @@ sources:
 updated: 2026-10-30
 ---
 import CircuitBreakerDemo from '../../../components/demos/CircuitBreakerDemo.tsx';
+import CbStates from '../../../assets/figures/apm/cb-states.svg';
 
 <OnDashboard title="주문 서비스 → 결제 API · 최근 10분" caption="결제 API를 부르는 서킷 브레이커가 열렸어요. 주문 서비스의 에러는 늘었는데, 그 에러 응답은 3ms 만에 끝나요. 결제 API까지 가지 않고 바로 실패했기 때문이에요.">
   <StatTile label="서킷 상태" value="열림" note="OPEN" tone="warn" />
@@ -48,15 +49,7 @@ import CircuitBreakerDemo from '../../../components/demos/CircuitBreakerDemo.tsx
 ## 세 가지 상태
 
 <Figure caption="닫힘에서는 호출을 보내며 실패율을 세요. 실패율이 기준을 넘으면 열림, 기다린 뒤 반열림이 되고, 시험 호출 결과에 따라 닫힘이나 열림으로 가요.">
-  <Triage
-    numbered={false}
-    ariaLabel="닫힘 상태에서 실패율이 기준을 넘으면 열림이 되고, 열림에서 기다린 뒤 반열림이 되며, 반열림에서 시험 호출이 성공하면 닫힘으로, 실패하면 다시 열림으로 가는 상태도"
-    steps={[
-      { label: '닫힘', note: '호출을 보내며 실패율을 세요', tone: 'accent', next: '실패율이 기준을 넘으면' },
-      { label: '열림', note: '호출하지 않고 바로 실패해요', tone: 'warn', next: '정한 시간을 기다린 뒤' },
-      { label: '반열림', note: '몇 개만 시험 삼아 보내요', exits: [{ when: '시험 성공', to: 1, tone: 'accent' }, { when: '시험 실패', to: 2, tone: 'warn' }] },
-    ]}
-  />
+  <CbStates aria-label="닫힘 상태에서는 호출하며 실패율을 세다가 실패율이 기준을 넘으면 열림이 돼요. 열림에서는 부르지 않고 바로 실패하고, 기다린 뒤 반열림이 되어 몇 개만 시험해요. 시험이 성공하면 닫힘으로, 실패하면 다시 열림으로 가는 상태도" />
 </Figure>
 
 | 상태 | 호출 | 다음 상태로 가는 때 |

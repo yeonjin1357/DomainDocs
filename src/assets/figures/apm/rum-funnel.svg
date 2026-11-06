@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="300" height="220">
+<rect x="8" y="6" width="284" height="34" rx="8" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="150" y="28" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">실제 사용자 전체</text>
+<rect x="30" y="64" width="240" height="34" rx="8" style="fill:var(--color-accent-weak)" />
+<text x="150" y="86" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">스크립트가 막히지 않은 사용자</text>
+<text x="150" y="57" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-warn)">광고·추적 차단에서 빠져요</text>
+<rect x="52" y="122" width="196" height="34" rx="8" style="fill:var(--color-accent-weak)" />
+<text x="150" y="144" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">전송이 닿은 페이지 보기</text>
+<text x="150" y="115" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-warn)">보내기 전에 꺼지면 빠져요</text>
+<rect x="74" y="180" width="152" height="34" rx="8" style="fill:var(--color-accent)" />
+<text x="150" y="202" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">RUM 화면의 데이터</text>
+<text x="150" y="173" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-warn)">샘플링하면 더 줄어요</text>
+</svg>

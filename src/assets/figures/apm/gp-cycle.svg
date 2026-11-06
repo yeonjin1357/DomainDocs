@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 166" width="300" height="166">
+<text x="8" y="52" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">GC</text>
+<rect x="101" y="36" width="8.4" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="122" y="36" width="117.6" height="24" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="180.8" y="52.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">앱과 함께 표시</text>
+<rect x="239.6" y="36" width="8.4" height="24" rx="3" style="fill:var(--color-warn)" />
+<rect x="260.6" y="36" width="6.3" height="24" rx="3" style="fill:var(--color-warn)" />
+<text x="8" y="94" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">앱 스레드</text>
+<rect x="80" y="78" width="21" height="24" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="109.4" y="78" width="130.2" height="24" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="174.5" y="94.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">일해요</text>
+<rect x="248" y="78" width="12.6" height="24" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="266.9" y="78" width="23.1" height="24" rx="3" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="105.2" y1="62" x2="105.2" y2="76" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="2 2" style="stroke:var(--color-warn)" />
+<line x1="243.8" y1="62" x2="243.8" y2="76" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="2 2" style="stroke:var(--color-warn)" />
+<line x1="263.8" y1="62" x2="263.8" y2="76" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="2 2" style="stroke:var(--color-warn)" />
+<rect x="85.5" y="7" width="39.4" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="105.2" y="22.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">멈춤</text>
+<rect x="216.1" y="7" width="72.1" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="252.2" y="22.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">멈춤 두 번</text>
+<text x="8" y="136" font-size="13" style="fill:var(--color-text-sub)">앱 스레드가 비는 곳은 멈춤뿐이라</text>
+<text x="8" y="156" font-size="13" font-weight="700" style="fill:var(--color-warn)">응답시간에는 멈춤만 더해져요</text>
+</svg>

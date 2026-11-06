@@ -17,6 +17,8 @@ sources:
     url: https://github.com/openjdk/jdk21u/blob/master/src/hotspot/share/runtime/os.cpp
 updated: 2026-10-30
 ---
+import GlEvac from '../../../assets/figures/apm/gl-evac.svg';
+import GlGcChoice from '../../../assets/figures/apm/gl-gc-choice.svg';
 
 <OnDashboard title="주문 API · GC 기록 · 최근 1시간" caption="GC로 멈춘 시간이 전체의 7% 가까이 돼요. Full GC가 났고, GC 직후 힙의 바닥도 오르는 중이에요.">
   <StatTile label="멈춤 비율" value="6.8" unit="%" tone="warn" />
@@ -118,25 +120,8 @@ GC 한 번이 로그 한 줄인데, 부분마다 줄을 나눠 적었어요.
 
 G1은 살아 있는 객체를 빈 영역으로 옮기며 치워요. 옮길 자리가 모자라면 <Term term="apm/evacuation-failure">Evacuation Failure</Term>가 찍혀요. Oracle 문서는 이 상태가 이어지면 G1이 결국 힙 전체를 압축하는 Full GC를 한다고 해요.
 
-<Figure caption="칸 하나가 힙의 영역 하나예요(칸 수는 예시). 평소에는 치울 영역의 산 객체를 빈 영역으로 옮겨요. 힙이 거의 차서 빈 영역이 없으면 옮기지 못해 Evacuation Failure가 찍혀요.">
-  <Strip
-    ariaLabel="힙 영역 여섯 칸 가운데 평소에는 빈 영역 두 칸이 있어 치울 영역의 산 객체를 그리로 옮기고, 126M/128M로 거의 찼을 때는 빈 영역이 없어 옮기지 못하고 Evacuation Failure가 나는 칸 띠"
-    rows={[
-      {
-        label: '평소',
-        cells: [{ label: '치울', tone: 'accent' }, { label: '치울', tone: 'accent' }, '사용', '사용', { label: '빔', tone: 'sub' }, { label: '빔', tone: 'sub' }],
-      },
-      {
-        label: '거의 찼을 때(126M/128M)',
-        cells: [{ label: '치울', tone: 'warn' }, { label: '치울', tone: 'warn' }, '사용', '사용', '사용', '사용'],
-      },
-    ]}
-    ranges={[
-      { row: 0, from: 0, to: 1, label: '산 객체를', tone: 'accent' },
-      { row: 0, from: 4, to: 5, label: '여기로 옮겨요', tone: 'accent' },
-      { row: 1, from: 0, to: 5, label: '옮길 빈 영역이 없어요 → Evacuation Failure', tone: 'warn' },
-    ]}
-  />
+<Figure caption="힙을 영역 여섯으로 줄여 그린 예시예요. 평소에는 치울 영역의 산 객체를 빈 영역으로 옮겨요. 힙이 거의 차서 빈 영역이 없으면 옮기지 못해 Evacuation Failure가 찍혀요.">
+  <GlEvac aria-label="평소에는 힙 영역 여섯 가운데 빈 영역 둘이 있어 치울 영역 둘의 산 객체를 그리로 옮겨요. 126M/128M로 거의 찼을 때는 모든 영역을 써서 옮길 빈 영역이 없어 Evacuation Failure가 나는 그림" />
 </Figure>
 
 위 실험에서도 Evacuation Failure 두 줄 바로 뒤에 <Term term="apm/full-gc">Full GC</Term>가 따라왔어요. GC 전후가 모두 거의 찬 상태(126M → 126M)라는 것도 함께 보여요.
@@ -156,13 +141,7 @@ JVM은 서버급 기계에서만 G1을 기본으로 골라요. JDK 소스의 기
 컨테이너 한도를 바꿔 가며 JDK 21을 돌려 봤어요. CPU 2개일 때 메모리 1791MB까지는 Serial GC를, 1792MB부터 G1을 골랐어요. CPU가 1개면 메모리 1GB에서도 Serial이었어요.
 
 <Figure caption="컨테이너의 CPU와 메모리 한도에 따라 JDK 21이 고른 GC예요. 작은 파드에서는 G1이 아니라 Serial이 돌 수 있어요.">
-  <Compare
-    columns={['CPU 2개, 메모리 1791MB', 'CPU 2개, 메모리 1792MB']}
-    rows={[
-      { label: '로그 첫 줄', values: ['Using Serial', 'Using G1'] },
-      { label: '수집하는 동안', values: ['앱 스레드를 모두 멈춰요', 'young·mixed는 멈추고, 표시는 앱과 함께 돌아요'] },
-    ]}
-  />
+  <GlGcChoice aria-label="CPU 2개 컨테이너에서 메모리가 1791MB면 JDK 21이 Using Serial로 앱 스레드를 모두 멈추며 수집하고, 1792MB면 Using G1로 young·mixed 수집만 멈추고 표시는 앱과 함께 해요. 메모리 1MB 차이로 GC가 달라지는 그림" />
 </Figure>
 
 그래서 GC 로그는 첫 줄(`Using G1`, `Using Serial`)부터 봐요. 어떤 GC인지에 따라 읽어야 할 종류가 달라요. 파드의 한도는 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>에서 다뤄요.

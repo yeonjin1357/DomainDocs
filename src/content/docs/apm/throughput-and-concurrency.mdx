@@ -18,6 +18,7 @@ sources:
 updated: 2026-10-30
 ---
 import LittlesLawDemo from '../../../components/demos/LittlesLawDemo.tsx';
+import TcCounter from '../../../assets/figures/apm/tc-counter.svg';
 
 <OnDashboard title="주문 API · DB가 느려진 뒤 10분" caption="DB가 느려져 응답시간이 세 배가 되자, 활성 트랜잭션이 스레드 상한 200에 붙었어요. 처리량은 초당 200건에서 133건으로 떨어졌어요.">
   <MiniLineChart ariaLabel="활성 트랜잭션이 100에서 오르기 시작해 200에 닿은 뒤 평평하게 이어지는 그래프" yMax={250} series={[{ label: '활성 트랜잭션', values: [100, 100, 100, 100, 150, 200, 200, 200, 200, 200, 200, 200], tone: 'warn', value: '200개' }]} />
@@ -51,20 +52,7 @@ import LittlesLawDemo from '../../../components/demos/LittlesLawDemo.tsx';
 활성 트랜잭션은 시작했지만 아직 끝나지 않은 요청 수예요. OpenTelemetry(오픈소스 계측 도구)의 `http.server.active_requests`가 이 값이에요. 요청이 시작하면 1 늘고, 끝나면 1 줄어요.
 
 <Figure caption="요청 하나가 지나가는 길이에요. 시작하면 활성 트랜잭션이 1 늘고, 끝나면 1 줄면서 처리량 카운터가 1 늘어요. 그래서 요청이 밀리면 처리량이 먼저 줄어요.">
-  <Flow
-    ariaLabel="요청이 시작하면 활성 트랜잭션이 1 늘고, 처리 중인 동안 활성 트랜잭션으로 세이며, 끝나면 활성 트랜잭션이 1 줄고 처리량 카운터가 1 느는 구조도"
-    nodes={[
-      { id: 'start', label: '요청 시작', col: 0, row: 0, note: '활성 +1' },
-      { id: 'work', label: '처리 중', col: 1, row: 0, note: '활성으로 셈', tone: 'accent' },
-      { id: 'end', label: '요청 끝', col: 2, row: 0, note: '활성 −1' },
-      { id: 'tps', label: '처리량', col: 2, row: 1, note: '카운터 +1' },
-    ]}
-    edges={[
-      { from: 'start', to: 'work' },
-      { from: 'work', to: 'end' },
-      { from: 'end', to: 'tps' },
-    ]}
-  />
+  <TcCounter aria-label="요청이 시작하면 활성 트랜잭션이 1 늘고, 처리 중인 동안 활성으로 세며(지금 3), 끝나면 활성이 1 줄고 처리량 카운터가 1 느는 그림. 밀리면 끝나는 요청이 줄어 처리량부터 줄어요" />
 </Figure>
 
 처리량이 그대로인데 이 값이 늘면, 요청 하나를 붙잡는 시간이 길어졌다는 뜻이에요.

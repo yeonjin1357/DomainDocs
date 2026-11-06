@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 272" width="300" height="272">
+<text x="40" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">앱</text>
+<line x1="40" y1="26" x2="40" y2="264" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="150" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">캐시</text>
+<line x1="150" y1="26" x2="150" y2="264" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="260" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">DB</text>
+<line x1="260" y1="26" x2="260" y2="264" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M40 48 L145.1 48" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 48 L143 43.7 L143 52.3 z" style="fill:var(--color-text-sub)" />
+<text x="95" y="42" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">상품 42 있어요?</text>
+<path d="M150 78 L44.9 78" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-warn)" />
+<path d="M40 78 L47 82.3 L47 73.7 z" style="fill:var(--color-warn)" />
+<text x="95" y="72" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">없어요(miss)</text>
+<path d="M40 108 L255.1 108" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M260 108 L253 103.7 L253 112.3 z" style="fill:var(--color-text-sub)" />
+<text x="200" y="102" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">상품 42 조회</text>
+<path d="M260 138 L44.9 138" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M40 138 L47 142.3 L47 133.7 z" style="fill:var(--color-text-sub)" />
+<text x="200" y="132" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">결과</text>
+<path d="M40 168 L145.1 168" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 168 L143 163.7 L143 172.3 z" style="fill:var(--color-accent)" />
+<text x="95" y="162" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">저장(TTL 5분)</text>
+<path d="M40 222 L145.1 222" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 222 L143 217.7 L143 226.3 z" style="fill:var(--color-text-sub)" />
+<text x="95" y="216" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">상품 42 있어요?</text>
+<path d="M150 252 L44.9 252" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<path d="M40 252 L47 256.3 L47 247.7 z" style="fill:var(--color-accent)" />
+<text x="95" y="246" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">있어요(hit)</text>
+<line x1="8" y1="188" x2="292" y2="188" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-line)" />
+<text x="292" y="206" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">다음 같은 요청</text>
+<text x="292" y="240" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-accent)">DB까지 안 가요</text>
+</svg>

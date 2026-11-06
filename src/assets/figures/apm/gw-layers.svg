@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 254" width="300" height="254">
+<rect x="71" y="8" width="26" height="17" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M65 29 L69 25 L99 25 L103 29 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="84" y="48" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">클라이언트</text>
+<path d="M84 54 L84 65.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M84 70 L87.7 64 L80.3 64 z" style="fill:var(--color-text-sub)" />
+<rect x="62" y="73" width="44" height="26" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="70" y1="86" x2="79" y2="86" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<path d="M79 86 L88 79 L94.5 79" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M98 79 L93 75.9 L93 82.1 z" style="fill:var(--color-text-sub)" />
+<path d="M79 86 L94.5 86" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M98 86 L93 82.9 L93 89.1 z" style="fill:var(--color-text-sub)" />
+<path d="M79 86 L88 93 L94.5 93" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M98 93 L93 89.9 L93 96.1 z" style="fill:var(--color-text-sub)" />
+<text x="178" y="84" font-size="13" font-weight="700" style="fill:var(--color-text)">로드 밸런서</text>
+<text x="178" y="101" font-size="13" style="fill:var(--color-text-sub)">연결을 나눠요</text>
+<path d="M84 100 L84 115.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M84 120 L87.7 114 L80.3 114 z" style="fill:var(--color-text-sub)" />
+<rect x="24" y="122" width="120" height="38" rx="8" style="fill:var(--color-accent)" />
+<text x="84" y="145.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">API 게이트웨이</text>
+<text x="178" y="138" font-size="13" font-weight="700" style="fill:var(--color-text)">경로·키·한도</text>
+<text x="178" y="155" font-size="13" style="fill:var(--color-text-sub)">규칙을 걸어요</text>
+<path d="M60 160 L60 181.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M60 186 L63.7 180 L56.3 180 z" style="fill:var(--color-accent)" />
+<rect x="8" y="188" width="104" height="38" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="60" y="211.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">주문 서비스</text>
+<rect x="188" y="188" width="104" height="38" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="240" y="211.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">결제 서비스</text>
+<path d="M112 207 L181.8 207" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M186 207 L180 203.3 L180 210.7 z" style="fill:var(--color-text-sub)" />
+<text x="150" y="246" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">서비스 메시: 안쪽 서비스끼리</text>
+<text x="150" y="200" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">메시</text>
+</svg>

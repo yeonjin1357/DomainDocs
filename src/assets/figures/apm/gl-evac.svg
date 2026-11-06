@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 254" width="300" height="254">
+<text x="8" y="34" font-size="13" font-weight="700" style="fill:var(--color-text)">평소</text>
+<rect x="8" y="44" width="42" height="42" rx="6" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="20" cy="56" r="5" style="fill:var(--color-text-weak)" />
+<circle cx="38" cy="56" r="5" style="fill:var(--color-accent)" />
+<circle cx="20" cy="74" r="5" style="fill:var(--color-text-weak)" />
+<circle cx="38" cy="74" r="5" style="fill:var(--color-accent)" />
+<text x="29" y="104" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">치울</text>
+<rect x="56" y="44" width="42" height="42" rx="6" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="68" cy="56" r="5" style="fill:var(--color-text-weak)" />
+<circle cx="86" cy="56" r="5" style="fill:var(--color-accent)" />
+<circle cx="68" cy="74" r="5" style="fill:var(--color-text-weak)" />
+<circle cx="86" cy="74" r="5" style="fill:var(--color-accent)" />
+<text x="77" y="104" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">치울</text>
+<rect x="104" y="44" width="42" height="42" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="116" cy="56" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="134" cy="56" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="116" cy="74" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="134" cy="74" r="5" style="fill:var(--color-text-sub)" />
+<text x="125" y="104" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">사용</text>
+<rect x="152" y="44" width="42" height="42" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="164" cy="56" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="182" cy="56" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="164" cy="74" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="182" cy="74" r="5" style="fill:var(--color-text-sub)" />
+<text x="173" y="104" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">사용</text>
+<rect x="200" y="44" width="42" height="42" rx="6" stroke-width="1.4" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="221" y="104" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">빔</text>
+<rect x="248" y="44" width="42" height="42" rx="6" stroke-width="1.4" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="269" y="104" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">빔</text>
+<path d="M50 42 C 90 22, 190 22, 222 40" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M224 43 L223.7 34.8 L216.5 39.6 z" style="fill:var(--color-accent)" />
+<text x="150" y="14" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">산 객체를 빈 영역으로</text>
+<text x="8" y="150" font-size="13" font-weight="700" style="fill:var(--color-warn)">거의 찼을 때 · 126M/128M</text>
+<rect x="8" y="160" width="42" height="42" rx="6" stroke-width="1.4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="20" cy="172" r="5" style="fill:var(--color-text-weak)" />
+<circle cx="38" cy="172" r="5" style="fill:var(--color-warn)" />
+<circle cx="20" cy="190" r="5" style="fill:var(--color-text-weak)" />
+<circle cx="38" cy="190" r="5" style="fill:var(--color-warn)" />
+<text x="29" y="220" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">치울</text>
+<rect x="56" y="160" width="42" height="42" rx="6" stroke-width="1.4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="68" cy="172" r="5" style="fill:var(--color-text-weak)" />
+<circle cx="86" cy="172" r="5" style="fill:var(--color-warn)" />
+<circle cx="68" cy="190" r="5" style="fill:var(--color-text-weak)" />
+<circle cx="86" cy="190" r="5" style="fill:var(--color-warn)" />
+<text x="77" y="220" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">치울</text>
+<rect x="104" y="160" width="42" height="42" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="116" cy="172" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="134" cy="172" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="116" cy="190" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="134" cy="190" r="5" style="fill:var(--color-text-sub)" />
+<text x="125" y="220" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">사용</text>
+<rect x="152" y="160" width="42" height="42" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="164" cy="172" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="182" cy="172" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="164" cy="190" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="182" cy="190" r="5" style="fill:var(--color-text-sub)" />
+<text x="173" y="220" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">사용</text>
+<rect x="200" y="160" width="42" height="42" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="212" cy="172" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="230" cy="172" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="212" cy="190" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="230" cy="190" r="5" style="fill:var(--color-text-sub)" />
+<text x="221" y="220" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">사용</text>
+<rect x="248" y="160" width="42" height="42" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="260" cy="172" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="278" cy="172" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="260" cy="190" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="278" cy="190" r="5" style="fill:var(--color-text-sub)" />
+<text x="269" y="220" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">사용</text>
+<text x="8" y="246" font-size="13" font-weight="700" style="fill:var(--color-warn)">옮길 빈 영역이 없어요 → Evacuation Failure</text>
+</svg>

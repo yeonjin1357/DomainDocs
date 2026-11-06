@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 248" width="300" height="248">
+<rect x="4" y="4" width="292" height="214" rx="12" stroke-width="1.5" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="14" y="22" font-size="13" font-weight="600" style="fill:var(--color-text)">서버 · 코어 2개</text>
+<rect x="92" y="32" width="116" height="44" rx="8" style="fill:var(--color-accent)" />
+<text x="150" y="51" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">마스터</text>
+<text x="150" y="69" font-size="13" text-anchor="middle" style="fill:var(--color-card)">띄우고 지켜봐요</text>
+<path d="M121.5 76 L39.9 106.5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M36 108 L42.9 109.4 L40.3 102.4 z" style="fill:var(--color-text-sub)" />
+<rect x="10" y="110" width="52" height="84" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="36" y="128" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">워커 1</text>
+<rect x="15.6" y="137" width="40.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="36" y="152.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">GIL</text>
+<rect x="19" y="164" width="34" height="24" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="19" y1="172" x2="53" y2="172" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="24" cy="168" r="1.4" style="fill:var(--color-text-sub)" />
+<circle cx="28" cy="168" r="1.4" style="fill:var(--color-text-sub)" />
+<path d="M25 180.8 L32.3 179 L39.7 180.2 L47 177.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M135.8 76 L96.4 105.5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M93 108 L100 107.4 L95.6 101.4 z" style="fill:var(--color-text-sub)" />
+<rect x="67" y="110" width="52" height="84" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="93" y="128" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">워커 2</text>
+<rect x="72.6" y="137" width="40.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="93" y="152.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">GIL</text>
+<rect x="76" y="164" width="34" height="24" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="76" y1="172" x2="110" y2="172" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="81" cy="168" r="1.4" style="fill:var(--color-text-sub)" />
+<circle cx="85" cy="168" r="1.4" style="fill:var(--color-text-sub)" />
+<path d="M82 180.8 L89.3 179 L96.7 180.2 L104 177.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 76 L150 103.8" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 108 L153.7 102 L146.3 102 z" style="fill:var(--color-text-sub)" />
+<rect x="124" y="110" width="52" height="84" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="128" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">워커 3</text>
+<rect x="129.6" y="137" width="40.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="150" y="152.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">GIL</text>
+<rect x="133" y="164" width="34" height="24" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="133" y1="172" x2="167" y2="172" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="138" cy="168" r="1.4" style="fill:var(--color-text-sub)" />
+<circle cx="142" cy="168" r="1.4" style="fill:var(--color-text-sub)" />
+<path d="M139 180.8 L146.3 179 L153.7 180.2 L161 177.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M164.3 76 L203.6 105.5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M207 108 L204.4 101.4 L200 107.4 z" style="fill:var(--color-text-sub)" />
+<rect x="181" y="110" width="52" height="84" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="207" y="128" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">워커 4</text>
+<rect x="186.6" y="137" width="40.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="207" y="152.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">GIL</text>
+<rect x="190" y="164" width="34" height="24" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="190" y1="172" x2="224" y2="172" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="195" cy="168" r="1.4" style="fill:var(--color-text-sub)" />
+<circle cx="199" cy="168" r="1.4" style="fill:var(--color-text-sub)" />
+<path d="M196 180.8 L203.3 179 L210.7 180.2 L218 177.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M178.5 76 L260.1 106.5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M264 108 L259.7 102.4 L257.1 109.4 z" style="fill:var(--color-text-sub)" />
+<rect x="238" y="110" width="52" height="84" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="264" y="128" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">워커 5</text>
+<rect x="243.6" y="137" width="40.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="264" y="152.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">GIL</text>
+<rect x="247" y="164" width="34" height="24" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="247" y1="172" x2="281" y2="172" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="252" cy="168" r="1.4" style="fill:var(--color-text-sub)" />
+<circle cx="256" cy="168" r="1.4" style="fill:var(--color-text-sub)" />
+<path d="M253 180.8 L260.3 179 L267.7 180.2 L275 177.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="150" y="240" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">워커마다 GIL·메모리·지표가 따로예요</text>
+</svg>

@@ -20,6 +20,9 @@ sources:
     url: https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/annotate-visualizations/
 updated: 2026-10-29
 ---
+import SdMixed from '../../../assets/figures/apm/sd-mixed.svg';
+import SdVersion from '../../../assets/figures/apm/sd-version.svg';
+import SdCanary from '../../../assets/figures/apm/sd-canary.svg';
 
 <Situation>
   오후 2시에 주문 API를 배포한 뒤 p99 응답시간이 400ms에서 900ms로 올랐어요. 에러는 늘지 않았어요.
@@ -53,18 +56,7 @@ updated: 2026-10-29
 롤링 업데이트는 인스턴스를 조금씩 바꿔 끼워요. 쿠버네티스 Deployment의 기본값은 원하는 수의 25%까지 더 띄우고 25%까지 비워 두는 방식이에요. 그래서 배포 중에는 옛 버전과 새 버전이 섞여 있고, 그래프도 서서히 바뀌어요.
 
 <Figure caption="인스턴스 4대를 바꿔 끼우는 예시예요. 배포 중에는 옛 버전 v41과 새 버전 v42가 섞여 있어서, 전체 그래프는 한 번에 바뀌지 않고 서서히 바뀌어요.">
-  <Strip
-    ariaLabel="인스턴스 4대가 배포 전에는 모두 v41이고, 배포 중에는 v42 2대와 v41 2대가 섞여 있으며, 배포 뒤에는 모두 v42인 칸 띠"
-    rows={[
-      { label: '배포 전', cells: ['v41', 'v41', 'v41', 'v41'] },
-      { label: '배포 중', cells: [{ label: 'v42', tone: 'accent' }, { label: 'v42', tone: 'accent' }, 'v41', 'v41'] },
-      { label: '배포 뒤', cells: [{ label: 'v42', tone: 'accent' }, { label: 'v42', tone: 'accent' }, { label: 'v42', tone: 'accent' }, { label: 'v42', tone: 'accent' }] },
-    ]}
-    ranges={[
-      { row: 1, from: 0, to: 1, label: '새 버전', tone: 'accent' },
-      { row: 1, from: 2, to: 3, label: '옛 버전' },
-    ]}
-  />
+  <SdMixed aria-label="인스턴스 4대가 배포 전에는 모두 v41, 배포 중에는 v42 2대와 v41 2대, 배포 뒤에는 모두 v42예요. 그래서 전체 지표는 한 번에 바뀌지 않고 서서히 바뀌는 그림" />
 </Figure>
 
 느려진 시각이 배포보다 앞섰다면 배포 탓이 아니에요. 같은 시각에 트래픽, DB, 바깥 API에 무슨 일이 있었는지 <Term slug="apm/slow-response">응답이 느려졌을 때</Term>의 순서로 봐요.
@@ -72,14 +64,7 @@ updated: 2026-10-29
 ## 2. 버전별로 나눠 보세요
 
 <Figure caption="배포가 반쯤 진행됐을 때의 예시예요. 같은 시간대에 새 버전 인스턴스만 느리면 새 버전 탓이에요. 둘 다 느리면 버전 밖의 원인이에요.">
-  <Compare
-    columns={['옛 버전 v41', '새 버전 v42']}
-    rows={[
-      { label: 'p99 응답시간', values: ['410ms', '920ms'] },
-      { label: '요청당 SQL 수', values: ['3번', '41번'] },
-      { label: '에러율', values: ['0.2%', '0.2%'] },
-    ]}
-  />
+  <SdVersion aria-label="같은 시간대에 옛 버전 v41과 새 버전 v42를 견준 막대. p99 응답시간은 410ms와 920ms, 요청당 SQL 수는 3번과 41번으로 새 버전만 늘었고, 에러율은 둘 다 0.2%예요" />
 </Figure>
 
 버전별로 나누려면 지표와 트레이스에 버전이 붙어 있어야 해요. OpenTelemetry는 이 값을 `service.version`이라는 리소스 속성으로 정해 둬요. 배포 도구가 이 값을 채우게 해 두면, 화면에서 버전으로 나눠 볼 수 있어요.
@@ -123,14 +108,7 @@ Google SRE Workbook은 새 버전을 일부에만 먼저 내보내 견주는 <Te
 배포 방식마다의 차이와 버전별 비교는 <Term slug="foundations/deployments">배포 방식과 지켜보기</Term>에서 다뤄요.
 
 <Figure caption="SRE Workbook의 예를 견줬어요. 요청의 20%를 실패시키는 버전도 트래픽 5%에만 내보내면, 전체 실패율은 1%에 그쳐요.">
-  <Compare
-    columns={['모두에게 내보낼 때', '5%에만 내보낼 때']}
-    rows={[
-      { label: '새 버전이 받는 트래픽', values: ['100%', '5%'] },
-      { label: '새 버전의 실패율', values: ['20%', '20%'] },
-      { label: '전체 실패율', values: ['20%', '1%'] },
-    ]}
-  />
+  <SdCanary aria-label="요청 100건을 사각형 100개로 그린 그림 둘. 모두에게 내보내면 100개 모두 새 버전이 받고 그중 20개가 실패라 전체 실패율이 20%예요. 5%에만 내보내면 새 버전이 받은 5개 가운데 1개가 실패라 전체 실패율이 5% × 20% = 1%예요" />
 </Figure>
 
 <Checkpoints>

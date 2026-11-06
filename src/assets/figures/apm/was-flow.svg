@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 278" width="300" height="278">
+<text x="8" y="42" font-size="13" font-weight="700" style="fill:var(--color-text)">요청</text>
+<path d="M42 37 L73.1 37" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M78 37 L71 32.7 L71 41.3 z" style="fill:var(--color-accent)" />
+<rect x="80" y="16" width="92" height="42" rx="8" style="fill:var(--color-accent)" />
+<text x="126" y="41.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">웹 서버</text>
+<path d="M172 37 L209.1 37" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M214 37 L207 32.7 L207 41.3 z" style="fill:var(--color-text-sub)" />
+<path d="M221 27 Q221 24 224 24 H231 L234 28 H248 Q251 28 251 31 V45 Q251 48 248 48 H224 Q221 48 221 45 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="258" y="32" font-size="13" font-weight="700" style="fill:var(--color-text)">정적</text>
+<text x="258" y="50" font-size="13" font-weight="700" style="fill:var(--color-text)">파일</text>
+<text x="236" y="74" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">바로 응답해요</text>
+<path d="M126 58 L126 105.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M126 110 L130.3 103 L121.7 103 z" style="fill:var(--color-accent)" />
+<text x="134" y="90" font-size="13" font-weight="600" style="fill:var(--color-accent)">나머지</text>
+<rect x="8" y="112" width="284" height="160" rx="12" stroke-width="1.5" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="18" y="130" font-size="13" font-weight="600" style="fill:var(--color-text)">WAS</text>
+<text x="286" y="130" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">스레드 풀 · 최대 200개</text>
+<path d="M40 146 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M40 200 L45 192 L35 192 z" style="fill:var(--color-text-weak)" />
+<path d="M66 146 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M66 200 L71 192 L61 192 z" style="fill:var(--color-text-weak)" />
+<path d="M92 146 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M92 200 L97 192 L87 192 z" style="fill:var(--color-text-weak)" />
+<path d="M118 146 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M118 200 L123 192 L113 192 z" style="fill:var(--color-accent)" />
+<path d="M144 146 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M144 200 L149 192 L139 192 z" style="fill:var(--color-text-weak)" />
+<path d="M170 146 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7 q8 3.8 0 7.7 q-8 3.8 0 7.7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M170 200 L175 192 L165 192 z" style="fill:var(--color-text-weak)" />
+<text x="196" y="160" font-size="13" font-weight="700" style="fill:var(--color-text-weak)">…</text>
+<rect x="64" y="214" width="108" height="44" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="118" y="233" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">앱 코드</text>
+<text x="118" y="251" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">DB·API 호출</text>
+<text x="196" y="196" font-size="13" font-weight="700" style="fill:var(--color-accent)">스레드 하나가</text>
+<text x="196" y="214" font-size="13" font-weight="700" style="fill:var(--color-accent)">요청 하나를</text>
+<text x="196" y="232" font-size="13" font-weight="700" style="fill:var(--color-accent)">맡아요</text>
+</svg>

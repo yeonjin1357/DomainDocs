@@ -15,6 +15,8 @@ sources:
     url: https://tomcat.apache.org/tomcat-10.1-doc/config/http.html
 updated: 2026-10-29
 ---
+import TpJava from '../../../assets/figures/apm/tp-java.svg';
+import TpTomcat from '../../../assets/figures/apm/tp-tomcat.svg';
 
 <KeyPoints>
   <Point title="스레드 수가 동시 처리 한도예요">
@@ -35,22 +37,7 @@ updated: 2026-10-29
 ## 스레드 풀은 이렇게 움직여요
 
 <Figure caption="자바 표준 스레드 풀의 순서예요. 기본 스레드가 다 바쁘면 대기열에 넣고, 대기열이 차야 max까지 스레드를 늘려요. 그래도 넘치면 거부해요.">
-  <Flow
-    ariaLabel="요청이 기본 스레드로 가고, 기본 스레드가 다 바쁘면 대기열로, 대기열이 가득 차면 스레드를 최대 수까지 늘리고, 그것도 넘으면 거부로 이어지는 구조도"
-    nodes={[
-      { id: 'req', label: '요청', col: 0, row: 0 },
-      { id: 'core', label: '기본 스레드', col: 1, row: 0, note: 'core 수만큼', tone: 'accent' },
-      { id: 'queue', label: '대기열', col: 1, row: 1, note: '차례를 기다림' },
-      { id: 'extra', label: '추가 스레드', col: 1, row: 2, note: 'max까지' },
-      { id: 'reject', label: '거부', col: 1, row: 3, tone: 'warn' },
-    ]}
-    edges={[
-      { from: 'req', to: 'core', tone: 'accent' },
-      { from: 'core', to: 'queue', label: '다 바쁘면' },
-      { from: 'queue', to: 'extra', label: '가득 차면' },
-      { from: 'extra', to: 'reject', label: 'max도 차면', tone: 'warn' },
-    ]}
-  />
+  <TpJava aria-label="1단계 요청은 core 수만큼인 기본 스레드가 맡고, 다 바쁘면 2단계 대기열에서 차례를 기다려요. 대기열이 가득 차면 3단계 max까지 추가 스레드를 늘리고, max도 차면 4단계 새 작업을 거부하는 순서" />
 </Figure>
 
 <Term term="apm/thread-pool">스레드 풀</Term>은 요청을 처리할 스레드를 정해 둔 수만큼 두고 돌려 써요. 요청마다 스레드를 새로 만들면 만드는 비용이 들고, 몰릴 때 스레드가 끝없이 늘어나기 때문이에요.
@@ -62,20 +49,7 @@ updated: 2026-10-29
 Tomcat의 요청 처리 스레드 풀은 순서가 달라요. 대기열에 넣기 전에 스레드부터 `maxThreads`까지 늘려요. 스레드가 다 찬 뒤에야 줄을 세워요.
 
 <Figure caption="Tomcat 기본값으로 그렸어요. 스레드 200개가 다 바쁘면 받아 둔 연결이 스레드를 기다려요. 연결이 8,192개에 닿으면 운영체제 대기열 100개에 쌓이고, 그것도 차면 새 연결은 거절되거나 끊길 수 있어요.">
-  <Flow
-    ariaLabel="Tomcat에서 요청은 먼저 스레드 200개가 처리하고, 다 차면 8,192개까지 받아 둔 연결이 스레드를 기다리며, 연결이 다 차면 운영체제 대기열 100개에 쌓이고, 그것도 차면 거절되거나 시간 초과로 끊기는 구조도"
-    nodes={[
-      { id: 'thr', label: '처리 중', col: 0, row: 0, note: '스레드 200개', tone: 'accent' },
-      { id: 'conn', label: '받아 둔 연결', col: 0, row: 1, note: '8,192개까지' },
-      { id: 'os', label: 'OS 대기열', col: 0, row: 2, note: '100개까지' },
-      { id: 'drop', label: '거절·끊김', col: 0, row: 3, tone: 'warn' },
-    ]}
-    edges={[
-      { from: 'thr', to: 'conn', label: '다 차면' },
-      { from: 'conn', to: 'os', label: '다 차면' },
-      { from: 'os', to: 'drop', label: '다 차면', tone: 'warn' },
-    ]}
-  />
+  <TpTomcat aria-label="Tomcat 기본값에서 요청은 스레드 200개가 처리하고, 다 차면 8,192개까지 받아 둔 연결이 스레드를 기다리며, 그것도 차면 OS 대기열 100개에 쌓여요. 그마저 차면 새 연결은 거절되거나 끊기는 그림" />
 </Figure>
 
 Node.js, Python, Go는 스레드 풀과 다른 방식으로 요청을 나눠 받아요. 차이는 <Term slug="apm/runtimes">JVM 밖의 런타임</Term>에서 다뤄요.

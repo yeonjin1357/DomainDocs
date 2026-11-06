@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 212" width="300" height="212">
+<rect x="6" y="8" width="52" height="112" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="32" y="28" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">요청 1</text>
+<text x="32" y="62" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">–</text>
+<rect x="12.3" y="95" width="39.4" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="32" y="110.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">성공</text>
+<rect x="64" y="8" width="52" height="112" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="90" y="28" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">요청 2</text>
+<circle cx="90" cy="46" r="7" style="fill:var(--color-warn)" />
+<text x="90" y="50.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">!</text>
+<rect x="70.3" y="95" width="39.4" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="90" y="110.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">성공</text>
+<rect x="122" y="8" width="52" height="112" rx="8" stroke-width="1.4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="148" y="28" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">요청 3</text>
+<circle cx="148" cy="46" r="7" style="fill:var(--color-warn)" />
+<text x="148" y="50.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">!</text>
+<circle cx="148" cy="64" r="7" style="fill:var(--color-warn)" />
+<text x="148" y="68.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">!</text>
+<circle cx="148" cy="82" r="7" style="fill:var(--color-warn)" />
+<text x="148" y="86.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">!</text>
+<rect x="128.3" y="95" width="39.4" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="148" y="110.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">실패</text>
+<rect x="180" y="8" width="52" height="112" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="206" y="28" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">요청 4</text>
+<text x="206" y="62" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">–</text>
+<rect x="186.3" y="95" width="39.4" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="206" y="110.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">성공</text>
+<rect x="238" y="8" width="52" height="112" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="264" y="28" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">요청 5</text>
+<text x="264" y="62" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">–</text>
+<rect x="244.3" y="95" width="39.4" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="264" y="110.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">성공</text>
+<circle cx="14" cy="146" r="7" style="fill:var(--color-warn)" />
+<text x="14" y="150.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">!</text>
+<text x="28" y="151" font-size="13" style="fill:var(--color-text-sub)">예외 · 모두 4번</text>
+<text x="8" y="184" font-size="13" font-weight="700" style="fill:var(--color-warn)">실패한 요청 1건 ÷ 요청 5건 = 에러율 20%</text>
+<text x="8" y="204" font-size="13" style="fill:var(--color-text-sub)">예외 수가 아니라 실패한 요청 수를 세요</text>
+</svg>
