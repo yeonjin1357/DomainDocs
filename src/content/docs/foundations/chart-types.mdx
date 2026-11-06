@@ -21,6 +21,10 @@ updated: 2026-11-03
 ---
 import CpuStacked from '../../../assets/figures/foundations/cpu-stacked.svg';
 import PieFive from '../../../assets/figures/foundations/pie-five.svg';
+import ChartCatalog from '../../../assets/figures/foundations/chart-catalog.svg';
+import ChartStackOk from '../../../assets/figures/foundations/chart-stack-ok.svg';
+import ChartAxis from '../../../assets/figures/foundations/chart-axis.svg';
+import ChartHeatmap from '../../../assets/figures/foundations/chart-heatmap.svg';
 
 <KeyPoints>
   <Point title="질문이 차트를 정해요">
@@ -42,21 +46,8 @@ import PieFive from '../../../assets/figures/foundations/pie-five.svg';
 
 차트를 고르기 전에 이 패널이 답할 질문을 정해요. 질문의 모양이 차트의 모양이에요.
 
-<Figure caption="패널이 답할 질문과 그에 맞는 차트예요. 오른쪽 글자가 그 질문에 맞는 차트예요.">
-  <Tree
-    ariaLabel="이 패널이 답할 질문에서, 시간에 따라 어떻게 바뀌나는 선 그래프, 전체가 무엇으로 나뉘나는 누적 영역이나 비율 막대, 무엇이 가장 큰가는 막대, 값이 어떻게 퍼져 있나는 히트맵, 지금 얼마인가는 숫자 카드, 정확한 값을 찾아야 하나는 표로 갈라지는 나무"
-    root={{
-      label: '이 패널이 답할 질문',
-      children: [
-        { label: '시간에 따라 어떻게 바뀌나', tag: '선 그래프', tone: 'accent' },
-        { label: '전체가 무엇으로 나뉘나', tag: '누적 영역' },
-        { label: '무엇이 가장 큰가', tag: '막대' },
-        { label: '값이 어떻게 퍼져 있나', tag: '히트맵' },
-        { label: '지금 얼마인가', tag: '숫자 카드' },
-        { label: '정확한 값을 찾나', tag: '표' },
-      ],
-    }}
-  />
+<Figure caption="패널이 답할 질문마다 맞는 차트예요. 바뀌는 모습은 선 그래프, 나뉘는 몫은 누적 영역, 가장 큰 것은 막대, 퍼진 모습은 히트맵, 지금 값 하나는 숫자 카드, 정확한 값은 표로 그려요.">
+  <ChartCatalog aria-label="차트 여섯 개를 작은 그림과 함께 놓은 카드. 선 그래프는 바뀌는 모습, 누적 영역은 나뉘는 몫, 막대는 가장 큰 것, 히트맵은 퍼진 모습, 숫자 카드는 지금 값 하나, 표는 정확한 값을 보여 줘요" />
 </Figure>
 
 ## 바뀌는 모습은 선 그래프
@@ -89,14 +80,7 @@ import PieFive from '../../../assets/figures/foundations/pie-five.svg';
 쌓아도 되는 건 더하면 전체가 되는 값뿐이에요. 서버별 p99 응답시간을 쌓으면 맨 위 선이 p99를 더한 숫자가 돼요. 어디에도 없는 응답시간이에요.
 
 <Figure caption="더하면 전체가 되는지가 기준이에요. 백분위수, 사용률(%), 온도처럼 더해도 뜻이 없는 값은 쌓지 않고 선을 겹쳐 그려요.">
-  <Compare
-    columns={['쌓아도 돼요', '쌓으면 안 돼요']}
-    rows={[
-      { label: '더하면', values: ['전체가 돼요', '뜻 없는 숫자가 돼요'] },
-      { label: '예 1', values: ['상태 코드별 요청 수', '서버별 p99 응답시간'] },
-      { label: '예 2', values: ['CPU 시간의 종류별 몫', '서버별 CPU 사용률(%)'] },
-    ]}
-  />
+  <ChartStackOk aria-label="상태 코드별 요청 수를 쌓으면 맨 위가 200, 404, 500을 더한 전체 요청이라 쌓아도 돼요. 서버별 p99를 쌓으면 맨 위가 뜻 없는 합이라, 쌓지 않고 선을 겹쳐 그려요" />
 </Figure>
 
 쌓은 그래프는 맨 아래 층만 바닥이 평평해요. 위층은 아래층 위에 얹혀 있어서, 위층 하나가 늘었는지 줄었는지 읽기 어려워요. Grafana 문서도 누적은 오해를 부를 수 있으니 조심해서 쓰라고 해요.
@@ -127,22 +111,8 @@ import PieFive from '../../../assets/figures/foundations/pie-five.svg';
 
 막대는 길이가 곧 값이에요. 축을 0이 아닌 곳에서 자르면, 길이가 값의 차이를 부풀려요.
 
-<Figure caption="같은 두 값 96%와 98%예요. 위는 축을 95%에서 잘라 세 배 차이처럼 보이고, 아래는 0부터 그려 거의 같아 보여요.">
-  <Bars
-    ariaLabel="축을 95%에서 자른 막대에서는 96%가 1칸, 98%가 3칸이라 세 배 차이처럼 보이는 그림"
-    bars={[
-      { label: '서버 A · 축을 95%에서 자르면', value: 1, display: '96%' },
-      { label: '서버 B · 축을 95%에서 자르면', value: 3, display: '98%', tone: 'warn' },
-    ]}
-  />
-  <Bars
-    ariaLabel="축을 0부터 그린 막대에서는 96%와 98%가 거의 같은 길이인 그림"
-    max={100}
-    bars={[
-      { label: '서버 A · 0부터', value: 96, display: '96%' },
-      { label: '서버 B · 0부터', value: 98, display: '98%', tone: 'accent' },
-    ]}
-  />
+<Figure caption="같은 두 값 96%와 98%예요. 축을 95%에서 자르면 세 배 차이처럼 보이고, 0부터 그리면 거의 같아 보여요.">
+  <ChartAxis aria-label="같은 두 값 A 96%와 B 98%를 그린 막대 두 쌍. 축을 95%에서 자르면 B 막대가 A의 세 배처럼 보이고, 0부터 그리면 거의 같은 길이예요" />
 </Figure>
 
 선 그래프는 다르게 봐요. 선은 높이가 아니라 오르내림을 보여 주는 거라, 축을 값 근처로 좁혀 작은 변화를 키워 봐도 돼요. 대신 축의 숫자를 꼭 같이 보여 줘요.
@@ -152,14 +122,7 @@ import PieFive from '../../../assets/figures/foundations/pie-five.svg';
 응답시간처럼 같은 시각에도 값이 넓게 퍼지는 숫자는 평균 선 하나로는 모양이 안 보여요. 히트맵은 시간마다 값의 구간별 개수를 칸의 진하기로 칠해요.
 
 <Figure caption="1분마다 응답시간 구간별 요청 수를 칠했어요. 진할수록 요청이 많아요. 14:04에는 요청이 1초 넘는 칸으로 몰렸어요.">
-  <Strip
-    ariaLabel="14시부터 14시 5분까지 1분마다 응답시간 세 구간의 요청 수를 진하기로 칠한 히트맵. 평소에는 0.5초 아래 칸이 진하지만 14시 4분에는 1초 넘는 칸이 진해져요"
-    rows={[
-      { label: '1초 넘음', heads: ['14:00', '14:01', '14:02', '14:03', '14:04', '14:05'], cells: [{ label: '', heat: 0 }, { label: '', heat: 0.02 }, { label: '', heat: 0 }, { label: '', heat: 0.03 }, { label: '', heat: 0.9 }, { label: '', heat: 0.02 }] },
-      { label: '0.5~1초', cells: [{ label: '', heat: 0.08 }, { label: '', heat: 0.1 }, { label: '', heat: 0.07 }, { label: '', heat: 0.09 }, { label: '', heat: 0.12 }, { label: '', heat: 0.08 }] },
-      { label: '0.5초 아래', cells: [{ label: '', heat: 1 }, { label: '', heat: 0.97 }, { label: '', heat: 0.95 }, { label: '', heat: 0.98 }, { label: '', heat: 0.25 }, { label: '', heat: 0.96 }] },
-    ]}
-  />
+  <ChartHeatmap aria-label="14시부터 14시 5분까지 1분마다 응답시간 세 구간의 요청 수를 진하기로 칠한 히트맵. 평소에는 0.5초 아래 칸이 진하지만 14시 4분에는 1초 넘는 칸이 진해져요" />
 </Figure>
 
 히트맵의 칸은 <Term slug="foundations/histograms">히스토그램</Term>의 버킷이에요. 점마다 요청을 찍는 분포도는 <Term slug="apm/response-time-distribution">응답시간 분포도</Term>에서 다뤄요.

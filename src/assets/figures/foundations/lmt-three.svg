@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 204" width="300" height="204">
+<rect x="135" y="11" width="30" height="22" rx="3" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M135 13 L150 24 L165 13" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="172" y="27" font-size="13" font-weight="700" style="fill:var(--color-accent)">결제 요청 하나</text>
+<path d="M150 36 L56.7 62.7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M52 64 L59.9 66.2 L57.5 57.9 z" style="fill:var(--color-text-weak)" />
+<path d="M150 36 L150 59.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M150 64 L154.3 57 L145.7 57 z" style="fill:var(--color-text-weak)" />
+<path d="M150 36 L243.3 62.7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M248 64 L242.5 57.9 L240.1 66.2 z" style="fill:var(--color-text-weak)" />
+<rect x="6" y="68" width="92" height="64" rx="10" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="52" y="88" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">에러 수</text>
+<text x="52" y="116" font-size="20" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">+1</text>
+<rect x="104" y="68" width="92" height="64" rx="10" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="114" y="80" width="70" height="9" rx="2" style="fill:var(--color-text-sub)" />
+<rect x="122" y="94" width="14" height="9" rx="2" style="fill:var(--color-text-sub)" />
+<rect x="136" y="108" width="46" height="9" rx="2" style="fill:var(--color-warn)" />
+<rect x="202" y="68" width="92" height="64" rx="10" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="212" y="82" width="56" height="6" rx="2" style="fill:var(--color-text-sub)" />
+<rect x="212" y="95" width="70" height="6" rx="2" style="fill:var(--color-text-sub)" />
+<rect x="212" y="108" width="44" height="6" rx="2" style="fill:var(--color-text-sub)" />
+<text x="212" y="126" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">trace_id</text>
+<line x1="198" y1="100" x2="200" y2="100" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-accent)" />
+<text x="52" y="152" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">메트릭</text>
+<text x="52" y="176" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">얼마나</text>
+<text x="52" y="196" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">에러율 4.8%</text>
+<text x="150" y="152" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">트레이스</text>
+<text x="150" y="176" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">어디서</text>
+<text x="150" y="196" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">DB 조회 2.1초</text>
+<text x="248" y="152" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">로그</text>
+<text x="248" y="176" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">왜</text>
+<text x="248" y="196" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">시간 초과</text>
+</svg>

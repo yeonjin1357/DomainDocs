@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 296" width="300" height="296">
+<rect x="4" y="4" width="292" height="140" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">그냥 둘 때</text>
+<text x="16" y="48" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">status="200"</text>
+<rect x="18" y="58" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="36" y="75" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">120</text>
+<rect x="58" y="58" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="76" y="75" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">240</text>
+<rect x="98" y="58" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="116" y="75" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">360</text>
+<rect x="138" y="58" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="156" y="75" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">480</text>
+<text x="16" y="100" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">status="500"</text>
+<rect x="18" y="110" width="36" height="24" rx="5" stroke-width="1.2" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="36" y="127" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">없음</text>
+<rect x="58" y="110" width="36" height="24" rx="5" stroke-width="1.2" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="76" y="127" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">없음</text>
+<rect x="98" y="110" width="36" height="24" rx="5" stroke-width="1.2" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="116" y="127" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">없음</text>
+<rect x="138" y="110" width="36" height="24" rx="5" stroke-width="1.2" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="156" y="127" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">없음</text>
+<path d="M184 88 L199.1 88" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M204 88 L197 83.7 L197 92.3 z" style="fill:var(--color-text-weak)" />
+<text x="246" y="78" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">에러율 질의</text>
+<rect x="218.1" y="91" width="55.8" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="246" y="106.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">빈 결과</text>
+<rect x="4" y="152" width="292" height="140" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="174" font-size="14" font-weight="700" style="fill:var(--color-text)">미리 0으로 내보낼 때</text>
+<text x="16" y="196" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">status="200"</text>
+<rect x="18" y="206" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="36" y="223" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">120</text>
+<rect x="58" y="206" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="76" y="223" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">240</text>
+<rect x="98" y="206" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="116" y="223" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">360</text>
+<rect x="138" y="206" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="156" y="223" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">480</text>
+<text x="16" y="248" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">status="500"</text>
+<rect x="18" y="258" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="36" y="275" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">0</text>
+<rect x="58" y="258" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="76" y="275" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">0</text>
+<rect x="98" y="258" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="116" y="275" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">0</text>
+<rect x="138" y="258" width="36" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="156" y="275" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">0</text>
+<path d="M184 236 L199.1 236" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M204 236 L197 231.7 L197 240.3 z" style="fill:var(--color-text-weak)" />
+<text x="246" y="226" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">에러율 질의</text>
+<rect x="231" y="239" width="30.1" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="246" y="254.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">0%</text>
+</svg>

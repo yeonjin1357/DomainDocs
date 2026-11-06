@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 298" width="300" height="298">
+<text x="8" y="18" font-size="13" font-weight="700" style="fill:var(--color-text)">왼쪽 5xx</text>
+<text x="8" y="36" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">by (job, status)</text>
+<text x="196" y="18" font-size="13" font-weight="700" style="fill:var(--color-text)">오른쪽 전체</text>
+<text x="196" y="36" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">by (job)</text>
+<rect x="4" y="48" width="126" height="102" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 72 V54 Q4.8 48.8 10 48.8 H124 Q129.3 48.8 129.3 54 V72 z" style="fill:var(--color-line)" />
+<rect x="4.8" y="72" width="124.5" height="26" rx="0" style="fill:var(--color-accent-weak)" />
+<rect x="4.8" y="98" width="124.5" height="26" rx="0" style="fill:var(--color-accent-weak)" />
+<line x1="4" y1="98" x2="130" y2="98" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="124" x2="130" y2="124" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="64.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">job·status</text>
+<text x="122" y="64.7" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">건/초</text>
+<text x="12" y="89.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">api·500</text>
+<text x="122" y="89.7" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">0.2</text>
+<text x="12" y="115.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">api·503</text>
+<text x="122" y="115.7" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">0.3</text>
+<text x="12" y="141.7" font-size="13" font-weight="400" style="fill:var(--color-text)">web·500</text>
+<text x="122" y="141.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">0.05</text>
+<rect x="196" y="48" width="100" height="76" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M196.8 72 V54 Q196.8 48.8 202 48.8 H290 Q295.3 48.8 295.3 54 V72 z" style="fill:var(--color-line)" />
+<rect x="196.8" y="72" width="98.5" height="26" rx="0" style="fill:var(--color-accent-weak)" />
+<line x1="196" y1="98" x2="296" y2="98" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="204" y="64.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">job</text>
+<text x="288" y="64.7" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">건/초</text>
+<text x="204" y="89.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">api</text>
+<text x="288" y="89.7" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">20</text>
+<text x="204" y="115.7" font-size="13" font-weight="400" style="fill:var(--color-text)">web</text>
+<text x="288" y="115.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">5</text>
+<path d="M132 85 L185.1 85" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M190 85 L183 80.7 L183 89.3 z" style="fill:var(--color-accent)" />
+<path d="M132 111 L185.4 90.7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M190 89 L181.9 87.4 L185 95.5 z" style="fill:var(--color-accent)" />
+<path d="M132 137 L185.5 113" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M190 111 L181.8 109.9 L185.4 117.8 z" style="fill:var(--color-text-sub)" />
+<text x="150" y="168" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">ignoring(status)로 status를 빼고 짝지어요</text>
+<text x="150" y="186" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">api 두 줄이 api 한 줄과 짝 → group_left</text>
+<rect x="4" y="200" width="292" height="96" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 224 V206 Q4.8 200.8 10 200.8 H290 Q295.3 200.8 295.3 206 V224 z" style="fill:var(--color-line)" />
+<line x1="4" y1="248" x2="296" y2="248" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="272" x2="296" y2="272" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="216.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">결과</text>
+<text x="288" y="216.7" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">5xx 비율</text>
+<text x="12" y="240.7" font-size="13" font-weight="400" style="fill:var(--color-text)">api·500</text>
+<text x="288" y="240.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">0.2 ÷ 20 = 1%</text>
+<text x="12" y="264.7" font-size="13" font-weight="400" style="fill:var(--color-text)">api·503</text>
+<text x="288" y="264.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">0.3 ÷ 20 = 1.5%</text>
+<text x="12" y="288.7" font-size="13" font-weight="400" style="fill:var(--color-text)">web·500</text>
+<text x="288" y="288.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">0.05 ÷ 5 = 1%</text>
+</svg>

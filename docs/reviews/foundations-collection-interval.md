@@ -98,3 +98,4 @@
   - 출처에 Prometheus Exporters and integrations, node_exporter README Textfile Collector(v1.12.1), OpenTelemetry Collector 문서를 더했어요.
 - (최종 검토) 더 깊이 「수집이 끊기면」의 `up` 문장을 "수집에 성공하면 1, 실패하면 0이에요."로 바꿨어요. 닿는 대상도 `sample_limit`를 넘으면 `up`이 0이라, "닿으면 1"은 틀려요. empty-graph.mdx, no-data-vs-zero.mdx의 `up` 풀이와도 맞췄어요.
 - (최종 검토) 머리말 `related`에 foundations/no-data-vs-zero와 foundations/empty-graph를 더했어요. 수집이 멈추면 데이터 없음이 되고, 가이드는 `up`과 stale 표시로 빈 그래프를 진단해요. 이 줄 말고는 바꾸지 않았어요.
+- (2026-11-06 그림 다시 그림) 게이지·카운터 그림: 1분 중 57초 40%와 3초 100%이면 일한 시간은 57 × 0.4 + 3 = 25.8초, ÷ 60초 = 43%예요. 넓이 그림: 15초 중 12초 40%와 3초 100%이면 12 × 0.4 + 3 = 7.8초, ÷ 15초 = 52%이고, 15초 내내 52%도 15 × 0.52 = 7.8초예요.

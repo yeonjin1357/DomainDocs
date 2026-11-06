@@ -217,6 +217,9 @@ describe('새 틀 규칙', () => {
     expect(rules(BASICS + SVG_IMPORT + BASICS_BODY.replace('<Checkpoints>', '<SwitchFigure aria-label="스위치 그림" />\n\n<Checkpoints>'))).toEqual(['structure']);
     expect(rules(BASICS + SVG_IMPORT + BASICS_BODY.replace(TILE, '<SwitchFigure />'))).toEqual(['structure']);
   });
+  it('SVG 그림은 OnDashboard 안에도 둘 수 있다', () => {
+    expect(lint(FRONT() + SVG_IMPORT + CONCEPT_BODY.replace('<StatTile label="p99" value="1.2" unit="초" />', '<SwitchFigure aria-label="스위치 그림" />'))).toEqual([]);
+  });
 });
 
 describe('컴포넌트 규칙', () => {

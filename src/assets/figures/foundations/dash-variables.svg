@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 238" width="300" height="238">
+<rect x="4" y="4" width="144" height="230" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">서버마다 복사</text>
+<rect x="20" y="44" width="92" height="60" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="28" y="62" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">server-1</text>
+<path d="M100 62 l8 -8 l4 4 l-8 8 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<rect x="30" y="70" width="92" height="60" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="38" y="88" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">server-2</text>
+<path d="M110 88 l8 -8 l4 4 l-8 8 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<rect x="40" y="96" width="92" height="60" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="48" y="114" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">server-3</text>
+<path d="M120 114 l8 -8 l4 4 l-8 8 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="76" y="172" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">패널 하나를 고치면</text>
+<text x="76" y="192" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">모두 따로 고쳐요</text>
+<text x="76" y="218" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">대시보드 = 서버 수</text>
+<rect x="152" y="4" width="144" height="230" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="14" font-weight="700" style="fill:var(--color-accent)">변수로 한 벌</text>
+<rect x="168" y="44" width="112" height="104" rx="6" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="176" y="52" width="96" height="22" rx="4" style="fill:var(--color-accent-weak)" />
+<text x="183" y="68" font-size="13" font-weight="700" style="fill:var(--color-accent)">server: 1 ▾</text>
+<path d="M180 121 L202 111 L224 116 L246 101 L268 106" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M262 104 l8 -8 l4 4 l-8 8 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="224" y="172" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">한 번 고치면</text>
+<text x="224" y="192" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">모든 서버에 반영</text>
+<text x="224" y="218" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">서버는 변수에서 골라요</text>
+</svg>

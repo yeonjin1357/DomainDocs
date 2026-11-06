@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 292" width="300" height="292">
+<text x="154" y="14" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">DB의 열</text>
+<text x="8" y="44" font-size="13" font-weight="700" style="fill:var(--color-text)">처음</text>
+<rect x="128" y="28" width="52" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="154" y="45" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">tel</text>
+<rect x="116.2" y="53" width="75.7" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="154" y="68.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">쓰기·읽기</text>
+<text x="8" y="98" font-size="13" font-weight="700" style="fill:var(--color-text)">1. 새 열 더하기</text>
+<rect x="128" y="82" width="52" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="154" y="99" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">tel</text>
+<rect x="188" y="82" width="52" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="214" y="99" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">phone</text>
+<rect x="116.2" y="107" width="75.7" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="154" y="122.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">쓰기·읽기</text>
+<path d="M270 94 L274.2 98.2 L282 89.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="8" y="152" font-size="13" font-weight="700" style="fill:var(--color-text)">2. 두 열에 쓰기</text>
+<rect x="128" y="136" width="52" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="154" y="153" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">tel</text>
+<rect x="188" y="136" width="52" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="214" y="153" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">phone</text>
+<rect x="116.2" y="161" width="75.7" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="154" y="176.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">쓰기·읽기</text>
+<rect x="194.3" y="161" width="39.4" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="214" y="176.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">쓰기</text>
+<path d="M270 148 L274.2 152.2 L282 143.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="8" y="206" font-size="13" font-weight="700" style="fill:var(--color-text)">3. 읽기 옮기기</text>
+<rect x="128" y="190" width="52" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="154" y="207" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">tel</text>
+<rect x="188" y="190" width="52" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="214" y="207" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">phone</text>
+<rect x="134.3" y="215" width="39.4" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="154" y="230.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">쓰기</text>
+<rect x="176.2" y="215" width="75.7" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="214" y="230.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">쓰기·읽기</text>
+<path d="M270 202 L274.2 206.2 L282 197.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="8" y="260" font-size="13" font-weight="700" style="fill:var(--color-text)">4. 옛 열 지우기</text>
+<rect x="128" y="244" width="52" height="24" rx="5" stroke-width="1.5" stroke-dasharray="3 3" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="154" y="261" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">tel</text>
+<line x1="136" y1="256" x2="172" y2="256" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="188" y="244" width="52" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="214" y="261" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">phone</text>
+<rect x="176.2" y="269" width="75.7" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="214" y="284.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">쓰기·읽기</text>
+<line x1="271" y1="251" x2="281" y2="261" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="271" y1="261" x2="281" y2="251" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="292" y="14" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">되돌리기</text>
+</svg>

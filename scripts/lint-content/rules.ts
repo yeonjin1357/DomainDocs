@@ -300,14 +300,14 @@ function checkTerms(tree: Root, fm: Record<string, unknown>, report: Report): vo
   });
 }
 
-/** 등록된 컴포넌트와 import한 데모·SVG 그림만 쓰게 한다. 데모에는 client 지시어, SVG 그림에는 Figure와 aria-label이 있어야 한다. */
+/** 등록된 컴포넌트와 import한 데모·SVG 그림만 쓰게 한다. 데모에는 client 지시어, SVG 그림에는 Figure(또는 OnDashboard)와 aria-label이 있어야 한다. */
 function checkComponents(tree: Root, demos: Set<string>, svgs: Set<string>, report: Report): void {
   visitParents(tree, (node, ancestors) => {
     if (!isJsx(node) || node.name == null) return;
     const name = node.name;
     if (svgs.has(name)) {
-      if (!ancestors.some((a) => isJsx(a) && a.name === 'Figure')) {
-        report('structure', lineOf(node), columnOf(node), `SVG 그림 <${name}>은(는) <Figure> 안에 둬요.`);
+      if (!ancestors.some((a) => isJsx(a) && (a.name === 'Figure' || a.name === 'OnDashboard'))) {
+        report('structure', lineOf(node), columnOf(node), `SVG 그림 <${name}>은(는) <Figure>나 <OnDashboard> 안에 둬요.`);
       }
       const label = jsxAttrs(node)['aria-label'];
       if (typeof label !== 'string' || label.trim() === '') {

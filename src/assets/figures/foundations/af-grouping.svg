@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 254" width="300" height="254">
+<rect x="17" y="17" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="23" y1="25" x2="37" y2="25" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="31" x2="37" y2="31" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="37" x2="37" y2="37" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="30" cy="44.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M48 29 C49 24 49 19 50 16 C52 10 64 10 66 16 C67 19 67 24 68 29 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="46" y1="29" x2="70" y2="29" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<circle cx="58" cy="33" r="2.6" style="fill:var(--color-warn)" />
+<line x1="58" y1="8" x2="58" y2="11" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="30" y="66" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">서버 1</text>
+<path d="M74 34 L133 108.2" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M136 112 L135 103.8 L128.2 109.2 z" style="fill:var(--color-warn)" />
+<rect x="17" y="91" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="23" y1="99" x2="37" y2="99" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="105" x2="37" y2="105" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="111" x2="37" y2="111" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="30" cy="118.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M48 103 C49 98 49 93 50 90 C52 84 64 84 66 90 C67 93 67 98 68 103 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="46" y1="103" x2="70" y2="103" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<circle cx="58" cy="107" r="2.6" style="fill:var(--color-warn)" />
+<line x1="58" y1="82" x2="58" y2="85" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="30" y="140" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">서버 2</text>
+<path d="M74 108 L131.1 111.7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M136 112 L129.3 107.2 L128.7 115.9 z" style="fill:var(--color-warn)" />
+<rect x="17" y="169" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="23" y1="177" x2="37" y2="177" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="183" x2="37" y2="183" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="189" x2="37" y2="189" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="30" cy="196.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M48 181 C49 176 49 171 50 168 C52 162 64 162 66 168 C67 171 67 176 68 181 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="46" y1="181" x2="70" y2="181" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<circle cx="58" cy="185" r="2.6" style="fill:var(--color-warn)" />
+<line x1="58" y1="160" x2="58" y2="163" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="30" y="218" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">서버 N</text>
+<path d="M74 186 L132.9 115.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M136 112 L128.2 114.6 L134.8 120.2 z" style="fill:var(--color-warn)" />
+<text x="30" y="160" font-size="16" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">⋮</text>
+<rect x="138" y="80" width="92" height="64" rx="10" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="184" y="104" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">알림 묶기</text>
+<text x="184" y="122" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">cluster,</text>
+<text x="184" y="138" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">alertname</text>
+<path d="M232 112 L250.4 112" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M256 112 L248 107 L248 117 z" style="fill:var(--color-accent)" />
+<rect x="268" y="98" width="16" height="28" rx="3" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="273" y1="122" x2="279" y2="122" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<text x="276" y="146" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">알림 1개</text>
+<text x="150" y="246" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">같은 클러스터의 같은 규칙 알림은 한 묶음</text>
+</svg>

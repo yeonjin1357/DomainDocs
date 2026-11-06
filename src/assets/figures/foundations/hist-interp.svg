@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 246" width="300" height="246">
+<rect x="30" y="40" width="240" height="40" rx="8" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="30" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">0.5~1초 칸의 10건</text>
+<circle cx="54" cy="60" r="5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="78" cy="60" r="5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="102" cy="60" r="5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="126" cy="60" r="5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="150" cy="60" r="7" stroke-width="1.6" style="fill:var(--color-accent);stroke:var(--color-accent)" />
+<circle cx="174" cy="60" r="5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="198" cy="60" r="5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="222" cy="60" r="5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="246" cy="60" r="5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="270" cy="60" r="5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="54" y="100" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">986</text>
+<text x="150" y="100" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">990</text>
+<text x="270" y="100" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">995</text>
+<line x1="30" y1="118" x2="270" y2="118" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="30" y1="114" x2="30" y2="122" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<text x="30" y="140" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">0.5초</text>
+<line x1="150" y1="114" x2="150" y2="122" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<text x="150" y="140" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">0.75</text>
+<line x1="270" y1="114" x2="270" y2="122" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<text x="270" y="140" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">1초</text>
+<rect x="30" y="156" width="240" height="40" rx="10" style="fill:var(--color-accent-weak)" />
+<text x="150" y="182" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">p99 추정값 0.75초</text>
+<text x="150" y="218" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">0.05초 간격으로 고르게 있다고 보고 계산해요</text>
+<text x="150" y="238" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">실제로는 0.5~1초 어디든 될 수 있어요</text>
+</svg>

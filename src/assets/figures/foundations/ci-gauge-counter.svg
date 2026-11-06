@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 342" width="300" height="342">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">실제 CPU 사용률 · 1분</text>
+<line x1="44" y1="61.6" x2="280" y2="61.6" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="38" y="66.1" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">40%</text>
+<line x1="44" y1="31.1" x2="280" y2="31.1" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="38" y="35.6" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">100%</text>
+<line x1="44" y1="82" x2="280" y2="82" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M44 61.6 L162 61.6 L162.8 31.1 L173 31.1 L173.8 61.6 L280 61.6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<line x1="8" y1="104" x2="292" y2="104" stroke-width="1" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="8" y="126" font-size="13" font-weight="700" style="fill:var(--color-text)">게이지로 받으면</text>
+<line x1="44" y1="166" x2="280" y2="166" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M44 146 L280 146" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<circle cx="44" cy="146" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="103" cy="146" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="162" cy="146" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="221" cy="146" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="280" cy="146" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="292" y="126" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">1분 동안 40% · 스파이크 빠짐</text>
+<line x1="8" y1="188" x2="292" y2="188" stroke-width="1" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="8" y="210" font-size="13" font-weight="700" style="fill:var(--color-text)">카운터로 받으면</text>
+<line x1="44" y1="284" x2="280" y2="284" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M44 284 L162 256.4 L173.8 249.6 L280 224.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M162 256.4 L173.8 249.6" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<circle cx="44" cy="284" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="280" cy="224.8" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="52" y="233.5" font-size="13" style="fill:var(--color-text-sub)">CPU가 일한 시간 누적</text>
+<text x="272" y="228.8" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">25.8초</text>
+<rect x="30" y="296" width="240" height="40" rx="10" style="fill:var(--color-accent-weak)" />
+<text x="150" y="322" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">25.8초 ÷ 60초 = 1분 평균 43%</text>
+</svg>

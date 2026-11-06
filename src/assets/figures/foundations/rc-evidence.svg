@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 268" width="300" height="268">
+<rect x="4" y="4" width="292" height="126" rx="12" style="fill:var(--color-accent-weak)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-accent)">튼튼한 근거 · 모두 갖춰야 해요</text>
+<path d="M17 46 L20.5 49.5 L27 42.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="36" y="50" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">시각</text>
+<text x="104" y="50" font-size="13" font-weight="600" style="fill:var(--color-text)">증상보다 먼저 변했어요</text>
+<path d="M17 68 L20.5 71.5 L27 64.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="36" y="72" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">위치</text>
+<text x="104" y="72" font-size="13" font-weight="600" style="fill:var(--color-text)">증상의 의존 경로 위에 있어요</text>
+<path d="M17 90 L20.5 93.5 L27 86.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="36" y="94" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">설명</text>
+<text x="104" y="94" font-size="13" font-weight="600" style="fill:var(--color-text)">모든 증상이 설명돼요</text>
+<path d="M17 112 L20.5 115.5 L27 108.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="36" y="116" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">되돌리면</text>
+<text x="104" y="116" font-size="13" font-weight="600" style="fill:var(--color-text)">증상이 사라져요</text>
+<rect x="4" y="138" width="292" height="126" rx="12" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="16" y="160" font-size="14" font-weight="700" style="fill:var(--color-warn)">약한 근거</text>
+<line x1="17.5" y1="175.5" x2="26.5" y2="184.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="17.5" y1="184.5" x2="26.5" y2="175.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="36" y="184" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">시각</text>
+<text x="104" y="184" font-size="13" font-weight="600" style="fill:var(--color-text)">같은 시각에 함께 튀었을 뿐</text>
+<line x1="17.5" y1="197.5" x2="26.5" y2="206.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="17.5" y1="206.5" x2="26.5" y2="197.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="36" y="206" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">위치</text>
+<text x="104" y="206" font-size="13" font-weight="600" style="fill:var(--color-text)">증상과 이어지지 않은 곳</text>
+<line x1="17.5" y1="219.5" x2="26.5" y2="228.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="17.5" y1="228.5" x2="26.5" y2="219.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="36" y="228" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">설명</text>
+<text x="104" y="228" font-size="13" font-weight="600" style="fill:var(--color-text)">일부 증상만 설명돼요</text>
+<line x1="17.5" y1="241.5" x2="26.5" y2="250.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="17.5" y1="250.5" x2="26.5" y2="241.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="36" y="250" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">되돌리면</text>
+<text x="104" y="250" font-size="13" font-weight="600" style="fill:var(--color-text)">그대로예요</text>
+</svg>

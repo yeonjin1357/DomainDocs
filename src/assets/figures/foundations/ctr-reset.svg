@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 268" width="300" height="268">
+<line x1="56" y1="160" x2="280" y2="160" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="50" y="164.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">0</text>
+<line x1="56" y1="47" x2="280" y2="47" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="50" y="51.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">1,000</text>
+<line x1="56" y1="160" x2="280" y2="160" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M81.8 47 L168 41.3 L211.1 41.3" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M211.1 41.3 L211.1 160" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<path d="M211.1 160 L254.2 157.7" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<circle cx="81.8" cy="47" r="4.5" style="fill:var(--color-accent)" />
+<circle cx="168" cy="41.3" r="4.5" style="fill:var(--color-accent)" />
+<circle cx="254.2" cy="157.7" r="4.5" style="fill:var(--color-accent)" />
+<circle cx="211.1" cy="160" r="4.5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-warn)" />
+<text x="81.8" y="35" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">1,000</text>
+<text x="168" y="29.3" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">1,050</text>
+<text x="263.2" y="162.7" font-size="13" font-weight="700" style="fill:var(--color-text)">20</text>
+<text x="205.1" y="126.1" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">재시작</text>
+<rect x="106" y="61.1" width="37.8" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="124.9" y="76.8" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">+50</text>
+<rect x="213.7" y="123" width="37.8" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="232.6" y="138.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">+20</text>
+<text x="150" y="208" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">그냥 빼면 20 − 1,050 = −1,030</text>
+<text x="81.8" y="180" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">1번 수집</text>
+<text x="168" y="180" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">2번</text>
+<text x="254.2" y="180" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">3번</text>
+<text x="56" y="14" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">수집한 카운터 값</text>
+<rect x="30" y="222" width="240" height="40" rx="10" style="fill:var(--color-accent-weak)" />
+<text x="150" y="248" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">rate·increase: 50 + 20 = 70</text>
+</svg>

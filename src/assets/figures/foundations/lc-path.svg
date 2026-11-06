@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 236" width="300" height="236">
+<rect x="23" y="23" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="29" y1="31" x2="43" y2="31" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="29" y1="37" x2="43" y2="37" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="29" y1="43" x2="43" y2="43" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="36" cy="50.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="36" y="76" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">앱</text>
+<path d="M56 40 L99.1 40" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M104 40 L97 35.7 L97 44.3 z" style="fill:var(--color-text-sub)" />
+<text x="80" y="32" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">써요</text>
+<path d="M117 27 Q117 24 120 24 H135 L143 32 V53 Q143 56 140 56 H120 Q117 56 117 53 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M135 24 V32 H143" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="123" y1="38" x2="137" y2="38" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="123" y1="43" x2="137" y2="43" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="123" y1="48" x2="132" y2="48" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="130" y="76" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">로그 파일</text>
+<text x="130" y="94" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">회전돼요</text>
+<path d="M150 40 L209.1 40" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M214 40 L207 35.7 L207 44.3 z" style="fill:var(--color-accent)" />
+<text x="182" y="32" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">따라 읽어요</text>
+<rect x="229" y="23" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="235" y1="31" x2="249" y2="31" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="235" y1="37" x2="249" y2="37" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="235" y1="43" x2="249" y2="43" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="242" cy="50.5" r="2" style="fill:var(--color-accent)" />
+<path d="M258 18 v14 l4 -3 l4 3 v-14 z" style="fill:var(--color-accent)" />
+<text x="242" y="76" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">수집 에이전트</text>
+<text x="242" y="94" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">위치 기록</text>
+<path d="M242 104 L242 134.4" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M242 140 L247 132 L237 132 z" style="fill:var(--color-accent)" />
+<path d="M225 151 V177 A17 5.5 0 0 0 259 177 V151" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M225 164 A17 5.5 0 0 0 259 164" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<ellipse cx="242" cy="151" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<text x="242" y="200" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">저장소 · 색인</text>
+<path d="M218 164 L150.9 164" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M146 164 L153 168.3 L153 159.7 z" style="fill:var(--color-text-sub)" />
+<circle cx="101" cy="159" r="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="107" y1="165" x2="114" y2="172" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<path d="M122 173 C123 168 123 163 124 160 C126 154 138 154 140 160 C141 163 141 168 142 173 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="120" y1="173" x2="144" y2="173" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<circle cx="132" cy="177" r="2.6" style="fill:var(--color-warn)" />
+<line x1="132" y1="152" x2="132" y2="155" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="116" y="200" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">검색·알림</text>
+<text x="8" y="228" font-size="13" style="fill:var(--color-text-sub)">검색과 알림은 저장소에 들어간 로그만 봐요</text>
+</svg>

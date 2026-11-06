@@ -1,19 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 234" width="300" height="234">
-  <line x1="6" y1="75.0" x2="50" y2="75.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
-  <circle cx="6" cy="75.0" r="4" style="fill:var(--color-text-sub)" />
-  <line x1="250" y1="75.0" x2="294" y2="75.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
-  <circle cx="294" cy="75.0" r="4" style="fill:var(--color-text-sub)" />
-  <polyline points="50,75.0 50,41.0 92.0,41.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
-  <polyline points="208.0,41.0 250,41.0 250,75.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
-  <rect x="92.0" y="16" width="116" height="50" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
-  <text x="150.0" y="38.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">서버</text>
-  <text x="150.0" y="56.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99%</text>
-  <polyline points="50,75.0 50,109.0 92.0,109.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
-  <polyline points="208.0,109.0 250,109.0 250,75.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
-  <rect x="92.0" y="84" width="116" height="50" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
-  <text x="150.0" y="106.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">서버</text>
-  <text x="150.0" y="124.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99%</text>
-  <text x="150" y="168" text-anchor="middle" font-size="13" style="fill:var(--color-text-sub)">하나만 살아도 성공</text>
-  <text x="150" y="196" text-anchor="middle" font-size="14" style="fill:var(--color-text)">둘 다 멈출 확률 1% × 1% = 0.01%</text>
-  <text x="150" y="222" text-anchor="middle" font-size="17" font-weight="700" style="fill:var(--color-accent)">→ 99.99%</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 218" width="300" height="218">
+<circle cx="14" cy="70" r="4.5" style="fill:var(--color-text-sub)" />
+<path d="M14 70 H60 V36 H120 M60 70 V104 H120" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M180 36 H240 V70 H270 M180 104 H240 V70" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M262 70 L284.4 70" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M290 70 L282 65 L282 75 z" style="fill:var(--color-text-weak)" />
+<rect x="122" y="8" width="56" height="56" rx="8" style="fill:var(--color-bg)" />
+<rect x="137" y="19" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="143" y1="27" x2="157" y2="27" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="143" y1="33" x2="157" y2="33" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="143" y1="39" x2="157" y2="39" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="150" cy="46.5" r="2" style="fill:var(--color-text-sub)" />
+<rect x="185.1" y="5" width="37.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="204" y="20.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">99%</text>
+<rect x="122" y="76" width="56" height="56" rx="8" style="fill:var(--color-bg)" />
+<rect x="137" y="87" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="143" y1="95" x2="157" y2="95" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="143" y1="101" x2="157" y2="101" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="143" y1="107" x2="157" y2="107" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="150" cy="114.5" r="2" style="fill:var(--color-text-sub)" />
+<rect x="185.1" y="73" width="37.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="204" y="88.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">99%</text>
+<text x="150" y="158" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">하나만 살아도 성공</text>
+<text x="150" y="184" font-size="14" text-anchor="middle" style="fill:var(--color-text)">둘 다 멈출 확률 1% × 1% = 0.01%</text>
+<text x="150" y="210" font-size="18" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">→ 99.99%</text>
 </svg>

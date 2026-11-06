@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 186" width="300" height="186">
+<text x="80" y="38" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text)">1초 넘음</text>
+<rect x="88" y="14" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="122" y="14" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="122" y="14" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.08" />
+<rect x="156" y="14" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="190" y="14" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="190" y="14" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.08" />
+<rect x="224" y="14" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="224" y="14" width="31" height="36" rx="4" style="fill:var(--color-warn);fill-opacity:0.9" />
+<rect x="258" y="14" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="258" y="14" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.08" />
+<text x="80" y="78" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text)">0.5~1초</text>
+<rect x="88" y="54" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="88" y="54" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.08" />
+<rect x="122" y="54" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="122" y="54" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.1" />
+<rect x="156" y="54" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="156" y="54" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.08" />
+<rect x="190" y="54" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="190" y="54" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.09" />
+<rect x="224" y="54" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="224" y="54" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.12" />
+<rect x="258" y="54" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="258" y="54" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.08" />
+<text x="80" y="118" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text)">0.5초 아래</text>
+<rect x="88" y="94" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="88" y="94" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:1" />
+<rect x="122" y="94" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="122" y="94" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.97" />
+<rect x="156" y="94" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="156" y="94" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.95" />
+<rect x="190" y="94" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="190" y="94" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.98" />
+<rect x="224" y="94" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="224" y="94" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.25" />
+<rect x="258" y="94" width="31" height="36" rx="4" style="fill:var(--color-line)" />
+<rect x="258" y="94" width="31" height="36" rx="4" style="fill:var(--color-accent);fill-opacity:0.96" />
+<rect x="222" y="10" width="35" height="124" rx="6" stroke-width="1.8" style="fill:none;stroke:var(--color-warn)" />
+<text x="104" y="152" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">14:00</text>
+<text x="172" y="152" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">14:02</text>
+<text x="240" y="152" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">14:04</text>
+<text x="8" y="178" font-size="13" style="fill:var(--color-text-sub)">진할수록 요청이 많아요</text>
+<text x="292" y="178" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">14:04에 1초 넘는 칸으로</text>
+</svg>

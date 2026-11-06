@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 264" width="300" height="264">
+<rect x="22" y="28" width="50" height="70" rx="6" style="fill:var(--color-accent)" />
+<text x="47" y="68" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">100%</text>
+<text x="47" y="116" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">코어 1</text>
+<rect x="88" y="28" width="50" height="70" rx="6" style="fill:var(--color-accent)" />
+<text x="113" y="68" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">100%</text>
+<text x="113" y="116" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">코어 2</text>
+<rect x="154" y="28" width="50" height="70" rx="6" style="fill:var(--color-accent)" />
+<text x="179" y="68" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">100%</text>
+<text x="179" y="116" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">코어 3</text>
+<rect x="220" y="28" width="50" height="70" rx="6" style="fill:var(--color-accent)" />
+<text x="245" y="68" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">100%</text>
+<text x="245" y="116" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">코어 4</text>
+<text x="8" y="16" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">네 코어가 모두 바쁜 같은 순간</text>
+<path d="M22 128 v6 H270 v-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="146" y="154" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">프로세스 기준: 더해서 400%</text>
+<text x="146" y="172" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">코어 하나를 100%로 세요</text>
+<rect x="22" y="192" width="248" height="22" rx="6" style="fill:var(--color-text)" />
+<text x="146" y="208" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">100%</text>
+<text x="146" y="238" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">서버 전체 기준: 100%</text>
+<text x="146" y="256" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">모든 코어를 합쳐 100%로 세요</text>
+</svg>

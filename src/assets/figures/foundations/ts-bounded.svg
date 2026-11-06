@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 244" width="300" height="244">
+<rect x="4" y="4" width="144" height="236" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">값이 정해진 것</text>
+<text x="16" y="44" font-size="13" style="fill:var(--color-text-sub)">응답 상태 코드</text>
+<rect x="14" y="55" width="37.1" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="32.6" y="70.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">200</text>
+<rect x="55.1" y="55" width="37.1" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="73.7" y="70.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">404</text>
+<rect x="96.2" y="55" width="37.1" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="114.8" y="70.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">500</text>
+<line x1="18" y1="182" x2="136" y2="182" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M18 165.8 L136 165.8" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="16" y="120" font-size="13" style="fill:var(--color-text-sub)">시계열 수</text>
+<text x="136" y="200" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">3개 그대로</text>
+<rect x="29" y="213" width="93.9" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="76" y="228.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">지표 레이블에</text>
+<rect x="152" y="4" width="144" height="236" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">끝없이 늘어나는 것</text>
+<text x="164" y="44" font-size="13" style="fill:var(--color-text-sub)">사용자 ID, 요청 ID</text>
+<rect x="162" y="55" width="29.4" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="176.7" y="70.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">u1</text>
+<rect x="195.4" y="55" width="29.4" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="210.1" y="70.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">u2</text>
+<rect x="228.8" y="55" width="29.4" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="243.5" y="70.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">u3</text>
+<rect x="162" y="81" width="29.4" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="176.7" y="96.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">u4</text>
+<rect x="195.4" y="81" width="29.4" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="210.1" y="96.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">u5</text>
+<rect x="228.8" y="81" width="24.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="241.2" y="96.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">…</text>
+<line x1="166" y1="182" x2="284" y2="182" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M166 176.6 L189.6 169 L213.2 159.3 L236.8 149.6 L260.4 138.8 L284 129.1" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<text x="164" y="120" font-size="13" style="fill:var(--color-text-sub)">시계열 수</text>
+<text x="284" y="200" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">새 값마다 +1</text>
+<rect x="167.1" y="213" width="113.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="224" y="228.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">로그·트레이스에</text>
+</svg>

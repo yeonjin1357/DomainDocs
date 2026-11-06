@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 260" width="300" height="260">
+<rect x="20" y="26" width="60" height="40" rx="6" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="46" cy="46" r="13" stroke-width="1.6" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<circle cx="46" cy="46" r="3" style="fill:var(--color-text-sub)" />
+<line x1="58" y1="52" x2="72" y2="34" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<rect x="9.3" y="75" width="81.3" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="50" y="90.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">상자에 1TB</text>
+<path d="M86 34 L123.2 26.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M128 26 L120.3 23 L121.9 31.6 z" style="fill:var(--color-text-weak)" />
+<path d="M86 58 L123.3 68.7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M128 70 L122.5 63.9 L120.1 72.2 z" style="fill:var(--color-text-weak)" />
+<text x="136" y="24" font-size="13" style="fill:var(--color-text-sub)">1000으로 나누면</text>
+<text x="136" y="44" font-size="16" font-weight="700" style="fill:var(--color-text)">1,000GB</text>
+<text x="206" y="44" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">df -H</text>
+<text x="136" y="70" font-size="13" style="fill:var(--color-text-sub)">1024로 나누면</text>
+<text x="136" y="90" font-size="16" font-weight="700" style="fill:var(--color-accent)">약 931GiB</text>
+<text x="136" y="108" font-size="13" font-weight="600" style="fill:var(--color-warn)">df -h는 이걸 G라고 적어요</text>
+<line x1="8" y1="124" x2="292" y2="124" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="8" y="146" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">단계가 커질수록 벌어지는 차이</text>
+<text x="8" y="173" font-size="13" font-weight="600" style="fill:var(--color-text)">K와 Ki</text>
+<rect x="70" y="162" width="40.8" height="14" rx="4" style="fill:var(--color-accent)" />
+<text x="118.8" y="173" font-size="13" font-weight="700" style="fill:var(--color-accent)">2.4%</text>
+<text x="8" y="199" font-size="13" font-weight="600" style="fill:var(--color-text)">M과 Mi</text>
+<rect x="70" y="188" width="83.3" height="14" rx="4" style="fill:var(--color-accent)" />
+<text x="161.3" y="199" font-size="13" font-weight="700" style="fill:var(--color-accent)">4.9%</text>
+<text x="8" y="225" font-size="13" font-weight="600" style="fill:var(--color-text)">G와 Gi</text>
+<rect x="70" y="214" width="125.8" height="14" rx="4" style="fill:var(--color-accent)" />
+<text x="203.8" y="225" font-size="13" font-weight="700" style="fill:var(--color-accent)">7.4%</text>
+<text x="8" y="251" font-size="13" font-weight="600" style="fill:var(--color-text)">T와 Ti</text>
+<rect x="70" y="240" width="170" height="14" rx="4" style="fill:var(--color-accent)" />
+<text x="248" y="251" font-size="13" font-weight="700" style="fill:var(--color-accent)">10.0%</text>
+</svg>

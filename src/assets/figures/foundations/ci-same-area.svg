@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 260" width="300" height="260">
+<text x="8" y="12" font-size="13" font-weight="700" style="fill:var(--color-text)">12초는 40%, 3초는 100%</text>
+<line x1="44" y1="86" x2="280" y2="86" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="38" y="90.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">0</text>
+<line x1="44" y1="27.8" x2="280" y2="27.8" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="38" y="32.3" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">100%</text>
+<line x1="44" y1="86" x2="280" y2="86" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M44 62.7 L232.8 62.7 L232.8 27.8 L280 27.8 L280 86 L44 86 z" style="fill:var(--color-accent-weak)" />
+<path d="M44 62.7 L232.8 62.7 L232.8 27.8 L280 27.8" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<line x1="44" y1="18" x2="44" y2="86" stroke-width="1.5" stroke-linecap="butt" stroke-dasharray="4 4" style="stroke:var(--color-accent)" />
+<line x1="280" y1="18" x2="280" y2="86" stroke-width="1.5" stroke-linecap="butt" stroke-dasharray="4 4" style="stroke:var(--color-accent)" />
+<text x="114.8" y="75.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">일한 시간 7.8초</text>
+<text x="256.4" y="21.8" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">100%</text>
+<text x="8" y="108" font-size="13" font-weight="700" style="fill:var(--color-text)">15초 내내 52%</text>
+<line x1="44" y1="182" x2="280" y2="182" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="38" y="186.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">0</text>
+<line x1="44" y1="123.8" x2="280" y2="123.8" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="38" y="128.3" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">100%</text>
+<line x1="44" y1="182" x2="280" y2="182" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M44 151.7 L280 151.7 L280 182 L44 182 z" style="fill:var(--color-accent-weak)" />
+<path d="M44 151.7 L280 151.7" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="44" y1="114" x2="44" y2="182" stroke-width="1.5" stroke-linecap="butt" stroke-dasharray="4 4" style="stroke:var(--color-accent)" />
+<line x1="280" y1="114" x2="280" y2="182" stroke-width="1.5" stroke-linecap="butt" stroke-dasharray="4 4" style="stroke:var(--color-accent)" />
+<text x="114.8" y="171.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">일한 시간 7.8초</text>
+<text x="44" y="200" font-size="13" style="fill:var(--color-text-sub)">0초 수집</text>
+<text x="280" y="200" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">15초 수집</text>
+<rect x="30" y="214" width="240" height="40" rx="10" style="fill:var(--color-accent-weak)" />
+<text x="150" y="240" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">카운터로 구하면 둘 다 52%</text>
+</svg>

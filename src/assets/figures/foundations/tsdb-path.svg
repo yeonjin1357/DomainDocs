@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 282" width="300" height="282">
+<rect x="8" y="5" width="81.2" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="48.6" y="20.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">수집한 샘플</text>
+<rect x="16" y="34" width="280" height="180" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="286" y="54" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-text)">Prometheus</text>
+<path d="M32 26 L32 84 L45.1 84" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M50 84 L43 79.7 L43 88.3 z" style="fill:var(--color-accent)" />
+<path d="M32 84 L32 168 L51.1 168" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M56 168 L49 163.7 L49 172.3 z" style="fill:var(--color-accent)" />
+<rect x="56" y="74" width="40" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="61" y="78" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<rect x="72" y="78" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<rect x="83" y="78" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<line x1="59" y1="92" x2="59" y2="96" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="64.6" y1="92" x2="64.6" y2="96" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="70.2" y1="92" x2="70.2" y2="96" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="75.8" y1="92" x2="75.8" y2="96" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="81.4" y1="92" x2="81.4" y2="96" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="87" y1="92" x2="87" y2="96" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="92.6" y1="92" x2="92.6" y2="96" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="104" y="80" font-size="13" font-weight="700" style="fill:var(--color-text)">메모리(head)</text>
+<text x="104" y="98" font-size="13" style="fill:var(--color-text-sub)">최근 몇 시간</text>
+<line x1="44" y1="124" x2="290" y2="124" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 4" style="stroke:var(--color-line)" />
+<text x="44" y="142" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">디스크</text>
+<path d="M63 159 Q63 156 66 156 H81 L89 164 V185 Q89 188 86 188 H66 Q63 188 63 185 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M81 156 V164 H89" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="69" y1="170" x2="83" y2="170" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="69" y1="175" x2="83" y2="175" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="69" y1="180" x2="78" y2="180" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="98" y="168" font-size="13" font-weight="700" style="fill:var(--color-text)">WAL</text>
+<text x="98" y="186" font-size="13" style="fill:var(--color-text-sub)">같은 내용의 사본</text>
+<rect x="222" y="158" width="52" height="32" rx="4" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="228" y="152" width="52" height="32" rx="4" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="234" y="146" width="52" height="32" rx="4" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="248" y="179" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">2시간</text>
+<text x="254" y="206" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">블록 파일</text>
+<path d="M192 84 L250 84 L250 135.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M250 140 L254.3 133 L245.7 133 z" style="fill:var(--color-text-sub)" />
+<text x="244" y="112" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">2시간마다</text>
+<path d="M76 192 L76 233.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M76 238 L80.3 231 L71.7 231 z" style="fill:var(--color-text-weak)" />
+<path d="M62 245 V271 A14 5.5 0 0 0 90 271 V245" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M62 258 A14 5.5 0 0 0 90 258" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<ellipse cx="76" cy="245" rx="14" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<text x="100" y="254" font-size="13" font-weight="700" style="fill:var(--color-text)">원격 저장소(선택)</text>
+<text x="100" y="272" font-size="13" style="fill:var(--color-text-sub)">WAL을 읽어 보내요</text>
+</svg>

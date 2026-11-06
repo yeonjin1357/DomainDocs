@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 204" width="300" height="204">
+<rect x="4" y="4" width="292" height="168" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="16" y="24" font-size="13" font-weight="700" style="fill:var(--color-text)">shop</text>
+<rect x="54" y="9" width="83.4" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="95.7" y="24.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">namespace</text>
+<rect x="14" y="40" width="168" height="120" rx="10" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="24" y="60" font-size="13" font-weight="700" style="fill:var(--color-accent)">checkout</text>
+<text x="172" y="60" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">service</text>
+<rect x="48" y="76" width="44" height="44" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="57" y="81" width="26" height="34" rx="3.5" stroke-width="1.6" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="63" y1="89" x2="77" y2="89" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="63" y1="95" x2="77" y2="95" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="63" y1="101" x2="77" y2="101" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="70" cy="108.5" r="2" style="fill:var(--color-accent)" />
+<text x="70" y="138" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">pod-a</text>
+<rect x="104" y="76" width="44" height="44" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="113" y="81" width="26" height="34" rx="3.5" stroke-width="1.6" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="119" y1="89" x2="133" y2="89" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="119" y1="95" x2="133" y2="95" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="119" y1="101" x2="133" y2="101" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="126" cy="108.5" r="2" style="fill:var(--color-accent)" />
+<text x="126" y="138" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">pod-b</text>
+<text x="98" y="154" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">instance</text>
+<rect x="190" y="40" width="96" height="120" rx="10" stroke-width="1.4" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="200" y="60" font-size="13" font-weight="700" style="fill:var(--color-text)">payment</text>
+<rect x="216" y="76" width="44" height="44" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="225" y="81" width="26" height="34" rx="3.5" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="231" y1="89" x2="245" y2="89" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="231" y1="95" x2="245" y2="95" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="231" y1="101" x2="245" y2="101" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="238" cy="108.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="238" y="138" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">pod-c</text>
+<text x="238" y="154" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">instance</text>
+<text x="150" y="196" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">인스턴스가 몇 개든 서비스 이름은 하나예요</text>
+</svg>

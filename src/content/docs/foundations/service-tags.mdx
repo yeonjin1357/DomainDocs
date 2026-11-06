@@ -31,6 +31,10 @@ sources:
     url: https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md
 updated: 2026-11-04
 ---
+import StMismatch from '../../../assets/figures/foundations/st-mismatch.svg';
+import StTree from '../../../assets/figures/foundations/st-tree.svg';
+import StAttach from '../../../assets/figures/foundations/st-attach.svg';
+import StCatalog from '../../../assets/figures/foundations/st-catalog.svg';
 
 <KeyPoints>
   <Point title="신호는 같은 이름표로 이어져요">
@@ -54,21 +58,8 @@ updated: 2026-11-04
 
 그런데 이름을 붙이는 쪽이 신호마다 달라요. 트레이스는 앱의 계측 설정에서, 로그는 수집 에이전트 설정에서 이름을 받기도 해요. 예를 들어 Datadog은 따로 정하지 않으면 로그의 서비스 이름을 컨테이너 이미지의 짧은 이름으로 정해요.
 
-<Figure caption="지표와 트레이스는 checkout으로 모였지만, 로그는 이미지 이름 checkout-api로 들어와 다른 서비스가 됐어요. checkout 화면은 점선으로 이은 이 로그를 찾지 못해요.">
-  <Flow
-    ariaLabel="지표와 트레이스는 서비스 이름 checkout으로 checkout 화면에 모이고, 로그는 서비스 이름 checkout-api라서 checkout 화면이 찾지 못하는 구조도"
-    nodes={[
-      { id: 'm', label: '지표', col: 0, row: 0, note: 'checkout' },
-      { id: 't', label: '트레이스', col: 0, row: 1, note: 'checkout' },
-      { id: 'l', label: '로그', col: 0, row: 2, note: 'checkout-api', tone: 'warn' },
-      { id: 'page', label: 'checkout 화면', col: 2, row: 1, note: '이름으로 모아요', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'm', to: 'page' },
-      { from: 't', to: 'page' },
-      { from: 'l', to: 'page', tone: 'warn', dashed: true },
-    ]}
-  />
+<Figure caption="지표와 트레이스는 checkout으로 모였지만, 로그는 이미지 이름 checkout-api로 들어와 다른 서비스가 됐어요. checkout 화면에서는 이 로그를 찾지 못해요.">
+  <StMismatch aria-label="지표와 트레이스는 서비스 이름 checkout으로 checkout 화면에 모이고, 로그는 서비스 이름 checkout-api라서 다른 서비스로 가 checkout 화면에는 로그가 없는 그림" />
 </Figure>
 
 신호 사이를 건너는 열쇠는 이름표예요. 로그와 트레이스는 trace id로도 이어지지만, 그건 요청 하나를 따라갈 때예요. 서비스 전체의 지표에서 로그로 건너가려면 서비스 이름표가 같아야 해요.
@@ -84,29 +75,7 @@ updated: 2026-11-04
 같은 서비스를 띄운 하나하나는 인스턴스예요. `service.instance.id`로 구별해요. 서비스 여러 개를 한 시스템으로 묶을 때는 `service.namespace`를 써요.
 
 <Figure caption="shop 묶음에 서비스 둘이 있고, checkout은 인스턴스 둘로 떠 있어요. 인스턴스가 몇 개든 서비스 이름은 하나예요.">
-  <Tree
-    ariaLabel="namespace shop 아래에 서비스 checkout과 payment가 있고, checkout 아래에는 인스턴스 pod-a와 pod-b, payment 아래에는 인스턴스 pod-c가 있는 나무"
-    root={{
-      label: 'shop',
-      tag: 'namespace',
-      children: [
-        {
-          label: 'checkout',
-          tag: 'service',
-          tone: 'accent',
-          children: [
-            { label: 'pod-a', tag: 'instance' },
-            { label: 'pod-b', tag: 'instance' },
-          ],
-        },
-        {
-          label: 'payment',
-          tag: 'service',
-          children: [{ label: 'pod-c', tag: 'instance' }],
-        },
-      ],
-    }}
-  />
+  <StTree aria-label="namespace shop 안에 서비스 checkout과 payment가 있고, checkout 안에는 인스턴스 pod-a와 pod-b, payment 안에는 인스턴스 pod-c가 있는 그림" />
 </Figure>
 
 환경과 버전은 이 나무에 들어가지 않아요. OpenTelemetry 규약은 환경 이름이 달라도 `service.name`이 같으면 같은 서비스로 쳐요. 그래서 환경으로 나눠 보지 않으면 운영과 시험의 숫자가 한 서비스로 섞여요.
@@ -127,27 +96,7 @@ production,service.version=1.4.2
 앱 밖의 에이전트나 Collector는 어디서 도는지를 덧붙여요. 호스트 이름, 쿠버네티스의 파드·네임스페이스·노드 이름이에요. 앱은 자기가 어느 파드에서 도는지 모르니, 이건 수집 쪽이 맡아요.
 
 <Figure caption="앱은 자기만 아는 서비스·버전·환경을 붙이고, 에이전트나 Collector는 어디서 도는지를 덧붙여요.">
-  <Stages
-    ariaLabel="앱 SDK 단계에서 service, version, env 이름표가 붙고, 에이전트·Collector 단계에서 pod와 node 이름표가 더 붙는 단계 칸"
-    rows={[
-      {
-        label: '앱 SDK',
-        note: '환경 변수로 정해요',
-        cells: [
-          { label: 'service', tone: 'accent' },
-          { label: 'version', tone: 'accent' },
-          { label: 'env', tone: 'accent' },
-          null,
-          null,
-        ],
-      },
-      {
-        label: '에이전트·Collector',
-        note: '자리를 덧붙여요',
-        cells: ['service', 'version', 'env', { label: 'pod', tone: 'accent' }, { label: 'node', tone: 'accent' }],
-      },
-    ]}
-  />
+  <StAttach aria-label="앱 SDK는 환경 변수로 service=checkout, version=1.4.2, env=prod 이름표를 붙이고, 에이전트·Collector는 여기에 어디서 도는지를 나타내는 pod=pod-a, node=node-3을 덧붙이는 그림" />
 </Figure>
 
 앱이 서비스 이름을 정하지 않았다면 Collector가 쿠버네티스 정보로 채우게 할 수 있어요.
@@ -273,20 +222,7 @@ spec:
 `spec`의 `type`, `lifecycle`, `owner`는 꼭 적어야 해요. `owner`는 책임지는 단 하나의 주체로, 보통 팀이에요. `metadata.name`은 서비스 이름표와 같게 둬야 알림에서 바로 찾아요.
 
 <Figure caption="알림의 서비스 이름표로 카탈로그를 찾고, 거기 적힌 주인 팀의 당직에게 보내요. 이름표와 카탈로그 이름이 다르면 이 길이 끊겨요.">
-  <Flow
-    ariaLabel="service=checkout 이름표가 붙은 알림이 서비스 카탈로그에서 checkout을 찾고, 카탈로그에 적힌 결제팀 당직과 런북으로 이어지는 구조도"
-    nodes={[
-      { id: 'alert', label: '알림', col: 0, row: 0, note: 'checkout 서비스', tone: 'warn' },
-      { id: 'cat', label: '카탈로그', col: 2, row: 0, note: 'checkout의 주인', tone: 'accent' },
-      { id: 'oncall', label: '결제팀 당직', col: 2, row: 1, note: '호출해요' },
-      { id: 'runbook', label: '런북', col: 0, row: 1, note: '대응 절차' },
-    ]}
-    edges={[
-      { from: 'alert', to: 'cat', label: '이름으로' },
-      { from: 'cat', to: 'oncall' },
-      { from: 'cat', to: 'runbook' },
-    ]}
-  />
+  <StCatalog aria-label="service=checkout 이름표가 붙은 알림이 이름으로 서비스 카탈로그 표를 찾아요. 표의 checkout 줄에는 주인 결제팀과 런북 결제 장애 대응이 적혀 있어서, 결제팀 당직을 호출하고 런북의 대응 절차로 이어지는 그림" />
 </Figure>
 
 알림을 팀에 나눠 보내는 방법은 <Term slug="foundations/alert-routing">알림 경로</Term>에서 다뤄요. 카탈로그가 있으면 경로 설정에 팀 이름을 하나하나 적지 않고, 서비스 이름으로 주인 팀을 찾아 붙일 수 있어요.

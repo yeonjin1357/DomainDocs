@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 222" width="300" height="222">
+<text x="8" y="18" font-size="13" style="fill:var(--color-text-sub)">지표</text>
+<text x="40" y="18" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">http_requests_total</text>
+<rect x="8" y="35" width="112.2" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="64.1" y="50.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">method="GET"</text>
+<rect x="126.2" y="35" width="108.5" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="180.4" y="50.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">status="200"</text>
+<line x1="40" y1="86" x2="280" y2="86" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<circle cx="40" cy="86" r="5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="40" y="74" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">100</text>
+<circle cx="100" cy="86" r="5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="100" y="74" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">104</text>
+<circle cx="160" cy="86" r="5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="160" y="74" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">109</text>
+<circle cx="220" cy="86" r="5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="220" y="74" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">113</text>
+<circle cx="280" cy="86" r="5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="280" y="74" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">118</text>
+<rect x="8" y="117" width="121.1" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="68.5" y="132.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">method="POST"</text>
+<rect x="135.1" y="117" width="108.5" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="189.3" y="132.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">status="200"</text>
+<line x1="40" y1="168" x2="280" y2="168" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<circle cx="40" cy="168" r="5" stroke-width="1.5" style="fill:var(--color-text-sub);stroke:var(--color-card)" />
+<text x="40" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">20</text>
+<circle cx="100" cy="168" r="5" stroke-width="1.5" style="fill:var(--color-text-sub);stroke:var(--color-card)" />
+<text x="100" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">21</text>
+<circle cx="160" cy="168" r="5" stroke-width="1.5" style="fill:var(--color-text-sub);stroke:var(--color-card)" />
+<text x="160" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">21</text>
+<circle cx="220" cy="168" r="5" stroke-width="1.5" style="fill:var(--color-text-sub);stroke:var(--color-card)" />
+<text x="220" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">23</text>
+<circle cx="280" cy="168" r="5" stroke-width="1.5" style="fill:var(--color-text-sub);stroke:var(--color-card)" />
+<text x="280" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">24</text>
+<text x="40" y="214" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">0초</text>
+<text x="100" y="214" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">15초</text>
+<text x="160" y="214" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">30초</text>
+<text x="220" y="214" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">45초</text>
+<text x="280" y="214" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">60초</text>
+<text x="292" y="116" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">줄 1</text>
+<text x="292" y="198" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-text-sub)">줄 2</text>
+</svg>

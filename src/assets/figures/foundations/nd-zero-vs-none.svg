@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 254" width="300" height="254">
+<rect x="4" y="4" width="144" height="246" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-accent)">0이에요</text>
+<line x1="18" y1="110" x2="136" y2="110" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M18 110 L31.1 110 L44.2 110 L57.3 110 L70.4 110 L83.6 110 L96.7 110 L109.8 110 L122.9 110 L136 110" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<circle cx="18" cy="110" r="3.2" style="fill:var(--color-accent)" />
+<circle cx="31.1" cy="110" r="3.2" style="fill:var(--color-accent)" />
+<circle cx="44.2" cy="110" r="3.2" style="fill:var(--color-accent)" />
+<circle cx="57.3" cy="110" r="3.2" style="fill:var(--color-accent)" />
+<circle cx="70.4" cy="110" r="3.2" style="fill:var(--color-accent)" />
+<circle cx="83.6" cy="110" r="3.2" style="fill:var(--color-accent)" />
+<circle cx="96.7" cy="110" r="3.2" style="fill:var(--color-accent)" />
+<circle cx="109.8" cy="110" r="3.2" style="fill:var(--color-accent)" />
+<circle cx="122.9" cy="110" r="3.2" style="fill:var(--color-accent)" />
+<circle cx="136" cy="110" r="3.2" style="fill:var(--color-accent)" />
+<text x="16" y="132" font-size="13" font-weight="600" style="fill:var(--color-text)">점마다 0이 찍혀요</text>
+<text x="16" y="158" font-size="13" style="fill:var(--color-text-sub)">재 봤더니 에러 0</text>
+<rect x="16" y="185" width="71.9" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="51.9" y="200.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">에러율 0%</text>
+<text x="16" y="234" font-size="13" font-weight="700" style="fill:var(--color-accent)">좋은 소식이에요</text>
+<rect x="152" y="4" width="144" height="246" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="14" font-weight="700" style="fill:var(--color-warn)">데이터 없음</text>
+<line x1="166" y1="110" x2="284" y2="110" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<rect x="225" y="40" width="59" height="70" rx="0" style="fill:var(--color-warn-weak)" />
+<path d="M166 89 L179.1 85.5 L192.2 90.8 L205.3 87.3 L218.4 89" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<circle cx="166" cy="89" r="3" style="fill:var(--color-text-sub)" />
+<circle cx="179.1" cy="85.5" r="3" style="fill:var(--color-text-sub)" />
+<circle cx="192.2" cy="90.8" r="3" style="fill:var(--color-text-sub)" />
+<circle cx="205.3" cy="87.3" r="3" style="fill:var(--color-text-sub)" />
+<circle cx="218.4" cy="89" r="3" style="fill:var(--color-text-sub)" />
+<text x="254.5" y="71.5" font-size="22" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">?</text>
+<text x="164" y="132" font-size="13" font-weight="600" style="fill:var(--color-text)">점이 없어요</text>
+<rect x="164" y="145" width="68.5" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="198.2" y="160.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">수집 멈춤</text>
+<rect x="164" y="169" width="81.2" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="204.6" y="184.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">서버 내려감</text>
+<rect x="164" y="193" width="84.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="206.4" y="208.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">아직 기록 전</text>
+<text x="164" y="234" font-size="13" font-weight="700" style="fill:var(--color-warn)">어느 쪽인지 몰라요</text>
+</svg>

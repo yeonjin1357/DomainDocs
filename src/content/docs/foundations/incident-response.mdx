@@ -25,6 +25,7 @@ sources:
     url: https://github.com/prometheus-operator/kube-prometheus/blob/main/manifests/kubernetesControlPlane-prometheusRule.yaml
 updated: 2026-11-03
 ---
+import IrDurations from '../../../assets/figures/foundations/ir-durations.svg';
 
 <KeyPoints>
   <Point title="원인보다 피해 멈추기가 먼저예요">
@@ -124,20 +125,7 @@ MTTR의 R은 repair(고침), recovery(복구), resolve(종료), respond(대응) 
 MTTR은 평균이에요. 그런데 장애 시간은 대부분 짧고 몇 건만 아주 길어서, 평균이 그 몇 건에 크게 끌려가요.
 
 <Figure caption="장애 10건이 걸린 시간(분)이에요. 9건은 20분 안에 끝났고 1건이 240분이라, 평균 35분은 어느 장애와도 닮지 않았어요. 중앙값은 12.5분이에요.">
-  <Strip
-    ariaLabel="장애 10건의 걸린 시간 8, 9, 10, 11, 12, 13, 14, 15, 20, 240분 위에 시간만큼의 막대를 세운 칸 띠. 마지막 한 건만 막대가 아주 높아요"
-    rows={[
-      {
-        label: '장애 10건이 걸린 시간(분)',
-        bars: [8, 9, 10, 11, 12, 13, 14, 15, 20, 240],
-        cells: ['8', '9', '10', '11', '12', '13', '14', '15', '20', { label: '240', tone: 'warn' }],
-      },
-    ]}
-    ranges={[
-      { from: 0, to: 8, label: '9건은 20분 안' },
-      { from: 9, to: 9, label: '1건', tone: 'warn' },
-    ]}
-  />
+  <IrDurations aria-label="장애 10건이 걸린 시간 8, 9, 10, 11, 12, 13, 14, 15, 20, 240분을 막대로 세운 그래프. 9건은 20분 안에 끝났고 1건만 240분으로 아주 높아요. 평균 35분 선은 어느 막대와도 닮지 않았어요" />
 </Figure>
 
 이 1건이 다음 분기에 없으면 평균은 크게 줄어요. 대응이 나아지지 않았는데도 나아진 것처럼 보여요.

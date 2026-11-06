@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 222" width="300" height="222">
+<line x1="50" y1="174" x2="280" y2="174" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="44" y="178.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">0</text>
+<line x1="50" y1="124" x2="280" y2="124" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="44" y="128.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">100ms</text>
+<line x1="50" y1="24" x2="280" y2="24" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="44" y="28.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">300ms</text>
+<line x1="50" y1="124" x2="280" y2="124" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="5 4" style="stroke:var(--color-accent)" />
+<line x1="50" y1="174" x2="280" y2="174" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M70.9 150 L154.5 146.5 L196.4 139 L238.2 111 L259.1 32" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<circle cx="70.9" cy="150" r="4.5" stroke-width="1.5" style="fill:var(--color-text-sub);stroke:var(--color-card)" />
+<text x="70.9" y="140" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">48</text>
+<circle cx="154.5" cy="146.5" r="4.5" stroke-width="1.5" style="fill:var(--color-text-sub);stroke:var(--color-card)" />
+<text x="154.5" y="136.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">55</text>
+<circle cx="196.4" cy="139" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="196.4" y="159" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">70</text>
+<circle cx="238.2" cy="111" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<text x="238.2" y="101" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">126</text>
+<circle cx="259.1" cy="32" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<text x="251.1" y="22" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">284</text>
+<line x1="196.4" y1="165" x2="196.4" y2="174" stroke-width="1.5" stroke-linecap="butt" stroke-dasharray="4 4" style="stroke:var(--color-accent)" />
+<text x="70.9" y="116" font-size="13" font-weight="700" style="fill:var(--color-accent)">목표 p99 100ms</text>
+<text x="70.9" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">200</text>
+<text x="154.5" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">280</text>
+<text x="196.4" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">320</text>
+<text x="259.1" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">380</text>
+<text x="196.4" y="214" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">한 대 용량 320 요청/초</text>
+</svg>

@@ -1,24 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 236" width="300" height="236">
-  <line x1="4" y1="75.0" x2="22" y2="75.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
-  <circle cx="4" cy="75.0" r="4" style="fill:var(--color-text-sub)" />
-  <polyline points="22,75.0 22,41.0 40,41.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
-  <polyline points="124,41.0 142,41.0 142,75.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
-  <rect x="40" y="16" width="84" height="50" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
-  <text x="82.0" y="38.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">웹 서버</text>
-  <text x="82.0" y="56.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.5%</text>
-  <polyline points="22,75.0 22,109.0 40,109.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
-  <polyline points="124,109.0 142,109.0 142,75.0" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:var(--color-text-sub)" />
-  <rect x="40" y="84" width="84" height="50" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
-  <text x="82.0" y="106.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">웹 서버</text>
-  <text x="82.0" y="124.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.5%</text>
-  <line x1="142" y1="75.0" x2="194" y2="75.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
-  <rect x="194" y="50.0" width="88" height="50" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-warn)" />
-  <text x="238.0" y="72.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-warn)">DB</text>
-  <text x="238.0" y="90.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.9%</text>
-  <line x1="282" y1="75.0" x2="296" y2="75.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
-  <circle cx="296" cy="75.0" r="4" style="fill:var(--color-text-sub)" />
-  <text x="82" y="168" text-anchor="middle" font-size="13" style="fill:var(--color-text-sub)">둘이면 99.9975%</text>
-  <text x="238.0" y="168" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--color-warn)">하나뿐</text>
-  <text x="150" y="198" text-anchor="middle" font-size="15" style="fill:var(--color-text)">99.9975% × 99.9%</text>
-  <text x="150" y="224" text-anchor="middle" font-size="16" font-weight="700" style="fill:var(--color-warn)">≈ 99.9% (DB와 같아요)</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="300" height="220">
+<circle cx="10" cy="70" r="4.5" style="fill:var(--color-text-sub)" />
+<path d="M10 70 H34 V36 H66 M34 70 V104 H66" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M118 36 H150 V70 H200 M118 104 H150 V70" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M256 70 L286.4 70" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M292 70 L284 65 L284 75 z" style="fill:var(--color-text-weak)" />
+<rect x="79" y="19" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="85" y1="27" x2="99" y2="27" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="85" y1="33" x2="99" y2="33" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="85" y1="39" x2="99" y2="39" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="92" cy="46.5" r="2" style="fill:var(--color-text-sub)" />
+<rect x="67.4" y="53" width="49.3" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="92" y="68.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">99.5%</text>
+<rect x="79" y="87" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="85" y1="95" x2="99" y2="95" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="85" y1="101" x2="99" y2="101" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="85" y1="107" x2="99" y2="107" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="92" cy="114.5" r="2" style="fill:var(--color-text-sub)" />
+<rect x="67.4" y="121" width="49.3" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="92" y="136.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">99.5%</text>
+<rect x="202" y="40" width="56" height="60" rx="10" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<path d="M215 57 V83 A15 5.5 0 0 0 245 83 V57" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<path d="M215 70 A15 5.5 0 0 0 245 70" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<ellipse cx="230" cy="57" rx="15" ry="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<rect x="194.6" y="105" width="70.8" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="230" y="120.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">DB 99.9%</text>
+<text x="92" y="160" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">둘이면 99.9975%</text>
+<text x="230" y="160" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">하나뿐</text>
+<text x="150" y="186" font-size="15" text-anchor="middle" style="fill:var(--color-text)">99.9975% × 99.9%</text>
+<text x="150" y="212" font-size="17" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">≈ 99.9% (DB와 같아요)</text>
 </svg>

@@ -31,6 +31,7 @@ sources:
     url: https://www.iana.org/time-zones
 updated: 2026-11-05
 ---
+import TzPipeline from '../../../assets/figures/foundations/tz-pipeline.svg';
 
 <KeyPoints>
   <Point title="저장은 UTC로, 보여 줄 때만 바꿔요">
@@ -174,17 +175,7 @@ promtool로 돌려 보니, UTC 2시(한국 11시)에는 결과가 나오고 UTC 
 시각은 여러 단계를 지나며 표기가 바뀌어요. 시간대를 정하는 곳이 단계마다 다르니, 어디서 정했는지 알아야 해요.
 
 <Figure caption="시간대 없이 찍힌 로그 한 줄이 화면에 뜨기까지의 예시예요. 에이전트가 시간대를 정한 뒤로는 숫자 하나로 다니고, 화면에서 다시 시간대가 붙어요.">
-  <Stages
-    ariaLabel="앱이 시간대 없이 2026-11-05 09:00:00을 쓰고, 에이전트가 +09:00으로 정해 RFC 3339 시각을 만들고, 저장소는 epoch 1793836800으로 담고, 한국 브라우저 화면은 09:00, UTC 대시보드는 00:00으로 보여요"
-    grow={0}
-    rows={[
-      { label: '앱이 씀', cells: ['2026-11-05 09:00:00', { label: '시간대 없음', tone: 'accent' }] },
-      { label: '에이전트가 읽음', note: '시간대를 정해요', cells: ['…T09:00:00+09:00', { label: '+09:00', tone: 'accent' }] },
-      { label: '저장소', cells: ['1793836800', 'UTC 기준 초'] },
-      { label: '한국 브라우저', cells: ['11-05 09:00', '브라우저 시간대'] },
-      { label: 'UTC 대시보드', cells: ['11-05 00:00', { label: '대시보드 설정', tone: 'accent' }] },
-    ]}
-  />
+  <TzPipeline aria-label="앱이 시간대 없이 2026-11-05 09:00:00을 쓰고, 에이전트가 읽으며 +09:00으로 시간대를 정하고, 저장소는 UTC 기준 초 1793836800으로 담아요. 저장소에서 갈라져 한국 브라우저는 11-05 09:00, UTC 대시보드는 11-05 00:00으로 보여 주는 그림" />
 </Figure>
 
 에이전트가 시간대를 잘못 정하면 로그가 9시간 어긋난 자리에 쌓여요. 이 경우는 <Term slug="foundations/logs-missing">로그가 안 들어올 때</Term>에서 다뤄요. 서버 시계 자체가 틀린 경우는 <Term slug="server/clock-drift">서버 시계가 어긋날 때</Term>에서 다뤄요.

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 170" width="300" height="170">
+<text x="8" y="16" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">status="200"</text>
+<rect x="10" y="26" width="43.3" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="31.7" y="43" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">120</text>
+<rect x="57.3" y="26" width="43.3" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="79" y="43" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">240</text>
+<rect x="104.7" y="26" width="43.3" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="126.3" y="43" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">360</text>
+<rect x="152" y="26" width="43.3" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="173.7" y="43" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">480</text>
+<rect x="199.3" y="26" width="43.3" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="221" y="43" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">600</text>
+<rect x="246.7" y="26" width="43.3" height="24" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="268.3" y="43" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">720</text>
+<text x="8" y="76" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">status="500"</text>
+<rect x="10" y="86" width="43.3" height="24" rx="5" stroke-width="1.2" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="31.7" y="103" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">없음</text>
+<rect x="57.3" y="86" width="43.3" height="24" rx="5" stroke-width="1.2" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="79" y="103" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">없음</text>
+<rect x="104.7" y="86" width="43.3" height="24" rx="5" stroke-width="1.2" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="126.3" y="103" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">없음</text>
+<rect x="152" y="86" width="43.3" height="24" rx="5" stroke-width="1.2" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="173.7" y="103" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">없음</text>
+<rect x="199.3" y="86" width="43.3" height="24" rx="5" style="fill:var(--color-warn-weak)" />
+<text x="221" y="103" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">1</text>
+<rect x="246.7" y="86" width="43.3" height="24" rx="5" style="fill:var(--color-warn-weak)" />
+<text x="268.3" y="103" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">1</text>
+<path d="M10 116 v6 H195.33333333333334 v-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="102.7" y="140" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0이 아니라 빈 결과</text>
+<text x="221" y="140" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">첫 500</text>
+<text x="31.7" y="164" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">1분</text>
+<text x="79" y="164" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">2분</text>
+<text x="126.3" y="164" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">3분</text>
+<text x="173.7" y="164" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">4분</text>
+<text x="221" y="164" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">5분</text>
+<text x="268.3" y="164" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">6분</text>
+</svg>

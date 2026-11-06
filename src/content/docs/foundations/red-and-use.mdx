@@ -37,6 +37,7 @@ sources:
     url: https://man7.org/linux/man-pages/man5/proc_loadavg.5.html
 updated: 2026-10-29
 ---
+import RedUse from '../../../assets/figures/foundations/red-use.svg';
 
 <OnDashboard title="주문 API · 서비스 첫 화면" caption="주문 API의 요청·에러·지연(RED) 세 숫자예요. 초당 1,200건이 들어와 4.8건(0.4%)이 실패하고, 에러를 뺀 요청의 99%가 820ms 안에 끝나요.">
   <StatTile label="요청(Rate)" value="1,200" unit="건/초" />
@@ -69,15 +70,7 @@ CPU·메모리·디스크·네트워크 같은 자원은 Brendan Gregg가 만든
 Errors는 디스크 I/O 에러처럼 자원이 낸 에러 횟수예요. USE는 문제의 원인을, RED는 사용자가 겪는 증상을 보여 줘요. 그래서 RED가 나빠지면 USE로 원인을 찾아요.
 
 <Figure caption="RED는 사용자가 겪는 증상을, USE는 자원 쪽 원인을 보여 줘요. 두 방법 모두 Errors가 있지만, 세는 대상이 달라요.">
-  <Compare
-    columns={['RED', 'USE']}
-    rows={[
-      { label: '보는 대상', values: ['요청을 받아 답하는 서비스', 'CPU·메모리·디스크·네트워크'] },
-      { label: '세 숫자', values: ['Rate, Errors, Duration', 'Utilization, Saturation, Errors'] },
-      { label: 'Errors는', values: ['실패하는 요청 수', '자원이 낸 에러 횟수'] },
-      { label: '보여 주는 것', values: ['사용자가 겪는 증상', '문제의 원인'] },
-    ]}
-  />
+  <RedUse aria-label="RED는 사용자가 주문 API에 보내는 요청을 서비스 쪽에서 봐요. R 요청 수, E 실패한 요청, D 응답시간이에요. USE는 CPU, 메모리, 디스크, 네트워크 자원 쪽을 봐요. U 사용률, S 밀린 일, E 자원 에러예요" />
 </Figure>
 
 ## 평균 사용률은 짧은 포화를 숨겨요

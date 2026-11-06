@@ -25,6 +25,10 @@ updated: 2026-11-04
 ---
 import CapacityForecast from '../../../assets/figures/foundations/capacity-forecast.svg';
 import LoadTestTypes from '../../../assets/figures/foundations/load-test-types.svg';
+import CapFlow from '../../../assets/figures/foundations/cap-flow.svg';
+import CapQueue from '../../../assets/figures/foundations/cap-queue.svg';
+import CapP99 from '../../../assets/figures/foundations/cap-p99.svg';
+import CapServers from '../../../assets/figures/foundations/cap-servers.svg';
 
 <KeyPoints>
   <Point title="늘리는 데 걸리는 시간보다 멀리 봐요">
@@ -46,25 +50,8 @@ import LoadTestTypes from '../../../assets/figures/foundations/load-test-types.s
 
 용량 계획(capacity planning)은 앞으로의 수요를 예측하고, 그 수요를 받을 자원을 미리 마련하는 일이에요. 자원은 서버, CPU, 메모리, 디스크, DB 연결 수처럼 다 쓰면 더 받지 못하는 것이에요.
 
-<Figure caption="용량 계획의 흐름이에요. 수요를 예측하고, 부하 테스트로 잰 한 대의 용량으로 나눠 대수를 구하고, 여유를 더해 리드 타임 전에 늘려요.">
-  <Flow
-    ariaLabel="지난 추세의 자연 증가와 출시·행사 같은 계획된 수요가 모여 수요 예측이 되고, 부하 테스트로 잰 한 대 용량으로 나눠 필요한 대수를 구한 뒤, 여유를 더해 리드 타임 전에 늘리는 구조도"
-    nodes={[
-      { id: 'org', label: '자연 증가', col: 0, row: 0, note: '지난 추세' },
-      { id: 'inorg', label: '계획된 수요', col: 2, row: 0, note: '출시·행사' },
-      { id: 'demand', label: '수요 예측', col: 1, row: 1, note: '피크 요청/초', tone: 'accent' },
-      { id: 'test', label: '부하 테스트', col: 0, row: 2, note: '한 대 용량' },
-      { id: 'count', label: '필요한 대수', col: 1, row: 2, note: '수요 ÷ 한 대 용량' },
-      { id: 'add', label: '늘리기', col: 1, row: 3, note: '여유 더해 미리', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'org', to: 'demand' },
-      { from: 'inorg', to: 'demand' },
-      { from: 'demand', to: 'count' },
-      { from: 'test', to: 'count' },
-      { from: 'count', to: 'add' },
-    ]}
-  />
+<Figure caption="용량 계획의 흐름을 이 글의 예시 숫자로 그렸어요. 수요를 예측하고, 부하 테스트로 잰 한 대의 용량으로 나눠 대수를 구하고, 여유를 더해 리드 타임 전에 늘려요.">
+  <CapFlow aria-label="지난 추세의 자연 증가와 출시·행사 같은 계획된 수요가 모여 수요 예측 피크 2,010 요청/초가 되고, 부하 테스트로 잰 한 대 용량 320 요청/초로 나눠 필요한 대수 7대를 구한 뒤, 여유 1대를 더해 8대를 리드 타임 전에 늘리는 흐름 그림" />
 </Figure>
 
 Google SRE Book은 세 가지를 꼭 하라고 해요. 자연 증가를 리드 타임보다 멀리 예측하고, 출시·행사 같은 수요를 더하고, 부하 테스트로 서버 수와 서비스가 받는 양을 이어요.
@@ -99,16 +86,7 @@ Google SRE Book은 세 가지를 꼭 하라고 해요. 자연 증가를 리드 �
 요청이 제각각 들어오면, 서버가 바쁠수록 새 요청이 앞 요청을 기다려요. 그래서 사용률이 높아질수록 응답시간이 가파르게 늘어요.
 
 <Figure caption="일꾼이 하나인 가장 단순한 대기열 모형(M/M/1)에서, 사용률에 따라 평균 응답시간이 처리 시간의 몇 배가 되는지예요. 90%면 10배, 95%면 20배예요.">
-  <Bars
-    ariaLabel="사용률에 따른 평균 응답시간 배수 막대. 50%는 2배, 70%는 3.3배, 80%는 5배, 90%는 10배, 95%는 20배예요"
-    bars={[
-      { label: '사용률 50%', value: 2, display: '2배' },
-      { label: '사용률 70%', value: 3.33, display: '3.3배' },
-      { label: '사용률 80%', value: 5, display: '5배' },
-      { label: '사용률 90%', value: 10, display: '10배', tone: 'warn' },
-      { label: '사용률 95%', value: 20, display: '20배', tone: 'warn' },
-    ]}
-  />
+  <CapQueue aria-label="사용률이 오를수록 평균 응답시간이 처리 시간의 몇 배인지 그린 곡선. 50%는 2배, 70%는 3.3배, 80%는 5배로 완만하다가, 80%를 넘으면 가팔라져 90%는 10배, 95%는 20배예요" />
 </Figure>
 
 그래서 목표 사용률(이 아래에서 운영할 한도)을 정해요. 몇 %로 둘지는 응답시간 목표와 코어 수에 따라 달라서, 부하 테스트로 정해요.
@@ -120,16 +98,7 @@ Google SRE Book은 세 가지를 꼭 하라고 해요. 자연 증가를 리드 �
 부하 테스트(load test)는 가짜 요청을 늘려 가며 보내, 서버가 목표를 지키며 받는 양을 재는 일이에요. 보내는 양을 늘리면 처리량은 어느 지점에서 더 늘지 않고, 응답시간만 치솟아요.
 
 <Figure caption="코어 4개 서버에 처리 시간이 평균 10ms인 요청을 보낸다고 보고 대기열 모형으로 계산한 p99예요. 목표가 100ms면 이 서버 한 대의 용량은 320 요청/초예요.">
-  <Bars
-    ariaLabel="보내는 양에 따른 p99 막대. 200 요청/초는 48ms, 280은 55ms, 320은 70ms로 목표 100ms 안이고, 360은 126ms, 380은 284ms로 목표를 넘어요"
-    bars={[
-      { label: '200 요청/초 · 사용률 50%', value: 48, display: '48ms' },
-      { label: '280 요청/초 · 사용률 70%', value: 55, display: '55ms' },
-      { label: '320 요청/초 · 사용률 80%', value: 70, display: '70ms', note: '목표 100ms 안 · 한 대 용량', tone: 'accent' },
-      { label: '360 요청/초 · 사용률 90%', value: 126, display: '126ms', tone: 'warn' },
-      { label: '380 요청/초 · 사용률 95%', value: 284, display: '284ms', tone: 'warn' },
-    ]}
-  />
+  <CapP99 aria-label="보내는 양에 따른 p99 그래프. 200 요청/초는 48ms, 280은 55ms, 320은 70ms로 목표 p99 100ms 선 아래이고, 360은 126ms, 380은 284ms로 선을 넘어요. 목표 안의 마지막 점 320 요청/초가 한 대 용량이에요" />
 </Figure>
 
 이 서버는 400 요청/초를 넘게 받으면 처리량은 400에 멈추고 줄만 끝없이 길어져요. 그러니 한 대의 용량은 처리량이 멈추는 400이 아니라, 목표를 지키는 320이에요.
@@ -137,28 +106,7 @@ Google SRE Book은 세 가지를 꼭 하라고 해요. 자연 증가를 리드 �
 한 대의 용량을 알면 대수를 셀 수 있어요. 지금 피크 1,500 요청/초가 매달 5%씩 늘면 6개월 뒤 약 2,010이에요. 2,010 ÷ 320 = 6.3이라 7대가 필요하고, 고장 대비 한 대를 더해 8대를 둬요.
 
 <Figure caption="6개월 뒤 피크 2,010 요청/초를 한 대 320씩 받으려면 7대가 필요하고, 고장 대비 한 대를 더해 8대예요.">
-  <Strip
-    ariaLabel="서버 8칸 중 7칸은 피크 2,010 요청/초를 320씩 나눠 받는 서버이고, 마지막 한 칸은 고장 대비 여유인 칸 띠"
-    rows={[
-      {
-        label: '서버',
-        cells: [
-          { label: '1', tone: 'accent' },
-          { label: '2', tone: 'accent' },
-          { label: '3', tone: 'accent' },
-          { label: '4', tone: 'accent' },
-          { label: '5', tone: 'accent' },
-          { label: '6', tone: 'accent' },
-          { label: '7', tone: 'accent' },
-          { label: '+1', tone: 'sub' },
-        ],
-      },
-    ]}
-    ranges={[
-      { from: 0, to: 6, label: '2,010 ÷ 320 → 7대', tone: 'accent' },
-      { from: 7, to: 7, label: '여유' },
-    ]}
-  />
+  <CapServers aria-label="서버 여덟 대 중 1번부터 7번은 피크 2,010 요청/초를 320씩 나눠 받고(2,010 ÷ 320 = 6.3 → 7대), 마지막 +1은 여유예요. 한 대가 고장 나도 남은 7대가 피크를 받아요" />
 </Figure>
 
 부하 테스트는 무엇을 알고 싶은지에 따라 보내는 모양이 달라요. 부하 테스트 도구 k6 문서는 이렇게 나눠요.

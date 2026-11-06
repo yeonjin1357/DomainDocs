@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 232" width="300" height="232">
+<text x="8" y="18" font-size="13" font-weight="700" style="fill:var(--color-text)">앱 SDK</text>
+<text x="292" y="18" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">환경 변수로 정해요</text>
+<rect x="4" y="28" width="292" height="72" rx="10" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="14" y="39" width="138" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="83" y="54.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-card)">service=checkout</text>
+<rect x="158" y="39" width="107" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="211.5" y="54.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-card)">version=1.4.2</text>
+<rect x="14" y="67" width="76.3" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="52.2" y="82.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-card)">env=prod</text>
+<path d="M150 104 L150 119.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M150 124 L154.3 117 L145.7 117 z" style="fill:var(--color-text-weak)" />
+<text x="8" y="144" font-size="13" font-weight="700" style="fill:var(--color-text)">에이전트·Collector</text>
+<text x="292" y="144" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">어디서 도는지 덧붙여요</text>
+<rect x="4" y="154" width="292" height="72" rx="10" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="14" y="165" width="138" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="83" y="180.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">service=checkout</text>
+<rect x="158" y="165" width="107" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="211.5" y="180.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">version=1.4.2</text>
+<rect x="14" y="193" width="76.3" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="52.2" y="208.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">env=prod</text>
+<rect x="96.3" y="193" width="81.2" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="136.9" y="208.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-card)">pod=pod-a</text>
+<rect x="183.5" y="193" width="96.6" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="231.8" y="208.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-card)">node=node-3</text>
+</svg>

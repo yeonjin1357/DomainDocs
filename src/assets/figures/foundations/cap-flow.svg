@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 304" width="300" height="304">
+<rect x="8" y="8" width="136" height="50" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="76" y="31" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">자연 증가</text>
+<text x="76" y="49" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">지난 추세</text>
+<rect x="156" y="8" width="136" height="50" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="224" y="31" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">계획된 수요</text>
+<text x="224" y="49" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">출시·행사</text>
+<path d="M76 58 L125.5 80" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M130 82 L125.4 75.2 L121.8 83.1 z" style="fill:var(--color-text-weak)" />
+<path d="M224 58 L174.5 80" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M170 82 L178.2 83.1 L174.6 75.2 z" style="fill:var(--color-text-weak)" />
+<rect x="70" y="84" width="160" height="50" rx="10" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="107" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">수요 예측</text>
+<text x="150" y="125" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">피크 2,010 요청/초</text>
+<path d="M150 134 L150 153.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M150 158 L154.3 151 L145.7 151 z" style="fill:var(--color-text-weak)" />
+<rect x="8" y="160" width="136" height="50" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="76" y="183" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">부하 테스트</text>
+<text x="76" y="201" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">한 대 320 요청/초</text>
+<path d="M144 185 L155.1 185" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M160 185 L153 180.7 L153 189.3 z" style="fill:var(--color-text-weak)" />
+<rect x="162" y="160" width="130" height="50" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="227" y="183" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">필요한 대수</text>
+<text x="227" y="201" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">2,010 ÷ 320 → 7대</text>
+<path d="M227 210 L227 227.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M227 232 L231.3 225 L222.7 225 z" style="fill:var(--color-text-weak)" />
+<rect x="27" y="239" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="33" y1="247" x2="47" y2="247" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="33" y1="253" x2="47" y2="253" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="33" y1="259" x2="47" y2="259" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="40" cy="266.5" r="2" style="fill:var(--color-accent)" />
+<rect x="58" y="239" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="64" y1="247" x2="78" y2="247" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="64" y1="253" x2="78" y2="253" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="64" y1="259" x2="78" y2="259" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="71" cy="266.5" r="2" style="fill:var(--color-accent)" />
+<rect x="89" y="239" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="95" y1="247" x2="109" y2="247" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="95" y1="253" x2="109" y2="253" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="95" y1="259" x2="109" y2="259" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="102" cy="266.5" r="2" style="fill:var(--color-accent)" />
+<rect x="120" y="239" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="126" y1="247" x2="140" y2="247" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="126" y1="253" x2="140" y2="253" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="126" y1="259" x2="140" y2="259" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="133" cy="266.5" r="2" style="fill:var(--color-accent)" />
+<rect x="151" y="239" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="157" y1="247" x2="171" y2="247" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="157" y1="253" x2="171" y2="253" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="157" y1="259" x2="171" y2="259" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="164" cy="266.5" r="2" style="fill:var(--color-accent)" />
+<rect x="182" y="239" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="188" y1="247" x2="202" y2="247" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="188" y1="253" x2="202" y2="253" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="188" y1="259" x2="202" y2="259" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="195" cy="266.5" r="2" style="fill:var(--color-accent)" />
+<rect x="213" y="239" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="219" y1="247" x2="233" y2="247" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="219" y1="253" x2="233" y2="253" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="219" y1="259" x2="233" y2="259" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="226" cy="266.5" r="2" style="fill:var(--color-accent)" />
+<rect x="244" y="239" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<line x1="250" y1="247" x2="264" y2="247" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="250" y1="253" x2="264" y2="253" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="250" y1="259" x2="264" y2="259" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="257" cy="266.5" r="2" style="fill:var(--color-text-weak)" />
+<text x="150" y="296" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">여유 1대를 더해 8대, 리드 타임 전에 늘려요</text>
+</svg>

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 266" width="300" height="266">
+<path d="M16 41 C17 36 17 31 18 28 C20 22 32 22 34 28 C35 31 35 36 36 41 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="14" y1="41" x2="38" y2="41" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<circle cx="26" cy="45" r="2.6" style="fill:var(--color-warn)" />
+<line x1="26" y1="20" x2="26" y2="23" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="46" y="30" font-size="13" font-weight="700" style="fill:var(--color-warn)">알림</text>
+<rect x="46" y="35" width="138" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="115" y="50.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">service=checkout</text>
+<path d="M100 60 L100 79.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M100 84 L104.3 77 L95.7 77 z" style="fill:var(--color-text-sub)" />
+<text x="110" y="78" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">이름으로 찾아요</text>
+<text x="8" y="104" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">서비스 카탈로그</text>
+<rect x="4" y="112" width="292" height="76" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 136 V118 Q4.8 112.8 10 112.8 H290 Q295.3 112.8 295.3 118 V136 z" style="fill:var(--color-line)" />
+<rect x="4.8" y="136" width="290.5" height="26" rx="0" style="fill:var(--color-accent-weak)" />
+<line x1="4" y1="162" x2="296" y2="162" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="128.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">서비스</text>
+<text x="104" y="128.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">주인</text>
+<text x="174" y="128.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">런북</text>
+<text x="12" y="153.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">checkout</text>
+<text x="104" y="153.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">결제팀</text>
+<text x="174" y="153.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">결제 장애 대응</text>
+<text x="12" y="179.7" font-size="13" font-weight="400" style="fill:var(--color-text)">payment</text>
+<text x="104" y="179.7" font-size="13" font-weight="400" style="fill:var(--color-text)">정산팀</text>
+<text x="174" y="179.7" font-size="13" font-weight="400" style="fill:var(--color-text)">정산 지연 대응</text>
+<path d="M120 190 L84 215.2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M80 218 L88.2 217.5 L83.2 210.4 z" style="fill:var(--color-accent)" />
+<path d="M230 190 L230 213.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M230 218 L234.3 211 L225.7 211 z" style="fill:var(--color-accent)" />
+<rect x="52" y="226" width="16" height="28" rx="3" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="57" y1="250" x2="63" y2="250" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<text x="76" y="236" font-size="13" font-weight="700" style="fill:var(--color-accent)">결제팀 당직</text>
+<text x="76" y="254" font-size="13" style="fill:var(--color-text-sub)">호출해요</text>
+<path d="M193 229 Q193 226 196 226 H211 L219 234 V255 Q219 258 216 258 H196 Q193 258 193 255 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M211 226 V234 H219" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="199" y1="240" x2="213" y2="240" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="199" y1="245" x2="213" y2="245" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="199" y1="250" x2="208" y2="250" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="226" y="238" font-size="13" font-weight="700" style="fill:var(--color-accent)">런북</text>
+<text x="226" y="256" font-size="13" style="fill:var(--color-text-sub)">대응 절차</text>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 274" width="300" height="274">
+<text x="8" y="40" font-size="13" font-weight="700" style="fill:var(--color-text)">원본 10초</text>
+<line x1="84" y1="10" x2="220" y2="10" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<line x1="84" y1="60" x2="220" y2="60" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<path d="M84 40 L147.5 40 L147.5 12.5 L152 12.5 L152 40 L220 40" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<text x="292" y="40" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">최고 95%</text>
+<text x="8" y="102" font-size="13" font-weight="700" style="fill:var(--color-text)">1분 평균</text>
+<line x1="84" y1="72" x2="220" y2="72" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<line x1="84" y1="122" x2="220" y2="122" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<path d="M84 102 L147.5 102 L147.5 88.5 L156.5 88.5 L156.5 102 L220 102" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="292" y="102" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">최고 67%</text>
+<text x="8" y="164" font-size="13" font-weight="700" style="fill:var(--color-text)">5분 평균</text>
+<line x1="84" y1="134" x2="220" y2="134" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<line x1="84" y1="184" x2="220" y2="184" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<path d="M84 164 L129.3 164 L129.3 161.5 L174.7 161.5 L174.7 164 L220 164" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="292" y="164" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">최고 45%</text>
+<text x="8" y="226" font-size="13" font-weight="700" style="fill:var(--color-text)">15분 평균</text>
+<line x1="84" y1="196" x2="220" y2="196" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<line x1="84" y1="246" x2="220" y2="246" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<path d="M84 225 L220 225" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="292" y="226" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">최고 42%</text>
+<text x="84" y="316" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">0분</text>
+<text x="147.5" y="316" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">7분</text>
+<text x="220" y="316" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">15분</text>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 194" width="300" height="194">
+<rect x="84" y="66.7" width="204" height="46.7" rx="0" style="fill:var(--color-accent-weak)" />
+<line x1="84" y1="66.7" x2="288" y2="66.7" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="5 4" style="stroke:var(--color-accent)" />
+<line x1="84" y1="113.3" x2="288" y2="113.3" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="5 4" style="stroke:var(--color-warn)" />
+<text x="78" y="71.2" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">SLO 99.95</text>
+<text x="78" y="117.8" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">SLA 99.9</text>
+<path d="M94.9 38.7 L131.4 48 L167.8 57.3 L204.2 76 L240.6 94.7 L277.1 132" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<circle cx="94.9" cy="38.7" r="4.5" stroke-width="1.5" style="fill:var(--color-text-sub);stroke:var(--color-card)" />
+<circle cx="131.4" cy="48" r="4.5" stroke-width="1.5" style="fill:var(--color-text-sub);stroke:var(--color-card)" />
+<circle cx="167.8" cy="57.3" r="4.5" stroke-width="1.5" style="fill:var(--color-text-sub);stroke:var(--color-card)" />
+<circle cx="204.2" cy="76" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="240.6" cy="94.7" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="277.1" cy="132" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<text x="94.9" y="28.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">99.98</text>
+<text x="131.4" y="38" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">99.97</text>
+<text x="167.8" y="47.3" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">99.96</text>
+<text x="204.2" y="66" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">99.94</text>
+<text x="240.6" y="84.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">99.92</text>
+<text x="277.1" y="152" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">99.88</text>
+<text x="131.4" y="95" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">계약 전에 손볼 때</text>
+<text x="84" y="190" font-size="13" style="fill:var(--color-text-sub)">SLI가 조금씩 떨어지는 예시(%)</text>
+</svg>

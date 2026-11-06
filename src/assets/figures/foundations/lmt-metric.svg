@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 218" width="300" height="218">
+<rect x="35" y="17" width="30" height="22" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M35 19 L50 30 L65 19" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="50" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">성공</text>
+<path d="M50 66 L123.6 101.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M128 104 L123.6 97 L119.8 104.8 z" style="fill:var(--color-text-weak)" />
+<rect x="135" y="17" width="30" height="22" rx="3" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<path d="M135 19 L150 30 L165 19" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<text x="150" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">실패</text>
+<path d="M150 66 L150 99.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M150 104 L154.3 97 L145.7 97 z" style="fill:var(--color-text-weak)" />
+<rect x="235" y="17" width="30" height="22" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M235 19 L250 30 L265 19" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="250" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">성공</text>
+<path d="M250 66 L176.4 101.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M172 104 L180.2 104.8 L176.4 97 z" style="fill:var(--color-text-weak)" />
+<rect x="96" y="108" width="108" height="56" rx="10" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="128" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">요청 수</text>
+<text x="150" y="154" font-size="22" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">3</text>
+<text x="150" y="190" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">요청이 늘어도 남는 건 숫자 하나</text>
+<text x="150" y="210" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">어느 요청이 실패했는지는 남지 않아요</text>
+</svg>

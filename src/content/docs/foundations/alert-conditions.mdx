@@ -41,6 +41,8 @@ sources:
     url: https://sre.google/workbook/alerting-on-slos/
 updated: 2026-10-29
 ---
+import AcPending from '../../../assets/figures/foundations/ac-pending.svg';
+import AcSymptom from '../../../assets/figures/foundations/ac-symptom.svg';
 
 <OnDashboard title="에러율 · 1분마다 평가 · 임계값 2%" caption="지속 시간이 없으면 2분·4분의 한 번짜리 스파이크까지 세 번 울려요. 지속 시간을 3분(for: 3m)으로 두면 7분부터 이어진 문제에만, 3분 늦은 10분에 한 번 울려요.">
   <MiniLineChart
@@ -69,22 +71,7 @@ updated: 2026-10-29
 알림 규칙(alerting rule)은 질의 결과가 임계값을 넘는 상태가 정한 시간(지속 시간)만큼 이어지면 울려요. 조건이 처음 맞으면 pending(대기)이 되고, 정해진 간격(평가 간격)마다 다시 봐서 그 시간을 채우면 firing(울림)이에요. 그 전에 한 번이라도 조건이 깨지면 pending은 사라지고, 다음엔 처음부터 다시 세요.
 
 <Figure caption="지속 시간 3분 규칙을 1분마다 평가하는 예시예요. 2분에 조건이 한 번 깨지자 pending이 사라지고, 3분부터 다시 세서 6분에야 울려요.">
-  <Timeline
-    ariaLabel="지속 시간 3분 규칙에서 0분부터 조건이 맞아 pending이 되지만 2분에 한 번 깨져 사라지고, 3분부터 다시 맞아 3분을 채운 6분에 울리는 시간 띠"
-    end={8}
-    lanes={[
-      { label: '조건', segments: [{ start: 0, end: 2, label: '넘음', tone: 'accent' }, { start: 3, end: 8, label: '넘음', tone: 'accent' }] },
-      { label: '상태', segments: [{ start: 0, end: 2, label: 'pending' }, { start: 3, end: 6, label: 'pending' }, { start: 6, end: 8, label: '울림', tone: 'warn' }] },
-    ]}
-    marks={[{ at: 3, label: '처음부터 다시 셈' }]}
-    ticks={[
-      { at: 0, label: '0분' },
-      { at: 2, label: '2분' },
-      { at: 3, label: '3분' },
-      { at: 6, label: '6분' },
-      { at: 8, label: '8분' },
-    ]}
-  />
+  <AcPending aria-label="1분마다 평가한 에러율이 0분과 1분에는 2%를 넘다가 2분에 한 번 아래로 내려가고, 3분부터 다시 넘는 그래프. 아래 상태는 0분부터 pending이었다가 2분에 사라지고, 3분부터 처음부터 다시 세어 3분을 채운 6분에 울려요" />
 </Figure>
 
 ```yaml
@@ -138,14 +125,7 @@ Prometheus에선 `expr`에 질의와 임계값(0.02, 곧 2%)을, `for`에 지속
 그래서 Google SRE Book은 사람을 부르는 알림은 증상에 걸고, 원인은 문제를 찾을 때 보라고 해요. CPU 같은 <Term slug="foundations/red-and-use">원인 지표</Term>는 대시보드에 두고, 아주 분명하고 임박한 원인에만 알림을 걸어요. 증상 알림의 임계값은 <Term slug="foundations/slo-and-error-budget">SLO</Term>에서 정하면 근거가 생겨요.
 
 <Figure caption="증상과 원인을 나눠 둔 곳을 견줬어요. 원인 지표에는 아주 분명하고 임박한 것에만 알림을 걸어요.">
-  <Compare
-    columns={['증상', '원인']}
-    rows={[
-      { label: '뜻', values: ['사용자가 겪는 일', '그 일의 이유'] },
-      { label: '예', values: ['에러, 느린 응답', 'CPU 과부하, DB 연결 거부'] },
-      { label: '두는 곳', values: ['사람을 부르는 알림', '대시보드(문제를 찾을 때)'] },
-    ]}
-  />
+  <AcSymptom aria-label="증상은 사용자가 겪는 일로, 사용자가 겪는 에러와 느린 응답에는 사람을 부르는 알림을 걸어요. 원인은 그 일의 이유로, CPU 과부하나 DB 연결 거부는 대시보드에서 봐요" />
 </Figure>
 
 <Checkpoints>

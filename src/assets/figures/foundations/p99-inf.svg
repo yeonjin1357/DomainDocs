@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 186" width="300" height="186">
+<rect x="8" y="30" width="170" height="54" rx="8" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="93" y="54" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">2.5초 이하</text>
+<text x="93" y="74" font-size="15" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">980건</text>
+<path d="M178 30 H270 M178 84 H270" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<rect x="178" y="30" width="92" height="54" rx="0" style="fill:var(--color-warn-weak)" />
+<path d="M270 57 L288.4 57" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M294 57 L286 52 L286 62 z" style="fill:var(--color-warn)" />
+<text x="224" y="54" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">그 위(+Inf)</text>
+<text x="224" y="74" font-size="15" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">20건</text>
+<rect x="192.7" y="5" width="62.5" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="224" y="20.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">990번째</text>
+<line x1="178" y1="92" x2="178" y2="112" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text)" />
+<text x="178" y="130" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">p99 = 2.5초에 붙어요</text>
+<text x="224" y="160" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">3초든 30초든</text>
+<text x="224" y="178" font-size="13" text-anchor="middle" style="fill:var(--color-warn)">같은 칸이에요</text>
+<text x="8" y="170" font-size="13" style="fill:var(--color-text-sub)">5분 동안 1,000건</text>
+</svg>

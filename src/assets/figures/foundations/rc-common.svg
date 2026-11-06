@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 274" width="300" height="274">
+<rect x="90" y="6" width="120" height="76" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="100" y="26" font-size="13" font-weight="700" style="fill:var(--color-accent)">트래픽 증가</text>
+<path d="M102 64.8 L121.2 64.1 L140.4 61.2 L159.6 50.4 L178.8 41.4 L198 39.6" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="8" y="150" width="120" height="76" rx="10" style="fill:var(--color-card)" />
+<text x="18" y="170" font-size="13" font-weight="700" style="fill:var(--color-text)">CPU 상승</text>
+<path d="M20 207.7 L39.2 207.1 L58.4 204.5 L77.6 194.8 L96.8 186.7 L116 185" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<rect x="172" y="150" width="120" height="76" rx="10" style="fill:var(--color-card)" />
+<text x="182" y="170" font-size="13" font-weight="700" style="fill:var(--color-text)">p99 상승</text>
+<path d="M184 206.6 L203.2 206.1 L222.4 203.8 L241.6 195.1 L260.8 187.9 L280 186.5" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M120 82 L79.2 141.4" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M76 146 L84.6 142.2 L76.4 136.6 z" style="fill:var(--color-accent)" />
+<path d="M180 82 L220.8 141.4" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M224 146 L223.6 136.6 L215.4 142.2 z" style="fill:var(--color-accent)" />
+<text x="150" y="116" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">공통 원인</text>
+<line x1="130" y1="188" x2="170" y2="188" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="4 4" style="stroke:var(--color-text-weak)" />
+<text x="150" y="248" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">CPU와 p99는 같이 오를 뿐</text>
+<text x="150" y="266" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">서로의 원인이 아니에요</text>
+</svg>

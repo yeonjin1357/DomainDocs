@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 238" width="300" height="238">
+<rect x="4" y="4" width="292" height="230" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="20" cy="21" r="9.5" style="fill:var(--color-accent)" />
+<text x="20" y="25.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">4</text>
+<text x="36" y="26" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">sum by (job)</text>
+<text x="138.8" y="26" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">서비스마다 더해요 → 2줄</text>
+<rect x="16" y="40" width="268" height="182" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="32" cy="57" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="32" y="61.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">3</text>
+<text x="48" y="62" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">rate( … )</text>
+<text x="127.1" y="62" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">초당 증가량 → 3줄</text>
+<rect x="28" y="76" width="244" height="134" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="44" cy="93" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="44" y="97.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">2</text>
+<text x="60" y="98" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">[5m]</text>
+<text x="99.6" y="98" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">5분 치 값을 잡아요</text>
+<rect x="40" y="112" width="220" height="86" rx="10" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-text-weak)" />
+<circle cx="56" cy="129" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="56" y="133.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">1</text>
+<text x="72" y="134" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">시계열 고르기 → 3줄</text>
+<text x="56" y="160" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">http_requests_total</text>
+<text x="56" y="182" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">{status=~"5.."}</text>
+</svg>

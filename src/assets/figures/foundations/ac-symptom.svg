@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 252" width="300" height="252">
+<rect x="4" y="4" width="292" height="112" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-warn)">증상</text>
+<text x="56" y="26" font-size="13" style="fill:var(--color-text-sub)">사용자가 겪는 일</text>
+<circle cx="40" cy="66" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M29 88 C29 76 51 76 51 88 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M66.3 45.5  H157.7 Q163.7 45.5 163.7 51.5 V64.5 Q163.7 70.5 157.7 70.5 L84 70.5 L80 76.5 L76 70.5 H66.3 Q60.3 70.5 60.3 64.5 V51.5 Q60.3 45.5 66.3 45.5 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="112" y="62.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">에러, 느린 응답</text>
+<path d="M164 74 L208.4 74" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M214 74 L206 69 L206 79 z" style="fill:var(--color-warn)" />
+<path d="M230 79 C231 74 231 69 232 66 C234 60 246 60 248 66 C249 69 249 74 250 79 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="228" y1="79" x2="252" y2="79" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<circle cx="240" cy="83" r="2.6" style="fill:var(--color-warn)" />
+<line x1="240" y1="58" x2="240" y2="61" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="240" y="104" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">사람을 부르는 알림</text>
+<rect x="4" y="124" width="292" height="124" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="146" font-size="14" font-weight="700" style="fill:var(--color-text)">원인</text>
+<text x="56" y="146" font-size="13" style="fill:var(--color-text-sub)">그 일의 이유</text>
+<rect x="22" y="166" width="28" height="28" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="29" y="173" width="14" height="14" rx="2" style="fill:var(--color-line)" />
+<text x="40" y="214" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">CPU 과부하</text>
+<path d="M105 167 V193 A17 5.5 0 0 0 139 193 V167" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M105 180 A17 5.5 0 0 0 139 180" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<ellipse cx="122" cy="167" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<text x="122" y="214" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">DB 연결 거부</text>
+<path d="M170 180 L208.4 180" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M214 180 L206 175 L206 185 z" style="fill:var(--color-text-sub)" />
+<rect x="224" y="161" width="52" height="38" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="224" y1="169" x2="276" y2="169" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="229" cy="165" r="1.4" style="fill:var(--color-text-sub)" />
+<circle cx="233" cy="165" r="1.4" style="fill:var(--color-text-sub)" />
+<path d="M230 187 L236.7 184 L243.3 186 L250 181 L256.7 183 L263.3 178 L270 182" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="250" y="214" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">대시보드</text>
+<text x="150" y="238" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">아주 분명하고 임박한 원인에만 알림을 걸어요</text>
+</svg>

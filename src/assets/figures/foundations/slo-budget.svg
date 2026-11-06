@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 218" width="300" height="218">
+<text x="8" y="18" font-size="13" font-weight="700" style="fill:var(--color-text)">30일, SLO 99.9%</text>
+<rect x="8" y="28" width="284" height="22" rx="4" style="fill:var(--color-accent)" />
+<rect x="284" y="28" width="8" height="22" rx="2" style="fill:var(--color-warn)" />
+<text x="140" y="44" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">성공해야 할 몫 99.9%</text>
+<path d="M284 50 L40 84 M292 50 L292 84" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-warn)" />
+<rect x="16" y="84" width="276" height="126" rx="12" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="30" y="108" font-size="15" font-weight="700" style="fill:var(--color-warn)">에러 버짓 0.1%</text>
+<text x="30" y="126" font-size="13" style="fill:var(--color-text-sub)">= 100% − SLO</text>
+<text x="28" y="154" font-size="13" style="fill:var(--color-text-sub)">요청으로 세면</text>
+<text x="28" y="174" font-size="14" font-weight="700" style="fill:var(--color-text)">100만 건 중 1,000건</text>
+<text x="162" y="154" font-size="13" style="fill:var(--color-text-sub)">시간으로 재면</text>
+<text x="162" y="174" font-size="14" font-weight="700" style="fill:var(--color-text)">43,200분 중 43.2분</text>
+<line x1="152" y1="142" x2="152" y2="190" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-warn)" />
+</svg>

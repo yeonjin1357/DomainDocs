@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 254" width="300" height="254">
+<line x1="74" y1="143.2" x2="270" y2="143.2" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="68" y="147.7" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">1,000,000</text>
+<line x1="74" y1="34.8" x2="270" y2="34.8" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="68" y="39.3" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">1,030,000</text>
+<path d="M74 143.2 L113.2 123.3 L152.4 99.8 L191.6 78.2 L230.8 58.3 L270 34.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="74" y1="143.2" x2="270" y2="143.2" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4 3" style="stroke:var(--color-accent)" />
+<line x1="270" y1="143.2" x2="270" y2="34.8" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4 3" style="stroke:var(--color-accent)" />
+<circle cx="74" cy="143.2" r="4.5" style="fill:var(--color-accent)" />
+<circle cx="270" cy="34.8" r="4.5" style="fill:var(--color-accent)" />
+<text x="172" y="163.2" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">300초(5분)</text>
+<text x="262" y="94" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">+30,000</text>
+<text x="74" y="187.2" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">구간 시작</text>
+<text x="270" y="187.2" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">구간 끝</text>
+<rect x="30" y="208" width="240" height="40" rx="10" style="fill:var(--color-accent-weak)" />
+<text x="150" y="234" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">rate = 30,000 ÷ 300 = 초당 100건</text>
+</svg>

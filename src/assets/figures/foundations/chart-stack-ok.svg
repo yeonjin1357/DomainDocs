@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 218" width="300" height="218">
+<rect x="4" y="4" width="144" height="210" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">상태 코드별 요청 수</text>
+<line x1="18" y1="134" x2="134" y2="134" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M18 72.8 L41.2 71 L64.4 68.3 L87.6 61.1 L110.8 69.2 L134 71 L134 87.2 L110.8 85.4 L87.6 82.7 L64.4 84.5 L41.2 87.2 L18 89 z" style="fill-opacity:0.35;fill:var(--color-warn)" />
+<path d="M18 89 L41.2 87.2 L64.4 84.5 L87.6 82.7 L110.8 85.4 L134 87.2 L134 107 L110.8 105.2 L87.6 107 L64.4 104.3 L41.2 107 L18 108.8 z" style="fill-opacity:0.4;fill:var(--color-text-weak)" />
+<path d="M18 108.8 L41.2 107 L64.4 104.3 L87.6 107 L110.8 105.2 L134 107 L134 134 L18 134 z" style="fill-opacity:0.55;fill:var(--color-accent)" />
+<path d="M18 72.8 L41.2 71 L64.4 68.3 L87.6 61.1 L110.8 69.2 L134 71" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="16" y="156" font-size="13" font-weight="700" style="fill:var(--color-accent)">맨 위 = 전체 요청</text>
+<text x="16" y="176" font-size="13" style="fill:var(--color-text-sub)">200 + 404 + 500</text>
+<path d="M17 198 L21.2 202.2 L29 193.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="36" y="203" font-size="13" font-weight="700" style="fill:var(--color-accent)">쌓아도 돼요</text>
+<rect x="152" y="4" width="144" height="210" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">서버별 p99</text>
+<line x1="166" y1="134" x2="282" y2="134" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M166 72.8 L189.2 71 L212.4 68.3 L235.6 61.1 L258.8 69.2 L282 71 L282 87.2 L258.8 85.4 L235.6 82.7 L212.4 84.5 L189.2 87.2 L166 89 z" style="fill-opacity:0.35;fill:var(--color-text-sub)" />
+<path d="M166 89 L189.2 87.2 L212.4 84.5 L235.6 82.7 L258.8 85.4 L282 87.2 L282 107 L258.8 105.2 L235.6 107 L212.4 104.3 L189.2 107 L166 108.8 z" style="fill-opacity:0.4;fill:var(--color-text-sub)" />
+<path d="M166 108.8 L189.2 107 L212.4 104.3 L235.6 107 L258.8 105.2 L282 107 L282 134 L166 134 z" style="fill-opacity:0.55;fill:var(--color-text-sub)" />
+<path d="M166 72.8 L189.2 71 L212.4 68.3 L235.6 61.1 L258.8 69.2 L282 71" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<text x="164" y="156" font-size="13" font-weight="700" style="fill:var(--color-warn)">맨 위 = 뜻 없는 합</text>
+<text x="164" y="176" font-size="13" style="fill:var(--color-text-sub)">p99를 더하면 안 돼요</text>
+<line x1="166" y1="193" x2="176" y2="203" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="166" y1="203" x2="176" y2="193" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="184" y="203" font-size="13" font-weight="700" style="fill:var(--color-warn)">선을 겹쳐 그려요</text>
+</svg>

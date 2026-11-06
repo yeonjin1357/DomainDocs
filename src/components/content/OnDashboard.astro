@@ -48,4 +48,13 @@ const { title, caption } = Astro.props;
   .widget-body > :global(p) {
     margin: 0;
   }
+
+  /* SVG 그림은 원래 비율대로, 화면보다 넓어지지 않게 */
+  .widget-body > :global(svg) {
+    flex: 0 1 auto;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    color: var(--color-text);
+  }
 </style>

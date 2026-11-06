@@ -63,6 +63,7 @@ export function lines(x, y, list, o = {}) {
 export function rect(x, y, w, h, o = {}) {
   const { rx = 6, fill = 'card', stroke = 'weak', sw = 1.5, dash } = o;
   const st = [`fill:${fill === 'none' ? 'none' : color(fill)}`];
+  if (o.op != null) st.push(`fill-opacity:${o.op}`);
   if (stroke !== 'none') st.push(`stroke:${color(stroke)}`);
   return `<rect x="${r1(x)}" y="${r1(y)}" width="${r1(w)}" height="${r1(h)}" rx="${rx}"${stroke !== 'none' ? ` stroke-width="${sw}"` : ''}${dash ? ` stroke-dasharray="${dash}"` : ''} style="${st.join(';')}" />`;
 }
@@ -342,6 +343,136 @@ export function phone(cx, cy, o = {}) {
 export function app(cx, cy, label, o = {}) {
   const { w = textWidth(label, 13, 600) + 16, h = 24, tone } = o;
   return rect(cx - w / 2, cy - h / 2, w, h, { rx: 5, fill: face(tone), stroke: ink(tone), sw: 1.5 }) + '\n' + text(cx, cy + 4.7, label, { size: 13, weight: 600, tone: tone === 'accent' ? 'accent' : 'text', anchor: 'middle' });
+}
+
+/** DB(원통). 34×36 */
+export function db(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  const rx = o.rx ?? 17;
+  const ry = 5.5;
+  const top = cy - 13;
+  const bot = cy + 13;
+  return [
+    path(`M${cx - rx} ${top} V${bot} A${rx} ${ry} 0 0 0 ${cx + rx} ${bot} V${top}`, { fill: face(o.tone), stroke: k, sw: 1.8 }),
+    path(`M${cx - rx} ${cy} A${rx} ${ry} 0 0 0 ${cx + rx} ${cy}`, { stroke: k, sw: 1.4 }),
+    `<ellipse cx="${cx}" cy="${top}" rx="${rx}" ry="${ry}" stroke-width="1.8" style="fill:${color(o.tone === 'accent' ? 'accentWeak' : o.tone === 'warn' ? 'warnWeak' : 'line')};stroke:${color(k)}" />`,
+  ].join('\n');
+}
+
+/** 대시보드 화면(작은 선 그래프가 든 창). w×h, 기본 52×38 */
+export function panel(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  const w = o.w ?? 52;
+  const h = o.h ?? 38;
+  const x = cx - w / 2;
+  const y = cy - h / 2;
+  const pts = o.points === null ? [0, 0] : o.points ?? [0.3, 0.45, 0.35, 0.6, 0.5, 0.75, 0.55];
+  const d = pts.map((v, i) => `${i ? 'L' : 'M'}${r1(x + 6 + ((w - 12) * i) / (pts.length - 1))} ${r1(y + h - 6 - (h - 18) * v)}`).join(' ');
+  return [
+    rect(x, y, w, h, { rx: 4, fill: face(o.tone), stroke: k, sw: 1.8 }),
+    line(x, y + 8, x + w, y + 8, { tone: k, sw: 1.2, cap: 'butt' }),
+    circle(x + 5, y + 4, 1.4, { fill: k }),
+    circle(x + 9, y + 4, 1.4, { fill: k }),
+    o.points === null ? '' : path(d, { stroke: o.line ?? 'accent', sw: 1.8 }),
+  ].join('\n');
+}
+
+/** 종(알림). 26×28 */
+export function bell(cx, cy, o = {}) {
+  const k = ink(o.tone ?? 'warn');
+  return [
+    path(`M${cx - 10} ${cy + 7} C${cx - 9} ${cy + 2} ${cx - 9} ${cy - 3} ${cx - 8} ${cy - 6} C${cx - 6} ${cy - 12} ${cx + 6} ${cy - 12} ${cx + 8} ${cy - 6} C${cx + 9} ${cy - 3} ${cx + 9} ${cy + 2} ${cx + 10} ${cy + 7} z`, { fill: face(o.tone ?? 'warn'), stroke: k, sw: 1.8 }),
+    line(cx - 12, cy + 7, cx + 12, cy + 7, { tone: k, sw: 2 }),
+    circle(cx, cy + 11, 2.6, { fill: k }),
+    line(cx, cy - 14, cx, cy - 11, { tone: k, sw: 2 }),
+  ].join('\n');
+}
+
+/** 사람. 24×30 */
+export function person(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  return [circle(cx, cy - 8, 6.5, { fill: face(o.tone), stroke: k, sw: 1.8 }), path(`M${cx - 11} ${cy + 14} C${cx - 11} ${cy + 2} ${cx + 11} ${cy + 2} ${cx + 11} ${cy + 14} z`, { fill: face(o.tone), stroke: k, sw: 1.8 })].join('\n');
+}
+
+/** 문서(파일). 26×32, lines로 줄 수 */
+export function doc(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  const x = cx - 13;
+  const y = cy - 16;
+  const parts = [
+    path(`M${x} ${y + 3} Q${x} ${y} ${x + 3} ${y} H${x + 18} L${x + 26} ${y + 8} V${y + 29} Q${x + 26} ${y + 32} ${x + 23} ${y + 32} H${x + 3} Q${x} ${y + 32} ${x} ${y + 29} z`, { fill: face(o.tone), stroke: k, sw: 1.8 }),
+    path(`M${x + 18} ${y} V${y + 8} H${x + 26}`, { stroke: k, sw: 1.4 }),
+  ];
+  const n = o.lines ?? 3;
+  for (let i = 0; i < n; i++) parts.push(line(x + 6, y + 14 + i * 5, x + 20 - (i === n - 1 ? 5 : 0), y + 14 + i * 5, { tone: k, sw: 1.5 }));
+  return parts.join('\n');
+}
+
+/** 편지(메시지). 30×22 */
+export function envelope(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  return [rect(cx - 15, cy - 11, 30, 22, { rx: 3, fill: face(o.tone), stroke: k, sw: 1.8 }), path(`M${cx - 15} ${cy - 9} L${cx} ${cy + 2} L${cx + 15} ${cy - 9}`, { stroke: k, sw: 1.6 })].join('\n');
+}
+
+/** 휴지통(버림). 24×28 */
+export function trash(cx, cy, o = {}) {
+  const k = ink(o.tone ?? 'warn');
+  return [
+    path(`M${cx - 9} ${cy - 8} L${cx - 7} ${cy + 13} H${cx + 7} L${cx + 9} ${cy - 8}`, { fill: face(o.tone ?? 'warn'), stroke: k, sw: 1.8 }),
+    line(cx - 12, cy - 9, cx + 12, cy - 9, { tone: k, sw: 2 }),
+    path(`M${cx - 4} ${cy - 9} V${cy - 13} H${cx + 4} V${cy - 9}`, { stroke: k, sw: 1.6 }),
+    line(cx - 3, cy - 4, cx - 3, cy + 9, { tone: k, sw: 1.3 }),
+    line(cx + 3, cy - 4, cx + 3, cy + 9, { tone: k, sw: 1.3 }),
+  ].join('\n');
+}
+
+/** 돋보기. 26×26 */
+export function magnifier(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  return [circle(cx - 3, cy - 3, 8, { fill: face(o.tone), stroke: k, sw: 2 }), line(cx + 3, cy + 3, cx + 10, cy + 10, { tone: k, sw: 3 })].join('\n');
+}
+
+/** 메모리 칩(RAM). 40×20 */
+export function ram(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  const parts = [rect(cx - 20, cy - 10, 40, 18, { rx: 2, fill: face(o.tone), stroke: k, sw: 1.8 })];
+  for (let i = 0; i < 3; i++) parts.push(rect(cx - 15 + i * 11, cy - 6, 8, 9, { rx: 1, fill: 'line', stroke: 'none' }));
+  for (let i = 0; i < 7; i++) parts.push(line(cx - 17 + i * 5.6, cy + 8, cx - 17 + i * 5.6, cy + 12, { tone: k, sw: 1.4, cap: 'butt' }));
+  return parts.join('\n');
+}
+
+// ── 그래프 ──
+
+/** 좌표 틀. (x,y)는 그래프 칸의 왼쪽 위, w×h. 값 범위를 받아 그리는 함수를 돌려준다. */
+export function plot(x, y, w, h, r = {}) {
+  const { x0 = 0, x1 = 1, y0 = 0, y1 = 1 } = r;
+  const sx = (v) => x + ((v - x0) / (x1 - x0)) * w;
+  const sy = (v) => y + h - ((v - y0) / (y1 - y0)) * h;
+  const P = (pts) => pts.map(([a, b], i) => `${i ? 'L' : 'M'}${r1(sx(a))} ${r1(sy(b))}`).join(' ');
+  return {
+    sx, sy, x, y, w, h,
+    /** 바닥선 */
+    base: (o = {}) => line(x, y + h, x + w, y + h, { tone: o.tone ?? 'weak', sw: o.sw ?? 1.5, cap: 'butt' }),
+    /** 가로 눈금선과 왼쪽 글자 */
+    yticks: (ticks, o = {}) => ticks.map(([v, s]) => [line(x, sy(v), x + w, sy(v), { tone: 'line', sw: 1, dash: '3 4', cap: 'butt' }), s ? text(x - 6, sy(v) + 4.5, s, { size: 13, tone: o.tone ?? 'sub', anchor: 'end' }) : ''].join('\n')).join('\n'),
+    /** 아래 눈금 글자 */
+    xticks: (ticks, o = {}) => ticks.map(([v, s]) => text(sx(v), y + h + (o.dy ?? 18), s, { size: 13, tone: o.tone ?? 'sub', anchor: o.anchor ?? 'middle' })).join('\n'),
+    line: (pts, o = {}) => path(P(pts), { stroke: o.tone ?? 'accent', sw: o.sw ?? 2.4, dash: o.dash }),
+    /** 선 아래를 칠한 영역(바닥은 y0 또는 base 배열) */
+    area: (pts, o = {}) => {
+      const bottom = o.base ? [...o.base].reverse() : [[pts[pts.length - 1][0], y0], [pts[0][0], y0]];
+      return path(P([...pts, ...bottom]) + ' z', { fill: o.fill ?? 'accentWeak', stroke: 'none' });
+    },
+    dots: (pts, o = {}) => pts.map(([a, b]) => circle(sx(a), sy(b), o.r ?? 3.5, { fill: o.tone ?? 'accent', stroke: o.ring ? 'card' : 'none', sw: 1.5 })).join('\n'),
+    hline: (v, o = {}) => line(o.from != null ? sx(o.from) : x, sy(v), o.to != null ? sx(o.to) : x + w, sy(v), { tone: o.tone ?? 'warn', sw: o.sw ?? 1.6, dash: o.dash ?? '5 4', cap: 'butt' }),
+    vline: (v, o = {}) => line(sx(v), o.top ?? y, sx(v), y + h, { tone: o.tone ?? 'sub', sw: o.sw ?? 1.5, dash: o.dash ?? '4 4', cap: 'butt' }),
+    /** 값 범위 띠 */
+    band: (a, b, o = {}) => rect(o.from != null ? sx(o.from) : x, sy(b), (o.to != null ? sx(o.to) : x + w) - (o.from != null ? sx(o.from) : x), sy(a) - sy(b), { rx: 0, fill: o.fill ?? 'accentWeak', stroke: 'none' }),
+    /** x 구간 띠(세로) */
+    span: (a, b, o = {}) => rect(sx(a), o.top ?? y, sx(b) - sx(a), (o.bottom ?? y + h) - (o.top ?? y), { rx: 0, fill: o.fill ?? 'warnWeak', stroke: 'none' }),
+    /** 막대 */
+    bar: (a, v, bw, o = {}) => rect(sx(a) - bw / 2, sy(v), bw, sy(y0) - sy(v), { rx: o.rx ?? 2, fill: o.tone ?? 'accent', stroke: 'none', op: o.op }),
+  };
 }
 
 // ── 표시 ──

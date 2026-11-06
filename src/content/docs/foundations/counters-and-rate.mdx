@@ -24,6 +24,8 @@ sources:
 updated: 2026-10-30
 ---
 import RateWindowDemo from '../../../components/demos/RateWindowDemo.tsx';
+import CtrRate from '../../../assets/figures/foundations/ctr-rate.svg';
+import CtrReset from '../../../assets/figures/foundations/ctr-reset.svg';
 
 <OnDashboard title="처리한 요청 수 · 10초마다 수집" caption="위는 카운터를 그대로 그린 선이에요. 아래는 이웃한 두 값 사이 증가량을 10초로 나눈 rate예요. 재시작한 순간에도 rate는 이어져요.">
   <MiniLineChart
@@ -62,20 +64,7 @@ import RateWindowDemo from '../../../components/demos/RateWindowDemo.tsx';
 rate(초당 증가량)는 구간 동안 늘어난 양을 구간 길이(초)로 나눈 값이에요. 5분(300초) 동안 1,000,000에서 1,030,000이 됐다면 30,000 ÷ 300 = 초당 100건이에요. 대시보드에는 카운터가 아니라 이 값을 그려요.
 
 <Figure caption="5분 구간에서 rate를 구하는 모습이에요. 카운터가 늘어난 양 30,000을 구간 길이 300초로 나눠 초당 100건을 얻어요.">
-  <Flow
-    ariaLabel="5분 구간의 시작 값 1,000,000과 끝 값 1,030,000에서 늘어난 양 30,000을 구하고, 300초로 나눠 rate 초당 100건을 얻는 구조도"
-    nodes={[
-      { id: 'from', label: '구간 시작', col: 0, row: 0, note: '1,000,000' },
-      { id: 'to', label: '구간 끝', col: 2, row: 0, note: '1,030,000' },
-      { id: 'inc', label: '늘어난 양', col: 1, row: 1, note: '30,000' },
-      { id: 'rate', label: 'rate', col: 1, row: 2, note: '초당 100건', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'from', to: 'inc' },
-      { from: 'to', to: 'inc' },
-      { from: 'inc', to: 'rate', label: '÷ 300초', tone: 'accent' },
-    ]}
-  />
+  <CtrRate aria-label="카운터가 구간 시작 1,000,000에서 300초(5분) 뒤 구간 끝 1,030,000까지 오른 선 그래프. 늘어난 30,000을 300초로 나눠 rate 초당 100건을 얻어요" />
 </Figure>
 
 구간 안에 샘플이 2개 이상 있어야 rate가 나와요. 아래에서 수집 주기와 구간을 바꿔 보세요.
@@ -86,16 +75,8 @@ rate(초당 증가량)는 구간 동안 늘어난 양을 구간 길이(초)로 �
 
 Prometheus의 `rate`와 `increase`(구간 증가량)는 재시작을 알아서 처리해요. 값이 1,000 → 1,050 → (재시작) → 20일 때, 재시작 앞뒤 값을 그냥 빼면 20 − 1,050 = −1,030이에요. 두 함수는 값이 줄어든 순간을 재시작으로 보고, 재시작 전에 늘어난 50과 뒤의 20을 더해 70으로 세요.
 
-<Figure caption="재시작한 카운터는 0부터 다시 세요. 두 함수는 재시작 전의 +50과 0부터 센 +20을 더해 70으로 봐요. 흐린 칸은 수집되지 않은 0이에요.">
-  <Strip
-    ariaLabel="카운터 값이 1,000, 1,050 다음 재시작으로 0이 된 뒤 20이 되어, 재시작 전 50과 재시작 뒤 20을 더해 증가량 70으로 세는 칸 띠"
-    rows={[{ label: '수집한 카운터 값', cells: ['1,000', '1,050', { label: '0', tone: 'sub' }, '20'] }]}
-    marks={[{ at: 2, label: '재시작', tone: 'warn' }]}
-    ranges={[
-      { from: 0, to: 1, label: '+50' },
-      { from: 2, to: 3, label: '+20' },
-    ]}
-  />
+<Figure caption="재시작한 카운터는 0부터 다시 세요. 그냥 빼면 −1,030이 되지만, rate와 increase는 재시작 전의 +50과 0부터 센 +20을 더해 70으로 봐요.">
+  <CtrReset aria-label="수집한 카운터 값이 1번 1,000, 2번 1,050이었다가 재시작으로 0으로 떨어진 뒤 3번에 20이 된 그래프. 그냥 빼면 20 − 1,050 = −1,030이지만, rate와 increase는 +50과 +20을 더해 70으로 봐요" />
 </Figure>
 
 <Checkpoints>

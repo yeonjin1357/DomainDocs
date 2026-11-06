@@ -21,6 +21,7 @@ sources:
     url: https://www.vldb.org/pvldb/vol8/p1816-teller.pdf
 updated: 2026-11-03
 ---
+import TsdbPath from '../../../assets/figures/foundations/tsdb-path.svg';
 
 <KeyPoints>
   <Point title="최근 값은 메모리에, 사본은 WAL에">
@@ -43,22 +44,7 @@ updated: 2026-11-03
 시계열 DB(TSDB)는 시각 순서로 쌓이는 숫자를 저장하는 데 맞춘 DB예요. 여기서는 Prometheus 3.5를 예로 들어요. 다른 시계열 DB도 이름은 달라도 비슷한 문제를 풀어요.
 
 <Figure caption="샘플 하나가 지나는 길이에요. 메모리에 모으면서 WAL에도 적고, 2시간마다 블록 파일로 내려요. 원격 저장소로 보내는 일도 WAL을 읽어서 해요.">
-  <Flow
-    ariaLabel="수집한 샘플이 메모리(head)와 WAL로 가고, 메모리의 샘플은 2시간마다 블록 파일로 내려가며, WAL은 원격 저장소로 보내는 원천이 되는 구조도"
-    nodes={[
-      { id: 'scrape', label: '수집', col: 0, row: 0 },
-      { id: 'head', label: '메모리(head)', col: 2, row: 0, note: '최근 몇 시간', tone: 'accent' },
-      { id: 'wal', label: 'WAL', col: 0, row: 1, note: '디스크의 사본' },
-      { id: 'block', label: '블록 파일', col: 2, row: 1, note: '압축해 디스크에' },
-      { id: 'remote', label: '원격 저장소', col: 0, row: 2, note: '선택' },
-    ]}
-    edges={[
-      { from: 'scrape', to: 'head', label: '샘플' },
-      { from: 'scrape', to: 'wal' },
-      { from: 'head', to: 'block', label: '2시간마다' },
-      { from: 'wal', to: 'remote', dashed: true },
-    ]}
-  />
+  <TsdbPath aria-label="수집한 샘플이 Prometheus 안에서 메모리(head)에 모이고, 디스크의 WAL에도 같은 내용의 사본으로 적혀요. 메모리의 샘플은 2시간마다 디스크의 블록 파일로 내려가고, 원격 저장소(선택)로는 WAL을 읽어 보내는 그림" />
 </Figure>
 
 새 샘플은 먼저 메모리의 head(지금 쌓는 중인 구간)에 모여요. 메모리는 꺼지면 사라져서, 같은 내용을 WAL(write-ahead log, 먼저 적어 두는 기록)에도 적어요. 재시작하면 WAL을 처음부터 다시 읽어 head를 되살려요.

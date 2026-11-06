@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 252" width="300" height="252">
+<rect x="4" y="4" width="144" height="244" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">경로 틀을 넣을 때</text>
+<circle cx="34" cy="54" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M23 76 C23 64 45 64 45 76 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="34" y="94" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">u1</text>
+<circle cx="74" cy="54" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M63 76 C63 64 85 64 85 76 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="74" y="94" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">u2</text>
+<circle cx="114" cy="54" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M103 76 C103 64 125 64 125 76 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="114" y="94" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">u3</text>
+<path d="M76 102 L76 117.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M76 122 L80.3 115 L71.7 115 z" style="fill:var(--color-text-weak)" />
+<rect x="14" y="128" width="124" height="22" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="22" y="143" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">/users/:id</text>
+<text x="76" y="236" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">있던 시계열에 더해요</text>
+<rect x="152" y="4" width="144" height="244" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">실제 경로를 넣을 때</text>
+<circle cx="182" cy="54" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M171 76 C171 64 193 64 193 76 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="182" y="94" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">u1</text>
+<circle cx="222" cy="54" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M211 76 C211 64 233 64 233 76 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="222" y="94" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">u2</text>
+<circle cx="262" cy="54" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M251 76 C251 64 273 64 273 76 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="262" y="94" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">u3</text>
+<path d="M224 102 L224 117.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M224 122 L228.3 115 L219.7 115 z" style="fill:var(--color-text-weak)" />
+<rect x="162" y="128" width="124" height="22" rx="5" style="fill:var(--color-warn-weak)" />
+<text x="170" y="143" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">/users/1</text>
+<rect x="162" y="154" width="124" height="22" rx="5" style="fill:var(--color-warn-weak)" />
+<text x="170" y="169" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">/users/2</text>
+<rect x="162" y="180" width="124" height="22" rx="5" style="fill:var(--color-warn-weak)" />
+<text x="170" y="195" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">/users/3</text>
+<text x="224" y="236" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">사용자 수만큼 늘어요</text>
+<text x="224" y="214" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">…</text>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 212" width="300" height="212">
+<line x1="40" y1="70" x2="284" y2="70" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="5 4" style="stroke:var(--color-warn)" />
+<text x="36" y="74.5" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">2%</text>
+<path d="M48.5 55 L76.9 50 L105.3 95 L133.6 60 L162 45 L190.4 40 L218.7 50 L247.1 35 L275.5 45" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<circle cx="48.5" cy="55" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<circle cx="76.9" cy="50" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<circle cx="105.3" cy="95" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="133.6" cy="60" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<circle cx="162" cy="45" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<circle cx="190.4" cy="40" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<circle cx="218.7" cy="50" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<circle cx="247.1" cy="35" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<circle cx="275.5" cy="45" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<text x="40" y="14" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">1분마다 평가한 에러율</text>
+<text x="36" y="156" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-text)">상태</text>
+<rect x="40" y="140" width="63.3" height="24" rx="5" style="fill:var(--color-line)" />
+<text x="72.6" y="157" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">pending</text>
+<rect x="133.6" y="140" width="83.1" height="24" rx="5" style="fill:var(--color-line)" />
+<text x="176.2" y="157" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">pending</text>
+<rect x="218.7" y="140" width="63.3" height="24" rx="5" style="fill:var(--color-warn)" />
+<text x="251.4" y="157" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">울림</text>
+<line x1="114.4" y1="147" x2="124.4" y2="157" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="114.4" y1="157" x2="124.4" y2="147" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="133.6" y="184" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">3분: 처음부터 다시 세요</text>
+<text x="292" y="204" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">6분: 3분을 채워 울려요</text>
+<text x="48.5" y="132" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">0분</text>
+<text x="105.3" y="132" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">2분</text>
+<text x="133.6" y="132" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">3분</text>
+<text x="218.7" y="132" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">6분</text>
+<text x="275.5" y="132" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">8분</text>
+</svg>

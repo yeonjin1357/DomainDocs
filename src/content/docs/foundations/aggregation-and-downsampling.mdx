@@ -40,6 +40,8 @@ sources:
 updated: 2026-10-29
 ---
 import DownsamplingDemo from '../../../components/demos/DownsamplingDemo.tsx';
+import AggPick from '../../../assets/figures/foundations/agg-pick.svg';
+import AggAverage from '../../../assets/figures/foundations/agg-average.svg';
 
 <OnDashboard title="CPU 사용률 · 같은 서버, 같은 시각" caption="같은 피크가 1시간 그래프에선 95%, 5분 평균으로 묶은 7일 그래프에선 45%예요.">
   <MiniLineChart
@@ -76,32 +78,8 @@ import DownsamplingDemo from '../../../components/demos/DownsamplingDemo.tsx';
 
 Prometheus에서 `[5m]` 같은 구간 없이 쓴 질의는 점마다 가장 최근 값 하나만 골라요. 그래서 짧은 피크는 점에 걸리면 그대로 보이고, 아니면 아예 빠져요.
 
-<Figure caption="칸 하나가 10초마다 수집한 CPU 사용률(%)이고, 점 간격은 예시로 1분이에요. 점은 제 시각의 가장 최근 값 하나만 골라요. 같은 30초 피크도 점에 걸리면 95%로 보이고, 아니면 사라져요.">
-  <Strip
-    ariaLabel="10초마다 수집한 값 12개를 1분 간격 점으로 그리는 두 줄의 칸 띠. 30초 피크가 점 사이에 들면 1분과 2분 점이 40%와 41%를 골라 피크가 빠지고, 피크가 1분 점에 걸리면 그 점이 95%를 고름"
-    rows={[
-      {
-        label: '피크가 점 사이에 들 때',
-        heads: ['', '', '', '', '', '1분', '', '', '', '', '', '2분'],
-        cells: ['40', '41', { label: '95', tone: 'warn' }, { label: '95', tone: 'warn' }, { label: '95', tone: 'warn' }, { label: '40', tone: 'accent' }, '39', '41', '40', '42', '40', { label: '41', tone: 'accent' }],
-      },
-      {
-        label: '피크가 점에 걸릴 때',
-        heads: ['', '', '', '', '', '1분', '', '', '', '', '', '2분'],
-        cells: ['40', '41', '40', '42', { label: '95', tone: 'warn' }, { label: '95', tone: 'warn' }, { label: '95', tone: 'warn' }, '40', '39', '41', '40', { label: '41', tone: 'accent' }],
-      },
-    ]}
-    marks={[
-      { row: 0, at: 5, label: '점 40%', tone: 'accent' },
-      { row: 0, at: 11, label: '점 41%', tone: 'accent' },
-      { row: 1, at: 5, label: '점 95%', tone: 'warn' },
-      { row: 1, at: 11, label: '점 41%', tone: 'accent' },
-    ]}
-    ranges={[
-      { row: 0, from: 2, to: 4, label: '30초 피크', tone: 'warn' },
-      { row: 1, from: 4, to: 6, label: '30초 피크', tone: 'warn' },
-    ]}
-  />
+<Figure caption="막대 하나가 10초마다 수집한 CPU 사용률(%)이고, 점 간격은 예시로 1분이에요. 점은 제 시각의 가장 최근 값 하나만 골라요. 같은 30초 피크도 점에 걸리면 95%로 보이고, 아니면 사라져요.">
+  <AggPick aria-label="10초마다 수집한 값 12개를 막대로 그리고, 1분과 2분 점이 고른 값을 이은 두 그래프. 위는 30초 피크(95%)가 점 사이에 들어 1분과 2분 점이 40과 41을 골라 피크가 빠지고, 아래는 피크가 1분 점에 걸려 그 점이 95를 골라요" />
 </Figure>
 
 ## 평균으로 묶으면 짧은 피크가 묻혀요
@@ -110,24 +88,8 @@ Prometheus에서 `[5m]` 같은 구간 없이 쓴 질의는 점마다 가장 최�
 
 1분씩 평균을 내면 피크가 든 점은 67%로 보여요. 5분이면 45%, 15분이면 42%예요. 15분 구간에서 30초는 1/30뿐이기 때문이에요.
 
-<Figure caption="띠 하나가 30초 피크를 품은 점 하나가 맡는 시간이고, 줄 이름 옆 숫자가 그 점의 평균이에요. 맡는 시간이 길수록 같은 30초의 몫이 작아져서 피크가 묻혀요.">
-  <Timeline
-    ariaLabel="15분 동안 30초 이어진 95% 피크를, 그 피크를 품은 점이 1분이면 67%, 5분이면 45%, 15분이면 42%로 보여 주는 시간 띠. 점이 맡는 시간이 길수록 피크의 몫이 작아짐"
-    end={900}
-    lanes={[
-      { label: '원본 95%', segments: [{ start: 420, end: 450, tone: 'warn' }] },
-      { label: '1분 67%', segments: [{ start: 420, end: 480, tone: 'accent' }] },
-      { label: '5분 45%', segments: [{ start: 300, end: 600, tone: 'accent' }] },
-      { label: '15분 42%', segments: [{ start: 0, end: 900, tone: 'accent' }] },
-    ]}
-    marks={[{ at: 435, label: '30초 피크', tone: 'warn' }]}
-    ticks={[
-      { at: 0, label: '0분' },
-      { at: 300, label: '5분' },
-      { at: 600, label: '10분' },
-      { at: 900, label: '15분' },
-    ]}
-  />
+<Figure caption="같은 30초 피크를 품은 점 하나가 맡는 시간을 1분, 5분, 15분으로 늘려 평균했어요. 맡는 시간이 길수록 같은 30초의 몫이 작아져서 피크가 묻혀요.">
+  <AggAverage aria-label="15분 동안 7분 무렵 30초 이어진 95% 피크를, 원본 10초 그래프는 95%로 보여 주고, 1분 평균은 최고 67%, 5분 평균은 45%, 15분 평균은 42%로 낮춰 보여 주는 네 줄 그래프" />
 </Figure>
 
 ## 최댓값으로 묶으면 피크는 남지만 길이가 부풀어요

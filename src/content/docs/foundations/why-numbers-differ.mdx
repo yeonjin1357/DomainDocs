@@ -28,6 +28,7 @@ sources:
     url: https://github.com/grafana/grafana-prometheus-datasource/blob/cb5651b00a6b7769b10067f1a6baec07278f4c52/pkg/promlib/models/query.go#L421-L469
 updated: 2026-10-29
 ---
+import WndPick from '../../../assets/figures/foundations/wnd-pick.svg';
 
 <Situation>
   대시보드 위젯은 결제 API의 p99(느린 쪽 1%의 경계값)가 1.2초라고 해요. 같은 시각을 보는 상세 화면은 3.4초라고 해요. 둘 중 하나가 버그일까요?
@@ -60,25 +61,7 @@ updated: 2026-10-29
 점 수를 줄이는 방법에 따라 짧은 피크가 빠지거나 묻혀요. Prometheus에서 `[5m]` 같은 구간 없이 쓴 질의는 점마다 가장 최근 값 하나만 골라, 피크가 점에 걸릴 때만 보여요. 평균으로 묶는 질의나 저장소에서는 피크가 낮아져요.
 
 <Figure caption="10초마다 모은 값 12개를 점 3개로 줄인 예시예요. 가장 최근 값만 고르면 세 점이 모두 10이라 피크 90이 사라져요. 평균으로 묶으면 피크가 든 구간이 30으로 낮아져요.">
-  <Strip
-    ariaLabel="10초마다 모은 값 12개 중 여섯째 값만 90이고 나머지는 10일 때, 4칸마다 마지막 값을 고른 점 세 개는 모두 10이고, 4칸씩 평균 내면 10, 30, 10이 되는 칸 띠"
-    rows={[
-      {
-        label: '10초마다 모은 값',
-        cells: ['10', '10', '10', { label: '10', tone: 'accent' }, '10', { label: '90', tone: 'warn' }, '10', { label: '10', tone: 'accent' }, '10', '10', '10', { label: '10', tone: 'accent' }],
-      },
-    ]}
-    marks={[
-      { at: 3, label: '점' },
-      { at: 7, label: '점' },
-      { at: 11, label: '점' },
-    ]}
-    ranges={[
-      { from: 0, to: 3, label: '평균 10' },
-      { from: 4, to: 7, label: '평균 30', tone: 'warn' },
-      { from: 8, to: 11, label: '평균 10' },
-    ]}
-  />
+  <WndPick aria-label="10초마다 모은 값 12개 중 여섯째 값만 90이고 나머지는 10인 막대 그래프. 4개마다 마지막 값을 고른 점 1, 2, 3은 모두 10이고, 4개씩 평균 내면 10, 30, 10이에요" />
 </Figure>
 
 확인은 두 화면의 시간 범위를 같게 맞추는 데서 시작해요. Grafana 패널은 Relative time이나 Time shift로 대시보드와 다른 기간을 볼 수 있어요. 한쪽 패널에만 이 설정이 있는지 봐요.

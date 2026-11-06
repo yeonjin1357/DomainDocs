@@ -23,6 +23,7 @@ sources:
     url: https://github.com/prometheus/alertmanager/blob/main/notify/metrics.go
 updated: 2026-10-30
 ---
+import ArLanding from '../../../assets/figures/foundations/ar-landing.svg';
 
 <Figure caption="team=payment인 알림은 결제 채팅방으로 가고, 그중 severity=critical만 결제 당직을 호출해요. 어디에도 맞지 않는 알림은 기본 경로의 운영 채팅방으로 가요.">
   <Tree
@@ -71,26 +72,12 @@ route:
           receiver: pay-oncall
 ```
 
-이 설정에서 `team="payment"`와 `severity="critical"`인 알림은 결제 당직(`pay-oncall`)으로 가요. 결제 팀의 warning은 결제 채팅방으로, 팀 레이블이 없는 알림은 기본 채팅방으로 가요.
+이 설정에서 `team="payment"`와 `severity="critical"`인 알림은 결제 당직(`pay-oncall`)으로 가요. 결제 팀의 warning은 결제 채팅방으로, 팀 레이블이 없는 알림은 기본 경로의 운영 채팅방으로 가요.
 
 레이블 값은 글자 그대로 견줘요. `team="Payment"`처럼 대소문자만 달라도 결제 경로에 맞지 않고 기본 경로로 가요.
 
-<Figure caption="위 설정에 알림 네 개를 넣은 모습이에요. 진한 칸이 마지막으로 맞은 경로이고, 흐린 칸은 맞지 않아 내려가지 못한 경로예요. 알림은 진한 칸의 받는 곳으로 가요.">
-  <Strip
-    ariaLabel="team=payment이고 severity=critical인 알림은 기본 경로, 결제 팀, critical까지 내려가 결제 당직으로 가고, 결제 팀의 warning은 결제 팀에서 멈춰 결제 채팅방으로, 팀 레이블이 없는 알림과 team=Payment인 알림은 기본 경로에서 멈춰 기본 채팅방으로 가는 칸 띠"
-    rows={[
-      { label: 'team=payment, severity=critical', cells: ['기본 경로', '결제 팀', { label: 'critical', tone: 'accent' }] },
-      { label: 'team=payment, severity=warning', cells: ['기본 경로', { label: '결제 팀', tone: 'accent' }, { label: 'critical', tone: 'sub' }] },
-      { label: '팀 레이블 없음', cells: [{ label: '기본 경로', tone: 'accent' }, { label: '결제 팀', tone: 'sub' }, { label: 'critical', tone: 'sub' }] },
-      { label: 'team=Payment', cells: [{ label: '기본 경로', tone: 'accent' }, { label: '결제 팀', tone: 'sub' }, { label: 'critical', tone: 'sub' }] },
-    ]}
-    ranges={[
-      { row: 0, from: 2, to: 2, label: '결제 당직', tone: 'accent' },
-      { row: 1, from: 1, to: 1, label: '결제 채팅방', tone: 'accent' },
-      { row: 2, from: 0, to: 0, label: '기본 채팅방', tone: 'accent' },
-      { row: 3, from: 0, to: 0, label: '기본 채팅방', tone: 'accent' },
-    ]}
-  />
+<Figure caption="위 설정에 알림 네 개를 넣은 모습이에요. 알림은 마지막으로 맞은 경로의 받는 곳으로 가요. team=Payment처럼 대문자 하나만 달라도 결제 경로에 맞지 않아요.">
+  <ArLanding aria-label="경로 나무에서 기본 경로는 운영 채팅방으로, 그 아래 결제 팀(team=payment)은 결제 채팅방으로, 그 아래 critical(severity=critical)은 결제 당직 호출로 보내요. 알림 넷 중 payment·critical은 결제 당직으로, payment·warning은 결제 채팅방으로, 팀 레이블 없는 알림과 team=Payment 알림은 운영 채팅방으로 가요" />
 </Figure>
 
 ## 심각도마다 방법을 달리해요

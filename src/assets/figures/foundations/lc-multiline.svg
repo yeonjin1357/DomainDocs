@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 256" width="300" height="256">
+<rect x="4" y="4" width="292" height="92" rx="8" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="16" y="26" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">Exception: timeout</text>
+<text x="16" y="46" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">  at db.query</text>
+<text x="16" y="66" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">  at order.save</text>
+<text x="16" y="86" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">  at http.handle</text>
+<text x="8" y="120" font-size="13" font-weight="700" style="fill:var(--color-warn)">묶지 않으면 로그 4개</text>
+<rect x="4" y="128" width="140" height="22" rx="5" style="fill:var(--color-warn-weak)" />
+<text x="12" y="143" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">Exception</text>
+<rect x="4" y="154" width="140" height="22" rx="5" style="fill:var(--color-warn-weak)" />
+<text x="12" y="169" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">at db.query</text>
+<rect x="4" y="180" width="140" height="22" rx="5" style="fill:var(--color-warn-weak)" />
+<text x="12" y="195" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">at order.save</text>
+<rect x="4" y="206" width="140" height="22" rx="5" style="fill:var(--color-warn-weak)" />
+<text x="12" y="221" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">at http.handle</text>
+<text x="156" y="120" font-size="13" font-weight="700" style="fill:var(--color-accent)">묶으면 로그 하나</text>
+<rect x="156" y="128" width="140" height="100" rx="6" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="164" y="148" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">Exception</text>
+<text x="164" y="170" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">at db.query</text>
+<text x="164" y="192" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">at order.save</text>
+<text x="164" y="214" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">at http.handle</text>
+<text x="8" y="248" font-size="13" style="fill:var(--color-text-sub)">'at' 줄만 보면 어느 예외인지 몰라요</text>
+</svg>

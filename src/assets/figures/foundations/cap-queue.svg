@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 222" width="300" height="222">
+<line x1="44" y1="174" x2="280" y2="174" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="38" y="178.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">0</text>
+<line x1="44" y1="105.8" x2="280" y2="105.8" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="38" y="110.3" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">10배</text>
+<line x1="44" y1="37.6" x2="280" y2="37.6" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="38" y="42.1" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">20배</text>
+<rect x="232.8" y="24" width="47.2" height="150" rx="0" style="fill:var(--color-warn-weak)" />
+<line x1="44" y1="174" x2="280" y2="174" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M44 167.2 L47.5 167.1 L51.1 167 L54.6 166.9 L58.2 166.7 L61.7 166.6 L65.2 166.5 L68.8 166.4 L72.3 166.3 L75.9 166.1 L79.4 166 L82.9 165.8 L86.5 165.7 L90 165.5 L93.6 165.4 L97.1 165.2 L100.6 165 L104.2 164.8 L107.7 164.7 L111.3 164.5 L114.8 164.3 L118.3 164 L121.9 163.8 L125.4 163.6 L129 163.3 L132.5 163.1 L136 162.8 L139.6 162.5 L143.1 162.2 L146.7 161.9 L150.2 161.6 L153.7 161.3 L157.3 160.9 L160.8 160.5 L164.4 160.1 L167.9 159.6 L171.4 159.2 L175 158.7 L178.5 158.1 L182.1 157.6 L185.6 157 L189.1 156.3 L192.7 155.6 L196.2 154.8 L199.8 153.9 L203.3 153 L206.8 152 L210.4 150.9 L213.9 149.6 L217.5 148.3 L221 146.7 L224.5 145 L228.1 143 L231.6 140.7 L235.2 138.1 L238.7 135 L242.2 131.4 L245.8 127 L249.3 121.6 L252.9 114.7 L256.4 105.8 L259.9 93.8 L263.5 76.6 L267 50 L269.4 22.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<circle cx="162" cy="160.4" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="154" y="158.4" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">2배</text>
+<circle cx="209.2" cy="151.3" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="201.2" y="149.3" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">3.3배</text>
+<circle cx="232.8" cy="139.9" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="224.8" y="137.9" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">5배</text>
+<circle cx="256.4" cy="105.8" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<text x="248.4" y="103.8" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">10배</text>
+<circle cx="268.2" cy="37.6" r="4.5" stroke-width="1.5" style="fill:var(--color-warn);stroke:var(--color-card)" />
+<text x="260.2" y="35.6" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">20배</text>
+<text x="44" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">0%</text>
+<text x="162" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">50%</text>
+<text x="232.8" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">80%</text>
+<text x="280" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">100%</text>
+<text x="256.4" y="163.8" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">가팔라져요</text>
+<text x="44" y="214" font-size="13" style="fill:var(--color-text-sub)">사용률 →  응답시간이 처리 시간의 몇 배인지</text>
+</svg>

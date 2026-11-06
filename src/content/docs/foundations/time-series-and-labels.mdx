@@ -38,6 +38,9 @@ sources:
 updated: 2026-10-30
 ---
 import CardinalityDemo from '../../../components/demos/CardinalityDemo.tsx';
+import TsSeries from '../../../assets/figures/foundations/ts-series.svg';
+import TsMultiply from '../../../assets/figures/foundations/ts-multiply.svg';
+import TsBounded from '../../../assets/figures/foundations/ts-bounded.svg';
 
 <OnDashboard title="활성 시계열 수 · 배포 전후" caption="레이블에 사용자 ID를 넣어 배포한 뒤로, 새 사용자가 요청할 때마다 시계열이 늘어요.">
   <MiniLineChart
@@ -71,20 +74,7 @@ import CardinalityDemo from '../../../components/demos/CardinalityDemo.tsx';
 요청 수를 세는 <Term slug="foundations/counters-and-rate">카운터</Term> `http_requests_total`로 보면 이래요. `{method="GET", status="200"}`과 `{method="POST", status="200"}`은 서로 다른 시계열이에요. 대시보드에 그리면 선도 두 개예요.
 
 <Figure caption="같은 지표 http_requests_total을 15초마다 모은 예시예요. 레이블 조합마다 줄이 따로 생기고, 줄마다 값이 시각 순서로 쌓여요.">
-  <Strip
-    ariaLabel="http_requests_total 지표에서 method가 GET인 줄과 POST인 줄이 따로 있고, 줄마다 0초부터 60초까지 15초마다 모은 값이 시각 순서로 쌓인 칸 띠"
-    rows={[
-      {
-        label: 'method="GET", status="200"',
-        heads: ['0초', '15초', '30초', '45초', '60초'],
-        cells: ['100', '104', '109', '113', '118'],
-      },
-      {
-        label: 'method="POST", status="200"',
-        cells: ['20', '21', '21', '23', '24'],
-      },
-    ]}
-  />
+  <TsSeries aria-label="지표 http_requests_total에서 method가 GET, status가 200인 줄 1에는 0초부터 60초까지 15초마다 100, 104, 109, 113, 118이 쌓이고, method가 POST인 줄 2에는 20, 21, 21, 23, 24가 쌓이는 그림" />
 </Figure>
 
 ## 시계열 수는 최대 레이블 값 수의 곱이에요
@@ -94,21 +84,7 @@ import CardinalityDemo from '../../../components/demos/CardinalityDemo.tsx';
 Prometheus는 수집할 때 수집 대상마다 `instance` 레이블을 붙여요. 서버마다 값이 달라서, 서버 50대면 최대 500,000개예요. 여기에 값이 10개인 레이블을 하나 더하면 5,000,000개까지 늘어요.
 
 <Figure caption="레이블마다 값의 수를 곱하면 시계열 수의 최대치예요. 레이블을 하나 더할 때마다 그 값의 수만큼 곱이 커져요.">
-  <Strip
-    ariaLabel="method 5개, status 10개, route 200개를 곱하면 서버 한 대에 최대 10,000개, instance 50개를 더 곱하면 최대 500,000개, 값이 10개인 레이블을 하나 더하면 최대 5,000,000개가 되는 칸 띠"
-    rows={[
-      {
-        label: '레이블마다 값의 수',
-        heads: ['method', 'status', 'route', 'instance', '하나 더'],
-        cells: ['5개', '10개', '200개', '50개', { label: '10개', tone: 'warn' }],
-      },
-    ]}
-    ranges={[
-      { from: 0, to: 2, label: '서버 한 대: 최대 10,000개', tone: 'accent' },
-      { from: 0, to: 3, label: '서버 50대: 최대 500,000개' },
-      { from: 0, to: 4, label: '하나 더하면: 최대 5,000,000개', tone: 'warn' },
-    ]}
-  />
+  <TsMultiply aria-label="method 5개, status 10개, route 200개를 곱하면 서버 한 대에 최대 10,000개, instance 50개를 더 곱하면 최대 500,000개, 값이 10개인 레이블을 하나 더하면 최대 5,000,000개가 되는 곱셈 그림" />
 </Figure>
 
 아래에서 레이블을 붙였다 떼어 보세요. user_id처럼 끝없이 늘어나는 레이블 하나가 곱을 크게 키워요.
@@ -122,14 +98,7 @@ Prometheus는 수집할 때 수집 대상마다 `instance` 레이블을 붙여�
 사용자별·요청별로 봐야 한다면 로그 본문이나 트레이스(요청 전체의 기록)에 남겨요. 지표 레이블에는 응답 상태 코드처럼 값이 몇 개로 정해진 것만 둬요.
 
 <Figure caption="레이블에는 값이 몇 개로 정해진 것만 둬요. 끝없이 늘어나는 값은 새 값마다 시계열을 만들어서, 로그나 트레이스에 남겨요.">
-  <Compare
-    columns={['값이 정해진 것', '끝없이 늘어나는 것']}
-    rows={[
-      { label: '예', values: ['응답 상태 코드', '사용자 ID, 요청 ID, 이메일, 원본 URL'] },
-      { label: '시계열 수', values: ['값이 몇 개로 정해져서 늘지 않아요', '새 값마다 늘어요'] },
-      { label: '남길 곳', values: ['지표 레이블', '로그 본문이나 트레이스'] },
-    ]}
-  />
+  <TsBounded aria-label="값이 정해진 응답 상태 코드는 200, 404, 500 세 값뿐이라 시계열 수가 3개 그대로이고 지표 레이블에 둬요. 끝없이 늘어나는 사용자 ID, 요청 ID는 u1, u2, u3처럼 새 값마다 시계열이 하나씩 늘어서 로그나 트레이스에 남겨요" />
 </Figure>
 
 <Checkpoints>

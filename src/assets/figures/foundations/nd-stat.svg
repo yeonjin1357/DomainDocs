@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 252" width="300" height="252">
+<text x="8" y="14" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">점 간격마다 계산한 에러율(%)</text>
+<rect x="158" y="30" width="128" height="80" rx="0" style="fill:var(--color-warn-weak)" />
+<line x1="30" y1="110" x2="286" y2="110" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M51.3 64.3 L94 52.9 L136.7 64.3" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<circle cx="51.3" cy="64.3" r="4.5" style="fill:var(--color-accent)" />
+<circle cx="94" cy="52.9" r="4.5" style="fill:var(--color-accent)" />
+<circle cx="136.7" cy="64.3" r="4.5" style="fill:var(--color-accent)" />
+<text x="51.3" y="54.3" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">0.4</text>
+<text x="94" y="42.9" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">0.5</text>
+<text x="136.7" y="54.3" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">0.4</text>
+<text x="222" y="66.6" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">수집 멈춤</text>
+<text x="222" y="84.6" font-size="13" text-anchor="middle" style="fill:var(--color-warn)">값 없음</text>
+<path d="M136.7 74.3 L81.1 142.2" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-accent)" />
+<path d="M78 146 L85.8 143.3 L79.1 137.8 z" style="fill:var(--color-accent)" />
+<path d="M264.7 114 L227.9 143" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<path d="M224 146 L232.2 145.1 L226.8 138.3 z" style="fill:var(--color-warn)" />
+<rect x="8" y="150" width="136" height="74" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="18" y="170" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">기본: 마지막 값</text>
+<text x="76" y="204" font-size="20" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">0.4%</text>
+<text x="76" y="244" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">장애를 가려요</text>
+<rect x="156" y="150" width="136" height="74" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-warn)" />
+<text x="166" y="170" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">Instant</text>
+<text x="224" y="204" font-size="20" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">No data</text>
+<text x="224" y="244" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">멈춘 게 보여요</text>
+</svg>

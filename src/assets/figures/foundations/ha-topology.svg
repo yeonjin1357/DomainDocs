@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 252" width="300" height="252">
+<path d="M52 124 L116.6 57.5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M120 54 L112 56 L118.2 62 z" style="fill:var(--color-text-sub)" />
+<path d="M52 124 L116.6 190.5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M120 194 L118.2 186 L112 192 z" style="fill:var(--color-text-sub)" />
+<path d="M156 54 L227.1 54" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M232 54 L225 49.7 L225 58.3 z" style="fill:var(--color-accent)" />
+<path d="M156 194 L229.5 68.2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M232 64 L224.7 67.9 L232.2 72.2 z" style="fill:var(--color-accent)" />
+<path d="M156 58 L221.7 179.7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<path d="M224 184 L224.5 175.8 L216.9 179.9 z" style="fill:var(--color-warn)" />
+<path d="M156 198 L219.1 194.3" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<path d="M224 194 L216.8 190.1 L217.3 198.7 z" style="fill:var(--color-warn)" />
+<rect x="23" y="107" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="29" y1="115" x2="43" y2="115" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="29" y1="121" x2="43" y2="121" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="29" y1="127" x2="43" y2="127" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="36" cy="134.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="36" y="158" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">수집 대상</text>
+<rect x="125" y="37" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="131" y1="45" x2="145" y2="45" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="131" y1="51" x2="145" y2="51" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="131" y1="57" x2="145" y2="57" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="138" cy="64.5" r="2" style="fill:var(--color-accent)" />
+<text x="138" y="88" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">수집 A</text>
+<text x="138" y="106" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">replica=a</text>
+<rect x="125" y="177" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="131" y1="185" x2="145" y2="185" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="131" y1="191" x2="145" y2="191" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="131" y1="197" x2="145" y2="197" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="138" cy="204.5" r="2" style="fill:var(--color-accent)" />
+<text x="138" y="228" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">수집 B</text>
+<text x="138" y="246" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">replica=b</text>
+<path d="M237 41 V67 A17 5.5 0 0 0 271 67 V41" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M237 54 A17 5.5 0 0 0 271 54" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<ellipse cx="254" cy="41" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="294" y="88" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">중앙 저장소</text>
+<text x="294" y="106" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">Thanos·Mimir</text>
+<path d="M230 201 C231 196 231 191 232 188 C234 182 246 182 248 188 C249 191 249 196 250 201 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="228" y1="201" x2="252" y2="201" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<circle cx="240" cy="205" r="2.6" style="fill:var(--color-warn)" />
+<line x1="240" y1="180" x2="240" y2="183" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<path d="M258 201 C259 196 259 191 260 188 C262 182 274 182 276 188 C277 191 277 196 278 201 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="256" y1="201" x2="280" y2="201" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<circle cx="268" cy="205" r="2.6" style="fill:var(--color-warn)" />
+<line x1="268" y1="180" x2="268" y2="183" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="294" y="228" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">Alertmanager</text>
+<text x="294" y="246" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">두 대</text>
+</svg>

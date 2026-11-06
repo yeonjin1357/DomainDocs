@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 164" width="300" height="164">
+<rect x="4" y="10" width="150" height="28" rx="6" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="12" y="29" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">GET</text>
+<text x="48" y="29" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">/users/1</text>
+<line x1="46" y1="25" x2="109.2" y2="25" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<path d="M158 24 L192.1 49.1" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M196 52 L192.9 44.4 L187.8 51.3 z" style="fill:var(--color-warn)" />
+<rect x="4" y="44" width="150" height="28" rx="6" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="12" y="63" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">GET</text>
+<text x="48" y="63" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">/users/2</text>
+<line x1="46" y1="59" x2="109.2" y2="59" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<path d="M158 58 L191.2 52.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M196 52 L188.4 48.8 L189.8 57.4 z" style="fill:var(--color-warn)" />
+<rect x="4" y="78" width="150" height="28" rx="6" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="12" y="97" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">GET</text>
+<text x="48" y="97" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">/users/3</text>
+<line x1="46" y1="93" x2="109.2" y2="93" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<path d="M158 92 L192.6 55.6" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M196 52 L188 54.1 L194.3 60.1 z" style="fill:var(--color-warn)" />
+<rect x="200" y="34" width="96" height="36" rx="8" stroke-width="1.6" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="248" y="57" font-size="14" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">GET</text>
+<text x="248" y="92" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">같은 조합 하나</text>
+<text x="150" y="136" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">route를 지우면 셋 다 method="GET"만 남아요</text>
+<text x="150" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">값이 하나만 남고 나머지는 덮여요</text>
+</svg>

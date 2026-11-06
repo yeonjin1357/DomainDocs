@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 302" width="300" height="302">
+<path d="M36 50 L36 67.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M36 72 L40.3 65 L31.7 65 z" style="fill:var(--color-text-weak)" />
+<path d="M36 114 L36 131.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M36 136 L40.3 129 L31.7 129 z" style="fill:var(--color-text-weak)" />
+<rect x="23" y="11" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="29" y1="19" x2="43" y2="19" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="29" y1="25" x2="43" y2="25" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="29" y1="31" x2="43" y2="31" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="36" cy="38.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="70" y="20" font-size="13" font-weight="700" style="fill:var(--color-text)">앱이 써요</text>
+<text x="70" y="40" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">2026-11-05 09:00:00</text>
+<text x="292" y="20" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-warn)">시간대 없음</text>
+<rect x="23" y="75" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="29" y1="83" x2="43" y2="83" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="29" y1="89" x2="43" y2="89" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="29" y1="95" x2="43" y2="95" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="36" cy="102.5" r="2" style="fill:var(--color-accent)" />
+<text x="70" y="84" font-size="13" font-weight="700" style="fill:var(--color-text)">에이전트가 읽어요</text>
+<text x="70" y="104" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">…T09:00:00+09:00</text>
+<text x="292" y="84" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-accent)">여기서 시간대를 정해요</text>
+<path d="M19 143 V169 A17 5.5 0 0 0 53 169 V143" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M19 156 A17 5.5 0 0 0 53 156" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<ellipse cx="36" cy="143" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<text x="70" y="148" font-size="13" font-weight="700" style="fill:var(--color-text)">저장소</text>
+<text x="70" y="168" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">1793836800</text>
+<text x="292" y="148" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">UTC 기준 초</text>
+<line x1="36" y1="176" x2="36" y2="200" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="36" y1="200" x2="222" y2="200" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<path d="M80 200 L80 211.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M80 216 L84.3 209 L75.7 209 z" style="fill:var(--color-text-weak)" />
+<path d="M222 200 L222 211.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M222 216 L226.3 209 L217.7 209 z" style="fill:var(--color-text-weak)" />
+<rect x="14" y="220" width="132" height="56" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="14" y1="228" x2="146" y2="228" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="19" cy="224" r="1.4" style="fill:var(--color-text-sub)" />
+<circle cx="23" cy="224" r="1.4" style="fill:var(--color-text-sub)" />
+
+<text x="80" y="263" font-size="15" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">11-05 09:00</text>
+<text x="80" y="294" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">한국 브라우저</text>
+<rect x="156" y="220" width="132" height="56" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="156" y1="228" x2="288" y2="228" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="161" cy="224" r="1.4" style="fill:var(--color-text-sub)" />
+<circle cx="165" cy="224" r="1.4" style="fill:var(--color-text-sub)" />
+
+<text x="222" y="263" font-size="15" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">11-05 00:00</text>
+<text x="222" y="294" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">UTC 대시보드</text>
+</svg>

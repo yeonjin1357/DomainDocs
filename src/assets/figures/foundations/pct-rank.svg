@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 228" width="300" height="228">
+<line x1="48" y1="180" x2="288" y2="180" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="42" y="184.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">0</text>
+<line x1="48" y1="130" x2="288" y2="130" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="42" y="134.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">0.5초</text>
+<line x1="48" y1="60" x2="288" y2="60" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+
+<line x1="48" y1="30" x2="288" y2="30" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+
+<rect x="48.4" y="174" width="1.7" height="6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="50.8" y="174" width="1.7" height="6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="53.2" y="174" width="1.7" height="6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="55.6" y="174" width="1.7" height="6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="58" y="174" width="1.7" height="6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="60.4" y="173.9" width="1.7" height="6.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="62.8" y="173.9" width="1.7" height="6.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="65.2" y="173.9" width="1.7" height="6.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="67.6" y="173.8" width="1.7" height="6.2" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="70" y="173.8" width="1.7" height="6.2" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="72.4" y="173.7" width="1.7" height="6.3" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="74.8" y="173.7" width="1.7" height="6.3" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="77.2" y="173.6" width="1.7" height="6.4" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="79.6" y="173.6" width="1.7" height="6.4" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="82" y="173.5" width="1.7" height="6.5" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="84.4" y="173.4" width="1.7" height="6.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="86.8" y="173.3" width="1.7" height="6.7" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="89.2" y="173.2" width="1.7" height="6.8" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="91.6" y="173.1" width="1.7" height="6.9" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="94" y="173" width="1.7" height="7" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="96.4" y="172.9" width="1.7" height="7.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="98.8" y="172.8" width="1.7" height="7.2" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="101.2" y="172.7" width="1.7" height="7.3" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="103.6" y="172.6" width="1.7" height="7.4" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="106" y="172.4" width="1.7" height="7.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="108.4" y="172.3" width="1.7" height="7.7" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="110.8" y="172.1" width="1.7" height="7.9" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="113.2" y="172" width="1.7" height="8" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="115.6" y="171.8" width="1.7" height="8.2" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="118" y="171.6" width="1.7" height="8.4" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="120.4" y="171.5" width="1.7" height="8.5" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="122.8" y="171.3" width="1.7" height="8.7" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="125.2" y="171.1" width="1.7" height="8.9" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="127.6" y="170.9" width="1.7" height="9.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="130" y="170.7" width="1.7" height="9.3" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="132.4" y="170.5" width="1.7" height="9.5" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="134.8" y="170.2" width="1.7" height="9.8" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="137.2" y="170" width="1.7" height="10" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="139.6" y="169.8" width="1.7" height="10.2" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="142" y="169.5" width="1.7" height="10.5" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="144.4" y="169.3" width="1.7" height="10.7" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="146.8" y="169" width="1.7" height="11" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="149.2" y="168.8" width="1.7" height="11.2" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="151.6" y="168.5" width="1.7" height="11.5" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="154" y="168.2" width="1.7" height="11.8" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="156.4" y="167.9" width="1.7" height="12.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="158.8" y="167.6" width="1.7" height="12.4" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="161.2" y="167.3" width="1.7" height="12.7" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="163.5" y="167" width="1.7" height="13" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="165.7" y="166.7" width="2.2" height="13.3" rx="0.5" style="fill:var(--color-text)" />
+<rect x="168.4" y="166.4" width="1.7" height="13.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="170.8" y="166.1" width="1.7" height="13.9" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="173.2" y="165.7" width="1.7" height="14.3" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="175.6" y="165.4" width="1.7" height="14.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="178" y="165" width="1.7" height="15" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="180.4" y="164.6" width="1.7" height="15.4" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="182.8" y="164.2" width="1.7" height="15.8" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="185.2" y="163.9" width="1.7" height="16.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="187.5" y="163.5" width="1.7" height="16.5" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="190" y="163.1" width="1.7" height="16.9" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="192.4" y="162.6" width="1.7" height="17.4" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="194.8" y="162.2" width="1.7" height="17.8" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="197.2" y="161.8" width="1.7" height="18.2" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="199.6" y="161.3" width="1.7" height="18.7" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="202" y="160.9" width="1.7" height="19.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="204.4" y="160.4" width="1.7" height="19.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="206.8" y="159.9" width="1.7" height="20.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="209.2" y="159.4" width="1.7" height="20.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="211.6" y="158.8" width="1.7" height="21.2" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="214" y="158.3" width="1.7" height="21.7" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="216.4" y="157.7" width="1.7" height="22.3" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="218.8" y="157.1" width="1.7" height="22.9" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="221.2" y="156.5" width="1.7" height="23.5" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="223.6" y="155.9" width="1.7" height="24.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="226" y="155.2" width="1.7" height="24.8" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="228.4" y="154.5" width="1.7" height="25.5" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="230.8" y="153.8" width="1.7" height="26.2" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="233.2" y="153" width="1.7" height="27" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="235.6" y="152.2" width="1.7" height="27.8" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="238" y="151.3" width="1.7" height="28.7" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="240.4" y="150.4" width="1.7" height="29.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="242.8" y="149.4" width="1.7" height="30.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="245.2" y="148.4" width="1.7" height="31.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="247.6" y="147.3" width="1.7" height="32.7" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="250" y="146.1" width="1.7" height="33.9" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="252.4" y="144.8" width="1.7" height="35.2" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="254.8" y="143.4" width="1.7" height="36.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="257.2" y="141.9" width="1.7" height="38.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="259.5" y="140.2" width="1.7" height="39.8" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="262" y="138.5" width="1.7" height="41.5" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="264.4" y="136.5" width="1.7" height="43.5" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="266.8" y="134.4" width="1.7" height="45.6" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="269.2" y="132.1" width="1.7" height="47.9" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="271.5" y="129.6" width="1.7" height="50.4" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="273.9" y="126.9" width="1.7" height="53.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="276.3" y="123.9" width="1.7" height="56.1" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="278.8" y="120.6" width="1.7" height="59.4" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="281.2" y="117" width="1.7" height="63" rx="0.5" style="fill:var(--color-text-weak)" />
+<rect x="283.3" y="60" width="2.2" height="120" rx="0.5" style="fill:var(--color-accent)" />
+<rect x="285.7" y="30" width="2.2" height="150" rx="0.5" style="fill:var(--color-warn)" />
+<path d="M282.8 31 l4 -5 l4 5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-card)" />
+<line x1="48" y1="60" x2="284.4" y2="60" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="4 3" style="stroke:var(--color-accent)" />
+<line x1="48" y1="180" x2="288" y2="180" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<text x="278.4" y="52" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">p99 = 1.2초</text>
+<text x="166.8" y="156.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">p50</text>
+<text x="286.8" y="22" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-warn)">100번</text>
+<path d="M48.2 198 v6 H285.4 v-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="166.8" y="220" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">1~99번 · 요청의 99%</text>
+<path d="M284.8 198 v6 H288.8 v-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<text x="292.8" y="220" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">1%</text>
+<text x="48" y="16" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">빠른 순서로 줄 세운 요청 100개</text>
+</svg>

@@ -17,6 +17,7 @@ sources:
 updated: 2026-10-30
 ---
 import DashboardTour from '../../../components/demos/DashboardTour.tsx';
+import OvPipeline from '../../../assets/figures/foundations/ov-pipeline.svg';
 
 <Analogy limit="기상 예보관은 관측값을 보고 사람이 판단하지만, 모니터링 화면은 정해 둔 계산을 그대로 보여 줘요. 평균을 고를지 p99를 고를지 하나만 바꿔도 같은 데이터에서 다른 결론이 나와요.">
   모니터링은 기상 관측과 비슷해요. 관측소가 기온을 재고(계측), 정해진 시각마다 모아(수집) 기록부(저장)에 적어요. 예보관은 평균·최고 기온을 계산하고(질의), 폭염이면 경보(알림)를 내요.
@@ -24,17 +25,8 @@ import DashboardTour from '../../../components/demos/DashboardTour.tsx';
 
 ## 숫자가 화면에 오기까지
 
-<Figure caption="숫자는 아래에서 위로 올라와요. 앱이 세고, 모아서 쌓고, 계산해서, 그래프와 알림으로 보여 줘요.">
-  <Layers
-    ariaLabel="아래부터 계측, 수집, 저장, 질의, 화면과 알림 순서로 쌓인 계층도"
-    layers={[
-      { label: '화면과 알림', note: '대시보드, 알림 규칙', tone: 'accent' },
-      { label: '질의', note: 'rate, 백분위수, 구간 묶기' },
-      { label: '저장', note: '지표 이름과 레이블로 구별한 시계열' },
-      { label: '수집', note: '정해진 간격으로 가져가거나 받아요' },
-      { label: '계측', note: '앱이 카운터·게이지·히스토그램으로 세요' },
-    ]}
-  />
+<Figure caption="숫자는 앱에서 화면까지 다섯 단계를 거쳐요. 앱이 세고, 모아서 쌓고, 계산해서, 그래프와 알림으로 보여 줘요.">
+  <OvPipeline aria-label="위에서 아래로 1 계측(카운터·게이지·히스토그램으로 세요), 2 수집(정해진 간격마다 가져가거나 받아요), 3 저장(이름·레이블별 시계열에 쌓아요), 4 질의(rate, 백분위수, 구간 묶기로 계산해요), 5 화면과 알림(그래프로 그리고, 조건을 넘으면 알려요)이 이어진 그림" />
 </Figure>
 
 1. **계측**: 앱이 요청 수 같은 숫자를 세요. 계속 더하기만 하는 카운터, 오르내리는 게이지, 값을 구간마다 세는 히스토그램이 있어요.

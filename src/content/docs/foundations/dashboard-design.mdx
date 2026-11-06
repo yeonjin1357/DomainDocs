@@ -15,17 +15,11 @@ sources:
     url: https://sre.google/sre-book/monitoring-distributed-systems/
 updated: 2026-10-30
 ---
+import DashLayout from '../../../assets/figures/foundations/dash-layout.svg';
+import DashVariables from '../../../assets/figures/foundations/dash-variables.svg';
 
 <OnDashboard title="결제 서비스 대시보드 · 위에서 아래로" caption="맨 위 한 줄만 봐도 '지금 괜찮은가'에 답해요. 아래로 내려갈수록 원인을 찾는 패널이에요.">
-  <Nest
-    ariaLabel="대시보드를 위에서부터 서비스 상태(SLO, 에러율, p99 응답시간), 요청 흐름(서비스마다 요청, 에러, 지연), 자원(CPU, 메모리, 스레드, 커넥션 풀), 의존 서비스(DB, 캐시, 외부 API) 줄로 짠 배치"
-    boxes={[
-      { label: '① 서비스 상태', tone: 'accent', cols: 3, children: [{ label: 'SLO' }, { label: '에러율' }, { label: 'p99 응답시간' }] },
-      { label: '② 요청 흐름', note: '서비스마다 한 줄', cols: 3, children: [{ label: '요청' }, { label: '에러' }, { label: '지연' }] },
-      { label: '③ 자원', cols: 4, children: [{ label: 'CPU' }, { label: '메모리' }, { label: '스레드' }, { label: '커넥션 풀' }] },
-      { label: '④ 의존 서비스', cols: 3, children: [{ label: 'DB' }, { label: '캐시' }, { label: '외부 API' }] },
-    ]}
-  />
+  <DashLayout aria-label="결제 서비스 대시보드를 위에서부터 1 서비스 상태(남은 버짓 62%, 에러율 0.02%, p99 820ms), 2 요청 흐름(요청, 에러, 지연 그래프), 3 자원(CPU, 메모리, 스레드, 커넥션 풀 막대), 4 의존 서비스(DB, 캐시, 외부 API 상태) 줄로 짠 배치. 위는 지금 괜찮은가에 답하고, 아래로 갈수록 원인을 찾아요" />
 </OnDashboard>
 
 <KeyPoints>
@@ -105,14 +99,7 @@ Google SRE Book은 사용자가 쓰는 시스템에서 네 가지만 잴 수 있
 서버마다, 환경마다 대시보드를 복사하면 한 벌을 고쳐도 나머지는 그대로예요. 대신 서비스, 환경, 서버를 고르는 변수(템플릿 변수)를 둬서 한 벌로 바꿔 봐요.
 
 <Figure caption="복사본은 서버 수만큼 생기고, 고칠 때마다 모두 손봐야 해요. 변수를 두면 한 벌을 고치는 것으로 끝나요.">
-  <Compare
-    columns={['서버마다 복사', '변수로 한 벌']}
-    rows={[
-      { label: '대시보드 수', values: ['서버 수만큼', '한 벌'] },
-      { label: '패널 하나를 고치면', values: ['고친 한 벌만 바뀜', '모든 서버에 반영'] },
-      { label: '다른 서버를 볼 때', values: ['다른 대시보드를 엶', '변수에서 서버를 고름'] },
-    ]}
-  />
+  <DashVariables aria-label="서버마다 복사하면 server-1, server-2, server-3 대시보드가 서버 수만큼 생기고, 패널 하나를 고치면 모두 따로 고쳐요. 변수로 한 벌이면 server 변수에서 서버를 고르고, 한 번 고치면 모든 서버에 반영돼요" />
 </Figure>
 
 대시보드끼리는 링크로 이어요. 맨 위 서비스 상태에서 서비스를 누르면 그 서비스의 상세 대시보드로 내려가게 해요. 이걸 drill-down이라고 불러요.

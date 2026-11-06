@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 214" width="300" height="214">
+<text x="8" y="16" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">버킷 경계: 0, 5, 10, 25, … 10,000</text>
+<rect x="8" y="28" width="44" height="36" rx="6" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="30" y="51" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0</text>
+<text x="30" y="82" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">~0</text>
+<rect x="56" y="28" width="44" height="36" rx="6" stroke-width="1.2" style="fill:var(--color-warn);stroke:var(--color-line)" />
+<text x="78" y="51" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">모두</text>
+<text x="78" y="82" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">~5</text>
+<rect x="104" y="28" width="44" height="36" rx="6" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="126" y="51" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0</text>
+<text x="126" y="82" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">~10</text>
+<rect x="152" y="28" width="44" height="36" rx="6" style="fill:var(--color-card)" />
+<text x="174" y="51" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">…</text>
+<text x="174" y="82" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">…</text>
+<rect x="200" y="28" width="44" height="36" rx="6" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="222" y="51" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0</text>
+<text x="222" y="82" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">~10,000</text>
+<rect x="248" y="28" width="44" height="36" rx="6" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="270" y="51" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0</text>
+<text x="270" y="82" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">그 위</text>
+<path d="M56 66 L20 108 M100 66 L280 108" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-warn)" />
+<rect x="20" y="108" width="260" height="54" rx="8" style="fill:var(--color-warn-weak)" />
+<circle cx="25.4" cy="128" r="3" style="fill:var(--color-accent)" />
+<circle cx="30.4" cy="128" r="3" style="fill:var(--color-accent)" />
+<circle cx="35.4" cy="128" r="3" style="fill:var(--color-accent)" />
+<circle cx="25.4" cy="136" r="3" style="fill:var(--color-accent)" />
+<circle cx="30.4" cy="136" r="3" style="fill:var(--color-accent)" />
+<circle cx="35.4" cy="136" r="3" style="fill:var(--color-accent)" />
+<circle cx="25.4" cy="144" r="3" style="fill:var(--color-accent)" />
+<circle cx="30.4" cy="144" r="3" style="fill:var(--color-accent)" />
+<circle cx="35.4" cy="144" r="3" style="fill:var(--color-accent)" />
+<text x="42.4" y="140" font-size="13" font-weight="700" style="fill:var(--color-accent)">실제 0.2초</text>
+<line x1="277.4" y1="112" x2="277.4" y2="158" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="271.4" y="140" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">p99 4.95초</text>
+<text x="20" y="180" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">0</text>
+<text x="280" y="180" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">5</text>
+<text x="150" y="206" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">칸 하나에 몰리면 그 칸의 끝 쪽을 골라요</text>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 224" width="300" height="224">
+<line x1="115.3" y1="26" x2="115.3" y2="136" stroke-width="1.5" stroke-linecap="butt" stroke-dasharray="3 3" style="stroke:var(--color-line)" />
+<line x1="200.7" y1="26" x2="200.7" y2="136" stroke-width="1.5" stroke-linecap="butt" stroke-dasharray="3 3" style="stroke:var(--color-line)" />
+<line x1="30" y1="136" x2="286" y2="136" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<rect x="34.2" y="126" width="13" height="10" rx="2" style="fill:var(--color-line)" />
+<rect x="55.5" y="126" width="13" height="10" rx="2" style="fill:var(--color-line)" />
+<rect x="76.8" y="126" width="13" height="10" rx="2" style="fill:var(--color-line)" />
+<rect x="98.2" y="126" width="13" height="10" rx="2" style="fill:var(--color-accent)" />
+<rect x="119.5" y="126" width="13" height="10" rx="2" style="fill:var(--color-line)" />
+<rect x="140.8" y="46" width="13" height="90" rx="2" style="fill:var(--color-warn);fill-opacity:0.35" />
+<rect x="162.2" y="126" width="13" height="10" rx="2" style="fill:var(--color-line)" />
+<rect x="183.5" y="126" width="13" height="10" rx="2" style="fill:var(--color-accent)" />
+<rect x="204.8" y="126" width="13" height="10" rx="2" style="fill:var(--color-line)" />
+<rect x="226.2" y="126" width="13" height="10" rx="2" style="fill:var(--color-line)" />
+<rect x="247.5" y="126" width="13" height="10" rx="2" style="fill:var(--color-line)" />
+<rect x="268.8" y="126" width="13" height="10" rx="2" style="fill:var(--color-accent)" />
+<circle cx="104.7" cy="126" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="190" cy="126" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="275.3" cy="126" r="4.5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<line x1="33.7" y1="126" x2="111.7" y2="126" stroke-width="2.4" stroke-linecap="butt" stroke-dasharray="6 3" style="stroke:var(--color-text-sub)" />
+<line x1="119" y1="106" x2="197" y2="106" stroke-width="2.4" stroke-linecap="butt" stroke-dasharray="6 3" style="stroke:var(--color-warn)" />
+<line x1="204.3" y1="126" x2="282.3" y2="126" stroke-width="2.4" stroke-linecap="butt" stroke-dasharray="6 3" style="stroke:var(--color-text-sub)" />
+<text x="158" y="98" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">평균 30</text>
+<text x="147.3" y="38" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">90</text>
+<text x="104.7" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">점 1</text>
+<text x="190" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">점 2</text>
+<text x="275.3" y="156" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">점 3</text>
+<text x="8" y="18" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">10초마다 모은 값 12개 → 점 3개</text>
+<circle cx="16" cy="186" r="4.5" style="fill:var(--color-accent)" />
+<text x="26" y="191" font-size="13" font-weight="600" style="fill:var(--color-accent)">마지막 값만 고르면 10, 10, 10</text>
+<line x1="10" y1="210" x2="22" y2="210" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="6 3" style="stroke:var(--color-warn)" />
+<text x="26" y="215" font-size="13" font-weight="600" style="fill:var(--color-warn)">평균으로 묶으면 10, 30, 10</text>
+</svg>

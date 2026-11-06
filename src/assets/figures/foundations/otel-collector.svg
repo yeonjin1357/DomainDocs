@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 232" width="300" height="232">
+<rect x="4" y="60" width="292" height="104" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="78" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">Collector 파이프라인</text>
+<rect x="12" y="8" width="96" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="60" y="24.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">앱 + SDK</text>
+<path d="M60 34 L60 82.4" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M60 88 L65 80 L55 80 z" style="fill:var(--color-text-sub)" />
+<rect x="12" y="90" width="84" height="44" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="54" y="110" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">receiver</text>
+<text x="54" y="127" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">받기</text>
+<path d="M96 112 L103.1 112" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M108 112 L101 107.7 L101 116.3 z" style="fill:var(--color-accent)" />
+<rect x="108" y="90" width="84" height="44" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="110" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">processor</text>
+<text x="150" y="127" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">가공</text>
+<path d="M192 112 L199.1 112" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M204 112 L197 107.7 L197 116.3 z" style="fill:var(--color-accent)" />
+<rect x="204" y="90" width="84" height="44" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="246" y="110" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">exporter</text>
+<text x="246" y="127" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">내보내기</text>
+<text x="16" y="154" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">셋을 파이프라인으로 이어야 흘러요</text>
+<path d="M246 134 L246 182.4" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M246 188 L251 180 L241 180 z" style="fill:var(--color-text-sub)" />
+<path d="M232 195 V221 A14 5.5 0 0 0 260 221 V195" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M232 208 A14 5.5 0 0 0 260 208" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<ellipse cx="246" cy="195" rx="14" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<text x="222" y="212" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-text)">백엔드</text>
+</svg>

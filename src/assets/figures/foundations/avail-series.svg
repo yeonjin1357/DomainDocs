@@ -1,20 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 178" width="300" height="178">
-  <line x1="4" y1="51.0" x2="20.0" y2="51.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
-  <circle cx="4" cy="51.0" r="4" style="fill:var(--color-text-sub)" />
-  <rect x="20.0" y="22" width="74" height="58" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
-  <text x="57.0" y="48.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">웹</text>
-  <text x="57.0" y="66.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.9%</text>
-  <line x1="94.0" y1="51.0" x2="113.0" y2="51.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
-  <rect x="113.0" y="22" width="74" height="58" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
-  <text x="150.0" y="48.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">API</text>
-  <text x="150.0" y="66.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.9%</text>
-  <line x1="187.0" y1="51.0" x2="206.0" y2="51.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
-  <rect x="206.0" y="22" width="74" height="58" rx="8" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
-  <text x="243.0" y="48.0" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--color-text)">DB</text>
-  <text x="243.0" y="66.0" text-anchor="middle" font-size="14" style="fill:var(--color-text-sub)">99.9%</text>
-  <line x1="280.0" y1="51.0" x2="296" y2="51.0" stroke-width="2" style="stroke:var(--color-text-sub)" />
-  <circle cx="296" cy="51.0" r="4" style="fill:var(--color-text-sub)" />
-  <text x="150" y="112" text-anchor="middle" font-size="13" style="fill:var(--color-text-sub)">셋 다 살아야 성공</text>
-  <text x="150" y="140" text-anchor="middle" font-size="15" style="fill:var(--color-text)">0.999 × 0.999 × 0.999</text>
-  <text x="150" y="166" text-anchor="middle" font-size="17" font-weight="700" style="fill:var(--color-warn)">≈ 99.7%</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 218" width="300" height="218">
+<line x1="10" y1="50" x2="290" y2="50" stroke-width="2.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="10" cy="50" r="4.5" style="fill:var(--color-text-sub)" />
+<path d="M270 50 L286.4 50" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M292 50 L284 45 L284 55 z" style="fill:var(--color-text-weak)" />
+<rect x="36" y="22" width="52" height="56" rx="8" style="fill:var(--color-bg)" />
+<rect x="49" y="33" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="55" y1="41" x2="69" y2="41" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="55" y1="47" x2="69" y2="47" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="55" y1="53" x2="69" y2="53" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="62" cy="60.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="62" y="98" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">웹</text>
+<rect x="37.4" y="109" width="49.3" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="62" y="124.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">99.9%</text>
+<rect x="124" y="22" width="52" height="56" rx="8" style="fill:var(--color-bg)" />
+<rect x="137" y="33" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="143" y1="41" x2="157" y2="41" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="143" y1="47" x2="157" y2="47" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="143" y1="53" x2="157" y2="53" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="150" cy="60.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="150" y="98" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">API</text>
+<rect x="125.4" y="109" width="49.3" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="150" y="124.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">99.9%</text>
+<rect x="212" y="22" width="52" height="56" rx="8" style="fill:var(--color-bg)" />
+<path d="M221 37 V63 A17 5.5 0 0 0 255 63 V37" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M221 50 A17 5.5 0 0 0 255 50" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<ellipse cx="238" cy="37" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<text x="238" y="98" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">DB</text>
+<rect x="213.4" y="109" width="49.3" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="238" y="124.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">99.9%</text>
+<text x="150" y="158" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">셋 다 살아야 성공</text>
+<text x="150" y="184" font-size="15" text-anchor="middle" style="fill:var(--color-text)">0.999 × 0.999 × 0.999</text>
+<text x="150" y="210" font-size="18" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">≈ 99.7%</text>
 </svg>

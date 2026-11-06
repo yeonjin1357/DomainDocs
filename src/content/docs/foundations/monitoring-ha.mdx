@@ -27,6 +27,7 @@ sources:
     url: https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/exporterhelper/README.md
 updated: 2026-11-05
 ---
+import HaTopology from '../../../assets/figures/foundations/ha-topology.svg';
 
 <KeyPoints>
   <Point title="두 대가 모으면 값도 두 배예요">
@@ -49,24 +50,7 @@ updated: 2026-11-05
 모니터링 시스템이 멈추면 다른 시스템의 장애도 못 봐요. 그래서 모니터링 시스템도 이중으로 두고, 한 대가 감당 못 할 만큼 커지면 나눠요. Prometheus 계열을 예로 들면 구성은 이래요.
 
 <Figure caption="같은 대상을 Prometheus 두 대(수집 A, B)가 수집하고, 둘 다 중앙 저장소와 Alertmanager 두 대에 보내는 구성 예시예요.">
-  <Flow
-    ariaLabel="수집 대상을 Prometheus A와 B가 함께 긁고, 두 대 모두 remote write로 중앙 저장소에 보내며, 두 대 모두 Alertmanager 두 대에 알림을 보내요"
-    nodes={[
-      { id: 'tgt', label: '수집 대상', col: 0, row: 1 },
-      { id: 'pa', label: '수집 A', note: 'replica=a', col: 1, row: 0 },
-      { id: 'pb', label: '수집 B', note: 'replica=b', col: 1, row: 2 },
-      { id: 'st', label: '중앙 저장소', note: 'Thanos·Mimir', col: 2, row: 0, tone: 'accent' },
-      { id: 'am', label: '알림 ×2', note: 'Alertmanager', col: 2, row: 2 },
-    ]}
-    edges={[
-      { from: 'tgt', to: 'pa' },
-      { from: 'tgt', to: 'pb' },
-      { from: 'pa', to: 'st' },
-      { from: 'pb', to: 'st' },
-      { from: 'pa', to: 'am' },
-      { from: 'pb', to: 'am' },
-    ]}
-  />
+  <HaTopology aria-label="수집 대상을 Prometheus 수집 A(replica=a)와 수집 B(replica=b)가 함께 수집하고, 두 대 모두 중앙 저장소(Thanos·Mimir)로 보내며, 두 대 모두 Alertmanager 두 대에 알림을 보내는 그림" />
 </Figure>
 
 키우는 방법은 목적에 따라 네 가지예요.

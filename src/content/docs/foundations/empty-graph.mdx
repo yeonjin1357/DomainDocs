@@ -69,6 +69,7 @@ sources:
     url: https://prometheus.io/docs/prometheus/latest/querying/functions/
 updated: 2026-10-29
 ---
+import EgSeries from '../../../assets/figures/foundations/eg-series.svg';
 
 <Situation>
   대시보드 패널에 No data가 떠요. 어제까지 이어지던 선이 중간에 끊기기도 해요. 서비스 장애일까요, 수집이 멈췄을까요, 질의가 틀렸을까요?
@@ -162,15 +163,7 @@ Prometheus는 조건에 맞는 <Term slug="foundations/time-series-and-labels">�
 앞의 셋이 모두 정상이라면 그 일이 정말 없었을 수 있어요. Prometheus Go·Python 클라이언트(앱에서 지표를 만드는 라이브러리)에선 레이블 조합을 처음 기록할 때 시계열이 생겨요. 그래서 500 응답이 한 번도 없던 경로엔 `status="500"` 시계열이 없고, 그 질의는 0이 아니라 빈 결과예요.
 
 <Figure caption="한 경로의 요청 카운터를 1분마다 본 예시예요. 500 시계열은 첫 500 응답을 기록할 때 생겨서, 그 전엔 0이 아니라 아예 없어요.">
-  <Strip
-    ariaLabel="1분부터 6분까지 status 200 시계열은 처음부터 값이 있고, status 500 시계열은 4분까지 없다가 5분에 첫 500 응답이 기록되며 1로 생기는 칸 띠"
-    rows={[
-      { label: 'status="200" 시계열', heads: ['1분', '2분', '3분', '4분', '5분', '6분'], cells: ['120', '240', '360', '480', '600', '720'] },
-      { label: 'status="500" 시계열', cells: [{ label: '없음', tone: 'sub' }, { label: '없음', tone: 'sub' }, { label: '없음', tone: 'sub' }, { label: '없음', tone: 'sub' }, { label: '1', tone: 'warn' }, '1'] },
-    ]}
-    marks={[{ row: 1, at: 4, label: '첫 500', tone: 'warn' }]}
-    ranges={[{ row: 1, from: 0, to: 3, label: '0이 아니라 빈 결과' }]}
-  />
+  <EgSeries aria-label="1분부터 6분까지 status 200 시계열은 120부터 720까지 처음부터 값이 있고, status 500 시계열은 4분까지 없음이다가 5분에 첫 500 응답이 기록되며 1로 생기는 그림. 없음인 동안 질의하면 0이 아니라 빈 결과예요" />
 </Figure>
 
 빈 결과만으로는 500 응답이 없었는지, 수집이 멈췄는지 구별할 수 없어요. 그래서 <Term slug="foundations/no-data-vs-zero">데이터 없음</Term>을 0으로 읽으면 장애를 놓쳐요.

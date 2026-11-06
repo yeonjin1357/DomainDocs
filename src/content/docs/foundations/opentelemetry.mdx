@@ -37,6 +37,8 @@ sources:
     url: https://github.com/open-telemetry/opentelemetry-collector/pull/14403
 updated: 2026-10-30
 ---
+import OtelPath from '../../../assets/figures/foundations/otel-path.svg';
+import OtelCollector from '../../../assets/figures/foundations/otel-collector.svg';
 
 <OnDashboard title="서비스별 분당 요청 · 지난 1시간" caption="서비스 이름(service.name)을 정하지 않은 자바 앱은 unknown_service:java로 보여요. 이름이 없는 앱끼리는 한 서비스로 섞여요.">
   <StatTile label="checkout" value="1,240" unit="/분" />
@@ -59,20 +61,7 @@ updated: 2026-10-30
 ## 데이터가 지나는 길
 
 <Figure caption="앱 안의 SDK가 만든 데이터를 같은 서버의 Collector(에이전트)가 받아, 한곳에 모으는 Collector(게이트웨이)를 거쳐 백엔드로 보내요. 에이전트나 게이트웨이 없이 바로 보내도 돼요.">
-  <Flow
-    ariaLabel="앱의 SDK가 OTLP로 에이전트 Collector에 보내고, 에이전트가 게이트웨이 Collector로, 게이트웨이가 백엔드로 보내는 구조도"
-    nodes={[
-      { id: 'app', label: '앱 + SDK', col: 0, row: 0, note: '데이터를 만들어요' },
-      { id: 'agent', label: 'Collector', col: 2, row: 0, note: '에이전트' },
-      { id: 'gw', label: 'Collector', col: 2, row: 1, note: '게이트웨이', tone: 'accent' },
-      { id: 'be', label: '백엔드', col: 0, row: 1, note: '저장·화면' },
-    ]}
-    edges={[
-      { from: 'app', to: 'agent', label: 'OTLP' },
-      { from: 'agent', to: 'gw' },
-      { from: 'gw', to: 'be', tone: 'accent' },
-    ]}
-  />
+  <OtelPath aria-label="서버 안의 앱 + SDK가 OTLP로 같은 서버의 Collector(에이전트)에 보내고, 에이전트가 다른 서버들의 데이터도 모으는 Collector(게이트웨이)로, 게이트웨이가 저장과 화면을 맡는 백엔드로 보내는 그림" />
 </Figure>
 
 앱이 보낸 데이터는 이 길을 모두 지나야 화면에 보여요. 그래서 데이터가 비면 앱, Collector, 백엔드 가운데 어디서 멈췄는지부터 가려요.
@@ -127,23 +116,7 @@ service:
 받는 쪽, 보내는 쪽을 정의만 해서는 일하지 않아요. 맨 아래 `service.pipelines`에 신호(traces, metrics, logs)마다 무엇을 이을지 적어야 켜져요.
 
 <Figure caption="Collector 안에서 receiver가 받고, processor가 가공하고, exporter가 내보내요. 셋은 파이프라인으로 이어야 데이터가 흘러요. 위 설정은 processor 없이 receiver와 exporter만 이었어요.">
-  <Flow
-    ariaLabel="앱의 SDK가 보낸 데이터를 Collector 안의 receiver가 받아 processor가 가공하고 exporter가 백엔드로 내보내는 구조도"
-    nodes={[
-      { id: 'app', label: '앱 + SDK', col: 0, row: 1 },
-      { id: 'be', label: '백엔드', col: 2, row: 1 },
-      { id: 'recv', label: 'receiver', col: 0, row: 0, note: '받기', tone: 'accent' },
-      { id: 'proc', label: 'processor', col: 1, row: 0, note: '가공' },
-      { id: 'exp', label: 'exporter', col: 2, row: 0, note: '내보내기', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'app', to: 'recv' },
-      { from: 'recv', to: 'proc' },
-      { from: 'proc', to: 'exp' },
-      { from: 'exp', to: 'be' },
-    ]}
-    groups={[{ label: 'Collector 파이프라인', cols: [0, 2], rows: [0, 0] }]}
-  />
+  <OtelCollector aria-label="앱 + SDK가 보낸 데이터를 Collector 파이프라인 안의 receiver가 받고, processor가 가공하고, exporter가 백엔드로 내보내는 그림" />
 </Figure>
 
 Collector를 두는 방식은 둘이에요. 에이전트는 쿠버네티스의 사이드카나 DaemonSet처럼 앱 곁이나 같은 서버에 하나씩 둬요. 게이트웨이는 클러스터나 리전마다 따로 띄워 한곳에 모아요.

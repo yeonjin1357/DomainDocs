@@ -19,6 +19,9 @@ sources:
     url: https://github.com/grafana/grafana/blob/main/packages/grafana-data/src/valueFormats/categories.ts
 updated: 2026-10-29
 ---
+import UnitKib from '../../../assets/figures/foundations/unit-kib.svg';
+import UnitBits from '../../../assets/figures/foundations/unit-bits.svg';
+import UnitPercent from '../../../assets/figures/foundations/unit-percent.svg';
 
 <OnDashboard title="같은 장비, 다른 숫자" caption="같은 디스크가 1TB로도, 931GiB로도 보여요. 1Gbps 회선은 바이트로 바꾸면 초당 125MB예요.">
   <StatTile label="디스크 표기" value="1" unit="TB" note="1000 기준" />
@@ -44,15 +47,8 @@ updated: 2026-10-29
 
 문제는 글자만 보고 어느 쪽인지 모를 때가 많다는 거예요. 리눅스 `df -h`는 1024로 나누면서도 `G`라고 적고, `df -H`는 1000으로 나눠요.
 
-<Figure caption="같은 디스크라도 1000으로 세는지 1024로 세는지에 따라 숫자가 달라요. df -h처럼 1024로 나누고도 G라고 적는 도구가 있어서, 글자만으론 가리기 어려워요.">
-  <Compare
-    columns={['k·M·G', 'Ki·Mi·Gi']}
-    rows={[
-      { label: '한 단계 커질 때', values: ['1000배', '1024배'] },
-      { label: '같은 1TB 디스크', values: ['1TB(10¹²바이트)', '약 931GiB'] },
-      { label: 'df로 보면', values: ['df -H', 'df -h(그래도 G라고 적어요)'] },
-    ]}
-  />
+<Figure caption="상자에 1TB라고 적힌 디스크를 1024로 나누면 약 931GiB예요. 1024로 세는 단위가 1000으로 세는 단위보다 큰 정도는 단계마다 벌어져요. df -h처럼 1024로 나누고도 G라고 적는 도구가 있어서, 글자만으론 가리기 어려워요.">
+  <UnitKib aria-label="1TB 디스크를 1000으로 나누면 1,000GB(df -H), 1024로 나누면 약 931GiB이고 df -h는 이를 G라고 적는 그림. 아래 막대는 Ki가 K보다 2.4%, Mi가 M보다 4.9%, Gi가 G보다 7.4%, Ti가 T보다 10.0% 커서 단계마다 차이가 벌어져요" />
 </Figure>
 
 ## 네트워크는 비트, 저장은 바이트예요
@@ -62,19 +58,7 @@ updated: 2026-10-29
 그래서 인터페이스의 바이트 카운터로 회선 사용률을 구할 때는 8을 곱해 비트로 바꿔요. 계산은 <Term slug="network/interfaces-and-traffic">인터페이스와 트래픽</Term>에 있어요.
 
 <Figure caption="비트로 센 회선 속도를 바이트로 바꿀 땐 8로 나눠요. 거꾸로 바이트 카운터를 회선 속도와 견줄 땐 8을 곱해 비트로 바꿔요.">
-  <Flow
-    ariaLabel="1Gbps 회선을 8로 나누면 초당 125MB가 되고, 바이트 카운터에 8을 곱하면 회선 속도와 견줄 수 있는 비트 값이 되는 구조도"
-    nodes={[
-      { id: 'link', label: '1Gbps 회선', col: 0, row: 0, note: '비트로 셈' },
-      { id: 'mb', label: '초당 125MB', col: 2, row: 0, note: '바이트로 셈' },
-      { id: 'counter', label: '바이트 카운터', col: 2, row: 1, note: '바이트로 셈' },
-      { id: 'bits', label: '비트 값', col: 0, row: 1, note: '회선과 견줘요', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'link', to: 'mb', label: '÷ 8' },
-      { from: 'counter', to: 'bits', label: '× 8', tone: 'accent' },
-    ]}
-  />
+  <UnitBits aria-label="0과 1이 적힌 비트 16개 중 8개를 묶어 8비트가 1바이트임을 보이는 그림. 아래에서 1Gbps 회선을 8로 나누면 초당 125MB, 바이트 카운터에 8을 곱하면 회선과 견줄 비트 값이 돼요" />
 </Figure>
 
 ## 퍼센트는 무엇에 대한 비율인지 봐요
@@ -82,20 +66,7 @@ updated: 2026-10-29
 프로세스 CPU 사용률은 코어 하나를 100%로 세서, 코어 4개를 다 쓰면 400%예요. 서버 전체 사용률은 모든 코어를 합쳐 100%로 세요. 기준은 <Term slug="server/cpu-usage">CPU 사용률과 부하</Term>에서 다뤄요.
 
 <Figure caption="코어 4개를 모두 다 쓰는 같은 순간이에요. 코어 하나를 100%로 세면 400%, 모든 코어를 합쳐 100%로 세면 100%예요.">
-  <Strip
-    ariaLabel="코어 4개가 모두 100%로 바쁜 같은 순간을, 프로세스 기준으로는 400%, 서버 전체 기준으로는 100%로 읽는 칸 띠"
-    rows={[
-      {
-        label: '코어 4개를 다 쓰는 프로세스',
-        heads: ['코어 1', '코어 2', '코어 3', '코어 4'],
-        cells: [{ label: '100%', tone: 'accent' }, { label: '100%', tone: 'accent' }, { label: '100%', tone: 'accent' }, { label: '100%', tone: 'accent' }],
-      },
-    ]}
-    ranges={[
-      { from: 0, to: 3, label: '프로세스 기준: 400%', tone: 'accent' },
-      { from: 0, to: 3, label: '서버 전체 기준: 100%' },
-    ]}
-  />
+  <UnitPercent aria-label="코어 넷이 모두 100%로 바쁜 같은 순간. 코어 하나를 100%로 세는 프로세스 기준으로는 더해서 400%, 모든 코어를 합쳐 100%로 세는 서버 전체 기준으로는 100%인 그림" />
 </Figure>
 
 에러율이 1%에서 2%가 되면 1%p(퍼센트포인트) 오른 거예요. 비율로는 두 배라, "1% 올랐다"와 "100% 올랐다"가 같은 변화를 말할 수 있어요.
