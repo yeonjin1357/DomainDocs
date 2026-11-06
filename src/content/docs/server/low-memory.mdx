@@ -20,6 +20,8 @@ sources:
     url: https://github.com/torvalds/linux/blob/master/mm/oom_kill.c
 updated: 2026-10-29
 ---
+import LmFreeAvail from '../../../assets/figures/server/lm-free-avail.svg';
+import LmSwap from '../../../assets/figures/server/lm-swap.svg';
 
 <Situation>
   서버의 메모리 사용률이 97%라는 알림이 왔어요. 그런데 앱은 멀쩡해 보여요. 다른 날에는 알림 없이 앱 프로세스가 갑자기 사라진 적도 있어요.
@@ -49,15 +51,8 @@ updated: 2026-10-29
 
 리눅스는 남는 메모리를 파일 캐시로 써서, free는 늘 작게 보여요. 사용률을 전체에서 free를 빼서 계산하면 캐시까지 사용으로 잡혀요. 진짜 여유는 <Term term="server/available-memory">available</Term>로 봐요.
 
-<Figure caption="같은 서버를 두 방식으로 계산했어요. free 기준으로는 97%이지만, available 기준으로는 38%예요. 캐시는 앱이 원하면 비워 줘요.">
-  <Bars
-    ariaLabel="(전체 − free) 기준 97%, (전체 − available) 기준 38%를 막대 길이로 견준 그림"
-    max={100}
-    bars={[
-      { label: '(전체 − free) 기준', value: 97, display: '97%', tone: 'warn' },
-      { label: '(전체 − available) 기준', value: 38, display: '38%', tone: 'accent' },
-    ]}
-  />
+<Figure caption="같은 서버를 두 방식으로 계산했어요. free 기준으로는 캐시까지 사용으로 잡혀 97%이지만, available 기준으로는 38%예요. 캐시는 앱이 원하면 비워 줘요.">
+  <LmFreeAvail aria-label="메모리를 프로그램 38%, 파일 캐시 59%, free 3%로 나눈 막대. 전체에서 free를 빼면 캐시까지 사용으로 잡혀 97%이고, free에 비울 수 있는 캐시를 더한 available 62%를 빼면 38%예요" />
 </Figure>
 
 available이 넉넉하다면 지금 메모리 부족은 아니에요. 알림 기준이 free로 계산된 건 아닌지 먼저 고쳐요. 숫자 읽는 법은 <Term slug="server/memory">메모리</Term>에 있어요.
@@ -70,15 +65,8 @@ available이 바닥에 가까워지면 커널은 덜 쓰는 메모리를 스왑�
 
 봐야 할 건 스왑 사용량이 아니라 지금 오가는 양이에요. 한 번 내보낸 메모리는 다시 쓰이기 전까지 스왑에 남아 있어서, 사용량만 높고 조용할 수 있어요.
 
-<Figure caption="스왑 사용량이 높아도 두 경우가 있어요. 왼쪽은 예전에 내보낸 것이 남아 있을 뿐이고, 오른쪽은 지금 디스크와 오가며 서버를 느리게 해요.">
-  <Compare
-    columns={['사용량만 높을 때', '지금 오갈 때']}
-    rows={[
-      { label: '지금 오가는 양', values: ['0에 가까워요', '0보다 커요'] },
-      { label: '스왑에 든 것', values: ['예전에 내보낸 메모리', '지금 내보내고 들여오는 메모리'] },
-      { label: '서버', values: ['스왑 때문에 느려지지 않아요', '눈에 띄게 느려져요'] },
-    ]}
-  />
+<Figure caption="스왑 사용량이 똑같이 80%여도 두 경우가 있어요. 예전에 내보낸 것이 남아 있을 뿐이면 느려지지 않고, 지금 디스크와 오가면 서버가 느려져요.">
+  <LmSwap aria-label="두 경우 모두 스왑 사용량이 80%예요. 사용량만 높을 때는 메모리와 스왑 사이에 오가는 게 없어 si·so가 0에 가깝고 느려지지 않아요. 지금 오갈 때는 메모리에서 스왑으로 내보내고(so) 들여와서(si) si·so가 0보다 크고 눈에 띄게 느려져요" />
 </Figure>
 
 **확인 방법**: `vmstat 5`의 si(스왑에서 들여온 양)와 so(스왑으로 내보낸 양)를 봐요. 둘 다 0에 가깝다면 지금 스왑 때문에 느려지고 있지는 않아요. 첫 줄은 부팅 뒤 평균이라 건너뛰어요.

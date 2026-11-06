@@ -33,6 +33,9 @@ sources:
     url: https://github.com/systemd/systemd/blob/main/NEWS
 updated: 2026-10-30
 ---
+import SvcSystemd from '../../../assets/figures/server/svc-systemd.svg';
+import SvcRestart from '../../../assets/figures/server/svc-restart.svg';
+import SvcRing from '../../../assets/figures/server/svc-ring.svg';
 
 <KeyPoints>
   <Point title="서비스는 systemd가 띄우고 지켜봐요">
@@ -52,24 +55,8 @@ updated: 2026-10-30
 
 ## 서비스는 systemd가 띄워요
 
-<Figure caption="systemd가 서비스를 띄워요(실선). 서비스가 내보낸 글과 커널 메시지는 journald로 모여요(점선).">
-  <Flow
-    ariaLabel="systemd가 웹 서버와 수집 에이전트를 띄우고, 두 서비스와 커널의 메시지가 journald로 모이는 구조도"
-    nodes={[
-      { id: 'systemd', label: 'systemd', col: 1, row: 0, note: 'PID 1', tone: 'accent' },
-      { id: 'web', label: '웹 서버', col: 0, row: 1, note: '서비스' },
-      { id: 'agent', label: '수집 에이전트', col: 2, row: 1, note: '서비스' },
-      { id: 'kernel', label: '커널', col: 0, row: 2 },
-      { id: 'journald', label: 'journald', col: 1, row: 2, note: '로그 모음', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'systemd', to: 'web' },
-      { from: 'systemd', to: 'agent' },
-      { from: 'web', to: 'journald', dashed: true },
-      { from: 'agent', to: 'journald', dashed: true },
-      { from: 'kernel', to: 'journald', dashed: true },
-    ]}
-  />
+<Figure caption="PID 1인 systemd가 서비스를 띄워요. 서비스가 표준 출력·에러로 낸 글과 커널 메시지는 journald로 모이고, 앱이 따로 파일에 쓴 로그는 거치지 않아요.">
+  <SvcSystemd aria-label="systemd(PID 1)가 수집 에이전트와 웹 서버 서비스를 띄워요. 두 서비스의 표준 출력·에러와 커널 메시지는 journald에 모이고, 웹 서버가 따로 쓴 access.log 파일은 journald를 거치지 않아요" />
 </Figure>
 
 <Term term="server/service">서비스</Term>는 화면 없이 뒤에서 계속 도는 프로그램이에요. 웹 서버, DB, 모니터링 에이전트가 모두 서비스예요. 데몬(daemon)이라고도 불러요.
@@ -100,14 +87,7 @@ Loaded 줄에는 유닛 파일의 위치와 enabled 여부가 나와요. enabled
 `on-failure`는 에러 코드로 끝나거나, 신호를 받아 죽거나, 정한 시간을 넘기면 다시 띄워요. 기본으로 100ms 쉬었다가 띄워요.
 
 <Figure caption="같은 서비스가 계속 죽을 때의 두 모습이에요. 다시 띄우기를 켜면 상태만으로는 죽고 있다는 걸 알기 어려워요.">
-  <Compare
-    columns={['끔(no, 기본값)', '켬(on-failure)']}
-    rows={[
-      { label: '죽으면', values: ['멈춘 채로 있어요', '100ms 뒤 다시 띄워요'] },
-      { label: '화면의 상태', values: ['failed', '대부분 active'] },
-      { label: '알아채려면', values: ['상태가 failed인지 봐요', '재시작 횟수와 켜진 시각을 봐요'] },
-    ]}
-  />
+  <SvcRestart aria-label="Restart=no(기본값)이면 프로세스가 한 번 죽은 뒤 멈춘 채로 있어 상태가 active에서 failed로 바뀌어요. Restart=on-failure면 죽을 때마다 100ms 뒤 다시 띄워서 상태가 대부분 active로 보여요. 그래서 재시작 횟수와 켜진 시각을 봐야 해요" />
 </Figure>
 
 다시 띄우기에도 한도가 있어요. 기본 설정에서 10초 안에 5번보다 많이 띄우려 하면 systemd는 더 띄우지 않아요. 이때 서비스는 failed로 남아요.
@@ -140,21 +120,7 @@ Loaded 줄에는 유닛 파일의 위치와 enabled 여부가 나와요. enabled
 <Term term="server/kernel-log">커널 로그</Term>는 커널이 남기는 메시지예요. 커널은 이 메시지를 메모리 안의 정해진 크기 공간(링 버퍼)에 쌓아요. 가득 차면 오래된 메시지부터 밀려나요.
 
 <Figure caption="메시지 6개가 차는 크기로 줄인 예시예요. 가득 찬 뒤 새 메시지 7이 들어오면, 가장 오래된 1이 밀려나요.">
-  <Strip
-    ariaLabel="메시지 1부터 6까지로 가득 찬 링 버퍼에 새 메시지 7이 들어오자, 가장 오래된 메시지 1이 밀려나고 2부터 7까지가 남는 칸 띠"
-    rows={[
-      { label: '가득 찬 링 버퍼', cells: ['1', '2', '3', '4', '5', '6'] },
-      { label: '새 메시지 7이 들어온 뒤', cells: [{ label: '1', tone: 'sub' }, '2', '3', '4', '5', '6', { label: '7', tone: 'accent' }] },
-    ]}
-    marks={[
-      { row: 1, at: 0, label: '밀려남', tone: 'warn' },
-      { row: 1, at: 6, label: '새 메시지', tone: 'accent' },
-    ]}
-    ranges={[
-      { row: 0, from: 0, to: 5, label: '정해진 크기' },
-      { row: 1, from: 1, to: 6, label: '정해진 크기' },
-    ]}
-  />
+  <SvcRing aria-label="6칸 링 버퍼에 메시지 1부터 6까지 가득 찼어요. 새 메시지 7이 들어오면 가장 오래된 1의 자리에 7을 쓰고, 1은 밀려나요" />
 </Figure>
 
 `dmesg`로 이 공간을 읽어요. journald도 커널 메시지를 받아 두어서, `journalctl -k`로도 볼 수 있어요.

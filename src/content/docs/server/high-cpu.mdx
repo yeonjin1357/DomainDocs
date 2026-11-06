@@ -18,6 +18,8 @@ sources:
     url: https://man7.org/linux/man-pages/man8/vmstat.8.html
 updated: 2026-10-29
 ---
+import HcQueue from '../../../assets/figures/server/hc-queue.svg';
+import HcTwoCases from '../../../assets/figures/server/hc-two-cases.svg';
 
 <Situation>
   새벽 3시부터 결제 서버의 CPU 사용률이 평소 40%에서 95%로 올라 알림이 울렸어요. 응답도 조금 느려졌어요.
@@ -73,17 +75,7 @@ updated: 2026-10-29
 CPU가 95%여도 일이 밀리지 않으면 아직 감당하고 있는 거예요. 부하가 코어 수보다 커지면 차례를 기다리는 일이 생겨 응답이 느려져요.
 
 <Figure caption="코어 8개 서버에 실행 중이거나 차례를 기다리는 프로세스가 14개인 예시예요. 코어마다 하나씩 8개가 돌고, 남은 6개는 기다려요.">
-  <Strip
-    ariaLabel="코어 8개가 프로세스 8개를 하나씩 실행하고, 남은 프로세스 6개가 차례를 기다려 모두 14개가 되는 칸 띠"
-    rows={[
-      { label: '코어 8개에서 실행 중', cells: [{ label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }, { label: '실행', tone: 'accent' }] },
-      { label: '차례를 기다림', cells: [{ label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }, { label: '대기', tone: 'warn' }] },
-    ]}
-    ranges={[
-      { row: 0, from: 0, to: 7, label: '8개' },
-      { row: 1, from: 0, to: 5, label: '6개', tone: 'warn' },
-    ]}
-  />
+  <HcQueue aria-label="코어 8개가 프로세스 8개를 하나씩 실행하고, 남은 6개가 차례를 기다려요. 실행 8에 기다림 6을 더한 14가 부하 14 안팎으로 보여요" />
 </Figure>
 
 **확인 방법**: `vmstat 5`의 r은 실행 중이거나 차례를 기다리는 프로세스 수예요. r이 코어 수보다 계속 크면 CPU가 모자라요. `pidstat -u`의 %wait은 프로세스가 차례를 기다린 비율이에요.
@@ -96,14 +88,8 @@ CPU가 오른 시각을 다른 사건과 나란히 놓아요. 배포, 배치 작
 - 요청 수는 그대로인데 CPU만 늘었다면, 요청 하나가 더 무거워졌어요. 배포된 코드나 데이터 변화를 봐요.
 - 일정한 시각마다 오른다면 정해진 작업(백업, 배치, cron)을 먼저 봐요.
 
-<Figure caption="CPU가 똑같이 올라도 요청 수에 따라 뜻이 달라요. 왼쪽은 일이 많아졌고, 오른쪽은 일 하나가 무거워졌어요.">
-  <Compare
-    columns={['요청 수도 늘었을 때', '요청 수는 그대로일 때']}
-    rows={[
-      { label: '뜻', values: ['부하가 늘었어요', '요청 하나가 무거워졌어요'] },
-      { label: '할 일', values: ['서버 늘리기, 요청 나누기', '배포된 코드, 데이터 변화 보기'] },
-    ]}
-  />
+<Figure caption="CPU가 똑같이 올라도 요청 수에 따라 뜻이 달라요. 요청 수도 함께 늘었다면 일이 많아졌고, 그대로라면 요청 하나가 무거워졌어요.">
+  <HcTwoCases aria-label="두 그래프 모두 CPU가 올라요. 요청 수도 함께 늘었을 때는 일이 많아진 것이라 서버를 늘리거나 요청을 나눠요. 요청 수가 그대로일 때는 요청 하나가 무거워진 것이라 배포된 코드와 데이터 변화를 봐요" />
 </Figure>
 
 자바 서버에서 CPU와 함께 GC 시간이 늘었다면 <Term slug="apm/gc-pause">GC 멈춤</Term>을 함께 봐요. 힙이 모자라 GC가 쉬지 않고 돌면 CPU가 높아져요.

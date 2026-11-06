@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 304" width="300" height="304">
+<text x="4" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">결제 API 프로세스의 fd</text>
+<rect x="4" y="26" width="230" height="216" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 50 V32 Q4.8 26.8 10 26.8 H228 Q233.3 26.8 233.3 32 V50 z" style="fill:var(--color-line)" />
+<path d="M4.8 218 H233.3 V236 Q233.3 241.3 228 241.3 H10 Q4.8 241.3 4.8 236 z" style="fill:var(--color-warn-weak)" />
+<line x1="4" y1="74" x2="234" y2="74" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="98" x2="234" y2="98" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="122" x2="234" y2="122" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="146" x2="234" y2="146" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="170" x2="234" y2="170" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="194" x2="234" y2="194" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="218" x2="234" y2="218" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="56" y="42.7" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">fd</text>
+<text x="72" y="42.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">가리키는 것</text>
+<text x="56" y="66.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-weak)">0</text>
+<text x="72" y="66.7" font-size="13" font-weight="400" style="fill:var(--color-text-weak)">표준 입력</text>
+<text x="56" y="90.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-weak)">1</text>
+<text x="72" y="90.7" font-size="13" font-weight="400" style="fill:var(--color-text-weak)">표준 출력</text>
+<text x="56" y="114.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-weak)">2</text>
+<text x="72" y="114.7" font-size="13" font-weight="400" style="fill:var(--color-text-weak)">표준 에러</text>
+<text x="56" y="138.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">3</text>
+<text x="72" y="138.7" font-size="13" font-weight="400" style="fill:var(--color-text)">로그 파일</text>
+<text x="56" y="162.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">4</text>
+<text x="72" y="162.7" font-size="13" font-weight="400" style="fill:var(--color-text)">소켓</text>
+<text x="56" y="186.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">5</text>
+<text x="72" y="186.7" font-size="13" font-weight="400" style="fill:var(--color-text)">소켓</text>
+<text x="56" y="210.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">…</text>
+<text x="72" y="210.7" font-size="13" font-weight="400" style="fill:var(--color-text)">…</text>
+<text x="56" y="234.7" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">1023</text>
+<text x="72" y="234.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">소켓</text>
+<path d="M240 52 h5 V120 h-5" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="252" y="84" font-size="13" style="fill:var(--color-text-sub)">처음부터</text>
+<text x="252" y="102" font-size="13" style="fill:var(--color-text-sub)">열려 있어요</text>
+<path d="M240 148 h5 V240 h-5" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="252" y="188" font-size="13" font-weight="600" style="fill:var(--color-accent)">대부분</text>
+<text x="252" y="206" font-size="13" font-weight="600" style="fill:var(--color-accent)">소켓</text>
+<rect x="4" y="252" width="292" height="46" rx="10" style="fill:var(--color-warn-weak)" />
+<line x1="16.5" y1="269.5" x2="27.5" y2="280.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="16.5" y1="280.5" x2="27.5" y2="269.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="38" y="270" font-size="13" font-weight="700" style="fill:var(--color-warn)">1,024번째를 열면 소프트 한도</text>
+<text x="38" y="288" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">Too many open files</text>
+</svg>

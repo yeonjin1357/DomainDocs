@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 270" width="300" height="270">
+<rect x="12" y="10" width="60" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="42" y="26.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">앱</text>
+<path d="M42 34 L42 47.8" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M42 52 L45.7 46 L38.3 46 z" style="fill:var(--color-text-sub)" />
+<rect x="4" y="56" width="292" height="74" rx="10" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="14" y="78" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">SSL_write_ex</text>
+<rect x="225.8" y="61" width="60.2" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="255.9" y="76.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">uprobe</text>
+<rect x="14" y="92" width="122" height="24" rx="0" style="fill:var(--color-card)" />
+<text x="75" y="108.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">HTTP/1.0 200 OK</text>
+<rect x="14" y="92" width="122" height="24" rx="4" stroke-width="1.5" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M164 104 L168.2 108.2 L176 99.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="182" y="109" font-size="13" font-weight="700" style="fill:var(--color-accent)">평문이 보여요</text>
+<path d="M42 130 L42 159.8" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M42 164 L45.7 158 L38.3 158 z" style="fill:var(--color-text-sub)" />
+<path d="M64.5 145 V141 A5.5 5.5 0 0 1 75.5 141 V145" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<rect x="62" y="145" width="16" height="12" rx="2.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="70" cy="151" r="1.8" style="fill:var(--color-warn)" />
+<text x="86" y="152" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">libssl이 암호화해요</text>
+<rect x="4" y="168" width="292" height="74" rx="10" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="14" y="190" font-size="13" font-weight="700" style="fill:var(--color-text)">write 시스템 콜</text>
+<rect x="194.9" y="173" width="91.1" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="240.5" y="188.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">tracepoint</text>
+<rect x="14" y="204" width="67.5" height="24" rx="0" style="fill:var(--color-accent)" />
+<text x="47.8" y="220.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-card)">17 03 03</text>
+<rect x="81.5" y="204" width="101.1" height="24" rx="0" style="fill:var(--color-line)" />
+<text x="132.1" y="220.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">8f 2a c1 9e …</text>
+<line x1="81.5" y1="204" x2="81.5" y2="228" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<rect x="14" y="204" width="168.6" height="24" rx="4" stroke-width="1.5" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="181" y1="211" x2="191" y2="221" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="181" y1="221" x2="191" y2="211" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="198" y="221" font-size="13" font-weight="700" style="fill:var(--color-warn)">암호문뿐이에요</text>
+<text x="14" y="262" font-size="13" style="fill:var(--color-text-sub)">17 03 03: TLS 레코드의 머리표</text>
+</svg>

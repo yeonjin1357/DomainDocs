@@ -18,6 +18,7 @@ sources:
     url: https://man7.org/linux/man-pages/man1/ps.1.html
 updated: 2026-10-29
 ---
+import SdAwait from '../../../assets/figures/server/sd-await.svg';
 
 <Situation>
   DB 서버의 쿼리가 느려졌고, CPU 그래프의 iowait가 평소보다 높아요. 디스크 사용률(%util)은 100%를 찍고 있어요.
@@ -56,18 +57,7 @@ updated: 2026-10-29
 r_await와 w_await는 요청이 줄에서 기다린 시간과 처리된 시간을 합친 값이에요. 이 값이 평소보다 크게 늘었다면 디스크가 밀리고 있어요.
 
 <Figure caption="읽기 한 번이 35ms 걸린 예시예요. r_await는 줄에서 기다린 시간과 처리된 시간을 더한 값이라, 줄이 길어지면 함께 커져요.">
-  <Timeline
-    ariaLabel="읽기 요청 하나가 0ms부터 25ms까지 줄에서 기다리고, 25ms부터 35ms까지 처리되어, r_await가 둘을 더한 35ms가 되는 시간 띠"
-    end={35}
-    lanes={[
-      { label: '읽기 1번', segments: [{ start: 0, end: 25, label: '줄에서 기다림', tone: 'warn' }, { start: 25, end: 35, label: '처리', tone: 'accent' }] },
-    ]}
-    marks={[{ at: 35, label: 'r_await 35ms' }]}
-    ticks={[
-      { at: 0, label: '0ms' },
-      { at: 25, label: '25ms' },
-    ]}
-  />
+  <SdAwait aria-label="디스크 앞에 요청 7개가 줄을 섰고, 줄 맨 뒤의 이 요청은 0ms부터 25ms까지 줄에서 기다린 뒤 25ms부터 35ms까지 처리돼요. r_await 35ms는 기다림과 처리를 더한 값이에요" />
 </Figure>
 
 **확인 방법**: `iostat -x 5`로 장치별 r_await, w_await, aqu-sz(평균 요청 줄 길이)를 봐요. 첫 보고는 부팅 뒤 평균이라 건너뛰거나 `-y`로 빼요.

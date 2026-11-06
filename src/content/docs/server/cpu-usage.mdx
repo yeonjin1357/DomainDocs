@@ -23,6 +23,8 @@ sources:
     url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-optimize-cpu.html
 updated: 2026-11-03
 ---
+import CpuLogical from '../../../assets/figures/server/cpu-logical.svg';
+import CpuLoad from '../../../assets/figures/server/cpu-load.svg';
 
 <KeyPoints>
   <Point title="사용률은 일한 시간의 비율이에요">
@@ -47,14 +49,7 @@ CPU 칩 하나에는 계산하는 코어가 여러 개 들어 있어요. 요즘 
 운영체제는 이 실행 흐름 하나하나를 CPU 하나로 봐요. 이렇게 보이는 CPU를 <Term term="server/logical-cpu">논리 CPU</Term>라고 해요. 코어 2개가 저마다 흐름 2개를 돌리면, 운영체제에는 CPU가 4개로 보여요.
 
 <Figure caption="물리 코어 2개가 저마다 실행 흐름 2개를 돌리는 CPU예요. 운영체제는 흐름마다 CPU 하나로 봐서, cpu0부터 cpu3까지 4개로 보여요.">
-  <Strip
-    ariaLabel="물리 코어 1이 cpu0과 cpu1을, 물리 코어 2가 cpu2와 cpu3을 돌려, 운영체제에는 논리 CPU 4개로 보이는 칸 띠"
-    rows={[{ label: '운영체제가 보는 논리 CPU', cells: ['cpu0', 'cpu1', 'cpu2', 'cpu3'] }]}
-    ranges={[
-      { from: 0, to: 1, label: '물리 코어 1', tone: 'accent' },
-      { from: 2, to: 3, label: '물리 코어 2', tone: 'accent' },
-    ]}
-  />
+  <CpuLogical aria-label="CPU 칩 하나 안에 물리 코어 두 개가 있고, 코어마다 실행 흐름 두 개가 돌아요. 흐름 네 개가 운영체제에는 cpu0, cpu1, cpu2, cpu3 네 개의 논리 CPU로 보이고, nproc은 4를 보여 줘요" />
 </Figure>
 
 AWS의 m5.xlarge가 이런 모양이에요. 코어 2개에 코어마다 흐름 2개라, vCPU(가상 CPU)가 4개예요. 이 글과 서버 화면에서 견주는 '코어 수'는 보통 이 논리 CPU 수예요.
@@ -87,15 +82,8 @@ sy가 높으면 앱이 시스템 콜을 아주 많이 부르거나 커널이 바
 
 리눅스의 <Term term="server/load-average">부하</Term>(load average)는 실행 중이거나 실행 대기 줄에 선 일(R 상태)과, 디스크 입출력을 기다리는 일(D 상태)의 수예요. 1분, 5분, 15분 동안의 평균으로 보여 줘요.
 
-<Figure caption="같은 코어 4개 서버라도 두 숫자는 다른 것을 재요. 디스크를 기다리는 일은 사용률을 올리지 않지만 부하는 올려요.">
-  <Compare
-    columns={['CPU 사용률', '부하(load average)']}
-    rows={[
-      { label: '무엇을 세나요', values: ['CPU가 일한 시간의 비율', '실행 중이거나 기다리는 일의 수'] },
-      { label: '디스크를 기다리는 일', values: ['쉰 시간(iowait)으로 세요', '부하에 들어가요'] },
-      { label: '읽는 법', values: ['100%에 가까우면 꽉 찼어요', '코어 수보다 크면 줄이 생겼어요'] },
-    ]}
-  />
+<Figure caption="코어 4개 서버의 두 순간이에요. 디스크를 기다리는 일은 쉰 시간(iowait)으로 세서 사용률을 올리지 않지만, 부하에는 들어가요.">
+  <CpuLoad aria-label="코어 4개 서버의 두 순간. CPU가 바쁠 때는 코어 4개가 모두 실행 중이고 4개가 CPU 차례를 기다려서 사용률 100%, 부하 8이에요. 디스크를 기다릴 때는 코어 1개만 실행 중이고 8개가 디스크를 기다려서 사용률 25%, 부하 9예요" />
 </Figure>
 
 부하는 코어 수와 견줘 읽어요. 코어 4개 서버의 부하 4는 딱 맞게 바쁜 거고, 부하 8이면 평균 4개가 차례를 기다려요. 같은 부하 8도 코어 16개 서버에서는 여유가 있어요.

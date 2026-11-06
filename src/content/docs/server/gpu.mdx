@@ -27,6 +27,9 @@ sources:
     url: https://github.com/NVIDIA/k8s-device-plugin
 updated: 2026-11-03
 ---
+import GpuArch from '../../../assets/figures/server/gpu-arch.svg';
+import GpuSm from '../../../assets/figures/server/gpu-sm.svg';
+import GpuMemTwo from '../../../assets/figures/server/gpu-mem-two.svg';
 
 <KeyPoints>
   <Point title="GPU 사용률은 일한 시간의 비율이에요">
@@ -51,24 +54,7 @@ CPU는 몇십 개의 코어가 복잡한 일을 순서대로 빠르게 처리해
 <Term term="server/gpu">GPU</Term>는 서버에 꽂는 따로 된 장치예요. 자기 메모리가 있어서, CPU가 계산할 데이터를 서버 메모리에서 GPU 메모리로 옮겨 줘야 해요.
 
 <Figure caption="CPU가 데이터를 GPU 메모리로 옮기고 계산을 맡기면, GPU의 SM들이 계산해요. 서버 메모리와 GPU 메모리는 따로라, 지표도 따로 봐요.">
-  <Flow
-    ariaLabel="서버 안의 CPU와 서버 메모리, GPU 카드 안의 SM 수천 개 코어와 GPU 메모리가 나뉘어 있고, CPU가 일감을 SM에 보내고 서버 메모리의 데이터를 GPU 메모리로 복사하는 구조도"
-    nodes={[
-      { id: 'cpu', label: 'CPU', col: 0, row: 0, note: '일감을 보내요' },
-      { id: 'ram', label: '서버 메모리', col: 0, row: 1 },
-      { id: 'sm', label: 'SM 여러 개', col: 2, row: 0, note: '코어 수천 개', tone: 'accent' },
-      { id: 'vram', label: 'GPU 메모리', col: 2, row: 1, tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'cpu', to: 'sm' },
-      { from: 'ram', to: 'vram' },
-      { from: 'sm', to: 'vram', both: true },
-    ]}
-    groups={[
-      { label: '서버', cols: [0, 0], rows: [0, 1] },
-      { label: 'GPU 카드', cols: [2, 2], rows: [0, 1] },
-    ]}
-  />
+  <GpuArch aria-label="서버 안의 CPU가 GPU 카드의 SM(코어 묶음) 여러 개에 계산을 맡기고, 서버 메모리의 데이터를 GPU 메모리로 옮겨요. SM은 GPU 메모리와 데이터를 주고받아요" />
 </Figure>
 
 GPU의 코어는 <Term term="server/sm">SM</Term>(streaming multiprocessor)이라는 묶음으로 나뉘어요. GPU 하나에 SM이 수십에서 백수십 개 있고, 계산은 이 SM들에 나뉘어 돌아요.
@@ -88,21 +74,8 @@ nvidia-smi와 많은 수집기가 보여 주는 GPU 사용률은 지난 짧은 �
 
 그래서 작은 계산 하나가 SM 몇 개만 쓰며 쉬지 않고 돌아도 사용률은 100%예요. 사용률 100%는 GPU가 쉬지 않았다는 뜻이지, 코어를 꽉 채웠다는 뜻이 아니에요.
 
-<Figure caption="두 GPU 모두 사용률 100%예요. 칸 하나가 SM 하나이고, 위 GPU는 모든 SM이 일하지만 아래 GPU는 두 개만 일해요.">
-  <Strip
-    ariaLabel="사용률이 둘 다 100%인 GPU 두 대의 SM 12개. 위 GPU는 12개가 모두 일하고, 아래 GPU는 2개만 일하고 10개는 쉬는 칸 띠"
-    rows={[
-      {
-        label: '사용률 100% · SM이 모두 일해요',
-        cells: Array.from({ length: 12 }, () => ({ label: '', tone: 'accent' })),
-      },
-      {
-        label: '사용률 100% · SM 두 개만 일해요',
-        cells: [{ label: '', tone: 'accent' }, { label: '', tone: 'accent' }, ...Array.from({ length: 10 }, () => ({ label: '', tone: 'sub' }))],
-      },
-    ]}
-    ranges={[{ row: 1, from: 2, to: 11, label: '쉬는 SM 10개', tone: 'warn' }]}
-  />
+<Figure caption="두 GPU 모두 사용률 100%예요. GPU 1은 SM 12개가 다 일하고, GPU 2는 두 개만 일해요. SM 활동으로 보면 100%와 약 17%로 갈려요.">
+  <GpuSm aria-label="사용률이 둘 다 100%인 GPU 두 대의 SM 12개. GPU 1은 SM 12개가 모두 일해 SM 활동이 100%이고, GPU 2는 SM 2개만 일하고 10개는 쉬어 SM 활동이 약 17%예요" />
 </Figure>
 
 GPU를 얼마나 채워 쓰는지 보려면 SM 활동(SM activity)을 봐요. 모든 SM에 대해 일감이 하나라도 올라 있던 시간의 비율을 평균한 값이에요. NVIDIA 문서는 GPU를 잘 쓰려면 이 값이 적어도 0.8(80%)은 돼야 하고, 0.5(50%) 아래면 잘 못 쓰는 것 같다고 해요.
@@ -136,14 +109,7 @@ PyTorch 같은 프레임워크는 한 번 잡은 GPU 메모리를 바로 돌려�
 '메모리'가 붙은 숫자가 하나 더 있어요. 메모리 사용률은 메모리가 찬 비율이 아니라, 메모리를 읽고 쓰느라 바빴던 시간의 비율이에요.
 
 <Figure caption="이름이 비슷한 두 숫자예요. 메모리가 모자란지는 사용량으로, 메모리를 오가는 길이 바쁜지는 사용률로 봐요.">
-  <Compare
-    columns={['메모리 사용량', '메모리 사용률']}
-    rows={[
-      { label: '재는 것', values: ['얼마나 찼나', '읽고 쓰느라 바빴던 시간'] },
-      { label: '단위', values: ['MiB, GB', '%'] },
-      { label: '높으면', values: ['새 할당이 실패할 수 있어요', '메모리를 기다리는 계산이 많아요'] },
-    ]}
-  />
+  <GpuMemTwo aria-label="SM과 GPU 메모리 사이를 데이터가 오가요. 1 메모리 사용량은 24GB 중 20GB처럼 얼마나 찼는지를 MiB나 GB로 재고, 높으면 새 할당이 실패할 수 있어요. 2 메모리 사용률은 오가는 길이 바빴던 시간을 %로 재고, 높으면 메모리를 기다리는 계산이 많아요" />
 </Figure>
 
 ## 뜨거우면 스스로 느려져요

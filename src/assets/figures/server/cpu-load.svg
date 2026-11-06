@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 312" width="300" height="312">
+<rect x="4" y="4" width="292" height="134" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">CPU가 바쁠 때</text>
+<rect x="16" y="40" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="32" cy="56" r="7" style="fill:var(--color-accent)" />
+<rect x="54" y="40" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="70" cy="56" r="7" style="fill:var(--color-accent)" />
+<rect x="92" y="40" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="108" cy="56" r="7" style="fill:var(--color-accent)" />
+<rect x="130" y="40" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="146" cy="56" r="7" style="fill:var(--color-accent)" />
+<text x="16" y="92" font-size="13" style="fill:var(--color-text-sub)">코어 4개</text>
+<text x="176" y="44" font-size="13" style="fill:var(--color-text-sub)">CPU 차례 기다림</text>
+<circle cx="182" cy="60" r="5.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="196" cy="60" r="5.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="210" cy="60" r="5.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="224" cy="60" r="5.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="176" y="84" font-size="13" style="fill:var(--color-text-sub)">디스크 기다림</text>
+<text x="176" y="105" font-size="13" style="fill:var(--color-text-weak)">없음</text>
+<line x1="16" y1="110" x2="284" y2="110" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="16" y="128" font-size="13" font-weight="700" style="fill:var(--color-accent)">사용률 100%</text>
+<text x="284" y="128" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">부하 8 = 실행 4 + 기다림 4</text>
+<rect x="4" y="146" width="292" height="134" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="168" font-size="14" font-weight="700" style="fill:var(--color-text)">디스크를 기다릴 때</text>
+<rect x="16" y="182" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="32" cy="198" r="7" style="fill:var(--color-accent)" />
+<rect x="54" y="182" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="70" y="203" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">쉼</text>
+<rect x="92" y="182" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="108" y="203" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">쉼</text>
+<rect x="130" y="182" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="146" y="203" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-weak)">쉼</text>
+<text x="16" y="234" font-size="13" style="fill:var(--color-text-sub)">코어 4개</text>
+<text x="176" y="186" font-size="13" style="fill:var(--color-text-sub)">CPU 차례 기다림</text>
+<text x="176" y="207" font-size="13" style="fill:var(--color-text-weak)">없음</text>
+<text x="176" y="226" font-size="13" style="fill:var(--color-text-sub)">디스크 기다림</text>
+<circle cx="182" cy="242" r="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="196" cy="242" r="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="210" cy="242" r="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="224" cy="242" r="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="238" cy="242" r="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="252" cy="242" r="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="266" cy="242" r="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="280" cy="242" r="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="16" y1="252" x2="284" y2="252" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="16" y="270" font-size="13" font-weight="700" style="fill:var(--color-accent)">사용률 25%</text>
+<text x="284" y="270" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">부하 9 = 실행 1 + 디스크 8</text>
+<circle cx="20" cy="300" r="5" style="fill:var(--color-accent)" />
+<text x="30" y="305" font-size="13" style="fill:var(--color-text-sub)">실행 중</text>
+<circle cx="100" cy="300" r="5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="110" y="305" font-size="13" style="fill:var(--color-text-sub)">차례 기다림</text>
+<circle cx="204" cy="300" r="5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="214" y="305" font-size="13" style="fill:var(--color-text-sub)">디스크 기다림</text>
+</svg>

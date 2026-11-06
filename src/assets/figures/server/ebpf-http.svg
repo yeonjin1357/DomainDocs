@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 234" width="300" height="234">
+<text x="40" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">클라이언트</text>
+<line x1="40" y1="26" x2="40" y2="226" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="140" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">커널</text>
+<line x1="140" y1="26" x2="140" y2="226" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="234" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">앱</text>
+<line x1="234" y1="26" x2="234" y2="226" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M40 56 L135.1 56" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M140 56 L133 51.7 L133 60.3 z" style="fill:var(--color-text-sub)" />
+<text x="90" y="50" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">GET /slow</text>
+<path d="M140 92 L229.1 92" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M234 92 L227 87.7 L227 96.3 z" style="fill:var(--color-accent)" />
+<text x="187" y="86" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">recvfrom</text>
+<path d="M234 176 L144.9 176" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M140 176 L147 180.3 L147 171.7 z" style="fill:var(--color-accent)" />
+<text x="187" y="170" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">sendto</text>
+<path d="M140 208 L44.9 208" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M40 208 L47 212.3 L47 203.7 z" style="fill:var(--color-text-sub)" />
+<text x="90" y="202" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">200 OK</text>
+<rect x="222" y="100" width="24" height="68" rx="4" style="fill:var(--color-line)" />
+<text x="234" y="138" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">쉼</text>
+<circle cx="140" cy="92" r="6.5" stroke-width="2" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="140" cy="176" r="6.5" stroke-width="2" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<rect x="67.6" y="123" width="144.7" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="140" y="138.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">eBPF가 시각을 적어요</text>
+<path d="M254 92 h8 V176 h-8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="268" y="130" font-size="14" font-weight="700" style="fill:var(--color-accent)">0.2초</text>
+<text x="268" y="148" font-size="13" style="fill:var(--color-text-sub)">처리</text>
+</svg>

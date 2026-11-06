@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+<rect x="4" y="4" width="292" height="70" rx="12" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="16" y="24" font-size="13" font-weight="700" style="fill:var(--color-text)">앱(프로세스)</text>
+<rect x="23" y="38" width="78" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="62" y="54.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">웹 서버</text>
+<rect x="111" y="38" width="78" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="54.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">DB</text>
+<rect x="199" y="38" width="78" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="238" y="54.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">에이전트</text>
+<path d="M40 76 L40 97.1" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M40 102 L44.3 95 L35.7 95 z" style="fill:var(--color-accent)" />
+<path d="M260 76 L260 97.1" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M260 102 L264.3 95 L255.7 95 z" style="fill:var(--color-accent)" />
+<text x="150" y="94" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">시스템 콜로 부탁해요</text>
+<rect x="4" y="104" width="292" height="70" rx="12" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="16" y="124" font-size="13" font-weight="700" style="fill:var(--color-accent)">운영체제 커널</text>
+<rect x="27.8" y="139" width="68.5" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="62" y="154.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">일정 짜기</text>
+<rect x="103" y="139" width="93.9" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="150" y="154.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">메모리 나누기</text>
+<rect x="211.9" y="139" width="52.1" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="238" y="154.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">입출력</text>
+<path d="M40 176 L40 197.1" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M40 202 L44.3 195 L35.7 195 z" style="fill:var(--color-text-sub)" />
+<path d="M260 176 L260 197.1" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M260 202 L264.3 195 L255.7 195 z" style="fill:var(--color-text-sub)" />
+<text x="150" y="194" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">하드웨어를 나눠 줘요</text>
+<rect x="4" y="204" width="292" height="92" rx="12" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="16" y="224" font-size="13" font-weight="700" style="fill:var(--color-text)">하드웨어</text>
+<line x1="38.5" y1="233" x2="38.5" y2="237" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="38.5" y1="267" x2="38.5" y2="271" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="27" y1="244.5" x2="31" y2="244.5" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="61" y1="244.5" x2="65" y2="244.5" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="46" y1="233" x2="46" y2="237" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="46" y1="267" x2="46" y2="271" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="27" y1="252" x2="31" y2="252" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="61" y1="252" x2="65" y2="252" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="53.5" y1="233" x2="53.5" y2="237" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="53.5" y1="267" x2="53.5" y2="271" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="27" y1="259.5" x2="31" y2="259.5" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="61" y1="259.5" x2="65" y2="259.5" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<rect x="31" y="237" width="30" height="30" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="37.6" y="243.6" width="16.8" height="16.8" rx="2" style="fill:var(--color-line)" />
+<rect x="96" y="240" width="40" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="101" y="244" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<rect x="112" y="244" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<rect x="123" y="244" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<line x1="99" y1="258" x2="99" y2="262" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="104.6" y1="258" x2="104.6" y2="262" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="110.2" y1="258" x2="110.2" y2="262" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="115.8" y1="258" x2="115.8" y2="262" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="121.4" y1="258" x2="121.4" y2="262" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="127" y1="258" x2="127" y2="262" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="132.6" y1="258" x2="132.6" y2="262" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<rect x="164" y="237" width="44" height="30" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="182" cy="252" r="9.5" stroke-width="1.5" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<circle cx="182" cy="252" r="2.2" style="fill:var(--color-text-sub)" />
+<line x1="191" y1="257" x2="202" y2="243" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<rect x="239" y="239" width="34" height="26" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M247 259 V250 H251 V246 H261 V250 H265 V259 z" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<line x1="252" y1="250" x2="252" y2="253" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="256" y1="250" x2="256" y2="253" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="260" y1="250" x2="260" y2="253" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="46" y="286" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">CPU</text>
+<text x="116" y="286" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">메모리</text>
+<text x="186" y="286" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">디스크</text>
+<text x="256" y="286" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">네트워크</text>
+</svg>

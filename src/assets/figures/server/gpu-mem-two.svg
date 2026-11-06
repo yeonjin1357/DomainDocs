@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 302" width="300" height="302">
+<rect x="96" y="6" width="108" height="34" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="28" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">SM(계산)</text>
+<path d="M136 98 L136 48.9" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M136 44 L131.7 51 L140.3 51 z" style="fill:var(--color-warn)" />
+<path d="M164 44 L164 93.1" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M164 98 L168.3 91 L159.7 91 z" style="fill:var(--color-warn)" />
+<circle cx="186" cy="70" r="9.5" style="fill:var(--color-warn)" />
+<text x="186" y="74.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">2</text>
+<text x="126" y="75" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-warn)">오가는 길</text>
+<rect x="50" y="102" width="200" height="50" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="52" y="104" width="163.3" height="46" rx="6" style="fill:var(--color-accent);fill-opacity:0.8" />
+<text x="130" y="132" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">20GB 찼어요</text>
+<text x="246" y="132" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">24GB</text>
+<circle cx="268" cy="127" r="9.5" style="fill:var(--color-accent)" />
+<text x="268" y="131.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">1</text>
+<rect x="4" y="168" width="144" height="128" rx="12" style="fill:var(--color-card)" />
+<circle cx="24" cy="190" r="9.5" style="fill:var(--color-accent)" />
+<text x="24" y="194.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">1</text>
+<text x="40" y="195" font-size="13" font-weight="700" style="fill:var(--color-text)">메모리 사용량</text>
+<text x="16" y="222" font-size="13" font-weight="600" style="fill:var(--color-accent)">얼마나 찼나</text>
+<text x="16" y="240" font-size="13" style="fill:var(--color-text-sub)">MiB, GB</text>
+<text x="16" y="264" font-size="13" style="fill:var(--color-text-sub)">높으면 새 할당이</text>
+<text x="16" y="282" font-size="13" style="fill:var(--color-text-sub)">실패할 수 있어요</text>
+<rect x="152" y="168" width="144" height="128" rx="12" style="fill:var(--color-card)" />
+<circle cx="172" cy="190" r="9.5" style="fill:var(--color-warn)" />
+<text x="172" y="194.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">2</text>
+<text x="188" y="195" font-size="13" font-weight="700" style="fill:var(--color-text)">메모리 사용률</text>
+<text x="164" y="222" font-size="13" font-weight="600" style="fill:var(--color-warn)">오가느라 바빴던 시간</text>
+<text x="164" y="240" font-size="13" style="fill:var(--color-text-sub)">%</text>
+<text x="164" y="264" font-size="13" style="fill:var(--color-text-sub)">높으면 메모리를</text>
+<text x="164" y="282" font-size="13" style="fill:var(--color-text-sub)">기다리는 계산이 많아요</text>
+</svg>

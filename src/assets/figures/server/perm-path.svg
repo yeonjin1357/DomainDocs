@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 210" width="300" height="210">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">다른 사용자가 app.log를 읽으려면</text>
+<path d="M15 49 Q15 46 18 46 H25 L28 50 H42 Q45 50 45 53 V67 Q45 70 42 70 H18 Q15 70 15 67 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="30" y="96" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">/</text>
+<text x="30" y="118" font-size="14" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">r-x</text>
+<path d="M48 58 L67.1 58" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M72 58 L65 53.7 L65 62.3 z" style="fill:var(--color-accent)" />
+<path d="M75 49 Q75 46 78 46 H85 L88 50 H102 Q105 50 105 53 V67 Q105 70 102 70 H78 Q75 70 75 67 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="90" y="96" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">srv</text>
+<text x="90" y="118" font-size="14" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">r-x</text>
+<path d="M108 58 L125.1 58" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M130 58 L123 53.7 L123 62.3 z" style="fill:var(--color-accent)" />
+<path d="M135 49 Q135 46 138 46 H145 L148 50 H162 Q165 50 165 53 V67 Q165 70 162 70 H138 Q135 70 135 67 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<path d="M156.5 65 V61 A5.5 5.5 0 0 1 167.5 61 V65" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<rect x="154" y="65" width="16" height="12" rx="2.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="162" cy="71" r="1.8" style="fill:var(--color-warn)" />
+<text x="150" y="96" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">app</text>
+<text x="150" y="118" font-size="14" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">---</text>
+<line x1="168" y1="58" x2="192" y2="58" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 4" style="stroke:var(--color-text-weak)" />
+<path d="M195 49 Q195 46 198 46 H205 L208 50 H222 Q225 50 225 53 V67 Q225 70 222 70 H198 Q195 70 195 67 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="210" y="96" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">logs</text>
+<text x="210" y="118" font-size="14" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">r-x</text>
+<line x1="228" y1="58" x2="252" y2="58" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 4" style="stroke:var(--color-text-weak)" />
+<path d="M257 45 Q257 42 260 42 H275 L283 50 V71 Q283 74 280 74 H260 Q257 74 257 71 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<path d="M275 42 V50 H283" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<line x1="263" y1="56" x2="277" y2="56" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="263" y1="61" x2="277" y2="61" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="263" y1="66" x2="272" y2="66" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<text x="270" y="96" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">app.log</text>
+<text x="270" y="118" font-size="14" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">r--</text>
+<text x="8" y="140" font-size="13" style="fill:var(--color-text-sub)">아래 글자: 나머지 칸의 권한</text>
+<rect x="4" y="154" width="292" height="50" rx="10" style="fill:var(--color-warn-weak)" />
+<text x="150" y="175" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">app에 x가 없어서 여기서 막혀요</text>
+<text x="150" y="195" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">app.log가 r--여도 못 읽어요</text>
+</svg>

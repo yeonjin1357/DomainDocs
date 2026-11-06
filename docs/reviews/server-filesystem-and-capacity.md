@@ -12,3 +12,4 @@
 | ext 계열 예약 공간 기본 5%, 이유, bytes-per-inode는 만든 뒤 못 바꿈 | https://man7.org/linux/man-pages/man8/mke2fs.8.html |
 
 - 메모: inode가 내용의 위치도 담는다는 건 ext4 같은 파일 시스템의 구조예요(inode(7)는 정보 목록만 들어요). 95%쯤에서 일반 앱이 막힌다는 건 기본 예약 5%에서 나온 설명이에요.
+- (2026-11-06 그림 다시 그림) inode 그림의 "디렉터리는 파일 이름과 inode 번호를 짝지어 담아요": readdir(3)의 struct dirent가 d_ino(Inode number)와 d_name(filename)을 담아요(https://man7.org/linux/man-pages/man3/readdir.3.html). 그림의 inode 번호, 블록 번호, 용량·inode 칸 비율(17%, 22%)은 설명용 예시예요.

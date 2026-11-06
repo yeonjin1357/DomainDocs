@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 196" width="300" height="196">
+<text x="58" y="16" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">주인</text>
+<text x="148" y="16" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">그룹</text>
+<text x="238" y="16" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">나머지</text>
+<rect x="21" y="26" width="24" height="32" rx="5" style="fill:var(--color-accent)" />
+<text x="33" y="48" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-card)">r</text>
+<text x="33" y="76" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">4</text>
+<rect x="47" y="26" width="24" height="32" rx="5" style="fill:var(--color-accent)" />
+<text x="59" y="48" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-card)">w</text>
+<text x="59" y="76" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">2</text>
+<rect x="73" y="26" width="24" height="32" rx="5" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="85" y="48" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">-</text>
+<text x="85" y="76" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">1</text>
+<rect x="111" y="26" width="24" height="32" rx="5" style="fill:var(--color-accent)" />
+<text x="123" y="48" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-card)">r</text>
+<text x="123" y="76" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">4</text>
+<rect x="137" y="26" width="24" height="32" rx="5" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="149" y="48" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">-</text>
+<text x="149" y="76" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">2</text>
+<rect x="163" y="26" width="24" height="32" rx="5" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="175" y="48" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">-</text>
+<text x="175" y="76" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">1</text>
+<rect x="201" y="26" width="24" height="32" rx="5" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="213" y="48" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">-</text>
+<text x="213" y="76" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">4</text>
+<rect x="227" y="26" width="24" height="32" rx="5" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="239" y="48" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">-</text>
+<text x="239" y="76" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">2</text>
+<rect x="253" y="26" width="24" height="32" rx="5" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="265" y="48" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">-</text>
+<text x="265" y="76" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">1</text>
+<path d="M21 86 v5 H95 v-5" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="58" y="110" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">4 + 2 + 0</text>
+<text x="58" y="140" font-size="22" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">6</text>
+<path d="M111 86 v5 H185 v-5" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="148" y="110" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">4 + 0 + 0</text>
+<text x="148" y="140" font-size="22" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">4</text>
+<path d="M201 86 v5 H275 v-5" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="238" y="110" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">0 + 0 + 0</text>
+<text x="238" y="140" font-size="22" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">0</text>
+<rect x="70" y="156" width="160" height="34" rx="10" style="fill:var(--color-accent-weak)" />
+<text x="150" y="178" font-size="15" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">chmod 640</text>
+</svg>

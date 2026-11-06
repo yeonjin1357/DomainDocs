@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 270" width="300" height="270">
+<rect x="4" y="72" width="292" height="32" rx="6" style="fill:var(--color-accent-weak)" />
+<rect x="20" y="7" width="44" height="30" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="38" cy="22" r="9.5" stroke-width="1.5" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<circle cx="38" cy="22" r="2.2" style="fill:var(--color-text-sub)" />
+<line x1="47" y1="27" x2="58" y2="13" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="42" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">디스크 1</text>
+<rect x="10" y="76" width="64" height="26" rx="5" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="42" y="94" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">A1</text>
+<rect x="10" y="110" width="64" height="26" rx="5" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="42" y="128" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">B1</text>
+<rect x="10" y="144" width="64" height="26" rx="5" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="42" y="162" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">C1</text>
+<rect x="10" y="178" width="64" height="26" rx="5" style="fill:var(--color-accent)" />
+<text x="42" y="196" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">D 패리티</text>
+<rect x="92" y="7" width="44" height="30" rx="4" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="110" cy="22" r="9.5" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="110" cy="22" r="2.2" style="fill:var(--color-warn)" />
+<line x1="119" y1="27" x2="130" y2="13" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="131" y1="5" x2="141" y2="15" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="131" y1="15" x2="141" y2="5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="114" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">디스크 2</text>
+<rect x="82" y="76" width="64" height="26" rx="5" stroke-width="1.3" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<text x="114" y="94" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">A2</text>
+<rect x="82" y="110" width="64" height="26" rx="5" stroke-width="1.3" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<text x="114" y="128" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">B2</text>
+<rect x="82" y="144" width="64" height="26" rx="5" stroke-width="1.3" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<text x="114" y="162" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">C 패리티</text>
+<rect x="82" y="178" width="64" height="26" rx="5" stroke-width="1.3" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<text x="114" y="196" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">D1</text>
+<rect x="164" y="7" width="44" height="30" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="182" cy="22" r="9.5" stroke-width="1.5" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<circle cx="182" cy="22" r="2.2" style="fill:var(--color-text-sub)" />
+<line x1="191" y1="27" x2="202" y2="13" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="186" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">디스크 3</text>
+<rect x="154" y="76" width="64" height="26" rx="5" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="186" y="94" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">A3</text>
+<rect x="154" y="110" width="64" height="26" rx="5" style="fill:var(--color-accent)" />
+<text x="186" y="128" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">B 패리티</text>
+<rect x="154" y="144" width="64" height="26" rx="5" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="186" y="162" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">C2</text>
+<rect x="154" y="178" width="64" height="26" rx="5" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="186" y="196" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">D2</text>
+<rect x="236" y="7" width="44" height="30" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="254" cy="22" r="9.5" stroke-width="1.5" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<circle cx="254" cy="22" r="2.2" style="fill:var(--color-text-sub)" />
+<line x1="263" y1="27" x2="274" y2="13" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="258" y="58" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">디스크 4</text>
+<rect x="226" y="76" width="64" height="26" rx="5" style="fill:var(--color-accent)" />
+<text x="258" y="94" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">A 패리티</text>
+<rect x="226" y="110" width="64" height="26" rx="5" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="258" y="128" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">B3</text>
+<rect x="226" y="144" width="64" height="26" rx="5" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="258" y="162" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">C3</text>
+<rect x="226" y="178" width="64" height="26" rx="5" stroke-width="1.3" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="258" y="196" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">D3</text>
+<rect x="4" y="218" width="292" height="46" rx="10" style="fill:var(--color-warn-weak)" />
+<text x="150" y="237" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">디스크 2가 죽으면 A2는</text>
+<text x="150" y="256" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">A1, A3, A 패리티로 다시 계산해요</text>
+</svg>

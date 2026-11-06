@@ -23,6 +23,11 @@ sources:
     url: https://www.sudo.ws/docs/man/sudo.man/
 updated: 2026-11-04
 ---
+import PermOctal from '../../../assets/figures/server/perm-octal.svg';
+import PermSlot from '../../../assets/figures/server/perm-slot.svg';
+import PermPath from '../../../assets/figures/server/perm-path.svg';
+import PermCaps from '../../../assets/figures/server/perm-caps.svg';
+import PermProc from '../../../assets/figures/server/perm-proc.svg';
 
 <KeyPoints>
   <Point title="프로세스는 실행한 사용자의 권한으로 돌아요">
@@ -84,46 +89,15 @@ updated: 2026-11-04
 r는 읽기, w는 쓰기, x는 실행이에요. 숫자로는 r=4, w=2, x=1을 더해 칸마다 한 자리로 써요. 그래서 `rw-r-----`는 640이고, `chmod 640 파일`로 이렇게 바꿔요.
 
 <Figure caption="권한 9칸을 세 칸씩 묶어 숫자 한 자리로 써요. rw-는 4+2=6, r--는 4, ---는 0이라 640이에요.">
-  <Strip
-    ariaLabel="권한 9칸 r w - r - - - - -를 주인 세 칸, 그룹 세 칸, 나머지 세 칸으로 묶고, 각각 숫자 6, 4, 0으로 읽는 칸 띠"
-    rows={[
-      {
-        heads: ['4', '2', '1', '4', '2', '1', '4', '2', '1'],
-        cells: [
-          { label: 'r', tone: 'accent' },
-          { label: 'w', tone: 'accent' },
-          { label: '-', tone: 'sub' },
-          { label: 'r', tone: 'accent' },
-          { label: '-', tone: 'sub' },
-          { label: '-', tone: 'sub' },
-          { label: '-', tone: 'sub' },
-          { label: '-', tone: 'sub' },
-          { label: '-', tone: 'sub' },
-        ],
-      },
-    ]}
-    ranges={[
-      { from: 0, to: 2, label: '주인 6', tone: 'accent' },
-      { from: 3, to: 5, label: '그룹 4', tone: 'accent' },
-      { from: 6, to: 8, label: '나머지 0' },
-    ]}
-  />
+  <PermOctal aria-label="권한 9칸 rw-r-----를 주인, 그룹, 나머지 세 칸씩 묶고 칸마다 r=4, w=2, x=1을 더해요. 주인은 4+2+0=6, 그룹은 4+0+0=4, 나머지는 0+0+0=0이라 chmod 640이에요" />
 </Figure>
 
 ## 권한은 한 칸만 봐요
 
 커널은 세 칸을 다 보지 않아요. 내가 파일 주인이면 주인 칸만, 아니고 파일 그룹에 속하면 그룹 칸만, 둘 다 아니면 나머지 칸만 봐요.
 
-<Figure caption="커널이 어느 칸을 볼지 고르는 순서예요. 앞에서 맞는 칸이 있으면 뒤의 칸은 보지 않아요.">
-  <Triage
-    numbered={false}
-    ariaLabel="파일 주인이면 주인 칸만 보고, 아니면 파일 그룹에 속하는지 보고 그룹 칸만 보고, 둘 다 아니면 나머지 칸을 보는 순서"
-    steps={[
-      { label: '파일 주인인가요?', exits: [{ when: '예', to: '주인 칸만 봐요', tone: 'accent' }], next: '아니요' },
-      { label: '파일 그룹에 속하나요?', exits: [{ when: '예', to: '그룹 칸만 봐요', tone: 'accent' }], next: '아니요' },
-      { label: '나머지 칸을 봐요', tone: 'accent' },
-    ]}
-  />
+<Figure caption="커널이 어느 칸을 볼지 고르는 순서예요. 앞에서 맞는 칸이 있으면 뒤의 칸은 보지 않아서, -------r--인 파일은 주인만 못 읽어요.">
+  <PermSlot aria-label="권한 rw- r-- ---의 주인 칸, 그룹 칸, 나머지 칸 가운데, 1 파일 주인 syslog는 주인 칸을, 2 주인이 아니고 adm 그룹이면 그룹 칸을, 3 둘 다 아니면 나머지 칸을 봐요. 권한이 -------r--일 때는 주인 칸이 비어 주인은 못 읽고, 나머지는 읽어요" />
 </Figure>
 
 그래서 권한이 `-------r--`인 파일은 나머지는 읽어도, 정작 주인은 못 읽어요. 주인 칸이 비어 있기 때문이에요. root는 이 검사를 거의 건너뛰어서, 읽기와 쓰기를 막을 수 없어요.
@@ -133,17 +107,7 @@ r는 읽기, w는 쓰기, x는 실행이에요. 숫자로는 r=4, w=2, x=1을 �
 디렉터리의 r은 안의 이름 목록을 보는 권한이고, x는 그 디렉터리를 지나 안의 파일에 닿는 권한이에요. 파일을 읽으려면 경로의 모든 디렉터리에 x가 있어야 해요.
 
 <Figure caption="app.log는 누구나 읽을 수 있는 644인데, 중간의 app 디렉터리가 700이라 다른 사용자는 지나가지 못해요.">
-  <Strip
-    ariaLabel="경로 /, srv, app, logs, app.log 중 app 디렉터리의 나머지 권한이 ---라서 다른 사용자가 거기서 막히는 칸 띠"
-    rows={[
-      {
-        label: '경로와 나머지 칸 권한',
-        heads: ['r-x', 'r-x', '---', 'r-x', 'r--'],
-        cells: ['/', 'srv', { label: 'app', tone: 'warn' }, 'logs', 'app.log'],
-      },
-    ]}
-    marks={[{ at: 2, label: 'x 없음, 여기서 막혀요', tone: 'warn' }]}
-  />
+  <PermPath aria-label="다른 사용자가 /, srv, app, logs를 지나 app.log로 가는 경로. 나머지 칸 권한이 /와 srv는 r-x라 지나가지만, app은 ---라 x가 없어 여기서 막혀요. 그래서 logs와 app.log(r--)에는 닿지 못해요" />
 </Figure>
 
 경로의 권한은 `namei -l`로 한꺼번에 봐요. 디렉터리마다 권한, 주인, 그룹이 한 줄씩 나와요.
@@ -175,22 +139,7 @@ app을 711(`rwx--x--x`)로 바꾸면 다른 사용자도 app.log를 읽어요. �
 둘째는 <Term term="server/capability">capability</Term>를 주는 거예요. 리눅스는 root의 힘을 capability라는 조각으로 나눠 두고, 조각을 하나씩 줄 수 있어요. 이 글을 쓸 때 쓴 커널(6.18)에는 41개가 있어요.
 
 <Figure caption="root의 힘을 조각낸 capability 중 모니터링에서 자주 만나는 다섯 개예요. 패킷을 잡는 에이전트에는 CAP_NET_RAW 하나만 주면 돼요.">
-  <Nest
-    ariaLabel="root의 힘 상자 안에 CAP_NET_RAW, CAP_NET_BIND_SERVICE, CAP_DAC_READ_SEARCH, CAP_DAC_OVERRIDE, CAP_SYS_PTRACE와 그 밖의 조각이 들어 있고, CAP_NET_RAW만 강조한 그림"
-    boxes={[
-      {
-        label: 'root의 힘(41조각)',
-        children: [
-          { label: 'CAP_NET_RAW', note: '패킷을 직접 보내고 받기', tone: 'accent', wide: true },
-          { label: 'CAP_NET_BIND_SERVICE', note: '1024 아래 포트 열기', wide: true },
-          { label: 'CAP_DAC_READ_SEARCH', note: '모든 파일 읽기', wide: true },
-          { label: 'CAP_DAC_OVERRIDE', note: '모든 파일 읽고 쓰기', wide: true },
-          { label: 'CAP_SYS_PTRACE', note: '다른 프로세스 들여다보기', wide: true },
-          { label: '그 밖의 조각', note: '시각 바꾸기, 모듈 올리기 등', wide: true, dashed: true },
-        ],
-      },
-    ]}
-  />
+  <PermCaps aria-label="root의 힘을 capability 41조각으로 나눈 칸 가운데 모니터링에서 자주 만나는 다섯 조각. 1 CAP_NET_RAW는 패킷을 직접 보내고 받기, 2 CAP_NET_BIND_SERVICE는 1024 아래 포트 열기, 3 CAP_DAC_READ_SEARCH는 모든 파일 읽기, 4 CAP_DAC_OVERRIDE는 모든 파일 읽고 쓰기, 5 CAP_SYS_PTRACE는 다른 프로세스 들여다보기이고, 패킷을 잡는 에이전트에는 1만 줘요" />
 </Figure>
 
 capability는 `setcap`으로 실행 파일에 붙이거나, systemd의 `AmbientCapabilities=`로 줘요. 파일에 붙일 때는 `setcap cap_net_raw+ep 파일`처럼 써요. 이렇게 주면 일반 사용자로 도는 프로세스도 그 일 하나만 root처럼 해요.
@@ -200,15 +149,7 @@ capability는 `setcap`으로 실행 파일에 붙이거나, systemd의 `AmbientC
 에이전트를 일반 사용자로 돌려도 시스템 지표는 대부분 읽혀요. CPU와 메모리 숫자가 든 `/proc/stat`, `/proc/meminfo`는 누구나 읽을 수 있어요. 막히는 건 다른 사용자 프로세스의 세부예요.
 
 <Figure caption="일반 사용자 agent로 PID 1(systemd)의 /proc 파일을 읽어 본 결과예요. 명령줄은 보이지만, 열린 파일 목록과 입출력 양은 막혀요.">
-  <Compare
-    columns={['일반 사용자', 'root']}
-    rows={[
-      { label: '/proc/stat, /proc/meminfo', values: ['읽어요', '읽어요'] },
-      { label: '/proc/1/cmdline (명령줄)', values: ['읽어요', '읽어요'] },
-      { label: '/proc/1/fd (열린 파일)', values: ['막혀요', '읽어요'] },
-      { label: '/proc/1/io (입출력 양)', values: ['막혀요', '읽어요'] },
-    ]}
-  />
+  <PermProc aria-label="일반 사용자 agent로 읽은 결과 표. /proc/stat과 meminfo(CPU·메모리 숫자), /proc/1/cmdline(명령줄)은 읽고, /proc/1/fd(열린 파일 목록)와 /proc/1/io(입출력 양)는 막혀요. root는 넷 다 읽어요" />
 </Figure>
 
 그래서 프로세스마다 열린 <Term term="server/file-descriptor">파일 디스크립터</Term> 수를 보는 에이전트는, 다른 사용자의 프로세스에서 값이 빠져요. 화면에 일부 프로세스만 0이나 빈칸이면 권한부터 의심해요.

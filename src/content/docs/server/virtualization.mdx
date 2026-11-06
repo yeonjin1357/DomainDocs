@@ -29,6 +29,8 @@ sources:
     url: https://github.com/torvalds/linux/blob/master/arch/x86/kernel/cpu/vmware.c
 updated: 2026-11-05
 ---
+import VirtStack from '../../../assets/figures/server/virt-stack.svg';
+import VirtMonitor from '../../../assets/figures/server/virt-monitor.svg';
 
 <KeyPoints>
   <Point title="VM의 CPU는 차례를 기다려요">
@@ -51,17 +53,7 @@ updated: 2026-11-05
 가상화는 물리 서버 한 대에서 운영체제 여러 개를 따로 돌리는 기술이에요. <Term term="server/hypervisor">하이퍼바이저</Term>가 CPU, 메모리, 디스크를 나눠 주고, 나눠 받은 단위를 가상 머신(VM)이라고 불러요. VM 안의 운영체제를 게스트(guest), 바깥의 물리 서버를 호스트(host)라고 해요.
 
 <Figure caption="코어 8개, 메모리 64GB인 호스트에 VM 세 개를 올린 예시예요. VM에 준 vCPU는 16개, 메모리는 72GB라 호스트가 가진 것보다 많아요.">
-  <Nest
-    ariaLabel="물리 서버(코어 8개, 메모리 64GB) 안에 VM 1(vCPU 8, 32GB), VM 2(vCPU 4, 16GB), VM 3(vCPU 4, 24GB)이 나란히 있고, 셋 모두 아래의 하이퍼바이저 위에서 돌아요. 각 VM 안에는 앱과 게스트 OS가 따로 있어요"
-    boxes={[
-      { label: '물리 서버(호스트)', note: '코어 8개 · 64GB', cols: 3, children: [
-        { label: 'VM 1', note: 'vCPU 8 · 32GB', children: [{ label: '앱' }, { label: 'OS' }] },
-        { label: 'VM 2', note: 'vCPU 4 · 16GB', children: [{ label: '앱' }, { label: 'OS' }] },
-        { label: 'VM 3', note: 'vCPU 4 · 24GB', children: [{ label: '앱' }, { label: 'OS' }] },
-        { label: '하이퍼바이저', note: 'VMware ESXi, KVM, Hyper-V', tone: 'accent', wide: true },
-      ] },
-    ]}
-  />
+  <VirtStack aria-label="아래에 물리 서버(코어 8개, 메모리 64GB), 그 위에 하이퍼바이저(ESXi, KVM, Hyper-V), 맨 위에 VM 셋이 있어요. VM마다 앱과 게스트 OS가 따로 있고, VM 1은 vCPU 8·32GB, VM 2는 vCPU 4·16GB, VM 3은 vCPU 4·24GB예요. VM에 준 합은 vCPU 16개, 메모리 72GB로 호스트보다 많아요(오버커밋)" />
 </Figure>
 
 서버에서는 하드웨어 바로 위에 하이퍼바이저를 깔아요. VMware ESXi, 리눅스의 KVM, Windows의 Hyper-V가 그렇게 써요. PC의 VirtualBox처럼 운영체제 위에 프로그램으로 까는 하이퍼바이저도 있어요.
@@ -178,20 +170,7 @@ VM의 디스크는 보통 여러 호스트가 함께 쓰는 저장소 위의 파
 VM의 숫자는 두 곳에서 와요. 게스트 안의 에이전트가 보는 숫자와, 하이퍼바이저가 보는 숫자예요. VMware라면 vCenter(호스트 여럿을 관리하는 서버)가 호스트와 VM의 숫자를 모아 API로 내줘요.
 
 <Figure caption="게스트 숫자와 호스트 숫자를 VM 이름으로 이어 한 화면에 놓는 구성 예시예요. 호스트 숫자는 게스트에 에이전트를 깔지 않아도 vCenter에서 가져와요.">
-  <Flow
-    ariaLabel="VM 안의 게스트 에이전트가 CPU와 메모리, steal을 모니터링 서버로 보내고, ESXi 호스트의 CPU Ready와 풍선, 호스트 스왑은 vCenter를 거쳐 모니터링 서버로 가요"
-    nodes={[
-      { id: 'agent', label: '게스트 에이전트', note: 'CPU·메모리·steal', col: 0, row: 0 },
-      { id: 'mon', label: '모니터링 서버', note: 'VM 이름으로', col: 2, row: 0, tone: 'accent' },
-      { id: 'esxi', label: 'ESXi 호스트', col: 0, row: 1 },
-      { id: 'vc', label: 'vCenter', note: 'Ready·풍선·스왑', col: 1, row: 1 },
-    ]}
-    edges={[
-      { from: 'agent', to: 'mon' },
-      { from: 'esxi', to: 'vc' },
-      { from: 'vc', to: 'mon' },
-    ]}
-  />
+  <VirtMonitor aria-label="ESXi 호스트의 VM web-01 안에 있는 게스트 에이전트가 CPU·메모리·steal을 모니터링 서버로 보내요. 하이퍼바이저의 숫자는 호스트를 관리하는 vCenter가 모아 Ready·풍선·스왑을 모니터링 서버로 보내고, 모니터링 서버는 둘을 VM 이름으로 이어요" />
 </Figure>
 
 호스트 쪽에서 볼 숫자는 이래요.

@@ -12,3 +12,4 @@
 | dmesg -T로 사람이 읽는 시각 | https://man7.org/linux/man-pages/man1/dmesg.1.html |
 
 - 메모: available·RSS·스왑·OOM의 개념은 server/memory의 근거를 따랐어요. 그래프와 StatTile 숫자는 설명용이에요.
+- (2026-11-06 그림 다시 그림) free·available 그림의 몫은 본문 숫자에서 거꾸로 나눴어요: (전체 − free) 97%라 free 3%, (전체 − available) 38%라 available 62%, 캐시는 62 − 3 = 59%를 모두 비울 수 있다고 친 예시예요. 스왑 그림의 사용량 80%는 설명용 예시예요.

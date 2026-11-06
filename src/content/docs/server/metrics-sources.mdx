@@ -21,6 +21,8 @@ sources:
     url: https://prometheus.io/docs/prometheus/latest/querying/functions/
 updated: 2026-10-30
 ---
+import MsPath from '../../../assets/figures/server/ms-path.svg';
+import MsContainer from '../../../assets/figures/server/ms-container.svg';
 
 <OnDashboard title="같은 서버의 CPU 사용률 · 같은 시각" caption="세 화면 모두 같은 커널 값에서 왔어요. 몇 초 동안의 평균인지가 달라서 숫자가 달라요.">
   <StatTile label="터미널의 top" value="92" unit="%" note="몇 초 평균" />
@@ -47,20 +49,7 @@ updated: 2026-10-30
 ## 커널에서 화면까지
 
 <Figure caption="에이전트는 서버마다 하나씩 돌며 커널 값을 읽어요. Prometheus 방식은 모니터링 서버가 에이전트에게 값을 받아 가고(pull), 많은 상용 에이전트는 직접 보내요(push).">
-  <Flow
-    ariaLabel="커널이 /proc와 /sys에 값을 내놓고, 에이전트가 읽어 모니터링 서버로 옮기고, 화면이 모니터링 서버의 값을 그리는 구조도"
-    nodes={[
-      { id: 'kernel', label: '커널', col: 0, row: 0, note: '/proc · /sys' },
-      { id: 'agent', label: '에이전트', col: 2, row: 0, note: '간격마다 읽기', tone: 'accent' },
-      { id: 'tsdb', label: '모니터링 서버', col: 2, row: 1, note: '시계열 저장' },
-      { id: 'ui', label: '화면', col: 0, row: 1, note: '계산해 그리기' },
-    ]}
-    edges={[
-      { from: 'kernel', to: 'agent', label: '읽기' },
-      { from: 'agent', to: 'tsdb', tone: 'accent' },
-      { from: 'tsdb', to: 'ui' },
-    ]}
-  />
+  <MsPath aria-label="서버 안에서 커널이 /proc와 /sys에 값을 내놓고, 에이전트가 간격마다 읽어요. 에이전트가 모니터링 서버로 값을 보내거나(push), 모니터링 서버가 에이전트에게서 가져가요(pull). 모니터링 서버는 시계열로 저장하고, 화면이 계산해 그려요" />
 </Figure>
 
 `/proc`의 값 대부분은 부팅 뒤 계속 늘어나는 누적값이에요. 에이전트는 이 누적값을 그대로 옮기고, 사용률이나 초당 양은 모니터링 서버나 화면에서 두 시점의 차이로 계산해요. 원리는 <Term slug="foundations/counters-and-rate">카운터와 rate</Term>와 같아요.
@@ -116,19 +105,8 @@ Prometheus 생태계의 서버 에이전트는 node_exporter예요. 기본으로
 
 컨테이너가 쓰는 양은 리눅스가 컨테이너를 묶는 단위인 cgroup의 파일에 있어요. cgroup v2에서는 `memory.current`가 지금 쓰는 메모리, `memory.max`가 한도, `cpu.stat`이 쓴 CPU 시간이에요.
 
-<Figure caption="컨테이너 안의 같은 프로그램도 어느 파일을 읽느냐에 따라 값이 달라요. /proc 파일은 서버 전체의 값이고, cgroup 파일은 그 컨테이너가 쓰는 양이에요.">
-  <Flow
-    ariaLabel="컨테이너 안의 프로그램이 /proc 파일을 읽으면 서버 전체의 값을, cgroup 파일을 읽으면 그 컨테이너의 값을 얻는 구조도"
-    nodes={[
-      { id: 'app', label: '프로그램', col: 1, row: 0, note: '컨테이너 안', tone: 'accent' },
-      { id: 'proc', label: '/proc 파일', col: 0, row: 1, note: '서버 전체 값', tone: 'warn' },
-      { id: 'cg', label: 'cgroup 파일', col: 2, row: 1, note: '이 컨테이너 값', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'app', to: 'proc', tone: 'warn' },
-      { from: 'app', to: 'cg', tone: 'accent' },
-    ]}
-  />
+<Figure caption="메모리 64GB 서버에서 한도 2GB인 컨테이너의 예시예요. 같은 프로그램도 /proc 파일을 읽으면 서버 전체의 값을, cgroup 파일을 읽으면 그 컨테이너가 쓰는 양을 얻어요.">
+  <MsContainer aria-label="메모리 64GB 서버 안의 한도 2GB 컨테이너에서 프로그램이 /proc/meminfo를 읽으면 서버 전체 64GB를, cgroup 파일 memory.current를 읽으면 이 컨테이너가 쓰는 1.2GB를 얻는 그림" />
 </Figure>
 
 반대로 서버 전체를 재는 node_exporter를 컨테이너로 돌리면, 서버의 파일 시스템과 프로세스를 보도록 따로 연결해 줘야 해요. README는 서버의 루트를 읽기 전용으로 붙이고 `--path.rootfs`로 알려 주라고 해요.

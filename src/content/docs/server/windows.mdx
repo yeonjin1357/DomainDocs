@@ -23,6 +23,9 @@ sources:
     url: https://github.com/prometheus-community/windows_exporter/blob/master/docs/collector.service.md
 updated: 2026-11-03
 ---
+import WinMap from '../../../assets/figures/server/win-map.svg';
+import WinQueue from '../../../assets/figures/server/win-queue.svg';
+import WinEvents from '../../../assets/figures/server/win-events.svg';
 
 <KeyPoints>
   <Point title="숫자는 성능 카운터로 읽어요">
@@ -43,15 +46,7 @@ updated: 2026-11-03
 ## 리눅스와 견줘 보면
 
 <Figure caption="서버가 하는 일은 같지만 숫자를 읽는 곳, 서비스를 관리하는 곳, 기록이 모이는 곳이 달라요.">
-  <Compare
-    columns={['리눅스', '윈도우']}
-    rows={[
-      { label: '숫자를 읽는 곳', values: ['/proc 같은 가상 파일', '성능 카운터'] },
-      { label: '서비스 관리', values: ['systemd', '서비스 제어 관리자(SCM)'] },
-      { label: '기록', values: ['journald, 커널 로그', '이벤트 로그'] },
-      { label: 'Prometheus 에이전트', values: ['node_exporter', 'windows_exporter'] },
-    ]}
-  />
+  <WinMap aria-label="리눅스와 윈도우의 대응표. 숫자는 리눅스가 /proc·/sys 가상 파일에서, 윈도우가 성능 카운터(Get-Counter)에서 읽어요. 서비스는 systemd와 SCM(서비스 제어 관리자)이 관리해요. 기록은 journald와 이벤트 로그에 모여요. Prometheus 에이전트는 node_exporter와 windows_exporter예요" />
 </Figure>
 
 CPU, 메모리, 디스크가 하는 일은 같아요. 그래서 <Term slug="server/cpu-usage">CPU 사용률과 부하</Term>, <Term slug="server/memory">메모리</Term> 글의 생각은 그대로 써요. 다만 숫자를 꺼내는 길과 몇몇 숫자의 뜻이 달라요.
@@ -74,14 +69,7 @@ CPU, 메모리, 디스크가 하는 일은 같아요. 그래서 <Term slug="serv
 이름이 비슷해도 세는 법이 다른 숫자가 있어요. 리눅스 기준으로 읽으면 판단이 틀려요.
 
 <Figure caption="둘 다 CPU가 밀렸는지 보는 숫자지만, 세는 대상이 달라요. 윈도우 값은 실행 중인 스레드와 디스크를 기다리는 일을 세지 않아요.">
-  <Compare
-    columns={['리눅스 부하', '윈도우 프로세서 큐 길이']}
-    rows={[
-      { label: '세는 것', values: ['실행 중 + 차례 대기 + 디스크 대기', '차례를 기다리는 스레드만'] },
-      { label: '줄의 수', values: ['평균값(1·5·15분)', '모든 CPU가 함께 쓰는 줄 하나'] },
-      { label: '읽는 법', values: ['코어 수와 견줘요', '논리 CPU 수로 나눠 봐요'] },
-    ]}
-  />
+  <WinQueue aria-label="논리 CPU 4개 서버의 같은 순간에 4개가 실행 중, 3개가 CPU 차례를 기다리고, 2개가 디스크를 기다려요. 리눅스 부하는 셋을 모두 세서 9이고 1·5·15분 평균으로 봐요. 윈도우 Processor Queue Length는 차례 기다림만 세서 3이고 CPU 수로 나눠 봐요" />
 </Figure>
 
 Processor Queue Length는 모든 CPU가 함께 쓰는 줄 하나의 길이예요. 그래서 논리 CPU 수로 나눠 봐요. 윈도우 설명은 CPU 하나에 10개 이하라면 대개 괜찮다고 해요.
@@ -103,20 +91,7 @@ Processor Queue Length는 모든 CPU가 함께 쓰는 줄 하나의 길이예요
 윈도우의 기록은 <Term term="server/event-log">이벤트 로그</Term>에 모여요. 운영체제 기록은 System, 앱 기록은 Application, 보안 기록은 Security 로그예요. 기록마다 수준(Critical, Error, Warning, Information)과 이벤트 ID가 붙어요.
 
 <Figure caption="서버가 다시 켜진 이유와 서비스가 죽은 기록을 가를 때 먼저 보는 System 로그의 이벤트예요.">
-  <Strip
-    ariaLabel="System 로그의 이벤트 ID 6008은 예기치 않은 종료, 1074는 사람이나 프로세스가 시작한 재시작, 7034는 서비스가 예기치 않게 끝남, 7031은 서비스가 끝나 복구 동작을 함을 뜻하는 칸 띠"
-    rows={[
-      {
-        label: 'System 로그 이벤트 ID',
-        heads: ['6008', '1074', '7034', '7031'],
-        cells: [{ label: '갑자기 꺼짐', tone: 'warn' }, '계획된 재시작', { label: '서비스 죽음', tone: 'warn' }, '죽고 복구'],
-      },
-    ]}
-    ranges={[
-      { from: 0, to: 1, label: '서버 재시작' },
-      { from: 2, to: 3, label: '서비스' },
-    ]}
-  />
+  <WinEvents aria-label="서버가 다시 켜졌을 때 보는 이벤트는 6008(EventLog, 갑자기 꺼졌어요)과 1074(User32, 누가 재시작·종료함)이고, 서비스가 죽었을 때 보는 이벤트는 7034(SCM, 갑자기 끝났어요)와 7031(SCM, 끝나서 복구 동작)인 표" />
 </Figure>
 
 - **6008**(EventLog): 직전 종료가 예기치 않았다는 기록이에요. 전원이 끊기거나 시스템이 멈췄을 때 남아요.

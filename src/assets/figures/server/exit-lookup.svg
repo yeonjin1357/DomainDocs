@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 252" width="300" height="252">
+<text x="4" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">프로세스가 사라졌어요 → 종료 코드는?</text>
+<rect x="4" y="28" width="292" height="50" rx="10" style="fill:var(--color-card)" />
+<rect x="12" y="37" width="72" height="32" rx="7" style="fill:var(--color-warn-weak)" />
+<text x="48" y="59" font-size="15" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">137</text>
+<text x="96" y="50" font-size="13" font-weight="700" style="fill:var(--color-text)">커널 로그의 OOM 줄</text>
+<text x="96" y="68" font-size="13" style="fill:var(--color-text-sub)">없으면 유예 시간 초과</text>
+<rect x="4" y="84" width="292" height="50" rx="10" style="fill:var(--color-card)" />
+<rect x="12" y="93" width="72" height="32" rx="7" style="fill:var(--color-warn-weak)" />
+<text x="48" y="115" font-size="15" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">139·134</text>
+<text x="96" y="106" font-size="13" font-weight="700" style="fill:var(--color-text)">segfault 줄, hs_err 파일</text>
+<text x="96" y="124" font-size="13" style="fill:var(--color-text-sub)">크래시</text>
+<rect x="4" y="140" width="292" height="50" rx="10" style="fill:var(--color-card)" />
+<rect x="12" y="149" width="72" height="32" rx="7" style="fill:var(--color-accent-weak)" />
+<text x="48" y="171" font-size="15" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">143</text>
+<text x="96" y="162" font-size="13" font-weight="700" style="fill:var(--color-text)">배포·축소 기록</text>
+<text x="96" y="180" font-size="13" style="fill:var(--color-text-sub)">누가 멈췄나</text>
+<rect x="4" y="196" width="292" height="50" rx="10" style="fill:var(--color-card)" />
+<rect x="12" y="205" width="72" height="32" rx="7" style="fill:var(--color-bg)" />
+<text x="48" y="227" font-size="15" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">1·2</text>
+<text x="96" y="218" font-size="13" font-weight="700" style="fill:var(--color-text)">표준 에러의 마지막 줄</text>
+<text x="96" y="236" font-size="13" style="fill:var(--color-text-sub)">처리 안 된 에러</text>
+</svg>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 258" width="300" height="258">
+<rect x="4" y="4" width="144" height="250" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">요청 수도 늘었을 때</text>
+<line x1="18" y1="116" x2="134" y2="116" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M18 97.5 L41.2 96 L64.4 90.1 L87.6 71.6 L110.8 58.3 L134 52.4" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M18 107.1 L41.2 105.6 L64.4 101.2 L87.6 86.4 L110.8 75.3 L134 70.1" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3" style="fill:none;stroke:var(--color-accent)" />
+<circle cx="22" cy="136" r="4.5" style="fill:var(--color-warn)" />
+<text x="32" y="141" font-size="13" style="fill:var(--color-text-sub)">CPU</text>
+<line x1="70" y1="136" x2="82" y2="136" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="4 2" style="stroke:var(--color-accent)" />
+<text x="88" y="141" font-size="13" style="fill:var(--color-text-sub)">요청 수</text>
+<line x1="16" y1="154" x2="136" y2="154" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="16" y="176" font-size="13" font-weight="700" style="fill:var(--color-accent)">일이 많아졌어요</text>
+<text x="16" y="216" font-size="13" style="fill:var(--color-text-sub)">서버 늘리기,</text>
+<text x="16" y="234" font-size="13" style="fill:var(--color-text-sub)">요청 나누기</text>
+<rect x="152" y="4" width="144" height="250" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">요청 수는 그대로일 때</text>
+<line x1="166" y1="116" x2="282" y2="116" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M166 97.5 L189.2 96 L212.4 90.1 L235.6 71.6 L258.8 58.3 L282 52.4" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M166 90.1 L189.2 90.8 L212.4 89.4 L235.6 90.1 L258.8 89.4 L282 90.1" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3" style="fill:none;stroke:var(--color-accent)" />
+<circle cx="170" cy="136" r="4.5" style="fill:var(--color-warn)" />
+<text x="180" y="141" font-size="13" style="fill:var(--color-text-sub)">CPU</text>
+<line x1="218" y1="136" x2="230" y2="136" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="4 2" style="stroke:var(--color-accent)" />
+<text x="236" y="141" font-size="13" style="fill:var(--color-text-sub)">요청 수</text>
+<line x1="164" y1="154" x2="284" y2="154" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="164" y="176" font-size="13" font-weight="700" style="fill:var(--color-warn)">요청 하나가</text>
+<text x="164" y="194" font-size="13" font-weight="700" style="fill:var(--color-warn)">무거워졌어요</text>
+<text x="164" y="216" font-size="13" style="fill:var(--color-text-sub)">배포된 코드,</text>
+<text x="164" y="234" font-size="13" style="fill:var(--color-text-sub)">데이터 변화 보기</text>
+</svg>

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 292" width="300" height="292">
+<rect x="70" y="6" width="160" height="50" rx="10" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M102 29.4 L104.9 29.6 L104.9 32.4 L102 32.6 L100.8 35.5 L102.7 37.7 L100.7 39.7 L98.5 37.8 L95.6 39 L95.4 41.9 L92.6 41.9 L92.4 39 L89.5 37.8 L87.3 39.7 L85.3 37.7 L87.2 35.5 L86 32.6 L83.1 32.4 L83.1 29.6 L86 29.4 L87.2 26.5 L85.3 24.3 L87.3 22.3 L89.5 24.2 L92.4 23 L92.6 20.1 L95.4 20.1 L95.6 23 L98.5 24.2 L100.7 22.3 L102.7 24.3 L100.8 26.5 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="94" cy="31" r="3.52" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="114" y="27" font-size="14" font-weight="700" style="fill:var(--color-accent)">systemd</text>
+<text x="114" y="45" font-size="13" style="fill:var(--color-text-sub)">PID 1</text>
+<path d="M118 56 L73.8 92.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M70 96 L78.2 94.9 L72.6 88.2 z" style="fill:var(--color-accent)" />
+<path d="M182 56 L226.2 92.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M230 96 L227.4 88.2 L221.8 94.9 z" style="fill:var(--color-accent)" />
+<text x="150" y="86" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">띄워요</text>
+<rect x="12" y="100" width="116" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="70" y="116.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">수집 에이전트</text>
+<rect x="172" y="100" width="116" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="230" y="116.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">웹 서버</text>
+<rect x="100" y="196" width="100" height="50" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M111 208 Q111 205 114 205 H129 L137 213 V234 Q137 237 134 237 H114 Q111 237 111 234 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M129 205 V213 H137" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="117" y1="219" x2="131" y2="219" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="117" y1="224" x2="131" y2="224" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="117" y1="229" x2="126" y2="229" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="142" y="217" font-size="13" font-weight="700" style="fill:var(--color-text)">journald</text>
+<text x="142" y="235" font-size="13" style="fill:var(--color-text-sub)">로그 모음</text>
+<path d="M86 126 L125.4 189.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M128 194 L128 185.8 L120.6 190.3 z" style="fill:var(--color-text-sub)" />
+<path d="M214 126 L174.6 189.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M172 194 L179.4 190.3 L172 185.8 z" style="fill:var(--color-text-sub)" />
+<text x="150" y="170" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">표준 출력·에러</text>
+<line x1="24" y1="205" x2="24" y2="209" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="24" y1="233" x2="24" y2="237" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="14" y1="215" x2="18" y2="215" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="42" y1="215" x2="46" y2="215" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="30" y1="205" x2="30" y2="209" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="30" y1="233" x2="30" y2="237" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="14" y1="221" x2="18" y2="221" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="42" y1="221" x2="46" y2="221" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="36" y1="205" x2="36" y2="209" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="36" y1="233" x2="36" y2="237" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="14" y1="227" x2="18" y2="227" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="42" y1="227" x2="46" y2="227" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<rect x="18" y="209" width="24" height="24" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="23.3" y="214.3" width="13.4" height="13.4" rx="2" style="fill:var(--color-line)" />
+<text x="30" y="254" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">커널</text>
+<path d="M48 221 L93.1 221" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M98 221 L91 216.7 L91 225.3 z" style="fill:var(--color-text-sub)" />
+<path d="M249 208 Q249 205 252 205 H267 L275 213 V234 Q275 237 272 237 H252 Q249 237 249 234 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M267 205 V213 H275" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="255" y1="219" x2="269" y2="219" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="255" y1="224" x2="264" y2="224" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="296" y="254" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text)">access.log</text>
+<path d="M262 126 L262 195.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M262 200 L265.7 194 L258.3 194 z" style="fill:var(--color-text-weak)" />
+<text x="292" y="284" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">파일에 쓴 로그는 journald를 안 거쳐요</text>
+</svg>

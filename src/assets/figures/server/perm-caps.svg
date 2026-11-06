@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 316" width="300" height="316">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">root의 힘 = capability 41조각</text>
+<rect x="8" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="28.5" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="49" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="69.5" y="28" width="17" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="78" y="42" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">1</text>
+<rect x="90" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="110.5" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="131" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="151.5" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="172" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="192.5" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="213" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="233.5" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="254" y="28" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="274.5" y="28" width="17" height="18" rx="3" style="fill:var(--color-text-sub)" />
+<text x="283" y="42" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">2</text>
+<rect x="8" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="28.5" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="49" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="69.5" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="90" y="50" width="17" height="18" rx="3" style="fill:var(--color-text-sub)" />
+<text x="98.5" y="64" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">3</text>
+<rect x="110.5" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="131" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="151.5" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="172" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="192.5" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="213" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="233.5" y="50" width="17" height="18" rx="3" style="fill:var(--color-text-sub)" />
+<text x="242" y="64" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">4</text>
+<rect x="254" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="274.5" y="50" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="8" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="28.5" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="49" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="69.5" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="90" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="110.5" y="72" width="17" height="18" rx="3" style="fill:var(--color-text-sub)" />
+<text x="119" y="86" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">5</text>
+<rect x="131" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="151.5" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="172" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="192.5" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="213" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="233.5" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="254" y="72" width="17" height="18" rx="3" style="fill:var(--color-line)" />
+<rect x="4" y="100" width="292" height="42" rx="8" style="fill:var(--color-accent-weak)" />
+<circle cx="20" cy="115" r="9.5" style="fill:var(--color-accent)" />
+<text x="20" y="119.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">1</text>
+<text x="36" y="119" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">CAP_NET_RAW</text>
+<text x="36" y="136" font-size="13" style="fill:var(--color-text-sub)">패킷을 직접 보내고 받기</text>
+<circle cx="20" cy="157" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="20" y="161.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">2</text>
+<text x="36" y="161" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">CAP_NET_BIND_SERVICE</text>
+<text x="36" y="178" font-size="13" style="fill:var(--color-text-sub)">1024 아래 포트 열기</text>
+<circle cx="20" cy="199" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="20" y="203.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">3</text>
+<text x="36" y="203" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">CAP_DAC_READ_SEARCH</text>
+<text x="36" y="220" font-size="13" style="fill:var(--color-text-sub)">모든 파일 읽기</text>
+<circle cx="20" cy="241" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="20" y="245.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">4</text>
+<text x="36" y="245" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">CAP_DAC_OVERRIDE</text>
+<text x="36" y="262" font-size="13" style="fill:var(--color-text-sub)">모든 파일 읽고 쓰기</text>
+<circle cx="20" cy="283" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="20" y="287.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">5</text>
+<text x="36" y="287" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">CAP_SYS_PTRACE</text>
+<text x="36" y="304" font-size="13" style="fill:var(--color-text-sub)">다른 프로세스 들여다보기</text>
+<rect x="170.7" y="104" width="119.3" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="230.3" y="119.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">에이전트엔 이것만</text>
+</svg>

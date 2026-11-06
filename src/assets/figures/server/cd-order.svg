@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 298" width="300" height="298">
+<text x="4" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">로그를 시각대로 줄 세우면</text>
+<rect x="4" y="26" width="292" height="76" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 50 V32 Q4.8 26.8 10 26.8 H290 Q295.3 26.8 295.3 32 V50 z" style="fill:var(--color-line)" />
+<rect x="4.8" y="50" width="290.5" height="26" rx="0" style="fill:var(--color-warn-weak)" />
+<line x1="4" y1="76" x2="296" y2="76" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="42.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">로그 시각</text>
+<text x="108" y="42.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">서버</text>
+<text x="178" y="42.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">일</text>
+<text x="12" y="67.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">10:00:02</text>
+<text x="108" y="67.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">DB</text>
+<text x="178" y="67.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">요청 받음</text>
+<text x="12" y="93.7" font-size="13" font-weight="400" style="fill:var(--color-text)">10:00:05</text>
+<text x="108" y="93.7" font-size="13" font-weight="400" style="fill:var(--color-text)">앱</text>
+<text x="178" y="93.7" font-size="13" font-weight="400" style="fill:var(--color-text)">요청 보냄</text>
+<text x="4" y="124" font-size="13" font-weight="600" style="fill:var(--color-warn)">받은 일이 보낸 일보다 3초 앞서 보여요</text>
+<line x1="4" y1="138" x2="296" y2="138" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="4" y="160" font-size="13" font-weight="700" style="fill:var(--color-text)">실제로는</text>
+<text x="8" y="192" font-size="13" font-weight="600" style="fill:var(--color-text)">앱 서버</text>
+<text x="8" y="240" font-size="13" font-weight="600" style="fill:var(--color-text)">DB 서버</text>
+<line x1="90" y1="188" x2="288" y2="188" stroke-width="2" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="90" y1="236" x2="288" y2="236" stroke-width="2" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<path d="M255 192 L256.8 225.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M257 230 L260.4 223.8 L253 224.2 z" style="fill:var(--color-accent)" />
+<circle cx="255" cy="188" r="5" style="fill:var(--color-accent)" />
+<circle cx="257" cy="236" r="5" style="fill:var(--color-warn)" />
+<text x="245" y="180" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text)">시계 10:00:05에 보냄</text>
+<text x="245" y="228" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-warn)">시계 10:00:02에 받음</text>
+<text x="245" y="254" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">DB 시계가 2.9초 늦어요</text>
+<line x1="90" y1="272" x2="288" y2="272" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<text x="90" y="290" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">:00</text>
+<text x="156" y="290" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">:02</text>
+<text x="222" y="290" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">:04</text>
+<text x="288" y="290" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">:06</text>
+<text x="8" y="290" font-size="13" style="fill:var(--color-text-sub)">실제 시각</text>
+</svg>

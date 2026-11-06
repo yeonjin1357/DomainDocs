@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 282" width="300" height="282">
+<rect x="4" y="4" width="292" height="66" rx="12" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="288" y="22" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">사용자 공간</text>
+<rect x="4" y="80" width="292" height="196" rx="12" stroke-width="1.2" style="fill:var(--color-accent-weak);fill-opacity:0.5;stroke:var(--color-accent)" />
+<text x="288" y="98" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">커널</text>
+<rect x="18" y="30" width="104" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="70" y="46.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">에이전트</text>
+<path d="M124 42 L165.1 42" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M170 42 L163 37.7 L163 46.3 z" style="fill:var(--color-text-sub)" />
+<rect x="176" y="31" width="93.9" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="223" y="46.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">모니터링 서버</text>
+<path d="M50 54 L50 103.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M50 108 L54.3 101 L45.7 101 z" style="fill:var(--color-accent)" />
+<text x="58" y="94" font-size="13" font-weight="600" style="fill:var(--color-accent)">① bpf()로 올려요</text>
+<rect x="14" y="110" width="124" height="42" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="24" y="127" font-size="13" font-weight="700" style="fill:var(--color-text)">② 검사기</text>
+<text x="24" y="144" font-size="13" style="fill:var(--color-text-sub)">끝나나 · 안전한가</text>
+<path d="M138 131 L151.8 131" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M156 131 L150 127.3 L150 134.7 z" style="fill:var(--color-warn)" />
+<line x1="161" y1="126" x2="171" y2="136" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="161" y1="136" x2="171" y2="126" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="176" y="136" font-size="13" font-weight="700" style="fill:var(--color-warn)">거절</text>
+<path d="M50 152 L50 189.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M50 194 L54.3 187 L45.7 187 z" style="fill:var(--color-accent)" />
+<text x="58" y="178" font-size="13" font-weight="600" style="fill:var(--color-accent)">③ 기계어로 붙어요</text>
+<line x1="14" y1="212" x2="138" y2="212" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="2 4" style="stroke:var(--color-text-sub)" />
+<rect x="26" y="196" width="96" height="32" rx="7" style="fill:var(--color-accent)" />
+<text x="74" y="217" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">프로그램</text>
+<circle cx="16" cy="212" r="3.5" style="fill:var(--color-text-sub)" />
+<circle cx="132" cy="212" r="3.5" style="fill:var(--color-text-sub)" />
+<text x="14" y="252" font-size="13" font-weight="600" style="fill:var(--color-accent)">④ 이벤트마다 돌아요</text>
+<text x="14" y="268" font-size="13" style="fill:var(--color-text-sub)">시스템 콜, 패킷 같은 길목</text>
+<path d="M122 212 L173.1 212" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M178 212 L171 207.7 L171 216.3 z" style="fill:var(--color-accent)" />
+<text x="150" y="204" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">적어요</text>
+<rect x="180" y="180" width="106" height="70" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M180.8 202 V186 Q180.8 180.8 186 180.8 H280 Q285.3 180.8 285.3 186 V202 z" style="fill:var(--color-line)" />
+<line x1="180" y1="226" x2="286" y2="226" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="188" y="195.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">맵</text>
+<text x="278" y="195.7" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)"></text>
+<text x="188" y="218.7" font-size="13" font-weight="400" style="fill:var(--color-text)">write</text>
+<text x="278" y="218.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">2,301</text>
+<text x="188" y="242.7" font-size="13" font-weight="400" style="fill:var(--color-text)">read</text>
+<text x="278" y="242.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">1,044</text>
+<path d="M232 178 L232 62 L124 62 L124 60.2" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M124 56 L120.3 62 L127.7 62 z" style="fill:var(--color-text-sub)" />
+<text x="226" y="160" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">⑤ 읽어 가요</text>
+</svg>

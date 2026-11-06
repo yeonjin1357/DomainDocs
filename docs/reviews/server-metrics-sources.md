@@ -17,3 +17,4 @@
 - 질의 확인: promtool 3.15.1로 코어 두 개(idle 25%, 75%)를 넣어 `1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))`가 0.5인지 확인했어요.
 - 메모: 맨 위 그림의 세 숫자는 예시예요.
 - 함께 한 것: 퀴즈 5문제를 썼어요.
+- (2026-11-06 그림 다시 그림) 컨테이너 그림의 서버 64GB, 한도 2GB, memory.current 1.2GB는 설명용 예시예요. memory.current가 지금 쓰는 양이라는 건 본문 근거(cgroup v2 문서)와 같아요.

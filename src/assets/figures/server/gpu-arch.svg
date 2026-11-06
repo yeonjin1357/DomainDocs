@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 236" width="300" height="236">
+<rect x="4" y="4" width="100" height="200" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="22" font-size="13" font-weight="600" style="fill:var(--color-text)">서버</text>
+<line x1="46" y1="44" x2="46" y2="48" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="46" y1="80" x2="46" y2="84" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="34" y1="56" x2="38" y2="56" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="70" y1="56" x2="74" y2="56" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="54" y1="44" x2="54" y2="48" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="54" y1="80" x2="54" y2="84" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="34" y1="64" x2="38" y2="64" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="70" y1="64" x2="74" y2="64" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="62" y1="44" x2="62" y2="48" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="62" y1="80" x2="62" y2="84" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="34" y1="72" x2="38" y2="72" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="70" y1="72" x2="74" y2="72" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<rect x="38" y="48" width="32" height="32" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="45" y="55" width="17.9" height="17.9" rx="2" style="fill:var(--color-line)" />
+<text x="54" y="104" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">CPU</text>
+<rect x="34" y="138" width="40" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="39" y="142" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<rect x="50" y="142" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<rect x="61" y="142" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<line x1="37" y1="156" x2="37" y2="160" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="42.6" y1="156" x2="42.6" y2="160" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="48.2" y1="156" x2="48.2" y2="160" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="53.8" y1="156" x2="53.8" y2="160" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="59.4" y1="156" x2="59.4" y2="160" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="65" y1="156" x2="65" y2="160" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="70.6" y1="156" x2="70.6" y2="160" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="54" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">서버 메모리</text>
+<rect x="168" y="4" width="128" height="200" rx="12" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="178" y="22" font-size="13" font-weight="600" style="fill:var(--color-accent)">GPU 카드</text>
+<rect x="176" y="30" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="188.5" y="43.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="205" y="30" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="217.5" y="43.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="234" y="30" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="246.5" y="43.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="263" y="30" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="275.5" y="43.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="176" y="52" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="188.5" y="65.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="205" y="52" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="217.5" y="65.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="234" y="52" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="246.5" y="65.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="263" y="52" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="275.5" y="65.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="176" y="74" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="188.5" y="87.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="205" y="74" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="217.5" y="87.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="234" y="74" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="246.5" y="87.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<rect x="263" y="74" width="25" height="18" rx="3" style="fill:var(--color-accent)" />
+<text x="275.5" y="87.5" font-size="13" text-anchor="middle" font-weight="700" textLength="18" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">SM</text>
+<text x="176" y="112" font-size="13" font-weight="600" style="fill:var(--color-accent)">SM(코어 묶음)</text>
+<rect x="176" y="138" width="25" height="22" rx="2" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<line x1="180" y1="160" x2="180" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<line x1="187" y1="160" x2="187" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<line x1="194" y1="160" x2="194" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<rect x="205" y="138" width="25" height="22" rx="2" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<line x1="209" y1="160" x2="209" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<line x1="216" y1="160" x2="216" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<line x1="223" y1="160" x2="223" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<rect x="234" y="138" width="25" height="22" rx="2" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<line x1="238" y1="160" x2="238" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<line x1="245" y1="160" x2="245" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<line x1="252" y1="160" x2="252" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<rect x="263" y="138" width="25" height="22" rx="2" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<line x1="267" y1="160" x2="267" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<line x1="274" y1="160" x2="274" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<line x1="281" y1="160" x2="281" y2="164" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<text x="176" y="184" font-size="13" font-weight="700" style="fill:var(--color-accent)">GPU 메모리</text>
+<path d="M284 100.2 L284 129.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M284 134 L287.7 128 L280.3 128 z" style="fill:var(--color-accent)" />
+<path d="M284 96 L280.3 102 L287.7 102 z" style="fill:var(--color-accent)" />
+<path d="M74 64 L167.1 64" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M172 64 L165 59.7 L165 68.3 z" style="fill:var(--color-text-sub)" />
+<text x="136" y="38" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">계산을</text>
+<text x="136" y="54" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">맡겨요</text>
+<path d="M78 148 L167.1 148" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M172 148 L165 143.7 L165 152.3 z" style="fill:var(--color-text-sub)" />
+<text x="136" y="122" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">데이터를</text>
+<text x="136" y="138" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">옮겨요</text>
+<text x="150" y="228" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">메모리가 따로라, 지표도 따로 봐요</text>
+</svg>

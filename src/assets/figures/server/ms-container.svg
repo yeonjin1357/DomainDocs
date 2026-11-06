@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 270" width="300" height="270">
+<rect x="4" y="4" width="292" height="262" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="22" font-size="13" font-weight="600" style="fill:var(--color-text)">서버 · 메모리 64GB</text>
+<rect x="20" y="32" width="260" height="70" rx="10" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="32" y="52" font-size="13" font-weight="700" style="fill:var(--color-accent)">컨테이너</text>
+<text x="268" y="52" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">한도 2GB</text>
+<rect x="102" y="66" width="96" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="82.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">프로그램</text>
+<path d="M130 92 L83.6 134.7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M80 138 L88.1 136.5 L82.2 130.1 z" style="fill:var(--color-warn)" />
+<path d="M170 92 L216.4 134.7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M220 138 L217.8 130.1 L211.9 136.5 z" style="fill:var(--color-accent)" />
+<path d="M63 145 Q63 142 66 142 H81 L89 150 V171 Q89 174 86 174 H66 Q63 174 63 171 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M81 142 V150 H89" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="69" y1="156" x2="83" y2="156" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="69" y1="161" x2="83" y2="161" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="69" y1="166" x2="78" y2="166" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="76" y="194" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">/proc 파일</text>
+<text x="76" y="212" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">meminfo</text>
+<rect x="23.3" y="229" width="105.4" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="76" y="244.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">서버 전체 64GB</text>
+<path d="M211 145 Q211 142 214 142 H229 L237 150 V171 Q237 174 234 174 H214 Q211 174 211 171 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M229 142 V150 H237" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="217" y1="156" x2="231" y2="156" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="217" y1="161" x2="231" y2="161" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="217" y1="166" x2="226" y2="166" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="224" y="194" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">cgroup 파일</text>
+<text x="224" y="212" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">memory.current</text>
+<rect x="163.1" y="229" width="121.9" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="224" y="244.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">이 컨테이너 1.2GB</text>
+</svg>

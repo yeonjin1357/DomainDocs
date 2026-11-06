@@ -16,6 +16,7 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc5905
 updated: 2026-10-29
 ---
+import CdOrder from '../../../assets/figures/server/cd-order.svg';
 
 <Situation>
   장애를 되짚는데, 앱 서버 로그로는 10시 00분 05초에 요청을 보냈고 DB 서버 로그로는 10시 00분 02초에 받았어요. 받은 게 보낸 것보다 3초 빨라요.
@@ -29,17 +30,8 @@ updated: 2026-10-29
   <Item title="시간대 문제는 아닌가">시계가 아니라 표시하는 시간대가 다를 수 있어요.</Item>
 </FirstLook>
 
-<Figure caption="로그에 적힌 시각대로 놓으면, DB가 받은 일이 앱이 보낸 일보다 3초 앞서요. DB 서버 시계가 2.9초 늦어서예요. 실제로는 보낸 직후(점선)에 받았어요.">
-  <Timeline
-    ariaLabel="앱 서버 로그는 10시 00분 05초에 보냈다고 적고, DB 서버 로그는 10시 00분 02초에 받았다고 적어 순서가 뒤집혀 보이지만, 실제로 받은 때는 보낸 직후인 시간 띠"
-    end={6}
-    lanes={[
-      { label: '앱 로그', segments: [{ start: 4.2, end: 5, label: '보냄', tone: 'accent' }] },
-      { label: 'DB 로그', segments: [{ start: 1.7, end: 2.5, label: '받음', tone: 'warn' }] },
-    ]}
-    marks={[{ at: 5.05, label: '실제로 받은 때', tone: 'accent' }]}
-    ticks={[{ at: 0, label: '10:00:00' }, { at: 2, label: ':02' }, { at: 4, label: ':04' }, { at: 6, label: ':06' }]}
-  />
+<Figure caption="로그에 적힌 시각대로 놓으면, DB가 받은 일이 앱이 보낸 일보다 3초 앞서요. DB 서버 시계가 2.9초 늦어서예요. 실제로는 보낸 직후에 받았어요.">
+  <CdOrder aria-label="로그를 시각대로 줄 세우면 10:00:02 DB 요청 받음이 10:00:05 앱 요청 보냄보다 먼저예요. 실제 시각으로 놓으면 앱이 자기 시계 10:00:05에 보내고 DB는 바로 뒤에 받았는데, DB 시계가 2.9초 늦어 10:00:02로 적었어요" />
 </Figure>
 
 <Figure caption="정확히 몇 시간씩 어긋난다면 시계가 아니라 시간대예요.">

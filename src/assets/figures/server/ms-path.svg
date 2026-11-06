@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 228" width="300" height="228">
+<rect x="4" y="4" width="168" height="206" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="22" font-size="13" font-weight="600" style="fill:var(--color-text)">서버</text>
+<rect x="38" y="40" width="100" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="88" y="56.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">에이전트</text>
+<path d="M88 104 L88 72.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M88 68 L83.7 75 L92.3 75 z" style="fill:var(--color-accent)" />
+<text x="80" y="84" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-accent)">간격마다</text>
+<text x="80" y="101" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-accent)">읽어요</text>
+<path d="M37 117 Q37 114 40 114 H55 L63 122 V143 Q63 146 60 146 H40 Q37 146 37 143 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M55 114 V122 H63" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="43" y1="128" x2="57" y2="128" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="43" y1="133" x2="57" y2="133" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="43" y1="138" x2="52" y2="138" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<path d="M113 117 Q113 114 116 114 H131 L139 122 V143 Q139 146 136 146 H116 Q113 146 113 143 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M131 114 V122 H139" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="119" y1="128" x2="133" y2="128" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="119" y1="133" x2="133" y2="133" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="119" y1="138" x2="128" y2="138" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="50" y="162" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">/proc</text>
+<text x="126" y="162" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">/sys</text>
+<rect x="14" y="172" width="148" height="30" rx="6" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<line x1="30" y1="175" x2="30" y2="179" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="30" y1="195" x2="30" y2="199" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="22" y1="183" x2="26" y2="183" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="42" y1="183" x2="46" y2="183" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="34" y1="175" x2="34" y2="179" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="34" y1="195" x2="34" y2="199" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="22" y1="187" x2="26" y2="187" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="42" y1="187" x2="46" y2="187" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="38" y1="175" x2="38" y2="179" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="38" y1="195" x2="38" y2="199" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="22" y1="191" x2="26" y2="191" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="42" y1="191" x2="46" y2="191" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<rect x="26" y="179" width="16" height="16" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="29.5" y="182.5" width="9" height="9" rx="2" style="fill:var(--color-line)" />
+<text x="50" y="192" font-size="13" font-weight="600" style="fill:var(--color-text)">커널이 내놓은 값</text>
+<path d="M138 40 L211.1 40" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M216 40 L209 35.7 L209 44.3 z" style="fill:var(--color-accent)" />
+<text x="178" y="30" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">보내요(push)</text>
+<path d="M216 62 L142.9 62" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M138 62 L145 66.3 L145 57.7 z" style="fill:var(--color-text-sub)" />
+<text x="162" y="80" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">가져가요(pull)</text>
+<path d="M233 37 V63 A17 5.5 0 0 0 267 63 V37" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M233 50 A17 5.5 0 0 0 267 50" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<ellipse cx="250" cy="37" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<text x="250" y="92" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">모니터링 서버</text>
+<text x="250" y="110" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">시계열 저장</text>
+<path d="M250 118 L250 135.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M250 140 L254.3 133 L245.7 133 z" style="fill:var(--color-text-sub)" />
+<rect x="220" y="143" width="60" height="42" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="220" y1="151" x2="280" y2="151" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="225" cy="147" r="1.4" style="fill:var(--color-text-sub)" />
+<circle cx="229" cy="147" r="1.4" style="fill:var(--color-text-sub)" />
+<path d="M226 171.8 L234 168.2 L242 170.6 L250 164.6 L258 167 L266 161 L274 165.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="250" y="204" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">화면</text>
+<text x="250" y="222" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">계산해 그려요</text>
+</svg>

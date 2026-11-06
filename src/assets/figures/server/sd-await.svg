@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="300" height="220">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">디스크 앞에 선 요청 줄(aqu-sz)</text>
+<rect x="10" y="30" width="24" height="24" rx="4" style="fill:var(--color-accent)" />
+<rect x="40" y="30" width="24" height="24" rx="4" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<rect x="70" y="30" width="24" height="24" rx="4" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<rect x="100" y="30" width="24" height="24" rx="4" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<rect x="130" y="30" width="24" height="24" rx="4" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<rect x="160" y="30" width="24" height="24" rx="4" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<rect x="190" y="30" width="24" height="24" rx="4" stroke-width="1.2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="22" y="72" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">이 요청</text>
+<path d="M222 42 L239.1 42" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M244 42 L237 37.7 L237 46.3 z" style="fill:var(--color-text-sub)" />
+<rect x="248" y="27" width="44" height="30" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="266" cy="42" r="9.5" stroke-width="1.5" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<circle cx="266" cy="42" r="2.2" style="fill:var(--color-text-sub)" />
+<line x1="275" y1="47" x2="286" y2="33" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="8" y="104" font-size="13" font-weight="700" style="fill:var(--color-text)">이 요청이 걸린 시간</text>
+<rect x="10" y="114" width="196.1" height="26" rx="4" style="fill:var(--color-warn-weak)" />
+<text x="108.6" y="132" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">줄에서 기다림 25ms</text>
+<rect x="208.1" y="114" width="77.9" height="26" rx="4" style="fill:var(--color-accent)" />
+<text x="246.6" y="132" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">처리</text>
+<text x="10" y="158" font-size="13" style="fill:var(--color-text-sub)">0ms</text>
+<text x="207.1" y="158" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">25ms</text>
+<text x="286" y="158" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">35ms</text>
+<path d="M10 168 v5 H286 v-5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="150" y="192" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">r_await 35ms = 기다림 + 처리</text>
+<text x="150" y="212" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">줄이 길어지면 기다림이 늘어 함께 커져요</text>
+</svg>

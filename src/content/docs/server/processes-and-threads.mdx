@@ -21,6 +21,7 @@ sources:
     url: https://man7.org/linux/man-pages/man5/proc_pid_task.5.html
 updated: 2026-10-21
 ---
+import PtIsolation from '../../../assets/figures/server/pt-isolation.svg';
 
 <KeyPoints>
   <Point title="프로세스는 실행 중인 프로그램이에요">
@@ -40,26 +41,8 @@ updated: 2026-10-21
 
 ## 프로세스는 따로, 스레드는 함께
 
-<Figure caption="프로세스 A의 두 스레드는 메모리 A를 함께 써요. 프로세스 B는 자기 메모리만 쓰고, A의 메모리는 볼 수 없어요.">
-  <Flow
-    ariaLabel="프로세스 A 안의 스레드 두 개가 메모리 A를 함께 쓰고, 프로세스 B의 스레드는 메모리 B만 쓰는 구조도"
-    nodes={[
-      { id: 'a1', label: '스레드 1', col: 0, row: 0 },
-      { id: 'a2', label: '스레드 2', col: 1, row: 0 },
-      { id: 'amem', label: '메모리 A', col: 0, row: 1, tone: 'accent' },
-      { id: 'b1', label: '스레드', col: 2, row: 0 },
-      { id: 'bmem', label: '메모리 B', col: 2, row: 1 },
-    ]}
-    edges={[
-      { from: 'a1', to: 'amem', tone: 'accent' },
-      { from: 'a2', to: 'amem', tone: 'accent' },
-      { from: 'b1', to: 'bmem' },
-    ]}
-    groups={[
-      { label: '프로세스 A', cols: [0, 1], rows: [0, 1] },
-      { label: '프로세스 B', cols: [2, 2], rows: [0, 1] },
-    ]}
-  />
+<Figure caption="프로세스 A의 두 스레드는 메모리 A를 함께 쓰고, 스택만 따로 가져요. 프로세스 B는 자기 메모리만 쓰고, A의 메모리는 볼 수 없어요.">
+  <PtIsolation aria-label="프로세스 A 안의 스레드 1과 스레드 2는 저마다 스택을 갖고 메모리 A(코드, 데이터, 힙)를 함께 써요. 프로세스 B의 스레드는 메모리 B만 쓰고, A의 메모리로 가는 길은 막혀 있어요" />
 </Figure>
 
 <Term term="server/process">프로세스</Term>는 실행 중인 프로그램이에요. 프로세스마다 번호(PID)가 붙고, 자기만의 메모리 공간을 받아요. 프로세스가 새 프로세스를 만들어도, 둘은 서로 다른 메모리 공간에서 돌아요.

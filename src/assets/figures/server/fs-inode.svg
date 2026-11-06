@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 238" width="300" height="238">
+<text x="4" y="14" font-size="13" font-weight="700" style="fill:var(--color-text)">디렉터리 /var/log</text>
+<rect x="4" y="24" width="142" height="96" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 48 V30 Q4.8 24.8 10 24.8 H140 Q145.3 24.8 145.3 30 V48 z" style="fill:var(--color-line)" />
+<rect x="4.8" y="72" width="140.5" height="24" rx="0" style="fill:var(--color-accent-weak)" />
+<line x1="4" y1="72" x2="146" y2="72" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="96" x2="146" y2="96" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="40.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">이름</text>
+<text x="138" y="40.7" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">inode</text>
+<text x="12" y="64.7" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">syslog</text>
+<text x="138" y="64.7" font-size="13" text-anchor="end" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">1801</text>
+<text x="12" y="88.7" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">app.log</text>
+<text x="138" y="88.7" font-size="13" text-anchor="end" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">2049</text>
+<text x="12" y="112.7" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">auth.log</text>
+<text x="138" y="112.7" font-size="13" text-anchor="end" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">1777</text>
+<path d="M146 84 L163.1 84" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M168 84 L161 79.7 L161 88.3 z" style="fill:var(--color-accent)" />
+<rect x="168" y="24" width="128" height="120" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="178" y="44" font-size="13" font-weight="700" style="fill:var(--color-accent)">inode 2049</text>
+<text x="178" y="68" font-size="13" style="fill:var(--color-text-sub)">크기</text>
+<text x="214" y="68" font-size="13" font-weight="600" style="fill:var(--color-text)">8KB</text>
+<text x="178" y="90" font-size="13" style="fill:var(--color-text-sub)">권한</text>
+<text x="214" y="90" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">rw-r-----</text>
+<text x="178" y="112" font-size="13" style="fill:var(--color-text-sub)">시각</text>
+<text x="214" y="112" font-size="13" font-weight="600" style="fill:var(--color-text)">10:02</text>
+<text x="178" y="134" font-size="13" style="fill:var(--color-text-sub)">블록</text>
+<text x="214" y="134" font-size="13" font-weight="700" style="fill:var(--color-accent)">5, 9</text>
+<text x="4" y="172" font-size="13" font-weight="700" style="fill:var(--color-text)">데이터 블록</text>
+<rect x="6" y="182" width="22" height="26" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="17" y="200" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">0</text>
+<rect x="30" y="182" width="22" height="26" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="41" y="200" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">1</text>
+<rect x="54" y="182" width="22" height="26" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="65" y="200" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">2</text>
+<rect x="78" y="182" width="22" height="26" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="89" y="200" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">3</text>
+<rect x="102" y="182" width="22" height="26" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="113" y="200" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">4</text>
+<rect x="126" y="182" width="22" height="26" rx="3" style="fill:var(--color-accent)" />
+<text x="137" y="200" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">5</text>
+<rect x="150" y="182" width="22" height="26" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="161" y="200" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">6</text>
+<rect x="174" y="182" width="22" height="26" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="185" y="200" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">7</text>
+<rect x="198" y="182" width="22" height="26" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="209" y="200" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">8</text>
+<rect x="222" y="182" width="22" height="26" rx="3" style="fill:var(--color-accent)" />
+<text x="233" y="200" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">9</text>
+<rect x="246" y="182" width="22" height="26" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="257" y="200" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">10</text>
+<rect x="270" y="182" width="22" height="26" rx="3" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="281" y="200" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-weak)">11</text>
+<path d="M226 146 L141.6 178.3" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M137 180 L145.1 181.6 L142 173.4 z" style="fill:var(--color-accent)" />
+<path d="M240 146 L234 175.2" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M233 180 L238.7 174 L230.2 172.3 z" style="fill:var(--color-accent)" />
+<text x="150" y="230" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">app.log의 내용은 블록 5와 9에 있어요</text>
+</svg>

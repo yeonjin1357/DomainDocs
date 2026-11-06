@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 288" width="300" height="288">
+<rect x="4" y="4" width="292" height="112" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">같은 순간의 서버</text>
+<text x="284" y="26" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">논리 CPU 4개</text>
+<rect x="16" y="40" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="32" cy="56" r="7" style="fill:var(--color-accent)" />
+<rect x="54" y="40" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="70" cy="56" r="7" style="fill:var(--color-accent)" />
+<rect x="92" y="40" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="108" cy="56" r="7" style="fill:var(--color-accent)" />
+<rect x="130" y="40" width="32" height="32" rx="6" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="146" cy="56" r="7" style="fill:var(--color-accent)" />
+<text x="16" y="92" font-size="13" style="fill:var(--color-text-sub)">실행 중 4</text>
+<text x="176" y="46" font-size="13" style="fill:var(--color-text-sub)">CPU 차례 기다림</text>
+<circle cx="182" cy="62" r="5.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="196" cy="62" r="5.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="210" cy="62" r="5.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="176" y="86" font-size="13" style="fill:var(--color-text-sub)">디스크 기다림</text>
+<circle cx="182" cy="102" r="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="196" cy="102" r="5.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<rect x="4" y="124" width="144" height="160" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="146" font-size="13" font-weight="700" style="fill:var(--color-text)">리눅스 부하</text>
+<text x="16" y="164" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">load average</text>
+<text x="16" y="202" font-size="28" font-weight="700" style="fill:var(--color-accent)">9</text>
+<circle cx="20" cy="222" r="5" style="fill:var(--color-accent)" />
+<circle cx="33" cy="222" r="5" style="fill:var(--color-accent)" />
+<circle cx="46" cy="222" r="5" style="fill:var(--color-accent)" />
+<circle cx="59" cy="222" r="5" style="fill:var(--color-accent)" />
+<circle cx="72" cy="222" r="5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="85" cy="222" r="5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="98" cy="222" r="5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="111" cy="222" r="5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="124" cy="222" r="5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="16" y="250" font-size="13" font-weight="600" style="fill:var(--color-text)">셋을 모두 세요</text>
+<text x="16" y="270" font-size="13" style="fill:var(--color-text-sub)">1·5·15분 평균</text>
+<rect x="152" y="124" width="144" height="160" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="146" font-size="13" font-weight="700" style="fill:var(--color-text)">윈도우 Processor</text>
+<text x="164" y="164" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">Queue Length</text>
+<text x="164" y="202" font-size="28" font-weight="700" style="fill:var(--color-accent)">3</text>
+<circle cx="168" cy="222" r="5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="181" cy="222" r="5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="194" cy="222" r="5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="164" y="250" font-size="13" font-weight="600" style="fill:var(--color-text)">차례 기다림만</text>
+<text x="164" y="270" font-size="13" style="fill:var(--color-text-sub)">CPU 수로 나눠 봐요</text>
+</svg>

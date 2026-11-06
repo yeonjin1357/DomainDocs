@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 304" width="300" height="304">
+<rect x="8" y="10" width="128" height="40" rx="8" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="20" y="35" font-size="13" font-weight="700" style="fill:var(--color-text)">앱 코드</text>
+<line x1="136" y1="30" x2="156" y2="30" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="158" cy="30" r="4" style="fill:var(--color-text-sub)" />
+<text x="170" y="26" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">uprobe</text>
+<text x="170" y="44" font-size="13" font-weight="400" style="fill:var(--color-text-sub)">함수 호출</text>
+<rect x="8" y="60" width="128" height="40" rx="8" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="20" y="85" font-size="13" font-weight="700" style="fill:var(--color-text)">TLS 라이브러리</text>
+<line x1="136" y1="80" x2="156" y2="80" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="158" cy="80" r="4" style="fill:var(--color-accent)" />
+<text x="170" y="76" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">uprobe</text>
+<text x="170" y="94" font-size="13" font-weight="700" style="fill:var(--color-accent)">암호화 전 평문</text>
+<rect x="8" y="132" width="128" height="40" rx="8" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-line)" />
+<text x="20" y="157" font-size="13" font-weight="700" style="fill:var(--color-accent)">시스템 콜</text>
+<line x1="136" y1="152" x2="156" y2="152" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="158" cy="152" r="4" style="fill:var(--color-text-sub)" />
+<text x="170" y="148" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">tracepoint</text>
+<text x="170" y="166" font-size="13" font-weight="400" style="fill:var(--color-text-sub)">주고받는 바이트</text>
+<rect x="8" y="182" width="128" height="40" rx="8" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-line)" />
+<text x="20" y="207" font-size="13" font-weight="700" style="fill:var(--color-accent)">커널 TCP/IP</text>
+<line x1="136" y1="202" x2="156" y2="202" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="158" cy="202" r="4" style="fill:var(--color-text-sub)" />
+<text x="170" y="198" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">kprobe</text>
+<text x="170" y="216" font-size="13" font-weight="400" style="fill:var(--color-text-sub)">연결·재전송·RTT</text>
+<rect x="8" y="232" width="128" height="40" rx="8" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-line)" />
+<text x="20" y="257" font-size="13" font-weight="700" style="fill:var(--color-accent)">네트워크 카드</text>
+<line x1="136" y1="252" x2="156" y2="252" stroke-width="1.6" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="158" cy="252" r="4" style="fill:var(--color-text-sub)" />
+<text x="170" y="248" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">XDP</text>
+<text x="170" y="266" font-size="13" font-weight="400" style="fill:var(--color-text-sub)">들어온 패킷</text>
+<line x1="4" y1="121" x2="296" y2="121" stroke-width="1.2" stroke-linecap="butt" stroke-dasharray="5 4" style="stroke:var(--color-text-sub)" />
+<text x="296" y="115" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">사용자 공간 ↑</text>
+<text x="296" y="137" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-accent)">커널 ↓</text>
+<text x="8" y="296" font-size="13" style="fill:var(--color-text-sub)">위로 갈수록 뜻, 아래로 갈수록 바이트가 보여요</text>
+</svg>

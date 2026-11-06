@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 278" width="300" height="278">
+<rect x="4" y="4" width="144" height="270" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">사용량만 높을 때</text>
+<rect x="56" y="46" width="40" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="61" y="50" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<rect x="72" y="50" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<rect x="83" y="50" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<line x1="59" y1="64" x2="59" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="64.6" y1="64" x2="64.6" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="70.2" y1="64" x2="70.2" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="75.8" y1="64" x2="75.8" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="81.4" y1="64" x2="81.4" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="87" y1="64" x2="87" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="92.6" y1="64" x2="92.6" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="76" y="86" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">메모리</text>
+<line x1="76" y1="98" x2="76" y2="124" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<rect x="54" y="133" width="44" height="30" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="72" cy="148" r="9.5" stroke-width="1.5" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<circle cx="72" cy="148" r="2.2" style="fill:var(--color-text-sub)" />
+<line x1="81" y1="153" x2="92" y2="139" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="76" y="180" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">스왑(디스크)</text>
+<rect x="20" y="192" width="112" height="10" rx="5" style="fill:var(--color-line)" />
+<rect x="20" y="192" width="89.6" height="10" rx="5" style="fill:var(--color-text-sub)" />
+<text x="20" y="220" font-size="13" style="fill:var(--color-text-sub)">사용량 80%</text>
+<text x="16" y="242" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">si·so ≈ 0</text>
+<text x="16" y="260" font-size="13" font-weight="600" style="fill:var(--color-accent)">느려지지 않아요</text>
+<rect x="152" y="4" width="144" height="270" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">지금 오갈 때</text>
+<rect x="204" y="46" width="40" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="209" y="50" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<rect x="220" y="50" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<rect x="231" y="50" width="8" height="9" rx="1" style="fill:var(--color-line)" />
+<line x1="207" y1="64" x2="207" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="212.6" y1="64" x2="212.6" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="218.2" y1="64" x2="218.2" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="223.8" y1="64" x2="223.8" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="229.4" y1="64" x2="229.4" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="235" y1="64" x2="235" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="240.6" y1="64" x2="240.6" y2="68" stroke-width="1.4" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="224" y="86" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">메모리</text>
+<path d="M212 98 L212 119.1" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M212 124 L216.3 117 L207.7 117 z" style="fill:var(--color-warn)" />
+<path d="M236 124 L236 102.9" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M236 98 L231.7 105 L240.3 105 z" style="fill:var(--color-warn)" />
+<text x="206" y="116" font-size="13" text-anchor="end" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">so</text>
+<text x="242" y="116" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">si</text>
+<rect x="202" y="133" width="44" height="30" rx="4" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="220" cy="148" r="9.5" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<circle cx="220" cy="148" r="2.2" style="fill:var(--color-warn)" />
+<line x1="229" y1="153" x2="240" y2="139" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="224" y="180" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">스왑(디스크)</text>
+<rect x="168" y="192" width="112" height="10" rx="5" style="fill:var(--color-line)" />
+<rect x="168" y="192" width="89.6" height="10" rx="5" style="fill:var(--color-text-sub)" />
+<text x="168" y="220" font-size="13" style="fill:var(--color-text-sub)">사용량 80%</text>
+<text x="164" y="242" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">si·so &gt; 0</text>
+<text x="164" y="260" font-size="13" font-weight="600" style="fill:var(--color-warn)">눈에 띄게 느려져요</text>
+</svg>

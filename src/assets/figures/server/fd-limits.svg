@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 272" width="300" height="272">
+<rect x="4" y="4" width="292" height="116" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="28" font-size="14" font-weight="700" style="fill:var(--color-text)">로그인한 세션(셸)</text>
+<path d="M17 51 Q17 48 20 48 H35 L43 56 V77 Q43 80 40 80 H20 Q17 80 17 77 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M35 48 V56 H43" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="23" y1="62" x2="37" y2="62" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="67" x2="37" y2="67" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="72" x2="32" y2="72" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="52" y="60" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">/etc/security/</text>
+<text x="52" y="78" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">limits.conf</text>
+<path d="M178 64 L209.1 64" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M214 64 L207 59.7 L207 68.3 z" style="fill:var(--color-accent)" />
+<rect x="218" y="52" width="72" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="254" y="68.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">셸</text>
+<text x="16" y="108" font-size="13" style="fill:var(--color-text-sub)">확인:</text>
+<text x="56" y="108" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">ulimit -n</text>
+<rect x="4" y="128" width="292" height="140" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="152" font-size="14" font-weight="700" style="fill:var(--color-text)">systemd가 띄운 서비스</text>
+<path d="M17 175 Q17 172 20 172 H35 L43 180 V201 Q43 204 40 204 H20 Q17 204 17 201 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M35 172 V180 H43" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="23" y1="186" x2="37" y2="186" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="191" x2="37" y2="191" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="196" x2="32" y2="196" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="52" y="184" font-size="13" font-weight="700" style="fill:var(--color-text)">유닛 파일의</text>
+<text x="52" y="202" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">LimitNOFILE=</text>
+<path d="M178 188 L209.1 188" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M214 188 L207 183.7 L207 192.3 z" style="fill:var(--color-accent)" />
+<rect x="218" y="176" width="72" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="254" y="192.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">서비스</text>
+<text x="16" y="232" font-size="13" style="fill:var(--color-text-sub)">확인:</text>
+<text x="56" y="232" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">/proc/&lt;PID&gt;/limits</text>
+<line x1="17.5" y1="246.5" x2="26.5" y2="255.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="17.5" y1="255.5" x2="26.5" y2="246.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="34" y="256" font-size="13" font-weight="700" style="fill:var(--color-warn)">limits.conf는 안 걸려요</text>
+</svg>

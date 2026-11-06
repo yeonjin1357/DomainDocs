@@ -441,6 +441,110 @@ export function ram(cx, cy, o = {}) {
   return parts.join('\n');
 }
 
+/** CPU 칩(사방에 다리). size×size, 기본 30 */
+export function chip(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  const s = o.size ?? 30;
+  const h = s / 2;
+  const b = (s * 0.56) / 2;
+  const parts = [];
+  for (let i = 0; i < 3; i++) {
+    const d = -s * 0.25 + i * s * 0.25;
+    parts.push(line(cx + d, cy - h - 4, cx + d, cy - h, { tone: k, sw: 1.6, cap: 'butt' }));
+    parts.push(line(cx + d, cy + h, cx + d, cy + h + 4, { tone: k, sw: 1.6, cap: 'butt' }));
+    parts.push(line(cx - h - 4, cy + d, cx - h, cy + d, { tone: k, sw: 1.6, cap: 'butt' }));
+    parts.push(line(cx + h, cy + d, cx + h + 4, cy + d, { tone: k, sw: 1.6, cap: 'butt' }));
+  }
+  parts.push(rect(cx - h, cy - h, s, s, { rx: 3, fill: face(o.tone), stroke: k, sw: 1.8 }));
+  parts.push(rect(cx - b, cy - b, b * 2, b * 2, { rx: 2, fill: o.tone === 'accent' ? 'accent' : 'line', stroke: 'none' }));
+  return parts.join('\n');
+}
+
+/** 하드디스크(옆에서 본 상자와 원판). 44×30 */
+export function hdd(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  return [
+    rect(cx - 22, cy - 15, 44, 30, { rx: 4, fill: face(o.tone), stroke: k, sw: 1.8 }),
+    circle(cx - 4, cy, 9.5, { fill: o.tone === 'warn' ? 'warnWeak' : 'line', stroke: k, sw: 1.5 }),
+    circle(cx - 4, cy, 2.2, { fill: k }),
+    line(cx + 5, cy + 5, cx + 16, cy - 9, { tone: k, sw: 1.8 }),
+  ].join('\n');
+}
+
+/** 네트워크 포트(랜 단자). 34×26 */
+export function jack(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  return [
+    rect(cx - 17, cy - 13, 34, 26, { rx: 4, fill: face(o.tone), stroke: k, sw: 1.8 }),
+    path(`M${cx - 9} ${cy + 7} V${cy - 2} H${cx - 5} V${cy - 6} H${cx + 5} V${cy - 2} H${cx + 9} V${cy + 7} z`, { fill: 'line', stroke: k, sw: 1.5 }),
+    line(cx - 4, cy - 2, cx - 4, cy + 1, { tone: k, sw: 1.2, cap: 'butt' }),
+    line(cx, cy - 2, cx, cy + 1, { tone: k, sw: 1.2, cap: 'butt' }),
+    line(cx + 4, cy - 2, cx + 4, cy + 1, { tone: k, sw: 1.2, cap: 'butt' }),
+  ].join('\n');
+}
+
+/** 톱니바퀴(관리·설정). 지름 약 2r, 기본 r 11 */
+export function gear(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  const R = o.r ?? 11;
+  const ri = R * 0.74;
+  const n = 8;
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const a0 = (i / n) * Math.PI * 2;
+    const da = Math.PI / n;
+    for (const [a, r] of [[a0 - da * 0.5, ri], [a0 - da * 0.32, R], [a0 + da * 0.32, R], [a0 + da * 0.5, ri]]) pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+  }
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${r1(p[0])} ${r1(p[1])}`).join(' ') + ' z';
+  return path(d, { fill: face(o.tone), stroke: k, sw: 1.6 }) + '\n' + circle(cx, cy, R * 0.32, { fill: 'card', stroke: k, sw: 1.5 });
+}
+
+/** 폴더. 30×24 */
+export function folder(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  const x = cx - 15;
+  const y = cy - 12;
+  return path(`M${x} ${y + 3} Q${x} ${y} ${x + 3} ${y} H${x + 10} L${x + 13} ${y + 4} H${x + 27} Q${x + 30} ${y + 4} ${x + 30} ${y + 7} V${y + 21} Q${x + 30} ${y + 24} ${x + 27} ${y + 24} H${x + 3} Q${x} ${y + 24} ${x} ${y + 21} z`, { fill: face(o.tone), stroke: k, sw: 1.8 });
+}
+
+/** 자물쇠. 18×22 */
+export function lock(cx, cy, o = {}) {
+  const k = ink(o.tone ?? 'warn');
+  return [
+    path(`M${cx - 5.5} ${cy - 1} V${cy - 5} A5.5 5.5 0 0 1 ${cx + 5.5} ${cy - 5} V${cy - 1}`, { stroke: k, sw: 2 }),
+    rect(cx - 8, cy - 1, 16, 12, { rx: 2.5, fill: face(o.tone ?? 'warn'), stroke: k, sw: 1.8 }),
+    circle(cx, cy + 5, 1.8, { fill: k }),
+  ].join('\n');
+}
+
+/** 시계. 반지름 r(기본 13), h·m으로 바늘 */
+export function clock(cx, cy, o = {}) {
+  const k = ink(o.tone);
+  const r = o.r ?? 13;
+  const h = o.h ?? 10;
+  const m = o.m ?? 0;
+  const ha = ((h % 12) / 12 + m / 720) * Math.PI * 2 - Math.PI / 2;
+  const ma = (m / 60) * Math.PI * 2 - Math.PI / 2;
+  const parts = [circle(cx, cy, r, { fill: face(o.tone), stroke: k, sw: 1.8 })];
+  for (let i = 0; i < 12; i += 3) {
+    const a = (i / 12) * Math.PI * 2;
+    parts.push(line(cx + (r - 3.5) * Math.cos(a), cy + (r - 3.5) * Math.sin(a), cx + (r - 1.5) * Math.cos(a), cy + (r - 1.5) * Math.sin(a), { tone: k, sw: 1.4 }));
+  }
+  parts.push(line(cx, cy, cx + r * 0.5 * Math.cos(ha), cy + r * 0.5 * Math.sin(ha), { tone: k, sw: 2.2 }));
+  parts.push(line(cx, cy, cx + r * 0.78 * Math.cos(ma), cy + r * 0.78 * Math.sin(ma), { tone: k, sw: 1.6 }));
+  return parts.join('\n');
+}
+
+/** 스레드(실행 흐름)를 나타내는 세로 물결 화살표. (cx, y0)에서 길이 len만큼 내려간다. */
+export function thread(cx, y0, len, o = {}) {
+  const { tone = 'accent', amp = 4, waves = 3, sw = 2 } = o;
+  const seg = (len - 8) / (waves * 2);
+  let d = `M${r1(cx)} ${r1(y0)}`;
+  for (let i = 0; i < waves * 2; i++) d += ` q${i % 2 ? -amp * 2 : amp * 2} ${r1(seg / 2)} 0 ${r1(seg)}`;
+  const yEnd = y0 + seg * waves * 2;
+  return path(d, { stroke: tone, sw }) + '\n' + head(cx, yEnd + 8, cx, yEnd, { tone, size: 8 });
+}
+
 // ── 그래프 ──
 
 /** 좌표 틀. (x,y)는 그래프 칸의 왼쪽 위, w×h. 값 범위를 받아 그리는 함수를 돌려준다. */

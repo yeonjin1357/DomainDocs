@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 244" width="300" height="244">
+<text x="4" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">서버가 다시 켜졌을 때</text>
+<rect x="4" y="26" width="292" height="80" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 50 V32 Q4.8 26.8 10 26.8 H290 Q295.3 26.8 295.3 32 V50 z" style="fill:var(--color-line)" />
+<rect x="4.8" y="50" width="290.5" height="28" rx="0" style="fill:var(--color-warn-weak)" />
+<line x1="4" y1="78" x2="296" y2="78" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="42.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">ID</text>
+<text x="68" y="42.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">원본</text>
+<text x="160" y="42.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">뜻</text>
+<text x="12" y="68.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">6008</text>
+<text x="68" y="68.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">EventLog</text>
+<text x="160" y="68.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">갑자기 꺼졌어요</text>
+<text x="12" y="96.7" font-size="13" font-weight="400" style="fill:var(--color-text)">1074</text>
+<text x="68" y="96.7" font-size="13" font-weight="400" style="fill:var(--color-text)">User32</text>
+<text x="160" y="96.7" font-size="13" font-weight="400" style="fill:var(--color-text)">누가 재시작·종료함</text>
+<text x="4" y="130" font-size="13" font-weight="700" style="fill:var(--color-text)">서비스가 죽었을 때</text>
+<rect x="4" y="140" width="292" height="80" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 164 V146 Q4.8 140.8 10 140.8 H290 Q295.3 140.8 295.3 146 V164 z" style="fill:var(--color-line)" />
+<rect x="4.8" y="164" width="290.5" height="28" rx="0" style="fill:var(--color-warn-weak)" />
+<line x1="4" y1="192" x2="296" y2="192" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="156.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">ID</text>
+<text x="68" y="156.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">원본</text>
+<text x="160" y="156.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">뜻</text>
+<text x="12" y="182.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">7034</text>
+<text x="68" y="182.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">SCM</text>
+<text x="160" y="182.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">갑자기 끝났어요</text>
+<text x="12" y="210.7" font-size="13" font-weight="400" style="fill:var(--color-text)">7031</text>
+<text x="68" y="210.7" font-size="13" font-weight="400" style="fill:var(--color-text)">SCM</text>
+<text x="160" y="210.7" font-size="13" font-weight="400" style="fill:var(--color-text)">끝나서 복구 동작</text>
+<text x="296" y="236" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">SCM: 서비스 제어 관리자</text>
+</svg>

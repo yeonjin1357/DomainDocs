@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180" width="300" height="180">
+<path d="M115.91999999999999 40 v-5 H292 v5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="204" y="12" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">free + 비울 수 있는 캐시</text>
+<text x="204" y="29" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">available 62%</text>
+<rect x="8" y="46" width="107.9" height="32" rx="4" style="fill:var(--color-line)" />
+<rect x="115.9" y="46" width="167.6" height="32" rx="0" style="fill:var(--color-accent-weak)" />
+<rect x="283.5" y="46" width="8.5" height="32" rx="0" style="fill:var(--color-card)" />
+<rect x="8" y="46" width="284" height="32" rx="4" stroke-width="1.4" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="62" y="67" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">프로그램</text>
+<text x="199.7" y="67" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파일 캐시</text>
+<text x="292" y="96" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">free 3%</text>
+<path d="M8 104 v5 H283.47999999999996 v-5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<text x="8" y="130" font-size="13" font-weight="600" style="fill:var(--color-warn)">(전체 − free) 기준</text>
+<text x="136" y="131" font-size="15" font-weight="700" style="fill:var(--color-warn)">97%</text>
+<text x="174" y="130" font-size="13" style="fill:var(--color-text-sub)">캐시까지 사용으로</text>
+<path d="M8 144 v5 H115.91999999999999 v-5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="8" y="170" font-size="13" font-weight="600" style="fill:var(--color-accent)">(전체 − available) 기준</text>
+<text x="164" y="171" font-size="15" font-weight="700" style="fill:var(--color-accent)">38%</text>
+</svg>

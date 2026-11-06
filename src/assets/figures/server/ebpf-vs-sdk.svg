@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 364" width="300" height="364">
+<rect x="4" y="4" width="292" height="162" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">SDK·APM 에이전트</text>
+<text x="284" y="26" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-accent)">앱 안에서</text>
+<rect x="18" y="40" width="104" height="40" rx="8" stroke-width="1.4" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="28" y="65" font-size="13" font-weight="700" style="fill:var(--color-text)">주문 앱</text>
+<rect x="73.2" y="49" width="40.8" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="93.6" y="64.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">SDK</text>
+<rect x="178" y="40" width="104" height="40" rx="8" stroke-width="1.4" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="188" y="65" font-size="13" font-weight="700" style="fill:var(--color-text)">결제 앱</text>
+<rect x="233.2" y="49" width="40.8" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="253.6" y="64.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">SDK</text>
+<path d="M122 60 L173.1 60" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M178 60 L171 55.7 L171 64.3 z" style="fill:var(--color-accent)" />
+<text x="150" y="96" font-size="13" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">traceparent</text>
+<path d="M16 114 L19.5 117.5 L26 110.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="32" y="118" font-size="13" style="fill:var(--color-text)">함수·사용자 속성</text>
+<path d="M154 114 L157.5 117.5 L164 110.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="170" y="118" font-size="13" style="fill:var(--color-text)">서비스 사이를 이어요</text>
+<path d="M16 136 L19.5 139.5 L26 132.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="32" y="140" font-size="13" style="fill:var(--color-text)">암호화와 상관없음</text>
+<line x1="154.8" y1="131.8" x2="163.2" y2="140.2" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="154.8" y1="140.2" x2="163.2" y2="131.8" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="170" y="140" font-size="13" style="fill:var(--color-text-sub)">앱마다 고쳐요</text>
+<rect x="4" y="174" width="292" height="186" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="196" font-size="14" font-weight="700" style="fill:var(--color-text)">eBPF</text>
+<text x="284" y="196" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-accent)">앱 밖에서</text>
+<rect x="25" y="208" width="90" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="70" y="224.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">주문 앱</text>
+<line x1="70" y1="232" x2="70" y2="254" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-text-sub)" />
+<rect x="145" y="208" width="90" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="190" y="224.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">결제 앱</text>
+<line x1="190" y1="232" x2="190" y2="254" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-text-sub)" />
+<rect x="16" y="254" width="268" height="30" rx="7" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="26" y="274" font-size="13" font-weight="700" style="fill:var(--color-accent)">커널</text>
+<circle cx="117" cy="265" r="8" stroke-width="2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="123" y1="271" x2="130" y2="278" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<text x="136" y="274" font-size="13" font-weight="600" style="fill:var(--color-accent)">eBPF가 지나가는 걸 봐요</text>
+<path d="M16 302 L19.5 305.5 L26 298.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="32" y="306" font-size="13" style="fill:var(--color-text)">앱은 그대로</text>
+<path d="M154 302 L157.5 305.5 L164 298.5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="170" y="306" font-size="13" style="fill:var(--color-text)">요청·연결·지연</text>
+<line x1="16.8" y1="319.8" x2="25.2" y2="328.2" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="16.8" y1="328.2" x2="25.2" y2="319.8" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="32" y="328" font-size="13" style="fill:var(--color-text-sub)">암호화는 훅 필요</text>
+<line x1="154.8" y1="319.8" x2="163.2" y2="328.2" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="154.8" y1="328.2" x2="163.2" y2="319.8" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="170" y="328" font-size="13" style="fill:var(--color-text-sub)">서비스 잇기 어려움</text>
+<line x1="16.8" y1="341.8" x2="25.2" y2="350.2" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="16.8" y1="350.2" x2="25.2" y2="341.8" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="32" y="350" font-size="13" style="fill:var(--color-text-sub)">높은 권한 필요</text>
+</svg>

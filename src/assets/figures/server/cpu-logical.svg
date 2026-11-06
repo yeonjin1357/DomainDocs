@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 248" width="300" height="248">
+<text x="8" y="18" font-size="13" font-weight="700" style="fill:var(--color-text)">CPU 칩 하나</text>
+<text x="292" y="18" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">코어마다 실행 흐름 2개(SMT)</text>
+<rect x="6" y="28" width="288" height="108" rx="12" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="18" y="40" width="128" height="84" rx="8" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="28" y="58" font-size="13" font-weight="700" style="fill:var(--color-text)">물리 코어 1</text>
+<path d="M54 66 q7 3 0 6 q-7 3 0 6 q7 3 0 6 q-7 3 0 6 q7 3 0 6 q-7 3 0 6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M54 110 L59 102 L49 102 z" style="fill:var(--color-accent)" />
+<path d="M110 66 q7 3 0 6 q-7 3 0 6 q7 3 0 6 q-7 3 0 6 q7 3 0 6 q-7 3 0 6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M110 110 L115 102 L105 102 z" style="fill:var(--color-accent)" />
+<rect x="154" y="40" width="128" height="84" rx="8" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="164" y="58" font-size="13" font-weight="700" style="fill:var(--color-text)">물리 코어 2</text>
+<path d="M190 66 q7 3 0 6 q-7 3 0 6 q7 3 0 6 q-7 3 0 6 q7 3 0 6 q-7 3 0 6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M190 110 L195 102 L185 102 z" style="fill:var(--color-accent)" />
+<path d="M246 66 q7 3 0 6 q-7 3 0 6 q7 3 0 6 q-7 3 0 6 q7 3 0 6 q-7 3 0 6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M246 110 L251 102 L241 102 z" style="fill:var(--color-accent)" />
+<line x1="54" y1="118" x2="54" y2="152" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-accent)" />
+<path d="M54 160 L58.3 153 L49.7 153 z" style="fill:var(--color-accent)" />
+<rect x="29" y="162" width="50" height="30" rx="6" style="fill:var(--color-accent)" />
+<text x="54" y="182" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-card)">cpu0</text>
+<line x1="110" y1="118" x2="110" y2="152" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-accent)" />
+<path d="M110 160 L114.3 153 L105.7 153 z" style="fill:var(--color-accent)" />
+<rect x="85" y="162" width="50" height="30" rx="6" style="fill:var(--color-accent)" />
+<text x="110" y="182" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-card)">cpu1</text>
+<line x1="190" y1="118" x2="190" y2="152" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-accent)" />
+<path d="M190 160 L194.3 153 L185.7 153 z" style="fill:var(--color-accent)" />
+<rect x="165" y="162" width="50" height="30" rx="6" style="fill:var(--color-accent)" />
+<text x="190" y="182" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-card)">cpu2</text>
+<line x1="246" y1="118" x2="246" y2="152" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 3" style="stroke:var(--color-accent)" />
+<path d="M246 160 L250.3 153 L241.7 153 z" style="fill:var(--color-accent)" />
+<rect x="221" y="162" width="50" height="30" rx="6" style="fill:var(--color-accent)" />
+<text x="246" y="182" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-card)">cpu3</text>
+<text x="150" y="220" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">운영체제에는 논리 CPU 4개로 보여요</text>
+<text x="150" y="240" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">nproc → 4</text>
+</svg>

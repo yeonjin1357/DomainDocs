@@ -17,6 +17,7 @@ sources:
     url: https://man7.org/linux/man-pages/man1/ps.1.html
 updated: 2026-10-21
 ---
+import DioSize from '../../../assets/figures/server/dio-size.svg';
 
 <KeyPoints>
   <Point title="세 숫자로 봐요">
@@ -50,16 +51,8 @@ updated: 2026-10-21
 
 같은 디스크라도 요청 하나의 크기에 따라 먼저 닿는 한계가 달라요.
 
-<Figure caption="작은 요청은 횟수가 많아도 옮기는 양이 적고, 큰 요청은 횟수가 적어도 양이 많아요.">
-  <Compare
-    columns={['작은 요청을 많이', '큰 요청을 적게']}
-    rows={[
-      { label: '요청 하나의 크기', values: ['4KB', '1MB'] },
-      { label: '초당 요청 수', values: ['1,000번', '200번'] },
-      { label: '처리량', values: ['약 4MB/초', '약 200MB/초'] },
-      { label: '흔한 예', values: ['DB의 무작위 읽기', '백업, 큰 파일 복사'] },
-    ]}
-  />
+<Figure caption="작은 요청은 횟수가 많아도 옮기는 양이 적고, 큰 요청은 횟수가 적어도 양이 많아요. 그래서 먼저 닿는 한계가 달라요.">
+  <DioSize aria-label="작은 요청을 많이 보내는 DB의 무작위 읽기는 4KB × 초당 1,000번 ≈ 4MB/초라 초당 횟수(IOPS) 한계에 먼저 닿아요. 큰 요청을 적게 보내는 백업, 큰 파일 복사는 1MB × 초당 200번 ≈ 200MB/초라 처리량 한계에 먼저 닿아요" />
 </Figure>
 
 그래서 처리량만 보면 작은 요청이 몰리는 DB 서버의 한계를 놓쳐요. 처리량이 4MB/초로 낮아 보여도, 디스크는 초당 횟수 한계에 닿아 있을 수 있어요.

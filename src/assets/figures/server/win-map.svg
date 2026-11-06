@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 276" width="300" height="276">
+<rect x="58" y="4" width="117" height="30" rx="8" style="fill:var(--color-line)" />
+<rect x="179" y="4" width="117" height="30" rx="8" style="fill:var(--color-line)" />
+<text x="116.5" y="24" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">리눅스</text>
+<text x="237.5" y="24" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">윈도우</text>
+<rect x="4" y="40" width="292" height="56" rx="10" style="fill:var(--color-card)" />
+<rect x="14" y="47" width="32" height="24" rx="4" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="14" y1="55" x2="46" y2="55" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<circle cx="19" cy="51" r="1.4" style="fill:var(--color-text-sub)" />
+<circle cx="23" cy="51" r="1.4" style="fill:var(--color-text-sub)" />
+<path d="M20 63.2 L23.3 62.3 L26.7 62.9 L30 61.4 L33.3 62 L36.7 60.5 L40 61.7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="30" y="92" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">숫자</text>
+<text x="66" y="64" font-size="13" font-weight="700" style="fill:var(--color-text)">/proc · /sys</text>
+<text x="66" y="83" font-size="13" style="fill:var(--color-text-sub)">가상 파일</text>
+<text x="187" y="64" font-size="13" font-weight="700" style="fill:var(--color-text)">성능 카운터</text>
+<text x="187" y="83" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">Get-Counter</text>
+<line x1="177" y1="50" x2="177" y2="86" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<rect x="4" y="100" width="292" height="56" rx="10" style="fill:var(--color-card)" />
+<path d="M37.3 117.6 L39.9 117.7 L39.9 120.3 L37.3 120.4 L36.2 123.1 L37.9 125.1 L36.1 126.9 L34.1 125.2 L31.4 126.3 L31.3 128.9 L28.7 128.9 L28.6 126.3 L25.9 125.2 L23.9 126.9 L22.1 125.1 L23.8 123.1 L22.7 120.4 L20.1 120.3 L20.1 117.7 L22.7 117.6 L23.8 114.9 L22.1 112.9 L23.9 111.1 L25.9 112.8 L28.6 111.7 L28.7 109.1 L31.3 109.1 L31.4 111.7 L34.1 112.8 L36.1 111.1 L37.9 112.9 L36.2 114.9 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="30" cy="119" r="3.2" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="30" y="152" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">서비스</text>
+<text x="66" y="124" font-size="13" font-weight="700" style="fill:var(--color-text)">systemd</text>
+<text x="66" y="143" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">systemctl</text>
+<text x="187" y="124" font-size="13" font-weight="700" style="fill:var(--color-text)">SCM</text>
+<text x="187" y="143" font-size="13" style="fill:var(--color-text-sub)">서비스 제어 관리자</text>
+<line x1="177" y1="110" x2="177" y2="146" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<rect x="4" y="160" width="292" height="56" rx="10" style="fill:var(--color-card)" />
+<path d="M17 166 Q17 163 20 163 H35 L43 171 V192 Q43 195 40 195 H20 Q17 195 17 192 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M35 163 V171 H43" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="23" y1="177" x2="37" y2="177" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="182" x2="37" y2="182" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="187" x2="32" y2="187" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="30" y="212" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">기록</text>
+<text x="66" y="184" font-size="13" font-weight="700" style="fill:var(--color-text)">journald</text>
+<text x="66" y="203" font-size="13" style="fill:var(--color-text-sub)">커널 로그도 모아요</text>
+<text x="187" y="184" font-size="13" font-weight="700" style="fill:var(--color-text)">이벤트 로그</text>
+<text x="187" y="203" font-size="13" style="fill:var(--color-text-sub)">System 로그 등</text>
+<line x1="177" y1="170" x2="177" y2="206" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<rect x="4" y="220" width="292" height="56" rx="10" style="fill:var(--color-card)" />
+<rect x="17" y="222" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="23" y1="230" x2="37" y2="230" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="236" x2="37" y2="236" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="242" x2="37" y2="242" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="30" cy="249.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="30" y="272" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">에이전트</text>
+<text x="66" y="244" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">node_exporter</text>
+<text x="66" y="263" font-size="13" style="fill:var(--color-text-sub)">Prometheus용</text>
+<text x="187" y="244" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="103" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text)">windows_exporter</text>
+<text x="187" y="263" font-size="13" style="fill:var(--color-text-sub)">Prometheus용</text>
+<line x1="177" y1="230" x2="177" y2="266" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+</svg>

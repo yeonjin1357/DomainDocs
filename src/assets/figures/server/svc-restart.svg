@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 310" width="300" height="310">
+<rect x="4" y="4" width="292" height="136" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">끔(Restart=no, 기본값)</text>
+<text x="16" y="68" font-size="13" style="fill:var(--color-text-sub)">프로세스</text>
+<rect x="74" y="56" width="76" height="16" rx="4" style="fill:var(--color-accent)" />
+<line x1="146.5" y1="59.5" x2="155.5" y2="68.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="146.5" y1="68.5" x2="155.5" y2="59.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="158" y1="64" x2="286" y2="64" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-text-weak)" />
+<text x="16" y="102" font-size="13" style="fill:var(--color-text-sub)">상태</text>
+<rect x="74" y="86" width="76" height="22" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="112" y="102" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">active</text>
+<rect x="152" y="86" width="134" height="22" rx="5" style="fill:var(--color-warn-weak)" />
+<text x="219" y="102" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">failed</text>
+<text x="16" y="130" font-size="13" font-weight="600" style="fill:var(--color-text)">상태가 failed인지 보면 돼요</text>
+<rect x="4" y="148" width="292" height="136" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="170" font-size="14" font-weight="700" style="fill:var(--color-text)">켬(Restart=on-failure)</text>
+<text x="16" y="212" font-size="13" style="fill:var(--color-text-sub)">프로세스</text>
+<rect x="74" y="200" width="38" height="16" rx="4" style="fill:var(--color-accent)" />
+<line x1="108.5" y1="203.5" x2="117.5" y2="212.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="108.5" y1="212.5" x2="117.5" y2="203.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="121" y="194" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">↻</text>
+<rect x="128" y="200" width="38" height="16" rx="4" style="fill:var(--color-accent)" />
+<line x1="162.5" y1="203.5" x2="171.5" y2="212.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="162.5" y1="212.5" x2="171.5" y2="203.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="175" y="194" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">↻</text>
+<rect x="182" y="200" width="38" height="16" rx="4" style="fill:var(--color-accent)" />
+<line x1="216.5" y1="203.5" x2="225.5" y2="212.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="216.5" y1="212.5" x2="225.5" y2="203.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="229" y="194" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">↻</text>
+<rect x="236" y="200" width="34" height="16" rx="4" style="fill:var(--color-accent)" />
+<line x1="266.5" y1="203.5" x2="275.5" y2="212.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="266.5" y1="212.5" x2="275.5" y2="203.5" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="16" y="246" font-size="13" style="fill:var(--color-text-sub)">상태</text>
+<rect x="74" y="230" width="212" height="22" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="180" y="246" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">대부분 active</text>
+<text x="16" y="274" font-size="13" font-weight="600" style="fill:var(--color-warn)">재시작 횟수와 켜진 시각을 봐요</text>
+<text x="150" y="302" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">↻ 죽고 100ms 뒤 다시 띄워요</text>
+</svg>

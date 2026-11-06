@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 242" width="300" height="242">
+<rect x="4" y="4" width="186" height="184" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="22" font-size="13" font-weight="600" style="fill:var(--color-text)">프로세스 A</text>
+<rect x="198" y="4" width="98" height="184" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="208" y="22" font-size="13" font-weight="600" style="fill:var(--color-text)">프로세스 B</text>
+<text x="52" y="44" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">스레드 1</text>
+<path d="M38 54 q8 3.7 0 7.3 q-8 3.7 0 7.3 q8 3.7 0 7.3 q-8 3.7 0 7.3 q8 3.7 0 7.3 q-8 3.7 0 7.3" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M38 106 L43 98 L33 98 z" style="fill:var(--color-accent)" />
+<rect x="50" y="62" width="34" height="22" rx="4" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="67" y="78" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">스택</text>
+<text x="138" y="44" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">스레드 2</text>
+<path d="M124 54 q8 3.7 0 7.3 q-8 3.7 0 7.3 q8 3.7 0 7.3 q-8 3.7 0 7.3 q8 3.7 0 7.3 q-8 3.7 0 7.3" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M124 106 L129 98 L119 98 z" style="fill:var(--color-accent)" />
+<rect x="136" y="62" width="34" height="22" rx="4" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="153" y="78" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">스택</text>
+<text x="240" y="44" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">스레드</text>
+<path d="M226 54 q8 3.7 0 7.3 q-8 3.7 0 7.3 q8 3.7 0 7.3 q-8 3.7 0 7.3 q8 3.7 0 7.3 q-8 3.7 0 7.3" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M226 106 L231 98 L221 98 z" style="fill:var(--color-accent)" />
+<rect x="238" y="62" width="34" height="22" rx="4" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="255" y="78" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">스택</text>
+<rect x="18" y="122" width="158" height="52" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="97" y="144" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">메모리 A</text>
+<text x="97" y="163" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">코드 · 데이터 · 힙</text>
+<rect x="208" y="122" width="78" height="52" rx="8" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="247" y="144" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">메모리 B</text>
+<text x="247" y="163" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">자기 것만</text>
+<path d="M226 108 L182 134" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<line x1="188" y1="123" x2="198" y2="133" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="188" y1="133" x2="198" y2="123" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="150" y="214" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">스레드는 메모리를 함께 쓰고, 스택만 따로 가져요</text>
+<text x="150" y="234" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">B는 A의 메모리를 볼 수 없어요</text>
+</svg>

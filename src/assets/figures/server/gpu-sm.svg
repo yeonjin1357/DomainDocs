@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 240" width="300" height="240">
+<rect x="4" y="4" width="144" height="206" rx="12" style="fill:var(--color-card)" />
+<rect x="4.2" y="11" width="143.5" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="76" y="26.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">GPU 1 · 사용률 100%</text>
+<rect x="16" y="38" width="120" height="96" rx="8" stroke-width="1.4" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<rect x="24" y="46" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="51" y="46" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="78" y="46" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="105" y="46" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="24" y="74" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="51" y="74" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="78" y="74" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="105" y="74" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="24" y="102" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="51" y="102" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="78" y="102" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="105" y="102" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<text x="16" y="158" font-size="13" font-weight="700" style="fill:var(--color-accent)">SM 12개가 다 일해요</text>
+<text x="16" y="186" font-size="13" style="fill:var(--color-text-sub)">SM 활동</text>
+<text x="136" y="186" font-size="15" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">100%</text>
+<rect x="152" y="4" width="144" height="206" rx="12" style="fill:var(--color-card)" />
+<rect x="152.2" y="11" width="143.5" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="224" y="26.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">GPU 2 · 사용률 100%</text>
+<rect x="164" y="38" width="120" height="96" rx="8" stroke-width="1.4" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<rect x="172" y="46" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="199" y="46" width="23" height="22" rx="3" style="fill:var(--color-accent)" />
+<rect x="226" y="46" width="23" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="253" y="46" width="23" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="172" y="74" width="23" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="199" y="74" width="23" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="226" y="74" width="23" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="253" y="74" width="23" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="172" y="102" width="23" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="199" y="102" width="23" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="226" y="102" width="23" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="253" y="102" width="23" height="22" rx="3" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="164" y="158" font-size="13" font-weight="700" style="fill:var(--color-warn)">SM 2개만 일해요</text>
+<text x="164" y="186" font-size="13" style="fill:var(--color-text-sub)">SM 활동</text>
+<text x="284" y="186" font-size="15" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">약 17%</text>
+<text x="150" y="232" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">쉬지 않았다는 것만 같고, 채운 정도는 달라요</text>
+</svg>

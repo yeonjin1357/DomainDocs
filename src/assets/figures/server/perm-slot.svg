@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 306" width="300" height="306">
+<text x="70" y="16" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">주인 칸</text>
+<text x="156" y="16" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">그룹 칸</text>
+<text x="242" y="16" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">나머지 칸</text>
+<rect x="32" y="24" width="76" height="32" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="70" y="46" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">rw-</text>
+<rect x="118" y="24" width="76" height="32" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="156" y="46" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">r--</text>
+<rect x="204" y="24" width="76" height="32" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="242" y="46" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">---</text>
+<path d="M70 96 L70 66.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M70 62 L65.7 69 L74.3 69 z" style="fill:var(--color-accent)" />
+<circle cx="70" cy="104" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M59 126 C59 114 81 114 81 126 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="70" y="146" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">① 주인이면</text>
+<text x="70" y="164" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">syslog</text>
+<path d="M156 96 L156 66.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M156 62 L151.7 69 L160.3 69 z" style="fill:var(--color-accent)" />
+<circle cx="156" cy="104" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M145 126 C145 114 167 114 167 126 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="156" y="146" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">② 그룹이면</text>
+<text x="156" y="164" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">adm 그룹</text>
+<path d="M242 96 L242 66.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M242 62 L237.7 69 L246.3 69 z" style="fill:var(--color-accent)" />
+<circle cx="242" cy="104" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M231 126 C231 114 253 114 253 126 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="242" y="146" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">③ 둘 다 아니면</text>
+<text x="242" y="164" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">그 밖의 사용자</text>
+<text x="150" y="192" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">앞에서 맞으면 뒤 칸은 보지 않아요</text>
+<line x1="8" y1="208" x2="292" y2="208" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="8" y="232" font-size="13" style="fill:var(--color-text-sub)">권한이</text>
+<text x="54" y="232" font-size="14" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">-------r--</text>
+<text x="140" y="232" font-size="13" style="fill:var(--color-text-sub)">일 때</text>
+<rect x="32" y="244" width="76" height="32" rx="6" stroke-width="1.4" style="fill:var(--color-warn-weak);stroke:var(--color-text-sub)" />
+<text x="70" y="266" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">---</text>
+<rect x="118" y="244" width="76" height="32" rx="6" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="156" y="266" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-weak)">---</text>
+<rect x="204" y="244" width="76" height="32" rx="6" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-text-sub)" />
+<text x="242" y="266" font-size="16" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">r--</text>
+<text x="70" y="298" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">주인은 못 읽어요</text>
+<text x="242" y="298" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">나머지는 읽어요</text>
+</svg>

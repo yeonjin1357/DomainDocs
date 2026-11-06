@@ -18,6 +18,7 @@ sources:
     url: https://man7.org/linux/man-pages/man1/systemctl.1.html
 updated: 2026-10-29
 ---
+import SnrPath from '../../../assets/figures/server/snr-path.svg';
 
 <Situation>
   서버 목록에서 웹 서버 한 대가 10분째 회색(수집 없음)으로 바뀌었어요. 그래프도 그 시각부터 비어 있어요.
@@ -48,20 +49,7 @@ updated: 2026-10-29
 <Term slug="foundations/no-data-vs-zero">데이터 없음</Term>은 "모른다"는 뜻이에요. 먼저 서버가 정말 멈췄는지 바깥에서 확인해요.
 
 <Figure caption="수집이 끊긴 이유는 세 갈래예요. 바깥에서 닿는지, 서버가 켜져 있는지, 에이전트가 도는지를 차례로 보면 갈래가 정해져요.">
-  <Flow
-    ariaLabel="모니터링 서버에서 네트워크를 지나 서버로 가고, 서버 안의 에이전트가 지표를 보내는 경로에서 네트워크, 서버, 에이전트 셋 중 하나가 멈출 수 있음을 보여 주는 구조도"
-    nodes={[
-      { id: 'mon', label: '모니터링 서버', col: 0, row: 0, tone: 'accent' },
-      { id: 'net', label: '네트워크', col: 1, row: 0, note: '방화벽·경로' },
-      { id: 'host', label: '서버', col: 2, row: 0, note: '전원·커널' },
-      { id: 'agent', label: '에이전트', col: 2, row: 1, note: '프로세스' },
-    ]}
-    edges={[
-      { from: 'agent', to: 'host', dashed: true },
-      { from: 'host', to: 'net' },
-      { from: 'net', to: 'mon' },
-    ]}
-  />
+  <SnrPath aria-label="서버 안의 에이전트가 보낸 지표가 네트워크를 지나 모니터링 서버로 가요. 1 네트워크가 막혔는지는 ping과 서비스 응답으로, 2 서버가 꺼졌다 켜졌는지는 재부팅 기록으로, 3 에이전트만 멈췄는지는 에이전트 프로세스로 가려요" />
 </Figure>
 
 - **ping도 서비스도 안 된다면**: 서버가 꺼졌거나 네트워크가 끊겼어요. 같은 네트워크의 다른 서버도 끊겼는지 봐요. 여럿이 한꺼번에 끊겼다면 네트워크나 장비 쪽이에요.

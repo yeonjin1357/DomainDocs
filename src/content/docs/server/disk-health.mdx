@@ -25,6 +25,8 @@ sources:
     url: https://docs.aws.amazon.com/ebs/latest/userguide/monitoring-volume-checks.html
 updated: 2026-11-03
 ---
+import Raid5 from '../../../assets/figures/server/raid5.svg';
+import RaidLevels from '../../../assets/figures/server/raid-levels.svg';
 
 <KeyPoints>
   <Point title="고장 전에 SMART 숫자가 늘어요">
@@ -104,30 +106,13 @@ SSD는 셀을 쓸 때마다 조금씩 닳아요. NVMe SSD는 항목 표 대신 �
 RAID 5는 데이터를 디스크마다 나눠 쓰고, 그 데이터로 계산한 패리티(되살리는 데 쓰는 값)를 한 칸 더 써요. 패리티 칸은 디스크마다 돌아가며 놓여요.
 
 <Figure caption="디스크 4개로 만든 RAID 5예요. 줄마다 데이터 세 칸과 패리티 한 칸이 있고, 패리티 자리가 디스크마다 돌아가요. 어느 디스크가 죽어도 나머지 셋으로 그 칸을 다시 계산해요.">
-  <Stacks
-    ariaLabel="디스크 4개의 RAID 5. 첫 줄은 디스크 4에, 둘째 줄은 디스크 3에, 셋째 줄은 디스크 2에, 넷째 줄은 디스크 1에 패리티가 있고 나머지 칸은 데이터인 나란한 기둥"
-    columns={[
-      { title: '디스크 1', blocks: ['A1', 'B1', 'C1', { label: 'D 패리티', tone: 'accent' }] },
-      { title: '디스크 2', blocks: ['A2', 'B2', { label: 'C 패리티', tone: 'accent' }, 'D1'] },
-      { title: '디스크 3', blocks: ['A3', { label: 'B 패리티', tone: 'accent' }, 'C2', 'D2'] },
-      { title: '디스크 4', blocks: [{ label: 'A 패리티', tone: 'accent' }, 'B3', 'C3', 'D3'] },
-    ]}
-  />
+  <Raid5 aria-label="디스크 4개의 RAID 5. A 줄은 디스크 4에, B 줄은 디스크 3에, C 줄은 디스크 2에, D 줄은 디스크 1에 패리티가 있어요. 디스크 2가 죽으면 A2는 A1, A3, A 패리티로 다시 계산해요" />
 </Figure>
 
 방식마다 쓸 수 있는 용량과 견디는 고장 수가 달라요. 아래는 4TB 디스크 4개로 만들었을 때예요.
 
 <Figure caption="4TB 디스크 4개(모두 16TB)로 만든 RAID의 쓸 수 있는 용량이에요. 용량을 많이 쓸수록 견디는 고장 수가 줄어요.">
-  <Bars
-    ariaLabel="쓸 수 있는 용량. RAID 0은 16TB이고 고장을 못 견뎌요. RAID 5는 12TB이고 1개를 견뎌요. RAID 6은 8TB이고 2개를 견뎌요. RAID 10은 8TB이고 거울 쌍마다 1개를 견뎌요"
-    max={16}
-    bars={[
-      { label: 'RAID 0', value: 16, display: '16TB', note: '고장 0개', tone: 'warn' },
-      { label: 'RAID 5', value: 12, display: '12TB', note: '1개까지' },
-      { label: 'RAID 6', value: 8, display: '8TB', note: '2개까지' },
-      { label: 'RAID 10', value: 8, display: '8TB', note: '거울 쌍마다 1개', tone: 'accent' },
-    ]}
-  />
+  <RaidLevels aria-label="4TB 디스크 4개로 만든 RAID. RAID 0은 모두 데이터라 16TB이고 고장을 못 견뎌요. RAID 5는 디스크마다 4분의 1이 패리티라 12TB이고 1개까지 견뎌요. RAID 6은 절반이 패리티라 8TB이고 2개까지 견뎌요. RAID 10은 두 쌍이 서로 복사해 8TB이고 쌍마다 1개를 견뎌요" />
 </Figure>
 
 ## 다시 채우는 동안이 가장 위험해요

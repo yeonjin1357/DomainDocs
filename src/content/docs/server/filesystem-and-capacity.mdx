@@ -21,6 +21,8 @@ sources:
     url: https://man7.org/linux/man-pages/man8/mke2fs.8.html
 updated: 2026-10-21
 ---
+import FsInode from '../../../assets/figures/server/fs-inode.svg';
+import FsTwoFull from '../../../assets/figures/server/fs-two-full.svg';
 
 <KeyPoints>
   <Point title="파일 내용과 파일 정보는 따로 둬요">
@@ -40,21 +42,8 @@ updated: 2026-10-21
 
 ## 파일은 두 부분으로 저장돼요
 
-<Figure caption="파일 이름은 inode를 가리키고, inode는 파일 정보와 데이터 블록의 위치를 담아요.">
-  <Flow
-    ariaLabel="파일 이름이 inode를 가리키고, inode가 데이터 블록 두 개를 가리키는 구조도"
-    nodes={[
-      { id: 'name', label: '파일 이름', col: 0, row: 0, note: 'app.log' },
-      { id: 'inode', label: 'inode', col: 1, row: 0, note: '크기·권한·위치', tone: 'accent' },
-      { id: 'b1', label: '데이터 블록', col: 2, row: 0 },
-      { id: 'b2', label: '데이터 블록', col: 2, row: 1 },
-    ]}
-    edges={[
-      { from: 'name', to: 'inode' },
-      { from: 'inode', to: 'b1', tone: 'accent' },
-      { from: 'inode', to: 'b2', tone: 'accent' },
-    ]}
-  />
+<Figure caption="파일 이름은 디렉터리에 inode 번호와 짝지어 적혀 있어요. inode는 크기, 권한, 시각과 데이터 블록의 위치를 담아요.">
+  <FsInode aria-label="디렉터리 /var/log의 표에서 app.log가 inode 2049와 짝지어 있고, inode 2049에는 크기 8KB, 권한 rw-r-----, 시각 10:02와 블록 5, 9가 적혀 있어요. 데이터 블록 0부터 11 가운데 5와 9에 app.log의 내용이 있어요" />
 </Figure>
 
 <Term term="server/file-system">파일 시스템</Term>은 디스크에 파일을 정리해 두는 방식이에요. 파일마다 <Term term="server/inode">inode</Term>가 하나씩 있고, 여기에 크기, 권한, 시각, 내용이 든 블록의 위치 같은 정보가 담겨요.
@@ -64,14 +53,7 @@ ext4 같은 파일 시스템은 만들 때 inode 수를 정해 둬요. 그래서
 ## 용량과 inode, 둘 다 차요
 
 <Figure caption="두 경우 모두 'No space left on device' 에러로 보여요. 용량만 보면 inode가 찬 경우를 놓쳐요.">
-  <Compare
-    columns={['용량이 찰 때', 'inode가 찰 때']}
-    rows={[
-      { label: '흔한 원인', values: ['큰 로그, 백업 파일', '작은 파일 수십만 개'] },
-      { label: '확인 명령', values: ['df', 'df -i'] },
-      { label: '먼저 막히는 일', values: ['파일에 더 쓰기', '새 파일 만들기'] },
-    ]}
-  />
+  <FsTwoFull aria-label="용량이 찰 때는 큰 로그나 백업 파일 때문에 데이터 블록이 100% 차고 inode는 17%만 써서 파일에 더 못 써요. df로 봐요. inode가 찰 때는 작은 파일 수십만 개 때문에 inode가 100% 차고 데이터 블록은 22%만 써서 새 파일을 못 만들어요. df -i로 봐요. 둘 다 No space left on device로 보여요" />
 </Figure>
 
 `df`는 파일 시스템마다 남은 공간을, `df -i`는 남은 inode를 보여 줘요. inode가 다 차면 새 파일을 만들려 할 때 "공간이 없다"는 에러(ENOSPC)가 나요. 용량은 넉넉한데 이 에러가 나면 inode부터 봐요.

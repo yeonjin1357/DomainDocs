@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 210" width="300" height="210">
+<text x="64" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">가득 찬 링 버퍼</text>
+<path d="M66.2 40.0 A56 56 0 0 1 111.3 66.1 L89.4 80.0 A30 30 0 0 0 65.2 66.0 z" style="fill:var(--color-accent-weak)" />
+<text x="85.5" y="63.8" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">1</text>
+<path d="M113.6 70.0 A56 56 0 0 1 113.6 122.0 L90.6 109.9 A30 30 0 0 0 90.6 82.1 z" style="fill:var(--color-accent-weak)" />
+<text x="107" y="101" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">2</text>
+<path d="M111.3 125.9 A56 56 0 0 1 66.2 152.0 L65.2 126.0 A30 30 0 0 0 89.4 112.0 z" style="fill:var(--color-accent-weak)" />
+<text x="85.5" y="138.2" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">3</text>
+<path d="M61.8 152.0 A56 56 0 0 1 16.7 125.9 L38.6 112.0 A30 30 0 0 0 62.8 126.0 z" style="fill:var(--color-accent-weak)" />
+<text x="42.5" y="138.2" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">4</text>
+<path d="M14.4 122.0 A56 56 0 0 1 14.4 70.0 L37.4 82.1 A30 30 0 0 0 37.4 109.9 z" style="fill:var(--color-accent-weak)" />
+<text x="21" y="101" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">5</text>
+<path d="M16.7 66.1 A56 56 0 0 1 61.8 40.0 L62.8 66.0 A30 30 0 0 0 38.6 80.0 z" style="fill:var(--color-accent-weak)" />
+<text x="42.5" y="63.8" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">6</text>
+<text x="64" y="101" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">6칸</text>
+<path d="M124 96 L137.1 96" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M142 96 L135 91.7 L135 100.3 z" style="fill:var(--color-text-sub)" />
+<text x="202" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">7이 들어온 뒤</text>
+<path d="M204.2 40.0 A56 56 0 0 1 249.3 66.1 L227.4 80.0 A30 30 0 0 0 203.2 66.0 z" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent);stroke:var(--color-accent)" />
+<text x="223.5" y="63.8" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">7</text>
+<path d="M251.6 70.0 A56 56 0 0 1 251.6 122.0 L228.6 109.9 A30 30 0 0 0 228.6 82.1 z" style="fill:var(--color-accent-weak)" />
+<text x="245" y="101" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">2</text>
+<path d="M249.3 125.9 A56 56 0 0 1 204.2 152.0 L203.2 126.0 A30 30 0 0 0 227.4 112.0 z" style="fill:var(--color-accent-weak)" />
+<text x="223.5" y="138.2" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">3</text>
+<path d="M199.8 152.0 A56 56 0 0 1 154.7 125.9 L176.6 112.0 A30 30 0 0 0 200.8 126.0 z" style="fill:var(--color-accent-weak)" />
+<text x="180.5" y="138.2" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">4</text>
+<path d="M152.4 122.0 A56 56 0 0 1 152.4 70.0 L175.4 82.1 A30 30 0 0 0 175.4 109.9 z" style="fill:var(--color-accent-weak)" />
+<text x="159" y="101" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">5</text>
+<path d="M154.7 66.1 A56 56 0 0 1 199.8 40.0 L200.8 66.0 A30 30 0 0 0 176.6 80.0 z" style="fill:var(--color-accent-weak)" />
+<text x="180.5" y="63.8" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">6</text>
+<text x="202" y="101" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">6칸</text>
+<circle cx="280" cy="52" r="11" stroke-width="1.5" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="280" y="57" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-weak)">1</text>
+<path d="M246 60 L261.9 56" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-warn)" />
+<path d="M266 55 L259.3 52.8 L261.1 60.1 z" style="fill:var(--color-warn)" />
+<text x="278" y="84" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">밀려남</text>
+<text x="150" y="182" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">크기가 정해져 있어서, 가득 차면</text>
+<text x="150" y="202" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">가장 오래된 메시지 자리에 새 메시지를 써요</text>
+</svg>
