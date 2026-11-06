@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 246" width="300" height="246">
+<rect x="12" y="79" width="56" height="34" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="40" y="100.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">주문</text>
+<text x="40" y="132" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">주문 파드</text>
+<path d="M68 96 L95.1 96" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M100 96 L93 91.7 L93 100.3 z" style="fill:var(--color-accent)" />
+<rect x="102" y="70" width="86" height="52" rx="10" style="fill:var(--color-accent)" />
+<text x="145" y="92" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">결제 서비스</text>
+<text x="145" y="111" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="76" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-card)">10.96.0.20</text>
+<path d="M188 96 L191.7 34.2" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M192 30 L187.9 35.8 L195.4 36.2 z" style="fill:var(--color-text-sub)" />
+<rect x="193" y="15" width="90" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="238" y="34.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">결제</text>
+<text x="238" y="60" font-size="13" text-anchor="middle" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">10.244.1.5</text>
+<path d="M188 96 L187.8 96" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M192 96 L186 92.3 L186 99.7 z" style="fill:var(--color-text-sub)" />
+<rect x="193" y="81" width="90" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="238" y="100.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">결제</text>
+<text x="238" y="126" font-size="13" text-anchor="middle" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">10.244.2.7</text>
+<path d="M188 96 L191.7 157.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M192 162 L195.4 155.8 L187.9 156.2 z" style="fill:var(--color-text-sub)" />
+<rect x="193" y="147" width="90" height="30" rx="8" style="fill:var(--color-accent)" />
+<text x="238" y="166.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">결제</text>
+<text x="238" y="192" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">10.244.1.9</text>
+<text x="238" y="214" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">다시 떠서 IP가 바뀜</text>
+<text x="8" y="238" font-size="13" style="fill:var(--color-text-sub)">레이블 app=pay인 결제 파드 셋</text>
+<text x="292" y="238" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">주소는 그대로예요</text>
+</svg>

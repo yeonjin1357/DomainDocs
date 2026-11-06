@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 270" width="300" height="270">
+<rect x="4" y="4" width="214" height="236" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="22" font-size="13" font-weight="600" style="fill:var(--color-text)">노드</text>
+<rect x="16" y="32" width="92" height="46" rx="9" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="62" y="52" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드 · 앱</text>
+<text x="62" y="70" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">stdout</text>
+<path d="M108 55 L133.1 55" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M138 55 L131 50.7 L131 59.3 z" style="fill:var(--color-text-sub)" />
+<rect x="140" y="38" width="68" height="34" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="174" y="59.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">런타임</text>
+<path d="M174 72 L174 93.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M174 98 L178.3 91 L169.7 91 z" style="fill:var(--color-text-sub)" />
+<path d="M161 107 Q161 104 164 104 H179 L187 112 V133 Q187 136 184 136 H164 Q161 136 161 133 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M179 104 V112 H187" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<line x1="167" y1="118" x2="181" y2="118" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="167" y1="123" x2="181" y2="123" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="167" y1="128" x2="176" y2="128" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<text x="174" y="154" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">로그 파일</text>
+<path d="M158 118 L114.9 118" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M110 118 L117 122.3 L117 113.7 z" style="fill:var(--color-text-sub)" />
+<rect x="16" y="102" width="92" height="32" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="62" y="122.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">kubelet</text>
+<path d="M62 134 L62 153.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M62 158 L66.3 151 L57.7 151 z" style="fill:var(--color-text-sub)" />
+<text x="62" y="176" font-size="13" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">kubectl logs</text>
+<path d="M174 162 L174 183.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M174 188 L178.3 181 L169.7 181 z" style="fill:var(--color-accent)" />
+<rect x="132" y="190" width="84" height="42" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="174" y="208" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">에이전트</text>
+<text x="174" y="226" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">DaemonSet</text>
+<path d="M216 211 L235.1 211" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M240 211 L233 206.7 L233 215.3 z" style="fill:var(--color-accent)" />
+<path d="M247 197 V223 A17 5.5 0 0 0 281 223 V197" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M247 210 A17 5.5 0 0 0 281 210" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<ellipse cx="264" cy="197" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="264" y="244" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">로그 저장소</text>
+<text x="264" y="260" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">노드 밖</text>
+<text x="8" y="262" font-size="13" font-weight="700" style="fill:var(--color-accent)">노드 밖에 남는 건 보낸 것뿐</text>
+</svg>

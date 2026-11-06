@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 210" width="300" height="210">
+<text x="8" y="18" font-size="13" font-weight="700" style="fill:var(--color-text)">메모리 한도 1Gi인 컨테이너</text>
+<rect x="8" y="32" width="283" height="34" rx="5" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<rect x="8" y="32" width="165.8" height="34" rx="5" style="fill:var(--color-accent)" />
+<rect x="173.8" y="32" width="27.6" height="34" rx="0" style="fill:var(--color-accent);fill-opacity:0.5" />
+<rect x="201.5" y="32" width="55.3" height="34" rx="0" style="fill:var(--color-text-sub);fill-opacity:0.4" />
+<line x1="173.8" y1="32" x2="173.8" y2="66" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-card)" />
+<line x1="201.5" y1="32" x2="201.5" y2="66" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-card)" />
+<line x1="256.7" y1="32" x2="256.7" y2="66" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-card)" />
+<line x1="291" y1="24" x2="291" y2="72" stroke-width="2.4" stroke-linecap="butt" style="stroke:var(--color-warn)" />
+<text x="291" y="18" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">한도</text>
+<text x="90.9" y="54" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">앱 600Mi</text>
+<line x1="187.6" y1="66" x2="187.6" y2="82" stroke-width="1.4" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<text x="193.6" y="96" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-accent)">자주 쓰는 캐시 100Mi</text>
+<line x1="229.1" y1="66" x2="229.1" y2="104" stroke-width="1.4" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="235.1" y="118" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">비울 수 있는 캐시 200Mi</text>
+<path d="M8 134 v6 H201.45703125 v-6" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="8" y="160" font-size="13" font-weight="700" style="fill:var(--color-accent)">working set 700Mi</text>
+<text x="138.1" y="160" font-size="13" style="fill:var(--color-text-sub)">· kubectl top</text>
+<path d="M8 176 v6 H256.73046875 v-6" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<text x="8" y="202" font-size="13" font-weight="700" style="fill:var(--color-warn)">usage 900Mi</text>
+<text x="95.9" y="202" font-size="13" style="fill:var(--color-text-sub)">· 캐시까지 세요</text>
+</svg>

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 276" width="300" height="276">
+<rect x="4" y="4" width="292" height="240" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="22" font-size="13" font-weight="600" style="fill:var(--color-text)">클러스터</text>
+<rect x="16" y="32" width="130" height="120" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="26" y="50" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">네임스페이스 dev</text>
+<rect x="28" y="115" width="48" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="52" y="132.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="86" y="115" width="48" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="110" y="132.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="154" y="32" width="130" height="120" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="164" y="50" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">네임스페이스 prod</text>
+<rect x="166" y="115" width="48" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="190" y="132.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="224" y="115" width="48" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="248" y="132.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="26" y="62" width="110" height="40" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="81" y="80" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">Role</text>
+<text x="81" y="96" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">dev의 파드 읽기</text>
+<rect x="199" y="183" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<line x1="205" y1="191" x2="219" y2="191" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="205" y1="197" x2="219" y2="197" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="205" y1="203" x2="219" y2="203" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="212" cy="210.5" r="2" style="fill:var(--color-text-weak)" />
+<rect x="229" y="183" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<line x1="235" y1="191" x2="249" y2="191" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="235" y1="197" x2="249" y2="197" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="235" y1="203" x2="249" y2="203" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="242" cy="210.5" r="2" style="fill:var(--color-text-weak)" />
+<rect x="259" y="183" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<line x1="265" y1="191" x2="279" y2="191" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="265" y1="197" x2="279" y2="197" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="265" y1="203" x2="279" y2="203" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="272" cy="210.5" r="2" style="fill:var(--color-text-weak)" />
+<text x="242" y="236" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">노드</text>
+<rect x="16" y="168" width="160" height="46" rx="8" style="fill:var(--color-accent)" />
+<text x="96" y="187" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">ClusterRole</text>
+<text x="96" y="205" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-card)">모든 파드와 노드 읽기</text>
+<text x="150" y="268" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">바인딩도 같은 범위로 둘로 나뉘어요</text>
+</svg>

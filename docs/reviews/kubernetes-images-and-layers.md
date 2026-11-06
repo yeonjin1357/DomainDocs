@@ -18,3 +18,4 @@
   - 큰 파일 이미지는 `docker image inspect`의 Size 56,078,147바이트, `docker images`의 크기 117MB였어요.
 - 「모니터링에서는」의 86%는 예시예요.
 - 함께 한 것: 용어 image-layer, writable-layer, copy-on-write, registry, image-pull-policy를 올리고, 쿠버네티스 개요와 「컨테이너」에 이 글을 이었어요. 퀴즈 5문제를 썼어요.
+- (2026-11-06 그림 다시 그림) 지우는 RUN 그림의 '약 61MB'는 docker history 레이어 크기의 합(8.47MB + 52.4MB + 4.1kB ≈ 60.9MB)이라 '레이어를 더하면'이라고 적었어요. 본문의 inspect 약 56MB, docker images 117MB와는 재는 방식이 달라요. 같은 RUN에서 지운 쪽의 '약 8.5MB'는 재지 않고 alpine 8.47MB에 거의 0인 레이어를 더해 어림한 값이에요.

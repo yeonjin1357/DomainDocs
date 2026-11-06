@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 228" width="300" height="228">
+<rect x="8" y="20" width="96" height="46" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="56" y="40" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">역할</text>
+<text x="56" y="58" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">파드·노드 읽기</text>
+<path d="M104 43 L185.1 43" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M190 43 L183 38.7 L183 47.3 z" style="fill:var(--color-text-sub)" />
+<text x="147" y="35" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">바인딩</text>
+<rect x="192" y="20" width="100" height="46" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="242" y="40" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">서비스 계정</text>
+<text x="242" y="58" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">따로 만든 계정</text>
+<path d="M242 66 L242 105.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M242 110 L246.3 103 L237.7 103 z" style="fill:var(--color-accent)" />
+<text x="250" y="92" font-size="13" font-weight="700" style="fill:var(--color-accent)">토큰</text>
+<rect x="180" y="112" width="116" height="60" rx="10" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="238" y="134" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<text x="238" y="154" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">API를 읽는 앱</text>
+<path d="M180 142 L112.9 142" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M108 142 L115 146.3 L115 137.7 z" style="fill:var(--color-accent)" />
+<text x="144" y="134" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">토큰을 실어</text>
+<rect x="8" y="120" width="98" height="46" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="57" y="140" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">API 서버</text>
+<text x="57" y="158" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">역할대로 허락</text>
+<text x="8" y="200" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="284" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text-sub)">/var/run/secrets/kubernetes.io/</text>
+<text x="8" y="220" font-size="13" style="fill:var(--color-text-sub)">파드 안 이 경로에 토큰이 들어가요</text>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 250" width="300" height="250">
+<text x="40" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">kubelet</text>
+<line x1="40" y1="26" x2="40" y2="214" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="150" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">앱</text>
+<line x1="150" y1="26" x2="150" y2="214" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="260" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">DB</text>
+<line x1="260" y1="26" x2="260" y2="214" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M40 52 L145.1 52" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 52 L143 47.7 L143 56.3 z" style="fill:var(--color-text-sub)" />
+<text x="95" y="46" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">liveness 검사</text>
+<path d="M150 88 L255.1 88" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M260 88 L253 83.7 L253 92.3 z" style="fill:var(--color-text-sub)" />
+<text x="205" y="82" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">DB도 확인</text>
+<path d="M260 124 L154.9 124" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-warn)" />
+<path d="M150 124 L157 128.3 L157 119.7 z" style="fill:var(--color-warn)" />
+<text x="205" y="118" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">잠깐 느림</text>
+<path d="M150 160 L44.9 160" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-warn)" />
+<path d="M40 160 L47 164.3 L47 155.7 z" style="fill:var(--color-warn)" />
+<text x="95" y="154" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">실패</text>
+<path d="M40 196 L145.1 196" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M150 196 L143 191.7 L143 200.3 z" style="fill:var(--color-warn)" />
+<text x="95" y="190" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">다시 시작</text>
+<rect x="96.7" y="225" width="106.6" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="150" y="240.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">앱은 멀쩡했어요</text>
+</svg>

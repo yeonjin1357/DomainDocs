@@ -19,6 +19,7 @@ sources:
     url: https://man7.org/linux/man-pages/man7/cgroups.7.html
 updated: 2026-10-21
 ---
+import CtVmVsContainer from '../../../assets/figures/kubernetes/ct-vm-vs-container.svg';
 
 <KeyPoints>
   <Point title="이미지에 앱과 필요한 것을 함께 담아요">
@@ -65,33 +66,7 @@ updated: 2026-10-21
 ## 가상 머신과의 차이
 
 <Figure caption="가상 머신은 저마다 운영체제를 통째로 돌리고, 컨테이너는 서버의 커널을 함께 써요. 그래서 컨테이너가 가볍지만 격리는 더 느슨해요.">
-  <Nest
-    ariaLabel="가상 머신 쪽은 앱 A와 앱 B가 저마다 자기 운영체제를 얹고 하이퍼바이저 위에서 돌고, 컨테이너 쪽은 앱 A와 앱 B가 서버의 운영체제 커널 하나를 함께 쓰는 그림"
-    boxes={[
-      {
-        label: '가상 머신',
-        cols: 2,
-        children: [
-          { label: '앱 A' },
-          { label: '앱 B' },
-          { label: '운영체제 A', tone: 'accent' },
-          { label: '운영체제 B', tone: 'accent' },
-          { label: '하이퍼바이저', wide: true },
-          { label: '서버 한 대', wide: true },
-        ],
-      },
-      {
-        label: '컨테이너',
-        cols: 2,
-        children: [
-          { label: '앱 A' },
-          { label: '앱 B' },
-          { label: '운영체제 커널 하나', note: '두 앱이 함께 써요', tone: 'accent', wide: true },
-          { label: '서버 한 대', wide: true },
-        ],
-      },
-    ]}
-  />
+  <CtVmVsContainer aria-label="가상 머신은 하드웨어 위 하이퍼바이저에 앱 A와 앱 B가 저마다 게스트 OS를 통째로 얹어 무겁지만 격리가 단단해요. 컨테이너는 하드웨어 위 호스트 OS 커널 하나와 컨테이너 런타임 위에 앱 A와 앱 B가 함께 올라 가볍지만 격리는 느슨한 두 쌓임 그림" />
 </Figure>
 
 ## 모니터링에서는

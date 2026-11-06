@@ -20,6 +20,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 updated: 2026-10-21
 ---
+import PpFit from '../../../assets/figures/kubernetes/pp-fit.svg';
 
 <Situation>
   새로 배포한 파드 3개 중 2개가 20분째 Pending이에요. 노드 대시보드를 보면 CPU 사용률은 30% 남짓으로 한가해요.
@@ -67,19 +68,8 @@ Message: 0/42 nodes available:
 
 원리는 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>에 있어요.
 
-<Figure caption="CPU 4코어 노드를 0.5코어 칸으로 나눴어요. 요청 합계는 3.5코어라 0.5코어만 남아서, 1코어를 요청한 새 파드는 못 들어가요. 실제 사용량이 1.2코어(30%)여도 그래요.">
-  <Strip
-    ariaLabel="CPU 4코어 노드에서 파드 A가 1.5코어, B와 C가 1코어씩 요청해 0.5코어만 남았고, 실제 사용량은 1.2코어인 칸 띠"
-    rows={[
-      {
-        label: '요청 합계 3.5코어(스케줄러가 보는 것)',
-        cells: [{ label: 'A', tone: 'accent' }, { label: 'A', tone: 'accent' }, { label: 'A', tone: 'accent' }, { label: 'B', tone: 'accent' }, { label: 'B', tone: 'accent' }, { label: 'C', tone: 'accent' }, { label: 'C', tone: 'accent' }, { label: '빈', tone: 'sub' }],
-      },
-      { label: '실제 사용량 1.2코어(대시보드가 보는 것)', cells: ['', '', '', '', '', '', '', ''] },
-    ]}
-    marks={[{ row: 0, at: 7, label: '0.5코어 남음', tone: 'warn' }]}
-    ranges={[{ row: 1, from: 0, to: 2, label: '30% 남짓' }]}
-  />
+<Figure caption="CPU 4코어 노드에 파드 A가 1.5코어, B와 C가 1코어씩 요청해 합계가 3.5코어예요. 0.5코어만 남아서, 1코어를 요청한 새 파드는 못 들어가요. 실제 사용량이 1.2코어(30%)여도 그래요.">
+  <PpFit aria-label="CPU 4코어 노드에 파드 A 1.5코어, B 1코어, C 1코어 요청이 차서 0.5코어만 남았어요. 실제 사용은 1.2코어인데, 1코어를 요청한 새 파드는 들어가지 못하는 그림" />
 </Figure>
 
 쿠버네티스 문서가 권하는 길은 세 가지예요.

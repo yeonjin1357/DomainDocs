@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 238" width="300" height="238">
+<rect x="4" y="6" width="292" height="52" rx="10" style="fill:var(--color-card)" />
+<text x="14" y="27" font-size="13" font-weight="700" style="fill:var(--color-text)">상태 없는 웹 서버</text>
+<text x="14" y="47" font-size="13" style="fill:var(--color-text-sub)">처리량을 10% 넘게 줄이지 않기</text>
+<rect x="152.9" y="11" width="135.1" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="220.4" y="26.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">minAvailable 90%</text>
+<rect x="4" y="64" width="292" height="52" rx="10" style="fill:var(--color-card)" />
+<text x="14" y="85" font-size="13" font-weight="700" style="fill:var(--color-text)">쿼럼이 있는 저장소 5개</text>
+<text x="14" y="105" font-size="13" style="fill:var(--color-text-sub)">과반이 늘 살아 있기</text>
+<rect x="168.9" y="69" width="119.1" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="228.5" y="84.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">minAvailable 3</text>
+<rect x="4" y="122" width="292" height="52" rx="10" style="fill:var(--color-card)" />
+<text x="14" y="143" font-size="13" font-weight="700" style="fill:var(--color-text)">복제본 하나</text>
+<text x="14" y="163" font-size="13" style="fill:var(--color-warn)">0으로 두면 drain이 멈춰요</text>
+<rect x="192.3" y="127" width="95.7" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="240.2" y="142.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">PDB 없음 · 0</text>
+<rect x="4" y="180" width="292" height="52" rx="10" style="fill:var(--color-card)" />
+<text x="14" y="201" font-size="13" font-weight="700" style="fill:var(--color-text)">다시 돌릴 수 있는 Job</text>
+<text x="14" y="221" font-size="13" style="fill:var(--color-text-sub)">새 파드가 이어서 해요</text>
+<rect x="218.2" y="185" width="69.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="253.1" y="200.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">PDB 없음</text>
+</svg>

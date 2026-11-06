@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 334" width="300" height="334">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">사이드카 모드</text>
+<rect x="4" y="26" width="292" height="92" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="44" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">노드</text>
+<rect x="14" y="50" width="84" height="56" rx="8" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="24" y="72" font-size="13" font-weight="700" style="fill:var(--color-text)">앱</text>
+<rect x="29.1" y="81" width="53.7" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="56" y="96.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">Envoy</text>
+<rect x="108" y="50" width="84" height="56" rx="8" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="118" y="72" font-size="13" font-weight="700" style="fill:var(--color-text)">앱</text>
+<rect x="123.1" y="81" width="53.7" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="150" y="96.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">Envoy</text>
+<rect x="202" y="50" width="84" height="56" rx="8" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="212" y="72" font-size="13" font-weight="700" style="fill:var(--color-text)">앱</text>
+<rect x="217.1" y="81" width="53.7" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="244" y="96.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">Envoy</text>
+<text x="8" y="140" font-size="13" style="fill:var(--color-text-sub)">파드마다 Envoy · 프록시 하나에 약 0.20 vCPU, 60MB</text>
+<text x="8" y="170" font-size="13" font-weight="700" style="fill:var(--color-text)">앰비언트 모드</text>
+<rect x="4" y="180" width="292" height="104" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="198" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">노드</text>
+<rect x="14" y="204" width="84" height="34" rx="8" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="24" y="226" font-size="13" font-weight="700" style="fill:var(--color-text)">앱</text>
+<rect x="108" y="204" width="84" height="34" rx="8" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="118" y="226" font-size="13" font-weight="700" style="fill:var(--color-text)">앱</text>
+<rect x="202" y="204" width="84" height="34" rx="8" stroke-width="1.3" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="212" y="226" font-size="13" font-weight="700" style="fill:var(--color-text)">앱</text>
+<rect x="14" y="246" width="272" height="28" rx="7" stroke-width="1.3" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="24" y="265" font-size="13" font-weight="700" style="fill:var(--color-accent)">ztunnel · 노드마다 하나 · mTLS</text>
+<text x="8" y="306" font-size="13" style="fill:var(--color-text-sub)">ztunnel 약 0.06 vCPU, 12MB</text>
+<text x="8" y="326" font-size="13" font-weight="600" style="fill:var(--color-warn)">HTTP 재시도·지표는 waypoint를 따로 둬요</text>
+</svg>

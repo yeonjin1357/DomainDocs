@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 196" width="300" height="196">
+<rect x="4" y="4" width="292" height="138" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 34 V10 Q4.8 4.8 10 4.8 H290 Q295.3 4.8 295.3 10 V34 z" style="fill:var(--color-line)" />
+<line x1="4" y1="70" x2="296" y2="70" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="106" x2="296" y2="106" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="23.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)"></text>
+<text x="90" y="23.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">쿠버네티스</text>
+<text x="188" y="23.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">OpenShift</text>
+<text x="12" y="56.7" font-size="13" font-weight="400" style="fill:var(--color-text)">바깥 접속</text>
+<text x="90" y="56.7" font-size="13" font-weight="400" style="fill:var(--color-text)">인그레스</text>
+<text x="188" y="56.7" font-size="13" font-weight="400" style="fill:var(--color-text)"></text>
+<text x="12" y="92.7" font-size="13" font-weight="400" style="fill:var(--color-text)">이름 묶음</text>
+<text x="90" y="92.7" font-size="13" font-weight="400" style="fill:var(--color-text)">네임스페이스</text>
+<text x="188" y="92.7" font-size="13" font-weight="400" style="fill:var(--color-text)">프로젝트</text>
+<text x="12" y="128.7" font-size="13" font-weight="400" style="fill:var(--color-text)">파드 거절</text>
+<text x="90" y="128.7" font-size="13" font-weight="400" style="fill:var(--color-text)">권한, 할당량</text>
+<text x="188" y="128.7" font-size="13" font-weight="400" style="fill:var(--color-text)"></text>
+<rect x="185" y="39" width="106" height="26" rx="6" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="193" y="57" font-size="13" font-weight="700" style="fill:var(--color-accent)">Route</text>
+<rect x="185" y="111" width="106" height="26" rx="6" stroke-width="1.2" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="193" y="129" font-size="13" font-weight="700" style="fill:var(--color-accent)">+ SCC 검사</text>
+<text x="8" y="168" font-size="13" style="fill:var(--color-text-sub)">인그레스를 만들면 Route도 함께 생겨요</text>
+<text x="8" y="188" font-size="13" style="fill:var(--color-text-sub)">프로젝트는 주석이 더 붙은 네임스페이스</text>
+</svg>

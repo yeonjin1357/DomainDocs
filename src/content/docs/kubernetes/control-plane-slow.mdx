@@ -22,6 +22,7 @@ sources:
     url: https://etcd.io/docs/v3.5/faq/
 updated: 2026-11-03
 ---
+import CpsHub from '../../../assets/figures/kubernetes/cps-hub.svg';
 
 <Situation>
   kubectl 명령이 몇 초씩 걸리고, 배포를 바꿔도 파드에 늦게 반영돼요. 때로는 "Too Many Requests"나 시간 초과 에러가 나요.
@@ -36,26 +37,7 @@ updated: 2026-11-03
 모든 구성 요소는 API 서버하고만 이야기해요. kubectl, 컨트롤러, 스케줄러, kubelet, 모니터링 에이전트가 모두 API 서버를 부르고, API 서버만 etcd에 읽고 써요. 그래서 API 서버나 etcd가 느려지면 클러스터 전체가 함께 느려져요.
 
 <Figure caption="모두가 API 서버 한 곳으로 모여요. API 서버는 요청을 받으면 웹훅에 물어보고, etcd에 읽고 써요. 이 길 어디가 막혀도 모두가 느려져요.">
-  <Flow
-    ariaLabel="kubectl, 컨트롤러, kubelet, 모니터링 에이전트가 모두 API 서버를 부르고, API 서버가 웹훅에 묻고 etcd에 읽고 쓰는 구조도"
-    nodes={[
-      { id: 'kubectl', label: 'kubectl', col: 0, row: 0 },
-      { id: 'ctrl', label: '컨트롤러', col: 0, row: 1, note: '스케줄러 포함' },
-      { id: 'kubelet', label: 'kubelet', col: 0, row: 2, note: '노드마다' },
-      { id: 'agent', label: '모니터링', col: 0, row: 3, note: '에이전트' },
-      { id: 'api', label: 'API 서버', col: 1, row: 1, tone: 'accent' },
-      { id: 'hook', label: '웹훅', col: 2, row: 0, note: '받기 전 검사' },
-      { id: 'etcd', label: 'etcd', col: 1, row: 3, note: '모든 데이터', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'kubectl', to: 'api' },
-      { from: 'ctrl', to: 'api' },
-      { from: 'kubelet', to: 'api' },
-      { from: 'agent', to: 'api' },
-      { from: 'api', to: 'hook' },
-      { from: 'api', to: 'etcd', both: true, tone: 'accent' },
-    ]}
-  />
+  <CpsHub aria-label="kubectl을 쓰는 사람, 스케줄러를 포함한 컨트롤러, 노드마다 있는 kubelet, 모니터링 에이전트가 모두 API 서버를 불러요. API 서버는 받기 전 웹훅에 물어보고, 모든 데이터가 있는 etcd에 읽고 써요. 이 길 어디가 막혀도 모두가 느려지는 그림" />
 </Figure>
 
 <Figure caption="앞에서부터 하나씩 지워 가요. API 서버가 느리면 거절, 웹훅, etcd 순서로 원인을 좁혀요.">

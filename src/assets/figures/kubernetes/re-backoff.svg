@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 226" width="300" height="226">
+<rect x="4" y="4" width="292" height="104" rx="10" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="14" y="13" width="69.2" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="48.6" y="28.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">Warning</text>
+<text x="91.2" y="29" font-size="13" font-weight="700" style="fill:var(--color-text)">BackOff</text>
+<text x="14" y="54" font-size="13"><tspan style="fill:var(--color-text-sub)">Back-off </tspan><tspan font-weight="700" style="fill:var(--color-accent)">restarting failed container</tspan></text>
+<text x="14" y="74" font-size="13" style="fill:var(--color-text-sub)">컨테이너가 죽어 다시 띄우기를 미뤄요</text>
+<text x="14" y="97" font-size="13" font-weight="700" style="fill:var(--color-accent)">→</text>
+<text x="32" y="97" font-size="13" font-weight="700" style="fill:var(--color-text)">파드가 계속 재시작될 때</text>
+<rect x="4" y="118" width="292" height="104" rx="10" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<rect x="14" y="127" width="69.2" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="48.6" y="142.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">Warning</text>
+<text x="91.2" y="143" font-size="13" font-weight="700" style="fill:var(--color-text)">BackOff</text>
+<text x="14" y="168" font-size="13"><tspan style="fill:var(--color-text-sub)">Back-off </tspan><tspan font-weight="700" style="fill:var(--color-accent)">pulling image</tspan></text>
+<text x="14" y="188" font-size="13" style="fill:var(--color-text-sub)">이미지를 못 받아 다시 받기를 미뤄요</text>
+<text x="14" y="211" font-size="13" font-weight="700" style="fill:var(--color-accent)">→</text>
+<text x="32" y="211" font-size="13" font-weight="700" style="fill:var(--color-text)">이미지 이름·태그와 인증 정보</text>
+</svg>

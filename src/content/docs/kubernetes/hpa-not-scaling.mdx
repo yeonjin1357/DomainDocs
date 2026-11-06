@@ -20,6 +20,8 @@ sources:
     url: https://github.com/kubernetes/kubernetes/blob/master/pkg/printers/internalversion/printers.go
 updated: 2026-10-29
 ---
+import HpaCalc from '../../../assets/figures/kubernetes/hpa-calc.svg';
+import HpaBigRequest from '../../../assets/figures/kubernetes/hpa-big-request.svg';
 
 <Situation>
   점심 트래픽이 두 배로 늘어 파드들의 CPU 사용률이 90%를 넘었어요. 그런데 HPA가 붙은 Deployment의 파드는 30분째 4개 그대로예요.
@@ -62,21 +64,8 @@ web    cpu: <unknown>/60%
 - **CPU 요청이 없어요**: 사용률은 요청 대비 퍼센트라, 파드의 컨테이너 하나라도 CPU 요청이 없으면 계산할 수 없어요. 이벤트에 `missing request for cpu`가 나와요.
 - **Metrics Server가 없어요**: CPU·메모리 사용량은 Metrics Server가 모아 줘요. 설치되지 않았거나 멈췄으면 사용량 자체가 없어요.
 
-<Figure caption="사용률은 Metrics Server가 모은 사용량을 파드의 CPU 요청으로 나눈 값이에요. 위의 둘 중 하나라도 없으면 계산할 수 없어서 TARGETS에 unknown이 떠요.">
-  <Flow
-    ariaLabel="Metrics Server가 모은 CPU 사용량과 파드 명세의 CPU 요청이 함께 HPA로 들어가 사용률을 계산하고, 그 값이 TARGETS 칸의 지금 값으로 보이는 구조도"
-    nodes={[
-      { id: 'use', label: '사용량', col: 0, row: 0, note: 'Metrics Server' },
-      { id: 'req', label: 'CPU 요청', col: 2, row: 0, note: '파드 명세' },
-      { id: 'hpa', label: 'HPA', col: 1, row: 1, note: '사용률 계산', tone: 'accent' },
-      { id: 'tgt', label: 'TARGETS', col: 1, row: 2, note: '지금/목표' },
-    ]}
-    edges={[
-      { from: 'use', to: 'hpa' },
-      { from: 'req', to: 'hpa' },
-      { from: 'hpa', to: 'tgt' },
-    ]}
-  />
+<Figure caption="사용률은 Metrics Server가 모은 사용량을 파드의 CPU 요청으로 나눈 값이에요. 둘 중 하나라도 없으면 계산할 수 없어서 TARGETS에 unknown이 떠요.">
+  <HpaCalc aria-label="Metrics Server가 모은 사용량 0.45코어를 파드 명세의 CPU 요청 0.5코어로 나눠 HPA가 사용률 90%를 계산하고, TARGETS에 cpu: 90%/60%로 보여요. 사용량이나 요청 중 하나라도 없으면 지금 값 자리에 unknown이 떠요" />
 </Figure>
 
 **확인 방법**: `kubectl describe hpa HPA이름`의 Events에서 FailedGetResourceMetric을 찾아요. 메시지는 이런 꼴이에요.
@@ -131,19 +120,8 @@ HPA가 원하는 파드 수를 올렸는데 준비된 파드가 그대로라면,
 - **병목이 CPU가 아니에요**: 스레드 풀이나 DB 연결이 모자라면 CPU는 한가한데 응답만 느려요. CPU 기준 HPA는 움직이지 않아요.
 - **막 뜬 파드는 0%로 쳐요**: 아직 준비되지 않은 파드는, CPU로 늘릴지 계산할 때 사용률을 0%로 보수적으로 봐요. 그래서 늘리는 폭이 작아질 수 있어요.
 
-<Figure caption="요청이 너무 큰 경우예요. 요청 2코어를 0.2코어씩 10칸으로 나누면, 0.8코어는 4칸이라 사용률 40%예요. 목표 60%에 닿지 않아서 앱이 느려도 HPA는 늘리지 않아요.">
-  <Strip
-    ariaLabel="CPU 요청 2코어를 10칸으로 나눈 띠에서 사용량 0.8코어가 4칸으로 사용률 40%이고, 목표 60%는 여섯째 칸 끝에 있어 아직 닿지 않은 칸 띠"
-    rows={[
-      {
-        label: '요청 2코어(한 칸 0.2코어)',
-        heads: ['', '', '', '40%', '', '60%', '', '', '', '100%'],
-        cells: [{ label: '', tone: 'accent' }, { label: '', tone: 'accent' }, { label: '', tone: 'accent' }, { label: '', tone: 'accent' }, '', '', '', '', '', ''],
-      },
-    ]}
-    marks={[{ at: 5, label: '목표', tone: 'warn' }]}
-    ranges={[{ from: 0, to: 3, label: '0.8코어 사용' }]}
-  />
+<Figure caption="요청이 너무 큰 경우예요. 요청 2코어에 0.8코어를 쓰면 사용률 40%라 목표 60%에 닿지 않아서, 앱이 느려도 HPA는 늘리지 않아요. 같은 0.8코어도 요청이 1코어면 80%라 늘려요.">
+  <HpaBigRequest aria-label="요청 2코어인 파드가 0.8코어를 쓰면 40%라 목표 60%에 못 닿아 늘리지 않아요. 같은 0.8코어를 요청 1코어인 파드가 쓰면 80%라 목표를 넘어 늘리는 두 막대 그림" />
 </Figure>
 
 ## 줄어드는 게 늦다면

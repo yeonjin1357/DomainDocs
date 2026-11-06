@@ -15,3 +15,4 @@
 | 롤링 업데이트는 기본 25%까지 파드를 더 띄움(할당량이 차면 새 파드를 못 만듦) | https://kubernetes.io/docs/concepts/workloads/controllers/deployment/ |
 
 - 함께 한 것: 용어 resource-quota, limit-range를 올리고 퀴즈 5문제를 썼어요.
+- (2026-11-06 그림 다시 그림) 요청 합계 그림은 본문 설정(team-a의 CPU 요청 할당량 4코어)에 1.5코어를 요청한 새 파드를 더한 예시예요. 3 + 1.5 = 4.5코어라 4코어를 넘어 거부돼요.

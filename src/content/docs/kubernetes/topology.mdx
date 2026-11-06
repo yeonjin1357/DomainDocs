@@ -19,27 +19,11 @@ sources:
     url: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 updated: 2026-10-30
 ---
+import TpGraph from '../../../assets/figures/kubernetes/tp-graph.svg';
+import TpSlices from '../../../assets/figures/kubernetes/tp-slices.svg';
 
-<OnDashboard title="주문 앱 · 오브젝트 토폴로지" caption="서비스에서 파드 2로 가는 선이 점선이에요. 파드 2는 셀렉터에는 맞지만 준비되지 않아 요청을 받지 않아요.">
-  <Flow
-    ariaLabel="인그레스가 서비스로, 서비스가 파드 1과 파드 2로 이어지고, ReplicaSet과 Deployment가 파드를 소유하는 관계도. 서비스에서 준비되지 않은 파드 2로 가는 선은 점선"
-    nodes={[
-      { id: 'ing', label: '인그레스', col: 0, row: 0 },
-      { id: 'svc', label: '서비스', col: 1, row: 0 },
-      { id: 'p1', label: '파드 1', col: 0, row: 1 },
-      { id: 'p2', label: '파드 2', col: 1, row: 1, note: '준비 안 됨', tone: 'warn' },
-      { id: 'rs', label: 'ReplicaSet', col: 1, row: 2 },
-      { id: 'dep', label: 'Deployment', col: 2, row: 2 },
-    ]}
-    edges={[
-      { from: 'ing', to: 'svc' },
-      { from: 'svc', to: 'p1' },
-      { from: 'svc', to: 'p2', dashed: true, tone: 'warn' },
-      { from: 'rs', to: 'p1' },
-      { from: 'rs', to: 'p2' },
-      { from: 'dep', to: 'rs' },
-    ]}
-  />
+<OnDashboard title="주문 앱 · 오브젝트 토폴로지" caption="파드 2는 셀렉터에는 맞지만 준비되지 않아 요청을 받지 않아요. 그래서 서비스에서 파드 2로 가는 요청 길이 끊겨 보여요.">
+  <TpGraph aria-label="인그레스가 서비스로, 서비스가 셀렉터로 파드 1과 파드 2로 이어지는 요청 길과, Deployment가 ReplicaSet을, ReplicaSet이 두 파드를 소유하는 관계도. 파드 2는 준비되지 않아 서비스에서 가는 길이 끊겨 있어요" />
 </OnDashboard>
 
 <KeyPoints>
@@ -79,20 +63,7 @@ EndpointSlice에는 파드마다 상태가 함께 적혀요. `serving`은 지금
 EndpointSlice 하나에는 기본으로 끝점 100개까지 담겨요. 파드가 많은 서비스는 슬라이스가 여러 개라서, 하나만 읽으면 선이 빠져요.
 
 <Figure caption="끝점이 250개인 서비스의 예시예요. 슬라이스 하나에 100개까지라 끝점이 적어도 세 슬라이스에 나뉘어요. 첫 슬라이스만 읽으면 나머지 슬라이스의 파드로 가는 선이 빠져요.">
-  <Strip
-    ariaLabel="끝점 250개인 서비스의 EndpointSlice가 100개까지 담는 슬라이스 셋으로 나뉘고, 첫 슬라이스만 읽으면 둘째와 셋째 슬라이스의 끝점으로 가는 선이 빠지는 칸 띠"
-    rows={[
-      {
-        label: '끝점 250개인 서비스의 EndpointSlice',
-        heads: ['100개까지', '100개까지', '100개까지'],
-        cells: [{ label: '슬라이스 1', tone: 'accent' }, '슬라이스 2', '슬라이스 3'],
-      },
-    ]}
-    ranges={[
-      { from: 0, to: 0, label: '하나만 읽음', tone: 'accent' },
-      { from: 1, to: 2, label: '여기 파드는 선이 빠져요', tone: 'warn' },
-    ]}
-  />
+  <TpSlices aria-label="끝점 250개인 서비스의 EndpointSlice가 100개까지 담는 슬라이스 1, 2, 3으로 나뉘어요. 슬라이스 1만 읽으면 그 파드들만 선이 이어지고, 슬라이스 2와 3의 파드로 가는 선은 빠지는 그림" />
 </Figure>
 
 ## 선이 없는 서비스

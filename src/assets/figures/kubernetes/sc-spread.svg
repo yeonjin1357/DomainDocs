@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 290" width="300" height="290">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">흩어 두면</text>
+<rect x="4" y="26" width="92" height="88" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="44" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">영역 a</text>
+<rect x="39" y="54" width="22" height="20" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+
+<rect x="102" y="26" width="92" height="88" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="112" y="44" font-size="13" font-weight="600" style="fill:var(--color-warn)">영역 b</text>
+<rect x="137" y="54" width="22" height="20" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+
+<line x1="175" y1="37" x2="185" y2="47" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="175" y1="47" x2="185" y2="37" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="148" y="100" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">멈춤</text>
+<rect x="200" y="26" width="92" height="88" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="210" y="44" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">영역 c</text>
+<rect x="235" y="54" width="22" height="20" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+
+<text x="8" y="136" font-size="13" font-weight="700" style="fill:var(--color-accent)">한 영역이 멈춰도 파드 둘이 남아요</text>
+<text x="8" y="162" font-size="13" font-weight="700" style="fill:var(--color-text)">한 곳에 몰리면</text>
+<rect x="4" y="172" width="92" height="88" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="14" y="190" font-size="13" font-weight="600" style="fill:var(--color-warn)">영역 a</text>
+<rect x="12" y="200" width="22" height="20" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+
+<rect x="39" y="200" width="22" height="20" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+
+<rect x="66" y="200" width="22" height="20" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+
+<line x1="77" y1="183" x2="87" y2="193" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="77" y1="193" x2="87" y2="183" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="50" y="246" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">멈춤</text>
+<rect x="102" y="172" width="92" height="88" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="112" y="190" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">영역 b</text>
+<rect x="200" y="172" width="92" height="88" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="210" y="190" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">영역 c</text>
+<text x="8" y="282" font-size="13" font-weight="700" style="fill:var(--color-warn)">그 영역이 멈추면 앱 전체가 멈춰요</text>
+</svg>

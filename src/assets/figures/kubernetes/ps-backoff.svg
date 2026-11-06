@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 166" width="300" height="166">
+<text x="8" y="18" font-size="13" font-weight="700" style="fill:var(--color-text)">컨테이너가 5초 돌고 죽기를 되풀이할 때</text>
+<rect x="10" y="34" width="15.5" height="28" rx="3" style="fill:var(--color-accent)" />
+<line x1="21.5" y1="24" x2="29.5" y2="32" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="21.5" y1="32" x2="29.5" y2="24" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="26.5" y="34" width="29" height="28" rx="3" style="fill:var(--color-warn-weak)" />
+<text x="41" y="53" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">10초</text>
+<rect x="56.5" y="34" width="15.5" height="28" rx="3" style="fill:var(--color-accent)" />
+<line x1="68" y1="24" x2="76" y2="32" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="68" y1="32" x2="76" y2="24" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="73" y="34" width="60" height="28" rx="3" style="fill:var(--color-warn-weak)" />
+<text x="103" y="53" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">20초</text>
+<rect x="134" y="34" width="15.5" height="28" rx="3" style="fill:var(--color-accent)" />
+<line x1="145.5" y1="24" x2="153.5" y2="32" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="145.5" y1="32" x2="153.5" y2="24" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="150.5" y="34" width="122" height="28" rx="3" style="fill:var(--color-warn-weak)" />
+<text x="211.5" y="53" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">40초</text>
+<rect x="273.5" y="34" width="15.5" height="28" rx="3" style="fill:var(--color-accent)" />
+<text x="10" y="82" font-size="13" style="fill:var(--color-text-sub)">0초</text>
+<text x="149.5" y="82" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">45초</text>
+<text x="289" y="82" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">90초</text>
+<rect x="8" y="98" width="12" height="12" rx="2" style="fill:var(--color-accent)" />
+<text x="26" y="109" font-size="13" style="fill:var(--color-text-sub)">실행</text>
+<rect x="70" y="98" width="12" height="12" rx="2" style="fill:var(--color-warn-weak)" />
+<text x="88" y="109" font-size="13" style="fill:var(--color-text-sub)">다시 띄우기 전 기다림</text>
+<text x="8" y="138" font-size="13" font-weight="700" style="fill:var(--color-warn)">두 배씩 늘어 최대 5분</text>
+<text x="8" y="158" font-size="13" style="fill:var(--color-text-sub)">10분 동안 잘 돌면 다시 10초부터</text>
+</svg>

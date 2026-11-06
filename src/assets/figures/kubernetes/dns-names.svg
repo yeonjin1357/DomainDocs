@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="300" height="200">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">같은 네임스페이스(shop)의 pay</text>
+<rect x="8" y="28" width="37.1" height="28" rx="0" style="fill:var(--color-accent)" />
+<text x="26.6" y="46.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-card)">pay</text>
+<rect x="45.1" y="28" width="48.6" height="28" rx="0" style="fill:var(--color-card)" />
+<text x="69.4" y="46.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">.shop</text>
+<rect x="93.7" y="28" width="40.9" height="28" rx="0" style="fill:var(--color-card)" />
+<text x="114.2" y="46.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">.svc</text>
+<rect x="134.6" y="28" width="114" height="28" rx="0" style="fill:var(--color-card)" />
+<text x="191.7" y="46.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">.cluster.local</text>
+<line x1="45.1" y1="28" x2="45.1" y2="56" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="93.7" y1="28" x2="93.7" y2="56" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="134.6" y1="28" x2="134.6" y2="56" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<rect x="8" y="28" width="240.7" height="28" rx="4" stroke-width="1.5" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M8 64 v5 H45.119200000000006 v-5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="8" y="86" font-size="13" font-weight="700" style="fill:var(--color-accent)">직접 적어요</text>
+<path d="M45.119200000000006 64 v5 H248.6832 v-5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="248.7" y="86" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">검색 도메인이 붙여요</text>
+<text x="8" y="120" font-size="13" font-weight="700" style="fill:var(--color-text)">다른 네임스페이스(billing)의 pay</text>
+<rect x="8" y="132" width="37.1" height="28" rx="0" style="fill:var(--color-accent)" />
+<text x="26.6" y="150.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-card)">pay</text>
+<rect x="45.1" y="132" width="71.7" height="28" rx="0" style="fill:var(--color-accent)" />
+<text x="81" y="150.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-card)">.billing</text>
+<rect x="116.8" y="132" width="40.9" height="28" rx="0" style="fill:var(--color-card)" />
+<text x="137.3" y="150.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">.svc</text>
+<rect x="157.8" y="132" width="114" height="28" rx="0" style="fill:var(--color-card)" />
+<text x="214.8" y="150.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">.cluster.local</text>
+<line x1="45.1" y1="132" x2="45.1" y2="160" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="116.8" y1="132" x2="116.8" y2="160" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="157.8" y1="132" x2="157.8" y2="160" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<rect x="8" y="132" width="263.8" height="28" rx="4" stroke-width="1.5" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M8 168 v5 H116.84960000000001 v-5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="8" y="190" font-size="13" font-weight="700" style="fill:var(--color-accent)">직접 적어요</text>
+<path d="M116.84960000000001 168 v5 H271.80240000000003 v-5" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="271.8" y="190" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">검색 도메인이 붙여요</text>
+</svg>

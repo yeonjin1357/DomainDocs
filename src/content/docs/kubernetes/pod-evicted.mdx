@@ -22,6 +22,9 @@ sources:
     url: https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/eviction/helpers.go
 updated: 2026-10-30
 ---
+import PeOomVsEvict from '../../../assets/figures/kubernetes/pe-oom-vs-evict.svg';
+import PeOrder from '../../../assets/figures/kubernetes/pe-order.svg';
+import PeEphemeral from '../../../assets/figures/kubernetes/pe-ephemeral.svg';
 
 <Situation>
   아침에 보니 `batch` 네임스페이스에 상태가 Evicted인 파드가 7개 쌓여 있어요. 같은 시각, 그 노드에 있던 API 파드들도 다른 노드에서 새로 떴어요.
@@ -77,14 +80,7 @@ Message:  The node was low on
 ## 2. OOMKilled와 가르세요
 
 <Figure caption="OOMKilled는 컨테이너가 자기 메모리 한도를 넘어 커널에 죽은 거예요. Evicted는 노드가 모자라거나 파드가 임시 저장 한도를 넘어 kubelet이 파드째 내보낸 거예요.">
-  <Compare
-    columns={['OOMKilled', 'Evicted']}
-    rows={[
-      { label: '누가', values: ['리눅스 커널', 'kubelet'] },
-      { label: '왜', values: ['컨테이너 메모리 한도', '노드 압박, 임시 저장 한도'] },
-      { label: '그 뒤', values: ['같은 파드에서 다시 시작', '파드째 끝나고 새 파드가 떠요'] },
-    ]}
-  />
+  <PeOomVsEvict aria-label="OOMKilled는 리눅스 커널이 메모리 한도를 넘은 컨테이너를 끝내고, 같은 파드에서 다시 시작해요. Evicted는 노드 압박이나 임시 저장 한도 초과 때 kubelet이 파드째 노드 밖으로 내보내고, 새 파드가 뜨는 두 경우 그림" />
 </Figure>
 
 OOMKilled는 컨테이너만 다시 시작해서, 파드의 재시작 횟수가 올라가요. 이건 <Term slug="kubernetes/pod-restarting">파드가 계속 재시작될 때</Term>에서 다뤄요.
@@ -107,20 +103,8 @@ nodefs는 kubelet과 파드 로그, emptyDir가 쓰는 노드의 주 파일 시�
 
 요청을 하나도 안 적은 BestEffort 파드는 조금만 써도 요청을 넘은 셈이라 앞쪽에 서요. 메모리 요청을 실제보다 낮게 적은 파드도 마찬가지예요. 원리는 <Term slug="kubernetes/requests-and-limits">요청과 한도</Term>에 있어요.
 
-<Figure caption="메모리가 모자랄 때 쫓겨나는 차례의 예시예요. 왼쪽부터 쫓겨나요. 같은 무리 안에서는 우선순위가 낮은 파드가 먼저예요.">
-  <Strip
-    ariaLabel="메모리가 모자랄 때 요청이 없는 BestEffort 파드와 요청보다 더 쓰는 파드가 먼저, 요청 안에서 쓰는 파드 둘이 마지막에 쫓겨나는 차례를 보여 주는 칸 띠"
-    rows={[
-      {
-        label: '쫓겨나는 차례(왼쪽부터)',
-        cells: [{ label: 'BestEffort', tone: 'warn' }, { label: '요청 초과', tone: 'warn' }, '요청 안', '요청 안'],
-      },
-    ]}
-    ranges={[
-      { from: 0, to: 1, label: '먼저: 요청보다 더 씀', tone: 'warn' },
-      { from: 2, to: 3, label: '마지막: 요청 안에서 씀' },
-    ]}
-  />
+<Figure caption="메모리가 모자랄 때 쫓겨나는 차례의 예시예요. 요청보다 더 쓰는 파드가 먼저, 요청 안에서 쓰는 파드가 마지막이에요. 같은 무리 안에서는 우선순위가 낮은 파드가 먼저예요.">
+  <PeOrder aria-label="파드 넷의 메모리 사용과 요청. 요청이 없는 BestEffort 파드와 요청보다 더 쓰는 파드가 먼저 쫓겨나고, 요청 안에서 쓰는 파드 둘은 마지막이에요. 같은 무리에서는 우선순위가 낮은 파드부터예요" />
 </Figure>
 
 **확인 방법**: `kubectl describe node 노드이름`의 Conditions에서 압박 조건이 켜졌던 시각을 봐요. 압박 조건은 <Term slug="kubernetes/node-not-ready">노드가 NotReady일 때</Term>에서도 다뤄요.
@@ -139,22 +123,8 @@ nodefs는 kubelet과 파드 로그, emptyDir가 쓰는 노드의 주 파일 시�
 
 이런 쓰기는 <Term term="kubernetes/ephemeral-storage">임시 저장 공간</Term>(ephemeral-storage)으로 요청·한도를 정할 수 있어요. 한도를 넘은 파드는 노드 압박을 기다리지 않고 바로 내보내져요. 1단계의 뒤쪽 두 메시지가 이 경우예요.
 
-<Figure caption="파드가 노드 디스크를 쓰는 세 곳이에요. 셋 다 노드 디스크에 쌓이고, 묶음 이름처럼 ephemeral-storage로 요청·한도를 정할 수 있어요.">
-  <Flow
-    ariaLabel="컨테이너 쓰기 레이어, emptyDir 볼륨, 컨테이너 로그 세 곳이 ephemeral-storage로 묶이고, 모두 노드 디스크에 쌓이는 구조도"
-    nodes={[
-      { id: 'w', label: '쓰기 레이어', col: 0, row: 0, note: '컨테이너 안' },
-      { id: 'ed', label: 'emptyDir', col: 1, row: 0, note: '볼륨' },
-      { id: 'log', label: '로그', col: 2, row: 0, note: '컨테이너 로그' },
-      { id: 'disk', label: '노드 디스크', col: 1, row: 1, note: '모두 여기에', tone: 'warn' },
-    ]}
-    edges={[
-      { from: 'w', to: 'disk' },
-      { from: 'ed', to: 'disk' },
-      { from: 'log', to: 'disk' },
-    ]}
-    groups={[{ label: 'ephemeral-storage', cols: [0, 2], rows: [0, 0] }]}
-  />
+<Figure caption="파드가 노드 디스크를 쓰는 세 곳이에요. 셋 다 노드 디스크에 쌓이고, ephemeral-storage로 묶어 요청·한도를 정할 수 있어요.">
+  <PeEphemeral aria-label="컨테이너 안의 쓰기 레이어, emptyDir 볼륨, 컨테이너 로그 세 곳이 ephemeral-storage로 묶여 요청과 한도를 정할 수 있고, 모두 노드 디스크에 쌓이는 그림" />
 </Figure>
 
 ## 5. 쫓겨난 파드를 정리하세요

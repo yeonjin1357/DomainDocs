@@ -24,6 +24,7 @@ sources:
     url: https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/metrics/collectors/volume_stats.go
 updated: 2026-10-28
 ---
+import VnaSteps from '../../../assets/figures/kubernetes/vna-steps.svg';
 
 <Situation>
   DB를 StatefulSet으로 띄우는데 `db-0` 파드가 10분째 ContainerCreating이에요. 노드 점검 때문에 다른 노드로 옮긴 직후예요.
@@ -38,14 +39,7 @@ updated: 2026-10-28
 </FirstLook>
 
 <Figure caption="볼륨이 파드에 붙는 세 단계예요. 단계마다 멈췄을 때 남는 흔적이 달라서, 이벤트로 어디서 멈췄는지 알 수 있어요.">
-  <Triage
-    ariaLabel="1단계 PVC를 PV에 묶고, 2단계 디스크를 노드에 붙이고, 3단계 노드가 디스크를 파드에 연결하는 순서. 1단계에서 멈추면 PVC가 Pending, 2단계는 FailedAttachVolume, 3단계는 FailedMount 이벤트가 남아요"
-    steps={[
-      { label: '묶기', note: 'PVC ↔ PV', exits: [{ when: '여기서 멈추면', to: 'PVC가 Pending', tone: 'warn' }] },
-      { label: '붙이기', note: '디스크 ↔ 노드', exits: [{ when: '여기서 멈추면', to: 'FailedAttachVolume', tone: 'warn' }] },
-      { label: '연결', note: '노드 ↔ 파드', tone: 'accent', exits: [{ when: '여기서 멈추면', to: 'FailedMount', tone: 'warn' }] },
-    ]}
-  />
+  <VnaSteps aria-label="볼륨이 파드에 붙는 세 단계. 1단계 묶기는 PVC와 PV를 묶고, 멈추면 PVC가 Pending이에요. 2단계 붙이기는 디스크를 노드에 붙이고, 멈추면 FailedAttachVolume이 남아요. 3단계 연결은 노드가 디스크를 파드 안에 연결하고, 멈추면 FailedMount가 남아요" />
 </Figure>
 
 ## 1. PVC가 Bound인지 보세요

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 234" width="300" height="234">
+<rect x="80" y="6" width="140" height="34" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="27.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">서비스 · 끝점 250개</text>
+<line x1="150" y1="40" x2="52" y2="66" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<rect x="8" y="66" width="88" height="42" rx="8" style="fill:var(--color-accent)" />
+<text x="52" y="84" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">슬라이스 1</text>
+<text x="52" y="102" font-size="13" text-anchor="middle" style="fill:var(--color-card)">100개까지</text>
+<line x1="52" y1="108" x2="30" y2="133" stroke-width="1.2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="30" cy="140" r="7" style="fill:var(--color-accent)" />
+<line x1="52" y1="108" x2="52" y2="133" stroke-width="1.2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="52" cy="140" r="7" style="fill:var(--color-accent)" />
+<line x1="52" y1="108" x2="74" y2="133" stroke-width="1.2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="74" cy="140" r="7" style="fill:var(--color-accent)" />
+<line x1="52" y1="108" x2="30" y2="155" stroke-width="1.2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="30" cy="162" r="7" style="fill:var(--color-accent)" />
+<line x1="52" y1="108" x2="52" y2="155" stroke-width="1.2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="52" cy="162" r="7" style="fill:var(--color-accent)" />
+<line x1="52" y1="108" x2="74" y2="155" stroke-width="1.2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="74" cy="162" r="7" style="fill:var(--color-accent)" />
+<line x1="52" y1="108" x2="30" y2="177" stroke-width="1.2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="30" cy="184" r="7" style="fill:var(--color-accent)" />
+<line x1="52" y1="108" x2="52" y2="177" stroke-width="1.2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="52" cy="184" r="7" style="fill:var(--color-accent)" />
+<line x1="52" y1="108" x2="74" y2="177" stroke-width="1.2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="74" cy="184" r="7" style="fill:var(--color-accent)" />
+<line x1="150" y1="40" x2="150" y2="66" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<rect x="106" y="66" width="88" height="42" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="84" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">슬라이스 2</text>
+<text x="150" y="102" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">100개까지</text>
+<circle cx="128" cy="140" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="150" cy="140" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="172" cy="140" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="128" cy="162" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="150" cy="162" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="172" cy="162" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="128" cy="184" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="150" cy="184" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="172" cy="184" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<line x1="150" y1="40" x2="248" y2="66" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<rect x="204" y="66" width="88" height="42" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="248" y="84" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">슬라이스 3</text>
+<text x="248" y="102" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">100개까지</text>
+<circle cx="226" cy="140" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="248" cy="140" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="270" cy="140" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="226" cy="162" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<circle cx="248" cy="162" r="7" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<rect x="32.3" y="201" width="39.4" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="52" y="216.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">읽음</text>
+<path d="M108 200 v6 H290 v-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<text x="199" y="226" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">여기 파드로 가는 선이 빠져요</text>
+</svg>

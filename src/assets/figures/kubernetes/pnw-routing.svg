@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 270" width="300" height="270">
+<rect x="4" y="4" width="144" height="262" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">오버레이</text>
+<text x="16" y="44" font-size="13" style="fill:var(--color-text-sub)">Flannel VXLAN 등</text>
+<text x="16" y="70" font-size="13" style="fill:var(--color-text-sub)">선 하나에 1,500바이트</text>
+<rect x="16" y="78" width="120" height="24" rx="4" style="fill:var(--color-line)" />
+<rect x="16" y="78" width="22" height="24" rx="4" style="fill:var(--color-accent)" />
+<rect x="38" y="78" width="98" height="24" rx="0" style="fill:var(--color-accent-weak)" />
+<text x="87" y="95" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드 1,450</text>
+<text x="16" y="122" font-size="13" font-weight="600" style="fill:var(--color-warn)">머리표만큼 줄어요</text>
+<path d="M22 166 V179 A22 7 0 0 0 66 179 V166" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<ellipse cx="44" cy="166" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M34 163.8 L49.5 163.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M53 163.8 L48 160.7 L48 166.9 z" style="fill:var(--color-text-sub)" />
+<path d="M54 168.4 L38.5 168.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M35 168.4 L40 171.5 L40 165.3 z" style="fill:var(--color-text-sub)" />
+<text x="74" y="168" font-size="13" font-weight="600" style="fill:var(--color-text)">바깥 네트워크</text>
+<text x="74" y="186" font-size="13" style="fill:var(--color-text-sub)">노드 IP만 알면</text>
+<text x="74" y="202" font-size="13" font-weight="600" style="fill:var(--color-accent)">돼요</text>
+<text x="16" y="238" font-size="13" font-weight="700" style="fill:var(--color-text)">바깥을 안 건드려요</text>
+<rect x="152" y="4" width="144" height="262" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">라우팅</text>
+<text x="164" y="44" font-size="13" style="fill:var(--color-text-sub)">Calico BGP 등</text>
+<text x="164" y="70" font-size="13" style="fill:var(--color-text-sub)">선 하나에 1,500바이트</text>
+<rect x="164" y="78" width="120" height="24" rx="4" style="fill:var(--color-line)" />
+<rect x="164" y="78" width="120" height="24" rx="4" style="fill:var(--color-accent-weak)" />
+<text x="224" y="95" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드 1,500</text>
+<text x="164" y="122" font-size="13" font-weight="600" style="fill:var(--color-accent)">실을 자리 그대로예요</text>
+<path d="M170 166 V179 A22 7 0 0 0 214 179 V166" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<ellipse cx="192" cy="166" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M182 163.8 L197.5 163.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M201 163.8 L196 160.7 L196 166.9 z" style="fill:var(--color-text-sub)" />
+<path d="M202 168.4 L186.5 168.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M183 168.4 L188 171.5 L188 165.3 z" style="fill:var(--color-text-sub)" />
+<text x="222" y="168" font-size="13" font-weight="600" style="fill:var(--color-text)">바깥 네트워크</text>
+<text x="222" y="186" font-size="13" style="fill:var(--color-text-sub)">파드 범위를</text>
+<text x="222" y="202" font-size="13" font-weight="600" style="fill:var(--color-warn)">알아야 해요</text>
+<text x="164" y="238" font-size="13" font-weight="700" style="fill:var(--color-text)">감싸는 손해가 없어요</text>
+</svg>

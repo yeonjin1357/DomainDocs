@@ -14,3 +14,4 @@
 | Retain·Delete 회수 정책, 동적 생성 PV는 StorageClass 정책을 따르고 기본 Delete | https://kubernetes.io/docs/concepts/storage/persistent-volumes/ |
 
 - 메모: PVC 사용률 예시 숫자는 설명용이에요.
+- (2026-11-06 그림 다시 그림) Secret 그림의 'cGFzc3dvcmQ='는 printf 'password' | base64로 확인한 값이에요.

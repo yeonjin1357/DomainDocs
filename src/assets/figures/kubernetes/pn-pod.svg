@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 214" width="300" height="214">
+<rect x="4" y="4" width="292" height="206" rx="14" stroke-width="1.6" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="18" y="28" font-size="14" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="200.6" y="11" width="85.4" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="243.3" y="26.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">IP 10.1.2.3</text>
+<rect x="18" y="46" width="112" height="54" rx="9" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="74" y="68" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">앱 컨테이너</text>
+<text x="74" y="88" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">:8080</text>
+<rect x="170" y="46" width="112" height="54" rx="9" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="226" y="68" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">로그 수집</text>
+<text x="226" y="88" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">보조 컨테이너</text>
+<path d="M138.2 66 L161.8 66" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M166 66 L160 62.3 L160 69.7 z" style="fill:var(--color-accent)" />
+<path d="M134 66 L140 69.7 L140 62.3 z" style="fill:var(--color-accent)" />
+<text x="150" y="120" font-size="13" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">localhost</text>
+<line x1="150" y1="70" x2="150" y2="106" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 3" style="stroke:var(--color-accent)" />
+<path d="M135 157 Q135 154 138 154 H145 L148 158 H162 Q165 158 165 161 V175 Q165 178 162 178 H138 Q135 178 135 175 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="198" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">공유 볼륨</text>
+<path d="M74 102 L74 166 L123.8 166" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M128 166 L122 162.3 L122 169.7 z" style="fill:var(--color-text-sub)" />
+<text x="80" y="148" font-size="13" style="fill:var(--color-text-sub)">로그를 써요</text>
+<path d="M172 166 L226 166 L226 106.2" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M226 102 L222.3 108 L229.7 108 z" style="fill:var(--color-text-sub)" />
+<text x="220" y="148" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">읽어 가요</text>
+</svg>

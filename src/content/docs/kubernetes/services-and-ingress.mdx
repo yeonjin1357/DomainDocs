@@ -21,6 +21,10 @@ sources:
     url: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 updated: 2026-10-30
 ---
+import SiService from '../../../assets/figures/kubernetes/si-service.svg';
+import SiSelector from '../../../assets/figures/kubernetes/si-selector.svg';
+import SiDns from '../../../assets/figures/kubernetes/si-dns.svg';
+import SiIngress from '../../../assets/figures/kubernetes/si-ingress.svg';
 
 <KeyPoints>
   <Point title="서비스는 고정된 대표 주소예요">
@@ -45,22 +49,7 @@ updated: 2026-10-30
 <Term term="kubernetes/service">서비스</Term>는 같은 일을 하는 파드 묶음 앞에 바뀌지 않는 주소를 하나 둬요. 요청은 서비스 주소로 보내고, 서비스가 지금 떠 있는 파드 중 하나로 넘겨요.
 
 <Figure caption="주문 파드는 결제 서비스의 고정 주소로 요청해요. 서비스는 레이블이 app=pay인 파드 셋 중 하나로 요청을 넘겨요.">
-  <Flow
-    ariaLabel="주문 파드가 결제 서비스 10.96.0.20에 요청하고, 서비스가 레이블 app=pay인 결제 파드 세 개로 요청을 나누는 구조도"
-    nodes={[
-      { id: 'client', label: '주문 파드', col: 0, row: 1 },
-      { id: 'svc', label: '결제 서비스', col: 1, row: 1, tone: 'accent', note: '10.96.0.20' },
-      { id: 'p1', label: '결제 파드', col: 2, row: 0, note: 'app=pay' },
-      { id: 'p2', label: '결제 파드', col: 2, row: 1, note: 'app=pay' },
-      { id: 'p3', label: '결제 파드', col: 2, row: 2, note: 'app=pay' },
-    ]}
-    edges={[
-      { from: 'client', to: 'svc', tone: 'accent' },
-      { from: 'svc', to: 'p1' },
-      { from: 'svc', to: 'p2' },
-      { from: 'svc', to: 'p3' },
-    ]}
-  />
+  <SiService aria-label="주문 파드가 결제 서비스 10.96.0.20으로 요청하고, 서비스가 레이블 app=pay인 결제 파드 셋(10.244.1.5, 10.244.2.7, 10.244.1.9) 중 하나로 넘겨요. 파드가 다시 떠서 IP가 바뀌어도 서비스 주소는 그대로인 그림" />
 </Figure>
 
 ## 레이블로 파드를 골라요
@@ -71,17 +60,8 @@ updated: 2026-10-30
 
 준비가 안 된 파드는 대상에서 빠져요. readiness 프로브가 실패하면 그 파드의 IP가 EndpointSlice에서 빠지기 때문이에요. 프로브는 <Term slug="kubernetes/pod-status">파드 상태와 재시작</Term>에서 다뤄요.
 
-<Figure caption="서비스의 셀렉터는 app: pay이고, 아래 상자 이름은 파드에 붙은 레이블이에요. 셀렉터에 맞고 준비된 가운데 파드만 요청을 받아요. 왼쪽은 레이블은 맞지만 준비되지 않아 빠지고, 오른쪽은 레이블이 달라 처음부터 대상이 아니에요.">
-  <Flow
-    ariaLabel="셀렉터가 app: pay인 결제 서비스가 레이블이 app=pay이고 준비된 파드로만 요청을 넘기고, app=pay지만 준비되지 않은 파드와 레이블이 app=web인 파드로는 넘기지 않는 구조도"
-    nodes={[
-      { id: 'svc', label: '결제 서비스', col: 1, row: 0, note: 'app: pay', tone: 'accent' },
-      { id: 'notready', label: 'app=pay', col: 0, row: 1, note: '준비 안 됨', tone: 'warn' },
-      { id: 'ready', label: 'app=pay', col: 1, row: 1, note: '준비됨', tone: 'accent' },
-      { id: 'other', label: 'app=web', col: 2, row: 1, note: '레이블 다름', tone: 'sub' },
-    ]}
-    edges={[{ from: 'svc', to: 'ready', label: '요청', tone: 'accent' }]}
-  />
+<Figure caption="셀렉터가 app: pay인 서비스예요. 레이블이 맞고 준비된 파드만 대상 목록(EndpointSlice)에 들어가 요청을 받아요. 레이블은 맞아도 준비되지 않은 파드는 빠지고, 레이블이 다른 파드는 처음부터 대상이 아니에요.">
+  <SiSelector aria-label="셀렉터가 app: pay인 결제 서비스와 파드 셋. app=pay이고 준비 안 된 파드, app=pay이고 준비된 파드, app=web인 파드 가운데 준비된 파드 하나만 대상 목록(EndpointSlice)에 10.244.1.6으로 올라 요청을 받는 그림" />
 </Figure>
 
 ## 이름으로 찾아가요
@@ -91,15 +71,7 @@ updated: 2026-10-30
 같은 네임스페이스 안에서는 서비스 이름만 써도 돼요. kubelet이 파드의 DNS 설정에 검색 도메인을 넣어 두기 때문이에요. 그래서 주문 파드는 그냥 `http://pay`로 결제 서비스를 불러요.
 
 <Figure caption="주문 파드가 http://pay를 부를 때의 순서예요. 먼저 클러스터 DNS에 pay를 물어 결제 서비스의 IP를 받고, 그 IP로 요청을 보내요.">
-  <Sequence
-    ariaLabel="주문 파드가 클러스터 DNS에 pay의 주소를 묻고, 결제 서비스 IP 10.96.0.20을 받은 뒤, 그 IP로 결제 서비스에 요청하는 순서"
-    participants={['주문 파드', '클러스터 DNS', '결제 서비스']}
-    messages={[
-      { from: '주문 파드', to: '클러스터 DNS', label: 'pay는 어디?' },
-      { from: '클러스터 DNS', to: '주문 파드', label: '10.96.0.20', dashed: true },
-      { from: '주문 파드', to: '결제 서비스', label: '10.96.0.20으로 요청', tone: 'accent' },
-    ]}
-  />
+  <SiDns aria-label="주문 파드가 클러스터 DNS에 pay는 어디냐고 묻고, 10.96.0.20을 받은 뒤, 그 IP로 결제 서비스에 요청하는 세 단계. 앱은 http://pay라고만 적어요" />
 </Figure>
 
 이름을 찾는 과정은 <Term slug="kubernetes/cluster-dns">클러스터 안의 DNS</Term>에서 자세히 다뤄요.
@@ -120,20 +92,7 @@ ClusterIP의 주소는 실제 장비에 붙은 주소가 아니에요. 노드마
 <Term term="kubernetes/ingress">인그레스</Term>는 클러스터 바깥에서 오는 HTTP 요청을 받아 서비스로 넘기는 규칙이에요. 호스트 이름과 경로를 보고 나누고, HTTPS의 TLS 처리도 맡을 수 있어요.
 
 <Figure caption="인그레스 컨트롤러가 바깥 요청을 받아 경로를 봐요. /api는 API 서비스로, 나머지는 웹 서비스로 넘겨요.">
-  <Flow
-    ariaLabel="사용자의 요청이 인그레스 컨트롤러로 들어와, /api 경로는 API 서비스로, 나머지 경로는 웹 서비스로 가는 구조도"
-    nodes={[
-      { id: 'user', label: '사용자', col: 0, row: 1 },
-      { id: 'ing', label: '인그레스', col: 1, row: 1, tone: 'accent', note: '경로를 봐요' },
-      { id: 'api', label: 'API 서비스', col: 2, row: 0, note: '/api' },
-      { id: 'web', label: '웹 서비스', col: 2, row: 2, note: '/' },
-    ]}
-    edges={[
-      { from: 'user', to: 'ing', tone: 'accent' },
-      { from: 'ing', to: 'api' },
-      { from: 'ing', to: 'web' },
-    ]}
-  />
+  <SiIngress aria-label="바깥 사용자의 요청이 인그레스 컨트롤러로 들어와 규칙대로 /api는 API 서비스의 파드로, 나머지 /는 웹 서비스의 파드로 나뉘는 그림. 컨트롤러가 없으면 규칙만 있고 아무 일도 안 일어나요" />
 </Figure>
 
 인그레스는 규칙일 뿐이라, 이 규칙대로 요청을 실제로 받는 인그레스 컨트롤러가 따로 있어야 해요. 컨트롤러 없이 인그레스만 만들면 아무 일도 일어나지 않아요. 컨트롤러는 대개 <Term term="apm/reverse-proxy">리버스 프록시</Term> 소프트웨어예요.

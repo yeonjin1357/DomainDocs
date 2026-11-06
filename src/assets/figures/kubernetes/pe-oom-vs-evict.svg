@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 258" width="300" height="258">
+<rect x="4" y="4" width="144" height="250" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">OOMKilled</text>
+<text x="16" y="46" font-size="13" style="fill:var(--color-text-sub)">리눅스 커널이</text>
+<rect x="152" y="4" width="144" height="250" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">Evicted</text>
+<text x="164" y="46" font-size="13" style="fill:var(--color-text-sub)">kubelet이</text>
+<rect x="16" y="60" width="120" height="96" rx="10" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="26" y="80" font-size="13" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="30" y="90" width="92" height="54" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-warn)" />
+<text x="40" y="108" font-size="13" font-weight="600" style="fill:var(--color-text)">컨테이너</text>
+<rect x="40" y="118" width="60" height="14" rx="3" stroke-width="1" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<rect x="40" y="118" width="60" height="14" rx="3" style="fill:var(--color-warn)" />
+<line x1="100" y1="113" x2="100" y2="137" stroke-width="2.4" stroke-linecap="butt" style="stroke:var(--color-warn)" />
+<line x1="107" y1="99" x2="117" y2="109" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="107" y1="109" x2="117" y2="99" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="16" y="178" font-size="13" font-weight="600" style="fill:var(--color-warn)">컨테이너가</text>
+<text x="16" y="196" font-size="13" font-weight="600" style="fill:var(--color-warn)">메모리 한도를 넘어서</text>
+<text x="16" y="226" font-size="13" font-weight="700" style="fill:var(--color-accent)">같은 파드에서</text>
+<text x="16" y="244" font-size="13" font-weight="700" style="fill:var(--color-accent)">다시 시작해요</text>
+<rect x="162" y="60" width="86" height="96" rx="10" stroke-width="1.4" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="172" y="80" font-size="13" font-weight="700" style="fill:var(--color-text)">노드</text>
+<rect x="202.3" y="65" width="39.4" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="222" y="80.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">압박</text>
+<rect x="174" y="115" width="44" height="26" rx="8" stroke-width="1.5" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="196" y="132.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-weak)">파드</text>
+<path d="M219 128 L257.1 128" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M262 128 L255 123.7 L255 132.3 z" style="fill:var(--color-warn)" />
+<rect x="264" y="115" width="26" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+
+<text x="164" y="178" font-size="13" font-weight="600" style="fill:var(--color-warn)">노드 압박이나</text>
+<text x="164" y="196" font-size="13" font-weight="600" style="fill:var(--color-warn)">임시 저장 한도 초과</text>
+<text x="164" y="226" font-size="13" font-weight="700" style="fill:var(--color-accent)">파드째 끝나고</text>
+<text x="164" y="244" font-size="13" font-weight="700" style="fill:var(--color-accent)">새 파드가 떠요</text>
+</svg>

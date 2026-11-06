@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 206" width="300" height="206">
+<rect x="8" y="46" width="104" height="66" rx="8" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="18" y="68" font-size="13" font-weight="700" style="fill:var(--color-accent)">서비스</text>
+<text x="18" y="86" font-size="13" style="fill:var(--color-text-sub)">셀렉터</text>
+<text x="18" y="104" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">app=pay</text>
+<rect x="176" y="14" width="116" height="56" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="186" y="36" font-size="13" font-weight="700" style="fill:var(--color-text)">파드 1</text>
+<text x="186" y="58" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"><tspan font-weight="700" style="fill:var(--color-text)">app=pay</tspan><tspan font-weight="700" style="fill:var(--color-warn)">ment</tspan></text>
+<line x1="112" y1="79" x2="176" y2="42" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4 3" style="stroke:var(--color-text-weak)" />
+<line x1="139" y1="55.5" x2="149" y2="65.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="139" y1="65.5" x2="149" y2="55.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="176" y="92" width="116" height="56" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="186" y="114" font-size="13" font-weight="700" style="fill:var(--color-text)">파드 2</text>
+<text x="186" y="136" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"><tspan font-weight="700" style="fill:var(--color-text)">app=pay</tspan><tspan font-weight="700" style="fill:var(--color-warn)">ment</tspan></text>
+<line x1="112" y1="79" x2="176" y2="120" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4 3" style="stroke:var(--color-text-weak)" />
+<line x1="139" y1="94.5" x2="149" y2="104.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="139" y1="104.5" x2="149" y2="94.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="150" y="176" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">고른 파드 0개 · 요청을 넘길 곳이 없어요</text>
+<text x="150" y="196" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">셀렉터와 레이블을 글자 그대로 견줘요</text>
+</svg>

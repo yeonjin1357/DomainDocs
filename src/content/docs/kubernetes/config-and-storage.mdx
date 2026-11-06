@@ -19,6 +19,8 @@ sources:
     url: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 updated: 2026-10-30
 ---
+import CsSecret from '../../../assets/figures/kubernetes/cs-secret.svg';
+import CsPvc from '../../../assets/figures/kubernetes/cs-pvc.svg';
 
 <KeyPoints>
   <Point title="설정은 이미지 밖에 둬요">
@@ -60,20 +62,7 @@ Secret에 넣는 값은 base64로 적어요. base64는 글자를 바꿔 적는 �
 쿠버네티스 문서는 Secret이 기본 설정에서 etcd에 암호화 없이 저장된다고 해요. API나 etcd에 접근할 수 있으면 Secret을 읽을 수 있어요. 한 네임스페이스에서 파드를 만들 수 있는 사람도 그 네임스페이스의 Secret을 읽을 수 있어요.
 
 <Figure caption="기본 설정에서 Secret 값에 닿는 세 갈래예요. 값은 암호화 없이 base64로만 적혀 있어서, 하나만 열려 있어도 원래 값을 읽어요.">
-  <Flow
-    ariaLabel="API에 접근할 수 있는 사람, etcd에 접근할 수 있는 사람, 같은 네임스페이스에서 파드를 만들 수 있는 사람 셋 모두가 암호화 없이 저장된 Secret을 읽을 수 있는 구조도"
-    nodes={[
-      { id: 'secret', label: 'Secret', col: 1, row: 0, note: '암호화 없음', tone: 'warn' },
-      { id: 'api', label: 'API 접근', col: 0, row: 1 },
-      { id: 'etcd', label: 'etcd 접근', col: 1, row: 1 },
-      { id: 'pod', label: '파드 만들기', col: 2, row: 1, note: '그 네임스페이스' },
-    ]}
-    edges={[
-      { from: 'api', to: 'secret' },
-      { from: 'etcd', to: 'secret' },
-      { from: 'pod', to: 'secret' },
-    ]}
-  />
+  <CsSecret aria-label="암호화 없이 저장된 Secret의 password: cGFzc3dvcmQ=는 base64를 풀면 password예요. Secret 읽기 권한이 있는 API 접근, 데이터와 백업이 있는 etcd 접근, 그 네임스페이스에서 파드 만들기 셋 가운데 하나만 열려 있어도 원래 값을 읽는 그림" />
 </Figure>
 
 ## 컨테이너의 파일은 사라져요
@@ -92,20 +81,7 @@ Secret에 넣는 값은 base64로 적어요. base64는 글자를 바꿔 적는 �
 파드가 노드의 CPU·메모리를 쓰듯, PVC는 PV를 써요. 파드는 PVC를 볼륨으로 붙이고, PVC가 묶인 PV가 실제 디스크로 이어져요.
 
 <Figure caption="파드는 PVC를 붙이고, PVC는 조건이 맞는 PV에 묶여요. PV는 파드와 따로 살아서, 파드가 바뀌어도 데이터가 남아요.">
-  <Flow
-    ariaLabel="파드가 PVC 10Gi를 붙이고, PVC가 PV에 묶이고, PV가 클라우드 디스크로 이어지는 구조도"
-    nodes={[
-      { id: 'pod', label: '파드', col: 0, row: 0 },
-      { id: 'pvc', label: 'PVC', col: 1, row: 0, tone: 'accent', note: '10Gi 요청' },
-      { id: 'pv', label: 'PV', col: 2, row: 0, note: '10Gi' },
-      { id: 'disk', label: '실제 디스크', col: 2, row: 1, note: '클라우드 디스크' },
-    ]}
-    edges={[
-      { from: 'pod', to: 'pvc' },
-      { from: 'pvc', to: 'pv', tone: 'accent' },
-      { from: 'pv', to: 'disk' },
-    ]}
-  />
+  <CsPvc aria-label="옛 파드와 새 파드가 /data에 붙이는 PVC(10Gi 요청서)가 10Gi PV에 묶이고, PV가 클라우드 디스크로 이어지는 그림. PV는 파드와 따로 살아서 파드가 바뀌어도 데이터가 남아요" />
 </Figure>
 
 PVC에는 크기와 함께 접근 모드를 적어요.

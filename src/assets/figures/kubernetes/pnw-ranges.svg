@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 238" width="300" height="238">
+<rect x="4" y="6" width="142" height="172" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="24" font-size="13" font-weight="600" style="fill:var(--color-text)">노드 1</text>
+<text x="136" y="24" font-size="13" text-anchor="end" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="74" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-accent)">10.244.1.0/24</text>
+<rect x="37" y="47" width="76" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="75" y="66.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드 A</text>
+<text x="75" y="94" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">10.244.1.5</text>
+<rect x="37" y="111" width="76" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="75" y="130.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드 B</text>
+<text x="75" y="158" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">10.244.1.6</text>
+<rect x="154" y="6" width="142" height="172" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="164" y="24" font-size="13" font-weight="600" style="fill:var(--color-text)">노드 2</text>
+<text x="286" y="24" font-size="13" text-anchor="end" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="74" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-accent)">10.244.2.0/24</text>
+<rect x="187" y="47" width="76" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="225" y="66.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드 C</text>
+<text x="225" y="94" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">10.244.2.7</text>
+<path d="M113 62 L181.1 62" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M186 62 L179 57.7 L179 66.3 z" style="fill:var(--color-accent)" />
+<rect x="4" y="192" width="292" height="40" rx="10" style="fill:var(--color-accent-weak)" />
+<text x="150" y="217" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">노드가 달라도 NAT 없이 IP로 바로 닿아요</text>
+</svg>

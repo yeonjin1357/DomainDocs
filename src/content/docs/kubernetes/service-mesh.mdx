@@ -29,6 +29,12 @@ sources:
     url: https://www.envoyproxy.io/docs/envoy/latest/configuration/advanced/substitution_formatter
 updated: 2026-11-04
 ---
+import SmMesh from '../../../assets/figures/kubernetes/sm-mesh.svg';
+import SmMoves from '../../../assets/figures/kubernetes/sm-moves.svg';
+import SmAmbient from '../../../assets/figures/kubernetes/sm-ambient.svg';
+import SmReporter from '../../../assets/figures/kubernetes/sm-reporter.svg';
+import SmFlags from '../../../assets/figures/kubernetes/sm-flags.svg';
+import SmRetry from '../../../assets/figures/kubernetes/sm-retry.svg';
 
 <KeyPoints>
   <Point title="통신 일을 앱 밖의 프록시가 맡아요">
@@ -53,27 +59,7 @@ updated: 2026-11-04
 가장 널리 쓰는 Istio는 두 부분으로 나뉘어요. 파드마다 붙는 프록시 <Term term="kubernetes/envoy">Envoy</Term>가 데이터 플레인이고, 이 프록시들에 설정과 인증서를 내려주는 istiod가 컨트롤 플레인이에요.
 
 <Figure caption="주문 앱이 결제 서비스를 부르면 요청은 주문 파드의 사이드카를 거쳐 결제 파드의 사이드카로 가요. 사이드카끼리는 mTLS로 주고받고, istiod는 둘에게 설정과 인증서를 내려줘요.">
-  <Flow
-    ariaLabel="istiod가 주문 파드와 결제 파드의 사이드카 프록시에 설정을 내려주고, 주문 앱의 요청이 주문 사이드카, 결제 사이드카를 거쳐 결제 앱에 닿는 구조도"
-    nodes={[
-      { id: 'istiod', label: 'istiod', col: 1, row: 0, note: '설정·인증서', tone: 'accent' },
-      { id: 'app1', label: '주문 앱', col: 0, row: 1 },
-      { id: 'px1', label: '사이드카', col: 0, row: 2, note: 'Envoy' },
-      { id: 'app2', label: '결제 앱', col: 2, row: 1 },
-      { id: 'px2', label: '사이드카', col: 2, row: 2, note: 'Envoy' },
-    ]}
-    edges={[
-      { from: 'istiod', to: 'px1', dashed: true },
-      { from: 'istiod', to: 'px2', dashed: true },
-      { from: 'app1', to: 'px1' },
-      { from: 'px1', to: 'px2', tone: 'accent' },
-      { from: 'px2', to: 'app2' },
-    ]}
-    groups={[
-      { label: '주문 파드', cols: [0, 0], rows: [1, 2] },
-      { label: '결제 파드', cols: [2, 2], rows: [1, 2] },
-    ]}
-  />
+  <SmMesh aria-label="주문 파드의 주문 앱이 보낸 요청이 주문 파드의 Envoy 사이드카를 거쳐 결제 파드의 Envoy 사이드카로 mTLS로 가고, 결제 앱에 닿아요. 컨트롤 플레인 istiod가 두 사이드카에 설정과 인증서를 내려주는 그림" />
 </Figure>
 
 앱은 평소처럼 결제 서비스 주소로 요청을 보내요. 파드 안의 네트워크 규칙이 이 요청을 같은 파드의 사이드카로 돌려서, 앱 코드는 바꾸지 않아도 돼요. <Term term="kubernetes/sidecar">사이드카</Term>(sidecar)는 앱 컨테이너 옆에 붙어 함께 도는 컨테이너예요.
@@ -83,16 +69,7 @@ updated: 2026-11-04
 통신에 필요한 일을 프록시 설정 하나로 모든 서비스에 똑같이 걸 수 있어요. 앱 코드에서 할 때와 견주면 이래요.
 
 <Figure caption="앱마다 코드로 하던 통신 일을 메시는 프록시 설정으로 해요. 다만 트레이스를 잇는 헤더 전달은 여전히 앱의 일이에요.">
-  <Compare
-    columns={['앱 코드에서', '서비스 메시에서']}
-    rows={[
-      { label: '재시도·타임아웃', values: ['언어마다 라이브러리로', '설정 하나로 모든 서비스에'] },
-      { label: '암호화', values: ['서비스마다 인증서 관리', '프록시끼리 자동 mTLS'] },
-      { label: '트래픽 나누기', values: ['배포 도구나 로드 밸런서', '비율로 나눠 보내기'] },
-      { label: '지표', values: ['앱마다 따로 계측', '프록시가 같은 이름으로'] },
-      { label: '트레이스 잇기', values: ['앱이 헤더를 넘겨요', '그래도 앱이 넘겨요'] },
-    ]}
-  />
+  <SmMoves aria-label="앱 코드에서는 Java 앱과 Go 앱이 재시도, 암호화, 지표, 헤더를 언어마다 따로 만들어요. 서비스 메시에서는 재시도와 mTLS를 프록시 설정 하나로 같게 하고, 트레이스를 잇는 헤더 넘기기만 여전히 앱의 일로 남는 그림" />
 </Figure>
 
 <Term term="kubernetes/mtls">mTLS</Term>(mutual TLS)는 양쪽이 서로의 인증서를 확인하는 TLS예요. Istio는 프록시가 붙은 두 서비스 사이의 통신을 자동으로 mTLS로 올리고, 인증서는 istiod가 서명해 줘요.
@@ -106,15 +83,7 @@ Istio의 기본값은 알아 둬요. 연결이 실패하거나 거절되면 두 
 사이드카는 파드마다 프록시가 하나씩 붙어서 그만큼 CPU와 메모리를 써요. Istio 1.24부터 정식이 된 앰비언트(ambient) 모드는 사이드카 없이 메시를 만들어요.
 
 <Figure caption="사이드카 모드는 파드마다 Envoy를 붙이고, 앰비언트 모드는 노드마다 ztunnel을 두고 HTTP 기능이 필요한 곳에만 waypoint를 둬요. 자원은 Istio 1.24를 1,000 요청/초로 잰 값이에요.">
-  <Compare
-    columns={['사이드카 모드', '앰비언트 모드']}
-    rows={[
-      { label: '프록시 자리', values: ['파드마다 Envoy', '노드마다 ztunnel'] },
-      { label: 'HTTP 재시도·지표', values: ['사이드카가 해요', 'waypoint를 둬야 해요'] },
-      { label: '프록시 자원', values: ['약 0.20 vCPU, 60MB', 'ztunnel 약 0.06 vCPU, 12MB'] },
-      { label: '앱 파드', values: ['사이드카가 붙어요', '그대로예요'] },
-    ]}
-  />
+  <SmAmbient aria-label="사이드카 모드는 노드의 앱마다 Envoy를 붙여 프록시 하나에 약 0.20 vCPU, 60MB를 써요. 앰비언트 모드는 노드마다 ztunnel 하나가 mTLS를 맡아 약 0.06 vCPU, 12MB를 쓰고, HTTP 재시도와 지표는 waypoint를 따로 둬요" />
 </Figure>
 
 ztunnel은 노드마다 하나씩 돌며 mTLS와 연결 단위 일(L4)을 맡아요. HTTP 요청 단위의 일(L7)은 waypoint라는 Envoy 프록시를 따로 둬야 해요.
@@ -128,14 +97,7 @@ ztunnel은 노드마다 하나씩 돌며 mTLS와 연결 단위 일(L4)을 맡아
 주문이 결제를 한 번 부르면, 주문 쪽 프록시와 결제 쪽 프록시가 모두 그 요청을 세요. 보내는 쪽은 `reporter="source"`, 받는 쪽은 `reporter="destination"` 레이블이 붙어요.
 
 <Figure caption="결제 요청 한 건을 두 프록시가 각자 세요. reporter를 고르지 않고 더하면 요청 수가 두 배로 나와요.">
-  <Flow
-    ariaLabel="주문 사이드카가 reporter source로, 결제 사이드카가 reporter destination으로 같은 요청 한 건을 각각 세는 구조도"
-    nodes={[
-      { id: 'src', label: '주문 사이드카', col: 0, row: 0, note: 'source +1' },
-      { id: 'dst', label: '결제 사이드카', col: 2, row: 0, note: 'destination +1' },
-    ]}
-    edges={[{ from: 'src', to: 'dst', label: '요청 1건', tone: 'accent' }]}
-  />
+  <SmReporter aria-label="결제 요청 한 건을 주문 파드의 프록시가 reporter=source로 1건, 결제 파드의 프록시가 reporter=destination으로 1건 세요. 그냥 더하면 2건이고, reporter=destination만 고르면 1건인 그림" />
 </Figure>
 
 그래서 서비스가 받은 요청을 셀 때는 받는 쪽 기록만 골라요.
@@ -153,26 +115,7 @@ sum(rate(
 메시에서는 앱이 아니라 프록시가 503을 내기도 해요. Envoy는 그 까닭을 <Term term="kubernetes/response-flags">응답 플래그</Term>(response flags)로 남기고, Istio 지표의 `response_flags` 레이블에도 붙어요.
 
 <Figure caption="'-'면 앱이 낸 응답이고, 나머지는 프록시가 까닭을 붙인 응답이에요. UH 말고는 Envoy 1.40으로 직접 재현해 봤어요.">
-  <Tree
-    ariaLabel="응답 플래그가 대시면 앱이 낸 응답, URX면 재시도를 다 쓴 경우, UF면 연결 실패, UO면 서킷 브레이커가 막음, NR이면 경로 없음, UH면 건강한 대상 없음으로 나뉘는 나무"
-    root={{
-      label: '응답 플래그',
-      children: [
-        { label: '앱이 낸 응답 그대로', tag: '-' },
-        { label: '앱이 실패를 거듭해 재시도를 다 씀', tag: 'URX', tone: 'warn' },
-        {
-          label: '프록시가 앱에 닿지 못함',
-          tone: 'accent',
-          children: [
-            { label: '연결 실패(503)', tag: 'UF' },
-            { label: '건강한 대상이 없음(503)', tag: 'UH' },
-            { label: '서킷 브레이커가 막음(503)', tag: 'UO' },
-            { label: '맞는 경로가 없음(404)', tag: 'NR' },
-          ],
-        },
-      ],
-    }}
-  />
+  <SmFlags aria-label="응답 플래그 표. 앱까지 갔으면 대시(-)는 앱이 낸 응답 그대로, URX는 앱이 계속 실패해 재시도를 다 쓴 경우예요. 프록시가 앱에 닿지 못했으면 UF는 연결 실패, UH는 건강한 대상 없음, UO는 서킷 브레이커가 막음으로 503이고, NR은 맞는 경로가 없어 404예요" />
 </Figure>
 
 503이 늘었는데 결제 앱의 로그에 에러가 없다면 플래그부터 봐요. UF나 UH면 앱이 죽었거나 아직 안 떴고, UO면 서킷 브레이커 한도에 걸린 거예요.
@@ -182,14 +125,7 @@ sum(rate(
 메시의 재시도와 앱의 재시도는 따로 돌아요. 둘 다 있으면 뒤쪽 서비스가 받는 요청이 곱으로 늘어요.
 
 <Figure caption="결제 앱이 늘 503을 내게 하고, 503에 두 번 다시 시도하도록 Envoy 1.40을 설정해 잰 결과예요. 앱도 3번 시도하면 결제 앱은 9번 받았어요.">
-  <Bars
-    ariaLabel="한 번의 요청에 결제 앱이 받은 횟수 막대. 재시도가 없으면 1번, 메시 재시도 두 번이면 3번, 앱 3번 곱하기 메시 3번이면 9번이에요"
-    bars={[
-      { label: '재시도 없음', value: 1, display: '1번' },
-      { label: '메시만 재시도(2번 더)', value: 3, display: '3번' },
-      { label: '앱 3번 × 메시 3번', value: 9, display: '9번', tone: 'warn' },
-    ]}
-  />
+  <SmRetry aria-label="주문 앱이 3번 시도하고, 시도마다 프록시가 3번씩 보내 결제 앱이 받은 요청이 3 × 3 = 9번이 되는 그림. 재시도가 없으면 1번, 메시만 재시도하면 3번이에요" />
 </Figure>
 
 결제가 이미 힘들 때 이 9배가 몰리면 회복을 막아요. 재시도는 한 층에서만 걸어요. 재시도가 장애를 키우는 길은 <Term slug="apm/timeouts-and-retries">타임아웃과 재시도</Term>에서 다뤄요.

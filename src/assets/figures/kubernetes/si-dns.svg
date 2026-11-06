@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 204" width="300" height="204">
+<text x="46" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">주문 파드</text>
+<line x1="46" y1="26" x2="46" y2="172" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="150" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">클러스터 DNS</text>
+<line x1="150" y1="26" x2="150" y2="172" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="254" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">결제 서비스</text>
+<line x1="254" y1="26" x2="254" y2="172" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M46 56 L145.1 56" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 56 L143 51.7 L143 60.3 z" style="fill:var(--color-text-sub)" />
+<text x="98" y="50" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">pay는 어디?</text>
+<path d="M150 96 L50.9 96" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<path d="M46 96 L53 100.3 L53 91.7 z" style="fill:var(--color-accent)" />
+<text x="98" y="90" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">10.96.0.20</text>
+<path d="M46 150 L249.1 150" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M254 150 L247 145.7 L247 154.3 z" style="fill:var(--color-accent)" />
+<text x="150" y="144" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">10.96.0.20으로 요청</text>
+<circle cx="20" cy="56" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="20" y="60.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">1</text>
+<circle cx="20" cy="96" r="9.5" style="fill:var(--color-accent)" />
+<text x="20" y="100.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">2</text>
+<circle cx="20" cy="150" r="9.5" style="fill:var(--color-accent)" />
+<text x="20" y="154.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">3</text>
+<text x="150" y="196" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">앱은 http://pay라고만 적어요</text>
+</svg>

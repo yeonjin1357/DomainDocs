@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="300" height="220">
+<text x="18" y="76" font-size="13" font-weight="700" style="fill:var(--color-text)">노드 · CPU 4코어</text>
+<rect x="18" y="86" width="228" height="44" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="20" y="88" width="81.5" height="40" rx="4" style="fill:var(--color-accent-weak)" />
+<rect x="20" y="116" width="27.2" height="12" rx="2" style="fill:var(--color-accent)" />
+<text x="60.8" y="108" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">A 1.5</text>
+<rect x="105.5" y="88" width="53" height="40" rx="4" style="fill:var(--color-accent-weak)" />
+<rect x="105.5" y="116" width="21.2" height="12" rx="2" style="fill:var(--color-accent)" />
+<text x="132" y="108" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">B 1</text>
+<rect x="162.5" y="88" width="53" height="40" rx="4" style="fill:var(--color-accent-weak)" />
+<rect x="162.5" y="116" width="15.9" height="12" rx="2" style="fill:var(--color-accent)" />
+<text x="189" y="108" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">C 1</text>
+<line x1="46.5" y1="132" x2="46.5" y2="138" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="75" y1="132" x2="75" y2="138" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="103.5" y1="132" x2="103.5" y2="138" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="132" y1="132" x2="132" y2="138" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="160.5" y1="132" x2="160.5" y2="138" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="189" y1="132" x2="189" y2="138" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="217.5" y1="132" x2="217.5" y2="138" stroke-width="1.2" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<text x="18" y="152" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">0</text>
+<text x="75" y="152" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">1</text>
+<text x="132" y="152" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">2</text>
+<text x="189" y="152" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">3</text>
+<text x="246" y="152" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">4</text>
+<text x="231.8" y="113" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">0.5</text>
+<rect x="219.5" y="18" width="53" height="30" rx="6" stroke-width="1.5" stroke-dasharray="4 3" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="246" y="38" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">새 파드 1</text>
+<path d="M243.5 48 L243.5 77.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M243.5 82 L247.2 76 L239.8 76 z" style="fill:var(--color-warn)" />
+<line x1="258.5" y1="59" x2="268.5" y2="69" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="258.5" y1="69" x2="268.5" y2="59" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="18" y="172" width="14" height="14" rx="3" style="fill:var(--color-accent-weak)" />
+<text x="38" y="184" font-size="13" style="fill:var(--color-text-sub)">요청 합계 3.5코어</text>
+<rect x="160" y="176" width="14" height="8" rx="2" style="fill:var(--color-accent)" />
+<text x="180" y="184" font-size="13" style="fill:var(--color-text-sub)">실제 사용 1.2코어</text>
+<text x="150" y="212" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">실제로는 30%만 써도 자리가 없어요</text>
+</svg>

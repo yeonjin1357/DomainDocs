@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 262" width="300" height="262">
+<path d="M194.1 45.8 L198.2 47.9 L202.1 50.1 L205.9 52.5 L209.6 55 L213.1 57.7 L216.5 60.6 L219.7 63.6 L222.7 66.8 L225.6 70 L228.2 73.4 L230.7 76.9 L230.4 76.4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M233 80.6 L232.9 72.3 L225.6 77 z" style="fill:var(--color-accent)" />
+<path d="M233 159.4 L230.7 163.1 L228.2 166.6 L225.6 170 L222.7 173.2 L219.7 176.4 L216.5 179.4 L213.1 182.3 L209.6 185 L205.9 187.5 L202.1 189.9 L198.2 192.1 L198.5 192" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M194.1 194.2 L202.3 194.9 L198.4 187.1 z" style="fill:var(--color-accent)" />
+<path d="M105.9 194.2 L101.8 192.1 L97.9 189.9 L94.1 187.5 L90.4 185 L86.9 182.3 L83.5 179.4 L80.3 176.4 L77.3 173.2 L74.4 170 L71.8 166.6 L69.3 163.1 L69.6 163.6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M67 159.4 L67.1 167.7 L74.4 163 z" style="fill:var(--color-accent)" />
+<path d="M67 80.6 L69.3 76.9 L71.8 73.4 L74.4 70 L77.3 66.8 L80.3 63.6 L83.5 60.6 L86.9 57.7 L90.4 55 L94.1 52.5 L97.9 50.1 L101.8 47.9 L101.5 48" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M105.9 45.8 L97.7 45.1 L101.6 52.9 z" style="fill:var(--color-accent)" />
+<rect x="100" y="15" width="100" height="42" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="33" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">지켜봐요</text>
+<text x="150" y="51" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">바뀌면 알아요</text>
+<rect x="194" y="99" width="100" height="42" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="244" y="117" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">견줘요</text>
+<text x="244" y="135" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">원하는 vs 지금</text>
+<rect x="100" y="183" width="100" height="42" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="201" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">맞춰요</text>
+<text x="150" y="219" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">실제를 바꿔요</text>
+<rect x="6" y="99" width="100" height="42" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="56" y="117" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">적어요</text>
+<text x="56" y="135" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">status에 결과</text>
+<text x="150" y="125" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">오퍼레이터</text>
+<text x="150" y="254" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">리소스가 바뀔 때도, 실제가 달라질 때도 다시 돌아요</text>
+</svg>

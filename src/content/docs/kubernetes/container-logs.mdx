@@ -21,6 +21,9 @@ sources:
     url: https://github.com/containerd/containerd/blob/main/docs/cri/config.md
 updated: 2026-11-03
 ---
+import ClPath from '../../../assets/figures/kubernetes/cl-path.svg';
+import ClRotation from '../../../assets/figures/kubernetes/cl-rotation.svg';
+import ClScope from '../../../assets/figures/kubernetes/cl-scope.svg';
 
 <KeyPoints>
   <Point title="stdout에 쓴 것만 모여요">
@@ -43,24 +46,7 @@ updated: 2026-11-03
 앱이 stdout이나 stderr에 한 줄을 쓰면, 컨테이너 런타임이 받아 노드의 파일에 적어요. 런타임은 containerd 같은 컨테이너 실행 프로그램이에요. 이 파일을 kubelet이 읽어 `kubectl logs`에 답하고, 수집 에이전트가 따라 읽어 밖으로 보내요.
 
 <Figure caption="컨테이너 로그가 지나는 길이에요. 노드의 로그 파일 하나를 kubelet과 수집 에이전트가 함께 읽어요. 노드 밖에 남는 건 에이전트가 보낸 것뿐이에요.">
-  <Flow
-    ariaLabel="앱이 stdout에 쓴 줄을 컨테이너 런타임이 받아 노드의 로그 파일에 적고, kubelet이 그 파일을 읽어 kubectl logs에 답하고, 수집 에이전트가 따라 읽어 노드 밖 로그 저장소로 보내는 구조도"
-    nodes={[
-      { id: 'app', label: '앱', col: 0, row: 0, note: 'stdout·stderr' },
-      { id: 'rt', label: '런타임', col: 2, row: 0, note: 'containerd 등' },
-      { id: 'kubelet', label: 'kubelet', col: 0, row: 1, note: 'kubectl logs' },
-      { id: 'file', label: '로그 파일', col: 2, row: 1, note: '노드 디스크', tone: 'accent' },
-      { id: 'store', label: '로그 저장소', col: 0, row: 2, note: '노드 밖' },
-      { id: 'agent', label: '에이전트', col: 2, row: 2, note: 'DaemonSet' },
-    ]}
-    edges={[
-      { from: 'app', to: 'rt', label: '출력' },
-      { from: 'rt', to: 'file' },
-      { from: 'file', to: 'kubelet', label: '읽기' },
-      { from: 'file', to: 'agent' },
-      { from: 'agent', to: 'store', label: '보내기' },
-    ]}
-  />
+  <ClPath aria-label="노드 안에서 파드의 앱이 stdout에 쓴 줄을 런타임이 노드의 로그 파일에 적어요. kubelet이 그 파일을 읽어 kubectl logs에 답하고, DaemonSet으로 뜬 에이전트가 따라 읽어 노드 밖 로그 저장소로 보내는 그림" />
 </Figure>
 
 앱이 컨테이너 안의 파일(예: `/app/logs/app.log`)에 쓰면 이 길에 오르지 않아요. 그 파일은 컨테이너의 쓰기 레이어나 볼륨에만 있어요. 그래서 컨테이너 앱은 로그를 stdout으로 내보내는 게 기본이에요.
@@ -115,19 +101,8 @@ updated: 2026-11-03
 
 로그 파일은 끝없이 커지지 않아요. kubelet이 10초마다 크기를 보다가 10Mi(`containerLogMaxSize`)를 넘으면 새 파일로 바꿔요. 컨테이너마다 파일은 5개(`containerLogMaxFiles`)까지 두고, 넘치면 가장 오래된 것부터 지워요.
 
-<Figure caption="kubelet 기본 설정에서 한 컨테이너의 로그 파일이에요. 회전된 파일은 다음 회전 때 gzip으로 압축돼요. kubectl logs는 맨 오른쪽 파일만 읽어요.">
-  <Strip
-    ariaLabel="한 컨테이너의 로그 파일 다섯 개. 앞의 세 개는 압축된 옛 파일, 넷째는 막 회전된 파일, 다섯째가 지금 쓰는 파일이고 kubectl logs는 다섯째만 읽는 칸 띠"
-    rows={[
-      {
-        label: '컨테이너 하나의 로그 파일(각 10Mi)',
-        heads: ['10:11', '10:12', '10:13', '10:14', '지금'],
-        cells: [{ label: '.gz', tone: 'sub' }, { label: '.gz', tone: 'sub' }, { label: '.gz', tone: 'sub' }, '회전됨', { label: '1.log', tone: 'accent' }],
-      },
-    ]}
-    marks={[{ at: 4, label: 'kubectl logs', tone: 'accent' }]}
-    ranges={[{ from: 0, to: 3, label: '회전된 옛 파일' }]}
-  />
+<Figure caption="kubelet 기본 설정에서 한 컨테이너의 로그 파일이에요. 10Mi가 차면 회전하고, 회전된 파일은 다음 회전 때 gzip으로 압축돼요. kubectl logs는 지금 쓰는 파일만 읽어요.">
+  <ClRotation aria-label="한 컨테이너의 로그 파일 다섯 개. 10:11, 10:12, 10:13에 회전해 압축된 옛 파일 셋, 10:14에 막 회전된 파일 하나, 지금 쓰는 1.log 하나이고, kubectl logs는 1.log만 읽어요. 컨테이너마다 5개를 넘으면 가장 오래된 것부터 지워요" />
 </Figure>
 
 그래서 `kubectl logs`는 최대 10Mi만 보여 줘요. 쿠버네티스 문서의 예로, 40MiB를 쓴 파드도 10MiB까지만 나와요. 그 앞은 노드에 남아 있어도 `kubectl logs`로는 볼 수 없어요.
@@ -137,16 +112,7 @@ updated: 2026-11-03
 `kubectl logs`는 지금 컨테이너의 로그를, `kubectl logs --previous`는 바로 전 컨테이너의 로그를 보여 줘요. kubelet은 재시작한 컨테이너의 끝난 인스턴스를 하나만 남겨서, 그보다 앞은 볼 수 없어요.
 
 <Figure caption="kubectl logs와 노드 밖 로그 저장소가 볼 수 있는 범위예요. 장애 원인을 나중에 찾으려면 노드 밖에 모아 둬야 해요.">
-  <Compare
-    columns={['kubectl logs', '노드 밖 로그 저장소']}
-    rows={[
-      { label: '지금 컨테이너', values: ['가장 최근 파일만', '봐요'] },
-      { label: '바로 전 컨테이너', values: ['--previous로 봐요', '봐요'] },
-      { label: '그보다 앞 컨테이너', values: ['못 봐요', '봐요'] },
-      { label: '지운 파드', values: ['못 봐요', '보내 둔 데까지 봐요'] },
-      { label: '사라진 노드', values: ['못 봐요', '보내 둔 데까지 봐요'] },
-    ]}
-  />
+  <ClScope aria-label="찾는 로그별로 kubectl logs와 노드 밖 저장소가 볼 수 있는지 견준 표. 지금 컨테이너는 kubectl logs로 최근 파일만, 바로 전 컨테이너는 --previous로 봐요. 그보다 앞 컨테이너, 지운 파드, 사라진 노드의 로그는 kubectl logs로 못 보고, 노드 밖 저장소에서 보내 둔 데까지 봐요" />
 </Figure>
 
 파드가 지워지거나 축출되면, 그 파드의 컨테이너와 로그 파일도 함께 지워져요. 노드가 사라지면 그 노드의 모든 로그가 사라져요. 그래서 운영 클러스터는 노드 밖에 로그를 모아요.

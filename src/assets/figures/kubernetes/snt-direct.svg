@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 222" width="300" height="222">
+<rect x="6" y="29" width="72" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="42" y="48.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">주문 파드</text>
+<rect x="222" y="29" width="72" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="258" y="48.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">결제 파드</text>
+<path d="M78 44 L216.4 44" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M222 44 L214 39 L214 49 z" style="fill:var(--color-accent)" />
+<path d="M112 24 L116.2 28.2 L124 19.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="130" y="29" font-size="13" font-weight="700" style="fill:var(--color-accent)">파드 IP로 직접</text>
+<path d="M42 59 L42 132 L93.1 132" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M98 132 L91 127.7 L91 136.3 z" style="fill:var(--color-text-sub)" />
+<rect x="98" y="106" width="104" height="54" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="150" y="128" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">서비스 IP</text>
+<text x="150" y="148" font-size="13" text-anchor="middle" style="fill:var(--color-warn)">kube-proxy 규칙</text>
+<path d="M202 132 L258 132 L258 63.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-warn)" />
+<path d="M258 59 L253.7 66 L262.3 66 z" style="fill:var(--color-warn)" />
+<line x1="224" y1="126" x2="236" y2="138" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="224" y1="138" x2="236" y2="126" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="150" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">직접은 되고 서비스로는 안 되면</text>
+<text x="150" y="212" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">그 사이의 서비스 규칙을 봐요</text>
+</svg>

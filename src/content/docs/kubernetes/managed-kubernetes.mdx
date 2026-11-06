@@ -27,6 +27,8 @@ sources:
     url: https://kubernetes.io/releases/version-skew-policy/
 updated: 2026-11-03
 ---
+import MkMatrix from '../../../assets/figures/kubernetes/mk-matrix.svg';
+import MkEks from '../../../assets/figures/kubernetes/mk-eks.svg';
 
 <KeyPoints>
   <Point title="컨트롤 플레인을 클라우드가 맡아요">
@@ -49,14 +51,7 @@ updated: 2026-11-03
 쿠버네티스를 직접 깔면 <Term term="kubernetes/control-plane">컨트롤 플레인</Term>부터 노드까지 모두 내가 운영해요. EKS(AWS), AKS(Azure), GKE(Google Cloud)는 컨트롤 플레인을 클라우드가 맡는 <Term term="kubernetes/managed-kubernetes">관리형 쿠버네티스</Term> 서비스예요.
 
 <Figure caption="세 가지 운영 방식에서 맡는 쪽이에요. 관리형 노드 그룹도 노드 업데이트는 내가 시작해요. Fargate나 GKE Autopilot을 쓰면 노드까지 클라우드가 맡아요.">
-  <Strip
-    ariaLabel="직접 운영은 컨트롤 플레인, etcd, 노드 OS, 노드 수, 파드를 모두 내가 맡고, 관리형 노드 그룹은 컨트롤 플레인과 etcd를 클라우드가 맡고, 노드까지 맡기면 파드 말고 모두 클라우드가 맡는 칸 띠"
-    rows={[
-      { label: '직접 운영', heads: ['컨트롤 플레인', 'etcd', '노드 OS', '노드 수', '파드'], cells: ['내가', '내가', '내가', '내가', '내가'] },
-      { label: '관리형 + 노드 그룹', heads: ['컨트롤 플레인', 'etcd', '노드 OS', '노드 수', '파드'], cells: [{ label: '클라우드', tone: 'accent' }, { label: '클라우드', tone: 'accent' }, '내가', '내가', '내가'] },
-      { label: '노드까지 맡김(Fargate·Autopilot)', heads: ['컨트롤 플레인', 'etcd', '노드 OS', '노드 수', '파드'], cells: [{ label: '클라우드', tone: 'accent' }, { label: '클라우드', tone: 'accent' }, { label: '클라우드', tone: 'accent' }, { label: '클라우드', tone: 'accent' }, '내가'] },
-    ]}
-  />
+  <MkMatrix aria-label="운영 방식 셋과 구성 요소 다섯의 표. 직접 운영은 컨트롤 플레인, etcd, 노드 OS, 노드 수, 파드를 모두 내가 맡아요. 관리형 노드 그룹은 컨트롤 플레인과 etcd를 클라우드가 맡고, 노드까지 맡기면 파드 말고 모두 클라우드가 맡아요" />
 </Figure>
 
 GKE Autopilot은 노드, 확장, 보안 설정까지 Google이 관리해요. AWS의 Fargate는 파드마다 따로 떨어진 실행 환경을 마련해 줘요.
@@ -66,18 +61,7 @@ GKE Autopilot은 노드, 확장, 보안 설정까지 Google이 관리해요. AWS
 컨트롤 플레인 서버에는 들어갈 수 없어요. 그래서 etcd나 스케줄러의 지표를 직접 모으지 못하고, 클라우드가 열어 준 길로만 봐요.
 
 <Figure caption="EKS에서 컨트롤 플레인을 보는 길이에요. API 서버 지표는 그대로 읽히지만, 나머지는 클라우드가 열어 준 만큼만 보여요.">
-  <Tree
-    ariaLabel="EKS 컨트롤 플레인을 보는 길. API 서버 지표는 /metrics로 그대로, 스케줄러와 컨트롤러 매니저 지표는 1.28부터 metrics.eks.amazonaws.com으로, 컨트롤 플레인 로그는 종류마다 켜야 CloudWatch Logs로, etcd는 직접 볼 수 없어요"
-    root={{
-      label: 'EKS 컨트롤 플레인',
-      children: [
-        { label: 'API 서버 지표', note: 'API의 /metrics로 그대로 읽어요', tag: '늘', tone: 'accent' },
-        { label: '스케줄러·컨트롤러 매니저 지표', note: 'metrics.eks.amazonaws.com', tag: '1.28부터' },
-        { label: '컨트롤 플레인 로그', note: '종류마다 켜야 CloudWatch Logs로', tag: '기본 꺼짐', tone: 'warn' },
-        { label: 'etcd', note: '직접 들어가 볼 수 없어요', tag: '안 보여요' },
-      ],
-    }}
-  />
+  <MkEks aria-label="AWS가 운영하는 EKS 컨트롤 플레인을 보는 길. API 서버 지표는 /metrics로 늘 그대로 읽어요. 스케줄러·컨트롤러 매니저 지표는 1.28부터 metrics.eks.amazonaws.com으로 읽어요. 컨트롤 플레인 로그는 기본으로 꺼져 있어 켜야 CloudWatch Logs로 가요. etcd는 직접 들어가 볼 수 없어요" />
 </Figure>
 
 EKS의 컨트롤 플레인 로그는 다섯 종류예요. api, audit, authenticator, controllerManager, scheduler가 있어요.

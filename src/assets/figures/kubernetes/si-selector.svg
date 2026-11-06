@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 258" width="300" height="258">
+<rect x="86" y="6" width="128" height="48" rx="10" style="fill:var(--color-accent)" />
+<text x="150" y="26" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">결제 서비스</text>
+<text x="150" y="45" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-card)">app: pay</text>
+<text x="222" y="34" font-size="13" style="fill:var(--color-text-sub)">← 셀렉터</text>
+<line x1="120" y1="54" x2="76" y2="92" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="4 3" style="stroke:var(--color-warn)" />
+<line x1="93" y1="68" x2="103" y2="78" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="93" y1="78" x2="103" y2="68" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="12" y="100" width="80" height="36" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="52" y="122.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">파드</text>
+<rect x="17.7" y="141" width="68.6" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="52" y="156.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">app=pay</text>
+<text x="52" y="182" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">준비 안 됨</text>
+<path d="M150 54 L150 93.1" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 98 L154.3 91 L145.7 91 z" style="fill:var(--color-accent)" />
+<rect x="110" y="100" width="80" height="36" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="122.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="115.7" y="141" width="68.6" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="150" y="156.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">app=pay</text>
+<text x="150" y="182" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">준비됨</text>
+<rect x="208" y="100" width="80" height="36" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="248" y="122.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">파드</text>
+<rect x="213.7" y="141" width="68.6" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="248" y="156.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">app=web</text>
+<text x="248" y="182" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">레이블 다름</text>
+<text x="166" y="80" font-size="13" font-weight="700" style="fill:var(--color-accent)">요청</text>
+<rect x="4" y="200" width="292" height="54" rx="10" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="16" y="222" font-size="13" font-weight="700" style="fill:var(--color-text)">대상 목록(EndpointSlice)</text>
+<text x="16" y="243" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">10.244.1.6</text>
+<text x="284" y="243" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">준비된 파드 하나만</text>
+</svg>

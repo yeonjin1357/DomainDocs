@@ -17,6 +17,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/overview/components/
 updated: 2026-10-21
 ---
+import PnPod from '../../../assets/figures/kubernetes/pn-pod.svg';
 
 <KeyPoints>
   <Point title="파드는 가장 작은 실행 단위예요">
@@ -39,20 +40,7 @@ updated: 2026-10-21
 <Term term="kubernetes/pod">파드</Term>는 쿠버네티스에서 만들고 다룰 수 있는 가장 작은 실행 단위예요. 컨테이너 하나 이상과, 그 컨테이너들을 어떻게 돌릴지 적은 설명으로 이뤄져요.
 
 <Figure caption="한 파드 안의 두 컨테이너는 같은 IP를 쓰고 localhost로 통신해요. 공유 볼륨으로 파일도 함께 써요.">
-  <Flow
-    ariaLabel="IP 10.1.2.3을 가진 파드 안에 앱 컨테이너와 로그 수집 컨테이너가 있고, 둘이 공유 볼륨을 함께 쓰는 구조도"
-    nodes={[
-      { id: 'app', label: '앱 컨테이너', col: 0, row: 0, tone: 'accent' },
-      { id: 'log', label: '로그 수집', col: 1, row: 0, note: '보조 컨테이너' },
-      { id: 'vol', label: '공유 볼륨', col: 0, row: 1, note: '로그 파일' },
-    ]}
-    edges={[
-      { from: 'app', to: 'log', both: true },
-      { from: 'app', to: 'vol' },
-      { from: 'log', to: 'vol' },
-    ]}
-    groups={[{ label: '파드 · IP 10.1.2.3', cols: [0, 1], rows: [0, 1] }]}
-  />
+  <PnPod aria-label="IP 10.1.2.3인 파드 안에서 8080으로 듣는 앱 컨테이너와 로그 수집 보조 컨테이너가 localhost로 이야기해요. 앱이 공유 볼륨에 로그를 쓰면 보조 컨테이너가 읽어 가는 그림" />
 </Figure>
 
 대부분의 파드에는 컨테이너가 하나예요. 둘 이상이면 보통 주 앱 하나와, 로그를 모으거나 통신을 대신하는 보조 컨테이너예요.

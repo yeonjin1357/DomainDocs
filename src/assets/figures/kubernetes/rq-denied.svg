@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 252" width="300" height="252">
+<text x="40" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">사용자</text>
+<line x1="40" y1="26" x2="40" y2="186" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="150" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">API 서버</text>
+<line x1="150" y1="26" x2="150" y2="186" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="256" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">ReplicaSet</text>
+<line x1="256" y1="26" x2="256" y2="186" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M40 54 L145.1 54" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 54 L143 49.7 L143 58.3 z" style="fill:var(--color-text-sub)" />
+<text x="95" y="48" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">Deployment 만들기</text>
+<path d="M150 86 L44.9 86" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<path d="M40 86 L47 90.3 L47 81.7 z" style="fill:var(--color-accent)" />
+<text x="95" y="80" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">성공</text>
+<path d="M256 132 L154.9 132" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 132 L157 136.3 L157 127.7 z" style="fill:var(--color-text-sub)" />
+<text x="203" y="126" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">파드 만들기</text>
+<path d="M150 166 L251.1 166" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-warn)" />
+<path d="M256 166 L249 161.7 L249 170.3 z" style="fill:var(--color-warn)" />
+<text x="203" y="160" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">거부: 할당량 초과</text>
+<rect x="4" y="200" width="292" height="46" rx="10" style="fill:var(--color-warn-weak)" />
+<text x="150" y="219" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">파드는 만들어지지 않고, 흔적은</text>
+<text x="150" y="238" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">ReplicaSet의 FailedCreate 이벤트에만 남아요</text>
+</svg>

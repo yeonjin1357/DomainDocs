@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 270" width="300" height="270">
+<rect x="4" y="4" width="144" height="262" rx="12" style="fill:var(--color-card)" />
+<text x="76" y="26" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">가상 머신</text>
+<rect x="152" y="4" width="144" height="262" rx="12" style="fill:var(--color-card)" />
+<text x="224" y="26" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">컨테이너</text>
+<rect x="12" y="64" width="62" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="43" y="82.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">앱 A</text>
+<rect x="12" y="96" width="62" height="52" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="43" y="118" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">게스트</text>
+<text x="43" y="136" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">OS</text>
+<rect x="78" y="64" width="62" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="109" y="82.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">앱 B</text>
+<rect x="78" y="96" width="62" height="52" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="109" y="118" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">게스트</text>
+<text x="109" y="136" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">OS</text>
+<rect x="12" y="152" width="128" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="76" y="170.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">하이퍼바이저</text>
+<rect x="12" y="184" width="128" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="76" y="202.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">하드웨어</text>
+<rect x="160" y="64" width="62" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="191" y="82.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">앱 A</text>
+<rect x="226" y="64" width="62" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="257" y="82.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">앱 B</text>
+<path d="M160 98 h128" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-line)" />
+<rect x="160" y="120" width="128" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="224" y="138.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">컨테이너 런타임</text>
+<rect x="160" y="152" width="128" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="224" y="171" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">호스트 OS 커널</text>
+<rect x="160" y="184" width="128" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="224" y="202.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">하드웨어</text>
+<text x="76" y="234" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">앱마다 OS를 통째로</text>
+<text x="224" y="234" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">커널 하나를 함께 써요</text>
+<text x="76" y="254" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">무겁지만 격리가 단단해요</text>
+<text x="224" y="254" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">가볍지만 격리는 느슨해요</text>
+</svg>

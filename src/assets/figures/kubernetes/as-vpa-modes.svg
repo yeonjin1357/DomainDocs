@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 280" width="300" height="280">
+<text x="8" y="16" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">updateMode</text>
+<rect x="4" y="28" width="292" height="44" rx="9" style="fill:var(--color-card)" />
+<text x="14" y="47" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">Off</text>
+<text x="14" y="65" font-size="13" style="fill:var(--color-text-sub)">추천값만 status에 남겨요</text>
+<rect x="204.8" y="31" width="81.2" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="245.4" y="46.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">바꾸지 않음</text>
+<rect x="4" y="78" width="292" height="44" rx="9" style="fill:var(--color-card)" />
+<text x="14" y="97" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">Initial</text>
+<text x="14" y="115" font-size="13" style="fill:var(--color-text-sub)">파드가 새로 뜰 때만 적용해요</text>
+<rect x="217.5" y="81" width="68.5" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="251.8" y="96.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">새 파드만</text>
+<rect x="4" y="128" width="292" height="44" rx="9" style="fill:var(--color-card)" />
+<text x="14" y="147" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">Recreate</text>
+<text x="14" y="165" font-size="13" style="fill:var(--color-text-sub)">파드를 내보내고 새로 띄우며 적용</text>
+<rect x="217.5" y="131" width="68.5" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="251.8" y="146.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">다시 띄움</text>
+<rect x="4" y="178" width="292" height="44" rx="9" style="fill:var(--color-accent-weak)" />
+<text x="14" y="197" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">InPlaceOrRecreate</text>
+<text x="14" y="215" font-size="13" style="fill:var(--color-text-sub)">제자리에서 바꾸고, 안 되면 다시 띄워요</text>
+<rect x="204.8" y="181" width="81.2" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="245.4" y="196.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">제자리 먼저</text>
+<rect x="4" y="228" width="292" height="44" rx="9" style="fill:var(--color-card)" />
+<text x="14" y="247" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">InPlace</text>
+<text x="14" y="265" font-size="13" style="fill:var(--color-text-sub)">제자리에서만 바꾸고, 안 되면 기다려요</text>
+<rect x="246.6" y="231" width="39.4" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="266.3" y="246.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">알파</text>
+</svg>

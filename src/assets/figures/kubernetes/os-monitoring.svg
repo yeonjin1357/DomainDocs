@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 276" width="300" height="276">
+<rect x="2" y="2" width="296" height="270" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<rect x="12" y="14" width="132" height="34" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="78" y="35.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">Thanos Querier</text>
+<rect x="156" y="14" width="132" height="34" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="222" y="35.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">Alertmanager</text>
+<rect x="90" y="84" width="120" height="36" rx="8" style="fill:var(--color-accent)" />
+<text x="150" y="106.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">Prometheus</text>
+<path d="M86 48 L114.7 80.3" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M118 84 L116.6 75.9 L110.1 81.7 z" style="fill:var(--color-text-sub)" />
+<text x="90" y="74" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">질의</text>
+<path d="M182 84 L210.7 51.7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M214 48 L206.1 50.3 L212.6 56.1 z" style="fill:var(--color-text-sub)" />
+<text x="210" y="74" font-size="13" style="fill:var(--color-text-sub)">알림</text>
+<path d="M54 154 L114.9 124.2" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M119.3 122 L111.1 121.2 L114.9 129 z" style="fill:var(--color-accent)" />
+<rect x="8" y="154" width="92" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="54" y="173" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">node-</text>
+<text x="54" y="190" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">exporter</text>
+<path d="M150 154 L150 126.9" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 122 L145.7 129 L154.3 129 z" style="fill:var(--color-accent)" />
+<rect x="104" y="154" width="92" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="173" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">kube-state-</text>
+<text x="150" y="190" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">metrics</text>
+<path d="M246 154 L185.1 124.2" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M180.7 122 L185.1 129 L188.9 121.2 z" style="fill:var(--color-accent)" />
+<rect x="200" y="154" width="92" height="44" rx="8" stroke-width="1.4" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="246" y="173" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">openshift-</text>
+<text x="246" y="190" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">state-metrics</text>
+<text x="158" y="142" font-size="13" font-weight="600" style="fill:var(--color-accent)">모아요</text>
+<path d="M38 234.4 L40.9 234.6 L40.9 237.4 L38 237.6 L36.8 240.5 L38.7 242.7 L36.7 244.7 L34.5 242.8 L31.6 244 L31.4 246.9 L28.6 246.9 L28.4 244 L25.5 242.8 L23.3 244.7 L21.3 242.7 L23.2 240.5 L22 237.6 L19.1 237.4 L19.1 234.6 L22 234.4 L23.2 231.5 L21.3 229.3 L23.3 227.3 L25.5 229.2 L28.4 228 L28.6 225.1 L31.4 225.1 L31.6 228 L34.5 229.2 L36.7 227.3 L38.7 229.3 L36.8 231.5 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="30" cy="236" r="3.52" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="52" y="232" font-size="13" font-weight="700" style="fill:var(--color-accent)">Cluster Monitoring Operator</text>
+<text x="52" y="252" font-size="13" style="fill:var(--color-text-sub)">위 구성 요소를 모두 깔고 관리해요</text>
+</svg>

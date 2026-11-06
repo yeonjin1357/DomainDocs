@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 260" width="300" height="260">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">pay를 찾을 때</text>
+<circle cx="18" cy="40" r="9.5" style="fill:var(--color-accent)" />
+<text x="18" y="44.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">1</text>
+<text x="34" y="45" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">+ shop.svc.cluster.local</text>
+<rect x="250.6" y="29" width="39.4" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="270.3" y="44.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">찾음</text>
+<line x1="8" y1="64" x2="292" y2="64" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="8" y="88" font-size="13" font-weight="700" style="fill:var(--color-text)">api.example.com을 찾을 때</text>
+<text x="8" y="106" font-size="13" style="fill:var(--color-text-sub)">점이 5개보다 적어서 검색 도메인부터 붙여요</text>
+<circle cx="18" cy="130" r="9.5" style="fill:var(--color-warn)" />
+<text x="18" y="134.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">1</text>
+<text x="34" y="135" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">+ shop.svc.cluster.local</text>
+<rect x="250.6" y="119" width="39.4" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="270.3" y="134.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">없음</text>
+<circle cx="18" cy="160" r="9.5" style="fill:var(--color-warn)" />
+<text x="18" y="164.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">2</text>
+<text x="34" y="165" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">+ svc.cluster.local</text>
+<rect x="250.6" y="149" width="39.4" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="270.3" y="164.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">없음</text>
+<circle cx="18" cy="190" r="9.5" style="fill:var(--color-warn)" />
+<text x="18" y="194.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">3</text>
+<text x="34" y="195" font-size="13" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">+ cluster.local</text>
+<rect x="250.6" y="179" width="39.4" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="270.3" y="194.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">없음</text>
+<circle cx="18" cy="220" r="9.5" style="fill:var(--color-accent)" />
+<text x="18" y="224.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">4</text>
+<text x="34" y="225" font-size="13" font-weight="600" style="fill:var(--color-text)">원래 이름 그대로</text>
+<rect x="250.6" y="209" width="39.4" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="270.3" y="224.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">주소</text>
+<text x="150" y="252" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">없음 세 번(NXDOMAIN) 뒤에야 주소를 받아요</text>
+</svg>

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 262" width="300" height="262">
+<rect x="115" y="5" width="70" height="26" rx="8" style="fill:var(--color-accent)" />
+<text x="150" y="22.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">새 파드</text>
+<path d="M150 32 L150 45.8" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 50 L153.7 44 L146.3 44 z" style="fill:var(--color-accent)" />
+<rect x="4" y="54" width="292" height="104" rx="10" style="fill:var(--color-card)" />
+<text x="12" y="72" font-size="13" font-weight="700" style="fill:var(--color-text)">① 필터: 놓을 수 있나</text>
+<rect x="19" y="85" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<line x1="25" y1="93" x2="39" y2="93" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="25" y1="99" x2="39" y2="99" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="25" y1="105" x2="39" y2="105" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="32" cy="112.5" r="2" style="fill:var(--color-text-weak)" />
+<text x="32" y="136" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-weak)">노드 1</text>
+<line x1="41" y1="83" x2="51" y2="93" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="41" y1="93" x2="51" y2="83" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="32" y="152" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">자리 부족</text>
+<rect x="78" y="85" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<line x1="84" y1="93" x2="98" y2="93" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="84" y1="99" x2="98" y2="99" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="84" y1="105" x2="98" y2="105" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="91" cy="112.5" r="2" style="fill:var(--color-text-weak)" />
+<text x="91" y="136" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-weak)">노드 2</text>
+<line x1="100" y1="83" x2="110" y2="93" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="100" y1="93" x2="110" y2="83" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="91" y="152" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">taint</text>
+<rect x="137" y="85" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<line x1="143" y1="93" x2="157" y2="93" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="143" y1="99" x2="157" y2="99" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="143" y1="105" x2="157" y2="105" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<circle cx="150" cy="112.5" r="2" style="fill:var(--color-text-weak)" />
+<text x="150" y="136" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-weak)">노드 3</text>
+<line x1="159" y1="83" x2="169" y2="93" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="159" y1="93" x2="169" y2="83" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="150" y="152" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">레이블 다름</text>
+<rect x="196" y="85" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="202" y1="93" x2="216" y2="93" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="202" y1="99" x2="216" y2="99" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="202" y1="105" x2="216" y2="105" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="209" cy="112.5" r="2" style="fill:var(--color-accent)" />
+<text x="209" y="136" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">노드 4</text>
+<path d="M219.5 88 L223.4 91.9 L230.5 84.2" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="255" y="85" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="261" y1="93" x2="275" y2="93" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="261" y1="99" x2="275" y2="99" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="261" y1="105" x2="275" y2="105" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="268" cy="112.5" r="2" style="fill:var(--color-accent)" />
+<text x="268" y="136" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">노드 5</text>
+<path d="M278.5 88 L282.4 91.9 L289.5 84.2" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="4" y="166" width="292" height="92" rx="10" style="fill:var(--color-card)" />
+<text x="12" y="184" font-size="13" font-weight="700" style="fill:var(--color-text)">② 점수: 어디가 더 낫나</text>
+<rect x="186" y="196" width="46" height="30" rx="8" style="fill:var(--color-accent)" />
+<text x="209" y="216" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">80점</text>
+<rect x="245" y="196" width="46" height="30" rx="8" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="268" y="216" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">60점</text>
+<text x="12" y="216" font-size="13" style="fill:var(--color-text-sub)">남은 둘에 점수를 매겨요</text>
+<text x="209" y="248" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">노드 4에 놓아요</text>
+</svg>

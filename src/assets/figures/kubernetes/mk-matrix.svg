@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 274" width="300" height="274">
+<text x="115" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">직접</text>
+<text x="115" y="36" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">운영</text>
+<text x="189" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">관리형</text>
+<text x="189" y="36" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">노드 그룹</text>
+<text x="263" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">노드까지</text>
+<text x="263" y="36" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">맡김</text>
+<text x="8" y="67" font-size="13" font-weight="600" style="fill:var(--color-text)">컨트롤</text>
+<text x="8" y="83" font-size="13" font-weight="600" style="fill:var(--color-text)">플레인</text>
+<rect x="82" y="55" width="66" height="32" rx="7" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="115" y="75.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">내가</text>
+<rect x="156" y="55" width="66" height="32" rx="7" style="fill:var(--color-accent)" />
+<text x="189" y="75.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">클라우드</text>
+<rect x="230" y="55" width="66" height="32" rx="7" style="fill:var(--color-accent)" />
+<text x="263" y="75.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">클라우드</text>
+<text x="8" y="115" font-size="13" font-weight="600" style="fill:var(--color-text)">etcd</text>
+<rect x="82" y="95" width="66" height="32" rx="7" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="115" y="115.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">내가</text>
+<rect x="156" y="95" width="66" height="32" rx="7" style="fill:var(--color-accent)" />
+<text x="189" y="115.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">클라우드</text>
+<rect x="230" y="95" width="66" height="32" rx="7" style="fill:var(--color-accent)" />
+<text x="263" y="115.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">클라우드</text>
+<text x="8" y="155" font-size="13" font-weight="600" style="fill:var(--color-text)">노드 OS</text>
+<rect x="82" y="135" width="66" height="32" rx="7" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="115" y="155.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">내가</text>
+<rect x="156" y="135" width="66" height="32" rx="7" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="189" y="155.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">내가</text>
+<rect x="230" y="135" width="66" height="32" rx="7" style="fill:var(--color-accent)" />
+<text x="263" y="155.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">클라우드</text>
+<text x="8" y="195" font-size="13" font-weight="600" style="fill:var(--color-text)">노드 수</text>
+<rect x="82" y="175" width="66" height="32" rx="7" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="115" y="195.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">내가</text>
+<rect x="156" y="175" width="66" height="32" rx="7" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="189" y="195.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">내가</text>
+<rect x="230" y="175" width="66" height="32" rx="7" style="fill:var(--color-accent)" />
+<text x="263" y="195.5" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">클라우드</text>
+<text x="8" y="235" font-size="13" font-weight="600" style="fill:var(--color-text)">파드</text>
+<rect x="82" y="215" width="66" height="32" rx="7" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="115" y="235.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">내가</text>
+<rect x="156" y="215" width="66" height="32" rx="7" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="189" y="235.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">내가</text>
+<rect x="230" y="215" width="66" height="32" rx="7" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="263" y="235.5" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">내가</text>
+<text x="8" y="266" font-size="13" style="fill:var(--color-text-sub)">노드까지 맡김: Fargate, GKE Autopilot</text>
+</svg>

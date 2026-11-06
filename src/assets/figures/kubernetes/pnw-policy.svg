@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 214" width="300" height="214">
+<rect x="18" y="30" width="76" height="32" rx="8" style="fill:var(--color-accent)" />
+<text x="56" y="50.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">프런트</text>
+<text x="56" y="80" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">app=front</text>
+<rect x="18" y="124" width="76" height="32" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="56" y="144.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">다른 파드</text>
+<text x="56" y="174" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">app=batch</text>
+<rect x="170" y="50" width="124" height="104" rx="14" stroke-width="1.6" stroke-dasharray="5 4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="182" y="72" font-size="13" font-weight="700" style="fill:var(--color-accent)">정책</text>
+<text x="182" y="90" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="104" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-accent)">from: app=front</text>
+<rect x="197" y="108" width="70" height="32" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="232" y="128.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">주문</text>
+<path d="M94 46 L192 115.2" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M196 118 L192.8 110.4 L187.8 117.5 z" style="fill:var(--color-accent)" />
+<path d="M126 64 L130.2 68.2 L138 59.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<line x1="94" y1="140" x2="166" y2="132" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3" style="stroke:var(--color-warn)" />
+<line x1="164" y1="126" x2="176" y2="138" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="164" y1="138" x2="176" y2="126" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="150" y="206" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">정책이 걸리면 허락한 곳만 들어와요</text>
+</svg>

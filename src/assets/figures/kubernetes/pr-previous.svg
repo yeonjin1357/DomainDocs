@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 264" width="300" height="264">
+<text x="8" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">한 컨테이너의 실행</text>
+<rect x="8" y="30" width="76" height="30" rx="6" stroke-width="1.4" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="46" y="50" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-weak)">그 전</text>
+<rect x="88" y="30" width="102" height="30" rx="6" stroke-width="1.4" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="139" y="50" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">직전 실행</text>
+<rect x="194" y="30" width="98" height="30" rx="6" stroke-width="1.4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="243" y="50" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">지금 실행</text>
+<line x1="81" y1="67" x2="91" y2="77" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="81" y1="77" x2="91" y2="67" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="187" y1="67" x2="197" y2="77" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="187" y1="77" x2="197" y2="67" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="181" y1="7" x2="191" y2="17" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="181" y1="17" x2="191" y2="7" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="198" y="17" font-size="13" style="fill:var(--color-warn)">죽고 다시 시작</text>
+<path d="M33 109 Q33 106 36 106 H51 L59 114 V135 Q59 138 56 138 H36 Q33 138 33 135 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<path d="M51 106 V114 H59" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<line x1="39" y1="120" x2="53" y2="120" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="39" y1="125" x2="53" y2="125" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="39" y1="130" x2="48" y2="130" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<path d="M126 109 Q126 106 129 106 H144 L152 114 V135 Q152 138 149 138 H129 Q126 138 126 135 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<path d="M144 106 V114 H152" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<line x1="132" y1="120" x2="146" y2="120" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="132" y1="125" x2="146" y2="125" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="132" y1="130" x2="141" y2="130" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<path d="M230 109 Q230 106 233 106 H248 L256 114 V135 Q256 138 253 138 H233 Q230 138 230 135 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M248 106 V114 H256" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<line x1="236" y1="120" x2="250" y2="120" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="236" y1="125" x2="250" y2="125" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="236" y1="130" x2="245" y2="130" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<path d="M139 186 L139 148.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<path d="M139 144 L134.7 151 L143.3 151 z" style="fill:var(--color-warn)" />
+<path d="M243 186 L243 148.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M243 144 L238.7 151 L247.3 151 z" style="fill:var(--color-accent)" />
+<text x="46" y="164" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">kubectl로</text>
+<text x="46" y="182" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">볼 수 없어요</text>
+<text x="139" y="204" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">kubectl logs</text>
+<text x="139" y="222" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">--previous</text>
+<text x="243" y="204" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">kubectl logs</text>
+<text x="243" y="222" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">옵션 없이</text>
+<text x="150" y="254" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">원인은 대개 직전 실행 로그의 끝에 남아요</text>
+</svg>

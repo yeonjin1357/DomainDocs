@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 262" width="300" height="262">
+<rect x="4" y="4" width="292" height="32" rx="6" style="fill:var(--color-line)" />
+<text x="14" y="25" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">찾는 로그</text>
+<text x="168" y="25" font-size="13" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="64" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text-sub)">kubectl logs</text>
+<text x="258" y="25" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">노드 밖</text>
+<text x="14" y="61" font-size="13" font-weight="600" style="fill:var(--color-text)">지금 컨테이너</text>
+<path d="M162.5 51 L166.4 54.9 L173.5 47.2" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="168" y="70" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">최근 파일만</text>
+<path d="M252 56 L256.2 60.2 L264 51.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<line x1="4" y1="76" x2="296" y2="76" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="14" y="101" font-size="13" font-weight="600" style="fill:var(--color-text)">바로 전 컨테이너</text>
+<path d="M162.5 91 L166.4 94.9 L173.5 87.2" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="168" y="110" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="64" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text-sub)">--previous</text>
+<path d="M252 96 L256.2 100.2 L264 91.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<line x1="4" y1="116" x2="296" y2="116" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<rect x="134" y="116" width="68" height="40" rx="0" style="fill:var(--color-warn-weak)" />
+<text x="14" y="141" font-size="13" font-weight="600" style="fill:var(--color-text)">그보다 앞 컨테이너</text>
+<line x1="162.5" y1="130.5" x2="173.5" y2="141.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="162.5" y1="141.5" x2="173.5" y2="130.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<path d="M252 136 L256.2 140.2 L264 131.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<line x1="4" y1="156" x2="296" y2="156" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<rect x="134" y="156" width="68" height="40" rx="0" style="fill:var(--color-warn-weak)" />
+<text x="14" y="181" font-size="13" font-weight="600" style="fill:var(--color-text)">지운 파드</text>
+<line x1="162.5" y1="170.5" x2="173.5" y2="181.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="162.5" y1="181.5" x2="173.5" y2="170.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<path d="M252 176 L256.2 180.2 L264 171.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<line x1="4" y1="196" x2="296" y2="196" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<rect x="134" y="196" width="68" height="40" rx="0" style="fill:var(--color-warn-weak)" />
+<text x="14" y="221" font-size="13" font-weight="600" style="fill:var(--color-text)">사라진 노드</text>
+<line x1="162.5" y1="210.5" x2="173.5" y2="221.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="162.5" y1="221.5" x2="173.5" y2="210.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<path d="M252 216 L256.2 220.2 L264 211.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="4" y="4" width="292" height="232" rx="6" stroke-width="1.5" style="fill:none;stroke:var(--color-line)" />
+<text x="296" y="254" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">노드 밖은 보내 둔 데까지 봐요</text>
+</svg>

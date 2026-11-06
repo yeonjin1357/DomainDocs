@@ -14,6 +14,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
 updated: 2026-10-29
 ---
+import RsSurge from '../../../assets/figures/kubernetes/rs-surge.svg';
 
 <Situation>
   새 버전을 배포했는데 20분째 끝나지 않아요. 원하는 파드는 3개인데 새 버전은 1개만 떴고, 그마저 준비되지 않았어요. 옛 버전 파드 3개가 아직 요청을 받고 있어요.
@@ -101,17 +102,7 @@ Deployment는 정해 둔 시간(`progressDeadlineSeconds`, 기본 600초) 동안
 원하는 수는 3개인데 파드가 4개인 건 롤링 업데이트의 기본값 때문이에요. maxSurge 25%는 올림해 1개를 더 띄우게 하고, maxUnavailable 25%는 내림해 0개라 옛 파드를 먼저 줄이지 않아요.
 
 <Figure caption="원하는 3개의 25%는 0.75개예요. maxSurge는 올림해 새 파드 1개를 더 띄우고, maxUnavailable은 내림해 0개라 옛 파드 3개를 그대로 둬요.">
-  <Strip
-    ariaLabel="원하는 3개만큼 옛 파드 3개가 그대로 있고, maxSurge로 새 파드 1개가 더 떠서 파드가 4개인 칸 띠"
-    rows={[
-      {
-        label: '지금 있는 파드 4개',
-        cells: [{ label: '옛', tone: 'accent' }, { label: '옛', tone: 'accent' }, { label: '옛', tone: 'accent' }, { label: '새', tone: 'warn' }],
-      },
-    ]}
-    marks={[{ at: 3, label: 'maxSurge로 1개 더', tone: 'warn' }]}
-    ranges={[{ from: 0, to: 2, label: '원하는 3개, 줄이지 않음' }]}
-  />
+  <RsSurge aria-label="원하는 3개 × 25% = 0.75개. maxUnavailable은 내림해 0개라 옛 파드 3개를 그대로 두어 요청을 받게 하고, maxSurge는 올림해 1개라 새 파드 하나를 더 띄웠지만 준비되지 않은 그림" />
 </Figure>
 
 <Checkpoints>

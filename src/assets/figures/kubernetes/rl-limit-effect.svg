@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 256" width="300" height="256">
+<rect x="4" y="4" width="144" height="248" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">CPU 한도</text>
+<line x1="18" y1="124" x2="134" y2="124" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="18" y1="62.5" x2="134" y2="62.5" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="5 4" style="stroke:var(--color-warn)" />
+<text x="20" y="56.5" font-size="13" font-weight="700" style="fill:var(--color-warn)">한도</text>
+<path d="M18 99.4 L41.2 87.1 L64.4 53.2 L87.6 47.1 L110.8 56.3 L134 80.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M18 99.4 L41.2 87.1 L58.6 62.5 L117.8 62.5 L134 80.9" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="16" y="146" font-size="13" font-weight="600" style="fill:var(--color-text-weak)">원한 만큼</text>
+<text x="80" y="146" font-size="13" font-weight="700" style="fill:var(--color-accent)">실제</text>
+<line x1="16" y1="160" x2="136" y2="160" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="16" y="182" font-size="13" font-weight="700" style="fill:var(--color-text)">한도까지만 돌려요</text>
+<text x="16" y="202" font-size="13" font-weight="600" style="fill:var(--color-accent)">→ 앱이 느려져요</text>
+<text x="16" y="226" font-size="13" style="fill:var(--color-text-sub)">흔적</text>
+<text x="16" y="244" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">스로틀링 횟수·시간</text>
+<rect x="152" y="4" width="144" height="248" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">메모리 한도</text>
+<line x1="166" y1="124" x2="282" y2="124" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<line x1="166" y1="62.5" x2="282" y2="62.5" stroke-width="1.6" stroke-linecap="butt" stroke-dasharray="5 4" style="stroke:var(--color-warn)" />
+<text x="168" y="56.5" font-size="13" font-weight="700" style="fill:var(--color-warn)">한도</text>
+<path d="M166 99.4 L200.8 80.9 L224 62.5" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M224 62.5 L224 117.8" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 3" style="fill:none;stroke:var(--color-warn)" />
+<path d="M224 117.8 L258.8 93.2 L282 77.8" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<line x1="219" y1="55.5" x2="229" y2="65.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="219" y1="65.5" x2="229" y2="55.5" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="164" y="146" font-size="13" font-weight="600" style="fill:var(--color-warn)">넘는 순간 끝내요</text>
+<line x1="164" y1="160" x2="284" y2="160" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="164" y="182" font-size="13" font-weight="700" style="fill:var(--color-text)">프로세스를 끝내요</text>
+<text x="164" y="202" font-size="13" font-weight="600" style="fill:var(--color-warn)">→ 다시 시작해요</text>
+<text x="164" y="226" font-size="13" style="fill:var(--color-text-sub)">흔적</text>
+<text x="164" y="244" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">OOMKilled</text>
+</svg>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 304" width="300" height="304">
+<rect x="4" y="4" width="144" height="270" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">계획된 중단</text>
+<text x="16" y="44" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">voluntary</text>
+<rect x="47" y="67" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="53" y1="75" x2="67" y2="75" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="53" y1="81" x2="67" y2="81" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="53" y1="87" x2="67" y2="87" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="60" cy="94.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M102 88.4 L104.9 88.6 L104.9 91.4 L102 91.6 L100.8 94.5 L102.7 96.7 L100.7 98.7 L98.5 96.8 L95.6 98 L95.4 100.9 L92.6 100.9 L92.4 98 L89.5 96.8 L87.3 98.7 L85.3 96.7 L87.2 94.5 L86 91.6 L83.1 91.4 L83.1 88.6 L86 88.4 L87.2 85.5 L85.3 83.3 L87.3 81.3 L89.5 83.2 L92.4 82 L92.6 79.1 L95.4 79.1 L95.6 82 L98.5 83.2 L100.7 81.3 L102.7 83.3 L100.8 85.5 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="94" cy="90" r="3.52" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="16" y="128" font-size="13" font-weight="600" style="fill:var(--color-text)">노드 점검·업그레이드</text>
+<text x="16" y="146" font-size="13" font-weight="600" style="fill:var(--color-text)">노드 줄이기</text>
+<line x1="16" y1="168" x2="136" y2="168" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<path d="M16.5 186 L20.4 189.9 L27.5 182.2" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="34" y="191" font-size="13" font-weight="700" style="fill:var(--color-accent)">PDB가 막아요</text>
+<text x="16" y="220" font-size="13" style="fill:var(--color-text-sub)">대비</text>
+<text x="16" y="240" font-size="13" font-weight="600" style="fill:var(--color-text)">PDB를 두고</text>
+<text x="16" y="258" font-size="13" font-weight="600" style="fill:var(--color-text)">한 노드씩 비워요</text>
+<rect x="152" y="4" width="144" height="270" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">뜻밖의 중단</text>
+<text x="164" y="44" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">involuntary</text>
+<rect x="211" y="67" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<line x1="217" y1="75" x2="231" y2="75" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="217" y1="81" x2="231" y2="81" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="217" y1="87" x2="231" y2="87" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<circle cx="224" cy="94.5" r="2" style="fill:var(--color-warn)" />
+<line x1="237" y1="65" x2="247" y2="75" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="237" y1="75" x2="247" y2="65" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="164" y="128" font-size="13" font-weight="600" style="fill:var(--color-text)">하드웨어 고장</text>
+<text x="164" y="146" font-size="13" font-weight="600" style="fill:var(--color-text)">커널 패닉, 압박 축출</text>
+<line x1="164" y1="168" x2="284" y2="168" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="165" y1="181" x2="175" y2="191" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="165" y1="191" x2="175" y2="181" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="182" y="191" font-size="13" font-weight="700" style="fill:var(--color-warn)">PDB로 못 막아요</text>
+<text x="164" y="220" font-size="13" style="fill:var(--color-text-sub)">대비</text>
+<text x="164" y="240" font-size="13" font-weight="600" style="fill:var(--color-text)">복제본 여러 개를</text>
+<text x="164" y="258" font-size="13" font-weight="600" style="fill:var(--color-text)">노드에 나눠 둬요</text>
+<text x="150" y="296" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">PDB는 축출 요청을 거치는 것만 막아요</text>
+</svg>

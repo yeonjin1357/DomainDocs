@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 224" width="300" height="224">
+<rect x="4" y="6" width="136" height="76" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="24" font-size="13" font-weight="600" style="fill:var(--color-text)">주문 파드</text>
+<rect x="18" y="32" width="108" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="72" y="51.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">프록시</text>
+<text x="72" y="104" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">reporter="source"</text>
+<rect x="50.6" y="117" width="42.8" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="72" y="132.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">+1건</text>
+<rect x="160" y="6" width="136" height="76" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="170" y="24" font-size="13" font-weight="600" style="fill:var(--color-text)">결제 파드</text>
+<rect x="174" y="32" width="108" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="228" y="51.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">프록시</text>
+<text x="228" y="104" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="132" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text-sub)">reporter="destination"</text>
+<rect x="206.6" y="117" width="42.8" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="228" y="132.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">+1건</text>
+<path d="M126 47 L167.1 47" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M172 47 L165 42.7 L165 51.3 z" style="fill:var(--color-accent)" />
+<text x="150" y="38" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">1건</text>
+<line x1="4" y1="152" x2="296" y2="152" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="11" y1="171" x2="21" y2="181" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="11" y1="181" x2="21" y2="171" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="30" y="181" font-size="13" style="fill:var(--color-text-sub)">그냥 더하면</text>
+<text x="288" y="182" font-size="15" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">2건</text>
+<path d="M10 208 L14.2 212.2 L22 203.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="30" y="213" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="172" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-accent)">reporter="destination"</text>
+<text x="288" y="214" font-size="15" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">1건</text>
+</svg>

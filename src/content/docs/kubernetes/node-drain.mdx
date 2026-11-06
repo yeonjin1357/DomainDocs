@@ -25,6 +25,9 @@ sources:
     url: https://github.com/kubernetes/kube-state-metrics/blob/main/docs/metrics/policy/poddisruptionbudget-metrics.md
 updated: 2026-11-03
 ---
+import NdDisruptions from '../../../assets/figures/kubernetes/nd-disruptions.svg';
+import NdEvict from '../../../assets/figures/kubernetes/nd-evict.svg';
+import NdPdb from '../../../assets/figures/kubernetes/nd-pdb.svg';
 
 <KeyPoints>
   <Point title="막고, 비우고, 돌려놔요">
@@ -47,14 +50,7 @@ updated: 2026-11-03
 파드는 누가 지우거나, 하드웨어나 시스템이 고장 나야 사라져요. 쿠버네티스는 이 둘을 나눠 불러요. 고장처럼 피할 수 없는 쪽은 뜻밖의 중단, 사람이 일부러 하는 쪽은 계획된 중단이에요.
 
 <Figure caption="두 중단의 차이예요. PDB는 계획된 중단 가운데 축출 요청을 거치는 것만 막아요.">
-  <Compare
-    columns={['계획된 중단(voluntary)', '뜻밖의 중단(involuntary)']}
-    rows={[
-      { label: '예', values: ['노드 점검·업그레이드, 노드 줄이기', '하드웨어 고장, 커널 패닉, 노드 압박 축출'] },
-      { label: 'PDB가 막나', values: ['축출 요청을 거치면 막아요', '못 막아요'] },
-      { label: '대비', values: ['PDB, 한 노드씩 비우기', '복제본 여러 개, 노드에 나눠 두기'] },
-    ]}
-  />
+  <NdDisruptions aria-label="계획된 중단(voluntary)은 노드 점검·업그레이드와 노드 줄이기라 PDB가 막을 수 있어, PDB를 두고 한 노드씩 비워요. 뜻밖의 중단(involuntary)은 하드웨어 고장, 커널 패닉, 압박 축출이라 PDB로 못 막아서, 복제본 여러 개를 노드에 나눠 두는 두 경우 그림" />
 </Figure>
 
 노드 점검이나 쿠버네티스 버전 업그레이드는 계획된 중단이에요. 노드를 하나씩 비우고, 고치고, 다시 받는 일을 되풀이해요.
@@ -66,17 +62,7 @@ updated: 2026-11-03
 다음으로 `kubectl drain <노드>`로 파드를 내보내요. 이 일을 <Term term="kubernetes/drain">drain</Term>이라고 해요. drain은 cordon까지 함께 하고, 노드의 파드마다 축출(eviction)을 요청해요.
 
 <Figure caption="drain이 파드 하나를 내보내는 순서예요. API 서버가 PDB를 보고 지금은 안 된다고 하면, drain은 잠시 뒤 다시 요청해요.">
-  <Sequence
-    ariaLabel="drain이 API 서버에 파드 축출을 요청하고, PDB 여유가 없어 429로 거절되자 잠시 뒤 다시 요청하며, 허용되면 API 서버가 파드에 종료를 알리는 순서"
-    participants={['drain', 'API 서버', '파드']}
-    messages={[
-      { from: 'drain', to: 'API 서버', label: '파드 축출 요청' },
-      { from: 'API 서버', to: 'drain', label: '429 거절(PDB 여유 0)', dashed: true, tone: 'warn' },
-      { from: 'drain', to: 'API 서버', label: '잠시 뒤 다시 요청' },
-      { from: 'API 서버', to: 'drain', label: '허용', dashed: true, tone: 'accent' },
-      { from: 'API 서버', to: '파드', label: '종료 신호(유예 시간)' },
-    ]}
-  />
+  <NdEvict aria-label="drain이 API 서버에 파드 축출을 요청하고 PDB 여유가 0이라 429를 받아요. 잠시 뒤 다시 요청해 허용되면 API 서버가 파드에 종료 신호를 보내는 주고받기 그림. 대신할 파드가 준비되어 여유가 생기면 허용돼요" />
 </Figure>
 
 허용된 파드는 정해진 유예 시간 안에 정리하고 끝나요. 그 파드를 만든 Deployment나 StatefulSet이 빈자리를 보고 새 파드를 만들고, 스케줄러가 다른 노드에 놓아요.
@@ -108,18 +94,7 @@ PDB가 지키는 건 축출 요청뿐이에요. 파드나 Deployment를 직접 �
 ## PDB는 앱 모양에 맞춰요
 
 <Figure caption="쿠버네티스 문서가 드는 앱별 PDB 예시예요. 복제본이 하나뿐이면 PDB로 지킬 수 없어서, 점검 때 잠깐 멈추는 것을 받아들이거나 미리 상의해요.">
-  <Tree
-    ariaLabel="앱 모양에 따른 PDB. 상태 없는 웹은 minAvailable 90%, 쿼럼이 있는 저장소는 쿼럼 크기, 복제본 하나는 PDB 없이 두거나 maxUnavailable 0, 다시 돌릴 수 있는 Job은 PDB를 두지 않아요"
-    root={{
-      label: '앱 모양',
-      children: [
-        { label: '상태 없는 웹 서버', note: '처리량을 10% 넘게 줄이지 않기', tag: 'minAvailable 90%' },
-        { label: '쿼럼이 있는 저장소(5개)', note: '과반이 늘 살아 있기', tag: 'minAvailable 3' },
-        { label: '복제본 하나', note: '0이면 drain이 멈춰요', tag: 'PDB 없음 / 0', tone: 'warn' },
-        { label: '다시 돌릴 수 있는 Job', note: '새 파드가 이어서 해요', tag: 'PDB 없음' },
-      ],
-    }}
-  />
+  <NdPdb aria-label="앱 모양별 PDB. 상태 없는 웹 서버는 처리량을 10% 넘게 줄이지 않게 minAvailable 90%, 쿼럼이 있는 저장소 5개는 과반이 늘 살아 있게 minAvailable 3이에요. 복제본 하나는 0으로 두면 drain이 멈추니 PDB 없이 두거나 0으로 두고, 다시 돌릴 수 있는 Job은 새 파드가 이어서 하니 PDB를 두지 않아요" />
 </Figure>
 
 `maxUnavailable: 0`이나, `minAvailable`을 복제본 수와 같게 두면 계획된 축출을 하나도 허락하지 않아요. 그 파드가 있는 노드는 drain이 끝나지 않아요. 쿠버네티스 문서도 이 경우 drain이 끝나지 않는다고 적어 두었어요.

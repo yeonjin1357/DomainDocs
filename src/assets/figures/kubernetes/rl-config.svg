@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 236" width="300" height="236">
+<text x="8" y="18" font-size="14" font-weight="700" style="fill:var(--color-text)">CPU</text>
+<text x="292" y="18" font-size="13" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">requests 250m · limits 500m</text>
+<rect x="16" y="36" width="268" height="28" rx="5" style="fill:var(--color-line)" />
+<rect x="16" y="36" width="134" height="28" rx="5" style="fill:var(--color-accent-weak)" />
+<rect x="16" y="36" width="67" height="28" rx="5" style="fill:var(--color-accent)" />
+<text x="49.5" y="55" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">요청</text>
+<line x1="150" y1="30" x2="150" y2="70" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="16" y="86" font-size="13" font-weight="400" style="fill:var(--color-text-sub)">0</text>
+<text x="83" y="86" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">250m</text>
+<text x="150" y="86" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">500m</text>
+<text x="217" y="86" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">750m</text>
+<text x="284" y="86" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text-sub)">1코어</text>
+<text x="8" y="120" font-size="14" font-weight="700" style="fill:var(--color-text)">메모리</text>
+<text x="292" y="120" font-size="13" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">requests 256Mi · limits 512Mi</text>
+<rect x="16" y="138" width="268" height="28" rx="5" style="fill:var(--color-line)" />
+<rect x="16" y="138" width="268" height="28" rx="5" style="fill:var(--color-accent-weak)" />
+<rect x="16" y="138" width="134" height="28" rx="5" style="fill:var(--color-accent)" />
+<text x="83" y="157" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">요청</text>
+<line x1="284" y1="132" x2="284" y2="172" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="16" y="188" font-size="13" font-weight="400" style="fill:var(--color-text-sub)">0</text>
+<text x="83" y="188" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">128Mi</text>
+<text x="150" y="188" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">256Mi</text>
+<text x="217" y="188" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">384Mi</text>
+<text x="284" y="188" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">512Mi</text>
+<rect x="8" y="214" width="14" height="14" rx="3" style="fill:var(--color-accent)" />
+<text x="28" y="226" font-size="13" style="fill:var(--color-text-sub)">요청: 늘 받아요</text>
+<rect x="130" y="214" width="14" height="14" rx="3" style="fill:var(--color-accent-weak)" />
+<text x="150" y="226" font-size="13" style="fill:var(--color-text-sub)">여유가 있으면 써요</text>
+<line x1="266" y1="212" x2="266" y2="230" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="274" y="226" font-size="13" font-weight="700" style="fill:var(--color-warn)">한도</text>
+</svg>

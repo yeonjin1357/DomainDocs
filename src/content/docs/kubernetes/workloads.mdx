@@ -25,6 +25,9 @@ sources:
     url: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
 updated: 2026-10-30
 ---
+import WlOwner from '../../../assets/figures/kubernetes/wl-owner.svg';
+import WlRolling from '../../../assets/figures/kubernetes/wl-rolling.svg';
+import WlCronjob from '../../../assets/figures/kubernetes/wl-cronjob.svg';
 
 <KeyPoints>
   <Point title="파드는 워크로드가 만들어요">
@@ -63,22 +66,7 @@ updated: 2026-10-30
 가장 흔한 워크로드는 <Term term="kubernetes/deployment">Deployment</Term>예요. Deployment는 직접 파드를 만들지 않고, 그 아래의 ReplicaSet을 만들어요. ReplicaSet은 정해 둔 개수의 파드가 언제나 떠 있도록 지키는 일만 해요.
 
 <Figure caption="Deployment는 ReplicaSet을 만들고, ReplicaSet이 파드 세 개를 지켜요. 파드 하나가 죽으면 ReplicaSet이 새로 띄워요.">
-  <Flow
-    ariaLabel="Deployment가 ReplicaSet을 만들고, ReplicaSet이 파드 세 개를 만드는 구조도"
-    nodes={[
-      { id: 'dep', label: 'Deployment', col: 1, row: 0, tone: 'accent', note: '버전·바꾸는 방식' },
-      { id: 'rs', label: 'ReplicaSet', col: 1, row: 1, note: '파드 3개 유지' },
-      { id: 'p1', label: '파드', col: 0, row: 2 },
-      { id: 'p2', label: '파드', col: 1, row: 2 },
-      { id: 'p3', label: '파드', col: 2, row: 2 },
-    ]}
-    edges={[
-      { from: 'dep', to: 'rs' },
-      { from: 'rs', to: 'p1' },
-      { from: 'rs', to: 'p2' },
-      { from: 'rs', to: 'p3' },
-    ]}
-  />
+  <WlOwner aria-label="Deployment가 ReplicaSet을 만들고, ReplicaSet이 파드 3개를 지켜요. 파드 하나가 죽자 ReplicaSet이 새 파드를 띄우는 그림" />
 </Figure>
 
 그럼 Deployment는 왜 따로 있을까요? 버전을 바꿀 때 쓰기 위해서예요. 새 이미지로 바꾸면 Deployment가 새 ReplicaSet을 만들고, 새 쪽은 늘리고 옛 쪽은 줄여요.
@@ -87,15 +75,8 @@ updated: 2026-10-30
 
 이렇게 조금씩 바꿔 끼우는 방식을 <Term term="kubernetes/rolling-update">롤링 업데이트</Term>라고 해요. 기본 설정에서는 원하는 개수의 75% 이상이 늘 떠 있게 하고, 125%를 넘게 띄우지 않아요.
 
-<Figure caption="파드 4개를 새 버전으로 바꾸는 예시예요. 새 파드가 늘어나는 만큼 옛 파드가 줄어서, 떠 있는 파드가 3개 아래로 내려가지 않아요.">
-  <MiniLineChart
-    ariaLabel="옛 버전 파드가 4개에서 0개로 줄고, 새 버전 파드가 0개에서 4개로 느는 그래프"
-    yMax={5}
-    series={[
-      { label: '옛 버전', values: [4, 4, 3, 3, 2, 2, 1, 1, 0], tone: 'sub', value: '4 → 0개' },
-      { label: '새 버전', values: [0, 1, 1, 2, 2, 3, 3, 4, 4], tone: 'accent', value: '0 → 4개' },
-    ]}
-  />
+<Figure caption="파드 4개를 새 버전으로 바꾸는 예시예요. 새 파드를 하나 띄우고, 준비되면 옛 파드를 하나 내리기를 되풀이해요. 기본 설정에서는 준비된 파드가 3개 아래로, 모든 파드가 5개 위로 가지 않아요.">
+  <WlRolling aria-label="옛 버전 파드 4개에서 시작해 새 파드 하나를 띄워 모두 5개가 되고, 새 파드가 준비되면 옛 파드 하나를 내려 다시 4개가 되기를 되풀이해 새 버전 파드 4개로 끝나는 단계 그림. 기본 설정에서는 준비된 파드 3개 이상, 모든 파드 5개 이하를 지켜요" />
 </Figure>
 
 새 버전 파드가 준비되지 않으면, Deployment는 정해 둔 범위를 넘어서까지 옛 파드를 내리지 않아요. 그래서 잘못된 버전을 배포해도 앱 전체가 한꺼번에 멈추지는 않아요. 문제가 있으면 이전 버전으로 되돌릴 수도 있어요.
@@ -119,20 +100,7 @@ StatefulSet의 파드는 `db-0`, `db-1`처럼 번호가 붙은 이름을 받아�
 CronJob은 정해진 일정마다 Job을 만들어요. 리눅스의 crontab 한 줄과 같아서, "매일 새벽 2시에 백업"처럼 적어요.
 
 <Figure caption="매일 새벽 2시에 백업하는 CronJob의 예시예요. CronJob은 날마다 Job을 새로 만들고, 성공과 실패는 Job마다 따로 남아요. 3일 Job은 기본 6번을 다시 시도하고도 실패한 경우예요.">
-  <Flow
-    ariaLabel="매일 새벽 2시 CronJob이 1일, 2일, 3일에 Job을 하나씩 만들고, 1일과 2일 Job은 성공, 3일 Job은 실패한 구조도"
-    nodes={[
-      { id: 'cron', label: 'CronJob', col: 1, row: 0, note: '매일 새벽 2시', tone: 'accent' },
-      { id: 'j1', label: 'Job', col: 0, row: 1, note: '1일 · 성공' },
-      { id: 'j2', label: 'Job', col: 1, row: 1, note: '2일 · 성공' },
-      { id: 'j3', label: 'Job', col: 2, row: 1, note: '3일 · 실패', tone: 'warn' },
-    ]}
-    edges={[
-      { from: 'cron', to: 'j1' },
-      { from: 'cron', to: 'j2' },
-      { from: 'cron', to: 'j3' },
-    ]}
-  />
+  <WlCronjob aria-label="매일 새벽 2시 CronJob이 1일, 2일, 3일에 Job을 하나씩 만들고, Job마다 파드를 띄워요. 1일과 2일 Job은 성공, 3일 Job은 파드를 6번 다시 띄우고도 실패한 그림" />
 </Figure>
 
 Job이 실패하거나 CronJob이 제때 돌지 않을 때 보는 순서는 <Term slug="kubernetes/job-failed">Job·CronJob이 실패하거나 안 돌 때</Term>에 있어요.

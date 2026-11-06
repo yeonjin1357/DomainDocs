@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 222" width="300" height="222">
+<path d="M44 46 L44 85.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M44 90 L48.3 83 L39.7 83 z" style="fill:var(--color-accent)" />
+<path d="M80 99 L106.4 75.3" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M110 72 L101.9 73.5 L107.7 79.9 z" style="fill:var(--color-accent)" />
+<path d="M80 113 L106.4 136.7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<path d="M110 140 L107.7 132.1 L101.9 138.5 z" style="fill:var(--color-warn)" />
+<path d="M248 46 L248 85.1" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M248 90 L252.3 83 L243.7 83 z" style="fill:var(--color-text-weak)" />
+<path d="M204 99 L177.6 75.3" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M174 72 L176.3 79.9 L182.1 73.5 z" style="fill:var(--color-text-weak)" />
+<path d="M204 113 L177.6 136.7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M174 140 L182.1 138.5 L176.3 132.1 z" style="fill:var(--color-text-weak)" />
+<rect x="8" y="14" width="72" height="32" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="44" y="34.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">인그레스</text>
+<rect x="8" y="90" width="72" height="32" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="44" y="110.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">서비스</text>
+<rect x="110" y="51" width="64" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="142" y="70.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드 1</text>
+<rect x="110" y="131" width="64" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="142" y="150.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">파드 2</text>
+<text x="142" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">준비 안 됨</text>
+<rect x="204" y="14" width="88" height="32" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="248" y="34.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">Deployment</text>
+<rect x="204" y="90" width="88" height="32" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="248" y="110.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">ReplicaSet</text>
+<line x1="8" y1="210" x2="30" y2="210" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<text x="36" y="215" font-size="13" style="fill:var(--color-text-sub)">요청 길(셀렉터)</text>
+<line x1="168" y1="210" x2="190" y2="210" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<text x="196" y="215" font-size="13" style="fill:var(--color-text-sub)">소유 관계</text>
+</svg>

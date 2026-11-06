@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 268" width="300" height="268">
+<rect x="29" y="14" width="26" height="17" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M23 35 L27 31 L57 31 L61 35 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="70" y="30" font-size="13" font-weight="600" style="fill:var(--color-text)">바깥 사용자</text>
+<path d="M42 42 L42 61.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M42 66 L46.3 59 L37.7 59 z" style="fill:var(--color-accent)" />
+<rect x="4" y="68" width="292" height="96" rx="12" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="14" y="83" width="44" height="26" rx="4" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="22" y1="96" x2="31" y2="96" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<path d="M31 96 L40 89 L46.5 89" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M50 89 L45 85.9 L45 92.1 z" style="fill:var(--color-accent)" />
+<path d="M31 96 L46.5 96" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M50 96 L45 92.9 L45 99.1 z" style="fill:var(--color-accent)" />
+<path d="M31 96 L40 103 L46.5 103" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M50 103 L45 99.9 L45 106.1 z" style="fill:var(--color-accent)" />
+<text x="66" y="92" font-size="13" font-weight="700" style="fill:var(--color-accent)">인그레스 컨트롤러</text>
+<text x="66" y="110" font-size="13" style="fill:var(--color-text-sub)">규칙대로 나눠요</text>
+<text x="176" y="92" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">/api</text>
+<text x="212" y="92" font-size="13" font-weight="600" style="fill:var(--color-text)">→ API 서비스</text>
+<text x="176" y="112" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">/</text>
+<text x="212" y="112" font-size="13" font-weight="600" style="fill:var(--color-text)">→ 웹 서비스</text>
+<text x="16" y="152" font-size="13" style="fill:var(--color-text-sub)">컨트롤러가 없으면 규칙만 있고 아무 일도 안 일어나요</text>
+<path d="M78 164 L78 185.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M78 190 L82.3 183 L73.7 183 z" style="fill:var(--color-text-sub)" />
+<rect x="16" y="192" width="124" height="30" rx="8" style="fill:var(--color-accent)" />
+<text x="78" y="212" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">API 서비스</text>
+<line x1="48" y1="222" x2="48" y2="236" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="108" y1="222" x2="108" y2="236" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<rect x="23" y="237" width="50" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="48" y="254.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="83" y="237" width="50" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="108" y="254.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<path d="M222 164 L222 185.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M222 190 L226.3 183 L217.7 183 z" style="fill:var(--color-text-sub)" />
+<rect x="160" y="192" width="124" height="30" rx="8" style="fill:var(--color-accent)" />
+<text x="222" y="212" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">웹 서비스</text>
+<line x1="192" y1="222" x2="192" y2="236" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="252" y1="222" x2="252" y2="236" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<rect x="167" y="237" width="50" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="192" y="254.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="227" y="237" width="50" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="252" y="254.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+</svg>

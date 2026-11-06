@@ -27,3 +27,4 @@ docs.redhat.com이 503을 돌려줘서, 같은 문서의 원본 저장소(opensh
 | 라우터는 서비스의 엔드포인트(파드 IP)로 바로 보내고 서비스 IP를 거치지 않음 | https://docs.openshift.com/container-platform/3.4/architecture/core_concepts/routes.html |
 
 - 메모: 그림이 라우터 → 서비스 → 파드로 그려져 있던 것을, 라우터가 서비스에서 주소만 얻고 파드로 바로 보내도록 고쳤어요.
+- (2026-11-06 그림 다시 그림) 모니터링 그림의 화살표(exporter → Prometheus 모음, Thanos Querier → Prometheus 질의, Prometheus → Alertmanager 알림)는 위 기본 구성 문서의 역할 설명을 그림으로 옮긴 거예요.

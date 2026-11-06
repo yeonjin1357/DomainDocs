@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 226" width="300" height="226">
+<text x="76" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">이미지 A</text>
+<path d="M14 38 l8 -8 H138 l-8 8 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M130 38 l8 -8 V64 l-8 8 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="14" y="38" width="116" height="34" rx="2" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="24" y="60" font-size="13" font-weight="700" style="fill:var(--color-text)">A의 앱 레이어</text>
+<path d="M76 74 L76 101.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M76 106 L80.3 99 L71.7 99 z" style="fill:var(--color-accent)" />
+<text x="224" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">이미지 B</text>
+<path d="M162 38 l8 -8 H286 l-8 8 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M278 38 l8 -8 V64 l-8 8 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="162" y="38" width="116" height="34" rx="2" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="172" y="60" font-size="13" font-weight="700" style="fill:var(--color-text)">B의 앱 레이어</text>
+<path d="M224 74 L224 101.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M224 106 L228.3 99 L219.7 99 z" style="fill:var(--color-accent)" />
+<path d="M14 112 l8 -8 H286 l-8 8 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-accent)" />
+<path d="M278 112 l8 -8 V148 l-8 8 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-accent)" />
+<rect x="14" y="112" width="264" height="44" rx="2" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="24" y="132" font-size="13" font-weight="700" style="fill:var(--color-accent)">alpine 3.20 베이스</text>
+<text x="24" y="149" font-size="13" style="fill:var(--color-text-sub)">sha256:08bc…</text>
+<rect x="4" y="180" width="292" height="40" rx="10" style="fill:var(--color-accent-weak)" />
+<text x="150" y="205" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">다이제스트가 같아서 노드에는 한 번만 저장돼요</text>
+</svg>

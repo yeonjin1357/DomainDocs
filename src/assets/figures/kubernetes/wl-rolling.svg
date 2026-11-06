@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 298" width="300" height="298">
+<text x="240" y="16" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">준비</text>
+<text x="280" y="16" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">모두</text>
+<text x="8" y="45" font-size="13" font-weight="600" style="fill:var(--color-text)">처음</text>
+<rect x="94" y="30" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="119" y="30" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="144" y="30" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="169" y="30" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="240" y="45" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">4</text>
+<text x="280" y="45" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">4</text>
+<text x="8" y="79" font-size="13" font-weight="600" style="fill:var(--color-text)">새 하나 띄움</text>
+<rect x="94" y="64" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="119" y="64" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="144" y="64" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="169" y="64" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="194" y="64" width="20" height="20" rx="5" stroke-width="1.5" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="240" y="79" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">4</text>
+<text x="280" y="79" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">5</text>
+<text x="8" y="113" font-size="13" font-weight="600" style="fill:var(--color-text)">옛 하나 내림</text>
+<rect x="94" y="98" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="119" y="98" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="144" y="98" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="169" y="98" width="20" height="20" rx="5" style="fill:var(--color-accent)" />
+<text x="240" y="113" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">4</text>
+<text x="280" y="113" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">4</text>
+<text x="8" y="147" font-size="13" font-weight="600" style="fill:var(--color-text)">새 하나 띄움</text>
+<rect x="94" y="132" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="119" y="132" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="144" y="132" width="20" height="20" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="169" y="132" width="20" height="20" rx="5" style="fill:var(--color-accent)" />
+<rect x="194" y="132" width="20" height="20" rx="5" stroke-width="1.5" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="240" y="147" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">4</text>
+<text x="280" y="147" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">5</text>
+<text x="64" y="181" font-size="13" style="fill:var(--color-text-sub)">같은 순서를 되풀이해요</text>
+<text x="8" y="215" font-size="13" font-weight="600" style="fill:var(--color-text)">끝</text>
+<rect x="94" y="200" width="20" height="20" rx="5" style="fill:var(--color-accent)" />
+<rect x="119" y="200" width="20" height="20" rx="5" style="fill:var(--color-accent)" />
+<rect x="144" y="200" width="20" height="20" rx="5" style="fill:var(--color-accent)" />
+<rect x="169" y="200" width="20" height="20" rx="5" style="fill:var(--color-accent)" />
+<text x="240" y="215" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">4</text>
+<text x="280" y="215" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">4</text>
+<line x1="4" y1="236" x2="296" y2="236" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="8" y="258" font-size="13" style="fill:var(--color-text-sub)">기본 설정에서는</text>
+<text x="292" y="258" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">준비 3개 이상, 모두 5개 이하</text>
+<rect x="8" y="276" width="16" height="16" rx="4" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="30" y="289" font-size="13" style="fill:var(--color-text-sub)">옛 버전</text>
+<rect x="104" y="276" width="16" height="16" rx="4" style="fill:var(--color-accent)" />
+<text x="126" y="289" font-size="13" style="fill:var(--color-text-sub)">새 버전</text>
+<rect x="200" y="276" width="16" height="16" rx="4" stroke-width="1.5" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="222" y="289" font-size="13" style="fill:var(--color-text-sub)">뜨는 중</text>
+</svg>

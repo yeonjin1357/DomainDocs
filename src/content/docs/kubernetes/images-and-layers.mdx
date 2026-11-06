@@ -21,6 +21,10 @@ sources:
     url: https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/
 updated: 2026-10-30
 ---
+import IlLayers from '../../../assets/figures/kubernetes/il-layers.svg';
+import IlRm from '../../../assets/figures/kubernetes/il-rm.svg';
+import IlShare from '../../../assets/figures/kubernetes/il-share.svg';
+import IlCow from '../../../assets/figures/kubernetes/il-cow.svg';
 
 <KeyPoints>
   <Point title="이미지는 레이어를 쌓은 것이에요">
@@ -50,15 +54,7 @@ RUN rm /big.bin
 ```
 
 <Figure caption="위 이미지의 레이어를 docker history로 본 크기예요. 아래 세 층은 읽기 전용이고, 컨테이너를 띄우면 맨 위에 쓰기 레이어가 하나 더 생겨요.">
-  <Layers
-    ariaLabel="위에서부터 컨테이너 쓰기 레이어, rm 레이어 4.1kB, dd 레이어 52.4MB, alpine 베이스 8.47MB가 쌓인 계층도"
-    layers={[
-      { label: '컨테이너 쓰기 레이어', note: '실행 중에 바뀐 것', tone: 'accent' },
-      { label: 'RUN rm /big.bin', note: '4.1kB · 지움 표시만' },
-      { label: 'RUN dd … big.bin', note: '52.4MB' },
-      { label: 'alpine 3.20 베이스', note: '8.47MB' },
-    ]}
-  />
+  <IlLayers aria-label="위에서부터 실행 중에 바뀐 것이 담기는 컨테이너 쓰기 레이어, 지움 표시만 하는 RUN rm 레이어 4.1kB, 50MB 파일을 만든 RUN dd 레이어 52.4MB, 운영체제 파일인 alpine 3.20 베이스 8.47MB가 쌓인 그림. 아래 세 층은 읽기 전용 이미지예요" />
 </Figure>
 
 파일을 바꾸는 명령마다 <Term term="kubernetes/image-layer">레이어</Term>가 하나씩 생겨요. 레이어에는 앞 레이어와 달라진 파일, 즉 더한 것, 고친 것, 지운 것만 담겨요.
@@ -74,31 +70,13 @@ RUN rm /big.bin
 그래서 큰 파일은 만든 명령과 같은 RUN 안에서 지워야 이미지가 작아져요. Docker 문서도 뒤 레이어에서 지운 캐시가 이미지 크기에 그대로 남는다고 해요.
 
 <Figure caption="50MB 파일을 어느 RUN에서 지우느냐에 따라 이미지 크기가 달라요. 컨테이너 안에서는 둘 다 안 보이지만, 다음 RUN에서 지우면 52.4MB 레이어가 그대로 남아요.">
-  <Compare
-    columns={['다음 RUN에서 지움', '같은 RUN에서 지움']}
-    rows={[
-      { label: 'big.bin', values: ['dd 레이어에 52.4MB 남아요', '레이어에 남지 않아요'] },
-      { label: '컨테이너 안에서', values: ['안 보여요', '안 보여요'] },
-      { label: '이미지 크기', values: ['줄지 않아요', '작아져요'] },
-    ]}
-  />
+  <IlRm aria-label="다음 RUN에서 지우면 alpine 8.47MB, RUN dd 52.4MB, RUN rm 4.1kB가 쌓여 레이어를 더하면 약 61MB이고, 같은 RUN에서 dd와 rm을 함께 하면 alpine 8.47MB에 거의 0인 레이어라 약 8.5MB예요. 두 경우 모두 컨테이너 안에선 파일이 안 보여요" />
 </Figure>
 
 ## 같은 레이어는 나눠 써요
 
 <Figure caption="alpine 3.20으로 만든 두 이미지가 첫 레이어를 같은 다이제스트로 가리켜요. 노드에는 한 번만 저장돼요.">
-  <Flow
-    ariaLabel="이미지 A와 이미지 B가 같은 alpine 베이스 레이어를 함께 가리키는 구조도"
-    nodes={[
-      { id: 'a', label: '이미지 A', col: 0, row: 0 },
-      { id: 'b', label: '이미지 B', col: 2, row: 0 },
-      { id: 'base', label: 'alpine 베이스', col: 1, row: 1, note: 'sha256:08bc…', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'a', to: 'base' },
-      { from: 'b', to: 'base' },
-    ]}
-  />
+  <IlShare aria-label="이미지 A와 이미지 B가 저마다 앱 레이어를 얹고, 다이제스트 sha256:08bc…가 같은 alpine 3.20 베이스 레이어를 함께 가리켜 노드에는 한 번만 저장되는 그림" />
 </Figure>
 
 레이어는 내용으로 만든 지문인 다이제스트로 가리켜요. 내용이 같으면 지문도 같아서, 노드에 이미 있는 레이어는 다시 받지 않아요. 직접 만든 세 이미지는 모두 첫 레이어가 `sha256:08bc4e53…`로 같았어요.
@@ -117,14 +95,8 @@ C /etc/motd
 A /new.txt
 ```
 
-<Figure caption="위 실험의 컨테이너예요. 고친 /etc/motd는 쓰기 레이어에 복사본으로 생기고, 컨테이너는 위층의 복사본을 봐요. 아래 이미지 레이어의 원본은 그대로예요.">
-  <Layers
-    ariaLabel="위층인 쓰기 레이어에 복사해서 고친 /etc/motd와 새로 만든 /new.txt가 있고, 아래 읽기 전용 이미지 레이어에는 /etc/motd 원본이 그대로 있는 계층도"
-    layers={[
-      { label: '컨테이너 쓰기 레이어', note: 'C /etc/motd 복사해서 고친 것 · A /new.txt 새로 만든 것', tone: 'accent' },
-      { label: '이미지 레이어(읽기 전용)', note: '/etc/motd 원본 그대로 · 같은 이미지의 컨테이너와 함께 써요' },
-    ]}
-  />
+<Figure caption="위 실험의 컨테이너예요. 고친 /etc/motd는 쓰기 레이어에 복사본으로 생기고, 컨테이너는 그 복사본을 봐요. 이미지 레이어의 원본은 그대로예요.">
+  <IlCow aria-label="컨테이너가 보는 파일 가운데 /etc/motd는 쓰기 레이어의 복사본을, /new.txt는 쓰기 레이어의 새 파일을, /bin/sh는 읽기 전용 이미지 레이어의 파일을 봐요. 이미지 레이어의 /etc/motd 원본은 그대로라 같은 이미지의 다른 컨테이너와 함께 쓰는 그림" />
 </Figure>
 
 쓰기 레이어는 컨테이너를 지우면 함께 사라져요. 남겨야 할 데이터는 볼륨에 둬요. 볼륨은 <Term slug="kubernetes/config-and-storage">설정과 저장소</Term>에서 다뤄요.

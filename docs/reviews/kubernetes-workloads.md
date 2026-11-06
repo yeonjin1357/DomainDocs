@@ -15,3 +15,4 @@
 | CronJob = 일정마다 Job 생성, crontab 한 줄과 같음, 백업·리포트 용도 | https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/ |
 
 - 메모: 롤링 업데이트 그래프는 파드 4개 기준의 단순화한 예시예요. 실제 순서는 준비 시간에 따라 달라요.
+- (2026-11-06 그림 다시 그림) 롤링 업데이트 그림은 파드 4개에 기본값 25%를 적용한 예시예요. maxSurge는 4 × 25% = 1(올림), maxUnavailable도 1(내림)이라 준비 3개 이상, 모두 5개 이하예요. '새 하나 띄움 → 옛 하나 내림'을 되풀이하는 차례는 이해를 돕는 단순화예요.

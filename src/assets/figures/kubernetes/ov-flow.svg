@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 368" width="300" height="368">
+<circle cx="118" cy="16" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M107 38 C107 26 129 26 129 38 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="138" y="20" font-size="13" font-weight="700" style="fill:var(--color-text)">사용자</text>
+<text x="138" y="38" font-size="13" font-weight="600" style="fill:var(--color-accent)">① 파드 3개를 원해요</text>
+<rect x="4" y="54" width="292" height="160" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="72" font-size="13" font-weight="600" style="fill:var(--color-text)">컨트롤 플레인</text>
+<path d="M118 42 L118 77.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M118 82 L122.3 75 L113.7 75 z" style="fill:var(--color-accent)" />
+<rect x="70" y="84" width="96" height="30" rx="8" style="fill:var(--color-accent)" />
+<text x="118" y="103.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">API 서버</text>
+<path d="M235 73 V99 A17 5.5 0 0 0 269 99 V73" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M235 86 A17 5.5 0 0 0 269 86" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<ellipse cx="252" cy="73" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<text x="252" y="120" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">etcd</text>
+<text x="252" y="136" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">② 적어 둬요</text>
+<path d="M170.2 92 L227.8 92" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M232 92 L226 88.3 L226 95.7 z" style="fill:var(--color-text-sub)" />
+<path d="M166 92 L172 95.7 L172 88.3 z" style="fill:var(--color-text-sub)" />
+<rect x="12" y="152" width="104" height="50" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="64" y="174" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">컨트롤러</text>
+<text x="64" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">③ 파드를 만들어요</text>
+<rect x="192" y="152" width="98" height="50" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="241" y="174" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">스케줄러</text>
+<text x="241" y="192" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">④ 노드를 정해요</text>
+<path d="M87.5 117.4 L66.5 146.6" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M64 150 L70.5 147.3 L64.5 143 z" style="fill:var(--color-text-sub)" />
+<path d="M90 114 L83.5 116.7 L89.5 121 z" style="fill:var(--color-text-sub)" />
+<path d="M153.8 115.9 L218.2 148.1" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M222 150 L218.3 144 L215 150.6 z" style="fill:var(--color-text-sub)" />
+<path d="M150 114 L153.7 120 L157 113.4 z" style="fill:var(--color-text-sub)" />
+<rect x="4" y="238" width="142" height="100" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="256" font-size="13" font-weight="600" style="fill:var(--color-text)">노드 1</text>
+<rect x="16" y="262" width="118" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="75" y="279.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">kubelet</text>
+<rect x="26" y="301" width="44" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="48" y="318.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="84" y="301" width="44" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="106" y="318.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<rect x="154" y="238" width="142" height="100" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="164" y="256" font-size="13" font-weight="600" style="fill:var(--color-text)">노드 2</text>
+<rect x="166" y="262" width="118" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="225" y="279.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">kubelet</text>
+<rect x="203" y="301" width="44" height="26" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="225" y="318.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">파드</text>
+<line x1="128" y1="120" x2="128" y2="224" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<path d="M128 115 L123.7 122 L132.3 122 z" style="fill:var(--color-accent)" />
+<path d="M128 224 L79 258.2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M75 261 L83.2 260.6 L78.3 253.4 z" style="fill:var(--color-accent)" />
+<path d="M128 224 L220.4 259.3" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M225 261 L220 254.5 L216.9 262.6 z" style="fill:var(--color-accent)" />
+<text x="150" y="360" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">⑤ kubelet이 컨테이너를 띄우고 ⑥ 상태를 알려요</text>
+</svg>

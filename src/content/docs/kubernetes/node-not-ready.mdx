@@ -18,6 +18,7 @@ sources:
     url: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 updated: 2026-10-29
 ---
+import NnrPressure from '../../../assets/figures/kubernetes/nnr-pressure.svg';
 
 <Situation>
   노드 목록에서 worker-3이 NotReady로 바뀌었어요. 그 노드 위의 파드들은 아직 Running으로 보이는데, 몇 분 뒤 다른 노드에 같은 파드가 새로 뜨기 시작했어요.
@@ -70,18 +71,7 @@ Ready 말고도 노드는 자원 압박을 따로 조건으로 알려요. 압박
 압박 조건이 켜지면 kubelet은 노드를 지키려고 파드를 쫓아내기 시작해요. 이걸 노드 압박 축출(node-pressure eviction)이라고 해요. 기본 기준은 리눅스 노드에서 쓸 수 있는 메모리 100Mi 미만, 노드 파일 시스템 여유 10% 미만 같은 값이에요.
 
 <Figure caption="압박 조건이 켜지면 두 가지가 함께 일어나요. 새 파드가 오지 않게 taint가 붙고, kubelet이 있던 파드를 쫓아내요. Ready는 True 그대로일 수 있어요.">
-  <Flow
-    ariaLabel="노드의 압박 조건이 켜지면 새 파드를 막는 taint가 붙고, kubelet이 있던 파드를 쫓아내는 구조도"
-    nodes={[
-      { id: 'p', label: '압박 조건', col: 1, row: 0, note: 'True로 켜짐', tone: 'warn' },
-      { id: 't', label: 'taint', col: 0, row: 1, note: '새 파드 막음' },
-      { id: 'e', label: '축출', col: 2, row: 1, note: '파드 내보냄', tone: 'warn' },
-    ]}
-    edges={[
-      { from: 'p', to: 't' },
-      { from: 'p', to: 'e', tone: 'warn' },
-    ]}
-  />
+  <NnrPressure aria-label="DiskPressure가 True로 켜진 노드에 taint가 붙어 새 파드가 들어오지 못하고, kubelet이 있던 파드 하나를 노드 밖으로 내보내는 그림. Ready는 True 그대로일 수 있어요" />
 </Figure>
 
 디스크 압박이라면 노드의 로그와 컨테이너 이미지가 쌓이지 않았는지 봐요. 서버 디스크를 보는 순서는 <Term slug="server/disk-filling-up">디스크가 차오를 때</Term>와 같아요.
