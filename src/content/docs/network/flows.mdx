@@ -23,6 +23,8 @@ sources:
     url: https://sflow.org/packetSamplingBasics/index.htm
 updated: 2026-10-30
 ---
+import FlowExport from '../../../assets/figures/network/flow-export.svg';
+import FlowNetflowSflow from '../../../assets/figures/network/flow-netflow-sflow.svg';
 
 <KeyPoints>
   <Point title="흐름은 같은 길로 오간 패킷 묶음이에요">
@@ -56,19 +58,8 @@ updated: 2026-10-30
 
 ## 장비가 세어 보내요
 
-<Figure caption="라우터나 스위치가 흐름 기록을 만들어 수집기로 보내요. 수집기가 기록을 모아 '누가 얼마나 썼나'를 정렬해 보여 줘요.">
-  <Flow
-    ariaLabel="라우터가 흐름 기록을 수집기로 보내고, 수집기가 모은 기록을 분석 화면이 보여 주는 구조도"
-    nodes={[
-      { id: 'router', label: '라우터', col: 0, row: 0, note: '흐름을 세요' },
-      { id: 'collector', label: '수집기', col: 2, row: 0, note: '기록을 모아요', tone: 'accent' },
-      { id: 'ui', label: '분석 화면', col: 2, row: 1, note: '상위 사용자' },
-    ]}
-    edges={[
-      { from: 'router', to: 'collector', label: '흐름 기록', tone: 'accent' },
-      { from: 'collector', to: 'ui' },
-    ]}
-  />
+<Figure caption="라우터가 지나가는 패킷을 흐름마다 세어 기록을 만들고 수집기로 보내요. 수집기가 기록을 모아 '누가 얼마나 썼나'를 정렬해 보여 줘요.">
+  <FlowExport aria-label="두 흐름의 패킷이 라우터를 지나고, 라우터가 흐름 기록(10.0.1.5에서 10.0.9.20:443으로 1.2GB, 10.0.2.8에서 10.0.9.30:5432로 0.4GB)을 만들어 UDP로 수집기에 보내면, 수집기가 많이 쓴 곳 순서로 보여 주는 그림" />
 </Figure>
 
 흐름을 세어 보내는 쪽을 내보내는 쪽(exporter), 받아 모으는 쪽을 수집기라고 해요. 기록은 보통 UDP로 보내요. IPFIX 수집기는 기본으로 4739번 포트에서, sFlow 수집기는 UDP 6343번 포트에서 받아요.
@@ -112,16 +103,8 @@ UDP는 받았다는 확인이 없어서, 중간에 기록이 사라져도 장비
 
 ## NetFlow·IPFIX와 sFlow
 
-<Figure caption="NetFlow·IPFIX는 장비가 흐름을 묶어 센 결과를 보내요. sFlow는 패킷 몇 개 중 하나를 떠서 그 머리 부분을 보내고, 묶는 일은 수집기가 해요.">
-  <Compare
-    columns={['NetFlow·IPFIX', 'sFlow']}
-    rows={[
-      { label: '보내는 것', values: ['장비가 묶어 센 흐름 기록', '표본 패킷의 머리 부분'] },
-      { label: '흐름으로 묶는 곳', values: ['장비', '수집기'] },
-      { label: '샘플링', values: ['설정에 따라 써요', '늘 N개 중 1개'] },
-      { label: '정한 곳', values: ['Cisco(v9), IETF(IPFIX)', 'sFlow.org'] },
-    ]}
-  />
+<Figure caption="NetFlow·IPFIX는 장비가 흐름을 묶어 센 결과를 보내요. sFlow는 패킷 N개 중 하나를 떠서 그 머리 부분을 보내고, 묶는 일은 수집기가 해요.">
+  <FlowNetflowSflow aria-label="위 NetFlow·IPFIX는 라우터가 지나가는 패킷을 모두 흐름으로 묶어 센 기록을 수집기에 보내고, 샘플링은 설정에 따라 써요. 아래 sFlow는 스위치가 패킷 N개 중 1개를 떠서 머리 복사본을 수집기에 보내고, 묶어 세는 일은 수집기가 해요" />
 </Figure>
 
 <Term term="network/netflow">NetFlow</Term>는 Cisco가 만든 형식이고, 그 9판(v9)을 바탕으로 IETF가 IPFIX를 표준으로 만들었어요. IPFIX 메시지의 버전 번호는 10이라, NetFlow v10이라고도 불러요.

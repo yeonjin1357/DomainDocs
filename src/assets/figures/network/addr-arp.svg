@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 276" width="300" height="276">
+<rect x="4" y="4" width="144" height="186" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="24" font-size="13" font-weight="700" style="fill:var(--color-text)">① 모두에게 물어요</text>
+<path d="M30 128 L56.8 104.7" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M61 101 L51.7 102.5 L58.2 110 z" style="fill:var(--color-accent)" />
+<rect x="17" y="129" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="23" y1="137" x2="37" y2="137" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="143" x2="37" y2="143" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="149" x2="37" y2="149" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="30" cy="156.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M75.7 101 L75.9 122.4" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M76 128 L80.9 119.9 L70.9 120.1 z" style="fill:var(--color-accent)" />
+<rect x="63" y="129" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="69" y1="137" x2="83" y2="137" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="69" y1="143" x2="83" y2="143" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="69" y1="149" x2="83" y2="149" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="76" cy="156.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M90.3 101 L117.7 124.4" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M122 128 L119.1 119 L112.7 126.6 z" style="fill:var(--color-accent)" />
+<rect x="109" y="129" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="115" y1="137" x2="129" y2="137" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="115" y1="143" x2="129" y2="143" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="115" y1="149" x2="129" y2="149" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="122" cy="156.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M46 85 L52 79 L104 79 L98 85 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M98 85 L104 79 L104 97 L98 103 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="46" y="85" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="51.2" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="58.5" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="65.8" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="73.2" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="80.5" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="87.8" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="30" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">A</text>
+<text x="76" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">B(10.30)</text>
+<text x="122" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">C</text>
+<path d="M25.3 37.5  H126.7 Q132.7 37.5 132.7 43.5 V56.5 Q132.7 62.5 126.7 62.5 L80 62.5 L76 68.5 L72 62.5 H25.3 Q19.3 62.5 19.3 56.5 V43.5 Q19.3 37.5 25.3 37.5 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="76" y="54.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">10.30 누구예요?</text>
+<rect x="152" y="4" width="144" height="186" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="24" font-size="13" font-weight="700" style="fill:var(--color-text)">② B만 답해요</text>
+<path d="M209 101 L182.2 124.3" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M178 128 L187.3 126.5 L180.8 119 z" style="fill:var(--color-accent)" />
+<rect x="165" y="129" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="171" y1="137" x2="185" y2="137" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="171" y1="143" x2="185" y2="143" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="171" y1="149" x2="185" y2="149" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="178" cy="156.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M224 128 L223.7 106.6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M223.7 101 L218.8 109.1 L228.7 108.9 z" style="fill:var(--color-accent)" />
+<rect x="211" y="129" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="217" y1="137" x2="231" y2="137" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="217" y1="143" x2="231" y2="143" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="217" y1="149" x2="231" y2="149" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="224" cy="156.5" r="2" style="fill:var(--color-text-sub)" />
+<line x1="238.3" y1="101" x2="270" y2="128" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<rect x="257" y="129" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="263" y1="137" x2="277" y2="137" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="263" y1="143" x2="277" y2="143" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="263" y1="149" x2="277" y2="149" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="270" cy="156.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M194 85 L200 79 L252 79 L246 85 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M246 85 L252 79 L252 97 L246 103 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="194" y="85" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="199.2" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="206.5" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="213.8" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="221.2" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="228.5" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="235.8" y="92" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="178" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">A</text>
+<text x="224" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">B(10.30)</text>
+<text x="270" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">C</text>
+<path d="M176.5 37.5  H271.5 Q277.5 37.5 277.5 43.5 V56.5 Q277.5 62.5 271.5 62.5 L228 62.5 L224 68.5 L220 62.5 H176.5 Q170.5 62.5 170.5 56.5 V43.5 Q170.5 37.5 176.5 37.5 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="224" y="54.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">나예요, aa:bb…</text>
+<text x="8" y="216" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">A의 ARP 표에 적어요</text>
+<rect x="4" y="226" width="292" height="48" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 250 V232 Q4.8 226.8 10 226.8 H290 Q295.3 226.8 295.3 232 V250 z" style="fill:var(--color-line)" />
+<path d="M4.8 250 H295.3 V268 Q295.3 273.3 290 273.3 H10 Q4.8 273.3 4.8 268 z" style="fill:var(--color-accent-weak)" />
+<text x="12" y="242.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">IP 주소</text>
+<text x="144" y="242.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">MAC 주소</text>
+<text x="12" y="266.7" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">192.168.10.30</text>
+<text x="144" y="266.7" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">aa:bb:cc:11:22:33</text>
+</svg>

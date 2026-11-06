@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 362" width="300" height="362">
+<text x="150" y="18" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">ifHCInOctets를 60초 간격으로 읽어요</text>
+<line x1="60" y1="52" x2="240" y2="52" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-line)" />
+<circle cx="60" cy="52" r="5" style="fill:var(--color-text-sub)" />
+<circle cx="240" cy="52" r="5" style="fill:var(--color-text-sub)" />
+<text x="60" y="40" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">0초</text>
+<text x="240" y="40" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">60초</text>
+<text x="60" y="76" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">1,000,000,000</text>
+<text x="240" y="76" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">4,750,000,000</text>
+<rect x="30" y="94" width="240" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="150" y="113" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">늘어난 수 3,750,000,000바이트</text>
+<path d="M150 122 L150 137.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M150 142 L154.3 135 L145.7 135 z" style="fill:var(--color-text-weak)" />
+<text x="162" y="137" font-size="13" font-weight="700" style="fill:var(--color-accent)">× 8 (비트로)</text>
+<rect x="30" y="142" width="240" height="28" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="150" y="161" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">30,000,000,000비트</text>
+<path d="M150 170 L150 185.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M150 190 L154.3 183 L145.7 183 z" style="fill:var(--color-text-weak)" />
+<text x="162" y="185" font-size="13" font-weight="700" style="fill:var(--color-accent)">÷ 60초</text>
+<rect x="30" y="190" width="240" height="28" rx="8" style="fill:var(--color-accent-weak)" />
+<text x="150" y="209" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">500,000,000bps = 500Mbps</text>
+<path d="M150 218 L150 233.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M150 238 L154.3 231 L145.7 231 z" style="fill:var(--color-text-weak)" />
+<text x="162" y="233" font-size="13" font-weight="700" style="fill:var(--color-accent)">÷ 1Gbps</text>
+<rect x="30" y="238" width="240" height="28" rx="8" style="fill:var(--color-accent)" />
+<text x="150" y="257" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">받는 쪽 사용률 50%</text>
+<rect x="20" y="286" width="260" height="18" rx="9" style="fill:var(--color-line)" />
+<rect x="20" y="286" width="130" height="18" rx="9" style="fill:var(--color-accent)" />
+<text x="26" y="324" font-size="13" font-weight="700" style="fill:var(--color-accent)">500Mbps</text>
+<text x="280" y="324" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">회선 1Gbps</text>
+<text x="150" y="352" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">보내는 쪽(ifHCOutOctets)도 따로 계산해요</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 270" width="300" height="270">
+<path d="M4 10 Q4 4 10 4 H158 L172 18 V194 Q172 200 166 200 H10 Q4 200 4 194 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M158 4 V18 H172" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">서버 인증서</text>
+<text x="16" y="50" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">이름(SAN)</text>
+<rect x="14" y="58" width="146" height="28" rx="6" style="fill:var(--color-accent-weak)" />
+<text x="22" y="77" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">api.example.com</text>
+<text x="16" y="104" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">기간</text>
+<rect x="14" y="112" width="146" height="28" rx="6" style="fill:var(--color-accent-weak)" />
+<text x="22" y="131" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">08.07 ~ 11.05</text>
+<text x="16" y="158" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">서명</text>
+<rect x="14" y="166" width="146" height="28" rx="6" style="fill:var(--color-accent-weak)" />
+<text x="22" y="185" font-size="13" font-weight="700" style="fill:var(--color-accent)">중간 CA가 서명</text>
+<circle cx="146" cy="30" r="9" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M141 37 L139 46 L144 43 L148 46 L151 37" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M168.2 72 L181.8 72" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M186 72 L180 68.3 L180 75.7 z" style="fill:var(--color-text-weak)" />
+<path d="M164 72 L170 75.7 L170 68.3 z" style="fill:var(--color-text-weak)" />
+<path d="M192 72 L196.2 76.2 L204 67.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="212" y="70" font-size="13" font-weight="700" style="fill:var(--color-text)">접속한 주소</text>
+<text x="212" y="88" font-size="13" style="fill:var(--color-text-sub)">같아야 해요</text>
+<path d="M168.2 126 L181.8 126" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M186 126 L180 122.3 L180 129.7 z" style="fill:var(--color-text-weak)" />
+<path d="M164 126 L170 129.7 L170 122.3 z" style="fill:var(--color-text-weak)" />
+<path d="M192 126 L196.2 130.2 L204 121.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="212" y="124" font-size="13" font-weight="700" style="fill:var(--color-text)">지금 시각</text>
+<text x="212" y="142" font-size="13" style="fill:var(--color-text-sub)">사이여야 해요</text>
+<path d="M168.2 180 L181.8 180" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M186 180 L180 176.3 L180 183.7 z" style="fill:var(--color-text-weak)" />
+<path d="M164 180 L170 183.7 L170 176.3 z" style="fill:var(--color-text-weak)" />
+<path d="M192 180 L196.2 184.2 L204 175.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="212" y="178" font-size="13" font-weight="700" style="fill:var(--color-text)">믿는 CA</text>
+<text x="212" y="196" font-size="13" style="fill:var(--color-text-sub)">까지 이어져야</text>
+<rect x="8" y="215" width="167.7" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="91.9" y="230.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">셋 다 맞으면 → HTTP 요청</text>
+<rect x="8" y="245" width="191.9" height="22" rx="11" style="fill:var(--color-warn)" />
+<text x="104" y="260.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">하나라도 어긋나면 → 연결 에러</text>
+</svg>

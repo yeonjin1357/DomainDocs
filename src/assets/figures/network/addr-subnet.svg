@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 240" width="300" height="240">
+<text x="57.2" y="30" font-size="20" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="116" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-accent)">192.168.10</text>
+<text x="173.2" y="30" font-size="20" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="11.6" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text-sub)">.</text>
+<text x="184.8" y="30" font-size="20" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="23.2" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text)">25</text>
+<text x="208" y="30" font-size="20" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="34.8" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text-sub)">/24</text>
+<path d="M58.2 40 v6 H172.2 v-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M185.8 40 v6 H207 v-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="115.2" y="66" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">네트워크 부분</text>
+<text x="115.2" y="84" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">앞 24비트</text>
+<text x="196.4" y="66" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">장비 부분</text>
+<text x="196.4" y="84" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">8비트</text>
+<line x1="10" y1="102" x2="290" y2="102" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-line)" />
+<rect x="9" y="113" width="34" height="22" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="13" y="117" width="26" height="14" rx="1.5" style="fill:var(--color-bg)" />
+<line x1="26" y1="135" x2="26" y2="140" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="18" y1="141" x2="34" y2="141" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="52" y="137" font-size="15" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="88" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-accent)">192.168.10</text>
+<text x="140" y="137" font-size="15" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="26.4" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text)">.25</text>
+<rect x="9" y="155" width="34" height="22" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="13" y="159" width="26" height="14" rx="1.5" style="fill:var(--color-bg)" />
+<line x1="26" y1="177" x2="26" y2="182" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="18" y1="183" x2="34" y2="183" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="52" y="179" font-size="15" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="88" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-accent)">192.168.10</text>
+<text x="140" y="179" font-size="15" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="26.4" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text)">.30</text>
+<rect x="9" y="197" width="34" height="22" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="13" y="201" width="26" height="14" rx="1.5" style="fill:var(--color-bg)" />
+<line x1="26" y1="219" x2="26" y2="224" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="18" y1="225" x2="34" y2="225" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="52" y="221" font-size="15" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="88" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-warn)">192.168.20</text>
+<text x="140" y="221" font-size="15" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" textLength="17.6" lengthAdjust="spacingAndGlyphs" style="fill:var(--color-text)">.7</text>
+<path d="M196 118 h6 V188 h-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="210" y="151" font-size="13" font-weight="700" style="fill:var(--color-accent)">같은 네트워크</text>
+<text x="210" y="169" font-size="13" style="fill:var(--color-text-sub)">스위치가 전해요</text>
+<text x="210" y="211" font-size="13" font-weight="700" style="fill:var(--color-warn)">다른 네트워크</text>
+<text x="210" y="229" font-size="13" style="fill:var(--color-text-sub)">라우터를 거쳐요</text>
+</svg>

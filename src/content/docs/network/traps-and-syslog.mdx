@@ -23,6 +23,7 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc5425.html
 updated: 2026-10-30
 ---
+import TrapVsPoll from '../../../assets/figures/network/trap-vs-poll.svg';
 
 <KeyPoints>
   <Point title="장비가 먼저 알려요">
@@ -43,14 +44,7 @@ updated: 2026-10-30
 ## 폴링과 알림
 
 <Figure caption="폴링은 수집 사이의 짧은 변화를 놓치고, 알림은 전송 중에 사라질 수 있어요. 그래서 둘을 함께 써요.">
-  <Compare
-    columns={['폴링(GET)', 'Trap·Syslog']}
-    rows={[
-      { label: '누가 먼저', values: ['관리 서버가 물어요', '장비가 먼저 보내요'] },
-      { label: '알게 되는 때', values: ['다음 수집 때', '일이 생긴 즉시'] },
-      { label: '놓칠 수 있는 것', values: ['수집 사이의 짧은 변화', '전송 중에 사라진 알림'] },
-    ]}
-  />
+  <TrapVsPoll aria-label="링크가 1분과 2분 사이에 잠깐 down이었는데, 1분마다 묻는 폴링은 모두 up으로 봐서 놓쳐요. 장비가 먼저 보내는 Trap은 linkDown이 바로 닿지만, linkUp은 중간에 사라졌어요" />
 </Figure>
 
 ## SNMP Trap

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 182" width="300" height="182">
+<path d="M6 70 L120.4 70" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M126 70 L118 65 L118 75 z" style="fill:var(--color-accent)" />
+<path d="M174 70 L220.4 70" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M226 70 L218 65 L218 75 z" style="fill:var(--color-accent)" />
+<path d="M274 70 L290.4 70" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M296 70 L288 65 L288 75 z" style="fill:var(--color-accent)" />
+<rect x="130" y="48" width="40" height="44" rx="2" style="fill:var(--color-accent-weak)" />
+<path d="M128 44 V92 H172 V44" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<rect x="230" y="48" width="40" height="44" rx="2" style="fill:var(--color-accent-weak)" />
+<path d="M228 44 V92 H272 V44" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M48 62 h14 l4 6 l-4 4 l4 6 h-18 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<rect x="168" y="36" width="10" height="10" rx="2" style="fill:var(--color-warn)" />
+<rect x="268" y="36" width="10" height="10" rx="2" style="fill:var(--color-warn)" />
+<text x="52" y="30" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">케이블·광</text>
+<text x="150" y="30" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">받는 버퍼</text>
+<text x="250" y="30" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">보내는 큐</text>
+<path d="M56 84 L56 131.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<path d="M56 136 L60.3 129 L51.7 129 z" style="fill:var(--color-warn)" />
+<text x="64" y="116" font-size="13" font-weight="600" style="fill:var(--color-warn)">깨짐</text>
+<text x="56" y="158" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">받은 에러</text>
+<text x="56" y="176" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">ifInErrors</text>
+<path d="M150 96 L150 131.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<path d="M150 136 L154.3 129 L145.7 129 z" style="fill:var(--color-warn)" />
+<text x="158" y="116" font-size="13" font-weight="600" style="fill:var(--color-warn)">넘침</text>
+<text x="150" y="158" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">받고 버림</text>
+<text x="150" y="176" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">ifInDiscards</text>
+<path d="M250 96 L250 131.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-warn)" />
+<path d="M250 136 L254.3 129 L245.7 129 z" style="fill:var(--color-warn)" />
+<text x="258" y="116" font-size="13" font-weight="600" style="fill:var(--color-warn)">넘침</text>
+<text x="250" y="158" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">보낼 때 버림</text>
+<text x="250" y="176" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">ifOutDiscards</text>
+</svg>

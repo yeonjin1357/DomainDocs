@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 276" width="300" height="276">
+<rect x="50" y="26" width="200" height="164" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="60" y="44" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">스위치·라우터</text>
+<path d="M8 74 L285 74" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M292 74 L282 67.8 L282 80.2 z" style="fill:var(--color-accent)" />
+<rect x="12" y="68" width="12" height="12" rx="2" style="fill:var(--color-accent)" />
+<rect x="28" y="68" width="12" height="12" rx="2" style="fill:var(--color-accent)" />
+<rect x="252" y="68" width="12" height="12" rx="2" style="fill:var(--color-accent)" />
+<rect x="268" y="68" width="12" height="12" rx="2" style="fill:var(--color-accent)" />
+<rect x="96" y="56" width="108" height="36" rx="8" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="79" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">전용 칩(ASIC)</text>
+<text x="150" y="16" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">지나가는 트래픽은 칩이 넘겨요</text>
+<rect x="108" y="128" width="84" height="36" rx="8" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="151" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">CPU</text>
+<path d="M44 214 L44 146 L103.1 146" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M108 146 L101 141.7 L101 150.3 z" style="fill:var(--color-text-sub)" />
+<path d="M256 214 L256 146 L196.9 146" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M192 146 L199 150.3 L199 141.7 z" style="fill:var(--color-text-sub)" />
+<rect x="31" y="213" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="37" y1="221" x2="51" y2="221" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="37" y1="227" x2="51" y2="227" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="37" y1="233" x2="51" y2="233" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="44" cy="240.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M234 226 V239 A22 7 0 0 0 278 239 V226" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<ellipse cx="256" cy="226" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M246 223.8 L261.5 223.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M265 223.8 L260 220.7 L260 226.9 z" style="fill:var(--color-text-sub)" />
+<path d="M266 228.4 L250.5 228.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M247 228.4 L252 231.5 L252 225.3 z" style="fill:var(--color-text-sub)" />
+<text x="44" y="266" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">SNMP·SSH</text>
+<text x="256" y="266" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">라우팅·STP</text>
+<text x="150" y="184" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">장비에 오는 관리 일</text>
+<text x="150" y="214" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">칩이 넘치면 → 패킷을 버려요</text>
+<text x="150" y="234" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">CPU가 바쁘면 → 관리 응답이 늦어요</text>
+</svg>

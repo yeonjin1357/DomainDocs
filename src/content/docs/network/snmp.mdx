@@ -21,6 +21,7 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc2863.html
 updated: 2026-10-21
 ---
+import SnmpPoll from '../../../assets/figures/network/snmp-poll.svg';
 
 <KeyPoints>
   <Point title="관리 서버가 묻고 장비가 답해요">
@@ -42,17 +43,8 @@ updated: 2026-10-21
 
 <Term term="network/snmp">SNMP</Term>에는 두 역할이 있어요. 값을 물어 모으는 <Term term="network/snmp-manager">관리 서버</Term>(매니저)와, 장비 안에서 답하는 <Term term="network/snmp-agent">에이전트</Term>예요.
 
-<Figure caption="관리 서버가 가동 시간과 받은 바이트를 묻고 장비가 답해요. 이 묻기를 정해진 간격으로 되풀이하는 것을 폴링이라고 불러요.">
-  <Sequence
-    ariaLabel="관리 서버가 장비에 가동 시간과 받은 바이트를 묻고 장비가 답한 뒤, 1분 뒤 다시 묻고 답하는 순서"
-    participants={['관리 서버', '장비(에이전트)']}
-    messages={[
-      { from: '관리 서버', to: '장비(에이전트)', label: 'GET 가동 시간, 받은 바이트' },
-      { from: '장비(에이전트)', to: '관리 서버', label: '값 두 개', dashed: true },
-      { from: '관리 서버', to: '장비(에이전트)', label: '1분 뒤 다시 GET', tone: 'accent' },
-      { from: '장비(에이전트)', to: '관리 서버', label: '새 값 두 개', dashed: true },
-    ]}
-  />
+<Figure caption="관리 서버가 장비의 에이전트에 가동 시간과 받은 바이트를 묻고, 에이전트가 답해요. 이 묻기를 정해진 간격으로 되풀이하는 것을 폴링이라고 불러요.">
+  <SnmpPoll aria-label="관리 서버가 장비의 SNMP 에이전트(UDP 161)에 GET으로 가동 시간과 받은 바이트를 묻고, 에이전트가 41일과 37.5억으로 답한 뒤, 1분마다 다시 묻는 그림" />
 </Figure>
 
 | 요청 | 하는 일 |

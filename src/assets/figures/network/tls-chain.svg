@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 266" width="300" height="266">
+<path d="M20 16 Q20 10 26 10 H156 L170 24 V54 Q170 60 164 60 H26 Q20 60 20 54 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M156 10 V24 H170" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<circle cx="44" cy="31" r="9" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M39 38 L37 47 L42 44 L46 47 L49 38" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="62" y="40" font-size="14" font-weight="700" style="fill:var(--color-text)">루트 인증서</text>
+<path d="M20 116 Q20 110 26 110 H156 L170 124 V154 Q170 160 164 160 H26 Q20 160 20 154 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<path d="M156 110 V124 H170" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<circle cx="44" cy="131" r="9" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M39 138 L37 147 L42 144 L46 147 L49 138" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="62" y="140" font-size="14" font-weight="700" style="fill:var(--color-accent)">중간 인증서</text>
+<path d="M20 216 Q20 210 26 210 H156 L170 224 V254 Q170 260 164 260 H26 Q20 260 20 254 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<path d="M156 210 V224 H170" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<circle cx="44" cy="231" r="9" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M39 238 L37 247 L42 244 L46 247 L49 238" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="62" y="240" font-size="14" font-weight="700" style="fill:var(--color-accent)">서버 인증서</text>
+<path d="M95 62 L95 100.4" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M95 106 L100 98 L90 98 z" style="fill:var(--color-text-sub)" />
+<path d="M95 162 L95 200.4" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M95 206 L100 198 L90 198 z" style="fill:var(--color-text-sub)" />
+<text x="106" y="89" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">서명</text>
+<text x="106" y="189" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">서명</text>
+<path d="M184 12 h6 V58 h-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<text x="198" y="31" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">클라이언트에</text>
+<text x="198" y="49" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">이미 있어요</text>
+<path d="M184 112 h6 V258 h-6" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<text x="198" y="180" font-size="13" font-weight="700" style="fill:var(--color-accent)">서버가</text>
+<text x="198" y="198" font-size="13" font-weight="700" style="fill:var(--color-accent)">함께 보내요</text>
+</svg>

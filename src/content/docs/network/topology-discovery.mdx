@@ -17,6 +17,9 @@ sources:
     url: https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst2960/software/release/12-2_55_se/configuration/guide/scg_2960/swcdp.html
 updated: 2026-10-29
 ---
+import LldpHello from '../../../assets/figures/network/lldp-hello.svg';
+import LldpMap from '../../../assets/figures/network/lldp-map.svg';
+import LldpMissing from '../../../assets/figures/network/lldp-missing.svg';
 
 <KeyPoints>
   <Point title="장비는 바로 옆 장비만 알아요">
@@ -37,16 +40,7 @@ updated: 2026-10-29
 ## 옆 장비에게 자기소개를 보내요
 
 <Figure caption="스위치끼리 포트마다 자기소개를 주고받아 이웃 표에 적어요. 관리 서버는 나중에 SNMP로 그 표를 읽어요.">
-  <Sequence
-    ariaLabel="스위치 A와 B가 서로 자기 이름과 포트를 알리고, 관리 서버가 스위치 A의 이웃 표를 SNMP로 읽는 순서"
-    participants={['스위치 A', '스위치 B', '관리 서버']}
-    messages={[
-      { from: '스위치 A', to: '스위치 B', label: '나는 A, 1번 포트' },
-      { from: '스위치 B', to: '스위치 A', label: '나는 B, 24번 포트' },
-      { from: '관리 서버', to: '스위치 A', label: '이웃 표 주세요(SNMP)', tone: 'accent' },
-      { from: '스위치 A', to: '관리 서버', label: '1번 옆은 B의 24번', dashed: true },
-    ]}
-  />
+  <LldpHello aria-label="스위치 A의 1번 포트와 스위치 B의 24번 포트가 이어져 있고, A는 '나는 A, 1번 포트', B는 '나는 B, 24번 포트'라고 보내요. A의 이웃 표에는 1번 옆이 B의 24번으로, B의 표에는 24번 옆이 A의 1번으로 적히고, 관리 서버가 A의 표를 SNMP로 읽어요" />
 </Figure>
 
 <Term term="network/lldp">LLDP</Term>(Link Layer Discovery Protocol)는 IEEE 802.1AB 표준이에요. 장비는 포트마다 자기 이름, 포트 이름, 관리 주소 같은 정보를 담아 옆 장비에 보내요. 받은 장비는 그 내용을 이웃 표에 적어 둬요.
@@ -67,19 +61,8 @@ LLDP는 제조사와 상관없이 써요. <Term term="network/cdp">CDP</Term>(Ci
 
 이웃 정보는 장비 안의 표에 쌓여요. LLDP라면 LLDP-MIB의 `lldpRemTable`이에요. 관리 서버는 <Term term="network/snmp">SNMP</Term>로 장비마다 이 표를 읽어요.
 
-<Figure caption="코어 스위치와 두 스위치의 이웃 표를 이어 붙인 연결도예요. 상자 아래 글자는 양쪽 포트 번호예요.">
-  <Flow
-    ariaLabel="코어 스위치 아래에 스위치 A와 B가 이어진 연결도. A의 1번 포트는 코어의 24번에, B의 1번 포트는 코어의 48번에 이어져요"
-    nodes={[
-      { id: 'core', label: '코어 스위치', col: 1, row: 0, tone: 'accent' },
-      { id: 'a', label: '스위치 A', col: 0, row: 1, note: '1번 ↔ 코어 24번' },
-      { id: 'b', label: '스위치 B', col: 2, row: 1, note: '1번 ↔ 코어 48번' },
-    ]}
-    edges={[
-      { from: 'a', to: 'core', both: true },
-      { from: 'b', to: 'core', both: true },
-    ]}
-  />
+<Figure caption="코어 스위치와 두 스위치의 이웃 표를 이어 붙인 연결도예요. 선 양 끝의 숫자는 그쪽 장비의 포트 번호예요.">
+  <LldpMap aria-label="코어 스위치 아래 스위치 A와 B가 이어진 연결도. A의 1번 포트는 코어의 24번에, B의 1번 포트는 코어의 48번에 이어져요" />
 </Figure>
 
 표의 한 줄은 "내 몇 번 포트 옆에 어떤 장비의 어떤 포트가 있다"예요. 이웃은 장비 ID(Chassis ID)와 포트 ID로 구별하고, 장비 이름도 함께 담겨요.
@@ -89,18 +72,7 @@ LLDP는 제조사와 상관없이 써요. <Term term="network/cdp">CDP</Term>(Ci
 ## 모니터링에서는
 
 <Figure caption="방화벽에서 LLDP가 꺼져 있으면 코어 스위치의 이웃 표에 방화벽이 없어요. 실제로는 이어져 있어도 연결도에는 선을 그리지 못해요.">
-  <Flow
-    ariaLabel="코어 스위치와 스위치 A는 실선으로 이어져 있고, LLDP가 꺼진 방화벽과는 점선으로만 표시된 연결도"
-    nodes={[
-      { id: 'core', label: '코어 스위치', col: 1, row: 0, tone: 'accent' },
-      { id: 'a', label: '스위치 A', col: 0, row: 1 },
-      { id: 'fw', label: '방화벽', col: 2, row: 1, note: 'LLDP 꺼짐', tone: 'warn' },
-    ]}
-    edges={[
-      { from: 'a', to: 'core', both: true },
-      { from: 'fw', to: 'core', dashed: true, tone: 'warn' },
-    ]}
-  />
+  <LldpMissing aria-label="왼쪽 실제 연결은 코어 스위치가 스위치 A와 방화벽 모두와 이어져 있고, 오른쪽 그려진 연결도에서는 LLDP가 꺼진 방화벽과의 선이 빠져 있는 그림" />
 </Figure>
 
 연결도는 장비들이 서로 알려 준 내용만큼만 정확해요. LLDP가 꺼진 장비, SNMP로 읽을 수 없는 장비, 관리 대상에 없는 장비가 있으면 그 자리의 선이 빠져요.

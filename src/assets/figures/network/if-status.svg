@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 234" width="300" height="234">
+<text x="198" y="18" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">동작 상태(ifOperStatus)</text>
+<text x="52" y="18" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">관리 상태</text>
+<rect x="100" y="30" width="96" height="30" rx="6" style="fill:var(--color-line)" />
+<rect x="198" y="30" width="98" height="30" rx="6" style="fill:var(--color-line)" />
+<text x="148" y="50" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">up</text>
+<text x="247" y="50" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">down</text>
+<rect x="4" y="62" width="92" height="68" rx="6" style="fill:var(--color-line)" />
+<rect x="4" y="132" width="92" height="68" rx="6" style="fill:var(--color-line)" />
+<text x="50" y="92" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">up</text>
+<text x="50" y="112" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">켜 둠</text>
+<text x="50" y="162" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">down</text>
+<text x="50" y="182" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">꺼 둠</text>
+<rect x="100" y="62" width="96" height="68" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="148" y="92" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">정상</text>
+<text x="148" y="112" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">쓰는 중</text>
+<rect x="198" y="62" width="98" height="68" rx="6" stroke-width="2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="247" y="92" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">고장이에요</text>
+<text x="247" y="112" font-size="13" text-anchor="middle" style="fill:var(--color-warn)">알림 대상</text>
+<rect x="100" y="132" width="96" height="68" rx="6" stroke-width="1" stroke-dasharray="4 3" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="148" y="162" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text-weak)">생기지 않아요</text>
+<rect x="198" y="132" width="98" height="68" rx="6" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="247" y="162" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">정상이에요</text>
+<text x="247" y="182" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">알림 대상 아님</text>
+<text x="150" y="226" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">관리 상태 = ifAdminStatus</text>
+</svg>

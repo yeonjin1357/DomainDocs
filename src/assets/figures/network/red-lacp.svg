@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 196" width="300" height="196">
+<rect x="78" y="36" width="144" height="104" rx="18" stroke-width="1.5" stroke-dasharray="5 4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="64" y1="72" x2="236" y2="72" stroke-width="6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="64" y1="106" x2="236" y2="106" stroke-width="6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<path d="M10 82 L16 76 L68 76 L62 82 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M62 82 L68 76 L68 94 L62 100 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="10" y="82" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="15.2" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="22.5" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="29.8" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="37.2" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="44.5" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="51.8" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M232 82 L238 76 L290 76 L284 82 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M284 82 L290 76 L290 94 L284 100 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="232" y="82" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="237.2" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="244.5" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="251.8" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="259.2" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="266.5" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="273.8" y="89" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="58" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">멤버 1 · 1Gbps</text>
+<text x="150" y="132" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">멤버 2 · 1Gbps</text>
+<rect x="124" y="61" width="52" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="150" y="76.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">흐름 A</text>
+<rect x="94" y="95" width="52" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="120" y="110.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">흐름 B</text>
+<rect x="156" y="95" width="52" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="182" y="110.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">흐름 C</text>
+<text x="150" y="24" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">묶은 논리 링크 2Gbps</text>
+<text x="150" y="166" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">흐름마다 멤버 하나를 정해요</text>
+<text x="150" y="186" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">흐름 A 하나는 1Gbps를 넘지 못해요</text>
+</svg>

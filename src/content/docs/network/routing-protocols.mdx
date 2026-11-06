@@ -19,6 +19,7 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc4273.html
 updated: 2026-11-03
 ---
+import RpStaticDynamic from '../../../assets/figures/network/rp-static-dynamic.svg';
 
 <KeyPoints>
   <Point title="경로표를 라우터끼리 채워요">
@@ -40,18 +41,11 @@ updated: 2026-11-03
 
 <Term slug="network/switches-and-routers">스위치와 라우터</Term>에서 본 경로표는 사람이 적을 수도, 라우터끼리 채울 수도 있어요. 라우터끼리 길을 알려 주는 약속을 <Term term="network/routing-protocol">라우팅 프로토콜</Term>이라고 해요.
 
-<Figure caption="사람이 적은 길은 끊겨도 그대로 남고, 라우팅 프로토콜로 배운 길은 끊기면 사라지고 다른 길로 바뀌어요.">
-  <Compare
-    columns={['정적 경로', '라우팅 프로토콜']}
-    rows={[
-      { label: '누가 적나', values: ['사람이 직접', '라우터끼리 알려 줘요'] },
-      { label: '길이 끊기면', values: ['그대로 남아요', '지우고 다른 길로 바꿔요'] },
-      { label: '흔한 곳', values: ['작은 망, 기본 경로', '큰 사내망, 인터넷'] },
-    ]}
-  />
+<Figure caption="B 너머 길이 끊겼을 때예요. 사람이 적은 정적 경로는 그대로 남아 B로 계속 보내고, 라우팅 프로토콜은 끊긴 길을 지우고 C로 바꿔요.">
+  <RpStaticDynamic aria-label="위는 정적 경로, 아래는 라우팅 프로토콜이에요. 라우터 A에서 목적지까지 B를 거치는 길과 C를 거치는 길이 있고, B와 목적지 사이가 끊겼어요. 정적 경로는 B로 계속 보내고, 라우팅 프로토콜은 C로 바꿔요" />
 </Figure>
 
-사내망 안에서는 OSPF를, 조직과 조직 사이에서는 BGP를 흔히 써요. 둘 다 이웃을 먼저 맺고, 그다음 길을 주고받아요.
+정적 경로는 작은 망이나 기본 경로에 흔히 써요. 사내망 안에서는 OSPF를, 조직과 조직 사이에서는 BGP를 흔히 써요. 둘 다 이웃을 먼저 맺고, 그다음 길을 주고받아요.
 
 ## 이웃부터 맺어요
 

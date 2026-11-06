@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 292" width="300" height="292">
+<rect x="47" y="5" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="53" y1="13" x2="67" y2="13" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="53" y1="19" x2="67" y2="19" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="53" y1="25" x2="67" y2="25" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="60" cy="32.5" r="2" style="fill:var(--color-text-sub)" />
+<path d="M218 18 V31 A22 7 0 0 0 262 31 V18" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<ellipse cx="240" cy="18" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M230 15.8 L245.5 15.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M249 15.8 L244 12.7 L244 18.9 z" style="fill:var(--color-text-sub)" />
+<path d="M250 20.4 L234.5 20.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M231 20.4 L236 23.5 L236 17.3 z" style="fill:var(--color-text-sub)" />
+<text x="60" y="56" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">관리 서버</text>
+<text x="240" y="56" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">장비</text>
+<text x="60" y="62" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)"></text>
+<line x1="60" y1="70" x2="60" y2="258" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="240" y="62" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)"></text>
+<line x1="240" y1="70" x2="240" y2="258" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M60 86 L235.1 86" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M240 86 L233 81.7 L233 90.3 z" style="fill:var(--color-text-sub)" />
+<text x="150" y="80" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">에코 요청 1</text>
+<path d="M240 108 L64.9 108" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<path d="M60 108 L67 112.3 L67 103.7 z" style="fill:var(--color-accent)" />
+<text x="150" y="102" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">12ms</text>
+<path d="M60 138 L235.1 138" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M240 138 L233 133.7 L233 142.3 z" style="fill:var(--color-text-sub)" />
+<text x="150" y="132" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">에코 요청 2</text>
+<path d="M240 160 L64.9 160" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<path d="M60 160 L67 164.3 L67 155.7 z" style="fill:var(--color-accent)" />
+<text x="150" y="154" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">14ms</text>
+<path d="M60 190 L159 190" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<line x1="160" y1="185" x2="170" y2="195" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="160" y1="195" x2="170" y2="185" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="109.5" y="184" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">에코 요청 3</text>
+<path d="M60 226 L235.1 226" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M240 226 L233 221.7 L233 230.3 z" style="fill:var(--color-text-sub)" />
+<text x="150" y="220" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">에코 요청 4</text>
+<path d="M240 248 L64.9 248" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<path d="M60 248 L67 252.3 L67 243.7 z" style="fill:var(--color-accent)" />
+<text x="150" y="242" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">40ms</text>
+<text x="196" y="195" font-size="13" font-weight="700" style="fill:var(--color-warn)">사라짐</text>
+<text x="150" y="284" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">4개 보내 3개 돌아옴 → 손실률 25%</text>
+</svg>

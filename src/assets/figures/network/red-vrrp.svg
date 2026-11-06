@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 250" width="300" height="250">
+<rect x="16" y="26" width="268" height="96" rx="16" stroke-width="1.5" stroke-dasharray="5 4" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="18" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">가상 IP 10.0.0.1</text>
+<line x1="80" y1="96" x2="136" y2="154" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="220" y1="96" x2="164" y2="154" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<text x="80" y="50" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">라우터 1 · 마스터</text>
+<text x="220" y="50" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">라우터 2 · 대기</text>
+<path d="M58 74 V87 A22 7 0 0 0 102 87 V74" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<ellipse cx="80" cy="74" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M70 71.8 L85.5 71.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M89 71.8 L84 68.7 L84 74.9 z" style="fill:var(--color-accent)" />
+<path d="M90 76.4 L74.5 76.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M71 76.4 L76 79.5 L76 73.3 z" style="fill:var(--color-accent)" />
+<path d="M198 74 V87 A22 7 0 0 0 242 87 V74" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<ellipse cx="220" cy="74" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M210 71.8 L225.5 71.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M229 71.8 L224 68.7 L224 74.9 z" style="fill:var(--color-text-sub)" />
+<path d="M230 76.4 L214.5 76.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M211 76.4 L216 79.5 L216 73.3 z" style="fill:var(--color-text-sub)" />
+<path d="M106 80 L189.1 80" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-accent)" />
+<path d="M194 80 L187 75.7 L187 84.3 z" style="fill:var(--color-accent)" />
+<text x="150" y="104" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">1초마다 알림</text>
+<path d="M121 159 L127 153 L179 153 L173 159 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M173 159 L179 153 L179 171 L173 177 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="121" y="159" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="126.2" y="166" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="133.5" y="166" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="140.8" y="166" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="148.2" y="166" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="155.5" y="166" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="162.8" y="166" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="128" y1="180" x2="80" y2="208" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="172" y1="180" x2="220" y2="208" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<rect x="57" y="209" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="63" y1="217" x2="77" y2="217" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="63" y1="223" x2="77" y2="223" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="63" y1="229" x2="77" y2="229" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="70" cy="236.5" r="2" style="fill:var(--color-text-sub)" />
+<rect x="217" y="209" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="223" y1="217" x2="237" y2="217" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="223" y1="223" x2="237" y2="223" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="223" y1="229" x2="237" y2="229" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="230" cy="236.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="150" y="222" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">서버들</text>
+<text x="150" y="242" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">게이트웨이 = 10.0.0.1</text>
+</svg>

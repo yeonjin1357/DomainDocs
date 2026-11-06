@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+<rect x="4" y="4" width="144" height="292" rx="12" style="fill:var(--color-card)" />
+<text x="76" y="28" font-size="16" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">TCP</text>
+<text x="28" y="52" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">보냄</text>
+<line x1="28" y1="60" x2="28" y2="226" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="124" y="52" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">받음</text>
+<line x1="124" y1="60" x2="124" y2="226" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M28 78 L119.1 78" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M124 78 L117 73.7 L117 82.3 z" style="fill:var(--color-text-sub)" />
+<text x="76" y="72" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">SYN</text>
+<path d="M124 98 L32.9 98" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M28 98 L35 102.3 L35 93.7 z" style="fill:var(--color-text-sub)" />
+<text x="76" y="92" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">SYN·ACK</text>
+<path d="M28 118 L119.1 118" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M124 118 L117 113.7 L117 122.3 z" style="fill:var(--color-text-sub)" />
+<text x="76" y="112" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">ACK</text>
+<path d="M28 146 L119.1 146" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M124 146 L117 141.7 L117 150.3 z" style="fill:var(--color-accent)" />
+<text x="76" y="140" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">데이터</text>
+<path d="M28 172 L85.6 172" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<line x1="86.6" y1="167" x2="96.6" y2="177" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="86.6" y1="177" x2="96.6" y2="167" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="56.8" y="166" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">사라짐</text>
+<path d="M28 198 L119.1 198" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M124 198 L117 193.7 L117 202.3 z" style="fill:var(--color-accent)" />
+<text x="76" y="192" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">다시 보냄</text>
+<path d="M124 218 L32.9 218" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M28 218 L35 222.3 L35 213.7 z" style="fill:var(--color-text-sub)" />
+<text x="76" y="254" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">머리 20바이트부터</text>
+<text x="76" y="274" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">HTTP, DB 연결</text>
+<rect x="152" y="4" width="144" height="292" rx="12" style="fill:var(--color-card)" />
+<text x="224" y="28" font-size="16" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">UDP</text>
+<text x="176" y="52" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">보냄</text>
+<line x1="176" y1="60" x2="176" y2="226" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="272" y="52" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">받음</text>
+<line x1="272" y1="60" x2="272" y2="226" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M176 146 L267.1 146" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M272 146 L265 141.7 L265 150.3 z" style="fill:var(--color-accent)" />
+<text x="224" y="140" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">데이터</text>
+<path d="M176 172 L233.6 172" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<line x1="234.6" y1="167" x2="244.6" y2="177" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="234.6" y1="177" x2="244.6" y2="167" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="204.8" y="166" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">사라짐</text>
+<path d="M176 198 L267.1 198" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M272 198 L265 193.7 L265 202.3 z" style="fill:var(--color-accent)" />
+<text x="224" y="192" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">데이터</text>
+<text x="224" y="254" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">머리 8바이트</text>
+<text x="224" y="274" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">DNS, SNMP, Syslog</text>
+<text x="228" y="92" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">연결 없이</text>
+<text x="228" y="110" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">바로 보내요</text>
+</svg>

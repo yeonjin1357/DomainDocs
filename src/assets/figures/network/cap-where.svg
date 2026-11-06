@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 302" width="300" height="302">
+<text x="8" y="18" font-size="13" font-weight="700" style="fill:var(--color-accent)">A 클라이언트에서</text>
+<text x="292" y="18" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">B 서버에서</text>
+<rect x="4" y="28" width="292" height="86" rx="12" style="fill:var(--color-card)" />
+<circle cx="20" cy="46" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="20" y="50.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">1</text>
+<text x="36" y="51" font-size="13" font-weight="700" style="fill:var(--color-text)">가는 길에서 사라지면</text>
+<circle cx="30" cy="74" r="11" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="30" y="79" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">A</text>
+<circle cx="270" cy="74" r="11" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="270" y="79" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">B</text>
+<path d="M44 70 L150 70" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="151" y1="65" x2="161" y2="75" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="151" y1="75" x2="161" y2="65" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="12" y="106" font-size="13" font-weight="600" style="fill:var(--color-text)">[S]만 되풀이</text>
+<text x="288" y="106" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-warn)">아무것도 없음</text>
+<rect x="4" y="120" width="292" height="86" rx="12" style="fill:var(--color-card)" />
+<circle cx="20" cy="138" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="20" y="142.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">2</text>
+<text x="36" y="143" font-size="13" font-weight="700" style="fill:var(--color-text)">오는 길에서 사라지면</text>
+<circle cx="30" cy="166" r="11" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="30" y="171" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">A</text>
+<circle cx="270" cy="166" r="11" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="270" y="171" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">B</text>
+<path d="M44 162 L251.1 162" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M256 162 L249 157.7 L249 166.3 z" style="fill:var(--color-text-sub)" />
+<path d="M256 172 L150 172" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="139" y1="167" x2="149" y2="177" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="139" y1="177" x2="149" y2="167" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="12" y="198" font-size="13" font-weight="600" style="fill:var(--color-text)">[S]만 되풀이</text>
+<text x="288" y="198" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text)">[S]와 [S.] 되풀이</text>
+<rect x="4" y="212" width="292" height="86" rx="12" style="fill:var(--color-card)" />
+<circle cx="20" cy="230" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="20" y="234.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">3</text>
+<text x="36" y="235" font-size="13" font-weight="700" style="fill:var(--color-text)">서버가 느리면</text>
+<circle cx="30" cy="258" r="11" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="30" y="263" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">A</text>
+<circle cx="270" cy="258" r="11" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="270" y="263" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">B</text>
+<path d="M44 254 L251.1 254" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M256 254 L249 249.7 L249 258.3 z" style="fill:var(--color-text-sub)" />
+<path d="M256 264 L48.9 264" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M44 264 L51 268.3 L51 259.7 z" style="fill:var(--color-text-sub)" />
+<text x="150" y="282" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">늦게</text>
+<text x="12" y="290" font-size="13" font-weight="600" style="fill:var(--color-text)">응답이 늦어요</text>
+<text x="288" y="290" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text)">응답이 늦어요</text>
+</svg>

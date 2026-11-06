@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 208" width="300" height="208">
+<line x1="132" y1="52" x2="70" y2="126" stroke-width="2.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="168" y1="52" x2="230" y2="126" stroke-width="2.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<path d="M121 33 L127 27 L179 27 L173 33 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M173 33 L179 27 L179 45 L173 51 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="121" y="33" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="126.2" y="40" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="133.5" y="40" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="140.8" y="40" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="148.2" y="40" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="155.5" y="40" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="162.8" y="40" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<path d="M38 133 L44 127 L96 127 L90 133 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M90 133 L96 127 L96 145 L90 151 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="38" y="133" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="43.2" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="50.5" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="57.8" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="65.2" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="72.5" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="79.8" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M208 133 L214 127 L266 127 L260 133 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M260 133 L266 127 L266 145 L260 151 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="208" y="133" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="213.2" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="220.5" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="227.8" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="235.2" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="242.5" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="249.8" y="140" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="109.4" y="3" width="81.2" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="150" y="18.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">코어 스위치</text>
+<rect x="109.3" y="61" width="29.4" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="124" y="76.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">24</text>
+<rect x="161.3" y="61" width="29.4" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="176" y="76.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">48</text>
+<rect x="67.1" y="99" width="21.7" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="78" y="114.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">1</text>
+<rect x="211.1" y="99" width="21.7" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="222" y="114.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">1</text>
+<text x="67" y="174" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">스위치 A</text>
+<text x="237" y="174" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">스위치 B</text>
+<text x="150" y="200" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">숫자는 선 양 끝의 포트 번호예요</text>
+</svg>

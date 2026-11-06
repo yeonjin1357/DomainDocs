@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 264" width="300" height="264">
+<rect x="4" y="4" width="96" height="150" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="22" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">안쪽</text>
+<rect x="39" y="31" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="45" y1="39" x2="59" y2="39" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="45" y1="45" x2="59" y2="45" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="45" y1="51" x2="59" y2="51" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="52" cy="58.5" r="2" style="fill:var(--color-text-sub)" />
+<rect x="39" y="95" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="45" y1="103" x2="59" y2="103" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="45" y1="109" x2="59" y2="109" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="45" y1="115" x2="59" y2="115" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="52" cy="122.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="52" y="80" font-size="13" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text);stroke:var(--color-card);stroke-width:4;stroke-linejoin:round;paint-order:stroke">10.0.0.5</text>
+<text x="52" y="144" font-size="13" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text);stroke:var(--color-card);stroke-width:4;stroke-linejoin:round;paint-order:stroke">10.0.0.6</text>
+<path d="M68 48 L123.6 75.8" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M128 78 L123.7 71 L119.8 78.8 z" style="fill:var(--color-accent)" />
+<path d="M68 112 L123.5 89.8" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M128 88 L119.9 86.6 L123.1 94.6 z" style="fill:var(--color-text-sub)" />
+<path d="M128 76 V89 A22 7 0 0 0 172 89 V76" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<ellipse cx="150" cy="76" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M140 73.8 L155.5 73.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M159 73.8 L154 70.7 L154 76.9 z" style="fill:var(--color-accent)" />
+<path d="M160 78.4 L144.5 78.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M141 78.4 L146 81.5 L146 75.3 z" style="fill:var(--color-accent)" />
+<text x="150" y="116" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">NAT</text>
+<text x="150" y="134" font-size="13" text-anchor="middle" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">203.0.113.7</text>
+<path d="M174 82 L239.1 82" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M244 82 L237 77.7 L237 86.3 z" style="fill:var(--color-accent)" />
+<rect x="253" y="65" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="259" y1="73" x2="273" y2="73" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="259" y1="79" x2="273" y2="79" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="259" y1="85" x2="273" y2="85" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="266" cy="92.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="266" y="116" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">바깥 서버</text>
+<text x="258" y="136" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">둘 다 같은</text>
+<text x="258" y="154" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">주소로 보여요</text>
+<text x="8" y="182" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">NAT 장비의 변환 표</text>
+<rect x="4" y="190" width="292" height="72" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 214 V196 Q4.8 190.8 10 190.8 H290 Q295.3 190.8 295.3 196 V214 z" style="fill:var(--color-line)" />
+<rect x="4.8" y="214" width="290.5" height="24" rx="0" style="fill:var(--color-accent-weak)" />
+<line x1="4" y1="238" x2="296" y2="238" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="206.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">안쪽 주소:포트</text>
+<text x="150" y="206.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">바깥에 보이는 주소:포트</text>
+<text x="12" y="230.7" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">10.0.0.5:51234</text>
+<text x="150" y="230.7" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">203.0.113.7:40001</text>
+<text x="12" y="254.7" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">10.0.0.6:51234</text>
+<text x="150" y="254.7" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">203.0.113.7:40002</text>
+</svg>

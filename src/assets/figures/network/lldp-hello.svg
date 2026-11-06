@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 272" width="300" height="272">
+<line x1="84" y1="96" x2="216" y2="96" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<path d="M96 86 L199.1 86" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M204 86 L197 81.7 L197 90.3 z" style="fill:var(--color-accent)" />
+<path d="M204 106 L100.9 106" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M96 106 L103 110.3 L103 101.7 z" style="fill:var(--color-text-sub)" />
+<path d="M26 89 L32 83 L84 83 L78 89 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M78 89 L84 83 L84 101 L78 107 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="26" y="89" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="31.2" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-accent);stroke:var(--color-accent)" />
+<rect x="38.5" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="45.8" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="53.2" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="60.5" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="67.8" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M218 89 L224 83 L276 83 L270 89 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M270 89 L276 83 L276 101 L270 107 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="218" y="89" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="223.2" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="230.5" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="237.8" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="245.2" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="252.5" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="259.8" y="96" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-accent);stroke:var(--color-accent)" />
+<text x="90" y="122" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">1번</text>
+<text x="210" y="122" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">24번</text>
+<text x="52" y="128" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">스위치 A</text>
+<text x="248" y="128" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">스위치 B</text>
+<path d="M34.5 33.5  H133.5 Q139.5 33.5 139.5 39.5 V52.5 Q139.5 58.5 133.5 58.5 L74 58.5 L70 64.5 L66 58.5 H34.5 Q28.5 58.5 28.5 52.5 V39.5 Q28.5 33.5 34.5 33.5 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="84" y="50.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">나는 A, 1번 포트</text>
+<path d="M162.7 33.5  H269.3 Q275.3 33.5 275.3 39.5 V52.5 Q275.3 58.5 269.3 58.5 L236 58.5 L232 64.5 L228 58.5 H162.7 Q156.7 58.5 156.7 52.5 V39.5 Q156.7 33.5 162.7 33.5 z" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="216" y="50.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">나는 B, 24번 포트</text>
+<rect x="4" y="144" width="138" height="48" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 168 V150 Q4.8 144.8 10 144.8 H136 Q141.3 144.8 141.3 150 V168 z" style="fill:var(--color-line)" />
+<path d="M4.8 168 H141.3 V186 Q141.3 191.3 136 191.3 H10 Q4.8 191.3 4.8 186 z" style="fill:var(--color-accent-weak)" />
+<text x="12" y="160.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">내 포트</text>
+<text x="68" y="160.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">이웃</text>
+<text x="12" y="184.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">1번</text>
+<text x="68" y="184.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">B의 24번</text>
+<rect x="158" y="144" width="138" height="48" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M158.8 168 V150 Q158.8 144.8 164 144.8 H290 Q295.3 144.8 295.3 150 V168 z" style="fill:var(--color-line)" />
+<text x="166" y="160.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">내 포트</text>
+<text x="222" y="160.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">이웃</text>
+<text x="166" y="184.7" font-size="13" font-weight="400" style="fill:var(--color-text)">24번</text>
+<text x="222" y="184.7" font-size="13" font-weight="400" style="fill:var(--color-text)">A의 1번</text>
+<text x="8" y="208" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">A의 이웃 표</text>
+<text x="162" y="208" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">B의 이웃 표</text>
+<rect x="137" y="233" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="143" y1="241" x2="157" y2="241" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="143" y1="247" x2="157" y2="247" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="143" y1="253" x2="157" y2="253" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="150" cy="260.5" r="2" style="fill:var(--color-accent)" />
+<path d="M132 240 L79.9 199" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-accent)" />
+<path d="M76 196 L78.8 203.7 L84.2 196.9 z" style="fill:var(--color-accent)" />
+<text x="170" y="246" font-size="13" font-weight="600" style="fill:var(--color-accent)">관리 서버가</text>
+<text x="170" y="264" font-size="13" font-weight="600" style="fill:var(--color-accent)">SNMP로 읽어요</text>
+</svg>

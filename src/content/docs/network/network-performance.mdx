@@ -17,6 +17,9 @@ sources:
     url: https://ebpf.io/what-is-ebpf/
 updated: 2026-10-30
 ---
+import NpmScope from '../../../assets/figures/network/npm-scope.svg';
+import NpmRatio from '../../../assets/figures/network/npm-ratio.svg';
+import NpmEbpf from '../../../assets/figures/network/npm-ebpf.svg';
 
 <OnDashboard title="서버 간 통신 · 최근 15분" caption="주문 서버에서 결제 서버로 가는 연결의 RTT와 재전송이 함께 올랐어요. 앱이 느려진 원인이 네트워크 쪽이라는 신호예요.">
   <StatTile label="주문 → 결제 RTT" value="38" unit="ms" tone="warn" note="평소 2ms" />
@@ -67,13 +70,7 @@ cwnd:10 unacked:2
 서버 전체의 재전송은 `/proc/net/snmp`의 `RetransSegs`로 세요. 보낸 조각 수 `OutSegs`와 함께 읽어요.
 
 <Figure caption="두 곳 모두 커널이 이미 세어 둔 값을 보여 줘요. ss -ti는 연결 하나하나를, /proc/net/snmp는 서버 전체를 봐요.">
-  <Compare
-    columns={['ss -ti', '/proc/net/snmp']}
-    rows={[
-      { label: '보는 범위', values: ['연결 하나하나', '서버 전체'] },
-      { label: '보이는 값', values: ['RTT와 흔들림, 재전송 수', 'RetransSegs, OutSegs'] },
-    ]}
-  />
+  <NpmScope aria-label="주문 서버에서 결제, 재고, DB 서버로 가는 연결마다 ss -ti가 RTT 38ms, 2ms, 1ms를 보여 주고, /proc/net/snmp는 서버 전체 합계로 다시 보낸 조각 1,230과 새로 보낸 조각 51,000을 보여 주는 그림" />
 </Figure>
 
 ## 재전송 비율 읽기
@@ -84,41 +81,14 @@ RFC 4022에 따르면 `OutSegs`는 재전송한 바이트만 담은 조각을 �
 
 두 값은 계속 늘기만 하는 <Term slug="foundations/counters-and-rate">카운터</Term>예요. 그래서 구간 사이의 차이로 계산해요.
 
-<Figure caption="두 카운터를 1분 간격으로 읽은 예시예요. 읽은 값끼리가 아니라 늘어난 수끼리 나눠요. 30 ÷ 1,000 = 3%예요.">
-  <Strip
-    ariaLabel="RetransSegs는 0분에 1,200, 1분에 1,230으로 30 늘고, OutSegs는 0분에 50,000, 1분에 51,000으로 1,000 늘어서, 늘어난 수끼리 나눈 재전송 비율이 3%인 칸 띠"
-    rows={[
-      {
-        label: 'RetransSegs(다시 보낸 조각)',
-        heads: ['0분에 읽음', '1분에 읽음', '늘어난 수'],
-        cells: ['1,200', '1,230', { label: '+30', tone: 'warn' }],
-      },
-      {
-        label: 'OutSegs(새로 보낸 조각)',
-        heads: ['0분에 읽음', '1분에 읽음', '늘어난 수'],
-        cells: ['50,000', '51,000', { label: '+1,000', tone: 'accent' }],
-      },
-    ]}
-  />
+<Figure caption="두 카운터를 1분 간격으로 읽은 예시예요. 읽은 값끼리가 아니라 늘어난 수끼리 나눠요.">
+  <NpmRatio aria-label="RetransSegs는 0분에 1,200, 1분에 1,230으로 30 늘고, OutSegs는 50,000에서 51,000으로 1,000 늘어서, 늘어난 수끼리 나눈 30 ÷ 1,000 = 3%가 재전송 비율인 그림" />
 </Figure>
 
 ## eBPF로 모아요
 
 <Figure caption="NPM 에이전트는 커널의 TCP 처리 지점에 eBPF 프로그램을 붙여 연결마다 값을 모아요. 앱 코드는 고치지 않아요.">
-  <Flow
-    ariaLabel="앱 프로세스의 통신이 커널 TCP 처리부를 지나고, 그곳에 붙은 eBPF 프로그램의 값을 에이전트가 모아 모니터링 서버로 보내는 구조도"
-    nodes={[
-      { id: 'app', label: '앱 프로세스', col: 0, row: 0 },
-      { id: 'tcp', label: '커널 TCP', col: 1, row: 0, note: 'eBPF가 붙어요', tone: 'accent' },
-      { id: 'agent', label: 'NPM 에이전트', col: 1, row: 1 },
-      { id: 'server', label: '모니터링 서버', col: 2, row: 1 },
-    ]}
-    edges={[
-      { from: 'app', to: 'tcp' },
-      { from: 'tcp', to: 'agent' },
-      { from: 'agent', to: 'server' },
-    ]}
-  />
+  <NpmEbpf aria-label="서버 안 사용자 공간에 앱 프로세스와 NPM 에이전트가, 커널에 TCP 처리가 있어요. 앱의 통신이 지나는 TCP 처리에 eBPF가 붙어 연결마다 기록하고, 에이전트가 이를 모아 모니터링 서버로 보내요" />
 </Figure>
 
 <Term term="network/ebpf">eBPF</Term>는 리눅스 커널 안에서 작은 프로그램을 안전하게 돌리는 기능이에요. 커널 소스를 고치거나 커널 모듈을 올리지 않아도 돼요. 올리기 전에 검사기(verifier)가 안전한지 먼저 확인해요.

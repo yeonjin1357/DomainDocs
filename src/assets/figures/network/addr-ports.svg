@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 280" width="300" height="280">
+<rect x="150" y="4" width="146" height="196" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="160" y="22" font-size="13" font-weight="600" style="fill:var(--color-text)">서버 10.0.0.9</text>
+<rect x="184" y="62" width="96" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="232" y="78.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">웹 서버</text>
+<rect x="184" y="140" width="96" height="24" rx="5" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="232" y="156.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">PostgreSQL</text>
+<rect x="151.4" y="63" width="37.1" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="170" y="78.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">443</text>
+<rect x="147.6" y="141" width="44.8" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="170" y="156.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">5432</text>
+<rect x="19" y="69" width="34" height="22" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="23" y="73" width="26" height="14" rx="1.5" style="fill:var(--color-bg)" />
+<line x1="36" y1="91" x2="36" y2="96" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="28" y1="97" x2="44" y2="97" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="36" y="120" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">클라이언트</text>
+<text x="36" y="138" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">10.0.0.5</text>
+<path d="M56 72 L96 66 L145.1 69.6" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 70 L143.3 65.2 L142.7 73.8 z" style="fill:var(--color-accent)" />
+<path d="M56 84 L96 92 L145.3 79.2" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 78 L142.1 75.6 L144.3 84 z" style="fill:var(--color-accent)" />
+<rect x="77.7" y="37" width="52.5" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="104" y="52.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">51234</text>
+<rect x="77.7" y="99" width="52.5" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="104" y="114.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">51235</text>
+<text x="8" y="228" font-size="13" font-weight="700" style="fill:var(--color-text)">연결 하나 = 양쪽 IP와 포트의 짝</text>
+<text x="8" y="250" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">10.0.0.5:51234 ↔ 10.0.0.9:443</text>
+<text x="8" y="270" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">10.0.0.5:51235 ↔ 10.0.0.9:443</text>
+</svg>

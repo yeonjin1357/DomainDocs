@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 354" width="300" height="354">
+<rect x="4" y="40" width="292" height="120" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="58" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">L3 스위치</text>
+<path d="M213 31.3 A6.75 6.75 0 0 1 209.3 19.3 A9.75 9.75 0 0 1 225.8 10.3 A8.25 8.25 0 0 1 241.5 15.5 A7.875 7.875 0 0 1 243.8 31.3 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="228" y="24" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">밖</text>
+<path d="M50 214 L50 86 L192.4 86" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M198 86 L190 81 L190 91 z" style="fill:var(--color-accent)" />
+<path d="M228 70 L228 41.6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M228 36 L223 44 L233 44 z" style="fill:var(--color-accent)" />
+<path d="M70 214 L70 116 L150 116 L150 208.4" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 214 L155 206 L145 206 z" style="fill:var(--color-text-sub)" />
+<rect x="28.3" y="135" width="63.5" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="60" y="150.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">Gi1/0/1</text>
+<rect x="118.3" y="135" width="63.5" height="22" rx="11" stroke-width="1" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="150" y="150.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">Gi1/0/2</text>
+<rect x="198" y="70" width="60" height="32" rx="6" stroke-width="1.5" stroke-dasharray="4 3" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="228" y="91" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">Vlan10</text>
+<text x="228" y="122" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">VLAN 10의</text>
+<text x="228" y="140" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">가상 인터페이스</text>
+<rect x="43" y="217" width="34" height="22" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="47" y="221" width="26" height="14" rx="1.5" style="fill:var(--color-bg)" />
+<line x1="60" y1="239" x2="60" y2="244" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="52" y1="245" x2="68" y2="245" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<rect x="133" y="217" width="34" height="22" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="137" y="221" width="26" height="14" rx="1.5" style="fill:var(--color-bg)" />
+<line x1="150" y1="239" x2="150" y2="244" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="142" y1="245" x2="158" y2="245" stroke-width="2.2" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="60" y="264" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">PC 1</text>
+<text x="150" y="264" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">PC 2</text>
+<circle cx="210" cy="204" r="9.5" style="fill:var(--color-text-sub)" />
+<text x="210" y="208.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">1</text>
+<text x="224" y="209" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">VLAN 안</text>
+<circle cx="210" cy="232" r="9.5" style="fill:var(--color-accent)" />
+<text x="210" y="236.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">2</text>
+<text x="224" y="237" font-size="13" font-weight="600" style="fill:var(--color-accent)">밖으로</text>
+<rect x="4" y="280" width="292" height="72" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 304 V286 Q4.8 280.8 10 280.8 H290 Q295.3 280.8 295.3 286 V304 z" style="fill:var(--color-line)" />
+<path d="M4.8 328 H295.3 V346 Q295.3 351.3 290 351.3 H10 Q4.8 351.3 4.8 346 z" style="fill:var(--color-accent-weak)" />
+<line x1="4" y1="328" x2="296" y2="328" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="296.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">세는 곳</text>
+<text x="152" y="296.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">① VLAN 안</text>
+<text x="248" y="296.7" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">② 밖으로</text>
+<text x="12" y="320.7" font-size="13" font-weight="400" style="fill:var(--color-text)">Gi1/0/1</text>
+<text x="152" y="320.7" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text)">세요</text>
+<text x="248" y="320.7" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text)">세요</text>
+<text x="12" y="344.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">Vlan10</text>
+<text x="152" y="344.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">빠져요</text>
+<text x="248" y="344.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">세요</text>
+</svg>

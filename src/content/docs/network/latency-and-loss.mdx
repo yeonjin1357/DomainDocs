@@ -16,6 +16,8 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc1812
 updated: 2026-10-29
 ---
+import LatHops from '../../../assets/figures/network/lat-hops.svg';
+import LatLoss from '../../../assets/figures/network/lat-loss.svg';
 
 <Situation>
   지점 사용자들이 본사 시스템이 느리다고 해요. 지점에서 본사 서버로 보낸 ping의 왕복 시간이 평소 8ms에서 90ms로 늘었고, 손실도 3%예요.
@@ -56,17 +58,7 @@ ping이 무엇을 재는지는 <Term slug="network/ping-and-latency">ping과 지
 traceroute는 TTL을 1부터 하나씩 늘린 패킷을 보내서, 길 위 라우터마다 "시간 초과" 답을 받아 경로를 보여 줘요. 각 단계(hop)마다 세 번씩 재서 왕복 시간을 보여 주고, 답이 없으면 `*`로 표시해요.
 
 <Figure caption="지점에서 본사까지의 경로 예시예요. 2번째 구간까지는 빠르고, 3번째 통신사 구간에서 지연이 크게 늘어나 끝까지 이어져요.">
-  <Waterfall
-    ariaLabel="1번째 지점 라우터 1ms, 2번째 지점 방화벽 2ms, 3번째 통신사 구간 85ms, 4번째 본사 라우터 87ms, 5번째 본사 서버 90ms로 3번째부터 지연이 크게 늘어나는 워터폴"
-    unit="ms"
-    spans={[
-      { label: '1. 지점 라우터', start: 0, duration: 1 },
-      { label: '2. 지점 방화벽', start: 0, duration: 2 },
-      { label: '3. 통신사 구간', start: 0, duration: 85, tone: 'warn' },
-      { label: '4. 본사 라우터', start: 0, duration: 87, tone: 'warn' },
-      { label: '5. 본사 서버', start: 0, duration: 90, tone: 'warn' },
-    ]}
-  />
+  <LatHops aria-label="지점 라우터 1ms, 지점 방화벽 2ms, 통신사 구간 85ms, 본사 라우터 87ms, 본사 서버 90ms로, 2번째와 3번째 사이에서 83ms 늘어 끝까지 이어지는 경로 그림" />
 </Figure>
 
 읽는 법은 "어디서부터 늘어나, 그 뒤로 계속 이어지는가"예요. 3번째 구간부터 늘어난 지연이 끝까지 이어진다면, 2번째와 3번째 사이에서 지연이 생긴 거예요.
@@ -79,22 +71,8 @@ traceroute에서 중간 장비 하나만 손실이 크거나 느리고, 그 뒤 
 
 진짜 손실은 그 구간부터 끝까지 이어져요. 중간 하나만 나쁘고 끝(목적지)은 멀쩡하다면, 그 장비가 답을 아끼고 있을 뿐이에요.
 
-<Figure caption="traceroute의 구간별 손실 예시예요. 위 줄은 3번째 구간부터 끝까지 손실이 이어져서 진짜 손실이에요. 아래 줄은 3번째 장비만 나쁘고 끝은 멀쩡해서, 그 장비가 답을 아끼는 거예요.">
-  <Strip
-    ariaLabel="위 줄은 1, 2번째 구간 손실이 0%이고 3번째부터 5번째 목적지까지 3%가 이어지며, 아래 줄은 3번째 구간만 40%이고 4, 5번째는 0%인 칸 띠"
-    rows={[
-      {
-        label: '진짜 손실',
-        heads: ['1번째', '2번째', '3번째', '4번째', '5번째'],
-        cells: ['0%', '0%', { label: '3%', tone: 'warn' }, { label: '3%', tone: 'warn' }, { label: '3%', tone: 'warn' }],
-      },
-      { label: '답을 아끼는 장비', cells: ['0%', '0%', { label: '40%', tone: 'warn' }, '0%', '0%'] },
-    ]}
-    ranges={[
-      { row: 0, from: 2, to: 4, label: '끝까지 이어짐', tone: 'warn' },
-      { row: 1, from: 2, to: 2, label: '여기만', tone: 'warn' },
-    ]}
-  />
+<Figure caption="위는 3번째 구간부터 끝까지 손실이 이어져서 진짜 손실이에요. 아래는 3번째 장비만 나쁘고 끝은 멀쩡해서, 그 장비가 답을 아끼는 거예요.">
+  <LatLoss aria-label="위 진짜 손실은 1, 2번째 구간이 0%이고 3번째부터 5번째까지 3%가 끝까지 이어져요. 아래 답을 아끼는 장비는 3번째만 40%이고 4, 5번째는 0%예요" />
 </Figure>
 
 ## 4. 그 구간의 인터페이스를 보세요

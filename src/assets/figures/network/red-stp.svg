@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 198" width="300" height="198">
+<rect x="4" y="4" width="144" height="190" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">① 평소</text>
+<line x1="60" y1="86" x2="38" y2="132" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="92" y1="86" x2="114" y2="132" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="64" y1="148" x2="88" y2="148" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 4" style="stroke:var(--color-text-weak)" />
+<circle cx="80" cy="148" r="6" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-warn)" />
+<line x1="76" y1="152" x2="84" y2="144" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<path d="M47 67 L53 61 L105 61 L99 67 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M99 67 L105 61 L105 79 L99 85 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="47" y="67" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="52.2" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="59.5" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="66.8" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="74.2" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="81.5" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="88.8" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<path d="M7 139 L13 133 L65 133 L59 139 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M59 139 L65 133 L65 151 L59 157 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="7" y="139" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="12.2" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="19.5" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="26.8" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="34.2" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="41.5" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="48.8" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M87 139 L93 133 L145 133 L139 139 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M139 139 L145 133 L145 151 L139 157 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="87" y="139" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="92.2" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="99.5" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="106.8" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="114.2" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="121.5" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="128.8" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="76" y="52" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">A · 루트</text>
+<text x="36" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">B</text>
+<text x="116" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">C</text>
+<text x="76" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">막아 둠</text>
+<rect x="152" y="4" width="144" height="190" rx="12" style="fill:var(--color-card)" />
+<text x="164" y="26" font-size="13" font-weight="700" style="fill:var(--color-text)">② A–B가 끊기면</text>
+<line x1="208" y1="86" x2="186" y2="132" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 4" style="stroke:var(--color-text-weak)" />
+<line x1="192" y1="104" x2="204" y2="116" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="192" y1="116" x2="204" y2="104" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="240" y1="86" x2="262" y2="132" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="212" y1="148" x2="236" y2="148" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<path d="M195 67 L201 61 L253 61 L247 67 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M247 67 L253 61 L253 79 L247 85 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="195" y="67" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="200.2" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="207.5" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="214.8" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="222.2" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="229.5" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="236.8" y="74" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<path d="M155 139 L161 133 L213 133 L207 139 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M207 139 L213 133 L213 151 L207 157 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="155" y="139" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="160.2" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="167.5" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="174.8" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="182.2" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="189.5" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="196.8" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M235 139 L241 133 L293 133 L287 139 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M287 139 L293 133 L293 151 L287 157 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<rect x="235" y="139" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="240.2" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="247.5" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="254.8" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="262.2" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="269.5" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="276.8" y="146" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="224" y="52" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">A · 루트</text>
+<text x="184" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">B</text>
+<text x="264" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">C</text>
+<text x="224" y="180" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">열어요</text>
+</svg>

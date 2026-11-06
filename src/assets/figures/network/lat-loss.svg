@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 232" width="300" height="232">
+<rect x="4" y="4" width="292" height="108" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">진짜 손실</text>
+<line x1="30" y1="56" x2="270" y2="56" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-line)" />
+<circle cx="30" cy="56" r="13" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="30" y="61" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">1</text>
+<text x="30" y="90" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0%</text>
+<circle cx="90" cy="56" r="13" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="90" y="61" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">2</text>
+<text x="90" y="90" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0%</text>
+<circle cx="150" cy="56" r="13" stroke-width="2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="150" y="61" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">3</text>
+<text x="150" y="90" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">3%</text>
+<circle cx="210" cy="56" r="13" stroke-width="2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="210" y="61" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">4</text>
+<text x="210" y="90" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">3%</text>
+<circle cx="270" cy="56" r="13" stroke-width="2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="270" y="61" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">5</text>
+<text x="270" y="90" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">3%</text>
+<path d="M134 36 v-5 H286 v5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<text x="284" y="26" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">끝까지 이어져요</text>
+<rect x="4" y="120" width="292" height="108" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="142" font-size="14" font-weight="700" style="fill:var(--color-text)">답을 아끼는 장비</text>
+<line x1="30" y1="172" x2="270" y2="172" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-line)" />
+<circle cx="30" cy="172" r="13" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="30" y="177" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">1</text>
+<text x="30" y="206" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0%</text>
+<circle cx="90" cy="172" r="13" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="90" y="177" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">2</text>
+<text x="90" y="206" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0%</text>
+<circle cx="150" cy="172" r="13" stroke-width="2" style="fill:var(--color-warn-weak);stroke:var(--color-warn)" />
+<text x="150" y="177" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">3</text>
+<text x="150" y="206" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">40%</text>
+<circle cx="210" cy="172" r="13" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="210" y="177" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">4</text>
+<text x="210" y="206" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0%</text>
+<circle cx="270" cy="172" r="13" stroke-width="2" style="fill:var(--color-card);stroke:var(--color-text-weak)" />
+<text x="270" y="177" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">5</text>
+<text x="270" y="206" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text-sub)">0%</text>
+<path d="M134 152 v-5 H166 v5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<text x="284" y="142" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">여기만</text>
+</svg>

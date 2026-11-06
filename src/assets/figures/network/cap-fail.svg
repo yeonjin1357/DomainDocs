@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 280" width="300" height="280">
+<rect x="4" y="4" width="144" height="272" rx="12" style="fill:var(--color-card)" />
+<text x="76" y="28" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">연결 거부</text>
+<text x="42" y="54" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">클라이언트</text>
+<line x1="42" y1="62" x2="42" y2="190" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="122" y="54" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">서버</text>
+<line x1="122" y1="62" x2="122" y2="190" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M42 84 L117.1 84" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M122 84 L115 79.7 L115 88.3 z" style="fill:var(--color-text-sub)" />
+<text x="90" y="78" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">[S]</text>
+<path d="M122 112 L46.9 112" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-warn)" />
+<path d="M42 112 L49 116.3 L49 107.7 z" style="fill:var(--color-warn)" />
+<text x="90" y="106" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">[R.]</text>
+<text x="76" y="218" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">왕복 한 번(15ms)</text>
+<text x="76" y="237" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">서버에 닿았고</text>
+<text x="76" y="256" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">그 포트가 닫혔어요</text>
+<rect x="152" y="4" width="144" height="272" rx="12" style="fill:var(--color-card)" />
+<text x="224" y="28" font-size="14" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">답이 없음</text>
+<text x="190" y="54" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">클라이언트</text>
+<line x1="190" y1="62" x2="190" y2="194" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<text x="270" y="54" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">서버</text>
+<line x1="270" y1="62" x2="270" y2="194" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<path d="M190 84 L238 84" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="239" y1="79" x2="249" y2="89" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="239" y1="89" x2="249" y2="79" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="222" y="78" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">[S]</text>
+<path d="M190 116 L238 116" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="239" y1="111" x2="249" y2="121" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="239" y1="121" x2="249" y2="111" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="222" y="110" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">[S]</text>
+<path d="M190 148 L238 148" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="239" y1="143" x2="249" y2="153" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="239" y1="153" x2="249" y2="143" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="222" y="142" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">[S]</text>
+<path d="M190 180 L238 180" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="239" y1="175" x2="249" y2="185" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="239" y1="185" x2="249" y2="175" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="222" y="174" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">[S]</text>
+<text x="158" y="89" font-size="13" style="fill:var(--color-text-sub);stroke:var(--color-card);stroke-width:4;stroke-linejoin:round;paint-order:stroke">0초</text>
+<text x="158" y="121" font-size="13" style="fill:var(--color-text-sub);stroke:var(--color-card);stroke-width:4;stroke-linejoin:round;paint-order:stroke">1초</text>
+<text x="158" y="153" font-size="13" style="fill:var(--color-text-sub);stroke:var(--color-card);stroke-width:4;stroke-linejoin:round;paint-order:stroke">2초</text>
+<text x="158" y="185" font-size="13" style="fill:var(--color-text-sub);stroke:var(--color-card);stroke-width:4;stroke-linejoin:round;paint-order:stroke">3초</text>
+<text x="224" y="218" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">4초 뒤 앱이 포기</text>
+<text x="224" y="237" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">가는 길이나 오는 길에서</text>
+<text x="224" y="256" font-size="13" text-anchor="middle" font-weight="400" style="fill:var(--color-text-sub)">사라져요</text>
+</svg>

@@ -25,6 +25,8 @@ sources:
     url: https://man7.org/linux/man-pages/man8/ping.8.html
 updated: 2026-11-03
 ---
+import TunVpn from '../../../assets/figures/network/tun-vpn.svg';
+import TunPmtud from '../../../assets/figures/network/tun-pmtud.svg';
 
 <KeyPoints>
   <Point title="터널은 패킷을 한 번 더 감싸요">
@@ -46,17 +48,8 @@ updated: 2026-11-03
 
 <Term term="network/tunnel">터널</Term>은 패킷을 다른 패킷 안에 넣어 보내는 방법이에요. 바깥 패킷에는 터널 양 끝 장비의 주소가 붙어요. 중간 장비는 안쪽 패킷이 무엇인지 몰라도 바깥 주소만 보고 날라요.
 
-<Figure caption="터널 양 끝 장비가 원래 패킷을 감싸고 벗겨요. 감싼 동안 중간 네트워크에는 파란 칸의 바깥 주소만 보여요.">
-  <Stages
-    ariaLabel="원래 패킷의 안쪽 IP와 데이터를 터널 입구 장비가 바깥 IP와 터널 머리표로 감싸서 보내고, 터널 출구 장비가 벗겨 원래 패킷을 넘기는 단계 칸"
-    hint={['터널 입구 → 출구', '']}
-    grow={3}
-    rows={[
-      { label: '원래 패킷', cells: [null, null, '안쪽 IP', '데이터'] },
-      { label: '입구에서 감쌈', note: '+ 바깥 주소', cells: [{ label: '바깥 IP', tone: 'accent' }, { label: '터널 머리', tone: 'accent' }, '안쪽 IP', '데이터'] },
-      { label: '출구에서 벗김', cells: [null, null, '안쪽 IP', '데이터'] },
-    ]}
-  />
+<Figure caption="지사의 원래 패킷을 터널 입구가 바깥 주소로 감싸 인터넷 너머로 보내고, 출구가 벗겨 본사에 넘겨요. 감싼 동안 중간 장비에는 파란 칸의 바깥 주소만 보여요.">
+  <TunVpn aria-label="지사 PC의 원래 패킷(안쪽 IP, 데이터)을 터널 입구가 바깥 IP와 터널 머리로 감싸 인터넷 위의 터널로 보내고, 본사의 출구가 벗겨 원래 패킷을 서버에 넘기는 그림" />
 </Figure>
 
 감싸는 방식을 일컫는 말이 셋 있어요.
@@ -98,17 +91,8 @@ updated: 2026-11-03
 
 문제는 방화벽이 ICMP를 모두 막을 때예요. 보내는 쪽은 "너무 커요"를 못 받아서, 같은 크기로 계속 다시 보내요. 큰 패킷만 소리 없이 사라지는 <Term term="network/mtu-black-hole">MTU 블랙홀</Term>이에요.
 
-<Figure caption="응답이 1,500바이트라 터널 입구에서 버려졌어요. 입구 장비가 보낸 ICMP는 방화벽에 막혀 서버에 닿지 않아서, 서버는 줄일 줄 모르고 같은 크기로 다시 보내요.">
-  <Sequence
-    ariaLabel="클라이언트의 작은 요청은 서버에 닿고, 서버의 1,500바이트 응답은 터널 입구에서 버려지며, 입구가 보낸 ICMP 너무 커요는 막혀 서버에 닿지 않아, 서버가 같은 크기로 다시 보내는 순서"
-    participants={['서버', '터널 입구', '클라이언트']}
-    messages={[
-      { from: '클라이언트', to: '서버', label: '요청(작음)' },
-      { from: '서버', to: '터널 입구', label: '응답 1,500B', tone: 'warn' },
-      { from: '터널 입구', to: '서버', label: 'ICMP 너무 커요(막힘)', dashed: true, tone: 'warn' },
-      { from: '서버', to: '터널 입구', label: '다시 1,500B', tone: 'warn' },
-    ]}
-  />
+<Figure caption="응답이 1,500바이트라 터널 입구에서 버려져요. 입구가 보낸 ICMP '너무 커요'는 방화벽에 막혀 서버에 닿지 않아서, 서버는 같은 크기로 다시 보내요.">
+  <TunPmtud aria-label="서버, 방화벽, 터널 입구, 클라이언트 순으로 놓인 그림. 클라이언트의 작은 요청은 서버에 닿고, 서버의 1,500바이트 응답은 터널 입구에서 버려져요. 입구가 보낸 ICMP 너무 커요는 방화벽에 막히고, 서버는 다시 1,500바이트로 보내 또 버려져요" />
 </Figure>
 
 그래서 연결은 맺어지고 작은 요청도 오가는데, 큰 응답이나 큰 인증서가 오가는 TLS 연결 맺기에서만 멈춰요. 연결이 끊기지 않고 그냥 멈춰 있어서, 시간 초과로만 보여요.

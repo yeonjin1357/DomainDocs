@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 268" width="300" height="268">
+<rect x="4" y="30" width="116" height="190" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="48" font-size="13" font-weight="600" style="fill:var(--color-text)">주문 서버</text>
+<rect x="14" y="140" width="96" height="66" rx="8" style="fill:var(--color-line)" />
+<text x="62" y="162" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">서버 전체</text>
+<text x="62" y="180" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">다시 보냄 1,230</text>
+<text x="62" y="198" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">새로 보냄 51,000</text>
+<line x1="120" y1="58" x2="248" y2="58" stroke-width="2.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<rect x="146.4" y="47" width="75.2" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="184" y="62.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">RTT 38ms</text>
+<rect x="257" y="41" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="263" y1="49" x2="277" y2="49" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="263" y1="55" x2="277" y2="55" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="263" y1="61" x2="277" y2="61" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="270" cy="68.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="270" y="88" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">결제 서버</text>
+<line x1="120" y1="122" x2="248" y2="122" stroke-width="2.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<rect x="150.2" y="111" width="67.5" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="184" y="126.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">RTT 2ms</text>
+<rect x="257" y="105" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="263" y1="113" x2="277" y2="113" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="263" y1="119" x2="277" y2="119" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="263" y1="125" x2="277" y2="125" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="270" cy="132.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="270" y="152" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">재고 서버</text>
+<line x1="120" y1="186" x2="248" y2="186" stroke-width="2.5" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<rect x="150.2" y="175" width="67.5" height="22" rx="11" style="fill:var(--color-accent-weak)" />
+<text x="184" y="190.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">RTT 1ms</text>
+<rect x="257" y="169" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="263" y1="177" x2="277" y2="177" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="263" y1="183" x2="277" y2="183" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="263" y1="189" x2="277" y2="189" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="270" cy="196.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="270" y="216" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">DB</text>
+<text x="184" y="22" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">ss -ti</text>
+<text x="184" y="40" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">연결 하나하나</text>
+<text x="62" y="242" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">/proc/net/snmp</text>
+<text x="62" y="260" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">서버 전체 합계</text>
+</svg>

@@ -29,6 +29,8 @@ sources:
     url: https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cloudwatch-metrics.html
 updated: 2026-11-03
 ---
+import LayersMacRewrite from '../../../assets/figures/network/layers-mac-rewrite.svg';
+import LayersTcpUdp from '../../../assets/figures/network/layers-tcp-udp.svg';
 
 <KeyPoints>
   <Point title="통신은 층마다 할 일을 나눠요">
@@ -143,16 +145,8 @@ VPN이나 오버레이 같은 터널은 이 패킷을 통째로 한 번 더 감�
 
 L2 머리표의 MAC 주소는 같은 네트워크 안에서만 써요. 그래서 라우터는 패킷을 다음 네트워크로 넘길 때 L2 머리표를 떼고 새로 붙여요. 안쪽의 IP 주소는 그대로예요.
 
-<Figure caption="서버 A가 라우터 너머의 서버 B에 보낸 같은 패킷을 두 구간에서 봤어요. IP 주소는 끝까지 그대로이고, 맨 바깥 MAC 주소만 구간마다 바뀌어요. 바뀐 칸은 파란색이에요.">
-  <Stages
-    ariaLabel="서버 A가 라우터 너머 서버 B에 보낸 패킷을 두 구간에서 본 그림. 첫 구간의 MAC은 서버 A에서 라우터로, 둘째 구간의 MAC은 라우터에서 서버 B로 바뀌지만, IP는 두 구간 모두 서버 A에서 서버 B로 그대로예요"
-    hint={['보낸 → 받는 주소', '']}
-    grow={2}
-    rows={[
-      { label: '서버 A → 라우터 구간', cells: ['MAC A→라우터', 'IP A→B', '안쪽 그대로'] },
-      { label: '라우터 → 서버 B 구간', note: 'MAC만 새로', cells: [{ label: 'MAC 라우터→B', tone: 'accent' }, 'IP A→B', '안쪽 그대로'] },
-    ]}
-  />
+<Figure caption="서버 A가 라우터 너머의 서버 B에 보낸 같은 패킷을 두 구간에서 봤어요. IP 주소는 끝까지 그대로이고, 맨 바깥 MAC 주소만 구간마다 새로 붙어요.">
+  <LayersMacRewrite aria-label="서버 A, 라우터, 서버 B가 이어진 그림. ① A에서 라우터 구간의 패킷은 MAC A→라우터, IP A→B이고, ② 라우터에서 B 구간의 패킷은 MAC 라우터→B로 바뀌지만 IP A→B는 그대로예요" />
 </Figure>
 
 서버 A는 받는 곳이 다른 네트워크라서, 받는 MAC 자리에 라우터(기본 게이트웨이)의 MAC을 적어요. 기본 게이트웨이는 <Term slug="network/switches-and-routers">스위치와 라우터</Term>에서 다뤄요.
@@ -163,17 +157,8 @@ NAT 장비를 지나면 IP 주소도 바뀔 수 있어요. 이건 <Term slug="ne
 
 전송층에는 규약이 둘 있어요. <Term slug="network/tcp-connections">TCP</Term>는 연결을 맺고, 받았다는 답을 확인하며 빠짐없이 순서대로 전해요. <Term term="network/udp">UDP</Term>는 연결도 확인도 없이 바로 보내요.
 
-<Figure caption="TCP는 확인하는 만큼 무겁고, UDP는 가볍지만 잃어도 몰라요. 앱이 필요에 맞는 쪽을 골라요.">
-  <Compare
-    columns={['TCP', 'UDP']}
-    rows={[
-      { label: '연결 맺기', values: ['세 번 주고받아요', '없어요'] },
-      { label: '잃으면', values: ['다시 보내요', '그대로 잃어요'] },
-      { label: '순서', values: ['맞춰 줘요', '맞추지 않아요'] },
-      { label: '머리 크기', values: ['20바이트부터', '8바이트'] },
-      { label: '쓰는 곳', values: ['HTTP, DB 연결', 'DNS 질의, SNMP, Syslog'] },
-    ]}
-  />
+<Figure caption="TCP는 연결을 맺고, 사라진 데이터를 다시 보내요. UDP는 연결 없이 바로 보내고, 사라져도 몰라요.">
+  <LayersTcpUdp aria-label="왼쪽 TCP는 SYN, SYN·ACK, ACK로 연결을 맺은 뒤 데이터를 보내고, 사라진 데이터를 다시 보내요. 머리는 20바이트부터이고 HTTP와 DB 연결에 써요. 오른쪽 UDP는 연결 없이 데이터를 보내고, 하나가 사라져도 그대로 다음 데이터를 보내요. 머리는 8바이트이고 DNS, SNMP, Syslog에 써요" />
 </Figure>
 
 UDP로 오는 SNMP Trap과 Syslog가 중간에 사라져도 보낸 쪽이 모르는 이유예요. 자세한 건 <Term slug="network/traps-and-syslog">SNMP Trap과 Syslog</Term>에 있어요.

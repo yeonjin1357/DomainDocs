@@ -16,6 +16,7 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc1812
 updated: 2026-10-29
 ---
+import DuSnmpPath from '../../../assets/figures/network/du-snmp-path.svg';
 
 <Situation>
   네트워크 장비 목록에서 지점 스위치 한 대가 "응답 없음"으로 바뀌었어요. 그런데 그 지점에서 일하는 사람들은 아무 문제가 없다고 해요.
@@ -63,22 +64,7 @@ ping은 되는데 SNMP만 답이 없다면, 장비는 살아 있고 질문 쪽�
 - 장비 CPU가 바빠서 SNMP 답이 제한 시간 안에 오지 않아요. 이때는 응답 없음이 났다 풀렸다를 되풀이해요.
 
 <Figure caption="SNMP 질문이 장비까지 가는 길이에요. 중간 방화벽에서는 UDP 161번 포트가, 장비에서는 계정 정보와 접근 목록(ACL)이 질문을 막을 수 있어요.">
-  <Flow
-    ariaLabel="관리 서버가 보낸 SNMP 질문이 중간 방화벽을 지나 장비의 SNMP 에이전트에 닿고, 방화벽에서는 UDP 161번 포트가, 장비에서는 계정과 ACL이 질문을 막을 수 있는 곳인 구조도"
-    nodes={[
-      { id: 'nms', label: '관리 서버', col: 0, row: 0, note: 'snmpget' },
-      { id: 'fw', label: '중간 방화벽', col: 1, row: 0 },
-      { id: 'dev', label: '장비', col: 2, row: 0, note: 'SNMP 에이전트', tone: 'accent' },
-      { id: 'port', label: 'UDP 161', col: 1, row: 1, note: '열려 있나', tone: 'warn' },
-      { id: 'auth', label: '계정·ACL', col: 2, row: 1, note: '맞나', tone: 'warn' },
-    ]}
-    edges={[
-      { from: 'nms', to: 'fw', tone: 'accent' },
-      { from: 'fw', to: 'dev', tone: 'accent' },
-      { from: 'fw', to: 'port', dashed: true },
-      { from: 'dev', to: 'auth', dashed: true },
-    ]}
-  />
+  <DuSnmpPath aria-label="관리 서버가 snmpget으로 보낸 SNMP 질문이 중간 방화벽을 지나 장비의 SNMP 에이전트에 닿는 그림. 방화벽에서는 UDP 161이 열려 있는지, 장비에서는 계정과 ACL이 맞는지가 질문을 막을 수 있어요" />
 </Figure>
 
 **확인 방법**: 관리 서버에서 그 장비로 `snmpget`을 직접 보내 봐요. 답이 오는데 화면만 응답 없음이라면 모니터링 쪽 설정을 봐요.

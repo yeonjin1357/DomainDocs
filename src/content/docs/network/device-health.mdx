@@ -21,6 +21,8 @@ sources:
     url: https://www.cisco.com/c/en/us/support/docs/switches/catalyst-6500-series-switches/63992-6k-high-cpu.html
 updated: 2026-11-03
 ---
+import DhParts from '../../../assets/figures/network/dh-parts.svg';
+import DhPlanes from '../../../assets/figures/network/dh-planes.svg';
 
 <KeyPoints>
   <Point title="장비도 몸 상태를 알려 줘요">
@@ -41,23 +43,7 @@ updated: 2026-11-03
 ## 무엇을 재나요
 
 <Figure caption="장비 한 대에서 읽는 상태예요. 인터페이스의 트래픽과 별개로, 장비 자체의 부품마다 값과 상태가 있어요.">
-  <Flow
-    ariaLabel="장비 한 대 안에 CPU와 메모리, 온도 센서, 팬, 전원 공급 장치가 있고, 관리 서버가 SNMP로 이 값들을 읽는 구조도"
-    nodes={[
-      { id: 'cpu', label: 'CPU·메모리', col: 0, row: 0, note: '관리 일의 양' },
-      { id: 'temp', label: '온도 센서', col: 2, row: 0, note: '℃' },
-      { id: 'fan', label: '팬', col: 0, row: 1, note: '돌고 있나' },
-      { id: 'psu', label: '전원 공급 장치', col: 2, row: 1, note: '둘 중 하나 고장?' },
-      { id: 'mgr', label: '관리 서버', col: 1, row: 2, note: 'SNMP로 읽어요', tone: 'accent' },
-    ]}
-    edges={[
-      { from: 'mgr', to: 'cpu', dashed: true },
-      { from: 'mgr', to: 'temp', dashed: true },
-      { from: 'mgr', to: 'fan', dashed: true },
-      { from: 'mgr', to: 'psu', dashed: true },
-    ]}
-    groups={[{ label: '장비 한 대', cols: [0, 2], rows: [0, 1] }]}
-  />
+  <DhParts aria-label="장비 한 대 안에 CPU·메모리, 온도 센서(42.5℃), 팬 두 개, 전원 공급 장치 두 개가 있고 그중 2번이 멈췄어요. 관리 서버가 SNMP로 이 값들을 읽는 그림" />
 </Figure>
 
 장비 안의 부품은 <Term term="network/entity-mib">ENTITY-MIB</Term>라는 표준 표로 읽어요. 표의 줄마다 부품 하나가 있고, 그 부품이 섀시인지, 모듈인지, 팬인지, 전원 공급 장치인지, 센서인지가 적혀 있어요.
@@ -70,15 +56,8 @@ updated: 2026-11-03
 
 CPU가 맡는 건 장비 자신에게 오는 일이에요. 라우팅 계산, 스패닝 트리 같은 제어 메시지, SNMP·SSH 같은 관리 요청, 칩이 처리하지 못하는 특이한 패킷이에요.
 
-<Figure caption="트래픽이 두 배로 늘어도 칩이 넘기는 몫이라 CPU는 그대로예요. 관리 요청이나 제어 메시지가 늘 때 CPU가 올라요.">
-  <Compare
-    columns={['전용 칩(ASIC)', 'CPU']}
-    rows={[
-      { label: '맡는 일', values: ['대부분의 패킷 전달', '라우팅 계산, 관리 요청'] },
-      { label: '늘면 바빠지는 것', values: ['지나가는 트래픽', 'SNMP 폴링, 제어 메시지'] },
-      { label: '나빠지면', values: ['패킷을 버려요', '관리 응답이 늦거나 끊겨요'] },
-    ]}
-  />
+<Figure caption="지나가는 트래픽은 전용 칩이 넘겨서, 트래픽이 두 배로 늘어도 CPU는 그대로예요. 관리 요청이나 제어 메시지가 늘 때 CPU가 올라요.">
+  <DhPlanes aria-label="스위치·라우터 안에서 지나가는 트래픽은 전용 칩(ASIC)을 거쳐 넘어가고, 관리 서버의 SNMP·SSH와 이웃 라우터의 라우팅·STP 메시지는 CPU로 가는 그림. 칩이 넘치면 패킷을 버리고, CPU가 바쁘면 관리 응답이 늦어요" />
 </Figure>
 
 그래서 장비 CPU 사용률은 트래픽이 얼마나 많은지 알려 주지 않아요. 트래픽은 <Term slug="network/interfaces-and-traffic">인터페이스와 트래픽</Term>으로 봐요.

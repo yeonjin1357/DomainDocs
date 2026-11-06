@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 278" width="300" height="278">
+<rect x="4" y="4" width="292" height="132" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="26" font-size="14" font-weight="700" style="fill:var(--color-text)">정적 경로</text>
+<text x="16" y="44" font-size="13" style="fill:var(--color-text-sub)">사람이 적은 길 · B로 가요</text>
+<line x1="62" y1="90" x2="130" y2="70" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="62" y1="102" x2="130" y2="116" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="172" y1="70" x2="248" y2="84" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4" style="stroke:var(--color-text-weak)" />
+<line x1="200" y1="71" x2="212" y2="83" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="200" y1="83" x2="212" y2="71" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="172" y1="116" x2="248" y2="100" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<path d="M20 90 V103 A22 7 0 0 0 64 103 V90" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<ellipse cx="42" cy="90" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M32 87.8 L47.5 87.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M51 87.8 L46 84.7 L46 90.9 z" style="fill:var(--color-accent)" />
+<path d="M52 92.4 L36.5 92.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M33 92.4 L38 95.5 L38 89.3 z" style="fill:var(--color-accent)" />
+<path d="M128 64 V77 A22 7 0 0 0 172 77 V64" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<ellipse cx="150" cy="64" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M140 61.8 L155.5 61.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M159 61.8 L154 58.7 L154 64.9 z" style="fill:var(--color-text-sub)" />
+<path d="M160 66.4 L144.5 66.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M141 66.4 L146 69.5 L146 63.3 z" style="fill:var(--color-text-sub)" />
+<path d="M128 110 V123 A22 7 0 0 0 172 123 V110" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<ellipse cx="150" cy="110" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M140 107.8 L155.5 107.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M159 107.8 L154 104.7 L154 110.9 z" style="fill:var(--color-text-sub)" />
+<path d="M160 112.4 L144.5 112.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M141 112.4 L146 115.5 L146 109.3 z" style="fill:var(--color-text-sub)" />
+<rect x="249" y="75" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="255" y1="83" x2="269" y2="83" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="255" y1="89" x2="269" y2="89" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="255" y1="95" x2="269" y2="95" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="262" cy="102.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="42" y="124" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">A</text>
+<text x="180" y="64" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">B</text>
+<text x="180" y="134" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">C</text>
+<text x="262" y="124" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">목적지</text>
+<rect x="196.8" y="19" width="106.5" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="250" y="34.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">B로 계속 보내요</text>
+<rect x="4" y="142" width="292" height="132" rx="12" style="fill:var(--color-card)" />
+<text x="16" y="164" font-size="14" font-weight="700" style="fill:var(--color-text)">라우팅 프로토콜</text>
+<text x="16" y="182" font-size="13" style="fill:var(--color-text-sub)">라우터끼리 알려 준 길</text>
+<line x1="62" y1="228" x2="130" y2="208" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-text-weak)" />
+<line x1="62" y1="240" x2="130" y2="254" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="172" y1="208" x2="248" y2="222" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4" style="stroke:var(--color-text-weak)" />
+<line x1="200" y1="209" x2="212" y2="221" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="200" y1="221" x2="212" y2="209" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="172" y1="254" x2="248" y2="238" stroke-width="3" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<path d="M20 228 V241 A22 7 0 0 0 64 241 V228" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<ellipse cx="42" cy="228" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M32 225.8 L47.5 225.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M51 225.8 L46 222.7 L46 228.9 z" style="fill:var(--color-accent)" />
+<path d="M52 230.4 L36.5 230.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M33 230.4 L38 233.5 L38 227.3 z" style="fill:var(--color-accent)" />
+<path d="M128 202 V215 A22 7 0 0 0 172 215 V202" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<ellipse cx="150" cy="202" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M140 199.8 L155.5 199.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M159 199.8 L154 196.7 L154 202.9 z" style="fill:var(--color-text-sub)" />
+<path d="M160 204.4 L144.5 204.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M141 204.4 L146 207.5 L146 201.3 z" style="fill:var(--color-text-sub)" />
+<path d="M128 248 V261 A22 7 0 0 0 172 261 V248" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<ellipse cx="150" cy="248" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<path d="M140 245.8 L155.5 245.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M159 245.8 L154 242.7 L154 248.9 z" style="fill:var(--color-text-sub)" />
+<path d="M160 250.4 L144.5 250.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M141 250.4 L146 253.5 L146 247.3 z" style="fill:var(--color-text-sub)" />
+<rect x="249" y="213" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="255" y1="221" x2="269" y2="221" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="255" y1="227" x2="269" y2="227" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="255" y1="233" x2="269" y2="233" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="262" cy="240.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="42" y="262" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">A</text>
+<text x="180" y="202" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">B</text>
+<text x="180" y="272" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">C</text>
+<text x="262" y="262" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">목적지</text>
+<rect x="211.3" y="157" width="77.4" height="22" rx="11" style="fill:var(--color-accent)" />
+<text x="250" y="172.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-card)">C로 바꿔요</text>
+</svg>

@@ -17,6 +17,7 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc3416
 updated: 2026-10-26
 ---
+import TelPullPush from '../../../assets/figures/network/tel-pull-push.svg';
 
 <OnDashboard title="코어 스위치 · 같은 인터페이스" caption="1분마다 묻는 SNMP 그래프에는 평균만 남아요. 10초마다 받는 스트리밍 그래프에는 그 사이의 짧은 폭주가 보여요.">
   <MiniLineChart
@@ -41,15 +42,7 @@ updated: 2026-10-26
 ## 두 방식
 
 <Figure caption="같은 장비에서 같은 값을 가져와도, 누가 시작하고 무엇으로 이름 붙이는지가 달라요.">
-  <Compare
-    columns={['SNMP 폴링', '스트리밍(gNMI)']}
-    rows={[
-      { label: '누가 시작', values: ['관리 서버가 주기마다 물어요', '구독하면 장비가 보내요'] },
-      { label: '전송', values: ['UDP, 묻고 답하기', 'gRPC, 연결을 열어 둬요'] },
-      { label: '값 이름', values: ['OID(숫자)', 'YANG 경로'] },
-      { label: '간격', values: ['폴링 주기', '정한 간격이나 바뀔 때'] },
-    ]}
-  />
+  <TelPullPush aria-label="왼쪽 SNMP 폴링은 관리 서버가 주기마다 GET으로 묻고 장비가 답해요. UDP를 쓰고 값 이름은 OID 숫자예요. 오른쪽 gNMI 스트리밍은 관리 서버가 한 번 구독하면 열어 둔 연결로 장비가 값을 계속 보내요. gRPC를 쓰고 값 이름은 YANG 경로예요" />
 </Figure>
 
 <Term slug="network/snmp">SNMP</Term>는 관리 서버가 값을 하나하나 묻고 답을 받아요. 인터페이스가 수백 개인 장비라면 한 번 돌 때마다 많은 요청이 오가요. 그래서 폴링 주기를 너무 짧게 잡기 어려워요.

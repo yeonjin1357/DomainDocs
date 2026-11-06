@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 184" width="300" height="184">
+<path d="M52 44 L118.4 44" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M124 44 L116 39 L116 49 z" style="fill:var(--color-accent)" />
+<path d="M176 44 L216.4 44" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M222 44 L214 39 L214 49 z" style="fill:var(--color-accent)" />
+<rect x="17" y="27" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="23" y1="35" x2="37" y2="35" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="41" x2="37" y2="41" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="23" y1="47" x2="37" y2="47" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="30" cy="54.5" r="2" style="fill:var(--color-text-sub)" />
+<rect x="130" y="30" width="40" height="28" rx="3" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="130" y1="39.3" x2="170" y2="39.3" stroke-width="1.3" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="130" y1="48.7" x2="170" y2="48.7" stroke-width="1.3" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="143" y1="30" x2="143" y2="39.3" stroke-width="1.3" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="157" y1="30" x2="157" y2="39.3" stroke-width="1.3" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="136.5" y1="39.3" x2="136.5" y2="48.6" stroke-width="1.3" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="150" y1="39.3" x2="150" y2="48.6" stroke-width="1.3" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="163.5" y1="39.3" x2="163.5" y2="48.6" stroke-width="1.3" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="143" y1="48.7" x2="143" y2="58" stroke-width="1.3" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<line x1="157" y1="48.7" x2="157" y2="58" stroke-width="1.3" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<path d="M228 37 L234 31 L286 31 L280 37 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M280 37 L286 31 L286 49 L280 55 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="228" y="37" width="52" height="18" rx="2" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<rect x="233.2" y="44" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="240.5" y="44" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="247.8" y="44" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="255.2" y="44" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="262.5" y="44" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<rect x="269.8" y="44" width="5" height="5" rx="1" stroke-width="1.2" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<text x="30" y="80" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">관리 서버</text>
+<text x="150" y="80" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">중간 방화벽</text>
+<text x="257" y="80" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">장비</text>
+<text x="30" y="98" font-size="13" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">snmpget</text>
+<text x="257" y="98" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">SNMP 에이전트</text>
+<text x="88" y="34" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-accent)">질문</text>
+<line x1="150" y1="110" x2="150" y2="122" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="83" y="125" width="134.1" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="150" y="140.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">UDP 161 열려 있나?</text>
+<line x1="257" y1="110" x2="257" y2="154" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<rect x="182.8" y="157" width="114.5" height="22" rx="11" style="fill:var(--color-warn-weak)" />
+<text x="240" y="172.7" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">계정·ACL 맞나?</text>
+</svg>

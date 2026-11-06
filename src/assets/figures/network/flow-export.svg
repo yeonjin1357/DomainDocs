@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 278" width="300" height="278">
+<line x1="8" y1="36" x2="292" y2="36" stroke-width="2" stroke-linecap="round" style="stroke:var(--color-line)" />
+<rect x="10" y="30" width="12" height="12" rx="2" style="fill:var(--color-accent)" />
+<rect x="28" y="30" width="12" height="12" rx="2" style="fill:var(--color-text-sub)" />
+<rect x="46" y="30" width="12" height="12" rx="2" style="fill:var(--color-accent)" />
+<rect x="64" y="30" width="12" height="12" rx="2" style="fill:var(--color-accent)" />
+<rect x="82" y="30" width="12" height="12" rx="2" style="fill:var(--color-text-sub)" />
+<rect x="220" y="30" width="12" height="12" rx="2" style="fill:var(--color-accent)" />
+<rect x="238" y="30" width="12" height="12" rx="2" style="fill:var(--color-text-sub)" />
+<rect x="256" y="30" width="12" height="12" rx="2" style="fill:var(--color-accent)" />
+<path d="M128 30 V43 A22 7 0 0 0 172 43 V30" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<ellipse cx="150" cy="30" rx="22" ry="7" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<path d="M140 27.8 L155.5 27.8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M159 27.8 L154 24.7 L154 30.9 z" style="fill:var(--color-accent)" />
+<path d="M160 32.4 L144.5 32.4" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M141 32.4 L146 35.5 L146 29.3 z" style="fill:var(--color-accent)" />
+<text x="150" y="72" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">라우터가 흐름마다 세어 적어요</text>
+<rect x="4" y="84" width="292" height="72" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 108 V90 Q4.8 84.8 10 84.8 H290 Q295.3 84.8 295.3 90 V108 z" style="fill:var(--color-line)" />
+<rect x="4.8" y="108" width="290.5" height="24" rx="0" style="fill:var(--color-accent-weak)" />
+<line x1="4" y1="132" x2="296" y2="132" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="100.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">출발지</text>
+<text x="86" y="100.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">목적지</text>
+<text x="232" y="100.7" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">바이트</text>
+<text x="288" y="100.7" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">패킷</text>
+<text x="12" y="124.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">10.0.1.5</text>
+<text x="86" y="124.7" font-size="13" font-weight="700" style="fill:var(--color-accent)">10.0.9.20:443</text>
+<text x="232" y="124.7" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">1.2GB</text>
+<text x="288" y="124.7" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent)">86만</text>
+<text x="12" y="148.7" font-size="13" font-weight="400" style="fill:var(--color-text)">10.0.2.8</text>
+<text x="86" y="148.7" font-size="13" font-weight="400" style="fill:var(--color-text)">10.0.9.30:5432</text>
+<text x="232" y="148.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">0.4GB</text>
+<text x="288" y="148.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">31만</text>
+<path d="M60 158 L60 190.4" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M60 196 L65 188 L55 188 z" style="fill:var(--color-accent)" />
+<text x="70" y="182" font-size="13" font-weight="600" style="fill:var(--color-accent)">UDP로 보내요</text>
+<rect x="47" y="205" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="53" y1="213" x2="67" y2="213" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="53" y1="219" x2="67" y2="219" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="53" y1="225" x2="67" y2="225" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="60" cy="232.5" r="2" style="fill:var(--color-accent)" />
+<text x="60" y="258" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">수집기</text>
+<rect x="118" y="196" width="178" height="76" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="128" y="216" font-size="13" font-weight="700" style="fill:var(--color-text-sub)">많이 쓴 곳</text>
+<text x="128" y="240" font-size="13" style="fill:var(--color-text)">10.0.1.5</text>
+<rect x="190" y="230" width="96" height="12" rx="3" style="fill:var(--color-accent)" />
+<text x="128" y="262" font-size="13" style="fill:var(--color-text)">10.0.2.8</text>
+<rect x="190" y="252" width="32" height="12" rx="3" style="fill:var(--color-text-sub)" />
+<path d="M84 222 L111.1 222" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-weak)" />
+<path d="M116 222 L109 217.7 L109 226.3 z" style="fill:var(--color-text-weak)" />
+</svg>

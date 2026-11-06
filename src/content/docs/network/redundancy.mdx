@@ -21,6 +21,9 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc5798.html
 updated: 2026-11-03
 ---
+import RedStp from '../../../assets/figures/network/red-stp.svg';
+import RedLacp from '../../../assets/figures/network/red-lacp.svg';
+import RedVrrp from '../../../assets/figures/network/red-vrrp.svg';
 
 <KeyPoints>
   <Point title="둘로 이으면 루프가 생겨요">
@@ -50,20 +53,8 @@ updated: 2026-11-03
 
 이렇게 돌며 불어난 프레임이 링크를 가득 채우는 걸 브로드캐스트 폭풍이라고 해요. 그래서 <Term term="network/stp">STP</Term>(Spanning Tree Protocol)가 길 하나를 막아 루프 없는 나무 모양을 만들어요.
 
-<Figure caption="스위치 셋을 삼각형으로 이은 예시예요. STP가 B와 C 사이 길을 막아 두고(점선), A와 B 또는 A와 C 길이 끊기면 그 길을 열어요.">
-  <Flow
-    ariaLabel="스위치 A가 위에, B와 C가 아래에 있고, A-B와 A-C 길은 전달 중이며, B-C 길은 STP가 막아 둔 점선인 구조도"
-    nodes={[
-      { id: 'a', label: '스위치 A', col: 1, row: 0, note: '루트', tone: 'accent' },
-      { id: 'b', label: '스위치 B', col: 0, row: 1 },
-      { id: 'c', label: '스위치 C', col: 2, row: 1 },
-    ]}
-    edges={[
-      { from: 'a', to: 'b', both: true },
-      { from: 'a', to: 'c', both: true },
-      { from: 'b', to: 'c', both: true, dashed: true, label: '막아 둠', tone: 'warn' },
-    ]}
-  />
+<Figure caption="스위치 셋을 삼각형으로 이은 예시예요. 평소에는 STP가 B와 C 사이 길을 막아 두고, A와 B 사이가 끊기면 그 길을 열어요.">
+  <RedStp aria-label="① 평소에는 루트 스위치 A가 B, C와 이어져 전달하고, B와 C 사이 길은 막혀 있어요. ② A와 B 사이가 끊기면 B와 C 사이 길을 열어, B가 C를 거쳐 A에 닿아요" />
 </Figure>
 
 쓰던 길이 끊기면 막아 둔 포트가 열려요. 옛 STP(802.1D)는 기본 설정에서 포트를 열기 전에 15초씩 두 번, 30초를 기다려요. 빠른 STP(RSTP, 802.1w)는 잘 짜인 네트워크라면 몇백 밀리초 안에 바꿔요.
@@ -74,14 +65,8 @@ updated: 2026-11-03
 
 묶으면 선 하나가 끊겨도 나머지로 이어져요. 대역폭도 멤버 수만큼 늘어요. 그런데 흐름 하나가 쓸 수 있는 건 여전히 멤버 하나예요.
 
-<Figure caption="1Gbps 선 두 개를 묶은 링크예요. 장비는 주소와 포트로 해시를 구해 흐름마다 멤버 하나를 정해요. 그래서 큰 흐름 하나는 1Gbps를 넘지 못해요.">
-  <Strip
-    ariaLabel="멤버 1과 멤버 2가 1Gbps씩 묶여 논리 링크 2Gbps가 되고, 흐름 A는 멤버 1로, 흐름 B와 C는 멤버 2로 가서 흐름 하나는 1Gbps를 넘지 못하는 칸 띠"
-    rows={[
-      { label: '멤버 링크', heads: ['1Gbps', '1Gbps'], cells: [{ label: '흐름 A', tone: 'accent' }, '흐름 B, C'] },
-    ]}
-    ranges={[{ from: 0, to: 1, label: '논리 링크 2Gbps' }]}
-  />
+<Figure caption="1Gbps 선 두 개를 묶어도, 장비는 주소와 포트로 해시를 구해 흐름마다 멤버 하나를 정해요. 그래서 큰 흐름 하나는 1Gbps를 넘지 못해요.">
+  <RedLacp aria-label="스위치 두 대를 1Gbps 멤버 링크 두 개로 묶은 2Gbps 논리 링크 그림. 흐름 A는 멤버 1로, 흐름 B와 C는 멤버 2로 가서, 흐름 A 하나는 1Gbps를 넘지 못해요" />
 </Figure>
 
 같은 주소와 포트의 패킷은 늘 같은 멤버로 가요. 그래야 순서가 뒤섞이지 않아요. 리눅스 bonding 문서도 연결 하나는 여러 멤버에 걸치지 않는다고 해요.
@@ -110,6 +95,10 @@ updated: 2026-11-03
       { at: 8.6, label: '8.6초' },
     ]}
   />
+</Figure>
+
+<Figure caption="라우터 둘이 가상 IP 10.0.0.1을 함께 맡아요. 서버는 이 가상 IP를 게이트웨이로 적고, 평소에는 마스터가 받아요.">
+  <RedVrrp aria-label="라우터 1(마스터)과 라우터 2(대기)가 가상 IP 10.0.0.1을 함께 맡고, 마스터가 1초마다 알림을 보내는 그림. 아래 스위치에 이어진 서버들은 게이트웨이를 10.0.0.1로 적어요" />
 </Figure>
 
 기다리는 시간은 알림 간격의 세 배에 우선순위로 정한 몫이 더해져요. 기본값(간격 1초, 대기 라우터 우선순위 100)이면 약 3.6초예요. Cisco 장비의 HSRP도 같은 일을 하는 Cisco 전용 규약이에요.

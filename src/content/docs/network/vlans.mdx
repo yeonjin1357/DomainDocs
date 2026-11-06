@@ -19,6 +19,8 @@ sources:
     url: https://www.rfc-editor.org/rfc/rfc4363.html
 updated: 2026-10-29
 ---
+import VlanSplit from '../../../assets/figures/network/vlan-split.svg';
+import VlanCounters from '../../../assets/figures/network/vlan-counters.svg';
 
 <KeyPoints>
   <Point title="스위치 한 대를 여러 네트워크로 나눠요">
@@ -38,19 +40,8 @@ updated: 2026-10-29
 
 ## 왜 나누나요
 
-<Figure caption="개발팀과 회계팀 PC가 같은 스위치에 꽂혀 있지만 VLAN이 달라요. 두 팀은 서로 다른 네트워크라 직접 닿지 않아요.">
-  <Nest
-    ariaLabel="스위치 한 대 안이 VLAN 10의 개발 PC 두 대와 VLAN 20의 회계 PC 두 대로 나뉜 그림"
-    boxes={[
-      {
-        label: '스위치 한 대',
-        children: [
-          { label: 'VLAN 10', note: '개발팀', tone: 'accent', children: [{ label: '개발 PC 1' }, { label: '개발 PC 2' }] },
-          { label: 'VLAN 20', note: '회계팀', children: [{ label: '회계 PC 1' }, { label: '회계 PC 2' }] },
-        ],
-      },
-    ]}
-  />
+<Figure caption="개발팀과 회계팀 PC가 같은 스위치에 꽂혀 있지만 VLAN이 달라요. 개발 PC 1이 모두에게 보낸 데이터도 VLAN 10 안에만 퍼지고, 회계팀에는 닿지 않아요.">
+  <VlanSplit aria-label="스위치 한 대에 VLAN 10의 개발 PC 두 대와 VLAN 20의 회계 PC 두 대가 꽂혀 있고, 개발 PC 1이 모두에게 보낸 데이터가 개발 PC 2에만 닿는 그림" />
 </Figure>
 
 <Term term="network/switch">스위치</Term>는 원래 연결된 모든 포트를 한 네트워크로 묶어요. 받는 쪽을 모를 때 모든 포트로 보내는 <Term term="network/flooding">플러딩</Term>도 그 네트워크 전체에 퍼져요. 장비가 많아지면 상관없는 트래픽이 모두에게 닿아요.
@@ -94,15 +85,8 @@ L3 스위치는 VLAN마다 가상 인터페이스를 하나씩 두고 그 사이
 
 ## 모니터링에서는
 
-<Figure caption="같은 스위치의 인터페이스 목록 예시예요. 물리 포트와 VLAN 인터페이스는 세는 트래픽이 달라요.">
-  <Compare
-    columns={['물리 포트 Gi1/0/1', 'VLAN 인터페이스 Vlan10']}
-    rows={[
-      { label: '무엇인가요', values: ['선이 꽂힌 실제 포트', 'VLAN 10의 가상 인터페이스'] },
-      { label: '세는 트래픽', values: ['그 포트로 오간 모든 프레임', 'VLAN 10이 라우팅으로 밖과 오간 양'] },
-      { label: '빠지는 것', values: ['다른 포트의 트래픽', 'VLAN 10 안에서만 오간 트래픽'] },
-    ]}
-  />
+<Figure caption="PC 1에서 나간 트래픽 두 갈래를 셌어요. 같은 VLAN의 PC 2로 간 양은 물리 포트에만 잡히고, Vlan10 인터페이스에는 밖으로 나간 양만 잡혀요.">
+  <VlanCounters aria-label="L3 스위치의 물리 포트 Gi1/0/1에 PC 1이, Gi1/0/2에 PC 2가 있어요. ① PC 1에서 PC 2로 간 트래픽은 Gi1/0/1에서는 세지만 Vlan10에서는 빠지고, ② PC 1에서 밖으로 간 트래픽은 Gi1/0/1과 Vlan10 모두에서 세요" />
 </Figure>
 
 장비의 인터페이스 목록에는 물리 포트와 함께 VLAN 인터페이스도 따로 나와요. VLAN 인터페이스의 트래픽은 그 VLAN이 다른 네트워크와 오간 양이에요. 같은 VLAN 안의 PC끼리 주고받은 양은 잡히지 않아요.
