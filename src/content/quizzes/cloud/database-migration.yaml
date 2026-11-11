@@ -1,0 +1,37 @@
+questions:
+  - id: cdc-reads-log
+    type: ox
+    prompt: CDC는 원본 DB가 변경을 적어 두는 로그를 읽어, 같은 변경을 대상 DB에 적용하나요?
+    answer: true
+    explain: MySQL은 binlog, PostgreSQL은 WAL을 읽어요. 그래서 원본에 로그 설정을 미리 해 둬야 해요.
+  - id: slot-closes-on-stop
+    type: ox
+    prompt: DMS 작업을 멈추면 PostgreSQL 원본의 복제 슬롯도 닫혀서 WAL을 더 붙잡지 않나요?
+    answer: false
+    explain: 슬롯은 작업이 멈춘 뒤에도 열려 있어요. 그래서 그대로 두면 WAL이 쌓여 원본 디스크가 차요.
+  - id: latency-target-side
+    type: choice
+    prompt: CDCLatencySource는 3초, CDCLatencyTarget은 840초예요. 먼저 볼 곳은?
+    choices:
+      - 대상 DB에 적용하는 쪽
+      - 원본 DB에서 읽는 쪽
+      - 원본의 binlog 보관 시간
+      - 복제 인스턴스의 작업 로그
+    answer: 0
+    explain: 원본에서는 제때 읽고 있는데 대상에 적는 게 늦어요. 대상 테이블의 기본 키·인덱스, 대상 자원, 네트워크를 봐요.
+  - id: running-with-errors
+    type: choice
+    prompt: DMS 작업 상태가 Running with errors예요. 무슨 뜻일까요?
+    choices:
+      - 일부 테이블은 못 옮겼지만 나머지는 계속 옮겨요
+      - 작업이 멈췄다가 스스로 다시 시작했어요
+      - 전체 적재가 끝나고 CDC만 남았어요
+      - 원본 DB 접속에 실패해 다시 붙기를 기다리는 중이에요
+    answer: 0
+    explain: 작업은 계속 돌지만 몇몇 테이블이 빠지고 있어요. 상태가 실행 중이라는 것만 보고 정상으로 보면 안 돼요.
+  - id: cdc-abbr
+    type: input
+    prompt: 원본 DB의 변경 로그를 읽어 같은 변경을 다른 곳에 계속 옮기는 방식을 세 글자 영어 약자로?
+    answer: [CDC]
+    term: cloud/cdc
+    explain: CDC는 change data capture의 약자예요. 전체 적재 뒤 이어지는 변경을 따라가요.

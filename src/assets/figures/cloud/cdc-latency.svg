@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 244" width="300" height="244">
+<path d="M23 17 V43 A17 5.5 0 0 0 57 43 V17" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M23 30 A17 5.5 0 0 0 57 30" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<ellipse cx="40" cy="17" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<text x="40" y="66" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">원본 DB</text>
+<rect x="137" y="13" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="143" y1="21" x2="157" y2="21" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="143" y1="27" x2="157" y2="27" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="143" y1="33" x2="157" y2="33" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="150" cy="40.5" r="2" style="fill:var(--color-accent)" />
+<text x="150" y="66" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">DMS</text>
+<path d="M243 17 V43 A17 5.5 0 0 0 277 43 V17" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M243 30 A17 5.5 0 0 0 277 30" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<ellipse cx="260" cy="17" rx="17" ry="5.5" stroke-width="1.8" style="fill:var(--color-line);stroke:var(--color-text-sub)" />
+<text x="260" y="66" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">대상 DB</text>
+<path d="M60 30 L129.1 30" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M134 30 L127 25.7 L127 34.3 z" style="fill:var(--color-text-sub)" />
+<path d="M166 30 L235.1 30" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M240 30 L233 25.7 L233 34.3 z" style="fill:var(--color-text-sub)" />
+<line x1="40" y1="86" x2="150" y2="86" stroke-width="2" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<line x1="40" y1="80" x2="40" y2="92" stroke-width="2" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<line x1="150" y1="80" x2="150" y2="92" stroke-width="2" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<text x="95" y="108" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">CDCLatencySource</text>
+<line x1="40" y1="128" x2="260" y2="128" stroke-width="2" stroke-linecap="butt" style="stroke:var(--color-warn)" />
+<line x1="40" y1="122" x2="40" y2="134" stroke-width="2" stroke-linecap="butt" style="stroke:var(--color-warn)" />
+<line x1="260" y1="122" x2="260" y2="134" stroke-width="2" stroke-linecap="butt" style="stroke:var(--color-warn)" />
+<text x="150" y="150" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-warn)">CDCLatencyTarget</text>
+<rect x="4" y="168" width="292" height="72" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 192 V174 Q4.8 168.8 10 168.8 H290 Q295.3 168.8 295.3 174 V192 z" style="fill:var(--color-line)" />
+<path d="M4.8 216 H295.3 V234 Q295.3 239.3 290 239.3 H10 Q4.8 239.3 4.8 234 z" style="fill:var(--color-warn-weak)" />
+<line x1="4" y1="216" x2="296" y2="216" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="78" y="184.7" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">원본 지연</text>
+<text x="160" y="184.7" font-size="13" text-anchor="end" font-weight="600" style="fill:var(--color-text-sub)">대상 지연</text>
+<text x="176" y="184.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">먼저 볼 곳</text>
+<text x="78" y="208.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">900초</text>
+<text x="160" y="208.7" font-size="13" text-anchor="end" font-weight="400" style="fill:var(--color-text)">920초</text>
+<text x="176" y="208.7" font-size="13" font-weight="400" style="fill:var(--color-text)">원본 쪽 읽기</text>
+<text x="78" y="232.7" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">3초</text>
+<text x="160" y="232.7" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-warn)">840초</text>
+<text x="176" y="232.7" font-size="13" font-weight="700" style="fill:var(--color-warn)">대상 쪽 적용</text>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 184" width="300" height="184">
+<line x1="40" y1="154" x2="276" y2="154" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="34" y="158.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">0</text>
+<line x1="40" y1="94" x2="276" y2="94" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="34" y="98.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">4</text>
+<line x1="40" y1="34" x2="276" y2="34" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="34" y="38.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">8</text>
+<line x1="40" y1="154" x2="276" y2="154" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M99 94 L99 64 L276 64 L276 94 L99 94 z" style="fill:var(--color-warn-weak)" />
+<path d="M40 94 L276 94" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text)" />
+<path d="M40 94 L99 94 L99 64 L276 64" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 4" style="fill:none;stroke:var(--color-accent)" />
+<text x="187.5" y="84" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">뜨지 못한 2대</text>
+<text x="40" y="174" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">0분</text>
+<text x="99" y="174" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">10분</text>
+<text x="158" y="174" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">20분</text>
+<text x="217" y="174" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">30분</text>
+<text x="276" y="174" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">40분</text>
+<line x1="40" y1="12" x2="62" y2="12" stroke-width="2.6" stroke-linecap="butt" stroke-dasharray="7 4" style="stroke:var(--color-accent)" />
+<text x="68" y="17" font-size="13" style="fill:var(--color-text-sub)">원하는 대수</text>
+<line x1="160" y1="12" x2="182" y2="12" stroke-width="2.4" stroke-linecap="butt" style="stroke:var(--color-text)" />
+<text x="188" y="17" font-size="13" style="fill:var(--color-text-sub)">서비스 중</text>
+</svg>

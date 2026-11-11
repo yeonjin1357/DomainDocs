@@ -1,0 +1,37 @@
+questions:
+  - id: public-board-account
+    type: ox
+    prompt: 로그인 없이 보는 공개 상태판에도 내 계정 서버의 퇴역 예정 소식이 나오나요?
+    answer: false
+    explain: 공개 상태판은 모두에게 같은 서비스 장애만 보여 줘요. 퇴역 예정 같은 소식은 내 계정의 AWS Health Dashboard로 와요.
+  - id: retire-instance-store
+    type: ox
+    prompt: 인스턴스 스토어 루트 볼륨을 쓰는 서버에 instance-retirement 이벤트가 걸리면, 그 시각에 서버가 지워지나요?
+    answer: true
+    explain: EBS 루트 볼륨이면 멈추고, 인스턴스 스토어 루트면 지워져요. 그래서 미리 옮겨 둬야 해요.
+  - id: az-wide-pattern
+    type: choice
+    prompt: EC2, RDS, ELB가 같은 시각에 AZ b에서만 함께 나빠졌어요. 먼저 볼 곳은?
+    choices:
+      - 사업자의 상태 소식
+      - 서버 하나의 상태 검사
+      - 앱의 최근 배포 기록
+      - DB의 슬로 쿼리 로그
+    answer: 0
+    explain: 서로 다른 서비스가 한 AZ에서 같은 시각에 나빠지면 사업자 쪽을 먼저 의심해요. 계정 소식과 공개 상태판을 봐요.
+  - id: health-api-plan
+    type: choice
+    prompt: 모니터링 제품이 AWS Health API로 이벤트를 모으는데, 한 고객 계정에서만 SubscriptionRequiredException이 나요. 까닭은?
+    choices:
+      - 그 계정에 상위 지원 플랜이 없어요
+      - 그 계정에 이벤트가 하나도 없어요
+      - 그 계정의 리전이 꺼져 있어요
+      - 그 계정의 CloudWatch 지표 수집이 꺼져 있어요
+    answer: 0
+    explain: AWS Health API는 Business Support+ 같은 상위 지원 플랜이 있어야 써요. 대시보드와 EventBridge는 모든 고객이 써요.
+  - id: resource-health-name
+    type: input
+    prompt: Azure에서 VM 같은 자원 하나가 Available, Degraded 같은 상태인지 보여 주는 기능은?
+    answer: [Resource Health, 리소스 상태]
+    term: cloud/resource-health
+    explain: Resource Health는 자원 하나의 상태와, 원인이 플랫폼 쪽인지 사용자 쪽인지를 보여 줘요.

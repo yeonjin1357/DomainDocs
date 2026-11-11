@@ -1,0 +1,168 @@
+---
+title: 가상 머신 자동 확장
+summary: 같은 서버를 부하에 맞춰 늘리고 줄이는 묶음이에요. 고장 난 서버도 새것으로 바꿔 끼워요.
+domain: cloud
+type: concept
+stage: basics
+order: 25
+icon: cloud
+keywords: [Auto Scaling group, ASG, 자동 확장 그룹, 오토 스케일링, Virtual Machine Scale Sets, VMSS, launch template, desired capacity, target tracking, lifecycle hook]
+related: [cloud/virtual-machines, cloud/load-balancers, kubernetes/autoscaling, cloud/pricing-models, foundations/no-data-vs-zero]
+sources:
+  - title: AWS — Auto Scaling groups
+    url: https://docs.aws.amazon.com/autoscaling/ec2/userguide/auto-scaling-groups.html
+  - title: AWS — Target tracking scaling policies for Amazon EC2 Auto Scaling
+    url: https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html
+  - title: AWS — Amazon EC2 Auto Scaling instance lifecycle
+    url: https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-lifecycle.html
+  - title: AWS — About the health checks for your Auto Scaling group
+    url: https://docs.aws.amazon.com/autoscaling/ec2/userguide/health-checks-overview.html
+  - title: AWS — Set the health check grace period for an Auto Scaling group
+    url: https://docs.aws.amazon.com/autoscaling/ec2/userguide/health-check-grace-period.html
+  - title: AWS — Configure termination policies for Amazon EC2 Auto Scaling
+    url: https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-termination-policies.html
+  - title: AWS — Amazon CloudWatch metrics for Amazon EC2 Auto Scaling
+    url: https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-metrics.html
+  - title: AWS — CloudWatch metrics that are available for your instances (dimensions)
+    url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html
+  - title: AWS — Simplify node lifecycle with managed node groups (EKS)
+    url: https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html
+  - title: Microsoft Learn — Overview of autoscale with Azure Virtual Machine Scale Sets
+    url: https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-autoscale-overview
+updated: 2026-11-11
+---
+
+import AsgCapacity from '../../../assets/figures/cloud/asg-capacity.svg';
+import AsgTracking from '../../../assets/figures/cloud/asg-tracking.svg';
+import AsgLifecycle from '../../../assets/figures/cloud/asg-lifecycle.svg';
+import AsgGap from '../../../assets/figures/cloud/asg-gap.svg';
+
+<KeyPoints>
+  <Point title="원하는 대수를 지켜 주는 묶음이에요">
+    최소·원하는·최대 대수를 정하면, 그룹이 원하는 대수만큼 서버를 띄워 계속 유지해요.
+  </Point>
+  <Point title="부하에 맞춰 대수를 바꿔요">
+    확장 정책이 평균 CPU 같은 지표를 보고 원하는 대수를 올리거나 내려요.
+  </Point>
+  <Point title="서버가 생겼다 사라지는 게 정상이에요">
+    그래서 화면은 서버 한 대가 아니라 그룹으로 묶어서 봐야 해요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="상담원은 이름과 자리가 그대로지만, 새로 띄운 서버는 이름(인스턴스 ID)과 IP 주소가 매번 달라요. 또 새 서버는 일할 준비를 마치기까지 몇 분이 걸려요.">
+  콜센터의 상담원 배치와 비슷해요. 평소 인원을 정해 두고, 전화가 몰리면 상담원을 더 부르고 한가해지면 돌려보내요. 아픈 상담원은 집에 보내고 대신 일할 사람을 불러요.
+</Analogy>
+
+## 그룹이 지키는 대수
+
+<Term term="cloud/auto-scaling-group">자동 확장 그룹</Term>(Auto Scaling group)은 같은 모양의 가상 머신을 묶어 대수를 관리하는 단위예요. AWS에서는 EC2 Auto Scaling 그룹, Azure에서는 Virtual Machine Scale Sets라고 불러요.
+
+서버를 어떻게 띄울지는 <Term term="cloud/launch-template">시작 템플릿</Term>(launch template)에 적어요. 어떤 이미지로, 어떤 <Term term="cloud/instance-type">인스턴스 유형</Term>으로, 어떤 보안 그룹을 붙일지가 들어가요. 그룹은 서버가 더 필요할 때마다 이 템플릿대로 새 서버를 띄워요.
+
+대수는 세 숫자로 정해요.
+
+- 최소 대수: 아무리 한가해도 이만큼은 남겨요.
+- <Term term="cloud/desired-capacity">원하는 대수</Term>(desired capacity): 지금 유지할 대수예요. 확장 정책이 이 값을 바꿔요.
+- 최대 대수: 아무리 바빠도 이 이상은 띄우지 않아요.
+
+<Figure caption="최소 2, 원하는 4, 최대 6인 그룹이에요. 그룹은 시작 템플릿대로 4대를 띄워 두 AZ에 2대씩 나눠 두고, 바빠지면 6대까지 늘릴 수 있어요.">
+  <AsgCapacity aria-label="위에 시작 템플릿(이미지, 인스턴스 유형, 보안 그룹)이 있고, 그 템플릿대로 AZ a와 AZ b에 서버를 2대씩 띄워요. AZ마다 빈자리가 하나씩 남아 있어요. 아래 눈금은 0부터 6까지이고, 서비스 중인 4대가 칠해져 있으며 최소 2, 원하는 4, 최대 6에 표시가 있어요" />
+</Figure>
+
+여러 <Term term="cloud/availability-zone">가용 영역</Term>(AZ)을 지정하면 서버를 AZ마다 고르게 나눠 띄워요. 한 AZ에 문제가 생겨도 다른 AZ의 서버가 남아요.
+
+그룹은 서버의 상태도 계속 확인해요. 서버가 고장 나면 그 서버를 지우고 새 서버를 띄워 원하는 대수를 다시 맞춰요.
+
+기본으로 보는 건 EC2 상태 검사예요. 서버가 실행 중(`running`)이 아니거나 상태 검사가 손상(`impaired`)으로 나오면 고장으로 봐요. 상태 검사가 무엇을 보는지는 <Term slug="cloud/vm-status-check">가상 머신 상태 검사가 실패할 때</Term>에 있어요.
+
+로드 밸런서의 상태 확인은 그룹에서 따로 켜야 써요. 켜지 않으면 앱이 요청에 답하지 못해도 서버가 살아 있는 한 바꿔 끼우지 않아요. 로드 밸런서의 상태 확인은 <Term slug="cloud/load-balancers">로드 밸런서</Term>에서 다뤄요.
+
+## 늘리고 줄이는 규칙
+
+가장 많이 쓰는 규칙은 <Term term="cloud/target-tracking">목표 추적</Term>(target tracking)이에요. "평균 CPU 50%"처럼 목표를 정하면, 그룹이 그 값에 가깝도록 대수를 맞춰요. 온도 조절기가 정한 온도를 지키는 것과 같아요.
+
+계산은 간단해요. 4대가 평균 CPU 75%로 일하면 일의 양은 4 × 75 = 300이에요. 이걸 50%씩 나눠 맡으려면 300 ÷ 50 = 6대가 필요해서 2대를 더해요.
+
+<Figure caption="목표 50%인 그룹의 1시간이에요. 평균 CPU가 75%로 오르자 2대를 더해 50%로 돌아왔고, 부하가 줄자 한 번에 다 줄이지 않고 1대씩 줄였어요.">
+  <AsgTracking aria-label="위 그래프는 평균 CPU예요. 45%에서 10분쯤 75%로 오르고, 12분에 서버를 2대 더한 뒤 50%로 돌아와요. 40분에 30%로 떨어지자 46분에 1대, 52분에 1대를 줄여 45%가 돼요. 아래 그래프는 서버 대수로, 4대에서 12분에 6대, 46분에 5대, 52분에 4대가 돼요" />
+</Figure>
+
+새 서버는 바로 숫자에 들어가지 않아요. 준비 시간(warmup)으로 정한 시간이 지나야 그룹 평균 CPU에 들어가요. 부팅 직후의 낮은 CPU가 평균을 끌어내려 서버를 너무 일찍 줄이는 일을 막아요.
+
+목표 추적은 늘릴 때는 빠르고 줄일 때는 천천히 움직여요. AWS 문서는 이걸 가용성을 먼저 챙기는 동작이라고 설명해요. 정책이 여러 개면 하나라도 늘리자고 하면 늘리고, 모두가 줄이자고 할 때만 줄여요.
+
+대수는 정수라서 목표에 딱 맞지 않을 수 있어요. 1.5대가 필요하면 2대를 더해요. 그래서 서버가 적은 그룹은 평균 CPU가 목표에서 꽤 떨어져 보일 수 있어요.
+
+목표 추적 말고도 규칙이 더 있어요.
+
+- 단계 조정(step scaling): "CPU 70% 넘으면 2대, 90% 넘으면 4대"처럼 구간마다 정해요.
+- 예약 조정(scheduled scaling): "평일 9시에 10대, 19시에 4대"처럼 시각으로 정해요.
+
+Azure의 Virtual Machine Scale Sets도 같은 생각이에요. "CPU 평균이 70%를 넘으면 2대 늘리기" 같은 지표 규칙과 시각 규칙으로 대수를 바꿔요.
+
+## 서버 하나의 일생
+
+그룹 안의 서버는 정해진 단계를 차례로 지나요.
+
+<Figure caption="그룹 안 서버의 단계예요. 서비스 중이 되기 전에 로드 밸런서에 등록되고, 지워지기 전에 등록이 풀려요. 훅을 걸면 두 길목에서 할 일을 끼워 넣을 수 있어요.">
+  <AsgLifecycle aria-label="위에서 아래로 대기(Pending), 서비스 중(InService), 종료 중(Terminating), 종료(Terminated) 네 단계가 이어져요. 대기와 서비스 중 사이에 시작 훅으로 준비 작업을 하고, 서비스 중에는 로드 밸런서에 등록된 뒤 요청을 받아요. 종료 중에는 등록을 풀고 하던 요청을 마저 처리하며, 종료 직전에 종료 훅으로 로그를 옮겨요" />
+</Figure>
+
+늘릴 때 새 서버는 대기(`Pending`)로 시작해요. 상태 검사를 통과하면 서비스 중(`InService`)이 되고, 이때부터 원하는 대수에 세어져요. 로드 밸런서가 붙은 그룹이면, 서비스 중이 되기 전에 로드 밸런서에 먼저 등록돼요.
+
+줄일 때 고른 서버는 종료 중(`Terminating`)이 되고, 다시 서비스로 돌아올 수 없어요. 로드 밸런서에서 등록이 풀리면 새 요청은 다른 서버로 가요. 이미 받은 요청은 등록 해제 대기 시간 동안 마저 처리해요.
+
+<Term term="cloud/lifecycle-hook">수명 주기 훅</Term>(lifecycle hook)을 걸면 두 길목에서 서버를 잠시 멈춰 세워요. 시작할 때는 설정이나 에이전트 등록을, 끝날 때는 로그 옮기기를 끼워 넣어요.
+
+요금은 서비스 중이 되기 전, 서버를 띄운 순간부터 붙어요. 그래서 준비가 오래 걸리는 서버는 일하지 않는 시간에도 돈이 나가요.
+
+## 모니터링에서는
+
+자동 확장 그룹을 보는 화면은 서버 한 대가 아니라 그룹이 중심이에요. 서버는 계속 바뀌고, 그룹 이름은 그대로예요.
+
+그룹 지표는 그룹 지표 수집을 켜야 와요. 켜면 1분 단위로 오고 추가 요금은 없어요. 많이 보는 지표는 이래요.
+
+| 지표 | 뜻 |
+| --- | --- |
+| `GroupDesiredCapacity` | 원하는 대수 |
+| `GroupInServiceInstances` | 서비스 중인 대수(대기·종료 중 제외) |
+| `GroupPendingInstances` | 대기 중인 대수 |
+| `GroupTerminatingInstances` | 종료 중인 대수 |
+
+<Figure caption="원하는 대수는 10분에 6대로 올랐는데, 서비스 중인 대수는 30분 넘게 4대에 머문 예시예요. 새 서버가 뜨지 못하고 있어요.">
+  <AsgGap aria-label="원하는 대수 점선은 10분에 4에서 6으로 오르고, 서비스 중 실선은 40분까지 4에 머물러요. 두 선 사이 2대만큼이 빨갛게 칠해져 뜨지 못한 2대로 표시돼요" />
+</Figure>
+
+원하는 대수와 서비스 중인 대수가 오래 어긋나면 새 서버가 뜨지 못하는 거예요. 고른 인스턴스 유형의 자리가 모자라거나, 시작 템플릿이 잘못됐거나, 계정 한도에 걸린 경우예요. 이유는 그룹의 확장 활동 기록에 남아요.
+
+EC2 지표는 `AutoScalingGroupName` 차원으로 그룹 전체를 묶어 볼 수 있어요. 서버 ID로 그린 그래프는 서버가 바뀔 때마다 선이 끊기지만, 그룹으로 묶은 그래프는 이어져요.
+
+그룹이 줄이며 지운 서버는 에이전트도 함께 사라져요. 이걸 "수집 끊김" 알림으로 울리면 축소할 때마다 거짓 알림이 나요. 끊긴 서버가 그룹이 지운 서버인지 먼저 확인해요.
+
+없는 데이터를 0과 구분하는 이야기는 <Term slug="foundations/no-data-vs-zero">데이터 없음과 0은 달라요</Term>에 있어요.
+
+<Checkpoints>
+  <Check>그룹이 줄이며 지운 서버까지 "수집 끊김"으로 울리고 있다면 다시 보세요. 끊긴 서버가 종료(Terminated)됐는지부터 확인하세요.</Check>
+  <Check>앱이 죽었는데 서버가 바뀌지 않는다면, 그룹에 로드 밸런서 상태 확인을 켰는지 보세요. 기본은 EC2 상태 검사만 봐요.</Check>
+  <Check>원하는 대수와 서비스 중인 대수가 오래 다르다면, 그룹의 확장 활동 기록에서 실패 이유를 찾으세요.</Check>
+  <Check>그룹의 대수 그래프가 비어 있다면 그룹 지표 수집을 켰는지 보세요. 꺼져 있으면 오지 않아요.</Check>
+  <Check>목표 추적이 만든 CloudWatch 경보를 고치거나 지우지 마세요. 그룹이 관리하는 경보라서, 건드리면 확장이 엉켜요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 줄일 때 어떤 서버를 지우나
+
+  기본 종료 정책은 AZ의 균형을 먼저 맞춰요. 서버가 가장 많은 AZ에서 고르고, 그 안에서는 옛 시작 템플릿이나 옛 버전으로 뜬 서버를 먼저 지워요. 그래서 가장 오래된 서버가 아니라 더 최근 서버가 지워질 수도 있어요.
+
+  ### 상태 검사가 실패해도 바로 바꾸지는 않아요
+
+  상태 검사가 잠깐 손상으로 나오면 그룹은 몇 분 기다려요. 사업자가 고칠 시간을 주는 거예요. 반면 서버가 실행 중이 아니게 되면 바로 고장으로 보고 바꿔요.
+
+  ### 상태 검사 유예 시간
+
+  새 서버가 준비되기 전에 상태 확인에 실패해 지워지지 않게 유예 시간을 둬요. 콘솔로 그룹을 만들면 기본 300초, CLI나 SDK로 만들면 기본 0초(끔)예요.
+
+  ### 쿠버네티스 노드도 이 그룹으로 늘어요
+
+  EKS의 관리형 노드 그룹은 노드를 자동 확장 그룹으로 띄워요. 파드를 늘리는 HPA와 노드를 늘리는 기능의 관계는 <Term slug="kubernetes/autoscaling">자동 확장</Term>에서 다뤄요.
+</Deeper>

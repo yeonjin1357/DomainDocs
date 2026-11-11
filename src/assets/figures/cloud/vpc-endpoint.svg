@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 272" width="300" height="272">
+<path d="M130 45 A9 9 0 0 1 125 29 A13 13 0 0 1 147 17 A11 11 0 0 1 168 24 A10.5 10.5 0 0 1 171 45 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="196" y="36" font-size="13" font-weight="700" style="fill:var(--color-accent)">CloudWatch API</text>
+<rect x="4" y="70" width="292" height="196" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-line)" />
+<text x="14" y="88" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">VPC</text>
+<rect x="16" y="106" width="120" height="48" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="76" y="126" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">NAT 게이트웨이</text>
+<text x="76" y="145" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-warn)">GB당 처리 요금</text>
+<path d="M76 104 L76 56 L113.6 38.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M118 36 L109.8 35.1 L113.5 42.9 z" style="fill:var(--color-text-sub)" />
+<text x="84" y="86" font-size="13" style="fill:var(--color-text-sub);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">인터넷 쪽</text>
+<rect x="164" y="106" width="120" height="48" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="224" y="126" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">인터페이스</text>
+<text x="224" y="145" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">엔드포인트</text>
+<path d="M224 104 L224 72 L186.1 46.7" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M182 44 L185.4 51.5 L190.2 44.3 z" style="fill:var(--color-accent)" />
+<text x="230" y="88" font-size="13" font-weight="600" style="fill:var(--color-accent);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">사설 IP로</text>
+<rect x="60" y="176" width="180" height="82" rx="12" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<text x="70" y="249" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">비공개 서브넷</text>
+<rect x="137" y="193" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<line x1="143" y1="201" x2="157" y2="201" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="143" y1="207" x2="157" y2="207" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="143" y1="213" x2="157" y2="213" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<circle cx="150" cy="220.5" r="2" style="fill:var(--color-text-sub)" />
+<text x="194" y="215" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">수집기</text>
+<path d="M138 192 L95.9 159" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M92 156 L94.8 163.7 L100.2 156.9 z" style="fill:var(--color-text-sub)" />
+<path d="M162 192 L204.1 159" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M208 156 L199.8 156.9 L205.2 163.7 z" style="fill:var(--color-accent)" />
+</svg>

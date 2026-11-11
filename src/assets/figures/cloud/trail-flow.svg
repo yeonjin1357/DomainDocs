@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 292" width="300" height="292">
+<circle cx="50" cy="18" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M39 40 C39 28 61 28 61 40 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="50" y="62" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">콘솔</text>
+<rect x="137" y="14" width="26" height="17" rx="2" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M131 35 L135 31 L165 31 L169 35 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="62" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">스크립트·SDK</text>
+<path d="M259.4 24.1 L262.9 24.4 L262.9 27.6 L259.4 27.9 L258 31.3 L260.3 34 L258 36.3 L255.3 34 L251.9 35.4 L251.6 38.9 L248.4 38.9 L248.1 35.4 L244.7 34 L242 36.3 L239.7 34 L242 31.3 L240.6 27.9 L237.1 27.6 L237.1 24.4 L240.6 24.1 L242 20.7 L239.7 18 L242 15.7 L244.7 18 L248.1 16.6 L248.4 13.1 L251.6 13.1 L251.9 16.6 L255.3 18 L258 15.7 L260.3 18 L258 20.7 z" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<circle cx="250" cy="26" r="4.16" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="250" y="62" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text)">AWS 서비스</text>
+<path d="M50 70 L50 86 L130 86 L130 91.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M130 96 L133.7 90 L126.3 90 z" style="fill:var(--color-text-sub)" />
+<path d="M150 70 L150 91.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M150 96 L153.7 90 L146.3 90 z" style="fill:var(--color-text-sub)" />
+<path d="M250 70 L250 86 L170 86 L170 91.8" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M170 96 L173.7 90 L166.3 90 z" style="fill:var(--color-text-sub)" />
+<rect x="90" y="98" width="120" height="30" rx="8" stroke-width="1.6" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="118" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">클라우드 API</text>
+<path d="M150 130 L150 145.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M150 150 L154.3 143 L145.7 143 z" style="fill:var(--color-accent)" />
+<rect x="54" y="152" width="192" height="34" rx="8" stroke-width="1.6" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="150" y="174" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">CloudTrail이 한 줄씩 남겨요</text>
+<path d="M110 188 L74.3 207.6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M70 210 L78.2 210.4 L74 202.8 z" style="fill:var(--color-text-sub)" />
+<path d="M190 188 L225.7 207.6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<path d="M230 210 L226 202.8 L221.8 210.4 z" style="fill:var(--color-text-sub)" />
+<rect x="4" y="212" width="140" height="76" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="14" y="232" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">Event history</text>
+<text x="14" y="252" font-size="13" style="fill:var(--color-text-sub)">최근 90일 관리 이벤트</text>
+<text x="14" y="272" font-size="13" style="fill:var(--color-text-sub)">따로 켜지 않아도 무료</text>
+<rect x="156" y="212" width="140" height="76" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<text x="166" y="232" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">trail</text>
+<text x="166" y="252" font-size="13" style="fill:var(--color-text-sub)">S3나 CloudWatch</text>
+<text x="166" y="272" font-size="13" style="fill:var(--color-text-sub)">Logs로 오래 보관</text>
+</svg>

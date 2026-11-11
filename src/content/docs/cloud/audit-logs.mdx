@@ -1,0 +1,147 @@
+---
+title: 감사 로그, 누가 무엇을 바꿨나
+summary: 클라우드 API를 누가, 언제, 어디서 불렀는지 남긴 기록이에요. 장애 직전의 변경을 찾을 때 봐요.
+domain: cloud
+type: concept
+stage: basics
+order: 77
+icon: cloud
+keywords: [CloudTrail, audit log, 감사 로그, Event history, trail, 관리 이벤트, 데이터 이벤트, Azure activity log, 활동 로그, eventName]
+related: [cloud/iam, foundations/root-cause, foundations/deployments, logs/retention-and-cost, cloud/provider-health]
+sources:
+  - title: AWS CloudTrail — How CloudTrail works
+    url: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/how-cloudtrail-works.html
+  - title: AWS CloudTrail — CloudTrail concepts (management events, data events)
+    url: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html
+  - title: AWS CloudTrail — Record contents for management, data, and network activity events
+    url: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+  - title: AWS — AWS CloudTrail pricing
+    url: https://aws.amazon.com/cloudtrail/pricing/
+  - title: Microsoft Learn — Activity Log in Azure Monitor
+    url: https://learn.microsoft.com/en-us/azure/azure-monitor/platform/activity-log
+updated: 2026-11-11
+---
+
+import TrailFlow from '../../../assets/figures/cloud/trail-flow.svg';
+import TrailOverlay from '../../../assets/figures/cloud/trail-overlay.svg';
+
+<KeyPoints>
+  <Point title="API 호출마다 한 건씩 남아요">
+    누가, 언제, 어떤 동작을, 어디서 불렀는지 남아요. 콘솔 클릭도 스크립트도 모두 API 호출이에요.
+  </Point>
+  <Point title="기본은 관리 이벤트 90일이에요">
+    자원을 만들고 바꾸는 호출은 따로 켜지 않아도 90일 남아요. 파일 읽기 같은 호출과 오래 보관은 따로 켜야 해요.
+  </Point>
+  <Point title="몇 분 늦게 도착해요">
+    CloudTrail은 호출 뒤 평균 5분쯤에 기록을 넘겨요. 실시간 알림보다는 원인을 거슬러 찾는 데 맞아요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="출입 기록부는 사람의 출입만 적지만, 감사 로그는 다른 클라우드 서비스가 대신 부른 호출까지 남겨요. 그리고 방 안에서 서랍을 여는 일 같은 데이터 읽기·쓰기는 따로 켜야 남아요.">
+  감사 로그는 건물의 출입 기록부와 비슷해요. 누가 몇 시에 어느 문으로 들어가 무엇을 했는지 적혀 있어서, 일이 터진 뒤 그 시각 전후를 거슬러 볼 수 있어요.
+</Analogy>
+
+## 무엇이 남나요
+
+클라우드에서 서버를 만들고, 보안 그룹을 바꾸고, 역할을 붙이는 일은 모두 API 호출이에요. 콘솔에서 버튼을 눌러도, 스크립트로 불러도, 다른 AWS 서비스가 대신 불러도 같아요. <Term term="cloud/audit-log">감사 로그</Term>는 이 호출을 한 건씩 남긴 기록이에요.
+
+AWS에서는 CloudTrail이 이 일을 해요. 계정을 만들면 따로 켜지 않아도 기록이 시작돼요. Azure에서는 활동 로그(Activity log)가 같은 일을 해요.
+
+<Figure caption="콘솔, 스크립트, 다른 AWS 서비스가 부른 API가 모두 CloudTrail에 남아요. 최근 90일은 Event history에서 바로 보고, 더 오래 두려면 trail로 내보내요.">
+  <TrailFlow aria-label="콘솔을 쓰는 사람, 스크립트와 SDK, 다른 AWS 서비스가 모두 클라우드 API를 불러요. 클라우드 API 호출은 CloudTrail이 한 줄씩 남기고, 기록은 두 곳으로 가요. 하나는 따로 켜지 않아도 무료인 Event history로 최근 90일 관리 이벤트를 보여 주고, 다른 하나는 trail로 S3나 CloudWatch Logs에 오래 보관해요" />
+</Figure>
+
+기록 한 건은 JSON이에요. 아래는 DB 인스턴스 설정을 바꾼 호출을 줄인 예예요.
+
+```json
+{
+  "eventTime": "2026-11-10T05:01:12Z",
+  "eventSource": "rds.amazonaws.com",
+  "eventName": "ModifyDBInstance",
+  "awsRegion": "ap-northeast-2",
+  "userIdentity": { "type": "AssumedRole", "arn": "arn:aws:sts::123456789012:assumed-role/deploy/deploy-bot" },
+  "sourceIPAddress": "10.0.3.15",
+  "readOnly": false,
+  "requestParameters": { "dBInstanceIdentifier": "orders-db", "dBInstanceClass": "db.r6g.large" }
+}
+```
+
+| 칸 | 뜻 |
+| --- | --- |
+| `eventTime` | 요청이 끝난 시각이에요. UTC로 적혀요 |
+| `eventSource` | 요청을 받은 서비스예요. CloudWatch는 `monitoring.amazonaws.com`이에요 |
+| `eventName` | 부른 API 이름이에요 |
+| `userIdentity` | 누가 불렀는지예요. 역할을 맡아 불렀다면 그 역할이 보여요 |
+| `sourceIPAddress` | 요청이 온 IP 주소예요 |
+| `readOnly` | 읽기만 하는 호출이면 `true`, 바꾸는 호출이면 `false`예요 |
+| `errorCode` | 실패한 호출에만 생겨요. 권한이 없으면 `AccessDenied` 같은 이름이 남아요 |
+
+시각은 UTC라서 한국 시각으로는 9시간을 더해 읽어요. 위의 05:01:12Z는 한국 시각 14:01:12예요. 시간대 이야기는 <Term slug="foundations/time-and-timezones">시각과 시간대</Term>에 있어요.
+
+## 관리 이벤트와 데이터 이벤트
+
+CloudTrail은 호출을 크게 둘로 나눠요.
+
+| | <Term term="cloud/management-event">관리 이벤트</Term> | <Term term="cloud/data-event">데이터 이벤트</Term> |
+| --- | --- | --- |
+| 무엇 | 자원을 만들고 바꾸는 호출 | 자원 안의 데이터를 읽고 쓰는 호출 |
+| 예 | 서브넷 만들기, 보안 그룹 바꾸기, 역할에 정책 붙이기 | S3 객체 읽기·쓰기·지우기, Lambda 함수 호출 |
+| 기본 | 남아요 | 남지 않아요. 켜면 요금이 붙어요 |
+
+데이터 이벤트는 양이 아주 많아서 기본으로 꺼져 있어요. 그래서 "누가 S3 파일을 지웠나"는 데이터 이벤트를 미리 켜 두지 않았다면 찾을 수 없어요.
+
+## 오래 남기기: trail
+
+Event history는 리전마다 최근 90일의 관리 이벤트를 보여 줘요. 따로 켜지 않아도 되고, 보는 데 요금도 없어요. 대신 90일이 지나면 사라지고, 데이터 이벤트는 들어 있지 않아요.
+
+더 오래, 더 많이 남기려면 <Term term="cloud/trail">trail</Term>을 만들어요. trail은 기록을 S3 버킷에 파일로 계속 내보내요. CloudWatch Logs로도 보내 검색하거나 알림을 걸 수 있어요.
+
+trail이 내보내는 관리 이벤트 사본 하나는 CloudTrail 요금이 없어요. 대신 S3에 쌓이는 저장 요금은 나와요. 콘솔에서 만든 trail은 모든 리전의 기록을 모아요.
+
+기록은 실시간이 아니에요. AWS 문서는 호출 뒤 평균 5분쯤에 기록을 넘긴다고 적고, 이 시간을 보장하지는 않아요. trail은 S3로 기록 파일을 5분쯤마다 내보내요.
+
+## Azure의 활동 로그
+
+Azure의 <Term term="cloud/activity-log">활동 로그</Term>는 자원을 만들고, 바꾸고, 지우는 관리 작업을 남겨요. 따로 켜지 않아도 모이고, 읽기 작업은 대개 남지 않아요.
+
+활동 로그는 90일 동안 무료로 남고 그 뒤 지워져요. 더 오래 두려면 진단 설정(diagnostic setting)으로 Log Analytics 작업 영역이나 스토리지로 내보내요. 기록은 보통 3분에서 20분 안에 검색할 수 있게 돼요.
+
+키 볼트에서 비밀 값 읽기처럼 자원 안에서 일어나는 작업은 리소스 로그(resource logs)에 남아요. 리소스 로그는 기본으로 모이지 않아서, 진단 설정으로 켜야 해요.
+
+## 모니터링에서는
+
+장애를 거슬러 찾을 때는 최근의 변경부터 봐요. 감사 로그는 클라우드 설정의 변경 기록이라, 그래프 위에 변경 표시로 겹치면 원인과 시각이 한눈에 맞춰져요. 원인을 찾는 순서는 <Term slug="foundations/root-cause">근본 원인 찾기와 상관관계</Term>에서 다뤄요.
+
+<Figure caption="API 에러율 그래프에 감사 로그의 변경 시각을 겹친 예시예요. 에러가 튀기 2분 전에 deploy-bot이 DB 인스턴스 설정을 바꿨어요. 시각은 한국 시각이에요.">
+  <TrailOverlay aria-label="13시 50분부터 14시 20분까지의 API 에러율 그래프예요. 14시 1분에 변경 표시가 있고, 14시 3분부터 에러율이 8%까지 올랐다가 14시 9분 뒤 내려와요. 아래 표는 같은 시간의 감사 로그로, 13시 55분 ops-user의 PutMetricAlarm, 14시 1분 deploy-bot의 ModifyDBInstance, 14시 9분 ops-user의 RebootDBInstance가 있고 14시 1분 줄이 강조돼 있어요" />
+</Figure>
+
+감사 로그는 권한 문제를 찾을 때도 써요. 수집기의 요청이 거부되면 `errorCode`에 `AccessDenied` 같은 이름이 남아요. 권한 정책은 <Term slug="cloud/iam">권한과 역할(IAM)</Term>에서 다뤄요.
+
+중요한 변경에는 알림을 걸 수 있어요. trail을 CloudWatch Logs로 보내 "보안 그룹 규칙 열기" 같은 호출을 찾게 해요. 다만 기록이 몇 분 늦게 오니, 알림도 그만큼 늦어요.
+
+<Checkpoints>
+  <Check>90일보다 오래된 변경을 찾아야 한다면 trail이 있는지 먼저 보세요. Event history는 90일이 지나면 사라져요.</Check>
+  <Check>S3 객체를 누가 지웠는지 찾는데 기록이 없다면, 데이터 이벤트를 켜 두었는지 보세요. 기본으로 꺼져 있어요.</Check>
+  <Check>Event history에서 변경이 안 보인다면 리전을 확인하세요. Event history는 리전마다 따로 보여 줘요.</Check>
+  <Check>감사 로그 시각을 한국 시각 그래프에 그대로 겹쳤다면 다시 보세요. `eventTime`은 UTC예요.</Check>
+  <Check>감사 로그로 실시간 알림을 만들었다면, 몇 분 늦게 울린다는 걸 기억하세요. 급한 알림은 지표나 서비스 이벤트로 거세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 다른 AWS 서비스가 대신 부른 호출
+
+  CloudFormation으로 스택을 만들면, CloudFormation이 EC2·RDS 같은 서비스의 API를 대신 불러요. 이 호출도 모두 남고, `userIdentity`의 `invokedBy`로 서비스가 부른 호출을 가려요.
+
+  ### 기록 파일은 순서대로가 아니에요
+
+  CloudTrail 기록 파일 안의 이벤트는 시각 순서로 정렬돼 있지 않아요. 순서가 필요하면 `eventTime`으로 정렬해서 봐요.
+
+  ### 더 남길 수 있는 것
+
+  CloudTrail Lake에 모으면 SQL로 기록을 질의할 수 있어요. API 호출량이나 에러율이 평소와 다를 때 알려 주는 Insights 이벤트도 있어요. 둘 다 따로 요금이 붙어요.
+
+  ### 조직 단위로 모으기
+
+  AWS Organizations를 쓰면 관리 계정에서 조직 trail을 만들어 모든 계정의 기록을 한곳에 모아요. 구성원 계정은 이 trail을 볼 수는 있지만 고치거나 지울 수 없어요.
+</Deeper>

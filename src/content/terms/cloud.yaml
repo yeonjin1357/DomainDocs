@@ -184,3 +184,192 @@ terms:
     short: 세계 곳곳의 엣지 서버가 원본의 응답을 담아 두었다가 대신 주는 서비스예요.
     analogy: 자주 찾는 물건을 미리 둔 동네 편의점과 같아요.
     doc: cloud/cdn
+  - id: auto-scaling-group
+    name: 자동 확장 그룹
+    en: Auto Scaling group
+    aliases: [ASG, Auto Scaling group, EC2 Auto Scaling, 오토 스케일링 그룹, Virtual Machine Scale Sets, VMSS, 확장 집합]
+    short: 같은 모양의 가상 머신을 묶어 대수를 늘리고 줄이며 지켜 주는 단위예요.
+    analogy: 평소 인원을 정해 두고 바쁘면 더 부르는 콜센터 배치표와 같아요.
+    doc: cloud/auto-scaling
+  - id: launch-template
+    name: 시작 템플릿
+    en: Launch template
+    aliases: [launch template, 시작 구성, launch configuration]
+    short: 새 가상 머신을 어떤 이미지·유형·보안 그룹으로 띄울지 적은 설계도예요.
+    doc: cloud/auto-scaling
+  - id: desired-capacity
+    name: 원하는 대수
+    en: Desired capacity
+    aliases: [desired capacity, 희망 용량, 원하는 용량, GroupDesiredCapacity]
+    short: 자동 확장 그룹이 지금 유지하려는 서버 대수예요.
+    doc: cloud/auto-scaling
+  - id: target-tracking
+    name: 목표 추적
+    en: Target tracking scaling
+    aliases: [target tracking, 대상 추적, 목표 추적 조정]
+    short: 평균 CPU 50%처럼 목표값을 정하면 그 값에 맞게 대수를 바꾸는 확장 규칙이에요.
+    analogy: 정한 온도를 지키는 온도 조절기와 같아요.
+    doc: cloud/auto-scaling
+  - id: lifecycle-hook
+    name: 수명 주기 훅
+    en: Lifecycle hook
+    aliases: [lifecycle hook, 라이프사이클 훅, 수명 주기 후크]
+    short: 그룹이 서버를 띄우거나 지울 때 잠시 멈춰 세우고 할 일을 끼워 넣는 장치예요.
+    doc: cloud/auto-scaling
+  - id: on-demand
+    name: 온디맨드
+    en: On-Demand
+    aliases: [On-Demand, 온디맨드 인스턴스, 종량제, pay-as-you-go]
+    short: 약속 없이 켠 만큼 내는 가장 기본적인 요금 방식이에요.
+    analogy: 갈 때마다 내는 헬스장 일일권과 같아요.
+    doc: cloud/pricing-models
+  - id: savings-plans
+    name: Savings Plans
+    en: Savings Plans
+    aliases: [절감형 플랜, 세이빙스 플랜, Compute Savings Plans, EC2 Instance Savings Plans]
+    short: 1년이나 3년 동안 시간당 사용 금액을 약정하고 할인받는 AWS 요금제예요.
+    doc: cloud/pricing-models
+  - id: reserved-instance
+    name: 예약 인스턴스
+    en: Reserved Instances
+    aliases: [RI, Reserved Instances, 예약, Azure Reservations, Azure 예약]
+    short: 인스턴스 구성을 정해 1년이나 3년을 약정하고 받는 청구 할인이에요.
+    analogy: 안 가도 매달 나가는 1년 회원권과 같아요.
+    doc: cloud/pricing-models
+  - id: spot-instance
+    name: 스팟 인스턴스
+    en: Spot Instances
+    aliases: [Spot, 스팟, Azure Spot, 스팟 VM]
+    short: 사업자의 남는 서버를 싸게 빌리되, 사업자가 필요하면 회수해 가는 서버예요.
+    analogy: 예약 손님이 오면 비켜야 하는 마감 할인 자리와 같아요.
+    doc: cloud/pricing-models
+  - id: sp-utilization
+    name: 약정 활용률
+    en: Utilization
+    aliases: [utilization, 활용률, 사용률, 약정 사용률]
+    short: 산 약정 금액 중 실제로 쓴 몫의 비율이에요.
+    doc: cloud/pricing-models
+  - id: sp-coverage
+    name: 약정 커버리지
+    en: Coverage
+    aliases: [coverage, 커버리지, 적용률, 약정 적용률]
+    short: 할인 대상이 되는 사용 비용 중 약정이 덮은 몫의 비율이에요.
+    doc: cloud/pricing-models
+  - id: replication-instance
+    name: 복제 인스턴스
+    en: Replication instance
+    aliases: [replication instance, DMS 인스턴스]
+    short: DMS에서 데이터를 읽어 옮기는 일을 실제로 하는 관리형 서버예요.
+    doc: cloud/database-migration
+  - id: full-load
+    name: 전체 적재
+    en: Full load
+    aliases: [full load, 풀 로드, 초기 적재]
+    short: 원본 테이블의 데이터를 한꺼번에 읽어 대상에 넣는 단계예요.
+    doc: cloud/database-migration
+  - id: cdc
+    name: 변경 데이터 캡처
+    en: Change data capture
+    aliases: [CDC, change data capture, 변경 캡처]
+    short: 원본 DB의 변경 로그를 읽어 같은 변경을 다른 곳에 계속 옮기는 방식이에요.
+    analogy: 이사 중 옛집에 온 택배를 적어 두었다가 새집으로 다시 보내는 일과 같아요.
+    doc: cloud/database-migration
+  - id: replication-slot
+    name: 복제 슬롯
+    en: Replication slot
+    aliases: [replication slot, 논리 복제 슬롯, logical replication slot]
+    short: 읽어 갈 쪽이 가져갈 때까지 PostgreSQL이 WAL을 지우지 않고 붙잡아 두는 표시예요.
+    doc: cloud/database-migration
+  - id: audit-log
+    name: 감사 로그
+    en: Audit log
+    aliases: [audit log, CloudTrail, 감사 기록, 감사 추적]
+    short: 클라우드 API를 누가, 언제, 어디서 불렀는지 남긴 기록이에요.
+    analogy: 누가 몇 시에 어느 문으로 들어왔는지 적힌 출입 기록부와 같아요.
+    doc: cloud/audit-logs
+  - id: management-event
+    name: 관리 이벤트
+    en: Management event
+    aliases: [management event, control plane event, 컨트롤 플레인 이벤트]
+    short: 자원을 만들고 바꾸는 API 호출의 기록이에요. CloudTrail에 기본으로 남아요.
+    doc: cloud/audit-logs
+  - id: data-event
+    name: 데이터 이벤트
+    en: Data event
+    aliases: [data event, data plane event, 데이터 플레인 이벤트]
+    short: S3 객체 읽기처럼 자원 안의 데이터를 다루는 호출의 기록이에요. 켜야 남아요.
+    doc: cloud/audit-logs
+  - id: trail
+    name: trail
+    en: CloudTrail trail
+    aliases: [트레일, 추적, CloudTrail trail]
+    short: CloudTrail 기록을 S3 버킷 같은 곳으로 계속 내보내는 설정이에요.
+    doc: cloud/audit-logs
+  - id: activity-log
+    name: 활동 로그
+    en: Azure activity log
+    aliases: [activity log, Azure Activity Log, 작업 로그]
+    short: Azure 자원을 만들고 바꾸고 지운 관리 작업의 기록이에요.
+    doc: cloud/audit-logs
+  - id: health-event
+    name: 상태 이벤트
+    en: AWS Health event
+    aliases: [Health event, AWS Health, AWS Health Dashboard, Personal Health Dashboard, Service Health]
+    short: 사업자가 알리는 서비스 장애, 점검 예정, 계정 소식 한 건이에요.
+    analogy: 관리사무소가 붙이는 단수 공지와 점검 안내와 같아요.
+    doc: cloud/provider-health
+  - id: scheduled-event
+    name: 예정 이벤트
+    en: Scheduled event
+    aliases: [scheduled event, 예약된 이벤트, instance-retirement, system-reboot, 퇴역]
+    short: 사업자가 하드웨어 점검을 위해 미리 잡아 둔 서버 재부팅·이동·퇴역 일정이에요.
+    doc: cloud/provider-health
+  - id: resource-health
+    name: Resource Health
+    en: Azure Resource Health
+    aliases: [리소스 상태, 리소스 상태 확인]
+    short: Azure 자원 하나가 지금 쓸 수 있는지 Available 같은 상태로 보여 주는 기능이에요.
+    doc: cloud/provider-health
+  - id: storage-class
+    name: 저장 등급
+    en: Storage class
+    aliases: [storage class, 스토리지 클래스, S3 Standard, Standard-IA, Glacier, Intelligent-Tiering, 액세스 계층, access tier]
+    short: 오브젝트마다 붙어 보관 요금, 꺼내는 시간, 꺼내는 요금을 정하는 등급이에요.
+    doc: cloud/storage
+  - id: lifecycle-rule
+    name: 수명 주기 규칙
+    en: Lifecycle rule
+    aliases: [lifecycle rule, lifecycle configuration, 수명 주기 구성, 라이프사이클 정책]
+    short: 정한 날짜가 지난 객체를 다른 저장 등급으로 옮기거나 지우는 버킷 규칙이에요.
+    doc: cloud/storage
+  - id: vpc-peering
+    name: VPC 피어링
+    en: VPC peering
+    aliases: [VPC peering, 피어링, VNet peering, 가상 네트워크 피어링]
+    short: VPC 두 개를 사설 IP로 바로 잇는 일대일 연결이에요.
+    doc: cloud/networking
+  - id: transit-gateway
+    name: Transit Gateway
+    en: AWS Transit Gateway
+    aliases: [TGW, 트랜짓 게이트웨이, 전송 게이트웨이]
+    short: 여러 VPC와 사내망을 한곳에 모아 잇는 클라우드의 중심 라우터예요.
+    analogy: 노선 여러 개가 모이는 환승역과 같아요.
+    doc: cloud/networking
+  - id: vpc-endpoint
+    name: VPC 엔드포인트
+    en: VPC endpoint
+    aliases: [VPC endpoint, PrivateLink, Private Link, 프라이빗 엔드포인트, private endpoint, 인터페이스 엔드포인트, 게이트웨이 엔드포인트]
+    short: VPC 안에서 인터넷을 거치지 않고 클라우드 서비스 API에 닿게 하는 입구예요.
+    doc: cloud/networking
+  - id: aws-organizations
+    name: AWS Organizations
+    en: AWS Organizations
+    aliases: [Organizations, 조직, 관리 계정, management account, OU, 조직 단위]
+    short: 여러 AWS 계정을 하나의 조직으로 묶어 정책과 청구를 한곳에서 다루는 서비스예요.
+    doc: cloud/iam
+  - id: scp
+    name: 서비스 제어 정책
+    en: Service control policy
+    aliases: [SCP, service control policy]
+    short: 조직의 OU나 계정에 걸어 그 안에서 할 수 있는 동작의 한계를 정하는 정책이에요.
+    doc: cloud/iam

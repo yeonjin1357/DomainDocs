@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 170" width="300" height="170">
+<text x="6" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">AZ 하나가 한꺼번에</text>
+<text x="64" y="40" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">a</text>
+<text x="94" y="40" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">b</text>
+<text x="124" y="40" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">c</text>
+<text x="6" y="69" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">EC2</text>
+<rect x="50" y="50" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<rect x="80" y="50" width="26" height="26" rx="5" style="fill:var(--color-warn)" />
+<rect x="110" y="50" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="6" y="99" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">RDS</text>
+<rect x="50" y="80" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<rect x="80" y="80" width="26" height="26" rx="5" style="fill:var(--color-warn)" />
+<rect x="110" y="80" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="6" y="129" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">ELB</text>
+<rect x="50" y="110" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<rect x="80" y="110" width="26" height="26" rx="5" style="fill:var(--color-warn)" />
+<rect x="110" y="110" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="6" y="160" font-size="13" font-weight="700" style="fill:var(--color-accent)">사업자 소식부터</text>
+<text x="162" y="16" font-size="13" font-weight="700" style="fill:var(--color-text)">서버 하나만</text>
+<text x="220" y="40" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">a</text>
+<text x="250" y="40" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">b</text>
+<text x="280" y="40" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">c</text>
+<text x="162" y="69" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">EC2</text>
+<rect x="206" y="50" width="26" height="26" rx="5" style="fill:var(--color-warn)" />
+<rect x="236" y="50" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<rect x="266" y="50" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="162" y="99" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">RDS</text>
+<rect x="206" y="80" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<rect x="236" y="80" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<rect x="266" y="80" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="162" y="129" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">ELB</text>
+<rect x="206" y="110" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<rect x="236" y="110" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<rect x="266" y="110" width="26" height="26" rx="5" style="fill:var(--color-accent-weak)" />
+<text x="162" y="160" font-size="13" font-weight="700" style="fill:var(--color-text)">서버 안부터</text>
+</svg>

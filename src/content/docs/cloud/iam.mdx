@@ -6,7 +6,7 @@ type: concept
 stage: basics
 order: 75
 icon: cloud
-keywords: [IAM, 권한, policy, 정책, role, 역할, access key, 접근 키, AccessDenied, managed identity]
+keywords: [IAM, policy, role, access key, AccessDenied, managed identity, AWS Organizations, SCP, cross-account, management group]
 related: [cloud/networking, cloud/cloud-metrics, cloud/cloud-metrics-missing, cloud/overview, kubernetes/rbac]
 sources:
   - title: AWS IAM — Policy evaluation logic (implicit deny, explicit deny)
@@ -29,8 +29,16 @@ sources:
     url: https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview
   - title: Azure — Built-in roles for Monitor (Monitoring Reader)
     url: https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/monitor
-updated: 2026-11-03
+  - title: AWS — What is AWS Organizations?
+    url: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html
+  - title: AWS — CloudWatch cross-account observability
+    url: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html
+  - title: Microsoft Learn — Organize your resources with management groups
+    url: https://learn.microsoft.com/en-us/azure/governance/management-groups/overview
+updated: 2026-11-11
 ---
+
+import OrgAccounts from '../../../assets/figures/cloud/org-accounts.svg';
 
 <KeyPoints>
   <Point title="누가, 무엇을, 어디에 할지 적어요">
@@ -129,6 +137,26 @@ AWS 문서는 서버와 앱이 역할의 임시 자격 증명을 쓰라고 권�
 
 외부 ID는 그 서비스가 다른 고객의 부탁을 받고 내 역할을 잘못 맡는 일을 막아요. 이 문제를 혼동된 대리인(confused deputy)이라고 불러요. AWS는 외부 ID를 비밀로 다루지 않아서, 비밀번호처럼 숨기는 값은 아니에요.
 
+## 계정이 여러 개일 때
+
+회사가 커지면 AWS 계정을 여러 개로 나눠 써요. 계정은 권한, 보안, 비용이 나뉘는 자연스러운 경계라서, AWS도 여러 계정으로 나누기를 권해요.
+
+<Term term="cloud/aws-organizations">AWS Organizations</Term>는 여러 계정을 하나의 조직으로 묶어요.
+
+- 관리 계정(management account): 조직을 만들고 다스리는 계정이에요. 조직 전체의 청구서가 이 계정에 하나로 모여요.
+- 조직 단위(OU, organizational unit): 계정을 운영, 개발처럼 묶는 폴더예요.
+- <Term term="cloud/scp">서비스 제어 정책</Term>(SCP): OU나 계정에 걸어, 그 안에서 할 수 있는 동작의 한계를 정해요.
+
+<Figure caption="조직의 관리 계정 아래에 OU 둘과 계정 셋이 있는 예시예요. 모니터링 계정은 계정마다 만들어 둔 읽기 역할을 맡아 지표를 읽어요.">
+  <OrgAccounts aria-label="맨 위 관리 계정(조직, 청구서 하나) 아래에 운영 OU와 개발 OU가 있어요. 운영 OU 아래에 prod-a, prod-b 계정이, 개발 OU 아래에 dev 계정이 있고, 계정마다 역할을 뜻하는 자물쇠가 있어요. 아래의 모니터링 계정에서 세 계정으로 점선 화살표가 가고, 계정마다 역할을 맡아 지표를 읽는다고 적혀 있어요" />
+</Figure>
+
+모니터링 제품이 여러 계정을 읽으려면, 계정마다 읽기 역할을 만들고 한 곳에서 그 역할들을 차례로 맡아요. 앞에서 본 외부 ID도 계정마다의 역할에 적어요. 조직에 새 계정이 생기면, 그 계정에도 역할을 만들어야 수집이 시작돼요.
+
+CloudWatch에는 계정을 넘어 보는 기능(cross-account observability)도 있어요. 모니터링 계정 하나에 소스 계정들을 이어, 한 리전 안에서 여러 계정의 지표·로그·트레이스를 함께 봐요. Organizations로 이어 두면 새로 만든 계정도 저절로 소스 계정이 되고, 지표와 로그를 나눠 보는 데는 추가 요금이 없어요.
+
+Azure에서는 구독(subscription)이 AWS 계정에 해당해요. 관리 그룹(management group)이 여러 구독을 묶고, 관리 그룹에 준 역할은 그 아래 구독과 자원에 모두 이어져요. 그래서 관리 그룹에 Monitoring Reader를 한 번 주면, 그 아래 구독을 모두 읽을 수 있어요.
+
 ## Azure에서는
 
 Azure는 역할 할당으로 권한을 줘요. 역할 할당은 세 가지로 이뤄져요. 누구에게(보안 주체), 어떤 역할을(역할 정의), 어디에(범위)예요.
@@ -157,6 +185,8 @@ AWS에서는 API 요청 기록인 CloudTrail에서 거부된 요청을 찾아요
   <Check>몇몇 서비스의 지표만 빈다면 정책의 `Action` 목록에 그 서비스의 읽기 동작이 빠졌는지 보세요. 수집기 로그의 AccessDenied를 함께 보세요.</Check>
   <Check>허락을 더했는데도 계속 거부된다면, 명시한 `Deny`가 어디 있는지 찾으세요. 거부는 허락보다 앞서요.</Check>
   <Check>외부 서비스에 맡길 역할에 외부 ID가 없다면 더하세요. 다른 고객의 부탁으로 내 역할이 쓰이는 일을 막아요.</Check>
+  <Check>조직에 새 계정이 생겼는데 그 계정 지표만 안 보인다면, 그 계정에 수집용 역할이 있는지 보세요.</Check>
+  <Check>역할 정책에 허락이 있는데도 한 계정에서만 거부된다면, 그 계정이나 OU에 걸린 SCP를 보세요.</Check>
 </Checkpoints>
 
 <Deeper>

@@ -6,7 +6,7 @@ type: concept
 stage: basics
 order: 30
 icon: cloud
-keywords: [VPC, VNet, subnet, 서브넷, security group, 보안 그룹, NACL, NAT gateway, internet gateway, NSG]
+keywords: [VPC, VNet, subnet, security group, NACL, NAT gateway, VPC peering, Transit Gateway, Direct Connect, VPC endpoint]
 related: [cloud/regions-and-zones, cloud/load-balancers, network/addresses, network/switches-and-routers]
 sources:
   - title: AWS — What is Amazon VPC?
@@ -23,8 +23,30 @@ sources:
     url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html
   - title: Microsoft Learn — Network security groups
     url: https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview
-updated: 2026-10-30
+  - title: AWS — What is VPC peering?
+    url: https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html
+  - title: AWS — How VPC peering connections work (limitations)
+    url: https://docs.aws.amazon.com/vpc/latest/peering/vpc-peering-basics.html
+  - title: AWS — What is AWS Transit Gateway?
+    url: https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html
+  - title: AWS — What is AWS Site-to-Site VPN?
+    url: https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html
+  - title: AWS — Monitor Site-to-Site VPN tunnels using CloudWatch
+    url: https://docs.aws.amazon.com/vpn/latest/s2svpn/monitoring-cloudwatch-vpn.html
+  - title: AWS — What is Direct Connect?
+    url: https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html
+  - title: AWS — Access AWS services through AWS PrivateLink
+    url: https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html
+  - title: AWS — Gateway endpoints
+    url: https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html
+  - title: Microsoft Learn — What is Azure Virtual Network?
+    url: https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview
+updated: 2026-11-11
 ---
+
+import VpcPeering from '../../../assets/figures/cloud/vpc-peering.svg';
+import VpcHub from '../../../assets/figures/cloud/vpc-hub.svg';
+import VpcEndpoint from '../../../assets/figures/cloud/vpc-endpoint.svg';
 
 <KeyPoints>
   <Point title="VPC는 나만의 네트워크예요">
@@ -108,6 +130,63 @@ VPC를 만들 때는 `10.0.0.0/16`처럼 쓸 IP 주소 범위를 정해요. 그 
 
 Azure에서는 네트워크 보안 그룹(NSG)이 이 역할을 해요. 허용과 거부 규칙을 모두 적고, 상태를 기억해서 응답은 따로 허용하지 않아도 돼요.
 
+## VPC 밖과 잇기
+
+VPC는 기본으로 다른 VPC나 회사 네트워크와 떨어져 있어요. 잇는 방법은 무엇과 잇느냐에 따라 네 갈래예요.
+
+| 잇는 대상 | AWS에서 쓰는 것 |
+| --- | --- |
+| 다른 VPC 하나 | VPC 피어링 |
+| 여러 VPC와 사내망을 한곳에서 | Transit Gateway |
+| 회사 데이터센터 | 사이트 간 VPN, 전용선(Direct Connect) |
+| 클라우드 서비스 API | VPC 엔드포인트 |
+
+### 다른 VPC와: 피어링
+
+<Term term="cloud/vpc-peering">VPC 피어링</Term>은 VPC 두 개를 사설 IP로 바로 잇는 연결이에요. 다른 계정이나 다른 리전의 VPC와도 이을 수 있어요. 따로 장비를 두지 않아서, 고장 나면 다 끊기는 한 지점이나 대역폭이 막히는 지점이 없어요.
+
+피어링에는 지킬 규칙이 둘 있어요. 두 VPC의 IP 범위가 겹치면 이을 수 없어요. 그리고 이어진 VPC를 거쳐 그 너머로 갈 수 없어요.
+
+<Figure caption="A와 B, A와 C를 피어링으로 이었어요. 그래도 B에서 A를 거쳐 C로 가는 길은 생기지 않아서, B와 C가 주고받으려면 둘 사이에 피어링을 따로 만들어요.">
+  <VpcPeering aria-label="위에 VPC A(10.0.0.0/16), 아래 왼쪽에 VPC B(10.1.0.0/16), 아래 오른쪽에 VPC C(10.2.0.0/16)가 있어요. A와 B, A와 C는 피어링 선으로 이어져 있고, B와 C 사이 점선에는 X 표시가 있어요. 아래에 B에서 A를 거쳐 C로는 못 가요라고 적혀 있어요" />
+</Figure>
+
+같은 까닭으로 상대 VPC의 인터넷 게이트웨이, NAT, VPN도 빌려 쓸 수 없어요. 피어링을 만든 뒤에는 양쪽 라우팅 테이블에 상대 VPC로 가는 경로를 넣어야 실제로 오가요. Azure에서는 가상 네트워크 피어링이라고 불러요.
+
+### 여럿을 한곳에서: Transit Gateway
+
+VPC가 많아지면 둘씩 잇는 피어링이 금방 얽혀요. <Term term="cloud/transit-gateway">Transit Gateway</Term>는 여러 VPC와 사내망을 한곳에 모아 잇는 중심 라우터예요. VPC, VPN, 전용선을 붙이고(attachment), 어디로 보낼지는 Transit Gateway의 라우팅 테이블로 정해요.
+
+<Figure caption="VPC 둘과 사내 데이터센터를 Transit Gateway 하나에 이은 예시예요. 사내망은 인터넷 위의 VPN 터널 두 개나 전용선으로 이어요.">
+  <VpcHub aria-label="위에 VPC A(10.0.0.0/16)와 VPC B(10.1.0.0/16)가 있고, 둘 다 가운데 Transit Gateway에 이어져요. Transit Gateway 아래의 사내 데이터센터 라우터와는 점선 두 줄인 VPN 터널 2개와 굵은 선인 전용선 Direct Connect로 이어져 있어요" />
+</Figure>
+
+요금은 붙인 연결마다 시간당 내고, 지나간 데이터 양만큼 더 내요.
+
+### 회사 네트워크와: VPN과 전용선
+
+회사 데이터센터와 VPC를 잇는 길은 두 가지예요.
+
+- 사이트 간 VPN(Site-to-Site VPN): 인터넷 위에 IPsec으로 암호화한 터널을 만들어요. 연결 하나에 터널이 둘이라, 하나가 끊겨도 다른 하나로 이어져요.
+- 전용선(Direct Connect): 회사 라우터와 AWS의 연결 지점을 광케이블로 직접 이어요. 인터넷 사업자를 거치지 않아요.
+
+Azure에서는 VPN Gateway로 사이트 간 VPN을, ExpressRoute로 전용선을 만들어요. ExpressRoute도 인터넷을 거치지 않아요. 터널과 VPN의 원리는 <Term slug="network/tunnels">터널과 오버레이(VPN·VXLAN)</Term>에서 다뤄요.
+
+### 클라우드 서비스에 안에서 닿기: VPC 엔드포인트
+
+S3나 CloudWatch 같은 AWS 서비스의 API는 공개 주소에 있어요. 그래서 비공개 서브넷의 서버가 이 API를 부르면, 길이 따로 없는 한 NAT 게이트웨이를 거쳐 나가요.
+
+<Term term="cloud/vpc-endpoint">VPC 엔드포인트</Term>를 만들면 VPC 안에서 바로 서비스에 닿아요. 두 가지가 있어요.
+
+- 게이트웨이 엔드포인트: S3와 DynamoDB에만 써요. 라우팅 테이블에 경로를 더하는 방식이고, 추가 요금이 없어요.
+- 인터페이스 엔드포인트: 서브넷 안에 사설 IP를 가진 네트워크 인터페이스를 만들어요. 많은 AWS 서비스에 쓰고, AZ마다 시간당 요금과 처리한 GB당 요금을 내요.
+
+<Figure caption="비공개 서브넷의 수집기가 CloudWatch API에 닿는 두 길이에요. NAT로 나가면 처리한 GB마다 NAT 요금이 붙고, 인터페이스 엔드포인트로 가면 사설 IP로 바로 닿아요.">
+  <VpcEndpoint aria-label="VPC 안 비공개 서브넷에 수집기가 있어요. 왼쪽 점선 길은 NAT 게이트웨이를 거쳐 인터넷 쪽으로 CloudWatch API에 닿고, NAT 게이트웨이에는 GB당 처리 요금이 표시돼 있어요. 오른쪽 실선 길은 인터페이스 엔드포인트를 거쳐 사설 IP로 CloudWatch API에 닿아요" />
+</Figure>
+
+인터페이스 엔드포인트에 사설 DNS를 켜면, 앱이 쓰던 서비스 주소가 그대로 엔드포인트의 사설 IP로 풀려요. 그래서 앱이나 SDK 설정을 고치지 않아도 엔드포인트로 가요. Azure에서는 Private Link와 서비스 엔드포인트가 이 역할을 해요.
+
 ## 모니터링에서는
 
 클라우드에서 "연결이 안 된다"는 문제는 서버 고장보다 네트워크 설정인 경우가 많아요. 서버 지표가 멀쩡한데 연결만 실패한다면, 경로와 규칙을 순서대로 봐요.
@@ -137,11 +216,20 @@ Azure에서는 네트워크 보안 그룹(NSG)이 이 역할을 해요. 허용�
 
 연결이 "거부"되는지 "시간 초과"되는지도 실마리예요. 둘의 차이는 <Term slug="network/tcp-connections">TCP 연결</Term>에서 다뤄요.
 
+피어링이나 Transit Gateway를 지나는 연결이라면, 이 순서에 "상대 쪽 라우팅 테이블에도 돌아오는 경로가 있나"를 더해요. 가는 길과 오는 길이 모두 있어야 해요.
+
+사이트 간 VPN은 CloudWatch의 `TunnelState` 지표로 터널 상태를 봐요. 터널이 살아 있으면 1, 끊기면 0이에요. 0과 1 사이 값이면 터널 중 하나 이상이 끊긴 채예요.
+
+수집기가 비공개 서브넷에서 CloudWatch API를 부르는 길도 봐요. NAT를 지나면 가져오는 지표 양만큼 NAT 처리 요금이 붙어요. NAT 요금은 <Term slug="cloud/costs">클라우드 비용은 어디서 나올까</Term>에서 다뤘어요.
+
 <Checkpoints>
   <Check>보안 그룹에 응답용 포트를 따로 열고 있다면 다시 보세요. 보안 그룹은 허용한 요청의 응답을 알아서 통과시켜요.</Check>
   <Check>네트워크 ACL에서 들어오는 쪽만 열었다면 다시 보세요. ACL은 상태를 기억하지 않아서 응답이 나갈 길도 열어야 해요.</Check>
   <Check>데이터베이스를 공개 서브넷에 두었다면 다시 보세요. 바깥에서 닿을 필요가 없는 서버는 비공개 서브넷에 둬요.</Check>
   <Check>비공개 서브넷의 서버가 밖으로 못 나간다면, NAT 게이트웨이로 가는 경로가 있는지 보세요.</Check>
+  <Check>IP 범위가 겹치는 VPC끼리 피어링하려 한다면 다시 보세요. 범위가 겹치면 이을 수 없어요.</Check>
+  <Check>VPN의 `TunnelState`가 0과 1 사이에 머문다면, 터널 하나가 끊긴 채 남은 하나로만 버티는 거예요. 이중화가 깨져 있어요.</Check>
+  <Check>비공개 서브넷의 수집기가 NAT로 클라우드 API를 부르고 있다면, 인터페이스 엔드포인트와 요금을 견줘 보세요.</Check>
 </Checkpoints>
 
 <Deeper>

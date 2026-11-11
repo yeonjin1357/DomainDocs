@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 152" width="300" height="152">
+<text x="52" y="14" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">BucketSizeBytes</text>
+<line x1="52" y1="107.3" x2="276" y2="107.3" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="46" y="111.8" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">1.2TB</text>
+<line x1="52" y1="74" x2="276" y2="74" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="46" y="78.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">1.3TB</text>
+<line x1="52" y1="40.7" x2="276" y2="40.7" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="46" y="45.2" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">1.4TB</text>
+<line x1="52" y1="124" x2="276" y2="124" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M52 104 L126.7 84 L201.3 67.3 L276 44" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 5" style="fill:none;stroke:var(--color-text-weak)" />
+<circle cx="52" cy="104" r="5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="126.7" cy="84" r="5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="201.3" cy="67.3" r="5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<circle cx="276" cy="44" r="5" stroke-width="1.5" style="fill:var(--color-accent);stroke:var(--color-card)" />
+<text x="52" y="144" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">11/8</text>
+<text x="126.7" y="144" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">11/9</text>
+<text x="201.3" y="144" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">11/10</text>
+<text x="276" y="144" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">11/11</text>
+<text x="164" y="104" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">점 사이엔 값이 없어요</text>
+</svg>

@@ -34,3 +34,24 @@ questions:
     prompt: 서버를 가용 영역 두 곳에 나눠 두려면, 서브넷도 가용 영역마다 하나씩 만들어야 하나요?
     answer: true
     explain: 서브넷 하나는 가용 영역 하나 안에만 있어서, 여러 가용 영역에 걸칠 수 없어요.
+  - id: peering-not-transitive
+    type: ox
+    prompt: VPC A–B, A–C가 피어링돼 있으면 B에서 A를 거쳐 C로 갈 수 있나요?
+    answer: false
+    explain: 피어링은 이어진 VPC를 거쳐 그 너머로 가지 못해요. B와 C 사이에도 피어링을 만들거나 Transit Gateway를 써요.
+  - id: tunnelstate-half
+    type: choice
+    prompt: 사이트 간 VPN의 TunnelState가 하루 종일 0과 1 사이에 머물러요. 무엇을 뜻할까요?
+    choices:
+      - 터널 하나 이상이 끊긴 채예요
+      - 대역폭의 절반쯤을 쓰고 있어요
+      - 패킷의 절반이 사라지고 있어요
+      - 두 터널이 모두 바쁘게 일해요
+    answer: 0
+    explain: 터널이 모두 살아 있으면 1, 모두 끊기면 0이에요. 그 사이 값이면 남은 터널로만 버티는 중이에요.
+  - id: vpc-endpoint-name
+    type: input
+    prompt: 비공개 서브넷의 서버가 NAT를 거치지 않고 S3나 CloudWatch API에 닿게 하는, VPC 안의 입구는?
+    answer: [VPC 엔드포인트, VPC endpoint]
+    term: cloud/vpc-endpoint
+    explain: S3와 DynamoDB는 무료인 게이트웨이 엔드포인트, 다른 서비스는 인터페이스 엔드포인트를 써요.

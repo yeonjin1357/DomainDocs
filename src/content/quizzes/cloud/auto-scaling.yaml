@@ -1,0 +1,33 @@
+questions:
+  - id: asg-elb-check-default
+    type: ox
+    prompt: 자동 확장 그룹은 따로 켜지 않아도 로드 밸런서의 상태 확인 결과를 보고 서버를 바꿔 끼우나요?
+    answer: false
+    explain: 기본으로는 EC2 상태 검사만 봐요. 로드 밸런서의 상태 확인은 그룹에서 켜야 서버 교체에 쓰여요.
+  - id: tracking-math
+    type: choice
+    prompt: 목표 추적의 목표가 평균 CPU 50%예요. 4대가 평균 CPU 75%로 일하고 있다면 그룹은 몇 대에 맞추려 할까요?
+    choices: [6대, 5대, 8대, 3대]
+    answer: 0
+    explain: 일의 양은 4 × 75 = 300이에요. 이걸 50%씩 나눠 맡으려면 300 ÷ 50 = 6대가 필요해요.
+  - id: desired-vs-inservice
+    type: choice
+    prompt: 원하는 대수(GroupDesiredCapacity)는 6인데 서비스 중 대수(GroupInServiceInstances)가 30분째 4예요. 무엇을 뜻할까요?
+    choices:
+      - 새 서버가 뜨지 못하고 있어요
+      - 서버 2대가 요청을 받지 않고 쉬고 있어요
+      - 그룹 지표 수집이 꺼져 있어요
+      - 목표 추적이 서버를 줄이는 중이에요
+    answer: 0
+    explain: 원하는 대수까지 서버를 띄우지 못하는 모양이에요. 자리 부족, 시작 템플릿 문제, 계정 한도 같은 이유가 확장 활동 기록에 남아요.
+  - id: scale-in-agent-gone
+    type: ox
+    prompt: 자동 확장 그룹이 줄이며 지운 서버는 그 안의 에이전트도 함께 사라져 수집이 끊기나요?
+    answer: true
+    explain: 서버가 종료되면 에이전트도 없어져요. 그래서 수집 끊김 알림은 끊긴 서버가 그룹이 지운 서버인지 먼저 가려야 해요.
+  - id: launch-template-name
+    type: input
+    prompt: 자동 확장 그룹이 새 서버를 띄울 때 따르는, 이미지·인스턴스 유형·보안 그룹을 적은 설계도는?
+    answer: [시작 템플릿, launch template]
+    term: cloud/launch-template
+    explain: 그룹은 서버가 더 필요할 때마다 시작 템플릿대로 새 서버를 띄워요.

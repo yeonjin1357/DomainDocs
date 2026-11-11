@@ -1,0 +1,37 @@
+questions:
+  - id: data-events-default
+    type: ox
+    prompt: CloudTrail은 따로 켜지 않아도 S3 객체를 읽고 지운 호출을 남기나요?
+    answer: false
+    explain: S3 객체 읽기·쓰기는 데이터 이벤트라 기본으로 꺼져 있어요. 켜야 남고, 켜면 요금이 붙어요.
+  - id: event-time-utc
+    type: ox
+    prompt: CloudTrail 기록의 eventTime은 UTC로 적히나요?
+    answer: true
+    explain: eventTime은 요청이 끝난 시각을 UTC로 적어요. 한국 시각 그래프에 겹칠 때는 9시간을 더해요.
+  - id: find-old-change
+    type: choice
+    prompt: 넉 달 전에 누가 보안 그룹을 바꿨는지 찾아야 해요. 그 기록은 어디에 있어야 할까요?
+    choices:
+      - S3로 내보내는 trail
+      - CloudTrail의 Event history 화면
+      - CloudWatch의 EC2 지표
+      - AWS Health Dashboard
+    answer: 0
+    explain: Event history는 최근 90일의 관리 이벤트만 보여 줘요. 그보다 오래된 기록은 trail로 내보내 둔 곳에 있어요.
+  - id: audit-alert-delay
+    type: choice
+    prompt: 감사 로그로 보안 그룹 규칙 열기 알림을 만들었어요. 알림은 언제쯤 울릴까요?
+    choices:
+      - 호출 뒤 몇 분 늦게
+      - 호출하는 바로 그 순간
+      - 다음 날 비용 집계 뒤
+      - 90일이 지난 다음
+    answer: 0
+    explain: CloudTrail은 호출 뒤 평균 5분쯤에 기록을 넘겨요. 알림도 그만큼 늦어요.
+  - id: activity-log-name
+    type: input
+    prompt: Azure에서 자원을 만들고 바꾸고 지운 관리 작업이 90일 동안 무료로 남는 곳은?
+    answer: [활동 로그, Activity log]
+    term: cloud/activity-log
+    explain: Azure 활동 로그는 관리 작업을 남기고, 읽기 작업은 대개 남기지 않아요.

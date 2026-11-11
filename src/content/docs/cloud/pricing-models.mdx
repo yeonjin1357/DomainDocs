@@ -1,0 +1,172 @@
+---
+title: 싸게 빌리는 법, 약정과 스팟
+summary: 오래 쓸 만큼 약정하면 할인받고, 남는 서버를 빌리면 더 싸지만 언제든 회수될 수 있어요.
+domain: cloud
+type: concept
+stage: basics
+order: 86
+icon: cloud
+keywords: [온디맨드, Savings Plans, Reserved Instances, 예약 인스턴스, RI, Spot Instances, 스팟 인스턴스, Azure 예약, 약정 할인, 활용률]
+related: [cloud/costs, cloud/virtual-machines, cloud/auto-scaling, foundations/capacity-planning, cloud/provider-health]
+sources:
+  - title: AWS — Amazon EC2 billing and purchasing options
+    url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-purchasing-options.html
+  - title: AWS — What are Savings Plans?
+    url: https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html
+  - title: AWS — Savings Plans types
+    url: https://docs.aws.amazon.com/savingsplans/latest/userguide/plan-types.html
+  - title: AWS — Understanding how Savings Plans apply to your usage
+    url: https://docs.aws.amazon.com/savingsplans/latest/userguide/sp-applying.html
+  - title: AWS — Using the Savings Plans utilization report
+    url: https://docs.aws.amazon.com/savingsplans/latest/userguide/ce-sp-usingPR.html
+  - title: AWS — Using the Savings Plans coverage report
+    url: https://docs.aws.amazon.com/savingsplans/latest/userguide/ce-sp-usingCR.html
+  - title: AWS — Reserved Instances for Amazon EC2 overview
+    url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-reserved-instances.html
+  - title: AWS — Amazon EC2 Spot Instances
+    url: https://aws.amazon.com/ec2/spot/
+  - title: AWS — Spot Instance interruption notices
+    url: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-instance-termination-notices.html
+  - title: Microsoft Learn — What are Azure Reservations?
+    url: https://learn.microsoft.com/en-us/azure/cost-management-billing/reservations/save-compute-costs-reservations
+  - title: Microsoft Learn — About Azure Spot Virtual Machines
+    url: https://learn.microsoft.com/en-us/azure/virtual-machines/spot-vms
+updated: 2026-11-11
+---
+
+import PmHourly from '../../../assets/figures/cloud/pm-hourly.svg';
+
+<KeyPoints>
+  <Point title="같은 서버도 사는 법마다 값이 달라요">
+    그냥 쓰는 온디맨드, 오래 쓰겠다고 약정하는 할인, 남는 서버를 빌리는 스팟이 있어요.
+  </Point>
+  <Point title="약정은 쓰든 안 쓰든 내요">
+    1년이나 3년 동안 시간마다 얼마를 쓰겠다고 약속하고 할인받아요. 그 시간에 못 쓴 약정은 버려져요.
+  </Point>
+  <Point title="스팟은 2분 예고로 회수돼요">
+    온디맨드보다 크게 싸지만, 사업자가 자리를 되찾을 때 2분 전에 알리고 멈추거나 지워요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="헬스장 회원권은 한 지점에 묶이지만, AWS의 Compute Savings Plans는 리전이나 인스턴스 종류를 바꿔도 할인이 따라가요. 그리고 약정은 시간마다 셈해서, 못 쓴 몫이 다음 시간으로 넘어가지 않아요.">
+  헬스장 이용권과 비슷해요. 갈 때마다 내는 일일권이 온디맨드, 안 가도 매달 나가는 1년 회원권이 약정이에요. 스팟은 남는 자리를 싸게 파는 마감 할인이라, 예약 손님이 오면 자리를 비켜야 해요.
+</Analogy>
+
+## 세 가지 사는 법
+
+<Figure caption="온디맨드 가격을 100으로 둔 AWS 문서의 최대 할인이에요. 실제 할인율은 인스턴스 유형, 리전, 약정 기간과 시점마다 달라요.">
+  <Bars
+    ariaLabel="온디맨드 100, 약정 할인은 최대 72% 싸서 28, 스팟은 최대 90% 싸서 10을 막대 길이로 견준 그림"
+    max={100}
+    bars={[
+      { label: '온디맨드', value: 100, display: '100', note: '기준' },
+      { label: '약정 할인', value: 28, display: '28', note: '최대 72% 할인', tone: 'accent' },
+      { label: '스팟', value: 10, display: '10', note: '최대 90% 할인', tone: 'warn' },
+    ]}
+  />
+</Figure>
+
+<Term term="cloud/on-demand">온디맨드</Term>(On-Demand)는 약속 없이 켠 만큼 내는 방식이에요. EC2 온디맨드는 켜 둔 시간을 초 단위로 셈해요. 언제든 켜고 끌 수 있어서 가장 비싸요.
+
+약정 할인은 오래 쓸 만큼을 미리 약속하고 깎는 방식이에요. AWS에는 두 가지가 있어요.
+
+- <Term term="cloud/savings-plans">Savings Plans</Term>: 1년이나 3년 동안 시간당 몇 달러를 쓰겠다고 약정해요. 약정한 금액까지는 할인된 요율이 저절로 붙어요.
+- <Term term="cloud/reserved-instance">예약 인스턴스</Term>(Reserved Instances): 인스턴스 유형과 리전 같은 구성을 정해 1년이나 3년을 약정해요.
+
+예약 인스턴스는 실제 서버가 아니에요. 구성이 맞는 온디맨드 서버에 붙는 청구 할인이에요. 그래서 예약을 사도 서버는 따로 띄워야 하고, 맞는 서버가 없으면 할인은 허공에 떠요.
+
+AWS 문서는 예약 인스턴스보다 Savings Plans를 권해요. 할인 폭은 비슷한데, Savings Plans는 구성을 바꿔도 할인이 따라가서예요.
+
+| 종류 | 약정하는 것 | 최대 할인 | 따라가는 범위 |
+| --- | --- | --- | --- |
+| Compute Savings Plans | 시간당 금액 | 66% | 인스턴스 종류·크기·리전, Fargate, Lambda |
+| EC2 Instance Savings Plans | 시간당 금액 | 72% | 한 리전의 한 인스턴스 계열(예: 버지니아의 m5) |
+| 예약 인스턴스 | 인스턴스 구성 | 72% | 구성이 맞는 서버 |
+
+<Term term="cloud/spot-instance">스팟 인스턴스</Term>(Spot Instances)는 사업자의 남는 서버를 빌리는 방식이에요. AWS는 온디맨드보다 최대 90% 싸다고 밝혀요. 대신 사업자가 자리가 필요해지면 회수해 가요.
+
+Azure도 같은 세 갈래가 있어요. 1년·3년 약정인 Azure 예약(Reservations)은 종량제 요금보다 최대 72% 싸요. 남는 자리를 쓰는 Azure Spot 가상 머신도 있어요.
+
+## 약정은 시간마다 채워요
+
+약정 할인은 한 시간 단위로 셈해요. 매 시간 그 시간의 사용에 약정을 먼저 채우고, 넘치는 몫은 온디맨드 요금으로 내요.
+
+<Figure caption="시간당 10달러를 약정한 하루의 예시예요. 밤에는 사용이 약정보다 적어 남은 몫이 버려지고, 낮에는 넘친 몫을 온디맨드 요금으로 내요.">
+  <PmHourly aria-label="시간당 10달러 약정선에 견준 6개 시간대의 사용 막대예요. 0시 6달러, 4시 5달러, 20시 8달러는 약정선 아래라 그 차이만큼 버려진 약정으로 칠해졌고, 8시 12달러, 12시 15달러, 16시 13달러는 10달러까지는 약정으로, 넘친 몫은 온디맨드 요금으로 칠해졌어요" />
+</Figure>
+
+0시에 약정 요율로 6달러어치만 썼다면, 남은 4달러는 그 시간에 그대로 버려져요. 다음 시간으로 넘어가지 않아요. 12시에 15달러어치를 썼다면 10달러까지는 약정으로 내고, 넘친 몫은 온디맨드 요금으로 내요.
+
+그래서 약정을 하루 중 가장 적게 쓰는 시간보다 크게 잡으면, 그 차이만큼 매일 버려져요. 늘 깔리는 바닥 사용은 약정으로, 오르내리는 사용은 온디맨드나 스팟으로 덮어요.
+
+약정이 잘 쓰이는지는 두 숫자로 봐요.
+
+- <Term term="cloud/sp-utilization">활용률</Term>(utilization): 약정 중 실제로 쓴 몫이에요. 시간당 10달러 약정에 9.8달러를 썼다면 98%예요.
+- <Term term="cloud/sp-coverage">커버리지</Term>(coverage): 할인 대상 사용 비용 중 약정이 덮은 몫이에요.
+
+활용률이 낮으면 약정을 너무 많이 산 거예요. 커버리지가 낮으면 온디맨드로 비싸게 내는 사용이 많다는 뜻이에요. 둘은 서로 당겨서, 약정을 늘리면 커버리지는 오르고 활용률은 떨어지기 쉬워요.
+
+## 스팟은 언제든 돌려줘야 해요
+
+AWS는 스팟 인스턴스를 회수하기 2분 전에 예고를 보내요. 예고는 두 길로 와요.
+
+- EventBridge로 `EC2 Spot Instance Interruption Warning` 이벤트가 와요.
+- 서버 안의 메타데이터 `spot/instance-action`에 할 일과 시각이 생겨요.
+
+<Figure caption="스팟 서버가 회수되는 예시예요. 예고가 온 뒤 2분 동안 로드 밸런서에서 빠지고 하던 일을 정리해요.">
+  <Timeline
+    ariaLabel="스팟 서버는 10분까지 일하다가 10분에 회수 예고를 받고, 10분부터 12분까지 정리한 뒤 12분에 회수돼요. 같은 그룹은 그 사이 대신할 서버를 띄워요"
+    start={4}
+    end={16}
+    lanes={[
+      { label: '스팟 서버', segments: [{ start: 4, end: 10, label: '일하는 중' }, { start: 10, end: 12, label: '정리', tone: 'warn' }] },
+      { label: '대신할 서버', segments: [{ start: 12, end: 16, label: '띄우는 중', tone: 'accent' }] },
+    ]}
+    marks={[{ at: 10, label: '예고', tone: 'warn' }, { at: 12, label: '회수' }]}
+    ticks={[{ at: 4, label: '4분' }, { at: 10, label: '10분' }, { at: 16, label: '16분' }]}
+  />
+</Figure>
+
+회수될 때 서버는 설정에 따라 지워지거나(terminate), 멈추거나(stop), 최대 절전(hibernate)으로 들어가요. 최대 절전은 예고는 오지만 2분 여유 없이 바로 시작해요. 예고는 최선을 다해 보내는 것이라, 늦거나 빠질 수도 있어요.
+
+그래서 스팟에는 언제 꺼져도 되는 일을 올려요. 상태를 따로 두는 웹 서버, 일괄 처리, 테스트 환경이 그 예예요. <Term slug="cloud/auto-scaling">자동 확장 그룹</Term>에 스팟을 섞으면, 회수된 서버 대신 그룹이 새 서버를 띄워요.
+
+Azure Spot 가상 머신은 회수(eviction) 최대 30초 전에 Scheduled Events로 알려요. 기본 회수 방식은 할당 해제(Deallocate)라서, 멈춘 뒤에도 디스크 요금은 계속 나와요.
+
+## 모니터링에서는
+
+<Figure caption="비용 화면의 약정 요약 예시예요. 활용률은 높지만 커버리지가 낮아 온디맨드로 내는 몫이 크고, 예약 하나는 23일 뒤 끝나요.">
+  <StatTile label="약정 활용률" value="98" unit="%" />
+  <StatTile label="약정 커버리지" value="61" unit="%" tone="warn" note="39%는 온디맨드" />
+  <StatTile label="예약 만료까지" value="23" unit="일" tone="warn" />
+</Figure>
+
+비용 화면에서는 약정의 활용률, 커버리지, 만료일을 함께 봐요. 예약 인스턴스는 저절로 다시 사지지 않아요. 끝난 다음 시간부터 그 서버는 온디맨드 요금으로 돌아가서, 비용 그래프가 계단처럼 뛰어요.
+
+스팟 서버가 사라졌다면 장애인지 회수인지부터 가려요. 회수라면 회수 예고 이벤트가 남아요. 회수를 "서버 수집 끊김"으로 울리면 스팟을 쓰는 한 거짓 알림이 계속 나요.
+
+요금이 하루쯤 늦게 집계되는 점은 약정에도 같아요. 요금이 집계되는 시점은 <Term slug="cloud/costs">클라우드 비용은 어디서 나올까</Term>에서 다뤘어요.
+
+<Checkpoints>
+  <Check>예약 인스턴스의 만료일을 알림으로 걸어 두지 않았다면 다시 보세요. 저절로 갱신되지 않아서, 끝나는 날부터 온디맨드 요금이 나와요.</Check>
+  <Check>활용률이 낮은데 커버리지를 올리려 약정을 더 사려 한다면 다시 보세요. 남는 약정이 더 늘어나요.</Check>
+  <Check>스팟 서버가 사라진 걸 장애로 울리고 있다면, 회수 예고 이벤트가 있었는지 먼저 확인하세요.</Check>
+  <Check>DB처럼 상태를 가진 서버를 스팟에 올렸다면 다시 보세요. 2분 안에 정리하지 못하면 데이터를 잃을 수 있어요.</Check>
+  <Check>약정을 하루 사용의 최고점에 맞춰 샀다면 다시 보세요. 사용이 적은 시간마다 남은 약정이 버려져요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 예약 인스턴스의 종류와 내는 법
+
+  예약 인스턴스는 표준(Standard)과 전환형(Convertible)이 있어요. 표준은 할인이 가장 크지만 다른 구성으로 바꿀 수 없어요. 전환형은 할인이 조금 적은 대신 다른 구성의 전환형 예약으로 바꿀 수 있어요.
+
+  내는 법은 전액 선결제, 일부 선결제, 선결제 없음 세 가지예요. 선결제를 많이 할수록 대체로 더 싸요. 산 예약은 취소할 수 없어요.
+
+  ### 약정이 붙는 순서
+
+  AWS는 예약 인스턴스를 먼저 붙이고, 그다음 Savings Plans를 붙여요. Savings Plans끼리는 범위가 좁은 EC2 Instance Savings Plans가 먼저예요. 같은 약정 안에서는 할인율이 가장 큰 사용부터 채워요.
+
+  ### Azure 예약의 환불
+
+  Azure 예약은 같은 종류의 다른 예약으로 바꿀 수 있어요. 필요 없어지면 12개월 동안 합계 5만 달러까지 환불도 돼요.
+</Deeper>

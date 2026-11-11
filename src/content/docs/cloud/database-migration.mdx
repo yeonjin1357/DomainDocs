@@ -1,0 +1,156 @@
+---
+title: DB 이전과 변경 데이터 캡처(CDC)
+summary: DB를 옮기는 동안 원본의 변경 로그를 읽어 새 DB에 계속 따라 적어요. 서비스는 잠깐만 멈춰요.
+domain: cloud
+type: concept
+stage: basics
+order: 65
+icon: cloud
+keywords: [DMS, Database Migration Service, CDC, change data capture, 변경 데이터 캡처, full load, 전체 적재, CDCLatencySource, CDCLatencyTarget, replication slot]
+related: [cloud/managed-databases, database/replication, database/logs-and-recovery, database/replication-lag, database/transactions]
+sources:
+  - title: AWS DMS — Components of AWS DMS
+    url: https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Introduction.Components.html
+  - title: AWS DMS — Monitoring AWS DMS tasks (task status, metrics)
+    url: https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Monitoring.html
+  - title: AWS DMS — Using a MySQL-compatible database as a source
+    url: https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Source.MySQL.html
+  - title: AWS DMS — Using a PostgreSQL database as an AWS DMS source
+    url: https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Source.PostgreSQL.html
+  - title: Microsoft Learn — What is Azure Database Migration Service?
+    url: https://learn.microsoft.com/en-us/azure/dms/dms-overview
+updated: 2026-11-11
+---
+
+import DmsFlow from '../../../assets/figures/cloud/dms-flow.svg';
+import CdcLatency from '../../../assets/figures/cloud/cdc-latency.svg';
+
+<KeyPoints>
+  <Point title="통째로 옮기고, 변경은 로그로 따라가요">
+    있는 데이터를 먼저 옮기고, 그동안과 그 뒤의 변경은 원본의 변경 로그를 읽어 계속 따라 적어요.
+  </Point>
+  <Point title="CDC는 원본 DB의 로그를 읽어요">
+    MySQL의 binlog, PostgreSQL의 WAL처럼 DB가 변경을 적는 로그를 읽어 같은 변경을 새 DB에 적용해요.
+  </Point>
+  <Point title="지연은 원본 쪽과 대상 쪽으로 나눠 봐요">
+    변경을 읽는 데 늦는지, 새 DB에 적는 데 늦는지 두 지표를 견줘서 가려요.
+  </Point>
+</KeyPoints>
+
+<Analogy limit="이사 때는 옛집이 비어 가지만, CDC 동안 원본 DB는 계속 손님을 받고 바뀌어요. 그리고 메모(로그)를 가져가지 않으면 원본 DB가 그 메모를 버리지 못해 디스크가 차기도 해요.">
+  이사와 비슷해요. 짐을 트럭으로 통째로 옮기는 동안 옛집에 오는 택배는 메모해 뒀다가 새집으로 그대로 다시 보내요. 두 집이 같아지면 그때 주소를 바꿔요.
+</Analogy>
+
+## 구성: 복제 인스턴스, 엔드포인트, 작업
+
+DB를 다른 곳으로 옮기는 일을 사업자가 맡아 주는 서비스가 있어요. AWS DMS(Database Migration Service)는 같은 엔진끼리도, 오라클에서 PostgreSQL처럼 다른 엔진으로도 옮겨요. Azure Database Migration Service는 지금 SQL Server를 Azure SQL로 옮기는 데 써요.
+
+DMS는 세 부품으로 일해요.
+
+- <Term term="cloud/replication-instance">복제 인스턴스</Term>(replication instance): 옮기는 일을 실제로 하는 관리형 서버예요.
+- 엔드포인트(endpoint): 원본 DB와 대상 DB에 접속하는 정보예요. 주소, 포트, 계정이 들어가요.
+- 작업(replication task): 무엇을 어떻게 옮길지 정한 단위예요. 복제 인스턴스 하나가 작업 여러 개를 돌릴 수 있어요.
+
+<Figure caption="복제 인스턴스가 원본 DB의 데이터와 변경 로그를 읽어 대상 DB에 적어요. 대상이 따라오지 못하면 변경이 메모리에 쌓이다가 디스크로 넘쳐요.">
+  <DmsFlow aria-label="왼쪽에 원본 DB와 그 변경 로그(binlog, WAL)가 있어요. 1번 화살표로 원본 DB의 데이터를 통째로, 2번 화살표로 변경 로그를 가운데 복제 인스턴스가 읽어요. 복제 인스턴스 안에는 작업과 메모리가 있고 넘치면 디스크를 써요. 복제 인스턴스는 오른쪽 대상 DB에 변경을 적용해요" />
+</Figure>
+
+## 세 가지 이전 방식
+
+작업을 만들 때 옮기는 방식을 골라요.
+
+| 방식 | 하는 일 | 맞는 경우 |
+| --- | --- | --- |
+| 전체 적재만 | 있는 데이터만 통째로 옮겨요 | 옮기는 동안 서비스를 멈출 수 있어요 |
+| 전체 적재 + CDC | 통째로 옮긴 뒤 그동안의 변경을 이어서 따라가요 | 멈추는 시간을 짧게 하고 싶어요 |
+| CDC만 | 변경만 따라가요 | 데이터는 DB 자체 도구로 따로 옮겼어요 |
+
+<Term term="cloud/full-load">전체 적재</Term>(full load)는 원본 테이블을 한꺼번에 읽어 대상에 넣는 단계예요. <Term term="cloud/cdc">변경 데이터 캡처</Term>(CDC, change data capture)는 그 뒤로 생기는 변경을 계속 읽어 같은 변경을 대상에 적용하는 단계예요.
+
+전체 적재와 CDC를 함께 쓰면 일은 이렇게 흘러가요.
+
+<Figure caption="전체 적재 + CDC로 옮기는 예시예요. 전체 적재 동안 쌓인 변경을 먼저 적용하고, 대상이 원본을 거의 실시간으로 따라오면 앱을 잠깐 멈추고 대상으로 돌려요.">
+  <Timeline
+    ariaLabel="앱은 10까지 원본 DB에 쓰고, 잠깐 멈춘 뒤 11에 새 DB로 전환해 써요. DMS는 4까지 전체 적재, 4부터 7.5까지 밀린 변경 적용, 7.5부터 11까지 실시간으로 따라가요"
+    end={14}
+    lanes={[
+      { label: '앱', segments: [{ start: 0, end: 10, label: '원본에 써요' }, { start: 11, end: 14, label: '새 DB', tone: 'accent' }] },
+      { label: 'DMS', segments: [{ start: 0, end: 4, label: '전체 적재' }, { start: 4, end: 7.5, label: '밀린 변경', tone: 'warn' }, { start: 7.5, end: 11, label: '따라가기', tone: 'accent' }] },
+    ]}
+    marks={[{ at: 11, label: '전환' }]}
+  />
+</Figure>
+
+전체 적재가 끝나면, 그동안 모아 둔 변경을 대상에 적용해요. 그 뒤로는 새 변경을 거의 실시간으로 따라가요. 이때 앱을 잠시 멈추고, 남은 변경이 다 넘어가면 앱이 새 DB를 보게 바꿔요.
+
+## CDC가 읽는 것
+
+CDC는 원본 DB가 변경을 적어 두는 로그를 읽어요. DB는 데이터를 바꾸기 전에 그 변경을 로그에 먼저 적어요. 이 로그는 <Term slug="database/logs-and-recovery">로그와 복구</Term>에서 다뤘고, <Term slug="database/replication">복제</Term>도 같은 로그를 써요.
+
+그래서 원본 DB에 미리 해 둘 설정이 있어요.
+
+- MySQL: 바이너리 로그(binlog)를 켜고, `binlog_format`을 `ROW`로, `binlog_row_image`를 `FULL`로 둬요.
+- PostgreSQL: `wal_level`을 `logical`로 두고, 논리 복제 슬롯(replication slot)을 써요.
+
+로그가 너무 빨리 지워져도 문제예요. RDS MySQL은 binlog를 되도록 빨리 지워서, DMS가 읽기 전에 사라질 수 있어요. 그래서 binlog 보관 시간을 24시간처럼 늘려 둬요.
+
+PostgreSQL은 반대로 로그가 너무 오래 남는 게 문제예요. <Term term="cloud/replication-slot">복제 슬롯</Term>은 DMS가 읽어 갈 때까지 WAL을 지우지 않고 붙잡아 둬요. 슬롯은 작업이 멈춘 뒤에도 열려 있어서, 그대로 두면 원본 DB의 디스크가 계속 차요.
+
+## 지연은 어디서 생기나
+
+CDC가 늦어지는 곳은 두 군데예요. 원본에서 변경을 읽어 오는 쪽과, 읽은 변경을 대상에 적용하는 쪽이에요. DMS는 이걸 두 지표로 따로 보여 줘요.
+
+<Figure caption="원본 지연은 원본에서 마지막으로 읽은 변경이 얼마나 오래됐는지예요. 대상 지연은 대상에 아직 못 적은 가장 오래된 변경이 얼마나 오래됐는지라서, 읽는 쪽 지연까지 함께 들어가요.">
+  <CdcLatency aria-label="원본 DB, DMS, 대상 DB가 화살표로 이어져 있어요. CDCLatencySource는 원본 DB에서 DMS까지, CDCLatencyTarget은 원본 DB에서 대상 DB까지 걸쳐 있어요. 아래 표에서 원본 지연 900초, 대상 지연 920초면 원본 쪽 읽기를, 원본 지연 3초, 대상 지연 840초면 대상 쪽 적용을 먼저 봐요" />
+</Figure>
+
+- `CDCLatencySource`: 원본에서 마지막으로 읽은 변경과 지금 사이의 간격(초)이에요. 높으면 원본에서 읽는 게 늦어요.
+- `CDCLatencyTarget`: 대상에 적기를 기다리는 가장 오래된 변경과 지금 사이의 간격(초)이에요. 높으면 대상에 적는 게 늦어요.
+
+두 값이 비슷하게 높으면 원본 쪽부터 봐요. 대상 지연만 훨씬 높으면 대상 쪽을 봐요. DMS 문서는 대상 쪽 원인으로 기본 키나 인덱스가 없는 대상 테이블, 대상이나 복제 인스턴스의 자원 부족, 둘 사이의 네트워크를 꼽아요.
+
+원본에서 긴 트랜잭션이 커밋되지 않고 열려 있어도 원본 지연이 계속 올라요. 커밋되기 전에는 그 변경을 넘길 수 없어서예요. 트랜잭션과 커밋은 <Term slug="database/transactions">트랜잭션과 커밋</Term>에 있어요.
+
+## 모니터링에서는
+
+<Figure caption="CDC 작업 화면의 예시예요. 원본 지연은 3초인데 대상 지연은 14분이고, 적용을 기다리는 변경이 12만 건 쌓였어요. 대상 쪽 적용이 늦는 모양이에요.">
+  <StatTile label="CDCLatencySource" value="3" unit="초" />
+  <StatTile label="CDCLatencyTarget" value="840" unit="초" tone="warn" />
+  <StatTile label="CDCIncomingChanges" value="120,000" unit="건" tone="warn" note="적용을 기다려요" />
+</Figure>
+
+`CDCIncomingChanges`는 대상에 적용되기를 기다리는 변경의 수예요. 원본의 변경 속도가 아니에요. 이 값이 크면 DMS가 변경을 제때 적용하지 못하고 있다는 뜻이에요.
+
+작업 상태(task status)도 함께 봐요. 실행 중(Running)과 실패(Failed) 사이에 "에러 있는 실행 중"(Running with errors)도 있어요. 테이블 몇 개는 옮기지 못했는데 작업은 나머지를 계속 옮기는 상태예요.
+
+복제 인스턴스는 서버처럼 CPU, 메모리, 디스크를 봐요. `FreeableMemory`가 0에 가깝거나 `SwapUsage`가 오르면 인스턴스가 작은 거예요. 대상이 따라오지 못해 변경이 디스크로 넘치면 `FreeStorageSpace`도 줄어요.
+
+원본 DB의 디스크도 지켜봐요. PostgreSQL 원본은 복제 슬롯이 WAL을 붙잡으면 디스크가 차요. 작업을 멈춰 둔 동안에도 그래요.
+
+<Checkpoints>
+  <Check>작업 상태가 "실행 중"이라는 것만 보고 정상이라고 판단했다면 다시 보세요. "에러 있는 실행 중"이면 일부 테이블이 빠지고 있어요.</Check>
+  <Check>PostgreSQL 원본에서 작업을 멈춰 둔 채 두었다면, 복제 슬롯과 원본 디스크를 확인하세요. 슬롯이 WAL을 붙잡아 디스크가 차요.</Check>
+  <Check>RDS MySQL 원본의 binlog 보관 시간을 늘리지 않았다면 다시 보세요. DMS가 읽기 전에 로그가 지워질 수 있어요.</Check>
+  <Check>대상 지연만 높다면 대상 테이블에 기본 키와 인덱스가 있는지 먼저 보세요.</Check>
+  <Check>원본 지연이 계속 오르기만 한다면, 원본에 커밋되지 않은 긴 트랜잭션이 있는지 보세요.</Check>
+</Checkpoints>
+
+<Deeper>
+  ### 메모리에서 디스크로 넘쳐요
+
+  CDC 작업은 넘길 변경을 메모리 버퍼에 담아요. 대상이 적용하는 속도보다 원본에서 읽는 속도가 빠르면 버퍼가 차고, 남은 변경을 디스크에 써요. 이때 대상 지연이 원본 지연보다 커져요.
+
+  `CDCChangesDiskTarget`이 디스크에 쌓인 변경의 수예요.
+
+  ### FreeableMemory는 빈 메모리가 아니에요
+
+  DMS 문서는 `FreeableMemory`가 실제 빈 메모리가 아니라고 밝혀요. 버퍼와 캐시처럼 쓰고 있지만 풀어 줄 수 있는 메모리예요. 그래서 `SwapUsage`와 함께 봐야 인스턴스가 모자란지 알 수 있어요.
+
+  ### 로그를 읽는 다른 도구
+
+  Kafka로 DB 변경을 흘려보내는 Debezium 같은 도구도 같은 원리로 원본 DB의 로그를 읽어요. 그래서 binlog 설정이나 복제 슬롯 같은 주의점도 비슷해요.
+
+  ### 작업 로그도 디스크를 써요
+
+  복제 인스턴스는 작업 로그도 자기 디스크에 남겨요. 자세한 디버그 로그를 켜면 로그가 빨리 불어 디스크가 찰 수 있어요. DMS는 10일이 지난 작업 로그를 지워요.
+</Deeper>

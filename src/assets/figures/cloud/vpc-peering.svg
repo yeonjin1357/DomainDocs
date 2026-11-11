@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 248" width="300" height="248">
+<rect x="90" y="4" width="120" height="62" rx="10" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="100" y="26" font-size="13" font-weight="700" style="fill:var(--color-accent)">VPC A</text>
+<text x="100" y="48" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">10.0.0.0/16</text>
+<rect x="4" y="150" width="120" height="62" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="14" y="172" font-size="13" font-weight="700" style="fill:var(--color-text)">VPC B</text>
+<text x="14" y="194" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">10.1.0.0/16</text>
+<rect x="176" y="150" width="120" height="62" rx="10" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="186" y="172" font-size="13" font-weight="700" style="fill:var(--color-text)">VPC C</text>
+<text x="186" y="194" font-size="13" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text-sub)">10.2.0.0/16</text>
+<line x1="118" y1="66" x2="70" y2="150" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="182" y1="66" x2="230" y2="150" stroke-width="2.4" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<text x="86" y="112" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">피어링</text>
+<text x="214" y="112" font-size="13" font-weight="700" style="fill:var(--color-accent);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">피어링</text>
+<line x1="124" y1="181" x2="176" y2="181" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 4" style="stroke:var(--color-warn)" />
+<line x1="144" y1="175" x2="156" y2="187" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<line x1="144" y1="187" x2="156" y2="175" stroke-width="2.6" stroke-linecap="round" style="stroke:var(--color-warn)" />
+<text x="150" y="238" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-warn)">B에서 A를 거쳐 C로는 못 가요</text>
+</svg>

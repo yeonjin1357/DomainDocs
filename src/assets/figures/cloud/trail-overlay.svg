@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 272" width="300" height="272">
+<text x="40" y="14" font-size="13" font-weight="700" style="fill:var(--color-text)">API 에러율(%)</text>
+<line x1="40" y1="118" x2="276" y2="118" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="34" y="122.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">0</text>
+<line x1="40" y1="72" x2="276" y2="72" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="34" y="76.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">5</text>
+<line x1="40" y1="26" x2="276" y2="26" stroke-width="1" stroke-linecap="butt" stroke-dasharray="3 4" style="stroke:var(--color-line)" />
+<text x="34" y="30.5" font-size="13" text-anchor="end" style="fill:var(--color-text-sub)">10</text>
+<line x1="40" y1="118" x2="276" y2="118" stroke-width="1.5" stroke-linecap="butt" style="stroke:var(--color-text-weak)" />
+<path d="M40 112.5 L71.5 113.4 L102.9 111.6 L126.5 112.5 L134.4 111.6 L142.3 55.4 L158 42.6 L181.6 48.1 L189.5 90.4 L205.2 110.6 L236.7 112.5 L276 113.4" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-warn)" />
+<line x1="79.3" y1="26" x2="79.3" y2="118" stroke-width="1.3" stroke-linecap="butt" stroke-dasharray="4 3" style="stroke:var(--color-text-sub)" />
+<line x1="126.5" y1="26" x2="126.5" y2="118" stroke-width="2" stroke-linecap="butt" stroke-dasharray="4 3" style="stroke:var(--color-accent)" />
+<line x1="189.5" y1="26" x2="189.5" y2="118" stroke-width="1.3" stroke-linecap="butt" stroke-dasharray="4 3" style="stroke:var(--color-text-sub)" />
+<text x="121.5" y="44" font-size="13" text-anchor="end" font-weight="700" style="fill:var(--color-accent);stroke:var(--color-bg);stroke-width:4;stroke-linejoin:round;paint-order:stroke">변경</text>
+<text x="40" y="138" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">13:50</text>
+<text x="118.7" y="138" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">14:00</text>
+<text x="197.3" y="138" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">14:10</text>
+<text x="276" y="138" font-size="13" text-anchor="middle" style="fill:var(--color-text-sub)">14:20</text>
+<text x="4" y="164" font-size="13" font-weight="700" style="fill:var(--color-text)">같은 시간의 감사 로그</text>
+<rect x="4" y="172" width="296" height="96" rx="6" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M4.8 196 V178 Q4.8 172.8 10 172.8 H294 Q299.3 172.8 299.3 178 V196 z" style="fill:var(--color-line)" />
+<rect x="4.8" y="220" width="294.5" height="24" rx="0" style="fill:var(--color-accent-weak)" />
+<line x1="4" y1="220" x2="300" y2="220" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<line x1="4" y1="244" x2="300" y2="244" stroke-width="1" stroke-linecap="butt" style="stroke:var(--color-line)" />
+<text x="12" y="188.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">시각</text>
+<text x="68" y="188.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">eventName</text>
+<text x="214" y="188.7" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">누가</text>
+<text x="12" y="212.7" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">13:55</text>
+<text x="68" y="212.7" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">PutMetricAlarm</text>
+<text x="214" y="212.7" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">ops-user</text>
+<text x="12" y="236.7" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">14:01</text>
+<text x="68" y="236.7" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">ModifyDBInstance</text>
+<text x="214" y="236.7" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-accent)">deploy-bot</text>
+<text x="12" y="260.7" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">14:09</text>
+<text x="68" y="260.7" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">RebootDBInstance</text>
+<text x="214" y="260.7" font-size="13" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">ops-user</text>
+</svg>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 272" width="300" height="272">
+<rect x="86" y="4" width="128" height="44" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="150" y="24" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">관리 계정</text>
+<text x="150" y="41" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">조직 · 청구서 하나</text>
+<line x1="150" y1="48" x2="150" y2="60" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="66" y1="60" x2="234" y2="60" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="66" y1="60" x2="66" y2="72" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="234" y1="60" x2="234" y2="72" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<rect x="16" y="72" width="100" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="66" y="92" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">운영 OU</text>
+<rect x="184" y="72" width="100" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-bg);stroke:var(--color-text-sub)" />
+<text x="234" y="92" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-text)">개발 OU</text>
+<line x1="66" y1="102" x2="66" y2="114" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="36" y1="114" x2="112" y2="114" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="36" y1="114" x2="36" y2="126" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="112" y1="114" x2="112" y2="126" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="234" y1="102" x2="234" y2="126" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<rect x="4" y="126" width="64" height="50" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="36" y="146" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">prod-a</text>
+<path d="M30.5 159 V155 A5.5 5.5 0 0 1 41.5 155 V159" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="28" y="159" width="16" height="12" rx="2.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="36" cy="165" r="1.8" style="fill:var(--color-accent)" />
+<rect x="80" y="126" width="64" height="50" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="112" y="146" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">prod-b</text>
+<path d="M106.5 159 V155 A5.5 5.5 0 0 1 117.5 155 V159" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="104" y="159" width="16" height="12" rx="2.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="112" cy="165" r="1.8" style="fill:var(--color-accent)" />
+<rect x="202" y="126" width="64" height="50" rx="8" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="234" y="146" font-size="13" text-anchor="middle" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" style="fill:var(--color-text)">dev</text>
+<path d="M228.5 159 V155 A5.5 5.5 0 0 1 239.5 155 V159" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<rect x="226" y="159" width="16" height="12" rx="2.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<circle cx="234" cy="165" r="1.8" style="fill:var(--color-accent)" />
+<rect x="4" y="236" width="140" height="30" rx="8" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="74" y="256" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">모니터링 계정</text>
+<path d="M74 234 L38.8 184" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<path d="M36 180 L36.5 188.2 L43.6 183.2 z" style="fill:var(--color-accent)" />
+<path d="M74 234 L109.2 184" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<path d="M112 180 L104.4 183.2 L111.5 188.2 z" style="fill:var(--color-accent)" />
+<path d="M74 234 L229.4 181.6" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-accent)" />
+<path d="M234 180 L226 178.1 L228.8 186.4 z" style="fill:var(--color-accent)" />
+<text x="156" y="248" font-size="13" font-weight="700" style="fill:var(--color-accent)">계정마다 역할을</text>
+<text x="156" y="266" font-size="13" font-weight="700" style="fill:var(--color-accent)">맡아 지표를 읽어요</text>
+</svg>

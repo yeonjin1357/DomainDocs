@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 212" width="300" height="212">
+<rect x="4" y="4" width="292" height="96" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-line)" />
+<path d="M20 67 A9 9 0 0 1 15 51 A13 13 0 0 1 37 39 A11 11 0 0 1 58 46 A10.5 10.5 0 0 1 61 67 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<text x="78" y="28" font-size="13" font-weight="700" style="fill:var(--color-text)">공개 상태판</text>
+<text x="78" y="48" font-size="13" style="fill:var(--color-text-sub)">모든 고객에게 같은 공지</text>
+<rect x="78" y="60" width="206" height="28" rx="6" style="fill:var(--color-bg)" />
+<text x="88" y="79" font-size="13" font-weight="600" style="fill:var(--color-text)">us-east-1 · EC2 API 지연</text>
+<rect x="4" y="110" width="292" height="96" rx="12" stroke-width="1.5" style="fill:var(--color-card);stroke:var(--color-accent)" />
+<circle cx="32" cy="148" r="6.5" stroke-width="1.8" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M21 170 C21 158 43 158 43 170 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<rect x="41" y="145" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="47" y1="153" x2="61" y2="153" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="47" y1="159" x2="61" y2="159" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="47" y1="165" x2="61" y2="165" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="54" cy="172.5" r="2" style="fill:var(--color-accent)" />
+<text x="78" y="134" font-size="13" font-weight="700" style="fill:var(--color-accent)">내 계정 소식</text>
+<text x="78" y="154" font-size="13" style="fill:var(--color-text-sub)">영향받는 내 자원까지 알려요</text>
+<rect x="78" y="166" width="206" height="28" rx="6" style="fill:var(--color-accent-weak)" />
+<text x="88" y="185" font-size="13" font-weight="600" style="fill:var(--color-accent)">i-0a1b2c · 퇴역 예정 11/20</text>
+</svg>

@@ -34,3 +34,18 @@ questions:
     prompt: 외부 모니터링 서비스에 내 계정의 역할을 맡길 때, 다른 고객의 부탁으로 그 역할이 쓰이는 일을 막으려고 역할에 함께 적어 두는 값은?
     answer: [외부 ID, External ID, 외부 아이디, ExternalId, sts:ExternalId]
     explain: 외부 ID예요. 혼동된 대리인(confused deputy) 문제를 막아요. AWS는 이 값을 비밀로 다루지 않아요.
+  - id: mg-role-inherit
+    type: ox
+    prompt: Azure 관리 그룹에 Monitoring Reader 역할을 주면, 그 아래 구독들의 지표도 읽을 수 있나요?
+    answer: true
+    explain: 관리 그룹에 준 역할은 그 아래 구독과 자원에 모두 이어져요.
+  - id: one-account-denied
+    type: choice
+    prompt: 역할 정책에 읽기 허락이 있는데 한 계정에서만 AccessDenied가 나요. 먼저 볼 곳은?
+    choices:
+      - 그 계정에 걸린 SCP
+      - 역할에 적은 외부 ID
+      - 보안 그룹의 443 포트
+      - 지표 수집 간격 설정
+    answer: 0
+    explain: SCP는 계정이나 OU에서 할 수 있는 동작의 한계를 정해요. 역할이 허락해도 SCP가 막으면 거부돼요.

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 270" width="300" height="270">
+<path d="M7 11 Q7 8 10 8 H25 L33 16 V37 Q33 40 30 40 H10 Q7 40 7 37 z" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="fill:var(--color-card);stroke:var(--color-text-sub)" />
+<path d="M25 8 V16 H33" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-text-sub)" />
+<line x1="13" y1="22" x2="27" y2="22" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="13" y1="27" x2="27" y2="27" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<line x1="13" y1="32" x2="22" y2="32" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--color-text-sub)" />
+<text x="44" y="19" font-size="13" font-weight="700" style="fill:var(--color-text)">시작 템플릿</text>
+<text x="44" y="38" font-size="13" style="fill:var(--color-text-sub)">이미지 · 인스턴스 유형 · 보안 그룹</text>
+<path d="M76 46 L76 59.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M76 64 L80.3 57 L71.7 57 z" style="fill:var(--color-accent)" />
+<path d="M224 46 L224 59.1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="fill:none;stroke:var(--color-accent)" />
+<path d="M224 64 L228.3 57 L219.7 57 z" style="fill:var(--color-accent)" />
+<text x="150" y="60" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">이대로 띄워요</text>
+<rect x="4" y="70" width="144" height="88" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-line)" />
+<text x="14" y="88" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">AZ a</text>
+<rect x="21" y="109" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="27" y1="117" x2="41" y2="117" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="27" y1="123" x2="41" y2="123" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="27" y1="129" x2="41" y2="129" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="34" cy="136.5" r="2" style="fill:var(--color-accent)" />
+<rect x="63" y="109" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="69" y1="117" x2="83" y2="117" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="69" y1="123" x2="83" y2="123" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="69" y1="129" x2="83" y2="129" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="76" cy="136.5" r="2" style="fill:var(--color-accent)" />
+<rect x="105" y="109" width="26" height="34" rx="3.5" stroke-width="1.5" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<rect x="152" y="70" width="144" height="88" rx="12" stroke-width="1.5" stroke-dasharray="5 4" style="fill:none;stroke:var(--color-line)" />
+<text x="162" y="88" font-size="13" font-weight="600" style="fill:var(--color-text-sub)">AZ b</text>
+<rect x="169" y="109" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="175" y1="117" x2="189" y2="117" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="175" y1="123" x2="189" y2="123" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="175" y1="129" x2="189" y2="129" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="182" cy="136.5" r="2" style="fill:var(--color-accent)" />
+<rect x="211" y="109" width="26" height="34" rx="3.5" stroke-width="1.8" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<line x1="217" y1="117" x2="231" y2="117" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="217" y1="123" x2="231" y2="123" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<line x1="217" y1="129" x2="231" y2="129" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--color-accent)" />
+<circle cx="224" cy="136.5" r="2" style="fill:var(--color-accent)" />
+<rect x="253" y="109" width="26" height="34" rx="3.5" stroke-width="1.5" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<rect x="34" y="195" width="228" height="14" rx="7" stroke-width="1.2" style="fill:var(--color-bg);stroke:var(--color-line)" />
+<rect x="34" y="195" width="152" height="14" rx="7" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="34" y="228" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">0</text>
+<text x="72" y="228" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">1</text>
+<text x="110" y="228" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">2</text>
+<text x="148" y="228" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">3</text>
+<text x="186" y="228" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">4</text>
+<text x="224" y="228" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">5</text>
+<text x="262" y="228" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">6</text>
+<line x1="110" y1="188" x2="110" y2="211" stroke-width="1.8" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="110" y="182" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">최소 2</text>
+<line x1="186" y1="188" x2="186" y2="211" stroke-width="1.8" stroke-linecap="butt" style="stroke:var(--color-accent)" />
+<text x="186" y="182" font-size="13" text-anchor="middle" font-weight="700" style="fill:var(--color-accent)">원하는 4</text>
+<line x1="262" y1="188" x2="262" y2="211" stroke-width="1.8" stroke-linecap="butt" style="stroke:var(--color-text-sub)" />
+<text x="262" y="182" font-size="13" text-anchor="middle" font-weight="600" style="fill:var(--color-text-sub)">최대 6</text>
+<rect x="30" y="248" width="14" height="14" rx="3" stroke-width="1.5" style="fill:var(--color-accent-weak);stroke:var(--color-accent)" />
+<text x="50" y="260" font-size="13" style="fill:var(--color-text-sub)">서비스 중</text>
+<rect x="130" y="248" width="14" height="14" rx="3" stroke-width="1.5" stroke-dasharray="4 3" style="fill:none;stroke:var(--color-text-weak)" />
+<text x="150" y="260" font-size="13" style="fill:var(--color-text-sub)">최대까지 늘릴 수 있는 자리</text>
+</svg>

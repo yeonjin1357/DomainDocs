@@ -39,3 +39,24 @@ questions:
     prompt: S3에 객체를 넣은 직후에 읽어도, 바로 새 내용이 보이나요?
     answer: true
     explain: S3는 강한 read-after-write 일관성을 줘서, 넣거나 지운 직후에 읽어도 새 내용이 보여요.
+  - id: ia-min-duration
+    type: ox
+    prompt: S3 Standard-IA에 넣은 객체를 열흘 만에 지우면, 열흘 치 보관 요금만 내나요?
+    answer: false
+    explain: Standard-IA는 최소 보관 기간이 30일이에요. 일찍 지워도 30일 치를 내요.
+  - id: s3-daily-metric
+    type: choice
+    prompt: 버킷 크기(BucketSizeBytes) 그래프를 1분 간격으로 그렸더니 점이 거의 없어요. 까닭은?
+    choices:
+      - 이 지표는 하루에 한 번만 와요
+      - 요청 지표를 켜지 않았어요
+      - 버킷이 비어 있어요
+      - 수명 주기 규칙이 객체를 지웠어요
+    answer: 0
+    explain: 버킷 크기와 객체 수는 하루에 한 번 오는 지표예요. 하루 간격으로 그려요.
+  - id: lifecycle-rule-name
+    type: input
+    prompt: 정한 날짜가 지난 S3 객체를 다른 저장 등급으로 옮기거나 지우는 버킷 설정은?
+    answer: [수명 주기 규칙, lifecycle rule]
+    term: cloud/lifecycle-rule
+    explain: 수명 주기 규칙은 이미 있는 객체에도 걸려요. 옮길 때마다 요청 요금이 붙어요.

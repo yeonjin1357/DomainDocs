@@ -19,3 +19,14 @@
 
 - 정책 예시 JSON은 문서의 `Version` 예시와 같은 문법으로 맞췄어요. 실제 계정에 붙여 보지는 않았어요.
 - 함께 한 것: 용어 iam, iam-policy, iam-role, managed-identity를 올렸어요. 퀴즈 5문제를 썼어요.
+
+## 2026-11-11 보강: 계정이 여러 개일 때
+
+| 확인한 주장 | 근거(URL) |
+| --- | --- |
+| 계정은 권한·보안·비용의 경계, 여러 계정 권장, Organizations로 묶기, OU, SCP, 청구서 하나(한 결제 수단) | https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html |
+| CloudWatch 계정 간 관찰: 모니터링 계정과 소스 계정, 한 리전 안, 지표·로그·트레이스, Organizations로 이으면 새 계정이 저절로 소스 계정, 지표·로그는 추가 요금 없음 | https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html |
+| Azure 관리 그룹이 구독을 묶고, 관리 그룹에 준 역할은 아래 구독·자원에 이어짐 | https://learn.microsoft.com/en-us/azure/governance/management-groups/overview |
+
+- "계정마다 읽기 역할을 만들고 한 곳에서 차례로 맡는다"는 앞 절의 외부 ID·역할 맡기 설명을 여러 계정에 넓힌 일반 설명이에요.
+- 함께 한 것: 용어 aws-organizations, scp를 올렸어요. 퀴즈 2문제를 더했어요. 그림 1개(org-accounts).
